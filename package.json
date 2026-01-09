@@ -17,7 +17,9 @@
     "seed": "node seed.js",
     "seed:auctions": "node seed_auctions_bids.js",
     "test": "mocha --timeout 10000 --recursive test --exit",
-    "optimize:db": "node scripts/addDatabaseIndexes.js"
+    "optimize:db": "node scripts/addDatabaseIndexes.js",
+    "build": "echo 'Build completed successfully'",
+    "deploy": "vercel --prod"
   },
   "dependencies": {
     "axios": "^1.13.2",

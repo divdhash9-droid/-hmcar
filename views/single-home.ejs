@@ -4,12 +4,12 @@
 <% var fullWidth = true; %>
 
 <!-- PWA Meta Tags -->
-<meta name="theme-color" content="#d4af37">
+<meta name="theme-color" content="#0b1f3a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="HM CAR">
 <meta name="application-name" content="HM CAR">
-<meta name="msapplication-TileColor" content="#d4af37">
+<meta name="msapplication-TileColor" content="#0b1f3a">
 <meta name="msapplication-config" content="/browserconfig.xml">
 
 <!-- PWA Icons -->
@@ -180,15 +180,15 @@ installButton.style.cssText = `
   position: fixed;
   bottom: 20px;
   left: 20px;
-  background: linear-gradient(135deg, #d4af37, #ffd700);
-  color: #000;
-  border: none;
+  background: var(--gold-gradient);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.22);
   padding: 15px 20px;
   border-radius: 15px;
   font-weight: 700;
   font-size: 14px;
   cursor: pointer;
-  box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+  box-shadow: var(--gold-shadow);
   z-index: 1000;
   display: none;
   align-items: center;
@@ -238,12 +238,12 @@ if ('serviceWorker' in navigator) {
                   position: fixed;
                   top: 20px;
                   right: 20px;
-                  background: linear-gradient(135deg, #d4af37, #ffd700);
-                  color: #000;
+                  background: var(--gold-gradient);
+                  color: #fff;
                   padding: 15px 20px;
                   border-radius: 15px;
                   font-weight: 700;
-                  box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+                  box-shadow: var(--gold-shadow);
                   z-index: 1001;
                   max-width: 300px;
                 ">
@@ -252,9 +252,9 @@ if ('serviceWorker' in navigator) {
                     <span>تحديث متاح!</span>
                   </div>
                   <button onclick="location.reload()" style="
-                    background: #000;
-                    color: #ffd700;
-                    border: none;
+                    background: #fff;
+                    color: #0b1f3a;
+                    border: 1px solid rgba(11, 31, 58, 0.18);
                     padding: 8px 15px;
                     border-radius: 8px;
                     font-weight: 600;

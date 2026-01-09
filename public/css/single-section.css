@@ -49,8 +49,8 @@ body::before {
     0 20px 60px rgba(0, 0, 0, 0.8),
     0 0 100px rgba(255, 215, 0, 0.2),
     inset 0 2px 0 rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
   box-sizing: border-box;
 }
 
@@ -101,8 +101,8 @@ body::before {
   border-radius: 20px;
   border: 2px solid rgba(255, 215, 0, 0.4);
   display: inline-block;
-  backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 }
 
 /* Action Buttons */
@@ -177,8 +177,8 @@ body::before {
   border-radius: 25px;
   padding: 2.5rem;
   margin-bottom: 3rem;
-  backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
+  backdrop-filter: blur(15px);
 }
 
 .search-title {
@@ -287,8 +287,8 @@ body::before {
   border-radius: 25px;
   padding: 2.5rem;
   margin-bottom: 3rem;
-  backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
+  backdrop-filter: blur(15px);
 }
 
 .stats-title {
@@ -354,8 +354,8 @@ body::before {
   border: 2px solid rgba(255, 215, 0, 0.5);
   border-radius: 25px;
   padding: 2.5rem;
-  backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
+  backdrop-filter: blur(15px);
 }
 
 .cars-title {
@@ -587,4 +587,137 @@ body::before {
   .stats-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* ======== Navy/White Theme Overrides (keep layout, remove gold) ======== */
+body {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color-light) 50%, var(--primary-color) 100%);
+  color: var(--text-color);
+}
+
+body::before {
+  background:
+    radial-gradient(circle at 30% 40%, rgba(11, 31, 58, 0.22) 0%, transparent 50%),
+    radial-gradient(circle at 70% 60%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
+}
+
+.single-section {
+  background: rgba(11, 31, 58, 0.78);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.55),
+    0 0 90px rgba(11, 31, 58, 0.18),
+    inset 0 2px 0 rgba(255, 255, 255, 0.12);
+}
+
+.hero-title {
+  background: linear-gradient(135deg, var(--secondary-color) 0%, var(--accent-color) 50%, var(--secondary-color) 100%);
+  text-shadow:
+    0 0 30px rgba(11, 31, 58, 0.35),
+    0 0 60px rgba(11, 31, 58, 0.18);
+  filter: drop-shadow(0 0 30px rgba(11, 31, 58, 0.32));
+}
+
+@keyframes titleGlow {
+  0% { filter: drop-shadow(0 0 28px rgba(11, 31, 58, 0.25)); }
+  100% { filter: drop-shadow(0 0 44px rgba(11, 31, 58, 0.4)); }
+}
+
+.hero-subtitle {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.cta-button {
+  background: var(--gold-gradient);
+  color: var(--text-color);
+  box-shadow:
+    0 10px 30px rgba(11, 31, 58, 0.22),
+    0 0 50px rgba(11, 31, 58, 0.14);
+}
+
+.cta-button.primary {
+  background: var(--secondary-color);
+  color: var(--primary-color);
+  border: 1px solid rgba(11, 31, 58, 0.18);
+}
+
+.cta-button i {
+  color: currentColor;
+  text-shadow: none;
+}
+
+.cta-button:hover {
+  box-shadow:
+    0 15px 40px rgba(11, 31, 58, 0.26),
+    0 0 80px rgba(11, 31, 58, 0.18);
+}
+
+.search-section,
+.stats-section,
+.cars-section {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.search-title,
+.search-title i {
+  color: var(--accent-color);
+  text-shadow: 0 4px 18px rgba(11, 31, 58, 0.35);
+}
+
+.search-item i {
+  color: var(--accent-color);
+  text-shadow: none;
+}
+
+.search-input,
+.search-select {
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.search-input:focus,
+.search-select:focus {
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 0 25px rgba(11, 31, 58, 0.22);
+}
+
+.search-button {
+  background: var(--gold-gradient);
+  color: var(--text-color);
+  box-shadow: var(--gold-shadow);
+}
+
+.stats-title,
+.cars-title {
+  color: var(--secondary-color);
+}
+
+.stat-item i,
+.cars-title i {
+  color: var(--accent-color);
+}
+
+.stat-number {
+  color: var(--secondary-color);
+}
+
+.car-card {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.car-thumb-badge {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: var(--accent-color);
+}
+
+.car-link {
+  color: var(--secondary-color);
+}
+
+.car-link:hover {
+  color: var(--accent-color);
 }

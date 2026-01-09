@@ -1,0 +1,770 @@
+<!-- Enhanced Real-Time Notifications Widget -->
+<div class="enhanced-notifications-widget">
+  <div class="enhanced-notifications__header">
+    <h3 class="enhanced-notifications__title">الإشعارات المباشرة</h3>
+    <div class="enhanced-notifications__controls">
+      <button class="enhanced-notifications__btn" id="markAllReadBtn">
+        <i class="fas fa-check-double"></i>
+        تعيين الكل كمقروء
+      </button>
+      <button class="enhanced-notifications__btn" id="clearAllBtn">
+        <i class="fas fa-trash"></i>
+        مسح الكل
+      </button>
+    </div>
+  </div>
+  
+  <div class="enhanced-notifications__filters">
+    <button class="enhanced-filter-btn enhanced-filter-btn--active" data-filter="all">
+      الكل <span class="enhanced-filter__count">12</span>
+    </button>
+    <button class="enhanced-filter-btn" data-filter="unread">
+      غير مقروء <span class="enhanced-filter__count">5</span>
+    </button>
+    <button class="enhanced-filter-btn" data-filter="important">
+      مهم <span class="enhanced-filter__count">3</span>
+    </button>
+    <button class="enhanced-filter-btn" data-filter="system">
+      النظام <span class="enhanced-filter__count">4</span>
+    </button>
+  </div>
+  
+  <div class="enhanced-notifications__list" id="notificationsList">
+    <!-- Important Notification -->
+    <div class="enhanced-notification enhanced-notification--important" data-type="important" data-read="false">
+      <div class="enhanced-notification__icon enhanced-notification__icon--important">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <div class="enhanced-notification__content">
+        <div class="enhanced-notification__title">تنبيه مهم</div>
+        <div class="enhanced-notification__message">
+          هناك مشكلة في قاعدة البيانات تتطلب اهتمامك الفوري
+        </div>
+        <div class="enhanced-notification__meta">
+          <span class="enhanced-notification__time">منذ 5 دقائق</span>
+          <span class="enhanced-notification__priority">مرتفع</span>
+        </div>
+      </div>
+      <div class="enhanced-notification__actions">
+        <button class="enhanced-notification__action" title="تعيين كمقروء">
+          <i class="fas fa-check"></i>
+        </button>
+        <button class="enhanced-notification__action" title="حذف">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+    
+    <!-- New User Notification -->
+    <div class="enhanced-notification" data-type="user" data-read="false">
+      <div class="enhanced-notification__icon enhanced-notification__icon--user">
+        <i class="fas fa-user-plus"></i>
+      </div>
+      <div class="enhanced-notification__content">
+        <div class="enhanced-notification__title">مستخدم جديد</div>
+        <div class="enhanced-notification__message">
+          <strong>أحمد محمد</strong> سجل في النظام
+        </div>
+        <div class="enhanced-notification__meta">
+          <span class="enhanced-notification__time">منذ 10 دقائق</span>
+          <span class="enhanced-notification__category">مستخدمون</span>
+        </div>
+      </div>
+      <div class="enhanced-notification__actions">
+        <button class="enhanced-notification__action" title="تعيين كمقروء">
+          <i class="fas fa-check"></i>
+        </button>
+        <button class="enhanced-notification__action" title="حذف">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+    
+    <!-- New Car Notification -->
+    <div class="enhanced-notification" data-type="car" data-read="false">
+      <div class="enhanced-notification__icon enhanced-notification__icon--car">
+        <i class="fas fa-car"></i>
+      </div>
+      <div class="enhanced-notification__content">
+        <div class="enhanced-notification__title">سيارة جديدة</div>
+        <div class="enhanced-notification__message">
+          <strong>مرسيدس G63 2024</strong> أضيفت للمعرض
+        </div>
+        <div class="enhanced-notification__meta">
+          <span class="enhanced-notification__time">منذ 15 دقيقة</span>
+          <span class="enhanced-notification__category">سيارات</span>
+        </div>
+      </div>
+      <div class="enhanced-notification__actions">
+        <button class="enhanced-notification__action" title="تعيين كمقروء">
+          <i class="fas fa-check"></i>
+        </button>
+        <button class="enhanced-notification__action" title="حذف">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Auction Notification -->
+    <div class="enhanced-notification" data-type="auction" data-read="true">
+      <div class="enhanced-notification__icon enhanced-notification__icon--auction">
+        <i class="fas fa-gavel"></i>
+      </div>
+      <div class="enhanced-notification__content">
+        <div class="enhanced-notification__title">مزاد جديد</div>
+        <div class="enhanced-notification__message">
+          <strong>بي إم إكس X6 2023</strong> بدأ المزاد
+        </div>
+        <div class="enhanced-notification__meta">
+          <span class="enhanced-notification__time">منذ 20 دقيقة</span>
+          <span class="enhanced-notification__category">مزادات</span>
+        </div>
+      </div>
+      <div class="enhanced-notification__actions">
+        <button class="enhanced-notification__action" title="تعيين كمقروء">
+          <i class="fas fa-check"></i>
+        </button>
+        <button class="enhanced-notification__action" title="حذف">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+    
+    <!-- System Notification -->
+    <div class="enhanced-notification" data-type="system" data-read="true">
+      <div class="enhanced-notification__icon enhanced-notification__icon--system">
+        <i class="fas fa-cog"></i>
+      </div>
+      <div class="enhanced-notification__content">
+        <div class="enhanced-notification__title">تحديث النظام</div>
+        <div class="enhanced-notification__message">
+          تم تحديث النظام إلى الإصدار 2.1.0 بنجاح
+        </div>
+        <div class="enhanced-notification__meta">
+          <span class="enhanced-notification__time">منذ 30 دقيقة</span>
+          <span class="enhanced-notification__category">نظام</span>
+        </div>
+      </div>
+      <div class="enhanced-notification__actions">
+        <button class="enhanced-notification__action" title="تعيين كمقروء">
+          <i class="fas fa-check"></i>
+        </button>
+        <button class="enhanced-notification__action" title="حذف">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Purchase Notification -->
+    <div class="enhanced-notification" data-type="purchase" data-read="false">
+      <div class="enhanced-notification__icon enhanced-notification__icon--purchase">
+        <i class="fas fa-shopping-cart"></i>
+      </div>
+      <div class="enhanced-notification__content">
+        <div class="enhanced-notification__title">شراء جديد</div>
+        <div class="enhanced-notification__message">
+          <strong>محمد علي</strong> اشترى <strong>تويوتا كامري 2022</strong>
+        </div>
+        <div class="enhanced-notification__meta">
+          <span class="enhanced-notification__time">منذ 35 دقيقة</span>
+          <span class="enhanced-notification__category">مشتريات</span>
+        </div>
+      </div>
+      <div class="enhanced-notification__actions">
+        <button class="enhanced-notification__action" title="تعيين كمقروء">
+          <i class="fas fa-check"></i>
+        </button>
+        <button class="enhanced-notification__action" title="حذف">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Notification Settings -->
+  <div class="enhanced-notifications__settings">
+    <button class="enhanced-settings-btn" id="notificationSettingsBtn">
+      <i class="fas fa-cog"></i>
+      إعدادات الإشعارات
+    </button>
+  </div>
+</div>
+
+<style>
+.enhanced-notifications-widget {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  margin: 2rem 0;
+  box-shadow: var(--shadow-light);
+  position: relative;
+  overflow: hidden;
+}
+
+.enhanced-notifications-widget::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--gradient-primary);
+  animation: pulseGold 2s infinite;
+}
+
+.enhanced-notifications__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.enhanced-notifications__title {
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.enhanced-notifications__controls {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.enhanced-notifications__btn {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-secondary);
+  color: var(--text-secondary);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.enhanced-notifications__btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-primary);
+  color: var(--primary-gold);
+}
+
+.enhanced-notifications__filters {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.enhanced-filter-btn {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-secondary);
+  color: var(--text-secondary);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.enhanced-filter-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-primary);
+  color: var(--primary-gold);
+}
+
+.enhanced-filter-btn--active {
+  background: var(--gradient-primary);
+  border-color: var(--primary-gold);
+  color: white;
+}
+
+.enhanced-filter__count {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.enhanced-notifications__list {
+  max-height: 500px;
+  overflow-y: auto;
+  padding-right: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.enhanced-notifications__list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.enhanced-notifications__list::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+}
+
+.enhanced-notifications__list::-webkit-scrollbar-thumb {
+  background: var(--primary-gold);
+  border-radius: var(--radius-sm);
+}
+
+.enhanced-notification {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-secondary);
+  transition: var(--transition-smooth);
+  position: relative;
+  overflow: hidden;
+}
+
+.enhanced-notification:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-primary);
+  transform: translateX(4px);
+}
+
+.enhanced-notification[data-read="false"] {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--border-primary);
+}
+
+.enhanced-notification--important {
+  background: rgba(220, 53, 69, 0.05);
+  border-color: var(--border-danger);
+}
+
+.enhanced-notification--important::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--gradient-danger);
+}
+
+.enhanced-notification::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.04), transparent);
+  transition: var(--transition-smooth);
+}
+
+.enhanced-notification:hover::before {
+  right: 100%;
+}
+
+.enhanced-notification__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+.enhanced-notification__icon--important {
+  background: var(--gradient-danger);
+}
+
+.enhanced-notification__icon--user {
+  background: var(--gradient-info);
+}
+
+.enhanced-notification__icon--car {
+  background: var(--gradient-primary);
+}
+
+.enhanced-notification__icon--auction {
+  background: var(--gradient-warning);
+}
+
+.enhanced-notification__icon--system {
+  background: var(--gradient-success);
+}
+
+.enhanced-notification__icon--purchase {
+  background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
+}
+
+.enhanced-notification__content {
+  flex: 1;
+}
+
+.enhanced-notification__title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.enhanced-notification__message {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.enhanced-notification__meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.enhanced-notification__time {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.enhanced-notification__priority {
+  font-size: 0.75rem;
+  color: var(--text-danger);
+  font-weight: 600;
+}
+
+.enhanced-notification__category {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  background: var(--bg-secondary);
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--radius-sm);
+}
+
+.enhanced-notification__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.enhanced-notification__action {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: var(--bg-card);
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+}
+
+.enhanced-notification__action:hover {
+  background: var(--primary-gold);
+  border-color: var(--primary-gold);
+  color: white;
+}
+
+.enhanced-notifications__settings {
+  display: flex;
+  justify-content: center;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-secondary);
+}
+
+.enhanced-settings-btn {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-secondary);
+  color: var(--text-secondary);
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.enhanced-settings-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-primary);
+  color: var(--primary-gold);
+}
+
+/* Filter animations */
+.enhanced-notification.hidden {
+  display: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .enhanced-notifications__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .enhanced-notifications__controls {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .enhanced-notifications__filters {
+    justify-content: center;
+  }
+  
+  .enhanced-notification {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.75rem;
+  }
+  
+  .enhanced-notification__actions {
+    flex-direction: row;
+    justify-content: center;
+  }
+  
+  .enhanced-notification__meta {
+    justify-content: center;
+  }
+}
+</style>
+
+<script>
+// Real-Time Notifications JavaScript
+document.addEventListener('DOMContentLoaded', function() {
+  const filterButtons = document.querySelectorAll('.enhanced-filter-btn');
+  const notifications = document.querySelectorAll('.enhanced-notification');
+  const markAllReadBtn = document.getElementById('markAllReadBtn');
+  const clearAllBtn = document.getElementById('clearAllBtn');
+  const notificationSettingsBtn = document.getElementById('notificationSettingsBtn');
+  
+  let currentFilter = 'all';
+  
+  // Filter functionality
+  filterButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      // Update active button
+      filterButtons.forEach(btn => btn.classList.remove('enhanced-filter-btn--active'));
+      this.classList.add('enhanced-filter-btn--active');
+      
+      // Update filter
+      currentFilter = this.dataset.filter;
+      filterNotifications();
+    });
+  });
+  
+  function filterNotifications() {
+    notifications.forEach(notification => {
+      const isRead = notification.dataset.read === 'true';
+      const type = notification.dataset.type;
+      const isImportant = notification.classList.contains('enhanced-notification--important');
+      
+      let show = false;
+      
+      switch (currentFilter) {
+        case 'all':
+          show = true;
+          break;
+        case 'unread':
+          show = !isRead;
+          break;
+        case 'important':
+          show = isImportant;
+          break;
+        case 'system':
+          show = type === 'system';
+          break;
+        default:
+          show = true;
+      }
+      
+      if (show) {
+        notification.classList.remove('hidden');
+      } else {
+        notification.classList.add('hidden');
+      }
+    });
+  }
+  
+  // Mark all as read
+  if (markAllReadBtn) {
+    markAllReadBtn.addEventListener('click', function() {
+      notifications.forEach(notification => {
+        notification.dataset.read = 'true';
+        notification.classList.remove('enhanced-notification--important');
+      });
+      updateFilterCounts();
+      console.log('All notifications marked as read');
+    });
+  }
+  
+  // Clear all
+  if (clearAllBtn) {
+    clearAllBtn.addEventListener('click', function() {
+      if (confirm('هل أنت متأكد من مسح كل الإشعارات؟')) {
+        notifications.forEach(notification => {
+          notification.remove();
+        });
+        updateFilterCounts();
+        console.log('All notifications cleared');
+      }
+    });
+  }
+  
+  // Individual notification actions
+  notifications.forEach(notification => {
+    const actions = notification.querySelectorAll('.enhanced-notification__action');
+    
+    actions.forEach((action, index) => {
+      action.addEventListener('click', function() {
+        if (index === 0) {
+          // Mark as read
+          notification.dataset.read = 'true';
+          notification.classList.remove('enhanced-notification--important');
+          updateFilterCounts();
+          console.log('Notification marked as read');
+        } else {
+          // Delete notification
+          notification.remove();
+          updateFilterCounts();
+          console.log('Notification deleted');
+        }
+      });
+    });
+  });
+  
+  // Update filter counts
+  function updateFilterCounts() {
+    const allCount = document.querySelectorAll('.enhanced-notification').length;
+    const unreadCount = document.querySelectorAll('.enhanced-notification[data-read="false"]').length;
+    const importantCount = document.querySelectorAll('.enhanced-notification--important').length;
+    const systemCount = document.querySelectorAll('.enhanced-notification[data-type="system"]').length;
+    
+    // Update counts in filter buttons
+    const filterCounts = document.querySelectorAll('.enhanced-filter__count');
+    if (filterCounts[0]) filterCounts[0].textContent = allCount;
+    if (filterCounts[1]) filterCounts[1].textContent = unreadCount;
+    if (filterCounts[2]) filterCounts[2].textContent = importantCount;
+    if (filterCounts[3]) filterCounts[3].textContent = systemCount;
+  }
+  
+  // Notification settings
+  if (notificationSettingsBtn) {
+    notificationSettingsBtn.addEventListener('click', function() {
+      alert('إعدادات الإشعارات - قيد التطوير');
+      console.log('Notification settings clicked');
+    });
+  }
+  
+  // Simulate new notification
+  function addNewNotification() {
+    const list = document.getElementById('notificationsList');
+    const types = ['user', 'car', 'auction', 'system', 'purchase'];
+    const type = types[Math.floor(Math.random() * types.length)];
+    
+    const notificationData = {
+      type: type,
+      title: 'إشعار جديد',
+      message: 'هذا إشعار جديد من النظام',
+      time: 'الآن',
+      category: 'نظام'
+    };
+    
+    const newNotification = createNotificationElement(notificationData);
+    
+    // Add to top of list
+    if (list.firstChild) {
+      list.insertBefore(newNotification, list.firstChild);
+    } else {
+      list.appendChild(newNotification);
+    }
+    
+    // Remove old notifications if too many
+    const allNotifications = list.querySelectorAll('.enhanced-notification');
+    if (allNotifications.length > 10) {
+      list.removeChild(allNotifications[allNotifications.length - 1]);
+    }
+    
+    updateFilterCounts();
+    filterNotifications();
+  }
+  
+  function createNotificationElement(data) {
+    const notification = document.createElement('div');
+    notification.className = 'enhanced-notification';
+    notification.dataset.type = data.type;
+    notification.dataset.read = 'false';
+    
+    const iconClass = data.type === 'user' ? 'enhanced-notification__icon--user' : 
+                       data.type === 'car' ? 'enhanced-notification__icon--car' : 
+                       data.type === 'auction' ? 'enhanced-notification__icon--auction' : 
+                       data.type === 'system' ? 'enhanced-notification__icon--system' : 
+                       'enhanced-notification__icon--purchase';
+    
+    const icon = data.type === 'user' ? 'fa-user-plus' : 
+                 data.type === 'car' ? 'fa-car' : 
+                 data.type === 'auction' ? 'fa-gavel' : 
+                 data.type === 'system' ? 'fa-cog' : 
+                 'fa-shopping-cart';
+    
+    notification.innerHTML = `
+      <div class="enhanced-notification__icon ${iconClass}">
+        <i class="fas ${icon}"></i>
+      </div>
+      <div class="enhanced-notification__content">
+        <div class="enhanced-notification__title">${data.title}</div>
+        <div class="enhanced-notification__message">${data.message}</div>
+        <div class="enhanced-notification__meta">
+          <span class="enhanced-notification__time">${data.time}</span>
+          <span class="enhanced-notification__category">${data.category}</span>
+        </div>
+      </div>
+      <div class="enhanced-notification__actions">
+        <button class="enhanced-notification__action" title="تعيين كمقروء">
+          <i class="fas fa-check"></i>
+        </button>
+        <button class="enhanced-notification__action" title="حذف">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    `;
+    
+    // Add event listeners to new notification
+    const actions = notification.querySelectorAll('.enhanced-notification__action');
+    actions.forEach((action, index) => {
+      action.addEventListener('click', function() {
+        if (index === 0) {
+          notification.dataset.read = 'true';
+          updateFilterCounts();
+        } else {
+          notification.remove();
+          updateFilterCounts();
+        }
+      });
+    });
+    
+    return notification;
+  }
+  
+  // Initialize
+  updateFilterCounts();
+  
+  // Simulate new notification every 30 seconds
+  setInterval(addNewNotification, 30000);
+});
+</script>

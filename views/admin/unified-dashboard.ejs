@@ -1,0 +1,2665 @@
+<% layout('layout') -%>
+<% var bodyClass = 'master-control-dashboard'; %>
+
+<style>
+.master-control-dashboard {
+  direction: rtl;
+  font-family: 'Playfair Display', 'Montserrat', 'Cormorant Garamond', 'Tajawal', sans-serif;
+  background: 
+    radial-gradient(ellipse at top left, var(--primary-color) 0%, var(--primary-color-light) 25%, var(--accent-color) 50%, var(--primary-color-light) 75%, var(--primary-color) 100%),
+    linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color-light) 20%, var(--accent-color) 40%, var(--primary-color-light) 60%, var(--primary-color) 100%);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.master-control-dashboard::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.06) 0%, transparent 45%),
+    radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 40%),
+    radial-gradient(circle at 30% 80%, rgba(255, 255, 255, 0.04) 0%, transparent 35%),
+    radial-gradient(circle at 70% 40%, rgba(255, 255, 255, 0.035) 0%, transparent 30%);
+  animation: luxuryBackgroundFlow 25s ease-in-out infinite;
+  z-index: -2;
+}
+
+.master-control-dashboard::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    linear-gradient(45deg, transparent 25%, rgba(255, 255, 255, 0.02) 50%, transparent 75%),
+    linear-gradient(135deg, transparent 25%, rgba(255, 255, 255, 0.015) 50%, transparent 75%),
+    repeating-linear-gradient(90deg, transparent, transparent 100px, rgba(255, 255, 255, 0.008) 100px, rgba(255, 255, 255, 0.008) 200px);
+  animation: luxuryShimmer 12s linear infinite;
+  z-index: -1;
+}
+
+@keyframes luxuryBackgroundFlow {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    opacity: 0.7;
+  }
+  20% {
+    transform: translate(-40px, -30px) rotate(72deg) scale(1.3);
+    opacity: 0.9;
+  }
+  40% {
+    transform: translate(30px, -20px) rotate(144deg) scale(0.85);
+    opacity: 0.8;
+  }
+  60% {
+    transform: translate(-20px, 40px) rotate(216deg) scale(1.15);
+    opacity: 0.85;
+  }
+  80% {
+    transform: translate(40px, 30px) rotate(288deg) scale(0.95);
+    opacity: 0.75;
+  }
+}
+
+@keyframes luxuryShimmer {
+  0% {
+    transform: translateX(-100%) translateY(-100%) rotate(0deg);
+  }
+  50% {
+    transform: translateX(0%) translateY(0%) rotate(180deg);
+  }
+  100% {
+    transform: translateX(100%) translateY(100%) rotate(360deg);
+  }
+}
+
+@keyframes backgroundFlow {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    opacity: 0.8;
+  }
+  25% {
+    transform: translate(-30px, -20px) rotate(90deg) scale(1.2);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translate(20px, -15px) rotate(180deg) scale(0.95);
+    opacity: 0.85;
+  }
+  75% {
+    transform: translate(-15px, 25px) rotate(270deg) scale(1.1);
+    opacity: 0.9;
+  }
+}
+
+@keyframes shimmerBackground {
+  0% {
+    transform: translateX(-100%) translateY(-100%);
+  }
+  100% {
+    transform: translateX(100%) translateY(100%);
+  }
+}
+
+/* Header */
+.master-header {
+  background: 
+    linear-gradient(135deg, rgba(10, 14, 26, 0.95) 0%, rgba(26, 31, 58, 0.9) 30%, rgba(45, 27, 105, 0.85) 70%, rgba(26, 31, 58, 0.9) 100%),
+    linear-gradient(90deg, transparent, rgba(11, 31, 58, 0.12), transparent);
+  color: var(--primary-color-light);
+  padding: 2.5rem 3rem;
+  box-shadow: 
+    0 12px 48px rgba(0, 0, 0, 0.6),
+    0 6px 24px rgba(11, 31, 58, 0.18),
+    inset 0 2px 0 rgba(19, 59, 107, 0.22),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.3);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 3px solid transparent;
+  border-image: var(--gold-gradient) 1;
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  position: relative;
+  overflow: hidden;
+}
+
+.master-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(19, 59, 107, 0.16), transparent);
+  animation: headerShimmer 8s linear infinite;
+}
+
+@keyframes headerShimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+.master-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.master-title {
+  font-size: 2.2rem;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  text-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.5),
+    0 0 20px rgba(19, 59, 107, 0.22);
+  background: var(--gold-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-family: 'Playfair Display', serif;
+  position: relative;
+}
+
+.master-title::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--primary-color-light), transparent);
+  animation: titleGlow 3s ease-in-out infinite;
+}
+
+@keyframes titleGlow {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scaleX(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+.master-user-info {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  background: 
+    linear-gradient(135deg, rgba(11, 31, 58, 0.14) 0%, rgba(19, 59, 107, 0.10) 50%, rgba(11, 31, 58, 0.14) 100%),
+    linear-gradient(90deg, transparent, rgba(19, 59, 107, 0.05), transparent);
+  padding: 1rem 2rem;
+  border-radius: 3rem;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 2px solid transparent;
+  border-image: var(--gold-gradient) 1;
+  box-shadow: 
+    0 8px 32px rgba(11, 31, 58, 0.22),
+    0 4px 16px rgba(0, 0, 0, 0.2),
+    inset 0 2px 0 rgba(19, 59, 107, 0.22);
+}
+
+.master-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: 
+    var(--gold-gradient),
+    var(--gold-gradient);
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.5rem;
+  box-shadow: 
+    0 8px 24px rgba(11, 31, 58, 0.26),
+    0 4px 12px rgba(0, 0, 0, 0.3),
+    inset 0 2px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+  animation: avatarPulse 4s ease-in-out infinite;
+}
+
+@keyframes avatarPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 
+      0 8px 24px rgba(11, 31, 58, 0.26),
+      0 4px 12px rgba(0, 0, 0, 0.3),
+      inset 0 2px 0 rgba(255, 255, 255, 0.4);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 
+      0 12px 36px rgba(11, 31, 58, 0.32),
+      0 6px 18px rgba(0, 0, 0, 0.4),
+      inset 0 2px 0 rgba(255, 255, 255, 0.6);
+  }
+}
+
+.master-avatar::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: avatarShimmer 3s linear infinite;
+}
+
+@keyframes avatarShimmer {
+  0% {
+    transform: translateX(-100%) translateY(-100%) rotate(0deg);
+  }
+  100% {
+    transform: translateX(100%) translateY(100%) rotate(360deg);
+  }
+}
+
+.master-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Stats Grid */
+.master-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.master-stat-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    0 4px 16px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.master-stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.6s ease;
+}
+
+.master-stat-card:hover::before {
+  left: 100%;
+}
+
+.master-stat-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.15),
+    0 10px 30px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.master-stat-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.master-stat-icon::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+  transition: all 0.3s ease;
+}
+
+.master-stat-icon.cars { 
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.05) 100%);
+  color: var(--primary-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+.master-stat-icon.cars::after {
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, transparent 70%);
+}
+
+.master-stat-icon.auctions { 
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.05) 100%);
+  color: var(--primary-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+.master-stat-icon.auctions::after {
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, transparent 70%);
+}
+
+.master-stat-icon.users { 
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.05) 100%);
+  color: var(--primary-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+.master-stat-icon.users::after {
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, transparent 70%);
+}
+
+.master-stat-icon.orders { 
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.05) 100%);
+  color: var(--primary-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+.master-stat-icon.orders::after {
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, transparent 70%);
+}
+
+.master-stat-icon.revenue { 
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.05) 100%);
+  color: var(--primary-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+.master-stat-icon.revenue::after {
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, transparent 70%);
+}
+
+.master-stat-icon.messages { 
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.05) 100%);
+  color: var(--primary-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+.master-stat-icon.messages::after {
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, transparent 70%);
+}
+
+.master-stat-card:hover .master-stat-icon {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.master-stat-value {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.master-stat-label {
+  color: #64748b;
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Control Sections */
+.master-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap: 2.5rem;
+  margin-bottom: 3rem;
+}
+
+.master-control-section {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%);
+  border-radius: 1.5rem;
+  padding: 2.5rem;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    0 4px 16px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.master-control-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.8s ease;
+}
+
+.master-control-section:hover::before {
+  left: 100%;
+}
+
+.master-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.12);
+  position: relative;
+}
+
+.master-section-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100px;
+  height: 2px;
+  background: var(--gold-gradient);
+  border-radius: 1px;
+}
+
+.master-section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.master-section-title i {
+  font-size: 1.3rem;
+  color: var(--primary-color);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.05) 100%);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+/* Forms */
+.master-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.master-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.master-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.master-form-label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.master-form-input,
+.master-form-select,
+.master-form-textarea {
+  padding: 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+  color: #1f2937;
+  font-size: 0.95rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.master-form-input:focus,
+.master-form-select:focus,
+.master-form-textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 
+    0 0 0 4px rgba(0, 0, 0, 0.06),
+    0 4px 12px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  background: white;
+  transform: translateY(-1px);
+}
+
+/* Tables */
+.master-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 1.5rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%);
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.master-table th,
+.master-table td {
+  padding: 1rem 1.5rem;
+  text-align: right;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+  transition: all 0.3s ease;
+}
+
+.master-table th {
+  font-weight: 700;
+  color: #1e293b;
+  font-size: 0.95rem;
+  background: linear-gradient(135deg, rgba(248, 250, 252, 0.8) 0%, rgba(241, 245, 249, 0.7) 100%);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  position: relative;
+}
+
+.master-table th::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--gold-gradient);
+}
+
+.master-table td {
+  color: #475569;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.master-table tr:hover td {
+  background: rgba(255, 255, 255, 0.06);
+  color: #1e293b;
+}
+
+.master-table tr:hover td:first-child {
+  border-radius: 0 0.5rem 0 0;
+}
+
+.master-table tr:hover td:last-child {
+  border-radius: 0.5rem 0 0 0;
+}
+
+/* Buttons */
+.master-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.master-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.6s ease;
+}
+
+.master-btn:hover::before {
+  left: 100%;
+}
+
+.master-btn-primary {
+  background: var(--gold-gradient);
+  color: white;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.18),
+    0 2px 6px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.master-btn-primary:hover {
+  background: var(--gold-gradient);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 25px rgba(0, 0, 0, 0.25),
+    0 4px 12px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.master-btn-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+  color: white;
+  box-shadow: 
+    0 4px 12px rgba(16, 185, 129, 0.3),
+    0 2px 6px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.master-btn-success:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 50%, #065f46 100%);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 25px rgba(16, 185, 129, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.master-btn-warning {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%);
+  color: white;
+  box-shadow: 
+    0 4px 12px rgba(245, 158, 11, 0.3),
+    0 2px 6px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.master-btn-warning:hover {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 50%, #92400e 100%);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 25px rgba(245, 158, 11, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.master-btn-danger {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
+  color: white;
+  box-shadow: 
+    0 4px 12px rgba(239, 68, 68, 0.3),
+    0 2px 6px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.master-btn-danger:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 50%, #991b1b 100%);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 25px rgba(239, 68, 68, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.master-btn-secondary {
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 50%, #374151 100%);
+  color: white;
+  box-shadow: 
+    0 4px 12px rgba(107, 114, 128, 0.3),
+    0 2px 6px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.master-btn-secondary:hover {
+  background: linear-gradient(135deg, #4b5563 0%, #374151 50%, #1f2937 100%);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 25px rgba(107, 114, 128, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.master-btn-outline {
+  background: transparent;
+  color: var(--primary-color);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.master-btn-outline:hover {
+  background: var(--gold-gradient);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 25px rgba(0, 0, 0, 0.25),
+    0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.master-btn-sm {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.85rem;
+}
+
+.master-btn-block {
+  width: 100%;
+  justify-content: center;
+}
+
+/* Quick Actions */
+.master-quick-actions {
+  display: flex;
+  gap: 1.5rem;
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: 
+    linear-gradient(135deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0.10) 100%),
+    linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.03), transparent);
+  border-radius: 1.5rem;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 2px solid transparent;
+  border-image: var(--gold-gradient) 1;
+  box-shadow: 
+    0 12px 48px rgba(0, 0, 0, 0.18),
+    0 6px 24px rgba(0, 0, 0, 0.1),
+    inset 0 2px 0 rgba(255, 255, 255, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.master-quick-actions::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+  animation: quickActionsShimmer 10s linear infinite;
+}
+
+@keyframes quickActionsShimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+.master-action-card {
+  background: 
+    linear-gradient(135deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0.10) 100%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(248, 250, 252, 0.02) 100%);
+  border: 2px solid transparent;
+  border-image: var(--gold-gradient) 1;
+  border-radius: 1.5rem;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+  color: var(--primary-color);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.18),
+    0 4px 16px rgba(0, 0, 0, 0.1),
+    inset 0 2px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  flex: 1;
+  min-width: 160px;
+  max-width: 200px;
+}
+
+.master-action-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: 
+    radial-gradient(circle at 30% 40%, rgba(255, 255, 255, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 70% 60%, rgba(255, 255, 255, 0.06) 0%, transparent 35%),
+    radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 30%);
+  animation: luxuryWaterFlow 12s ease-in-out infinite;
+  opacity: 0.7;
+}
+
+@keyframes luxuryWaterFlow {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+  25% {
+    transform: translate(-20px, -15px) rotate(90deg) scale(1.2);
+  }
+  50% {
+    transform: translate(15px, -10px) rotate(180deg) scale(0.9);
+  }
+  75% {
+    transform: translate(-10px, 20px) rotate(270deg) scale(1.1);
+  }
+}
+
+.master-action-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.18),
+    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0.18),
+    transparent
+  );
+  animation: luxuryShimmer 4s ease-in-out infinite;
+}
+
+@keyframes luxuryShimmer {
+  0% {
+    left: -100%;
+  }
+  50%, 100% {
+    left: 100%;
+  }
+}
+
+.master-action-card:hover {
+  background: 
+    linear-gradient(135deg, rgba(255, 255, 255, 0.10) 0%, rgba(248, 250, 252, 0.05) 100%),
+    var(--gold-gradient);
+  color: #ffffff;
+  transform: translateY(-8px) scale(1.05);
+  box-shadow: 
+    0 20px 80px rgba(0, 0, 0, 0.28),
+    0 10px 40px rgba(0, 0, 0, 0.20),
+    0 5px 20px rgba(0, 0, 0, 0.2),
+    inset 0 3px 0 rgba(255, 255, 255, 0.20),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.master-action-card:hover::before {
+  background: 
+    radial-gradient(circle at 30% 40%, rgba(255, 255, 255, 0.12) 0%, transparent 40%),
+    radial-gradient(circle at 70% 60%, rgba(255, 255, 255, 0.10) 0%, transparent 35%),
+    radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 30%);
+  animation: luxuryWaterFlowHover 6s ease-in-out infinite;
+}
+
+@keyframes luxuryWaterFlowHover {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg) scale(1.3);
+  }
+  33% {
+    transform: translate(25px, -20px) rotate(120deg) scale(1.5);
+  }
+  66% {
+    transform: translate(-20px, 25px) rotate(240deg) scale(1.4);
+  }
+}
+
+.master-action-card:hover .master-action-icon {
+  transform: scale(1.2) rotate(10deg);
+  color: #ffffff;
+  text-shadow: 
+    0 0 40px rgba(255, 255, 255, 0.45),
+    0 0 80px rgba(255, 255, 255, 0.30),
+    0 0 120px rgba(255, 255, 255, 0.20);
+  filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.25));
+}
+
+.master-action-card:hover .master-action-title {
+  color: #ffffff;
+  transform: translateY(-3px);
+  text-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.master-action-icon {
+  font-size: 3rem;
+  margin-bottom: 1.5rem;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-block;
+  position: relative;
+  z-index: 3;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.18));
+}
+
+.master-action-icon::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.14) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+  transition: all 0.6s ease;
+  animation: luxuryIconGlow 4s ease-in-out infinite alternate;
+}
+
+@keyframes luxuryIconGlow {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.4);
+    opacity: 0.9;
+  }
+}
+
+.master-action-card:hover .master-action-icon::before {
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.18) 0%,
+    rgba(255, 255, 255, 0.10) 50%,
+    transparent 70%
+  );
+  transform: translate(-50%, -50%) scale(1.5);
+}
+
+.master-action-title {
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--primary-color);
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  z-index: 3;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  font-family: 'Montserrat', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.master-action-card:hover .master-action-title::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  width: 0;
+  height: 3px;
+  background: var(--gold-gradient);
+  transform: translateX(-50%);
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 2px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.20);
+}
+
+.master-action-card:hover .master-action-title::after {
+  width: 100%;
+}
+
+/* Status Badges */
+.master-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.master-badge-success { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+.master-badge-warning { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+.master-badge-danger { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+.master-badge-info { background: rgba(255, 255, 255, 0.12); color: var(--primary-color); }
+
+/* Tabs */
+.master-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 10px 15px rgba(0, 0, 0, 0.05);
+  margin-bottom: 0;
+  width: 320px;
+  position: sticky;
+  top: 120px;
+  height: fit-content;
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.master-tab {
+  padding: 1.25rem 1.5rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 0.75rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+  overflow: hidden;
+  text-align: right;
+}
+
+.master-tab::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+  transition: right 0.6s ease;
+}
+
+.master-tab:hover::before {
+  right: 100%;
+}
+
+.master-tab:hover {
+  background: linear-gradient(135deg, #e2e8f0 0%, #f1f5f9 100%);
+  color: #1e293b;
+  transform: translateX(-8px) scale(1.02);
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.master-tab.active {
+  background: var(--gold-gradient);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25), 0 4px 12px rgba(0, 0, 0, 0.18);
+  transform: translateX(-12px) scale(1.03);
+}
+
+.master-tab.active::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0.5rem;
+  width: 6px;
+  height: 70%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.18) 100%);
+  border-radius: 3px;
+  transform: translateY(-50%);
+  animation: pulse 2s infinite;
+}
+
+.master-tab i {
+  font-size: 1.3rem;
+  width: 24px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.master-tab:hover i {
+  transform: scale(1.1);
+}
+
+.master-tab.active i {
+  color: #ffffff;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.25);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.master-tab-content {
+  display: none;
+}
+
+.master-tab-content.active {
+  display: block;
+}
+
+/* Alerts */
+.master-alert {
+  padding: 1rem 1.5rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.master-alert-success {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.master-alert-error {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.master-alert-warning {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+/* Loading */
+.master-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: #6b7280;
+}
+
+.master-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #e5e7eb;
+  border-top: 2px solid var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-left: 0.5rem;
+}
+
+/* Simple lists (activity/support) */
+.master-simple-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.master-simple-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0.75rem;
+}
+
+.master-simple-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.10);
+  color: var(--primary-color);
+  flex-shrink: 0;
+}
+
+.master-simple-icon.is-success { background: rgba(16, 185, 129, 0.12); color: #10b981; }
+.master-simple-icon.is-warning { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
+
+.master-simple-content { flex: 1; }
+.master-simple-title { font-weight: 500; }
+.master-simple-meta { font-size: 0.875rem; color: #6b7280; }
+
+/* Summary cards */
+.master-summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.master-summary-card {
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0.75rem;
+  text-align: center;
+}
+
+.master-summary-value {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.master-summary-value.is-primary { color: var(--primary-color); }
+.master-summary-label { color: #6b7280; font-size: 0.875rem; }
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Bottom Navigation Tabs */
+.master-tabs-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  background: 
+    linear-gradient(135deg, rgba(11, 31, 58, 0.10) 0%, rgba(19, 59, 107, 0.05) 50%, rgba(11, 31, 58, 0.10) 100%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(248, 250, 252, 0.02) 100%);
+  border-radius: 1.5rem;
+  box-shadow: 
+    0 12px 48px rgba(11, 31, 58, 0.12),
+    0 6px 24px rgba(0, 0, 0, 0.1),
+    inset 0 2px 0 rgba(19, 59, 107, 0.10);
+  width: 100%;
+  position: relative;
+  height: fit-content;
+  overflow-y: auto;
+  border: 2px solid transparent;
+  border-image: var(--gold-gradient) 1;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  margin-top: 2rem;
+}
+
+.master-tabs-header {
+  text-align: center;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid transparent;
+  border-image: var(--gold-gradient) 1;
+  margin-bottom: 1rem;
+}
+
+.master-tab-sidebar {
+  padding: 1rem 1.5rem;
+  background: 
+    linear-gradient(135deg, rgba(11, 31, 58, 0.06) 0%, rgba(19, 59, 107, 0.03) 50%, rgba(11, 31, 58, 0.06) 100%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(248, 250, 252, 0.01) 100%);
+  border: 2px solid transparent;
+  border-image: var(--gold-gradient) 1;
+  border-radius: 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--primary-color-light);
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+  overflow: hidden;
+  text-align: right;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.master-tab-sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(19, 59, 107, 0.20), transparent);
+  transition: right 0.6s ease;
+}
+
+.master-tab-sidebar:hover::before {
+  right: 100%;
+}
+
+.master-tab-sidebar:hover {
+  background: 
+    linear-gradient(135deg, rgba(11, 31, 58, 0.18) 0%, rgba(19, 59, 107, 0.14) 50%, rgba(11, 31, 58, 0.18) 100%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(248, 250, 252, 0.05) 100%);
+  color: rgba(255, 255, 255, 0.92);
+  transform: translateY(-2px) scale(1.02);
+  border-color: var(--primary-color-light);
+  box-shadow: 
+    0 8px 32px rgba(11, 31, 58, 0.22),
+    0 4px 16px rgba(0, 0, 0, 0.1),
+    inset 0 2px 0 rgba(19, 59, 107, 0.18);
+}
+
+.master-tab-sidebar.active {
+  background: 
+    linear-gradient(135deg, rgba(11, 31, 58, 0.22) 0%, rgba(19, 59, 107, 0.18) 50%, rgba(11, 31, 58, 0.22) 100%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(248, 250, 252, 0.05) 100%);
+  color: rgba(255, 255, 255, 0.92);
+  border-color: var(--primary-color-light);
+  box-shadow: 
+    0 12px 48px rgba(11, 31, 58, 0.26),
+    0 6px 24px rgba(11, 31, 58, 0.20),
+    inset 0 3px 0 rgba(19, 59, 107, 0.24);
+  transform: translateY(-3px) scale(1.03);
+}
+
+.master-tab-sidebar.active::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0.5rem;
+  width: 6px;
+  height: 70%;
+  background: var(--gold-gradient);
+  border-radius: 3px;
+  transform: translateY(-50%);
+  animation: pulse 2s infinite;
+  box-shadow: 0 0 10px rgba(19, 59, 107, 0.28);
+}
+
+.master-tab-sidebar i {
+  font-size: 1.2rem;
+  width: 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.master-tab-sidebar:hover i {
+  transform: scale(1.1);
+}
+
+.master-tab-sidebar.active i {
+  color: var(--primary-color-light);
+  text-shadow: 0 0 8px rgba(19, 59, 107, 0.28);
+}
+
+/* Quick Actions Header */
+.master-quick-actions-header {
+  text-align: center;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid transparent;
+  border-image: linear-gradient(90deg, var(--primary-color-light), var(--primary-color), var(--primary-color-light)) 1;
+  margin-bottom: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .master-container {
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .master-tabs-sidebar {
+    width: 100%;
+    position: static;
+    max-height: none;
+    flex-direction: row;
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+  
+  .master-quick-actions {
+    width: 100%;
+    position: static;
+    max-height: none;
+    flex-direction: row;
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+  
+  .master-tab-sidebar,
+  .master-action-card {
+    min-width: 200px;
+  }
+}
+
+@media (max-width: 768px) {
+  .master-container {
+    padding: 1rem;
+  }
+  
+  .master-controls {
+    grid-template-columns: 1fr;
+  }
+  
+  .master-form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .master-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .master-header-content {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .master-tabs-sidebar,
+  .master-quick-actions {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .master-tab-sidebar,
+  .master-action-card {
+    padding: 1rem 1.5rem;
+    min-width: auto;
+  }
+  
+  .master-action-icon {
+    font-size: 2.5rem;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.master-fade-in {
+  animation: fadeIn 0.6s ease-out;
+}
+
+.master-fade-in-delay-1 { animation-delay: 0.1s; }
+.master-fade-in-delay-2 { animation-delay: 0.2s; }
+.master-fade-in-delay-3 { animation-delay: 0.3s; }
+.master-fade-in-delay-4 { animation-delay: 0.4s; }
+</style>
+
+<!-- Flash Messages -->
+<% if (flash && flash.message) { %>
+  <div class="master-alert master-alert-<%= flash.type === 'success' ? 'success' : flash.type === 'error' ? 'error' : 'warning' %>">
+    <i class="fas fa-<%= flash.type === 'success' ? 'check-circle' : flash.type === 'error' ? 'exclamation-triangle' : 'info-circle' %>"></i>
+    <div>
+      <strong><%= flash.message %></strong>
+    </div>
+  </div>
+<% } %>
+
+<!-- Header -->
+<header class="master-header">
+  <div class="master-header-content">
+    <div class="master-title">
+      <i class="fas fa-crown"></i>
+      <span>لوحة التحكم الرئيسية - التحكم الكامل</span>
+    </div>
+    <div class="master-user-info">
+      <div>
+        <div style="font-weight: 600;"><%= currentUser ? currentUser.name : 'المدير' %></div>
+        <div style="font-size: 0.875rem; opacity: 0.8;">مدير النظام</div>
+      </div>
+      <div class="master-avatar">
+        <%= currentUser && currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'A' %>
+      </div>
+      <a href="/auth/logout" class="master-btn master-btn-danger master-btn-sm">
+        <i class="fas fa-sign-out-alt"></i>
+        خروج
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- Main Container -->
+<div class="master-container" style="display: flex; gap: 2rem; align-items: flex-start;">
+  <!-- Top Quick Actions -->
+  <div class="master-quick-actions master-fade-in master-fade-in-delay-1">
+    <div class="master-quick-actions-header">
+      <h3 style="color: white; font-size: 1.1rem; margin-bottom: 1rem; text-align: center;">
+        <i class="fas fa-bolt"></i> إجراءات سريعة
+      </h3>
+    </div>
+    <a href="#cars" class="master-action-card" onclick="showTab('cars')">
+      <div class="master-action-icon">🏎️</div>
+      <div class="master-action-title">إضافة سيارة</div>
+    </a>
+    <a href="#auctions" class="master-action-card" onclick="showTab('cars')">
+      <div class="master-action-icon">🔨</div>
+      <div class="master-action-title">إنشاء مزاد</div>
+    </a>
+    <a href="#users" class="master-action-card" onclick="showTab('users')">
+      <div class="master-action-icon">👤</div>
+      <div class="master-action-title">إضافة مستخدم</div>
+    </a>
+    <a href="#communications" class="master-action-card" onclick="showTab('communications')">
+      <div class="master-action-icon">📢</div>
+      <div class="master-action-title">إرسال إشعار</div>
+    </a>
+    <a href="#settings" class="master-action-card" onclick="showTab('settings')">
+      <div class="master-action-icon">⚙️</div>
+      <div class="master-action-title">الإعدادات</div>
+    </a>
+    <a href="#reports" class="master-action-card" onclick="showTab('reports')">
+      <div class="master-action-icon">📈</div>
+      <div class="master-action-title">التقارير</div>
+    </a>
+  </div>
+
+  <!-- Content Area -->
+  <div style="flex: 1;">
+    <!-- Stats Grid -->
+    <div class="master-stats master-fade-in">
+      <div class="master-stat-card" onclick="scrollToSection('cars-control')">
+        <div class="master-stat-icon cars">
+          <i class="fas fa-car"></i>
+        </div>
+        <div class="master-stat-content">
+          <div class="master-stat-number"><%= stats.totalCars %></div>
+          <div class="master-stat-label">إجمالي السيارات</div>
+        </div>
+      </div>
+      
+      <div class="master-stat-card" onclick="scrollToSection('auctions-control')">
+        <div class="master-stat-icon auctions">
+          <i class="fas fa-gavel"></i>
+        </div>
+        <div class="master-stat-content">
+          <div class="master-stat-number"><%= stats.activeAuctions %></div>
+          <div class="master-stat-label">المزادات النشطة</div>
+        </div>
+      </div>
+      
+      <div class="master-stat-card" onclick="scrollToSection('users-control')">
+        <div class="master-stat-icon users">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="master-stat-content">
+          <div class="master-stat-number"><%= stats.totalUsers %></div>
+          <div class="master-stat-label">إجمالي المستخدمين</div>
+        </div>
+      </div>
+      
+      <div class="master-stat-card" onclick="scrollToSection('orders-control')">
+        <div class="master-stat-icon orders">
+          <i class="fas fa-shopping-cart"></i>
+        </div>
+        <div class="master-stat-content">
+          <div class="master-stat-number"><%= stats.newOrders %></div>
+          <div class="master-stat-label">الطلبات الجديدة</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation Tabs -->
+    <div class="master-tabs-sidebar master-fade-in master-fade-in-delay-2">
+      <div class="master-tabs-header">
+        <h3 style="color: white; font-size: 1.1rem; margin-bottom: 1rem; text-align: center;">
+          <i class="fas fa-crown"></i> القائمة الرئيسية
+        </h3>
+      </div>
+      <button class="master-tab-sidebar active" onclick="showTab('overview')">
+        <i class="fas fa-home"></i>
+        نظرة عامة
+      </button>
+      <button class="master-tab-sidebar" onclick="showTab('cars')">
+        <i class="fas fa-car"></i>
+        السيارات والمزادات
+      </button>
+      <button class="master-tab-sidebar" onclick="showTab('users')">
+        <i class="fas fa-users"></i>
+        المستخدمون
+      </button>
+      <button class="master-tab-sidebar" onclick="showTab('orders')">
+        <i class="fas fa-shopping-cart"></i>
+        الطلبات
+      </button>
+      <button class="master-tab-sidebar" onclick="showTab('brands')">
+        <i class="fas fa-building"></i>
+        الشركات والفئات
+      </button>
+      <button class="master-tab-sidebar" onclick="showTab('spare-parts')">
+        <i class="fas fa-cogs"></i>
+        قطع الغيار
+      </button>
+      <button class="master-tab-sidebar" onclick="showTab('support')">
+        <i class="fas fa-headset"></i>
+        الدعم الفني
+      </button>
+      <button class="master-tab-sidebar" onclick="showTab('settings')">
+        <i class="fas fa-cog"></i>
+        الإعدادات
+      </button>
+      <button class="master-tab-sidebar" onclick="showTab('communications')">
+        <i class="fas fa-bell"></i>
+        الاتصالات
+      </button>
+      <button class="master-tab-sidebar" onclick="showTab('reports')">
+        <i class="fas fa-chart-bar"></i>
+        التقارير
+      </button>
+      <button class="master-tab-sidebar" onclick="showTab('system')">
+        <i class="fas fa-server"></i>
+        النظام
+      </button>
+    </div>
+  </div>
+
+  <!-- Content Area -->
+  <div style="flex: 1;">
+    <!-- Stats Grid -->
+    <div class="master-stats master-fade-in">
+      <div class="master-stat-card" onclick="scrollToSection('cars-control')">
+        <div class="master-stat-icon cars">
+          <i class="fas fa-car"></i>
+        </div>
+        <div class="master-stat-value">150</div>
+        <div class="master-stat-label">إجمالي السيارات</div>
+      </div>
+      <div class="master-stat-card" onclick="scrollToSection('auctions-control')">
+        <div class="master-stat-icon auctions">
+          <i class="fas fa-gavel"></i>
+        </div>
+        <div class="master-stat-value">45</div>
+        <div class="master-stat-label">المزادات النشطة</div>
+      </div>
+      <div class="master-stat-card" onclick="scrollToSection('users-control')">
+        <div class="master-stat-icon users">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="master-stat-value">1,250</div>
+        <div class="master-stat-label">إجمالي المستخدمين</div>
+      </div>
+      <div class="master-stat-card" onclick="scrollToSection('orders-control')">
+        <div class="master-stat-icon orders">
+          <i class="fas fa-shopping-cart"></i>
+        </div>
+        <div class="master-stat-value">89</div>
+        <div class="master-stat-label">الطلبات الجديدة</div>
+      </div>
+      <div class="master-stat-card" onclick="scrollToSection('revenue-control')">
+        <div class="master-stat-icon revenue">
+          <i class="fas fa-dollar-sign"></i>
+        </div>
+        <div class="master-stat-value">2.5M</div>
+        <div class="master-stat-label">إجمالي الإيرادات</div>
+      </div>
+      <div class="master-stat-card" onclick="scrollToSection('messages-control')">
+        <div class="master-stat-icon messages">
+          <i class="fas fa-envelope"></i>
+        </div>
+        <div class="master-stat-value">23</div>
+        <div class="master-stat-label">الرسائل الجديدة</div>
+      </div>
+    </div>
+
+    
+  <!-- Tab Contents -->
+    <div id="overview" class="master-tab-content active">
+    
+    <!-- Recent Activity -->
+    <div class="master-control-section master-fade-in master-fade-in-delay-3">
+      <div class="master-section-header">
+        <h2 class="master-section-title">
+          <i class="fas fa-clock"></i>
+          النشاط الأخير
+        </h2>
+      </div>
+      <div class="master-simple-list">
+        <div class="master-simple-item">
+          <div class="master-simple-icon is-success">
+            <i class="fas fa-check"></i>
+          </div>
+          <div class="master-simple-content">
+            <div class="master-simple-title">تم بيع سيارة مرسيدس S-Class 2024</div>
+            <div class="master-simple-meta">قبل 5 دقائق</div>
+          </div>
+          <span class="master-badge master-badge-success">مكتمل</span>
+        </div>
+        <div class="master-simple-item">
+          <div class="master-simple-icon is-warning">
+            <i class="fas fa-gavel"></i>
+          </div>
+          <div class="master-simple-content">
+            <div class="master-simple-title">بدأ مزاد جديد لسيارة بي إم دبليو X7</div>
+            <div class="master-simple-meta">قبل 15 دقيقة</div>
+          </div>
+          <span class="master-badge master-badge-warning">نشط</span>
+        </div>
+        <div class="master-simple-item">
+          <div class="master-simple-icon">
+            <i class="fas fa-user-plus"></i>
+          </div>
+          <div class="master-simple-content">
+            <div class="master-simple-title">انضم عميل جديد إلى المنصة</div>
+            <div class="master-simple-meta">قبل 30 دقيقة</div>
+          </div>
+          <span class="master-badge master-badge-info">جديد</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="cars" class="master-tab-content">
+    <!-- Cars & Auctions Control -->
+    <div class="master-control-section master-fade-in">
+      <div class="master-section-header">
+        <h2 class="master-section-title">
+          <i class="fas fa-car"></i>
+          إضافة سيارة جديدة
+        </h2>
+      </div>
+      <form action="/cars/new" method="POST" class="master-form">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        
+        <div class="master-form-grid">
+          <div class="master-form-group">
+            <label class="master-form-label">عنوان السيارة *</label>
+            <input type="text" name="title" required class="master-form-input" placeholder="مثال: تويوتا كامري 2024">
+          </div>
+          <div class="master-form-group">
+            <label class="master-form-label">رابط المزاد الخارجي</label>
+            <input type="url" name="externalUrl" class="master-form-input" placeholder="https://example.com/auction">
+          </div>
+        </div>
+
+        <div class="master-form-grid">
+          <div class="master-form-group">
+            <label class="master-form-label">الشركة *</label>
+            <input type="text" name="make" required class="master-form-input" placeholder="تويوتا">
+          </div>
+          <div class="master-form-group">
+            <label class="master-form-label">الموديل *</label>
+            <input type="text" name="model" required class="master-form-input" placeholder="كامري">
+          </div>
+        </div>
+
+        <div class="master-form-grid">
+          <div class="master-form-group">
+            <label class="master-form-label">سنة الصنع</label>
+            <input type="number" name="year" class="master-form-input" placeholder="2024">
+          </div>
+          <div class="master-form-group">
+            <label class="master-form-label">المسافة (كم)</label>
+            <input type="number" name="mileage" class="master-form-input" placeholder="50000">
+          </div>
+        </div>
+
+        <div class="master-form-group">
+          <label class="master-form-label">الوصف</label>
+          <textarea name="description" rows="3" class="master-form-textarea" placeholder="وصف السيارة والمميزات"></textarea>
+        </div>
+
+        <div class="master-form-grid">
+          <div class="master-form-group">
+            <label class="master-form-label">السعر (ريال) *</label>
+            <input type="number" name="priceSar" required class="master-form-input" placeholder="85000">
+          </div>
+          <div class="master-form-group">
+            <label class="master-form-label">السعر (دولار)</label>
+            <input type="number" name="priceUsd" class="master-form-input" placeholder="22667">
+          </div>
+        </div>
+
+        <div class="master-form-grid">
+          <div class="master-form-group">
+            <label class="master-form-label">رابط شعار الشركة</label>
+            <input type="url" name="carMakeLogoUrl" class="master-form-input" placeholder="https://example.com/logo.png">
+          </div>
+          <div class="master-form-group">
+            <label class="master-form-label">حالة السيارة</label>
+            <select name="condition" class="master-form-select">
+              <option value="excellent">ممتازة</option>
+              <option value="good" selected>جيدة</option>
+              <option value="fair">متوسطة</option>
+              <option value="poor">ضعيفة</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="master-form-group">
+          <label class="master-form-label">روابط الصور (كل رابط في سطر)</label>
+          <textarea name="images" rows="4" class="master-form-textarea" placeholder="https://example.com/image1.jpg&#10;https://example.com/image2.jpg"></textarea>
+        </div>
+
+        <button type="submit" class="master-btn master-btn-primary master-btn-block">
+          <i class="fas fa-plus"></i>
+          إضافة سيارة وإنشاء مزاد
+        </button>
+      </form>
+    </div>
+
+    <!-- Recent Cars -->
+    <div class="master-control-section master-fade-in master-fade-in-delay-1">
+      <div class="master-section-header">
+        <h2 class="master-section-title">
+          <i class="fas fa-list"></i>
+          آخر السيارات المضافة
+        </h2>
+        <a href="/admin/cars" class="master-btn master-btn-outline master-btn-sm">عرض الكل</a>
+      </div>
+      <table class="master-table">
+        <thead>
+          <tr>
+            <th>السيارة</th>
+            <th>السعر</th>
+            <th>الحالة</th>
+            <th>التاريخ</th>
+            <th>إجراءات</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>تويوتا كامري 2024</td>
+            <td>85,000 ريال</td>
+            <td><span class="master-badge master-badge-success">متاحة</span></td>
+            <td>2024/01/05</td>
+            <td>
+              <button class="master-btn master-btn-outline master-btn-sm">عرض</button>
+              <button class="master-btn master-btn-danger master-btn-sm">حذف</button>
+            </td>
+          </tr>
+          <tr>
+            <td>مرسيدس S-Class 2024</td>
+            <td>250,000 ريال</td>
+            <td><span class="master-badge master-badge-warning">في المزاد</span></td>
+            <td>2024/01/04</td>
+            <td>
+              <button class="master-btn master-btn-outline master-btn-sm">عرض</button>
+              <button class="master-btn master-btn-danger master-btn-sm">حذف</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="users" class="master-tab-content">
+    <!-- Users Control -->
+    <div class="master-control-section master-fade-in">
+      <div class="master-section-header">
+        <h2 class="master-section-title">
+          <i class="fas fa-user-plus"></i>
+          إضافة مستخدم جديد
+        </h2>
+      </div>
+      <form action="/admin/users-management/create" method="POST" class="master-form">
+        <div class="master-form-grid">
+          <div class="master-form-group">
+            <label class="master-form-label">الاسم *</label>
+            <input type="text" name="name" required class="master-form-input" placeholder="اسم المستخدم">
+          </div>
+          <div class="master-form-group">
+            <label class="master-form-label">البريد الإلكتروني *</label>
+            <input type="email" name="email" required class="master-form-input" placeholder="user@example.com">
+          </div>
+        </div>
+        <div class="master-form-grid">
+          <div class="master-form-group">
+            <label class="master-form-label">رقم الهاتف *</label>
+            <input type="tel" name="phone" required class="master-form-input" placeholder="05xxxxxxxx">
+          </div>
+          <div class="master-form-group">
+            <label class="master-form-label">كلمة المرور *</label>
+            <input type="password" name="password" required class="master-form-input" placeholder="كلمة المرور">
+          </div>
+        </div>
+        <div class="master-form-grid">
+          <div class="master-form-group">
+            <label class="master-form-label">الدور *</label>
+            <select name="role" required class="master-form-select">
+              <option value="admin">أدمن</option>
+              <option value="super_admin">أدمن رئيسي</option>
+              <option value="manager">مدير</option>
+              <option value="buyer">مشتري</option>
+            </select>
+          </div>
+          <div class="master-form-group">
+            <label class="master-form-label">الحالة</label>
+            <select name="status" class="master-form-select">
+              <option value="active" selected>نشط</option>
+              <option value="inactive">غير نشط</option>
+              <option value="suspended">معلق</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="master-btn master-btn-success master-btn-block">
+          <i class="fas fa-user-plus"></i>
+          إضافة مستخدم جديد
+        </button>
+      </form>
+    </div>
+
+    <!-- Users List -->
+    <div class="master-control-section master-fade-in master-fade-in-delay-1">
+      <div class="master-section-header">
+        <h2 class="master-section-title">
+          <i class="fas fa-users"></i>
+          المستخدمون
+        </h2>
+        <a href="/admin/users" class="master-btn master-btn-outline master-btn-sm">عرض الكل</a>
+      </div>
+      <table class="master-table">
+        <thead>
+          <tr>
+            <th>الاسم</th>
+            <th>البريد</th>
+            <th>الهاتف</th>
+            <th>الدور</th>
+            <th>الحالة</th>
+            <th>إجراءات</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>أحمد الزمزمي</td>
+            <td>admin@localhost.com</td>
+            <td>05xxxxxxxx</td>
+            <td><span class="master-badge master-badge-danger">أدمن رئيسي</span></td>
+            <td><span class="master-badge master-badge-success">نشط</span></td>
+            <td>
+              <button class="master-btn master-btn-outline master-btn-sm">تعديل</button>
+              <button class="master-btn master-btn-danger master-btn-sm">حذف</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="orders" class="master-tab-content">
+    <!-- Orders Control -->
+    <div class="master-control-section master-fade-in">
+      <div class="master-section-header">
+        <h2 class="master-section-title">
+          <i class="fas fa-shopping-cart"></i>
+          إدارة الطلبات
+        </h2>
+        <a href="/admin/orders" class="master-btn master-btn-outline master-btn-sm">عرض الكل</a>
+      </div>
+      <table class="master-table">
+        <thead>
+          <tr>
+            <th>رقم الطلب</th>
+            <th>العميل</th>
+            <th>المبلغ</th>
+            <th>الحالة</th>
+            <th>التاريخ</th>
+            <th>إجراءات</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>#ORD-001</td>
+            <td>أحمد محمد</td>
+            <td>85,000 ريال</td>
+            <td><span class="master-badge master-badge-success">مكتمل</span></td>
+            <td>2024/01/05</td>
+            <td>
+              <button class="master-btn master-btn-outline master-btn-sm">عرض</button>
+              <button class="master-btn master-btn-warning master-btn-sm">تعديل</button>
+            </td>
+          </tr>
+          <tr>
+            <td>#ORD-002</td>
+            <td>محمد علي</td>
+            <td>120,000 ريال</td>
+            <td><span class="master-badge master-badge-warning">قيد المعالجة</span></td>
+            <td>2024/01/04</td>
+            <td>
+              <button class="master-btn master-btn-outline master-btn-sm">عرض</button>
+              <button class="master-btn master-btn-warning master-btn-sm">تعديل</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="settings" class="master-tab-content">
+    <!-- Settings Control -->
+    <div class="master-controls">
+      <div class="master-control-section master-fade-in">
+        <div class="master-section-header">
+          <h2 class="master-section-title">
+            <i class="fas fa-cog"></i>
+            الإعدادات العامة
+          </h2>
+        </div>
+        <form action="/admin/settings" method="POST" class="master-form">
+          <div class="master-form-group">
+            <label class="master-form-label">اسم الشركة</label>
+            <input type="text" name="companyName" class="master-form-input" placeholder="HM CAR">
+          </div>
+          <div class="master-form-group">
+            <label class="master-form-label">البريد الإلكتروني</label>
+            <input type="email" name="email" class="master-form-input" placeholder="info@hmcar.com">
+          </div>
+          <div class="master-form-group">
+            <label class="master-form-label">رقم الهاتف</label>
+            <input type="tel" name="phone" class="master-form-input" placeholder="05xxxxxxxx">
+          </div>
+          <div class="master-form-group">
+            <label class="master-form-label">العنوان</label>
+            <textarea name="address" rows="2" class="master-form-textarea" placeholder="العنوان الكامل"></textarea>
+          </div>
+          <button type="submit" class="master-btn master-btn-primary master-btn-block">
+            <i class="fas fa-save"></i>
+            حفظ الإعدادات
+          </button>
+        </form>
+      </div>
+
+      <div class="master-control-section master-fade-in master-fade-in-delay-1">
+        <div class="master-section-header">
+          <h2 class="master-section-title">
+            <i class="fab fa-whatsapp"></i>
+            إعدادات الواتساب
+          </h2>
+        </div>
+        <form action="/admin/settings/whatsapp" method="POST" class="master-form">
+          <div class="master-form-group">
+            <label class="master-form-label">رقم الواتساب</label>
+            <input type="tel" name="whatsappNumber" class="master-form-input" placeholder="05xxxxxxxx">
+          </div>
+          <div class="master-form-group">
+            <label class="master-form-label">رسالة الترحيب</label>
+            <textarea name="welcomeMessage" rows="3" class="master-form-textarea" placeholder="مرحباً! كيف يمكنني مساعدتك؟"></textarea>
+          </div>
+          <div class="master-form-group">
+            <label class="master-form-label">تفعيل الواتساب</label>
+            <select name="whatsappEnabled" class="master-form-select">
+              <option value="true">مفعل</option>
+              <option value="false">معطل</option>
+            </select>
+          </div>
+          <button type="submit" class="master-btn master-btn-success master-btn-block">
+            <i class="fab fa-whatsapp"></i>
+            حفظ إعدادات الواتساب
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="communications" class="master-tab-content">
+    <!-- Communications Control -->
+    <div class="master-controls">
+      <div class="master-control-section master-fade-in">
+        <div class="master-section-header">
+          <h2 class="master-section-title">
+            <i class="fas fa-bell"></i>
+            إرسال إشعار
+          </h2>
+        </div>
+        <form action="/admin/notifications/send" method="POST" class="master-form">
+          <div class="master-form-group">
+            <label class="master-form-label">عنوان الإشعار</label>
+            <input type="text" name="title" required class="master-form-input" placeholder="عنوان الإشعار">
+          </div>
+          <div class="master-form-group">
+            <label class="master-form-label">نص الإشعار</label>
+            <textarea name="message" required rows="4" class="master-form-textarea" placeholder="نص الإشعار"></textarea>
+          </div>
+          <div class="master-form-group">
+            <label class="master-form-label">الجمهور</label>
+            <select name="audience" class="master-form-select">
+              <option value="all">جميع المستخدمين</option>
+              <option value="admins">الأدمن فقط</option>
+              <option value="buyers">المشترين فقط</option>
+            </select>
+          </div>
+          <button type="submit" class="master-btn master-btn-primary master-btn-block">
+            <i class="fas fa-paper-plane"></i>
+            إرسال الإشعار
+          </button>
+        </form>
+      </div>
+
+      <div class="master-control-section master-fade-in master-fade-in-delay-1">
+        <div class="master-section-header">
+          <h2 class="master-section-title">
+            <i class="fas fa-headset"></i>
+            رسائل الدعم الفني
+          </h2>
+        </div>
+        <div class="master-simple-list">
+          <div class="master-simple-item">
+            <div class="master-simple-icon">
+              <i class="fas fa-envelope"></i>
+            </div>
+            <div class="master-simple-content">
+              <div class="master-simple-title">استفسار عن سيارة</div>
+              <div class="master-simple-meta">من: أحمد محمد - قبل ساعة</div>
+            </div>
+            <button class="master-btn master-btn-outline master-btn-sm">عرض</button>
+          </div>
+          <div class="master-simple-item">
+            <div class="master-simple-icon is-warning">
+              <i class="fas fa-envelope"></i>
+            </div>
+            <div class="master-simple-content">
+              <div class="master-simple-title">مشكلة في الدفع</div>
+              <div class="master-simple-meta">من: محمد علي - قبل 3 ساعات</div>
+            </div>
+            <button class="master-btn master-btn-outline master-btn-sm">عرض</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="reports" class="master-tab-content">
+    <!-- Reports Control -->
+    <div class="master-controls">
+      <div class="master-control-section master-fade-in">
+        <div class="master-section-header">
+          <h2 class="master-section-title">
+            <i class="fas fa-chart-bar"></i>
+            الإحصائيات والتقارير
+          </h2>
+        </div>
+        <div class="master-summary-grid">
+          <div class="master-summary-card">
+            <div class="master-summary-value is-primary">2.5M</div>
+            <div class="master-summary-label">إجمالي الإيرادات</div>
+          </div>
+          <div class="master-summary-card">
+            <div class="master-summary-value" style="color: #10b981;">89</div>
+            <div class="master-summary-label">الطلبات هذا الشهر</div>
+          </div>
+          <div class="master-summary-card">
+            <div class="master-summary-value" style="color: #f59e0b;">45</div>
+            <div class="master-summary-label">المزادات النشطة</div>
+          </div>
+          <div class="master-summary-card">
+            <div class="master-summary-value" style="color: #ef4444;">23</div>
+            <div class="master-summary-label">الرسائل غير المقروءة</div>
+          </div>
+        </div>
+        <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+          <button class="master-btn master-btn-primary">
+            <i class="fas fa-download"></i>
+            تحميل تقرير كامل
+          </button>
+          <button class="master-btn master-btn-outline">
+            <i class="fas fa-file-excel"></i>
+            تصدير Excel
+          </button>
+          <button class="master-btn master-btn-outline">
+            <i class="fas fa-file-pdf"></i>
+            تصدير PDF
+          </button>
+        </div>
+      </div>
+
+      <div class="master-control-section master-fade-in master-fade-in-delay-1">
+        <div class="master-section-header">
+          <h2 class="master-section-title">
+            <i class="fas fa-exchange-rate"></i>
+            سعر الصرف
+          </h2>
+        </div>
+        <form action="/admin/exchange-rate" method="POST" class="master-form">
+          <div class="master-form-group">
+            <label class="master-form-label">سعر صرف الدولار (ريال)</label>
+            <input type="number" step="0.0001" name="usdToSar" required class="master-form-input" placeholder="3.7500">
+          </div>
+          <div class="master-form-group">
+            <label class="master-form-label">ملاحظات</label>
+            <textarea name="notes" rows="2" class="master-form-textarea" placeholder="ملاحظات حول التحديث"></textarea>
+          </div>
+          <button type="submit" class="master-btn master-btn-warning master-btn-block">
+            <i class="fas fa-sync"></i>
+            تحديث سعر الصرف
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="brands" class="master-tab-content">
+    <!-- Brands & Categories Control -->
+    <div class="master-controls">
+      <div class="master-control-section master-fade-in">
+        <div class="master-section-header">
+          <h2 class="master-section-title">
+            <i class="fas fa-building"></i>
+            إدارة الشركات
+          </h2>
+          <a href="/admin/brands" class="master-btn master-btn-outline master-btn-sm">عرض الكل</a>
+        </div>
+        <form action="/admin/brands" method="POST" enctype="multipart/form-data" class="master-form">
+          <div class="master-form-group">
+            <label class="master-form-label">اسم الشركة *</label>
+            <input type="text" name="name" required class="master-form-input" placeholder="مثال: تويوتا">
+          </div>
+          <div class="master-form-group">
+            <label class="master-form-label">شعار الشركة</label>
+            <input type="file" name="logo" accept="image/*" class="master-form-input">
+          </div>
+          <div class="master-form-group">
+            <label class="master-form-label">رابط الشعار (بدلاً من الرفع)</label>
+            <input type="url" name="logoUrl" class="master-form-input" placeholder="https://example.com/logo.png">
+          </div>
+          <button type="submit" class="master-btn master-btn-primary master-btn-block">
+            <i class="fas fa-plus"></i>
+            إضافة شركة جديدة
+          </button>
+        </form>
+      </div>
+
+      <div class="master-control-section master-fade-in master-fade-in-delay-1">
+        <div class="master-section-header">
+          <h2 class="master-section-title">
+            <i class="fas fa-tags"></i>
+            إدارة فئات السيارات
+          </h2>
+          <a href="/admin/categories" class="master-btn master-btn-outline master-btn-sm">عرض الكل</a>
+        </div>
+        <form action="/admin/categories" method="POST" class="master-form">
+          <div class="master-form-group">
+            <label class="master-form-label">اسم الفئة *</label>
+            <input type="text" name="name" required class="master-form-input" placeholder="مثال: سيارات سيدان">
+          </div>
+          <div class="master-form-group">
+            <label class="master-form-label">الوصف</label>
+            <textarea name="description" rows="3" class="master-form-textarea" placeholder="وصف الفئة"></textarea>
+          </div>
+          <div class="master-form-group">
+            <label class="master-form-label">الأيقونة</label>
+            <input type="text" name="icon" class="master-form-input" placeholder="fas fa-car">
+          </div>
+          <button type="submit" class="master-btn master-btn-success master-btn-block">
+            <i class="fas fa-plus"></i>
+            إضافة فئة جديدة
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Recent Brands -->
+    <div class="master-control-section master-fade-in master-fade-in-delay-2">
+      <div class="master-section-header">
+        <h2 class="master-section-title">
+          <i class="fas fa-list"></i>
+          آخر الشركات المضافة
+        </h2>
+      </div>
+      <table class="master-table">
+        <thead>
+          <tr>
+            <th>الشركة</th>
+            <th>الشعار</th>
+            <th>عدد السيارات</th>
+            <th>التاريخ</th>
+            <th>إجراءات</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>تويوتا</td>
+            <td><img src="/images/toyota-logo.png" alt="تويوتا" style="width: 40px; height: 40px; object-fit: contain;"></td>
+            <td>25</td>
+            <td>2024/01/05</td>
+            <td>
+              <button class="master-btn master-btn-outline master-btn-sm">تعديل</button>
+              <button class="master-btn master-btn-danger master-btn-sm">حذف</button>
+            </td>
+          </tr>
+          <tr>
+            <td>مرسيدس</td>
+            <td><img src="/images/mercedes-logo.png" alt="مرسيدس" style="width: 40px; height: 40px; object-fit: contain;"></td>
+            <td>18</td>
+            <td>2024/01/04</td>
+            <td>
+              <button class="master-btn master-btn-outline master-btn-sm">تعديل</button>
+              <button class="master-btn master-btn-danger master-btn-sm">حذف</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="spare-parts" class="master-tab-content">
+    <!-- Spare Parts Control -->
+    <div class="master-controls">
+      <div class="master-control-section master-fade-in">
+        <div class="master-section-header">
+          <h2 class="master-section-title">
+            <i class="fas fa-cogs"></i>
+            إضافة قطعة غيار جديدة
+          </h2>
+          <a href="/admin/spare-parts" class="master-btn master-btn-outline master-btn-sm">عرض الكل</a>
+        </div>
+        <form action="/admin/spare-parts" method="POST" enctype="multipart/form-data" class="master-form">
+          <div class="master-form-grid">
+            <div class="master-form-group">
+              <label class="master-form-label">اسم القطعة *</label>
+              <input type="text" name="name" required class="master-form-input" placeholder="مثال: فلتر زيت">
+            </div>
+            <div class="master-form-group">
+              <label class="master-form-label">الشركة المصنعة</label>
+              <input type="text" name="manufacturer" class="master-form-input" placeholder="مثال: بوش">
+            </div>
+          </div>
+          <div class="master-form-group">
+            <label class="master-form-label">الوصف</label>
+            <textarea name="description" rows="3" class="master-form-textarea" placeholder="وصف القطعة والمميزات"></textarea>
+          </div>
+          <div class="master-form-grid">
+            <div class="master-form-group">
+              <label class="master-form-label">السعر (ريال) *</label>
+              <input type="number" name="priceSar" required class="master-form-input" placeholder="250">
+            </div>
+            <div class="master-form-group">
+              <label class="master-form-label">السعر (دولار)</label>
+              <input type="number" name="priceUsd" class="master-form-input" placeholder="67">
+            </div>
+          </div>
+          <div class="master-form-group">
+            <label class="master-form-label">الكمية المتاحة</label>
+            <input type="number" name="quantity" class="master-form-input" placeholder="50">
+          </div>
+          <div class="master-form-group">
+            <label class="master-form-label">الصور (حتى 5 صور)</label>
+            <input type="file" name="images" multiple accept="image/*" class="master-form-input">
+          </div>
+          <button type="submit" class="master-btn master-btn-primary master-btn-block">
+            <i class="fas fa-plus"></i>
+            إضافة قطعة غيار
+          </button>
+        </form>
+      </div>
+
+      <div class="master-control-section master-fade-in master-fade-in-delay-1">
+        <div class="master-section-header">
+          <h2 class="master-section-title">
+            <i class="fas fa-industry"></i>
+            شركات قطع الغيار
+          </h2>
+          <a href="/admin/spare-brands" class="master-btn master-btn-outline master-btn-sm">عرض الكل</a>
+        </div>
+        <form action="/admin/spare-brands" method="POST" class="master-form">
+          <div class="master-form-group">
+            <label class="master-form-label">اسم الشركة *</label>
+            <input type="text" name="name" required class="master-form-input" placeholder="مثال: بوش">
+          </div>
+          <div class="master-form-group">
+            <label class="master-form-label">البلد</label>
+            <input type="text" name="country" class="master-form-input" placeholder="مثال: ألمانيا">
+          </div>
+          <button type="submit" class="master-btn master-btn-success master-btn-block">
+            <i class="fas fa-plus"></i>
+            إضافة شركة قطع غيار
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Recent Spare Parts -->
+    <div class="master-control-section master-fade-in master-fade-in-delay-2">
+      <div class="master-section-header">
+        <h2 class="master-section-title">
+          <i class="fas fa-list"></i>
+          آخر قطع الغيار المضافة
+        </h2>
+      </div>
+      <table class="master-table">
+        <thead>
+          <tr>
+            <th>القطعة</th>
+            <th>الشركة</th>
+            <th>السعر</th>
+            <th>الكمية</th>
+            <th>التاريخ</th>
+            <th>إجراءات</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>فلتر زيت تويوتا</td>
+            <td>تويوتا</td>
+            <td>85 ريال</td>
+            <td>150</td>
+            <td>2024/01/05</td>
+            <td>
+              <button class="master-btn master-btn-outline master-btn-sm">عرض</button>
+              <button class="master-btn master-btn-danger master-btn-sm">حذف</button>
+            </td>
+          </tr>
+          <tr>
+            <td>بطارية مرسيدس</td>
+            <td>فارتكس</td>
+            <td>450 ريال</td>
+            <td>25</td>
+            <td>2024/01/04</td>
+            <td>
+              <button class="master-btn master-btn-outline master-btn-sm">عرض</button>
+              <button class="master-btn master-btn-danger master-btn-sm">حذف</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="support" class="master-tab-content">
+    <!-- Support Control -->
+    <div class="master-controls">
+      <div class="master-control-section master-fade-in">
+        <div class="master-section-header">
+          <h2 class="master-section-title">
+            <i class="fas fa-headset"></i>
+            رسائل الدعم الفني
+          </h2>
+          <a href="/admin/support" class="master-btn master-btn-outline master-btn-sm">عرض الكل</a>
+        </div>
+        <div class="master-simple-list">
+          <div class="master-simple-item">
+            <div class="master-simple-icon">
+              <i class="fas fa-envelope"></i>
+            </div>
+            <div class="master-simple-content">
+              <div class="master-simple-title">استفسار عن سيارة</div>
+              <div class="master-simple-meta">من: أحمد محمد - قبل ساعة</div>
+            </div>
+            <span class="master-badge master-badge-info">جديد</span>
+            <button class="master-btn master-btn-outline master-btn-sm">عرض</button>
+          </div>
+          <div class="master-simple-item">
+            <div class="master-simple-icon is-warning">
+              <i class="fas fa-envelope"></i>
+            </div>
+            <div class="master-simple-content">
+              <div class="master-simple-title">مشكلة في الدفع</div>
+              <div class="master-simple-meta">من: محمد علي - قبل 3 ساعات</div>
+            </div>
+            <span class="master-badge master-badge-warning">قيد المعالجة</span>
+            <button class="master-btn master-btn-outline master-btn-sm">عرض</button>
+          </div>
+          <div class="master-simple-item">
+            <div class="master-simple-icon is-success">
+              <i class="fas fa-check"></i>
+            </div>
+            <div class="master-simple-content">
+              <div class="master-simple-title">طلب استشارة</div>
+              <div class="master-simple-meta">من: خالد سعد - بالأمس</div>
+            </div>
+            <span class="master-badge master-badge-success">مكتمل</span>
+            <button class="master-btn master-btn-outline master-btn-sm">عرض</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="master-control-section master-fade-in master-fade-in-delay-1">
+        <div class="master-section-header">
+          <h2 class="master-section-title">
+            <i class="fas fa-reply"></i>
+            الرد السريع
+          </h2>
+        </div>
+        <form action="/admin/support/reply" method="POST" class="master-form">
+          <div class="master-form-group">
+            <label class="master-form-label">اختر الرسالة</label>
+            <select name="messageId" class="master-form-select">
+              <option value="">اختر رسالة للرد عليها</option>
+              <option value="1">استفسار عن سيارة - أحمد محمد</option>
+              <option value="2">مشكلة في الدفع - محمد علي</option>
+            </select>
+          </div>
+          <div class="master-form-group">
+            <label class="master-form-label">الرد *</label>
+            <textarea name="reply" required rows="4" class="master-form-textarea" placeholder="اكتب ردك هنا"></textarea>
+          </div>
+          <div class="master-form-group">
+            <label class="master-form-label">الإجراء</label>
+            <select name="action" class="master-form-select">
+              <option value="reply">إرسال رد فقط</option>
+              <option value="close">إرسال رد وإغلاق التذكرة</option>
+              <option value="escalate">رفع إلى إدارة عليا</option>
+            </select>
+          </div>
+          <button type="submit" class="master-btn master-btn-primary master-btn-block">
+            <i class="fas fa-paper-plane"></i>
+            إرسال الرد
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="system" class="master-tab-content">
+    <!-- System Control -->
+    <div class="master-controls">
+      <div class="master-control-section master-fade-in">
+        <div class="master-section-header">
+          <h2 class="master-section-title">
+            <i class="fas fa-server"></i>
+            حالة النظام
+          </h2>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f8fafc; border-radius: 0.5rem;">
+            <span>قاعدة البيانات</span>
+            <span class="master-badge master-badge-success">نشطة</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f8fafc; border-radius: 0.5rem;">
+            <span>الخادم</span>
+            <span class="master-badge master-badge-success">يعمل</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f8fafc; border-radius: 0.5rem;">
+            <span>التخزين</span>
+            <span class="master-badge master-badge-warning">75%</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f8fafc; border-radius: 0.5rem;">
+            <span>آخر نسخة احتياطية</span>
+            <span style="color: #6b7280;">منذ ساعتين</span>
+          </div>
+        </div>
+        <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+          <button class="master-btn master-btn-warning">
+            <i class="fas fa-sync"></i>
+            إعادة تشغيل النظام
+          </button>
+          <button class="master-btn master-btn-primary">
+            <i class="fas fa-download"></i>
+            نسخة احتياطية
+          </button>
+        </div>
+      </div>
+
+      <div class="master-control-section master-fade-in master-fade-in-delay-1">
+        <div class="master-section-header">
+          <h2 class="master-section-title">
+            <i class="fas fa-tools"></i>
+            صيانة النظام
+          </h2>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <button class="master-btn master-btn-outline">
+            <i class="fas fa-broom"></i>
+            تنظيف الملفات المؤقتة
+          </button>
+          <button class="master-btn master-btn-outline">
+            <i class="fas fa-database"></i>
+            تحسين قاعدة البيانات
+          </button>
+          <button class="master-btn master-btn-outline">
+            <i class="fas fa-compress"></i>
+            ضغط الصور
+          </button>
+          <button class="master-btn master-btn-danger">
+            <i class="fas fa-trash"></i>
+            حذف البيانات القديمة
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Tab functionality
+function showTab(tabName) {
+  // Hide all tabs
+  document.querySelectorAll('.master-tab-content').forEach(tab => {
+    tab.classList.remove('active');
+  });
+  
+  // Remove active class from all tab buttons
+  document.querySelectorAll('.master-tab').forEach(button => {
+    button.classList.remove('active');
+  });
+  
+  // Show selected tab
+  document.getElementById(tabName).classList.add('active');
+  
+  // Add active class to clicked button
+  event.target.classList.add('active');
+}
+
+// Scroll to section
+function scrollToSection(sectionId) {
+  const element = document.getElementById(sectionId);
+  if (element) {
+    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+// Initialize animations
+document.addEventListener('DOMContentLoaded', function() {
+  // Add fade-in animation to elements
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  });
+
+  document.querySelectorAll('.master-fade-in').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'all 0.6s ease-out';
+    observer.observe(el);
+  });
+});
+</script>
+  </div> <!-- End Content Area -->
+</div> <!-- End Main Container -->

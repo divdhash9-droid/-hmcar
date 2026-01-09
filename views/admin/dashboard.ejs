@@ -1,0 +1,212 @@
+<% layout('layout') -%>
+<% var hideNavbar = true; %>
+<% var hideSearch = true; %>
+<% var fullWidth = true; %>
+<% var bodyClass = 'admin-dashboard-luxury admin-ultra-dashboard'; %>
+
+<div class="hm-dashboard">
+  <div class="hm-dashboard__container">
+    <header class="hm-hero hm-hero--ultra" aria-label="لوحة الإدارة">
+      <div class="hm-hero__layout">
+        <div class="hm-hero__meta">
+          <span class="hm-hero__highlight"><i class="fas fa-crown"></i> تحكم فائق</span>
+          <span class="hm-hero__badge"><i class="fas fa-shield-halved"></i> أمان محسّن</span>
+          <span class="hm-hero__badge"><i class="fas fa-bolt"></i> تحديثات فورية</span>
+        </div>
+
+        <nav class="hm-hero__actions hero-cta hero-cta--vertical" aria-label="إجراءات سريعة">
+          <a class="btn btn-primary" href="/cars/new" aria-label="إضافة سيارة"><i class="fas fa-plus me-1"></i>إضافة سيارة</a>
+          <a class="btn btn-outline-light" href="/auctions/cars/new" aria-label="إنشاء مزاد"><i class="fas fa-gavel me-1"></i>إنشاء مزاد</a>
+          <a class="btn btn-outline-light" href="/admin/orders" aria-label="الطلبات"><i class="fas fa-file-invoice me-1"></i>الطلبات</a>
+          <a class="btn btn-outline-light" href="/auth/logout" aria-label="خروج"><i class="fas fa-sign-out-alt me-1"></i>خروج</a>
+        </nav>
+      </div>
+
+      <div class="hm-hero__top hm-hero__top--compact">
+        <div class="hm-hero__brand hm-hero__brand--small">
+          <img class="hm-hero__logo" src="/images/navbar-logo.png" alt="HM CAR" loading="eager" decoding="async" onerror="this.onerror=null;this.src='/images/logo.png';" />
+          <div class="hm-hero__titles">
+            <h1 class="hm-hero__title">لوحة الإدارة الفاخرة</h1>
+            <div class="hm-hero__subtitle">إدارة سلسة، أرقام واضحة، وقرارات أسرع</div>
+          </div>
+        </div>
+      </div>
+
+      <section class="stat-grid stat-grid--compact" aria-label="إحصائيات سريعة">
+        <div class="stat-tile stat-tile--small">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="stat-label">إجمالي السيارات</div>
+              <div class="stat-value"><%= Number(stats?.totalCars || 0) %></div>
+            </div>
+            <span class="hm-pill"><i class="fas fa-car"></i></span>
+          </div>
+          <div class="stat-sub">مخزون محدث</div>
+        </div>
+        <div class="stat-tile stat-tile--small">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="stat-label">إجمالي المستخدمين</div>
+              <div class="stat-value"><%= Number(stats?.totalUsers || 0) %></div>
+            </div>
+            <span class="hm-pill"><i class="fas fa-users"></i></span>
+          </div>
+          <div class="stat-sub">فريق وعملاء</div>
+        </div>
+        <div class="stat-tile stat-tile--small">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="stat-label">إشعارات جديدة</div>
+              <div class="stat-value"><%= Number(stats?.unseenCount || 0) %></div>
+            </div>
+            <span class="hm-pill"><i class="fas fa-bell"></i></span>
+          </div>
+          <div class="stat-sub">أحدث التنبيهات</div>
+        </div>
+      </section>
+    </header>
+
+    <section class="admin-quick-links" aria-label="روابط سريعة">
+      <a class="aq-link" href="/admin" aria-label="لوحة التحكم"><i class="fas fa-gauge-high"></i><span>لوحة التحكم</span></a>
+      <a class="aq-link" href="/admin/cars" aria-label="السيارات"><i class="fas fa-car"></i><span>السيارات</span></a>
+      <a class="aq-link" href="/admin/spare-parts" aria-label="قطع الغيار"><i class="fas fa-cog"></i><span>قطع الغيار</span></a>
+      <a class="aq-link" href="/admin/orders" aria-label="الطلبات"><i class="fas fa-file-invoice"></i><span>الطلبات</span></a>
+      <a class="aq-link" href="/admin/auctions" aria-label="المزادات"><i class="fas fa-gavel"></i><span>المزادات</span></a>
+      <a class="aq-link" href="/admin/notifications" aria-label="الإشعارات"><i class="fas fa-bell"></i><span>الإشعارات</span></a>
+      <a class="aq-link" href="/admin/settings" aria-label="الإعدادات"><i class="fas fa-gear"></i><span>الإعدادات</span></a>
+    </section>
+
+    <% if (flash && flash.message) { %>
+      <div class="mt-3">
+        <div class="alert alert-<%= flash.type || 'info' %> alert-dismissible fade show" role="alert">
+          <%= flash.message %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      </div>
+    <% } %>
+
+    <section class="hm-section" aria-label="إدارة سريعة">
+      <h2 class="hm-section__title">إدارة سريعة</h2>
+      <div class="hm-grid hm-grid--modern">
+        <a class="hm-card" href="/admin/cars" aria-label="إدارة السيارات">
+          <div class="hm-card__icon" aria-hidden="true"><i class="fas fa-car"></i></div>
+          <div class="hm-card__title">إدارة السيارات</div>
+          <div class="hm-card__subtitle">قائمة، تعديل، وحذف</div>
+          <div class="hm-card__value"><%= Number(stats?.totalCars || 0) %></div>
+        </a>
+
+        <a class="hm-card" href="/admin/orders" aria-label="إدارة الطلبات">
+          <div class="hm-card__icon" aria-hidden="true"><i class="fas fa-file-invoice"></i></div>
+          <div class="hm-card__title">إدارة الطلبات</div>
+          <div class="hm-card__subtitle">متابعة حالة الطلب</div>
+          <div class="hm-card__value"><%= Number(stats?.unseenCount || 0) %></div>
+        </a>
+
+        <a class="hm-card" href="/admin/users" aria-label="إدارة المستخدمين">
+          <div class="hm-card__icon" aria-hidden="true"><i class="fas fa-users"></i></div>
+          <div class="hm-card__title">إدارة المستخدمين</div>
+          <div class="hm-card__subtitle">التحكم بالحسابات</div>
+          <div class="hm-card__value"><%= Number(stats?.totalUsers || 0) %></div>
+        </a>
+      </div>
+    </section>
+
+    <section class="hm-section" aria-label="الإشعارات">
+      <h2 class="hm-section__title">آخر الإشعارات</h2>
+      
+      <!-- Enhanced Stats Widget -->
+      <%- include('widgets/admin-stats-enhanced') %>
+      
+      <!-- Enhanced Quick Actions Widget -->
+      <%- include('widgets/admin-quick-actions') %>
+      
+      <!-- Enhanced Activity Monitor Widget -->
+      <%- include('widgets/admin-activity-monitor') %>
+      
+      <!-- Enhanced Performance Dashboard Widget -->
+      <%- include('widgets/admin-performance-dashboard') %>
+      
+      <!-- Enhanced Real-Time Notifications Widget -->
+      <%- include('widgets/admin-real-time-notifications') %>
+      
+      <!-- Navigation Fix Widget -->
+      <%- include('widgets/admin-navigation-fix') %>
+      
+      <!-- Background Test Widget -->
+      <%- include('widgets/admin-background-test') %>
+      
+      <div class="hm-list">
+        <% if (notifications && notifications.length) { %>
+          <% notifications.slice(0, 8).forEach(function(n){ %>
+            <div class="hm-list__item">
+              <div>
+                <h3 class="hm-list__title">
+                  <%= (n.car && n.car.title) ? n.car.title : 'إشعار' %>
+                </h3>
+                <div class="hm-list__meta">
+                  <%= (n.user && n.user.name) ? n.user.name : '' %>
+                  <%= (n.user && n.user.phone) ? (' - ' + n.user.phone) : '' %>
+                  <%= (n.createdAt) ? (' - ' + new Date(n.createdAt).toLocaleString('ar')) : '' %>
+                </div>
+              </div>
+              <div class="d-flex flex-column align-items-end gap-2">
+                <span class="hm-chip <%= (n.status === 'new') ? 'hm-chip--new' : '' %>">
+                  <i class="fas <%= (n.status === 'new') ? 'fa-star' : 'fa-check' %>"></i>
+                  <span><%= (n.status === 'new') ? 'جديد' : 'تمت المشاهدة' %></span>
+                </span>
+                <% if (n.status === 'new') { %>
+                  <form method="POST" action="/admin/notifications/<%= n._id %>/seen">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <button class="hm-embed__close" type="submit">تعليم كمشاهد</button>
+                  </form>
+                <% } %>
+              </div>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <div class="hm-list__item">
+            <div>
+              <h3 class="hm-list__title">لا توجد إشعارات حالياً</h3>
+              <div class="hm-list__meta">كل شيء تحت السيطرة</div>
+            </div>
+          </div>
+        <% } %>
+      </div>
+
+      <div class="mt-3 d-flex gap-2 flex-wrap">
+        <form method="POST" action="/admin/notifications/mark-all-seen">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button class="hm-embed__close" type="submit">تعليم الكل كمشاهد</button>
+        </form>
+        <a class="hm-embed__close" href="/admin/notifications">إدارة الإشعارات</a>
+      </div>
+    </section>
+
+    <section class="hm-section" aria-label="فريق الإدارة">
+      <h2 class="hm-section__title">فريق الإدارة</h2>
+      <div class="hm-list">
+        <% if (users && users.length) { %>
+          <% users.slice(0, 8).forEach(function(u){ %>
+            <div class="hm-list__item">
+              <div>
+                <h3 class="hm-list__title"><%= u.name || 'مستخدم' %></h3>
+                <div class="hm-list__meta"><%= u.email || '' %> <%= u.phone ? (' - ' + u.phone) : '' %></div>
+              </div>
+              <span class="hm-chip"><i class="fas fa-user-shield"></i><span><%= u.role || 'admin' %></span></span>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <div class="hm-list__item">
+            <div>
+              <h3 class="hm-list__title">لا يوجد مستخدمون إداريون</h3>
+              <div class="hm-list__meta">أضف فريق الإدارة من صفحة المستخدمين</div>
+            </div>
+          </div>
+        <% } %>
+      </div>
+      <div class="mt-3">
+        <a class="hm-embed__close" href="/admin/users">عرض كل المستخدمين</a>
+      </div>
+    </section>
+  </div>
+</div>

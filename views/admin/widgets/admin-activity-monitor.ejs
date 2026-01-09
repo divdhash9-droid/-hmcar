@@ -1,0 +1,574 @@
+<!-- Enhanced Activity Monitor Widget -->
+<div class="enhanced-activity-widget">
+  <div class="enhanced-activity__header">
+    <h3 class="enhanced-activity__title">مراقبة النشاط المباشر</h3>
+    <div class="enhanced-activity__controls">
+      <button class="enhanced-activity__btn enhanced-activity__btn--active" data-filter="all">
+        الكل
+      </button>
+      <button class="enhanced-activity__btn" data-filter="users">
+        المستخدمون
+      </button>
+      <button class="enhanced-activity__btn" data-filter="cars">
+        السيارات
+      </button>
+      <button class="enhanced-activity__btn" data-filter="auctions">
+        المزادات
+      </button>
+    </div>
+  </div>
+  
+  <div class="enhanced-activity__timeline">
+    <!-- Live Activity Items -->
+    <div class="enhanced-activity__item" data-type="users">
+      <div class="enhanced-activity__icon enhanced-activity__icon--user">
+        <i class="fas fa-user-plus"></i>
+      </div>
+      <div class="enhanced-activity__content">
+        <div class="enhanced-activity__title">مستخدم جديد</div>
+        <div class="enhanced-activity__description">
+          <strong>أحمد محمد</strong> سجل دخوله للتو
+        </div>
+        <div class="enhanced-activity__time">منذ دقيقتين</div>
+      </div>
+      <div class="enhanced-activity__status enhanced-activity__status--success">
+        <i class="fas fa-check-circle"></i>
+      </div>
+    </div>
+    
+    <div class="enhanced-activity__item" data-type="cars">
+      <div class="enhanced-activity__icon enhanced-activity__icon--car">
+        <i class="fas fa-car"></i>
+      </div>
+      <div class="enhanced-activity__content">
+        <div class="enhanced-activity__title">سيارة جديدة</div>
+        <div class="enhanced-activity__description">
+          <strong>مرسيدس G63 2024</strong> أضيفت للمعرض
+        </div>
+        <div class="enhanced-activity__time">منذ 5 دقائق</div>
+      </div>
+      <div class="enhanced-activity__status enhanced-activity__status--info">
+        <i class="fas fa-info-circle"></i>
+      </div>
+    </div>
+    
+    <div class="enhanced-activity__item" data-type="auctions">
+      <div class="enhanced-activity__icon enhanced-activity__icon--auction">
+        <i class="fas fa-gavel"></i>
+      </div>
+      <div class="enhanced-activity__content">
+        <div class="enhanced-activity__title">مزاد جديد</div>
+        <div class="enhanced-activity__description">
+          <strong>بي إم إكس X6 2023</strong> بدأ المزاد
+        </div>
+        <div class="enhanced-activity__time">منذ 8 دقائق</div>
+      </div>
+      <div class="enhanced-activity__status enhanced-activity__status--warning">
+        <i class="fas fa-exclamation-circle"></i>
+      </div>
+    </div>
+    
+    <div class="enhanced-activity__item" data-type="users">
+      <div class="enhanced-activity__icon enhanced-activity__icon--user">
+        <i class="fas fa-user-check"></i>
+      </div>
+      <div class="enhanced-activity__content">
+        <div class="enhanced-activity__title">شراء جديد</div>
+        <div class="enhanced-activity__description">
+          <strong>محمد علي</strong> اشترى <strong>تويوتا كامري 2022</strong>
+        </div>
+        <div class="enhanced-activity__time">منذ 12 دقيقة</div>
+      </div>
+      <div class="enhanced-activity__status enhanced-activity__status--success">
+        <i class="fas fa-check-circle"></i>
+      </div>
+    </div>
+    
+    <div class="enhanced-activity__item" data-type="cars">
+      <div class="enhanced-activity__icon enhanced-activity__icon--car">
+        <i class="fas fa-edit"></i>
+      </div>
+      <div class="enhanced-activity__content">
+        <div class="enhanced-activity__title">تحديث سيارة</div>
+        <div class="enhanced-activity__description">
+          <strong>هونداي أكسنت 2021</strong> تم تحديث السعر
+        </div>
+        <div class="enhanced-activity__time">منذ 15 دقيقة</div>
+      </div>
+      <div class="enhanced-activity__status enhanced-activity__status--info">
+        <i class="fas fa-info-circle"></i>
+      </div>
+    </div>
+    
+    <div class="enhanced-activity__item" data-type="auctions">
+      <div class="enhanced-activity__icon enhanced-activity__icon--auction">
+        <i class="fas fa-hammer"></i>
+      </div>
+      <div class="enhanced-activity__content">
+        <div class="enhanced-activity__title">مزاد مغلق</div>
+        <div class="enhanced-activity__description">
+          <strong>لكزس ES350 2020</strong> تم بيعه في المزاد
+        </div>
+        <div class="enhanced-activity__time">منذ 20 دقيقة</div>
+      </div>
+      <div class="enhanced-activity__status enhanced-activity__status--success">
+        <i class="fas fa-check-circle"></i>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Live Stats -->
+  <div class="enhanced-activity__stats">
+    <div class="enhanced-activity__stat">
+      <div class="enhanced-activity__stat-value">127</div>
+      <div class="enhanced-activity__stat-label">مستخدم نشط</div>
+    </div>
+    <div class="enhanced-activity__stat">
+      <div class="enhanced-activity__stat-value">8</div>
+      <div class="enhanced-activity__stat-label">مزاد مفتوح</div>
+    </div>
+    <div class="enhanced-activity__stat">
+      <div class="enhanced-activity__stat-value">24</div>
+      <div class="enhanced-activity__stat-label">سيارة جديدة</div>
+    </div>
+    <div class="enhanced-activity__stat">
+      <div class="enhanced-activity__stat-value">15</div>
+      <div class="enhanced-activity__stat-label">عملية اليوم</div>
+    </div>
+  </div>
+  
+  <!-- Auto Refresh Indicator -->
+  <div class="enhanced-activity__refresh">
+    <div class="enhanced-activity__refresh-icon">
+      <i class="fas fa-sync-alt"></i>
+    </div>
+    <div class="enhanced-activity__refresh-text">
+      تحديث تلقائي كل <span id="refreshCountdown">30</span> ثانية
+    </div>
+  </div>
+</div>
+
+<style>
+.enhanced-activity-widget {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  margin: 2rem 0;
+  box-shadow: var(--shadow-light);
+  position: relative;
+  overflow: hidden;
+}
+
+.enhanced-activity-widget::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--gradient-primary);
+  animation: pulseGold 2s infinite;
+}
+
+.enhanced-activity__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.enhanced-activity__title {
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.enhanced-activity__controls {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.enhanced-activity__btn {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-secondary);
+  color: var(--text-secondary);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.enhanced-activity__btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-primary);
+  color: var(--primary-gold);
+}
+
+.enhanced-activity__btn--active {
+  background: var(--gradient-primary);
+  border-color: var(--primary-gold);
+  color: white;
+}
+
+.enhanced-activity__timeline {
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 1rem;
+  margin-bottom: 2rem;
+}
+
+.enhanced-activity__timeline::-webkit-scrollbar {
+  width: 6px;
+}
+
+.enhanced-activity__timeline::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+}
+
+.enhanced-activity__timeline::-webkit-scrollbar-thumb {
+  background: var(--primary-gold);
+  border-radius: var(--radius-sm);
+}
+
+.enhanced-activity__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-secondary);
+  transition: var(--transition-smooth);
+  position: relative;
+  overflow: hidden;
+}
+
+.enhanced-activity__item:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-primary);
+  transform: translateX(4px);
+}
+
+.enhanced-activity__item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.04), transparent);
+  transition: var(--transition-smooth);
+}
+
+.enhanced-activity__item:hover::before {
+  right: 100%;
+}
+
+.enhanced-activity__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+.enhanced-activity__icon--user {
+  background: var(--gradient-info);
+}
+
+.enhanced-activity__icon--car {
+  background: var(--gradient-primary);
+}
+
+.enhanced-activity__icon--auction {
+  background: var(--gradient-warning);
+}
+
+.enhanced-activity__content {
+  flex: 1;
+}
+
+.enhanced-activity__title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.enhanced-activity__description {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.enhanced-activity__time {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.enhanced-activity__status {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.enhanced-activity__status--success {
+  background: var(--bg-success);
+  color: var(--text-success);
+}
+
+.enhanced-activity__status--info {
+  background: var(--bg-info);
+  color: var(--text-info);
+}
+
+.enhanced-activity__status--warning {
+  background: var(--bg-warning);
+  color: var(--text-warning);
+}
+
+.enhanced-activity__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.enhanced-activity__stat {
+  text-align: center;
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-secondary);
+}
+
+.enhanced-activity__stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-gold);
+  margin-bottom: 0.25rem;
+}
+
+.enhanced-activity__stat-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.enhanced-activity__refresh {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-secondary);
+}
+
+.enhanced-activity__refresh-icon {
+  color: var(--primary-gold);
+  animation: spin 2s linear infinite;
+}
+
+.enhanced-activity__refresh-text {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Filter animations */
+.enhanced-activity__item[data-type]:not([data-type*="all"]) {
+  display: flex;
+}
+
+.enhanced-activity__item.hidden {
+  display: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .enhanced-activity__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .enhanced-activity__controls {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .enhanced-activity__stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .enhanced-activity__item {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.75rem;
+  }
+}
+</style>
+
+<script>
+// Activity Monitor JavaScript
+document.addEventListener('DOMContentLoaded', function() {
+  const buttons = document.querySelectorAll('.enhanced-activity__btn');
+  const items = document.querySelectorAll('.enhanced-activity__item');
+  const countdownElement = document.getElementById('refreshCountdown');
+  let currentFilter = 'all';
+  let countdown = 30;
+  
+  // Filter functionality
+  buttons.forEach(button => {
+    button.addEventListener('click', function() {
+      // Update active button
+      buttons.forEach(btn => btn.classList.remove('enhanced-activity__btn--active'));
+      this.classList.add('enhanced-activity__btn--active');
+      
+      // Update filter
+      currentFilter = this.dataset.filter;
+      filterItems();
+    });
+  });
+  
+  function filterItems() {
+    items.forEach(item => {
+      if (currentFilter === 'all') {
+        item.classList.remove('hidden');
+      } else {
+        const itemType = item.dataset.type;
+        if (itemType === currentFilter) {
+          item.classList.remove('hidden');
+        } else {
+          item.classList.add('hidden');
+        }
+      }
+    });
+  }
+  
+  // Countdown timer
+  function updateCountdown() {
+    countdown--;
+    if (countdownElement) {
+      countdownElement.textContent = countdown;
+    }
+    
+    if (countdown <= 0) {
+      countdown = 30;
+      // Here you would typically fetch new data
+      console.log('Refreshing activity data...');
+      // Simulate new activity
+      addNewActivity();
+    }
+  }
+  
+  // Simulate adding new activity
+  function addNewActivity() {
+    const timeline = document.querySelector('.enhanced-activity__timeline');
+    const activities = [
+      {
+        type: 'users',
+        icon: 'fa-user',
+        title: 'مستخدم جديد',
+        description: 'مستخدم جديد سجل دخوله',
+        status: 'success'
+      },
+      {
+        type: 'cars',
+        icon: 'fa-car',
+        title: 'سيارة جديدة',
+        description: 'سيارة جديدة أضيفت للمعرض',
+        status: 'info'
+      },
+      {
+        type: 'auctions',
+        icon: 'fa-gavel',
+        title: 'مزاد جديد',
+        description: 'مزاد جديد بدأ',
+        status: 'warning'
+      }
+    ];
+    
+    const randomActivity = activities[Math.floor(Math.random() * activities.length)];
+    const newItem = createActivityItem(randomActivity);
+    
+    // Add to top of timeline
+    if (timeline.firstChild) {
+      timeline.insertBefore(newItem, timeline.firstChild);
+    } else {
+      timeline.appendChild(newItem);
+    }
+    
+    // Remove old items if too many
+    const allItems = timeline.querySelectorAll('.enhanced-activity__item');
+    if (allItems.length > 10) {
+      timeline.removeChild(allItems[allItems.length - 1]);
+    }
+    
+    // Apply current filter
+    filterItems();
+  }
+  
+  function createActivityItem(activity) {
+    const item = document.createElement('div');
+    item.className = 'enhanced-activity__item';
+    item.dataset.type = activity.type;
+    
+    const iconClass = activity.type === 'users' ? 'enhanced-activity__icon--user' : 
+                     activity.type === 'cars' ? 'enhanced-activity__icon--car' : 
+                     'enhanced-activity__icon--auction';
+    
+    const statusClass = activity.status === 'success' ? 'enhanced-activity__status--success' : 
+                       activity.status === 'info' ? 'enhanced-activity__status--info' : 
+                       'enhanced-activity__status--warning';
+    
+    const statusIcon = activity.status === 'success' ? 'fa-check-circle' : 
+                      activity.status === 'info' ? 'fa-info-circle' : 
+                      'fa-exclamation-circle';
+    
+    item.innerHTML = `
+      <div class="enhanced-activity__icon ${iconClass}">
+        <i class="fas ${activity.icon}"></i>
+      </div>
+      <div class="enhanced-activity__content">
+        <div class="enhanced-activity__title">${activity.title}</div>
+        <div class="enhanced-activity__description">${activity.description}</div>
+        <div class="enhanced-activity__time">الآن</div>
+      </div>
+      <div class="enhanced-activity__status ${statusClass}">
+        <i class="fas ${statusIcon}"></i>
+      </div>
+    `;
+    
+    return item;
+  }
+  
+  // Start countdown
+  setInterval(updateCountdown, 1000);
+});
+</script>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" role="img" aria-label="Car 2">
+  <defs>
+    <linearGradient id="bg2" x1="0" x2="1">
+      <stop offset="0" stop-color="#071428"/>
+      <stop offset="1" stop-color="#0b2130"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0" x2="1">
+      <stop offset="0" stop-color="#b88f2f" />
+      <stop offset="1" stop-color="#ffd97a" />
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#bg2)"/>
+  <g transform="translate(50,130) scale(1.15)">
+    <path d="M60 160 C120 100, 280 80, 420 110 C520 130, 620 160, 700 150 L700 210 L60 210 Z" fill="#0e1620" opacity="0.9"/>
+    <path d="M90 138 C150 102, 310 88, 430 112 C530 132, 630 152, 690 148" stroke="url(#g2)" stroke-width="5" fill="none" stroke-linecap="round"/>
+  </g>
+  <text x="40" y="420" font-family="Inter, sans-serif" font-size="28" fill="#ffd97a">بي إم دبليو M5 — 2019</text>
+</svg>

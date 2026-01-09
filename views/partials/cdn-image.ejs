@@ -1,0 +1,79 @@
+<% if (typeof cdn !== 'undefined' && cdn.isAvailable()) { %>
+  <% 
+    // CDN is available, use optimized images
+    const imageUrl = typeof image === 'string' ? image : image.url || image;
+    const publicId = typeof image === 'object' ? image.publicId : imageUrl;
+    const alt = alt || image.title || image.description || 'صورة';
+    const className = className || 'img-fluid';
+    const loading = loading || 'lazy';
+    const sizes = sizes || '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw';
+  %>
+  
+  <picture class="<%= className %>">
+    <% if (cdn.isAvailable()) { %>
+      <!-- Different sizes for responsive images -->
+      <source 
+        srcset="<%= cdn.getOptimizedUrl(publicId, { width: 400, height: 300 }) %> 400w,
+                <%= cdn.getOptimizedUrl(publicId, { width: 800, height: 600 }) %> 800w,
+                <%= cdn.getOptimizedUrl(publicId, { width: 1200, height: 900 }) %> 1200w"
+        sizes="<%= sizes %>"
+        type="image/webp"
+      />
+      <source 
+        srcset="<%= cdn.getOptimizedUrl(publicId, { width: 400, height: 300, format: 'jpg' }) %> 400w,
+                <%= cdn.getOptimizedUrl(publicId, { width: 800, height: 600, format: 'jpg' }) %> 800w,
+                <%= cdn.getOptimizedUrl(publicId, { width: 1200, height: 900, format: 'jpg' }) %> 1200w"
+        sizes="<%= sizes %>"
+        type="image/jpeg"
+      />
+    <% } %>
+    
+    <!-- Fallback image -->
+    <img 
+      src="<%= cdn.isAvailable() ? cdn.getOptimizedUrl(publicId, { width: 800, height: 600 }) : imageUrl %>"
+      alt="<%= alt %>"
+      class="<%= className %>"
+      loading="<%= loading %>"
+      <% if (width) { %>width="<%= width %>"<% } %>
+      <% if (height) { %>height="<%= height %>"<% } %>
+      <% if (onclick) { %>onclick="<%= onclick %>"<% } %>
+      <% if (style) { %>style="<%= style %>"<% } %>
+    />
+  </picture>
+<% } else { %>
+  <!-- Fallback to regular image when CDN is not available -->
+  <img 
+    src="<%= typeof image === 'string' ? image : image.url || image %>"
+    alt="<%= alt || image.title || image.description || 'صورة' %>"
+    class="<%= className || 'img-fluid' %>"
+    loading="<%= loading || 'lazy' %>"
+    <% if (width) { %>width="<%= width %>"<% } %>
+    <% if (height) { %>height="<%= height %>"<% } %>
+    <% if (onclick) { %>onclick="<%= onclick %>"<% } %>
+    <% if (style) { %>style="<%= style %>"<% } %>
+  />
+<% } %>
+
+<% if (showProgressive && typeof cdn !== 'undefined' && cdn.isAvailable()) { %>
+  <!-- Progressive image loading with placeholder -->
+  <script>
+    (function() {
+      const img = document.currentScript.previousElementSibling.querySelector('img');
+      const imageUrl = typeof image === 'string' ? image : image.url || image;
+      const placeholder = '<%= cdn.getPlaceholderUrl(imageUrl) %>';
+      
+      // Show low-quality placeholder first
+      img.style.filter = 'blur(10px)';
+      img.src = placeholder;
+      
+      // Load full image
+      const fullImg = new Image();
+      fullImg.onload = function() {
+        img.src = '<%= cdn.getOptimizedUrl(imageUrl, { width: 800, height: 600 }) %>';
+        img.style.filter = 'none';
+        img.style.transition = 'filter 0.3s ease';
+      };
+      fullImg.src = '<%= cdn.getOptimizedUrl(imageUrl, { width: 800, height: 600 }) %>';
+    })();
+  </script>
+<% } %>

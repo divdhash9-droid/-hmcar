@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" role="img" aria-label="Car 3">
+  <defs>
+    <linearGradient id="bg3" x1="0" x2="1">
+      <stop offset="0" stop-color="#04121a"/>
+      <stop offset="1" stop-color="#0a2430"/>
+    </linearGradient>
+    <linearGradient id="g3" x1="0" x2="1">
+      <stop offset="0" stop-color="#cda84a" />
+      <stop offset="1" stop-color="#ffd97a" />
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#bg3)"/>
+  <g transform="translate(70,120) scale(1.18)">
+    <path d="M50 160 C100 110, 260 88, 400 110 C520 128, 620 160, 700 155 L700 210 L50 210 Z" fill="#0b1318" opacity="0.9"/>
+    <path d="M90 140 C150 106, 310 92, 430 114 C530 132, 630 150, 690 146" stroke="url(#g3)" stroke-width="5" fill="none" stroke-linecap="round"/>
+  </g>
+  <text x="40" y="420" font-family="Inter, sans-serif" font-size="28" fill="#ffd97a">أودي R8 — 2021</text>
+</svg>

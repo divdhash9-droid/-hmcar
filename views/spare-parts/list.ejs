@@ -1,0 +1,397 @@
+<% layout('layout') -%>
+<!-- صفحة قائمة قطع الغيار: فلاتر (بحث + شركة/موديل/سنة) + عرض النتائج + شراء للمشتري -->
+<% const _filters = filters || {}; %>
+<% const _safe = (v) => (v === undefined || v === null) ? '' : String(v); %>
+<% const _makes = makes || []; %>
+
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2 mb-3">
+  <div>
+    <h3 class="mb-1">قطع الغيار</h3>
+    <div class="text-muted">اختر الشركة ثم الموديل ثم السنة لفلترة النتائج بسهولة.</div>
+  </div>
+  <a class="btn btn-outline-secondary" href="/spare-parts/brands<%= isEmbed ? '?embed=1' : '' %>">كل الشركات</a>
+</div>
+
+<form class="card border-0 shadow-sm mb-3" method="get" action="/spare-parts">
+  <div class="card-body row g-3">
+    <% if (isEmbed) { %>
+      <input type="hidden" name="embed" value="1" />
+    <% } %>
+    <!-- نخزن القيم الحالية للموديل/السنة حتى يعيد سكربت التحميل تحديدها بعد جلب الخيارات من API -->
+    <input type="hidden" id="currentModelValue" value="<%= _safe(_filters.model) %>" />
+    <input type="hidden" id="currentYearValue" value="<%= _safe(_filters.year) %>" />
+    <div class="col-md-4">
+      <label class="form-label">اسم القطعة أو نوعها</label>
+      <input name="q" class="form-control" placeholder="فلتر، مكابح..." value="<%= _safe(_filters.q) %>" />
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label">الشركة</label>
+      <select id="makeSelect" name="make" class="form-select">
+        <option value="">كل الشركات</option>
+        <% _makes.forEach(m => { %>
+          <option value="<%= m %>" <%= _safe(_filters.make).toLowerCase() === String(m).toLowerCase() ? 'selected' : '' %>><%= m %></option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label">الموديل</label>
+      <select id="modelSelect" name="model" class="form-select" <%= _safe(_filters.make) ? '' : 'disabled' %>>
+        <option value="">كل الموديلات</option>
+      </select>
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label">السنة</label>
+      <select id="yearSelect" name="year" class="form-select" <%= (_safe(_filters.make) && _safe(_filters.model)) ? '' : 'disabled' %>>
+        <option value="">كل السنوات</option>
+      </select>
+    </div>
+
+
+    <div class="col-12 d-flex gap-2 justify-content-end">
+      <button class="btn btn-primary">بحث</button>
+      <a class="btn btn-outline-secondary" href="/spare-parts<%= isEmbed ? '?embed=1' : '' %>">إزالة الفلاتر</a>
+    </div>
+  </div>
+</form>
+
+<div class="row g-3">
+  <% if (!parts.length) { %>
+    <!-- لا توجد نتائج حسب الفلاتر الحالية -->
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body text-center py-5">
+          <h5 class="mb-2">لا توجد نتائج</h5>
+          <div class="text-muted">جرّب تغيير الفلاتر أو إزالة البحث.</div>
+        </div>
+      </div>
+    </div>
+  <% } %>
+
+  <% parts.forEach(part => { %>
+    <div class="col-md-4">
+      <div class="card h-100 border-0 shadow-sm overflow-hidden">
+        <a href="/spare-parts/part/<%= part._id %>" class="text-decoration-none">
+          <% if (part.images && part.images[0]) { %>
+            <img src="<%= part.images[0] %>" class="card-img-top hm-part-card-img" alt="صورة قطعة" loading="lazy" decoding="async" />
+          <% } else { %>
+            <div class="hm-part-placeholder hm-part-placeholder--220">
+              <img class="hm-part-placeholder__img" src="/public/images/spare-parts.png" alt="" width="88" height="88" loading="lazy" decoding="async" />
+              <div class="hm-part-placeholder__text">صورة القطعة غير متوفرة</div>
+            </div>
+          <% } %>
+        </a>
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title"><a class="text-decoration-none" href="/spare-parts/part/<%= part._id %>"><%= part.name %></a></h5>
+          <p class="text-muted mb-1"><%= part.partType || 'نوع غير محدد' %></p>
+          <p class="mb-1">المركبة: <%= [part.carMake, part.carModel, part.carYear].filter(Boolean).join(' - ') || 'عام' %></p>
+          <p class="fw-semibold">
+            السعر:
+            <% const sar = (part.priceSar !== undefined && part.priceSar !== null) ? part.priceSar : null; %>
+            <% const usd = (part.priceUsd !== undefined && part.priceUsd !== null) ? part.priceUsd : null; %>
+            <% if (sar !== null || usd !== null) { %>
+              <span class="price-display" data-sar="<%= sar %>" data-usd="<%= usd %>">
+                <span class="price-current">
+                  <%= sar !== null ? sar.toLocaleString('en-US') + ' SAR' : '' %>
+                  <%= (sar !== null && usd !== null) ? ' | ' : '' %>
+                  <%= usd !== null ? usd.toLocaleString('en-US') + ' USD' : '' %>
+                </span>
+                <button class="btn btn-sm btn-outline-secondary ms-2 convert-price" type="button">
+                  <i class="fas fa-exchange-alt"></i> تحويل
+                </button>
+              </span>
+            <% } else { %>
+              <%= part.price.toLocaleString('en-US') %>
+            <% } %>
+          </p>
+          <p class="flex-grow-1"><%= part.description || '' %></p>
+          <div class="d-flex align-items-center justify-content-between gap-2 mt-auto">
+            <span class="badge <%= part.inStock ? 'bg-success' : 'bg-secondary' %>"><%= part.inStock ? 'متوفر' : 'غير متوفر' %></span>
+            <% if (currentUser && currentUser.role === 'buyer') { %>
+              <div class="d-flex gap-1">
+                <!-- زر المفضلات -->
+                <button class="btn btn-outline-danger btn-sm favorite-btn" data-part-id="<%= part._id %>" data-type="spare-part">
+                  <i class="fas fa-heart"></i>
+                </button>
+                <!-- زر إضافة للسلة -->
+                <form method="post" action="/cart/add" class="d-inline">
+                  <input type="hidden" name="type" value="spare-part">
+                  <input type="hidden" name="itemId" value="<%= part._id %>">
+                  <input type="hidden" name="qty" value="1">
+                  <button type="submit" class="btn btn-outline-primary btn-sm" <%= part.inStock ? '' : 'disabled' %>>
+                    <i class="fas fa-shopping-cart me-1"></i>سلة
+                  </button>
+                </form>
+                <!-- زر الشراء المباشر -->
+                <form method="post" action="/purchase/buy-now" class="d-inline">
+                  <input type="hidden" name="type" value="spare-part">
+                  <input type="hidden" name="itemId" value="<%= part._id %>">
+                  <button type="submit" class="btn btn-success btn-sm buy-now-btn" data-item-type="spare-part" data-item-id="<%= part._id %>" <%= part.inStock ? '' : 'disabled' %>>
+                    <i class="fas fa-bolt me-1"></i>شراء
+                  </button>
+                </form>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% }) %>
+</div>
+
+<script>
+  (function () {
+    // سكربت الفلاتر التفاعلي:
+    // - عند اختيار الشركة: نجلب الموديلات من /spare-parts/meta?make=
+    // - عند اختيار الموديل: نجلب السنوات من /spare-parts/meta?make=&model=
+    const makeSelect = document.getElementById('makeSelect');
+    const modelSelect = document.getElementById('modelSelect');
+    const yearSelect = document.getElementById('yearSelect');
+    const currentModelEl = document.getElementById('currentModelValue');
+    const currentYearEl = document.getElementById('currentYearValue');
+    if (!makeSelect || !modelSelect || !yearSelect) return;
+
+    const currentModel = currentModelEl ? currentModelEl.value : '';
+    const currentYear = currentYearEl ? currentYearEl.value : '';
+
+    const resetSelect = (el, firstLabel) => {
+      while (el.firstChild) el.removeChild(el.firstChild);
+      const opt = document.createElement('option');
+      opt.value = '';
+      opt.textContent = firstLabel;
+      el.appendChild(opt);
+    };
+
+    const loadModels = async () => {
+      const make = makeSelect.value;
+      resetSelect(modelSelect, 'كل الموديلات');
+      resetSelect(yearSelect, 'كل السنوات');
+      yearSelect.disabled = true;
+
+      if (!make) {
+        modelSelect.disabled = true;
+        return;
+      }
+
+      modelSelect.disabled = false;
+      const url = '/spare-parts/meta?make=' + encodeURIComponent(make);
+      const res = await fetch(url);
+      const data = await res.json();
+      (data.models || []).forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m;
+        opt.textContent = m;
+        if (currentModel && String(m).toLowerCase() === String(currentModel).toLowerCase()) opt.selected = true;
+        modelSelect.appendChild(opt);
+      });
+
+      await loadYears();
+    };
+
+    const loadYears = async () => {
+      const make = makeSelect.value;
+      const model = modelSelect.value;
+      resetSelect(yearSelect, 'كل السنوات');
+
+      if (!make || !model) {
+        yearSelect.disabled = true;
+        return;
+      }
+
+      yearSelect.disabled = false;
+      const url = '/spare-parts/meta?make=' + encodeURIComponent(make) + '&model=' + encodeURIComponent(model);
+      const res = await fetch(url);
+      const data = await res.json();
+      (data.years || []).forEach(y => {
+        const opt = document.createElement('option');
+        opt.value = y;
+        opt.textContent = y;
+        if (currentYear && String(y) === String(currentYear)) opt.selected = true;
+        yearSelect.appendChild(opt);
+      });
+    };
+
+    makeSelect.addEventListener('change', () => {
+      currentModelEl.value = '';
+      currentYearEl.value = '';
+      loadModels().catch(() => {});
+    });
+
+    modelSelect.addEventListener('change', () => {
+      currentYearEl.value = '';
+      loadYears().catch(() => {});
+    });
+
+    if (makeSelect.value) {
+      loadModels().catch(() => {});
+    }
+  })();
+</script>
+
+<script>
+// Currency Converter for Spare Parts
+(function() {
+  const EXCHANGE_RATE = 3.75; // 1 USD = 3.75 SAR
+  
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('.convert-price')) {
+      const button = e.target.closest('.convert-price');
+      const priceDisplay = button.closest('.price-display');
+      const priceCurrent = priceDisplay.querySelector('.price-current');
+      
+      const sar = parseFloat(priceDisplay.dataset.sar);
+      const usd = parseFloat(priceDisplay.dataset.usd);
+      
+      if (button.dataset.converted === 'true') {
+        // Convert back to original
+        let originalPrice = '';
+        if (sar !== null && usd !== null) {
+          originalPrice = `${sar.toLocaleString('en-US')} SAR | ${usd.toLocaleString('en-US')} USD`;
+        } else if (sar !== null) {
+          originalPrice = `${sar.toLocaleString('en-US')} SAR`;
+        } else if (usd !== null) {
+          originalPrice = `${usd.toLocaleString('en-US')} USD`;
+        }
+        priceCurrent.innerHTML = originalPrice;
+        button.innerHTML = '<i class="fas fa-exchange-alt"></i> تحويل';
+        button.dataset.converted = 'false';
+      } else {
+        // Convert to other currency
+        let convertedPrice = '';
+        if (sar !== null && usd === null) {
+          // Convert SAR to USD
+          const convertedUsd = (sar / EXCHANGE_RATE).toFixed(2);
+          convertedPrice = `${sar.toLocaleString('en-US')} SAR ≈ ${parseFloat(convertedUsd).toLocaleString('en-US')} USD`;
+        } else if (usd !== null && sar === null) {
+          // Convert USD to SAR
+          const convertedSar = (usd * EXCHANGE_RATE).toFixed(2);
+          convertedPrice = `${usd.toLocaleString('en-US')} USD ≈ ${parseFloat(convertedSar).toLocaleString('en-US')} SAR`;
+        } else if (sar !== null && usd !== null) {
+          // Show both converted values
+          const convertedUsd = (sar / EXCHANGE_RATE).toFixed(2);
+          const convertedSar = (usd * EXCHANGE_RATE).toFixed(2);
+          convertedPrice = `${sar.toLocaleString('en-US')} SAR (${parseFloat(convertedUsd).toLocaleString('en-US')} USD) | ${usd.toLocaleString('en-US')} USD (${parseFloat(convertedSar).toLocaleString('en-US')} SAR)`;
+        }
+        priceCurrent.innerHTML = convertedPrice;
+        button.innerHTML = '<i class="fas fa-undo"></i> الأصلي';
+        button.dataset.converted = 'true';
+      }
+    }
+  });
+})();
+
+// JavaScript for Shopping Functions
+document.addEventListener('DOMContentLoaded', function() {
+    // معالجة زر المفضلات
+    document.querySelectorAll('.favorite-btn').forEach(btn => {
+        btn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            const partId = this.dataset.partId;
+            const type = this.dataset.type;
+            const icon = this.querySelector('i');
+            
+            try {
+                const response = await fetch('/favorites/toggle', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ type, itemId: partId })
+                });
+                
+                if (response.ok) {
+                    icon.classList.toggle('fas');
+                    icon.classList.toggle('far');
+                    icon.classList.toggle('text-danger');
+                    
+                    // إظهار رسالة نجاح
+                    showToast('تم تحديث المفضلات بنجاح', 'success');
+                } else {
+                    showToast('حدث خطأ، يرجى المحاولة مرة أخرى', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('حدث خطأ في الاتصال', 'error');
+            }
+        });
+    });
+    
+    // معالجة زر الشراء المباشر مع التكامل مع الواتساب
+    document.querySelectorAll('.buy-now-btn').forEach(btn => {
+        btn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            const itemType = this.dataset.itemType;
+            const itemId = this.dataset.itemId;
+            
+            try {
+                const response = await fetch('/purchase/buy-now', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ type: itemType, itemId: itemId })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // إرسال تفاصيل الشراء للواتساب
+                    sendWhatsAppMessage(data);
+                    
+                    // إظهار رسالة نجاح
+                    showToast('جاري إتمام عملية الشراء...', 'success');
+                    
+                    // تحويل إلى صفحة تأكيد الشراء بعد ثانيتين
+                    setTimeout(() => {
+                        window.location.href = '/purchase/confirmation';
+                    }, 2000);
+                } else {
+                    showToast('حدث خطأ في عملية الشراء', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('حدث خطأ في الاتصال', 'error');
+            }
+        });
+    });
+    
+    // دالة إرسال رسالة الواتساب
+    function sendWhatsAppMessage(orderData) {
+        const phoneNumber = '966500000002'; // رقم الواتساب للإدارة
+        const productUrl = `${window.location.origin}/${orderData.type === 'car' ? 'cars' : 'spare-parts'}/${orderData.itemId}`;
+        
+        let message = `🛒 طلب شراء جديد\n\n`;
+        message += `📋 التفاصيل:\n`;
+        message += `🔗 رابط المنتج: ${productUrl}\n`;
+        message += `💰 السعر: ${orderData.price}\n`;
+        message += `👤 العميل: ${orderData.customerName}\n`;
+        message += `📞 الهاتف: ${orderData.customerPhone}\n`;
+        message += `📅 التاريخ: ${new Date().toLocaleString('ar-SA')}\n\n`;
+        message += `يرجى متابعة الطلب في أقرب وقت`;
+        
+        const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+        
+        // فتح الواتساب في نافذة جديدة
+        window.open(whatsappUrl, '_blank');
+    }
+    
+    // دالة عرض الرسائل
+    function showToast(message, type = 'info') {
+        // إنشاء عنصر Toast
+        const toast = document.createElement('div');
+        toast.className = `alert alert-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'info'} position-fixed top-0 start-50 translate-middle-x mt-3`;
+        toast.style.zIndex = '9999';
+        toast.style.minWidth = '300px';
+        toast.textContent = message;
+        
+        document.body.appendChild(toast);
+        
+        // إزالة الرسالة بعد 3 ثواني
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+});
+</script>

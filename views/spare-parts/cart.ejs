@@ -1,0 +1,87 @@
+<% layout('layout') -%>
+
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2 mb-3">
+  <div>
+    <h3 class="mb-1">سلة قطع الغيار</h3>
+    <div class="text-muted">أضف القطع ثم أرسل الطلب للإدارة عبر واتساب.</div>
+  </div>
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-secondary" href="/spare-parts">متابعة التسوق</a>
+  </div>
+</div>
+
+<% if (!items || !items.length) { %>
+  <div class="card border-0 shadow-sm">
+    <div class="card-body py-5 text-center">
+      <h5 class="mb-2">السلة فارغة</h5>
+      <div class="text-muted">قم بإضافة قطع من صفحة قطع الغيار.</div>
+    </div>
+  </div>
+<% } else { %>
+  <div class="card border-0 shadow-sm mb-3">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>القطعة</th>
+              <th class="text-center">الكمية</th>
+              <th>الحالة</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% items.forEach(it => { %>
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <% if (it.part.images && it.part.images[0]) { %>
+                      <img src="<%= it.part.images[0] %>" alt="" width="56" height="56" class="hm-spare-thumb hm-spare-thumb--cover" loading="lazy" decoding="async" />
+                    <% } else { %>
+                      <img src="/public/images/spare-parts.png" alt="" width="56" height="56" class="hm-spare-thumb hm-spare-thumb--contain" loading="lazy" decoding="async" />
+                    <% } %>
+                    <div>
+                      <div class="fw-semibold"><a class="text-decoration-none" href="/spare-parts/part/<%= it.part._id %>"><%= it.part.name %></a></div>
+                      <div class="small text-muted"><%= [it.part.carMake, it.part.carModel, it.part.carYear].filter(Boolean).join(' - ') || '' %></div>
+                    </div>
+                  </div>
+                </td>
+                <td class="text-center hm-spare-qty-cell">
+                  <form method="post" action="/spare-parts/cart/update/<%= it.part._id %>" class="d-flex gap-2 justify-content-center">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                    <input name="qty" type="number" min="1" class="form-control hm-spare-qty" value="<%= it.qty %>" />
+                    <button class="btn btn-outline-primary" type="submit">تحديث</button>
+                  </form>
+                </td>
+                <td>
+                  <span class="badge <%= it.part.inStock ? 'bg-success' : 'bg-secondary' %>"><%= it.part.inStock ? 'متوفر' : 'غير متوفر' %></span>
+                </td>
+                <td class="text-end hm-spare-remove-cell">
+                  <form method="post" action="/spare-parts/cart/remove/<%= it.part._id %>" onsubmit="return confirm('حذف القطعة من السلة؟');">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                    <button class="btn btn-outline-danger" type="submit">حذف</button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="d-flex flex-column flex-md-row justify-content-end gap-2">
+        <form method="post" action="/spare-parts/cart/checkout">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <button class="btn btn-primary">إتمام الطلب</button>
+        </form>
+        <form method="post" action="/spare-parts/cart/checkout?autoWhatsApp=1">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <button class="btn btn-success">إتمام الطلب وإرسال واتساب</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="alert alert-info mb-0">
+    سيتم إنشاء طلب من محتوى السلة. بعد فتح صفحة الطلب يمكنك إرساله عبر واتساب للإدارة.
+  </div>
+<% } %>

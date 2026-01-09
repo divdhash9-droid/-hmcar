@@ -1,0 +1,175 @@
+<% layout('layout') -%>
+<% var hideNavbar = true; %>
+<% var hideSearch = true; %>
+<% var fullWidth = true; %>
+<% var bodyClass = 'admin-dashboard-luxury'; %>
+
+<div class="hm-dashboard">
+  <div class="hm-dashboard__container">
+    <header class="hm-hero" aria-label="إنشاء مزاد جديد">
+      <div class="hm-hero__top">
+        <div class="hm-hero__brand">
+          <img class="hm-hero__logo" src="/public/images/navbar-logo.png" alt="HM CAR" loading="eager" decoding="async" onerror="this.onerror=null;this.src='/public/images/logo.png';" />
+          <div class="hm-hero__titles">
+            <h1 class="hm-hero__title">إنشاء مزاد جديد</h1>
+            <div class="hm-hero__subtitle">إضافة يدوية أو استيراد من رابط</div>
+          </div>
+        </div>
+        <nav class="hm-hero__actions" aria-label="إجراءات">
+          <a class="hm-pill" href="/admin/auctions" aria-label="العودة إلى المزادات"><i class="fas fa-arrow-left"></i><span>عودة</span></a>
+        </nav>
+      </div>
+    </header>
+
+    <section class="hm-section" aria-label="نموذج إضافة مزاد">
+      <div class="add-auction-container">
+        <div class="tabs">
+          <button class="tab-link <%= !importedData ? 'active' : '' %>" onclick="showTab('manual')">
+            <i class="fas fa-edit"></i> إضافة يدوية
+          </button>
+          <button class="tab-link <%= importedData ? 'active' : '' %>" onclick="showTab('import')">
+            <i class="fas fa-link"></i> استيراد من رابط
+          </button>
+        </div>
+
+        <div id="manual" class="tab-content <%= !importedData ? 'active' : '' %>">
+          <form action="/auctions/cars/new" method="POST" class="modern-form">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="title">عنوان السيارة</label>
+                <input type="text" id="title" name="title" class="form-control" value="<%= importedData ? importedData.title : '' %>" required>
+              </div>
+              <div class="form-group">
+                <label for="make">الشركة المصنعة</label>
+                <input type="text" id="make" name="make" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label for="model">الموديل</label>
+                <input type="text" id="model" name="model" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label for="year">سنة الصنع</label>
+                <input type="number" id="year" name="year" class="form-control">
+              </div>
+              <div class="form-group">
+                <label for="priceSar">السعر (SAR)</label>
+                <input type="number" id="priceSar" name="priceSar" class="form-control" step="any" value="<%= (importedData && importedData.currency === 'SAR') ? importedData.price : '' %>">
+              </div>
+              <div class="form-group">
+                <label for="priceUsd">السعر (USD)</label>
+                <input type="number" id="priceUsd" name="priceUsd" class="form-control" step="any" value="<%= (importedData && importedData.currency === 'USD') ? importedData.price : '' %>">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="description">الوصف</label>
+              <textarea id="description" name="description" class="form-control" rows="3"><%= importedData ? importedData.description : '' %></textarea>
+            </div>
+            <div class="form-group">
+              <label for="images">روابط الصور (كل رابط في سطر)</label>
+              <textarea id="images" name="images" class="form-control" rows="5"><%= importedData ? importedData.images : '' %></textarea>
+            </div>
+            <div class="form-group">
+                <label for="externalUrl">رابط المزاد الخارجي (اختياري)</label>
+                <input type="url" id="externalUrl" name="externalUrl" class="form-control" value="<%= importedData ? importedData.externalUrl : '' %>">
+            </div>
+            <div class="form-group">
+                <label for="carMakeLogoUrl">رابط شعار الشركة (اختياري)</label>
+                <input type="url" id="carMakeLogoUrl" name="carMakeLogoUrl" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary">إنشاء المزاد</button>
+          </form>
+        </div>
+
+        <div id="import" class="tab-content <%= importedData ? 'active' : '' %>">
+          <form action="/admin/auctions/import" method="POST" class="modern-form">
+            <p>أدخل رابط المزاد من موقع آخر لجلب البيانات تلقائيًا.</p>
+            <div class="form-group">
+              <label for="importUrl">رابط المزاد</label>
+              <input type="url" id="importUrl" name="importUrl" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary">استيراد البيانات</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<style>
+  .add-auction-container {
+    background: var(--background-color);
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
+  .tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 1.5rem;
+  }
+  .tab-link {
+    background: none;
+    border: none;
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    font-size: 1rem;
+    color: var(--text-color-secondary);
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+  }
+  .tab-link.active {
+    color: var(--primary-color-light);
+    border-bottom-color: var(--primary-color-light);
+  }
+  .tab-link i {
+    margin-right: 0.5rem;
+  }
+  .tab-content {
+    display: none;
+  }
+  .tab-content.active {
+    display: block;
+  }
+  .modern-form .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+  .modern-form .form-group {
+    margin-bottom: 1.5rem;
+  }
+  .modern-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--primary-color);
+  }
+  .modern-form .form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+  }
+  .modern-form .btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+</style>
+
+<script>
+  function showTab(tabName) {
+    const tabContents = document.querySelectorAll('.tab-content');
+    tabContents.forEach(content => {
+      content.classList.remove('active');
+    });
+
+    const tabLinks = document.querySelectorAll('.tab-link');
+    tabLinks.forEach(link => {
+      link.classList.remove('active');
+    });
+
+    document.getElementById(tabName).classList.add('active');
+    event.currentTarget.classList.add('active');
+  }
+</script>

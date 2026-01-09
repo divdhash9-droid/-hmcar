@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="HM CAR">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d4af37"/>
+      <stop offset="1" stop-color="#b8891a"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="120" fill="#071428"/>
+  <path fill="url(#g)" d="M124 306c-10 0-18-8-18-18 0-50 28-92 73-108l16-40c12-30 41-50 73-50h26c32 0 61 20 73 50l16 40c45 16 73 58 73 108 0 10-8 18-18 18h-18v42c0 23-19 42-42 42-18 0-34-12-40-28H178c-6 16-22 28-40 28-23 0-42-19-42-42v-42h-18zm54-20h156c-7-18-25-30-46-30h-64c-21 0-39 12-46 30zm-18 38c-12 0-22 10-22 22s10 22 22 22 22-10 22-22-10-22-22-22zm192 0c-12 0-22 10-22 22s10 22 22 22 22-10 22-22-10-22-22-22z"/>
+  <text x="256" y="454" text-anchor="middle" font-family="system-ui,Segoe UI,Arial" font-size="44" font-weight="700" fill="#faf7f2">HM CAR</text>
+</svg>

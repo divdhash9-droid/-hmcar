@@ -1,0 +1,149 @@
+<% layout('layout') -%>
+<% var hideNavbar = true; %>
+<% var hideSearch = true; %>
+<% var fullWidth = true; %>
+
+<link href="/public/css/creative-single.css" rel="stylesheet">
+
+<div class="main-container">
+  <div class="creative-layout">
+    <!-- Left Section - Hero -->
+    <div class="hero-section">
+      <h1 class="hero-title">HM CAR</h1>
+      <p class="hero-subtitle">مزادات السيارات الفاخرة في المملكة العربية السعودية</p>
+      
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <a href="/auctions" class="cta-button primary">
+          <i class="fas fa-gavel"></i>
+          <%= __('home.creative.cta.exploreAuctions') %>
+        </a>
+        <a href="/cars" class="cta-button">
+          <i class="fas fa-car"></i>
+          <%= __('home.creative.cta.browseCars') %>
+        </a>
+        <a href="/auth/register" class="cta-button primary">
+          <i class="fas fa-user-plus"></i>
+          <%= __('home.creative.cta.register') %>
+        </a>
+        <a href="/auth/login" class="cta-button">
+          <i class="fas fa-sign-in-alt"></i>
+          <%= __('home.creative.cta.login') %>
+        </a>
+      </div>
+    </div>
+
+    <!-- Right Section - Interactive -->
+    <div class="interactive-section">
+      <!-- Search Box -->
+      <div class="search-box">
+        <h2 class="search-title">
+          <i class="fas fa-search"></i>
+          <%= __('home.creative.searchTitle') %>
+        </h2>
+        <form action="/search" method="GET" class="search-form">
+          <div class="search-grid">
+            <div class="search-item">
+              <i class="fas fa-search"></i>
+              <input type="text" name="q" placeholder="<%= __('home.creative.searchPlaceholder') %>" class="search-input">
+            </div>
+            <div class="search-item">
+              <i class="fas fa-car"></i>
+              <select name="brand" class="search-select">
+                <option value=""><%= __('home.creative.brand') %></option>
+                <% if (brands && brands.length > 0) { %>
+                  <% brands.forEach(brand => { %>
+                    <option value="<%= brand._id %>"><%= brand.name %></option>
+                  <% }); %>
+                <% } %>
+              </select>
+            </div>
+            <div class="search-item">
+              <i class="fas fa-money-bill-wave"></i>
+              <select name="minPrice" class="search-select">
+                <option value=""><%= __('home.creative.minPrice') %></option>
+                <option value="50000">50,000 ريال</option>
+                <option value="100000">100,000 ريال</option>
+                <option value="200000">200,000 ريال</option>
+              </select>
+            </div>
+            <div class="search-item">
+              <i class="fas fa-money-bill-wave"></i>
+              <select name="maxPrice" class="search-select">
+                <option value=""><%= __('home.creative.maxPrice') %></option>
+                <option value="200000">200,000 ريال</option>
+                <option value="300000">300,000 ريال</option>
+                <option value="500000">500,000 ريال</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="search-button">
+            <i class="fas fa-search"></i>
+            <%= __('home.creative.searchButton') %>
+          </button>
+        </form>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-item">
+          <i class="fas fa-car"></i>
+          <span class="stat-number"><%= (stats && typeof stats.totalCars !== 'undefined') ? stats.totalCars : '500+' %></span>
+          <span class="stat-label"><%= __('home.creative.stats.cars') %></span>
+        </div>
+        <div class="stat-item">
+          <i class="fas fa-gavel"></i>
+          <span class="stat-number"><%= (stats && typeof stats.activeAuctions !== 'undefined') ? stats.activeAuctions : '50+' %></span>
+          <span class="stat-label"><%= __('home.creative.stats.activeAuctions') %></span>
+        </div>
+        <div class="stat-item">
+          <i class="fas fa-users"></i>
+          <span class="stat-number"><%= (stats && typeof stats.totalUsers !== 'undefined') ? stats.totalUsers : '10K+' %></span>
+          <span class="stat-label"><%= __('home.creative.stats.users') %></span>
+        </div>
+        <div class="stat-item">
+          <i class="fas fa-trophy"></i>
+          <span class="stat-number"><%= (stats && typeof stats.completedAuctions !== 'undefined') ? stats.completedAuctions : '200+' %></span>
+          <span class="stat-label"><%= __('home.creative.stats.completedAuctions') %></span>
+        </div>
+      </div>
+
+      <!-- Cars Preview -->
+      <div class="cars-preview">
+        <h3 class="cars-preview-title">
+          <i class="fas fa-star"></i>
+          <%= __('home.creative.featuredTitle') %>
+        </h3>
+        <div class="cars-grid">
+          <% if (cars && cars.length > 0) { %>
+            <% cars.slice(0, 3).forEach(car => { %>
+              <div class="car-card">
+                <div class="car-thumb">
+                  <img class="car-thumb-img" src="<%= (car.images && car.images[0] && car.images[0].url) ? car.images[0].url : '/images/default-car.jpg' %>" alt="<%= car.make %> <%= car.model %>">
+                  <div class="car-thumb-badge" title="مميز">
+                    <i class="fas fa-crown"></i>
+                  </div>
+                </div>
+                <div class="car-name"><%= car.make %> <%= car.model %></div>
+                <div class="car-meta">
+                  <span><i class="fas fa-calendar-alt"></i> <%= car.year || '—' %></span>
+                  <span><i class="fas fa-tag"></i> <%= (typeof car.startPrice !== 'undefined' && car.startPrice) ? (new Intl.NumberFormat('en-US').format(car.startPrice) + ' $') : (car.price ? (car.price.toLocaleString() + ' ريال') : 'عند الطلب') %></span>
+                </div>
+                <a class="car-link" href="/cars/<%= car._id %>">
+                  <i class="fas fa-arrow-left"></i>
+                  <%= __('common.details') %>
+                </a>
+              </div>
+            <% }); %>
+          <% } else { %>
+            <div class="no-cars-message">
+              <i class="fas fa-car-side"></i>
+              <h3><%= __('home.creative.noCarsTitle') %></h3>
+              <p><%= __('home.creative.noCarsSubtitle') %></p>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

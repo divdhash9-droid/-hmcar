@@ -1,0 +1,116 @@
+<% layout('layout') -%>
+<link rel="stylesheet" href="/public/css/admin-unified.css" />
+<% var hideNavbar = true; %>
+<% var hideSearch = true; %>
+<% var fullWidth = true; %>
+<% var bodyClass = 'admin-unified-bg' %>
+
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+      <!-- زر العودة -->
+      <a href="/admin" class="back-btn">
+        <i class="fas fa-arrow-right ms-2"></i>
+        العودة للوحة التحكم
+      </a>
+      
+      <!-- البطاقة الرئيسية -->
+      <div class="cars-card">
+        <!-- رأس البطاقة -->
+        <div class="cars-header">
+          <h5 class="mb-0">
+            <i class="fas fa-car me-2"></i>إدارة السيارات
+          </h5>
+        </div>
+        
+        <!-- محتوى البطاقة -->
+        <div class="p-4">
+          <% if (cars && cars.length > 0) { %>
+            <div class="row">
+              <div class="col-12">
+                <h6 class="mb-3 text-muted">إجمالي السيارات: <%= cars.length %></h6>
+              </div>
+            </div>
+            
+            <% cars.forEach(function(car) { %>
+              <div class="car-item">
+                <div class="row align-items-center">
+                  <div class="col-md-8">
+                    <div class="car-title">
+                      <%= car.title || (car.make + ' ' + car.model + ' ' + car.year) %>
+                    </div>
+                    <div class="car-details">
+                      <i class="fas fa-tachometer-alt me-2"></i>
+                      <%= car.mileage || 'N/A' %> كم
+                    </div>
+                    <div class="car-details">
+                      <i class="fas fa-gas-pump me-2"></i>
+                      <%= car.fuelType || 'N/A' %>
+                    </div>
+                    <div class="car-details">
+                      <i class="fas fa-cog me-2"></i>
+                      <%= car.transmission || 'N/A' %>
+                    </div>
+                    <% if (car.category && car.category.name) { %>
+                      <div class="car-details">
+                        <i class="fas fa-tag me-2"></i>
+                        <%= car.category.name %>
+                      </div>
+                    <% } %>
+                  </div>
+                  <div class="col-md-4 text-md-end">
+                    <div class="car-price">
+                      <% if (car.priceSar) { %>
+                        <%= car.priceSar.toLocaleString('ar-SA') %> ريال
+                      <% } else if (car.price) { %>
+                        <%= car.price.toLocaleString('ar-SA') %> ريال
+                      <% } else { %>
+                        لم يحدد السعر
+                      <% } %>
+                    </div>
+                    <div class="mt-2">
+                      <% if (car.isSold) { %>
+                        <span class="badge badge-sold">تم البيع</span>
+                      <% } else { %>
+                        <span class="badge badge-available">متاحة</span>
+                      <% } %>
+                    </div>
+                    <div class="mt-3">
+                      <a href="/cars/<%= car._id %>/edit" class="btn btn-sm btn-outline-light me-2">
+                        <i class="fas fa-edit me-1"></i>تعديل
+                      </a>
+                      <form method="post" action="/admin/cars/<%= car._id %>/toggle-active" class="d-inline me-2">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <button type="submit" class="btn btn-sm <%= car.isActive ? 'btn-warning' : 'btn-success' %>">
+                          <i class="fas fa-<%= car.isActive ? 'eye-slash' : 'eye' %> me-1"></i>
+                          <%= car.isActive ? 'إلغاء التفعيل' : 'تفعيل' %>
+                        </button>
+                      </form>
+                      <% if (!car.isSold) { %>
+                        <form method="post" action="/cars/<%= car._id %>/delete" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذه السيارة؟')">
+                          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                          <button type="submit" class="btn btn-sm btn-outline-danger">
+                            <i class="fas fa-trash me-1"></i>حذف
+                          </button>
+                        </form>
+                      <% } %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <% }) %>
+          <% } else { %>
+            <div class="empty-state">
+              <i class="fas fa-car"></i>
+              <h5>لا توجد سيارات حالياً</h5>
+              <p>لم يتم إضافة أي سيارات بعد. ابدأ بإضافة سيارة جديدة.</p>
+              <a href="/cars/new" class="btn btn-primary mt-3">
+                <i class="fas fa-plus me-2"></i>إضافة سيارة جديدة
+              </a>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

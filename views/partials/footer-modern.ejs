@@ -1,0 +1,33 @@
+<footer class="main-footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section about">
+                <h4><%= __('footer.aboutTitle') %></h4>
+                <p><%= __('footer.aboutText') %></p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <div class="footer-section links">
+                <h4><%= __('footer.quickLinksTitle') %></h4>
+                <ul>
+                    <li><a href="/auctions"><%= __('navigation.auctions') %></a></li>
+                    <li><a href="/cars"><%= __('footer.links.buyCars') %></a></li>
+                    <li><a href="/sell"><%= __('footer.links.sellCar') %></a></li>
+                    <li><a href="/support"><%= __('footer.links.support') %></a></li>
+                </ul>
+            </div>
+            <div class="footer-section contact">
+                <h4><%= __('footer.contactTitle') %></h4>
+                <p><i class="fas fa-map-marker-alt"></i> <%= __('footer.contact.address') %></p>
+                <p><i class="fas fa-phone"></i> <%= __('footer.contact.phone') %></p>
+                <p><i class="fas fa-envelope"></i> <%= __('footer.contact.email') %></p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            © <%= new Date().getFullYear() %> HM CAR | <%= __('footer.rightsReserved') %>
+        </div>
+    </div>
+</footer>

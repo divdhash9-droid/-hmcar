@@ -1,0 +1,74 @@
+{
+  "name": "HM CAR Auction",
+  "short_name": "HM CAR",
+  "description": "مزادات السيارات الفاخرة في المملكة العربية السعودية",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#1a1a1a",
+  "theme_color": "#d4af37",
+  "orientation": "portrait-primary",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "/public/images/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/public/images/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/public/images/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "categories": ["business", "shopping", "automotive"],
+  "shortcuts": [
+    {
+      "name": "المزادات",
+      "short_name": "مزادات",
+      "description": "استكشف المزادات الحالية",
+      "url": "/auctions",
+      "icons": [{ "src": "/public/images/icons/icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "السيارات",
+      "short_name": "سيارات",
+      "description": "تصفح السيارات المتاحة",
+      "url": "/cars",
+      "icons": [{ "src": "/public/images/icons/icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "تسجيل الدخول",
+      "short_name": "دخول",
+      "description": "تسجيل الدخول إلى حسابك",
+      "url": "/auth/login",
+      "icons": [{ "src": "/public/images/icons/icon.svg", "sizes": "any" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/public/images/screenshots/desktop-1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "الصفحة الرئيسية - HM CAR Auction"
+    },
+    {
+      "src": "/public/images/screenshots/mobile-1.png",
+      "sizes": "375x667",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "تطبيق الهاتف - HM CAR Auction"
+    }
+  ],
+  "prefer_related_applications": false
+}

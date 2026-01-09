@@ -1,0 +1,199 @@
+<!-- views/cars/form.ejs -->
+<% layout('layout') -%>
+<h3 class="mb-3"><%= isEdit ? 'تعديل سيارة' : 'إضافة سيارة' %></h3>
+<form method="post" enctype="multipart/form-data" action="<%= isEdit ? '/cars/' + car._id + '/edit' : '/cars/new' %>">
+  <!-- حقل مخفي لحماية CSRF: يتم توليده من السيرفر ويُرسل مع الفورم للتأكد أن الطلب موثوق -->
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+  <!-- شبكة الحقول: نقسم المدخلات إلى أعمدة باستخدام Bootstrap -->
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <!-- عنوان الإعلان/السيارة كما سيظهر للمستخدمين -->
+      <label class="form-label">عنوان السيارة</label>
+      <input name="title" class="form-control" required value="<%= isEdit && car ? car.title : '' %>" />
+    </div>
+    <div class="col-md-3 mb-3">
+      <!-- الشركة المصنعة (اختياري) -->
+      <label class="form-label">الشركة</label>
+      <input name="make" class="form-control" value="<%= isEdit && car ? car.make : '' %>" />
+    </div>
+    <div class="col-md-3 mb-3">
+      <!-- موديل السيارة (اختياري) -->
+      <label class="form-label">الموديل</label>
+      <input name="model" class="form-control" value="<%= isEdit && car ? car.model : '' %>" />
+    </div>
+    <div class="col-md-6 mb-3">
+      <!-- رابط شعار الشركة: يُستخدم لعرض شعار بجانب بيانات السيارة إن توفر -->
+      <label class="form-label">شعار الشركة (رابط اختياري)</label>
+      <input name="makeLogoUrl" class="form-control" placeholder="https://..." value="<%= isEdit && car ? car.makeLogoUrl : '' %>" />
+    </div>
+    <div class="col-md-3 mb-3">
+      <!-- سنة الصنع (اختياري) -->
+      <label class="form-label">السنة</label>
+      <input name="year" type="number" class="form-control" value="<%= isEdit && car ? car.year : '' %>" />
+    </div>
+    <div class="col-md-3 mb-3">
+      <!-- السعر بالريال: يمكن أن يعتمد عليه المزاد/العرض حسب منطق الباك إند -->
+      <label class="form-label">السعر (SAR)</label>
+      <input name="priceSar" type="number" step="0.01" class="form-control" value="<%= isEdit && car ? car.priceSar : '' %>" />
+    </div>
+    <div class="col-md-3 mb-3">
+      <!-- السعر بالدولار: نفس الفكرة لكن بعملة مختلفة -->
+      <label class="form-label">السعر (USD)</label>
+      <input name="priceUsd" type="number" step="0.01" class="form-control" value="<%= isEdit && car ? car.priceUsd : '' %>" />
+    </div>
+    <div class="col-md-3 mb-3">
+      <!-- حقل سعر قديم/متوافق مع بيانات سابقة (اختياري) -->
+      <label class="form-label">السعر (قديم/اختياري)</label>
+      <input name="price" type="number" step="0.01" class="form-control" value="<%= isEdit && car ? car.price : '' %>" />
+    </div>
+    <div class="col-md-6 mb-3">
+      <!-- اختيار فئة السيارة: يتم تعبئة الخيارات من المتغير categories القادم من السيرفر -->
+      <label class="form-label">فئة السيارة</label>
+      <select name="categoryId" class="form-select">
+        <option value="">بدون فئة</option>
+        <% (categories || []).forEach(cat => { %>
+          <option value="<%= cat._id %>" <%= (isEdit && car && car.category && car.category._id.toString() === cat._id.toString()) ? 'selected' : '' %>><%= cat.name %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="col-md-3 mb-3">
+      <!-- عدد الكيلومترات/الممشى (اختياري) -->
+      <label class="form-label">الممشى</label>
+      <input name="mileage" type="number" class="form-control" value="<%= isEdit && car ? car.mileage : '' %>" />
+    </div>
+    <div class="col-md-3 mb-3">
+      <!-- حالة السيارة: قيم option هي التي تُرسل للباك إند (بالإنجليزية) بينما النص المعروض بالعربي -->
+      <label class="form-label">الحالة</label>
+      <select name="condition" class="form-select">
+        <option value="excellent" <%= (isEdit && car && car.condition === 'excellent') ? 'selected' : '' %>>ممتاز</option>
+        <option value="good" <%= (isEdit && car && car.condition === 'good') ? 'selected' : '' %>>جيد</option>
+        <option value="fair" <%= (isEdit && car && car.condition === 'fair') ? 'selected' : '' %>>متوسط</option>
+        <option value="needs work" <%= (isEdit && car && car.condition === 'needs work') ? 'selected' : '' %>>يحتاج صيانة</option>
+      </select>
+    </div>
+    <div class="col-12 mb-3">
+      <!-- وصف تفصيلي: يفضّل كتابة أهم المواصفات والعيوب إن وجدت -->
+      <label class="form-label">الوصف</label>
+      <textarea name="description" rows="3" class="form-control"><%= isEdit && car ? car.description : '' %></textarea>
+    </div>
+    <div class="col-12 mb-3">
+      <!-- رفع صور متعددة: اسم الحقل images، والسيرفر عادة يقيّد العدد (مثلاً حتى 5) -->
+      <label class="form-label">صور السيارة (حتى 5 صور)</label>
+      <div class="border rounded p-3 bg-light">
+        <input name="images" type="file" multiple class="form-control" accept="image/jpeg,image/png,image/webp" />
+        <div class="form-text text-muted mt-2">
+          <i class="fas fa-info-circle me-1"></i>
+          يمكنك اختيار حتى 5 صور من جهازك. الصيغ المسموحة: JPG, PNG, WEBP. الحد الأقصى للحجم: 5MB لكل صورة.
+        </div>
+        <div id="imagePreview" class="mt-3"></div>
+      </div>
+    </div>
+  </div>
+  <!-- زر الإرسال: بعد الحفظ يتم الانتقال عادة لخطوة إنشاء المزاد -->
+  <button class="btn btn-primary">حفظ ومتابعة لإنشاء المزاد</button>
+</form>
+
+<script>
+// Image Preview Functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const imageInput = document.querySelector('input[name="images"]');
+  const previewContainer = document.getElementById('imagePreview');
+  
+  if (imageInput && previewContainer) {
+    imageInput.addEventListener('change', function(e) {
+      previewContainer.innerHTML = '';
+      
+      const files = Array.from(e.target.files);
+      if (files.length > 0) {
+        const previewTitle = document.createElement('div');
+        previewTitle.className = 'mb-2';
+        previewTitle.innerHTML = '<strong>معاينة الصور:</strong>';
+        previewContainer.appendChild(previewTitle);
+        
+        const previewGrid = document.createElement('div');
+        previewGrid.className = 'row g-2';
+        
+        files.forEach((file, index) => {
+          if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+              const col = document.createElement('div');
+              col.className = 'col-md-3 col-6';
+              
+              const imgContainer = document.createElement('div');
+              imgContainer.className = 'position-relative';
+              
+              const img = document.createElement('img');
+              img.src = e.target.result;
+              img.className = 'img-fluid rounded';
+              img.style.maxHeight = '150px';
+              img.style.width = '100%';
+              img.style.objectFit = 'cover';
+              
+              const removeBtn = document.createElement('button');
+              removeBtn.type = 'button';
+              removeBtn.className = 'btn btn-danger btn-sm position-absolute top-0 end-0 m-1';
+              removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+              removeBtn.onclick = function() {
+                col.remove();
+                // Remove file from input
+                const dt = new DataTransfer();
+                const remainingFiles = Array.from(imageInput.files).filter((f, i) => i !== index);
+                remainingFiles.forEach(f => dt.items.add(f));
+                imageInput.files = dt.files;
+              };
+              
+              imgContainer.appendChild(img);
+              imgContainer.appendChild(removeBtn);
+              col.appendChild(imgContainer);
+              previewGrid.appendChild(col);
+            };
+            
+            reader.readAsDataURL(file);
+          }
+        });
+        
+        previewContainer.appendChild(previewGrid);
+        
+        if (files.length > 5) {
+          const warning = document.createElement('div');
+          warning.className = 'alert alert-warning mt-2';
+          warning.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>يمكنك رفع 5 صور كحد أقصى. سيتم تجاهل الصور الإضافية.';
+          previewContainer.appendChild(warning);
+        }
+      }
+    });
+  }
+});
+
+// Currency Converter for Car Form
+(function() {
+  // Get current exchange rate
+  fetch('/api/exchange-rate/current')
+    .then(response => response.json())
+    .then(data => {
+      const EXCHANGE_RATE = data.rate || 3.75;
+      
+      const priceSarInput = document.querySelector('input[name="priceSar"]');
+      const priceUsdInput = document.querySelector('input[name="priceUsd"]');
+      
+      // Convert SAR to USD
+      priceSarInput.addEventListener('input', function() {
+        if (this.value && !priceUsdInput.value) {
+          const usdValue = (parseFloat(this.value) / EXCHANGE_RATE).toFixed(2);
+          priceUsdInput.value = usdValue;
+        }
+      });
+      
+      // Convert USD to SAR
+      priceUsdInput.addEventListener('input', function() {
+        if (this.value && !priceSarInput.value) {
+          const sarValue = (parseFloat(this.value) * EXCHANGE_RATE).toFixed(2);
+          priceSarInput.value = sarValue;
+        }
+      });
+    })
+    .catch(err => console.error('Error fetching exchange rate:', err));
+})();
+</script>

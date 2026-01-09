@@ -1,0 +1,52 @@
+<div class="car-card">
+    <a href="/cars/<%= car._id %>" class="card-link">
+        <div class="card-image-container">
+            <% if (car.images && car.images.length > 0) { %>
+                <img src="<%= car.images[0] %>" alt="<%= car.title %>" class="card-image" loading="lazy">
+            <% } else { %>
+                <div class="image-placeholder">
+                    <i class="fas fa-image"></i>
+                </div>
+            <% } %>
+            <div class="card-overlay">
+                <% if (car.isSold) { %>
+                    <span class="badge sold">تم البيع</span>
+                <% } else if (car.listingType === 'auction') { %>
+                    <span class="badge auction">مزاد</span>
+                <% } else { %>
+                    <span class="badge available">متوفر</span>
+                <% } %>
+            </div>
+        </div>
+        <div class="card-content">
+            <div class="card-title-make">
+                <% if (car.makeLogoUrl) { %>
+                    <img src="<%= car.makeLogoUrl %>" alt="<%= car.make %>" class="make-logo">
+                <% } %>
+                <h3 class="card-title"><%= car.title %></h3>
+            </div>
+            <p class="card-model"><%= car.make %> <%= car.model %></p>
+            <div class="card-specs">
+                <span><i class="fas fa-calendar-alt"></i> <%= car.year || 'N/A' %></span>
+                <span><i class="fas fa-tachometer-alt"></i> <%= car.mileage ? car.mileage.toLocaleString() + ' كم' : 'N/A' %></span>
+            </div>
+            <div class="card-price">
+                <% if (car.priceSar) { %>
+                    <%= car.priceSar.toLocaleString() %> ريال
+                <% } else if (car.price) { %>
+                    <%= car.price.toLocaleString() %> ريال
+                <% } else { %>
+                    السعر عند الطلب
+                <% } %>
+            </div>
+        </div>
+    </a>
+    <div class="card-actions">
+        <a href="/cars/<%= car._id %>" class="btn btn-primary">التفاصيل</a>
+        <% if (currentUser && currentUser.role === 'buyer' && !car.isSold) { %>
+            <button class="btn btn-secondary favorite-btn" data-car-id="<%= car._id %>">
+                <i class="far fa-heart"></i>
+            </button>
+        <% } %>
+    </div>
+</div>

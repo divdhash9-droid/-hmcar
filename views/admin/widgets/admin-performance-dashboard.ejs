@@ -1,0 +1,670 @@
+<!-- Enhanced Performance Dashboard Widget -->
+<div class="enhanced-performance-widget">
+  <div class="enhanced-performance__header">
+    <h3 class="enhanced-performance__title">لوحة الأداء</h3>
+    <div class="enhanced-performance__period">
+      <select class="enhanced-performance__select">
+        <option value="24h">24 ساعة</option>
+        <option value="7d" selected>7 أيام</option>
+        <option value="30d">30 يوم</option>
+        <option value="90d">90 يوم</option>
+      </select>
+    </div>
+  </div>
+  
+  <!-- Performance Metrics -->
+  <div class="enhanced-performance__metrics">
+    <div class="enhanced-metric-card">
+      <div class="enhanced-metric__header">
+        <div class="enhanced-metric__title">معدل التحويل</div>
+        <div class="enhanced-metric__trend enhanced-metric__trend--up">
+          <i class="fas fa-arrow-up"></i>
+          <span>+12.5%</span>
+        </div>
+      </div>
+      <div class="enhanced-metric__value">3.2%</div>
+      <div class="enhanced-metric__chart">
+        <canvas id="conversionChart" width="100" height="40"></canvas>
+      </div>
+    </div>
+    
+    <div class="enhanced-metric-card">
+      <div class="enhanced-metric__header">
+        <div class="enhanced-metric__title">متوسط وقت التحميل</div>
+        <div class="enhanced-metric__trend enhanced-metric__trend--down">
+          <i class="fas fa-arrow-down"></i>
+          <span>-8.3%</span>
+        </div>
+      </div>
+      <div class="enhanced-metric__value">1.2s</div>
+      <div class="enhanced-metric__chart">
+        <canvas id="loadTimeChart" width="100" height="40"></canvas>
+      </div>
+    </div>
+    
+    <div class="enhanced-metric-card">
+      <div class="enhanced-metric__header">
+        <div class="enhanced-metric__title">معدل الارتداد</div>
+        <div class="enhanced-metric__trend enhanced-metric__trend--down">
+          <i class="fas fa-arrow-down"></i>
+          <span>-5.7%</span>
+        </div>
+      </div>
+      <div class="enhanced-metric__value">24.8%</div>
+      <div class="enhanced-metric__chart">
+        <canvas id="bounceRateChart" width="100" height="40"></canvas>
+      </div>
+    </div>
+    
+    <div class="enhanced-metric-card">
+      <div class="enhanced-metric__header">
+        <div class="enhanced-metric__title">الزوار اليوميين</div>
+        <div class="enhanced-metric__trend enhanced-metric__trend--up">
+          <i class="fas fa-arrow-up"></i>
+          <span>+18.2%</span>
+        </div>
+      </div>
+      <div class="enhanced-metric__value">1,247</div>
+      <div class="enhanced-metric__chart">
+        <canvas id="dailyUsersChart" width="100" height="40"></canvas>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Performance Overview Chart -->
+  <div class="enhanced-performance__overview">
+    <div class="enhanced-overview__header">
+      <h4 class="enhanced-overview__title">نظرة عامة على الأداء</h4>
+      <div class="enhanced-overview__legend">
+        <div class="enhanced-legend__item">
+          <div class="enhanced-legend__color enhanced-legend__color--visitors"></div>
+          <span>الزوار</span>
+        </div>
+        <div class="enhanced-legend__item">
+          <div class="enhanced-legend__color enhanced-legend__color--conversions"></div>
+          <span>التحويلات</span>
+        </div>
+        <div class="enhanced-legend__item">
+          <div class="enhanced-legend__color enhanced-legend__color--revenue"></div>
+          <span>الإيرادات</span>
+        </div>
+      </div>
+    </div>
+    <div class="enhanced-overview__chart">
+      <canvas id="performanceOverviewChart" width="400" height="200"></canvas>
+    </div>
+  </div>
+  
+  <!-- System Health -->
+  <div class="enhanced-performance__health">
+    <h4 class="enhanced-health__title">صحة النظام</h4>
+    <div class="enhanced-health__metrics">
+      <div class="enhanced-health-item">
+        <div class="enhanced-health__label">CPU</div>
+        <div class="enhanced-health__progress">
+          <div class="enhanced-health__bar" style="width: 45%"></div>
+        </div>
+        <div class="enhanced-health__value">45%</div>
+      </div>
+      
+      <div class="enhanced-health-item">
+        <div class="enhanced-health__label">الذاكرة</div>
+        <div class="enhanced-health__progress">
+          <div class="enhanced-health__bar" style="width: 62%"></div>
+        </div>
+        <div class="enhanced-health__value">62%</div>
+      </div>
+      
+      <div class="enhanced-health-item">
+        <div class="enhanced-health__label">التخزين</div>
+        <div class="enhanced-health__progress">
+          <div class="enhanced-health__bar" style="width: 38%"></div>
+        </div>
+        <div class="enhanced-health__value">38%</div>
+      </div>
+      
+      <div class="enhanced-health-item">
+        <div class="enhanced-health__label">قاعدة البيانات</div>
+        <div class="enhanced-health__progress">
+          <div class="enhanced-health__bar" style="width: 28%"></div>
+        </div>
+        <div class="enhanced-health__value">28%</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Top Pages -->
+  <div class="enhanced-performance__pages">
+    <h4 class="enhanced-pages__title">أكثر الصفحات زيارة</h4>
+    <div class="enhanced-pages__list">
+      <div class="enhanced-page-item">
+        <div class="enhanced-page__info">
+          <div class="enhanced-page__title">الصفحة الرئيسية</div>
+          <div class="enhanced-page__url">/</div>
+        </div>
+        <div class="enhanced-page__stats">
+          <div class="enhanced-page__views">3,247</div>
+          <div class="enhanced-page__trend enhanced-page__trend--up">
+            <i class="fas fa-arrow-up"></i>
+            <span>+12%</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="enhanced-page-item">
+        <div class="enhanced-page__info">
+          <div class="enhanced-page__title">عرض السيارات</div>
+          <div class="enhanced-page__url">/cars</div>
+        </div>
+        <div class="enhanced-page__stats">
+          <div class="enhanced-page__views">2,156</div>
+          <div class="enhanced-page__trend enhanced-page__trend--up">
+            <i class="fas fa-arrow-up"></i>
+            <span>+8%</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="enhanced-page-item">
+        <div class="enhanced-page__info">
+          <div class="enhanced-page__title">المزادات</div>
+          <div class="enhanced-page__url">/auctions</div>
+        </div>
+        <div class="enhanced-page__stats">
+          <div class="enhanced-page__views">1,892</div>
+          <div class="enhanced-page__trend enhanced-page__trend--down">
+            <i class="fas fa-arrow-down"></i>
+            <span>-3%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.enhanced-performance-widget {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  margin: 2rem 0;
+  box-shadow: var(--shadow-light);
+}
+
+.enhanced-performance__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.enhanced-performance__title {
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.enhanced-performance__select {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-secondary);
+  color: var(--text-primary);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.enhanced-performance__metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.enhanced-metric-card {
+  background: var(--gradient-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  transition: var(--transition-smooth);
+  position: relative;
+  overflow: hidden;
+}
+
+.enhanced-metric-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-medium);
+  border-color: var(--border-primary);
+}
+
+.enhanced-metric-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--gradient-primary);
+  transform: scaleY(0);
+  transition: var(--transition-smooth);
+}
+
+.enhanced-metric-card:hover::before {
+  transform: scaleY(1);
+}
+
+.enhanced-metric__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.enhanced-metric__title {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.enhanced-metric__trend {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+}
+
+.enhanced-metric__trend--up {
+  background: var(--bg-success);
+  color: var(--text-success);
+}
+
+.enhanced-metric__trend--down {
+  background: var(--bg-danger);
+  color: var(--text-danger);
+}
+
+.enhanced-metric__value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.enhanced-metric__chart {
+  height: 40px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem;
+}
+
+.enhanced-performance__overview {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.enhanced-overview__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.enhanced-overview__title {
+  color: var(--text-primary);
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.enhanced-overview__legend {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.enhanced-legend__item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.enhanced-legend__color {
+  width: 12px;
+  height: 12px;
+  border-radius: var(--radius-sm);
+}
+
+.enhanced-legend__color--visitors {
+  background: var(--primary-gold);
+}
+
+.enhanced-legend__color--conversions {
+  background: var(--success-green);
+}
+
+.enhanced-legend__color--revenue {
+  background: var(--info-blue);
+}
+
+.enhanced-overview__chart {
+  height: 200px;
+  background: var(--bg-primary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-card);
+  padding: 1rem;
+}
+
+.enhanced-performance__health {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.enhanced-health__title {
+  color: var(--text-primary);
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+}
+
+.enhanced-health__metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.enhanced-health-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--bg-primary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-card);
+}
+
+.enhanced-health__label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  min-width: 80px;
+}
+
+.enhanced-health__progress {
+  flex: 1;
+  height: 8px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.enhanced-health__bar {
+  height: 100%;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-full);
+  transition: var(--transition-smooth);
+}
+
+.enhanced-health__value {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--primary-gold);
+  min-width: 40px;
+  text-align: left;
+}
+
+.enhanced-performance__pages {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+}
+
+.enhanced-pages__title {
+  color: var(--text-primary);
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+}
+
+.enhanced-pages__list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.enhanced-page-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: var(--bg-primary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-card);
+  transition: var(--transition-smooth);
+}
+
+.enhanced-page-item:hover {
+  border-color: var(--border-primary);
+  transform: translateX(4px);
+}
+
+.enhanced-page__info {
+  flex: 1;
+}
+
+.enhanced-page__title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.enhanced-page__url {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.enhanced-page__stats {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.enhanced-page__views {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary-gold);
+}
+
+.enhanced-page__trend {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.enhanced-page__trend--up {
+  color: var(--text-success);
+}
+
+.enhanced-page__trend--down {
+  color: var(--text-danger);
+}
+
+@media (max-width: 768px) {
+  .enhanced-performance__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .enhanced-performance__metrics {
+    grid-template-columns: 1fr;
+  }
+  
+  .enhanced-overview__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .enhanced-health__metrics {
+    grid-template-columns: 1fr;
+  }
+  
+  .enhanced-page-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .enhanced-page__stats {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+</style>
+
+<script>
+// Performance Dashboard JavaScript
+document.addEventListener('DOMContentLoaded', function() {
+  // Mini chart drawing function
+  function drawMiniChart(canvasId, data, color) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    
+    ctx.clearRect(0, 0, width, height);
+    
+    // Draw simple line chart
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    
+    data.forEach((value, index) => {
+      const x = (width / (data.length - 1)) * index;
+      const y = height - (value / 100) * height;
+      
+      if (index === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
+    });
+    
+    ctx.stroke();
+    
+    // Add gradient fill
+    const gradient = ctx.createLinearGradient(0, 0, 0, height);
+    gradient.addColorStop(0, color + '40');
+    gradient.addColorStop(1, color + '10');
+    
+    ctx.fillStyle = gradient;
+    ctx.lineTo(width, height);
+    ctx.lineTo(0, height);
+    ctx.closePath();
+    ctx.fill();
+  }
+  
+  // Draw mini charts with sample data
+  function getThemeVar(name, fallback) {
+    try {
+      const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+      return value || fallback;
+    } catch (e) {
+      return fallback;
+    }
+  }
+
+  const themePrimary = getThemeVar('--primary-color', '#0f172a');
+
+  drawMiniChart('conversionChart', [20, 35, 30, 45, 40, 55, 50, 65, 60, 70], themePrimary);
+  drawMiniChart('loadTimeChart', [80, 70, 60, 50, 40, 35, 30, 25, 20, 15], '#28A745');
+  drawMiniChart('bounceRateChart', [60, 55, 50, 45, 40, 35, 30, 28, 25, 24], '#DC3545');
+  drawMiniChart('dailyUsersChart', [40, 45, 50, 55, 60, 65, 70, 75, 80, 85], '#17A2B8');
+  
+  // Draw overview chart
+  function drawOverviewChart() {
+    const canvas = document.getElementById('performanceOverviewChart');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    
+    ctx.clearRect(0, 0, width, height);
+    
+    // Sample data
+    const visitors = [120, 150, 180, 140, 200, 160, 220, 180, 240, 200, 260, 220];
+    const conversions = [12, 18, 22, 16, 28, 20, 32, 24, 36, 28, 40, 32];
+    const revenue = [800, 1200, 1600, 1000, 2000, 1400, 2400, 1800, 2800, 2200, 3200, 2600];
+    
+    // Draw grid lines
+    ctx.strokeStyle = '#E9ECEF';
+    ctx.lineWidth = 1;
+    
+    for (let i = 0; i <= 4; i++) {
+      const y = (height / 4) * i;
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(width, y);
+      ctx.stroke();
+    }
+    
+    // Draw data lines
+    function drawLine(data, color) {
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      
+      data.forEach((value, index) => {
+        const x = (width / (data.length - 1)) * index;
+        const y = height - (value / Math.max(...revenue)) * height;
+        
+        if (index === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+      });
+      
+      ctx.stroke();
+    }
+    
+    drawLine(visitors, themePrimary);
+    drawLine(conversions, '#28A745');
+    drawLine(revenue, '#17A2B8');
+  }
+  
+  drawOverviewChart();
+  
+  // Period selector
+  const periodSelect = document.querySelector('.enhanced-performance__select');
+  if (periodSelect) {
+    periodSelect.addEventListener('change', function() {
+      console.log('Period changed to:', this.value);
+      // Here you would fetch new data based on the selected period
+      drawMiniChart('conversionChart', [30, 45, 40, 55, 50, 65, 60, 75, 70, 80], themePrimary);
+      drawMiniChart('loadTimeChart', [70, 60, 50, 40, 30, 25, 20, 15, 10, 5], '#28A745');
+      drawMiniChart('bounceRateChart', [50, 45, 40, 35, 30, 25, 20, 18, 15, 14], '#DC3545');
+      drawMiniChart('dailyUsersChart', [50, 55, 60, 65, 70, 75, 80, 85, 90, 95], '#17A2B8');
+      drawOverviewChart();
+    });
+  }
+});
+</script>

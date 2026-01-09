@@ -1,0 +1,69 @@
+<% layout('layout') -%>
+
+<!-- صفحة سيارات المزاد: قائمة السيارات المُضافة من الإدارة للمزاد/المزايدات -->
+
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2 mb-3">
+  <div>
+    <h3 class="mb-1">سيارات المزاد</h3>
+    <div class="text-muted">سيارات تم إدخالها من الإدارة لعرضها للعملاء مع المزايدات.</div>
+  </div>
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-secondary" href="/auctions/live">العودة للمزاد المباشر</a>
+    <% if (currentUser && currentUser.role === 'admin') { %>
+      <!-- زر إداري لإضافة سيارة مزاد جديدة -->
+      <a class="btn btn-primary" href="/auctions/cars/new">إضافة سيارة مزاد</a>
+    <% } %>
+  </div>
+</div>
+
+<% if (!cars || cars.length === 0) { %>
+  <!-- حالة عدم وجود سيارات مزاد -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-body py-5 text-center">
+      <h5 class="mb-2">لا توجد سيارات مزاد حالياً</h5>
+      <div class="text-muted">سيقوم الأدمن بإضافة السيارات من لوحة المزاد.</div>
+    </div>
+  </div>
+<% } else { %>
+  <!-- عرض السيارات كبطاقات -->
+  <div class="row g-3">
+    <% cars.forEach(c => { %>
+      <div class="col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm h-100 overflow-hidden">
+          <% if (c.images && c.images.length) { %>
+            <!-- صورة الغلاف: أول صورة إن وجدت -->
+            <img src="<%= c.images[0] %>" class="img-fluid" style="height: 220px; width: 100%; object-fit: cover;" alt="صورة سيارة" loading="lazy" decoding="async" />
+          <% } else { %>
+            <!-- بديل الصورة عند عدم وجود صور -->
+            <div class="bg-body-tertiary d-flex align-items-center justify-content-center" style="height: 220px;">
+              <span class="text-muted">لا توجد صورة</span>
+            </div>
+          <% } %>
+          <div class="card-body">
+            <h5 class="mb-1"><%= c.title %></h5>
+            <div class="text-muted small mb-2"><%= c.make %> - <%= c.model %> - <%= c.year %></div>
+            <div class="text-muted mb-3">
+              <!-- عرض السعر: نفضل priceSar/priceUsd إن كانت متوفرة، وإلا نرجع للحقل القديم price -->
+              <% const sar = (c.priceSar !== undefined && c.priceSar !== null) ? c.priceSar : null; %>
+              <% const usd = (c.priceUsd !== undefined && c.priceUsd !== null) ? c.priceUsd : null; %>
+              <% if (sar !== null || usd !== null) { %>
+                <%= sar !== null ? sar.toLocaleString('en-US') + ' SAR' : '' %>
+                <%= (sar !== null && usd !== null) ? ' | ' : '' %>
+                <%= usd !== null ? usd.toLocaleString('en-US') + ' USD' : '' %>
+              <% } else { %>
+                <%= c.price ? c.price.toLocaleString('en-US') : '' %>
+              <% } %>
+            </div>
+
+            <!-- الانتقال لصفحة عرض المزايدات لهذه السيارة -->
+            <a class="btn btn-outline-primary w-100" href="/auctions/car/<%= c._id %>">عرض المزايدات</a>
+            <% if (c.externalUrl) { %>
+              <!-- رابط خارجي (اختياري) لصفحة المزاد الأصلية -->
+              <a class="btn btn-link w-100 mt-2" href="<%= c.externalUrl %>" target="_blank" rel="noopener">فتح رابط المزاد الخارجي</a>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+<% } %>

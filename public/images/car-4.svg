@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" role="img" aria-label="Car 4">
+  <defs>
+    <linearGradient id="bg4" x1="0" x2="1">
+      <stop offset="0" stop-color="#051426"/>
+      <stop offset="1" stop-color="#0f2a36"/>
+    </linearGradient>
+    <linearGradient id="g4" x1="0" x2="1">
+      <stop offset="0" stop-color="#e0b84a" />
+      <stop offset="1" stop-color="#ffd97a" />
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#bg4)"/>
+  <g transform="translate(60,110) scale(1.2)">
+    <path d="M40 160 C90 120, 240 96, 360 120 C480 142, 600 160, 680 152 L680 210 L40 210 Z" fill="#0d1b22" opacity="0.92"/>
+    <path d="M80 136 C140 100, 300 88, 420 110 C520 130, 620 150, 690 146" stroke="url(#g4)" stroke-width="6" fill="none" stroke-linecap="round"/>
+  </g>
+  <text x="40" y="420" font-family="Inter, sans-serif" font-size="28" fill="#ffd97a">لامبورجيني هوراكان — 2018</text>
+</svg>

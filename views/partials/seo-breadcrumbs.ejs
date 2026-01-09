@@ -1,0 +1,25 @@
+<!-- SEO Breadcrumbs -->
+<% 
+// Create default seo object if not defined
+const seoData = typeof seo !== 'undefined' ? seo : {
+  breadcrumbs: {
+    items: []
+  }
+};
+%>
+
+<% if (seoData && seoData.breadcrumbs && seoData.breadcrumbs.items && seoData.breadcrumbs.items.length > 1) { %>
+  <nav aria-label="breadcrumb" class="seo-breadcrumbs">
+    <ol class="breadcrumb">
+      <% seoData.breadcrumbs.items.forEach((item, index) => { %>
+        <li class="breadcrumb-item <%= index === seoData.breadcrumbs.items.length - 1 ? 'active' : '' %>">
+          <% if (index === seoData.breadcrumbs.items.length - 1) { %>
+            <span><%= item.name %></span>
+          <% } else { %>
+            <a href="<%= item.url %>"><%= item.name %></a>
+          <% } %>
+        </li>
+      <% }) %>
+    </ol>
+  </nav>
+<% } %>

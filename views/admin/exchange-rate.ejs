@@ -1,0 +1,102 @@
+<% layout('layout') -%>
+<% var hideNavbar = true; %>
+<% var hideSearch = true; %>
+<% var fullWidth = true; %>
+<% var bodyClass = 'admin-dashboard-luxury'; %>
+
+<div class="hm-dashboard">
+  <div class="hm-dashboard__container">
+    <header class="hm-hero" aria-label="إدارة سعر الصرف">
+      <div class="hm-hero__top">
+        <div class="hm-hero__brand">
+          <img class="hm-hero__logo" src="/public/images/navbar-logo.png" alt="HM CAR" loading="eager" decoding="async" onerror="this.onerror=null;this.src='/public/images/logo.png';" />
+          <div class="hm-hero__titles">
+            <h1 class="hm-hero__title">إدارة سعر الصرف</h1>
+            <div class="hm-hero__subtitle">تحكم فاخر بسعر الدولار — يظهر فوراً على الأسعار</div>
+          </div>
+        </div>
+
+        <nav class="hm-hero__actions" aria-label="روابط">
+          <a class="hm-pill" href="/admin" aria-label="لوحة الإدارة"><i class="fas fa-tachometer-alt"></i><span>لوحة الإدارة</span></a>
+          <a class="hm-pill" href="/admin/settings" aria-label="الإعدادات"><i class="fas fa-cogs"></i><span>الإعدادات</span></a>
+          <a class="hm-pill hm-pill--danger" href="/auth/logout" aria-label="خروج"><i class="fas fa-sign-out-alt"></i><span>خروج</span></a>
+        </nav>
+      </div>
+
+      <section class="hm-kpis" aria-label="القيمة الحالية">
+        <div class="hm-kpi">
+          <div class="hm-kpi__row">
+            <div>
+              <div class="hm-kpi__label">USD -> SAR</div>
+              <div class="hm-kpi__value"><%= (exchangeRate && exchangeRate.usdToSar) ? Number(exchangeRate.usdToSar).toFixed(4) : '3.7500' %></div>
+            </div>
+            <div class="hm-kpi__icon" aria-hidden="true"><i class="fas fa-dollar-sign"></i></div>
+          </div>
+        </div>
+        <div class="hm-kpi">
+          <div class="hm-kpi__row">
+            <div>
+              <div class="hm-kpi__label">آخر تحديث</div>
+              <div class="hm-kpi__value"><%= (exchangeRate && exchangeRate.lastUpdated) ? new Date(exchangeRate.lastUpdated).toLocaleDateString('ar') : '-' %></div>
+            </div>
+            <div class="hm-kpi__icon" aria-hidden="true"><i class="fas fa-clock"></i></div>
+          </div>
+        </div>
+        <div class="hm-kpi">
+          <div class="hm-kpi__row">
+            <div>
+              <div class="hm-kpi__label">ملاحظات</div>
+              <div class="hm-kpi__value">OK</div>
+            </div>
+            <div class="hm-kpi__icon" aria-hidden="true"><i class="fas fa-sticky-note"></i></div>
+          </div>
+        </div>
+        <div class="hm-kpi">
+          <div class="hm-kpi__row">
+            <div>
+              <div class="hm-kpi__label">حماية</div>
+              <div class="hm-kpi__value">CSRF</div>
+            </div>
+            <div class="hm-kpi__icon" aria-hidden="true"><i class="fas fa-shield-alt"></i></div>
+          </div>
+        </div>
+      </section>
+    </header>
+
+    <% if (flash && flash.message) { %>
+      <div class="mt-3">
+        <div class="alert alert-<%= flash.type || 'info' %> alert-dismissible fade show" role="alert">
+          <%= flash.message %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      </div>
+    <% } %>
+
+    <section class="hm-section" aria-label="تحديث السعر">
+      <h2 class="hm-section__title">تحديث سعر الصرف</h2>
+      <div class="hm-list">
+        <div class="hm-list__item">
+          <form class="w-100" method="POST" action="/admin/exchange-rate">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <div class="row g-3 align-items-end">
+              <div class="col-md-4">
+                <label class="form-label text-light">USD إلى SAR</label>
+                <input class="form-control" name="usdToSar" value="<%= (exchangeRate && exchangeRate.usdToSar) ? exchangeRate.usdToSar : 3.75 %>" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label text-light">ملاحظات</label>
+                <input class="form-control" name="notes" value="<%= (exchangeRate && exchangeRate.notes) ? exchangeRate.notes : '' %>" placeholder="سبب التحديث أو ملاحظة">
+              </div>
+              <div class="col-md-2">
+                <button class="hm-embed__close w-100" type="submit">حفظ</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="mt-3">
+        <a class="hm-embed__close" href="/admin/settings">رجوع للإعدادات</a>
+      </div>
+    </section>
+  </div>
+</div>

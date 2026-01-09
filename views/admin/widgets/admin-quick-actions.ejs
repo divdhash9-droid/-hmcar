@@ -1,0 +1,328 @@
+<!-- Enhanced Quick Actions Widget -->
+<div class="enhanced-actions-widget">
+  <div class="enhanced-actions__header">
+    <h3 class="enhanced-actions__title">إجراءات سريعة</h3>
+    <div class="enhanced-actions__subtitle">الوصول السريع للوظائف الشائعة</div>
+  </div>
+  
+  <div class="enhanced-actions__grid">
+    <!-- Add Car -->
+    <a href="/cars/new" class="enhanced-action-card enhanced-action-card--primary">
+      <div class="enhanced-action__icon">
+        <i class="fas fa-plus"></i>
+      </div>
+      <div class="enhanced-action__content">
+        <div class="enhanced-action__title">إضافة سيارة</div>
+        <div class="enhanced-action__subtitle">سيارة جديدة للمعرض</div>
+      </div>
+      <div class="enhanced-action__arrow">
+        <i class="fas fa-arrow-left"></i>
+      </div>
+    </a>
+    
+    <!-- Create Auction -->
+    <a href="/auctions/cars/new" class="enhanced-action-card enhanced-action-card--warning">
+      <div class="enhanced-action__icon">
+        <i class="fas fa-gavel"></i>
+      </div>
+      <div class="enhanced-action__content">
+        <div class="enhanced-action__title">إنشاء مزاد</div>
+        <div class="enhanced-action__subtitle">مزاد جديد للسيارات</div>
+      </div>
+      <div class="enhanced-action__arrow">
+        <i class="fas fa-arrow-left"></i>
+      </div>
+    </a>
+    
+    <!-- Manage Orders -->
+    <a href="/admin/orders" class="enhanced-action-card enhanced-action-card--info">
+      <div class="enhanced-action__icon">
+        <i class="fas fa-shopping-cart"></i>
+      </div>
+      <div class="enhanced-action__content">
+        <div class="enhanced-action__title">الطلبات</div>
+        <div class="enhanced-action__subtitle">إدارة طلبات العملاء</div>
+      </div>
+      <div class="enhanced-action__arrow">
+        <i class="fas fa-arrow-left"></i>
+      </div>
+    </a>
+    
+    <!-- Manage Users -->
+    <a href="/admin/users" class="enhanced-action-card enhanced-action-card--success">
+      <div class="enhanced-action__icon">
+        <i class="fas fa-users"></i>
+      </div>
+      <div class="enhanced-action__content">
+        <div class="enhanced-action__title">المستخدمون</div>
+        <div class="enhanced-action__subtitle">إدارة حسابات المستخدمين</div>
+      </div>
+      <div class="enhanced-action__arrow">
+        <i class="fas fa-arrow-left"></i>
+      </div>
+    </a>
+    
+    <!-- Settings -->
+    <a href="/admin/settings" class="enhanced-action-card enhanced-action-card--secondary">
+      <div class="enhanced-action__icon">
+        <i class="fas fa-cog"></i>
+      </div>
+      <div class="enhanced-action__content">
+        <div class="enhanced-action__title">الإعدادات</div>
+        <div class="enhanced-action__subtitle">إعدادات النظام</div>
+      </div>
+      <div class="enhanced-action__arrow">
+        <i class="fas fa-arrow-left"></i>
+      </div>
+    </a>
+    
+    <!-- Reports -->
+    <a href="/admin/reports" class="enhanced-action-card enhanced-action-card--purple">
+      <div class="enhanced-action__icon">
+        <i class="fas fa-chart-bar"></i>
+      </div>
+      <div class="enhanced-action__content">
+        <div class="enhanced-action__title">التقارير</div>
+        <div class="enhanced-action__subtitle">تقارير وإحصائيات</div>
+      </div>
+      <div class="enhanced-action__arrow">
+        <i class="fas fa-arrow-left"></i>
+      </div>
+    </a>
+    
+    <!-- Support -->
+    <a href="/admin/support" class="enhanced-action-card enhanced-action-card--danger">
+      <div class="enhanced-action__icon">
+        <i class="fas fa-headset"></i>
+      </div>
+      <div class="enhanced-action__content">
+        <div class="enhanced-action__title">الدعم الفني</div>
+        <div class="enhanced-action__subtitle">رسائل الدعم الفني</div>
+      </div>
+      <div class="enhanced-action__arrow">
+        <i class="fas fa-arrow-left"></i>
+      </div>
+    </a>
+  </div>
+  
+  <!-- Quick Stats Bar -->
+  <div class="enhanced-actions__stats">
+    <div class="enhanced-stat-bar">
+      <div class="enhanced-stat-bar__item">
+        <div class="enhanced-stat-bar__label">السيارات النشطة</div>
+        <div class="enhanced-stat-bar__value">24</div>
+      </div>
+      <div class="enhanced-stat-bar__item">
+        <div class="enhanced-stat-bar__label">المزادات المفتوحة</div>
+        <div class="enhanced-stat-bar__value">8</div>
+      </div>
+      <div class="enhanced-stat-bar__item">
+        <div class="enhanced-stat-bar__label">المستخدمون النشطون</div>
+        <div class="enhanced-stat-bar__value">156</div>
+      </div>
+      <div class="enhanced-stat-bar__item">
+        <div class="enhanced-stat-bar__label">المبيعات اليوم</div>
+        <div class="enhanced-stat-bar__value">12</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.enhanced-actions-widget {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  margin: 2rem 0;
+  box-shadow: var(--shadow-light);
+}
+
+.enhanced-actions__header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.enhanced-actions__title {
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+}
+
+.enhanced-actions__subtitle {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.enhanced-actions__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.enhanced-action-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: var(--transition-smooth);
+  position: relative;
+  overflow: hidden;
+}
+
+.enhanced-action-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: var(--transition-smooth);
+}
+
+.enhanced-action-card:hover::before {
+  right: 100%;
+}
+
+.enhanced-action-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-medium);
+}
+
+.enhanced-action-card--primary {
+  background: var(--gradient-primary);
+  color: white;
+}
+
+.enhanced-action-card--warning {
+  background: var(--gradient-warning);
+  color: white;
+}
+
+.enhanced-action-card--info {
+  background: var(--gradient-info);
+  color: white;
+}
+
+.enhanced-action-card--success {
+  background: var(--gradient-success);
+  color: white;
+}
+
+.enhanced-action-card--secondary {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-secondary);
+}
+
+.enhanced-action-card--purple {
+  background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
+  color: white;
+}
+
+.enhanced-action-card--danger {
+  background: var(--gradient-danger);
+  color: white;
+}
+
+.enhanced-action__icon {
+  width: 50px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.enhanced-action-card--secondary .enhanced-action__icon {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--primary-gold);
+}
+
+.enhanced-action__content {
+  flex: 1;
+}
+
+.enhanced-action__title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.enhanced-action__subtitle {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.enhanced-action__arrow {
+  font-size: 0.875rem;
+  opacity: 0.7;
+  transition: var(--transition-smooth);
+}
+
+.enhanced-action-card:hover .enhanced-action__arrow {
+  opacity: 1;
+  transform: translateX(-4px);
+}
+
+.enhanced-actions__stats {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+}
+
+.enhanced-stat-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.enhanced-stat-bar__item {
+  text-align: center;
+  padding: 1rem;
+  background: var(--bg-primary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-card);
+}
+
+.enhanced-stat-bar__label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.enhanced-stat-bar__value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-gold);
+}
+
+@media (max-width: 768px) {
+  .enhanced-actions__grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .enhanced-stat-bar {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .enhanced-action-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.75rem;
+  }
+  
+  .enhanced-action__arrow {
+    display: none;
+  }
+}
+</style>

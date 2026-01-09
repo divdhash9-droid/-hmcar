@@ -1,0 +1,151 @@
+<% layout('layout') -%>
+<!-- صفحة قديمة/بديلة لقائمة قطع الغيار مع فلاتر نصية بسيطة.
+     حالياً يوجد أيضاً: views/spare-parts/list.ejs (نسخة أحدث بفلاتر تفاعلية)
+-->
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2 mb-3">
+  <div>
+    <h3 class="mb-1">قطع الغيار</h3>
+    <div class="text-muted">ابحث عن القطع حسب الاسم أو الشركة أو موديل السيارة.</div>
+  </div>
+  <a href="/" class="btn btn-outline-secondary">العودة للصفحة الرئيسية</a>
+</div>
+
+<form class="card border-0 shadow-sm mb-3" method="get">
+  <!-- فلاتر البحث (q/make/model) عبر QueryString -->
+  <div class="card-body row g-3">
+    <% if (isEmbed) { %>
+      <input type="hidden" name="embed" value="1" />
+    <% } %>
+    <div class="col-md-4">
+      <label class="form-label">اسم القطعة أو نوعها</label>
+      <input name="q" class="form-control" placeholder="فلتر، مكابح..." value="<%= filters.q %>" />
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">الشركة</label>
+      <input name="make" class="form-control" placeholder="Toyota" value="<%= filters.make %>" />
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">الموديل</label>
+      <input name="model" class="form-control" placeholder="Camry" value="<%= filters.model %>" />
+    </div>
+    <div class="col-12 d-flex gap-2 justify-content-end">
+      <button class="btn btn-primary">بحث</button>
+      <a class="btn btn-outline-secondary" href="/spare-parts<%= isEmbed ? '?embed=1' : '' %>">إزالة الفلاتر</a>
+    </div>
+  </div>
+</form>
+
+<div class="row g-3">
+  <% if (!parts.length) { %>
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body text-center py-5">
+          <h5 class="mb-2">لا توجد نتائج</h5>
+          <div class="text-muted">جرّب تغيير كلمات البحث أو إزالة الفلاتر.</div>
+        </div>
+      </div>
+    </div>
+  <% } %>
+  <% parts.forEach(part => { %>
+    <!-- بطاقة قطعة غيار -->
+    <div class="col-md-4">
+      <div class="card h-100 border-0 shadow-sm overflow-hidden">
+        <% if (part.images && part.images[0]) { %>
+          <img src="<%= part.images[0] %>" class="card-img-top hm-part-card-img" alt="صورة قطعة" loading="lazy" decoding="async" />
+        <% } else { %>
+          <div class="hm-part-placeholder hm-part-placeholder--220">
+            <img class="hm-part-placeholder__img" src="/public/images/spare-parts.png" alt="" width="88" height="88" loading="lazy" decoding="async" />
+            <div class="hm-part-placeholder__text">صورة القطعة غير متوفرة</div>
+          </div>
+        <% } %>
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title"><%= part.name %></h5>
+          <p class="text-muted mb-1"><%= part.partType || 'نوع غير محدد' %></p>
+          <p class="mb-1">المركبة: <%= [part.carMake, part.carModel, part.carYear].filter(Boolean).join(' - ') || 'عام' %></p>
+          <p class="fw-semibold">
+            السعر:
+            <% const sar = (part.priceSar !== undefined && part.priceSar !== null) ? part.priceSar : null; %>
+            <% const usd = (part.priceUsd !== undefined && part.priceUsd !== null) ? part.priceUsd : null; %>
+            <% if (sar !== null || usd !== null) { %>
+              <span class="price-display" data-sar="<%= sar %>" data-usd="<%= usd %>">
+                <span class="price-current">
+                  <%= sar !== null ? sar.toLocaleString('en-US') + ' SAR' : '' %>
+                  <%= (sar !== null && usd !== null) ? ' | ' : '' %>
+                  <%= usd !== null ? usd.toLocaleString('en-US') + ' USD' : '' %>
+                </span>
+                <button class="btn btn-sm btn-outline-secondary ms-2 convert-price" type="button">
+                  <i class="fas fa-exchange-alt"></i> تحويل
+                </button>
+              </span>
+            <% } else { %>
+              <%= part.price.toLocaleString('en-US') %>
+            <% } %>
+          </p>
+          <p class="flex-grow-1"><%= part.description || '' %></p>
+          <div class="d-flex align-items-center justify-content-between gap-2 mt-auto">
+            <span class="badge <%= part.inStock ? 'bg-success' : 'bg-secondary' %>"><%= part.inStock ? 'متوفر' : 'غير متوفر' %></span>
+            <% if (currentUser && currentUser.role === 'buyer') { %>
+              <form method="post" action="/spare-parts/buy/<%= part._id %>">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                <button class="btn btn-sm btn-success" type="submit" <%= part.inStock ? '' : 'disabled' %>>شراء</button>
+              </form>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% }) %>
+</div>
+
+<script>
+// Currency Converter for Spare Parts
+(function() {
+  const EXCHANGE_RATE = 3.75; // 1 USD = 3.75 SAR
+  
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('.convert-price')) {
+      const button = e.target.closest('.convert-price');
+      const priceDisplay = button.closest('.price-display');
+      const priceCurrent = priceDisplay.querySelector('.price-current');
+      
+      const sar = parseFloat(priceDisplay.dataset.sar);
+      const usd = parseFloat(priceDisplay.dataset.usd);
+      
+      if (button.dataset.converted === 'true') {
+        // Convert back to original
+        let originalPrice = '';
+        if (sar !== null && usd !== null) {
+          originalPrice = `${sar.toLocaleString('en-US')} SAR | ${usd.toLocaleString('en-US')} USD`;
+        } else if (sar !== null) {
+          originalPrice = `${sar.toLocaleString('en-US')} SAR`;
+        } else if (usd !== null) {
+          originalPrice = `${usd.toLocaleString('en-US')} USD`;
+        }
+        priceCurrent.innerHTML = originalPrice;
+        button.innerHTML = '<i class="fas fa-exchange-alt"></i> تحويل';
+        button.dataset.converted = 'false';
+      } else {
+        // Convert to other currency
+        let convertedPrice = '';
+        if (sar !== null && usd === null) {
+          // Convert SAR to USD
+          const convertedUsd = (sar / EXCHANGE_RATE).toFixed(2);
+          convertedPrice = `${sar.toLocaleString('en-US')} SAR ≈ ${parseFloat(convertedUsd).toLocaleString('en-US')} USD`;
+        } else if (usd !== null && sar === null) {
+          // Convert USD to SAR
+          const convertedSar = (usd * EXCHANGE_RATE).toFixed(2);
+          convertedPrice = `${usd.toLocaleString('en-US')} USD ≈ ${parseFloat(convertedSar).toLocaleString('en-US')} SAR`;
+        } else if (sar !== null && usd !== null) {
+          // Show both converted values
+          const convertedUsd = (sar / EXCHANGE_RATE).toFixed(2);
+          const convertedSar = (usd * EXCHANGE_RATE).toFixed(2);
+          convertedPrice = `${sar.toLocaleString('en-US')} SAR (${parseFloat(convertedUsd).toLocaleString('en-US')} USD) | ${usd.toLocaleString('en-US')} USD (${parseFloat(convertedSar).toLocaleString('en-US')} SAR)`;
+        }
+        priceCurrent.innerHTML = convertedPrice;
+        button.innerHTML = '<i class="fas fa-undo"></i> الأصلي';
+        button.dataset.converted = 'true';
+      }
+    }
+  });
+})();
+</script>

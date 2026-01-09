@@ -1,0 +1,22 @@
+<article class="lux-card auction-card">
+  <div class="card-media hm-auction-media">
+    <% const webp = (localImg && localImg.replace(/\.jpg$|\.jpeg$|\.png$/i, '.webp')) || '' %>
+    <picture>
+      <% if (webp) { %>
+        <source srcset="<%= webp %>" type="image/webp">
+      <% } %>
+      <% if (localImg) { %>
+        <source srcset="<%= localImg %>" type="image/jpeg">
+      <% } %>
+      <img src="<%= img %>" alt="<%= title %>" loading="lazy" class="hm-auction-img" data-local="<%= localImg || '' %>" />
+    </picture>
+  </div>
+  <div class="card-body hm-auction-body">
+    <h5 class="card-title hm-auction-title"><%= title %></h5>
+    <p class="muted small hm-auction-subtitle"><%= subtitle %></p>
+    <div class="d-flex justify-content-between align-items-center mt-3">
+      <span class="price-badge"><%= price %></span>
+      <a href="<%= href %>" class="btn-lux">عرض</a>
+    </div>
+  </div>
+</article>

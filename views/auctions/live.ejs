@@ -1,0 +1,96 @@
+<% layout('layout') -%>
+
+<!-- صفحة المزاد المباشر: تعرض رابط مزاد خارجي (وقد يتم تضمينه داخل iframe إن سمح الموقع) -->
+
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2 mb-3">
+  <div>
+    <h3 class="mb-1">المزاد المباشر</h3>
+    <div class="text-muted">رابط المزاد المباشر الذي حدده الأدمن.</div>
+  </div>
+  <% if (!(typeof isEmbed !== 'undefined' && isEmbed)) { %>
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-secondary" href="/auctions/cars">سيارات المزاد</a>
+      <a class="btn btn-outline-secondary" href="/cars">العودة للسيارات</a>
+    </div>
+  <% } %>
+</div>
+
+<% if (isEnded) { %>
+  <div class="card border-0 shadow-sm">
+    <div class="card-body py-5 text-center">
+      <h5 class="mb-2">انتظروا المزاد الآخر قريباً</h5>
+      <div class="text-muted">انتهى مزاد اليوم. سيتم إضافة رابط المزاد القادم قريباً.</div>
+    </div>
+  </div>
+<% } else if (!liveAuctionUrl) { %>
+  <!-- في حال لم يتم ضبط رابط المزاد المباشر من الإدارة -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-body py-5 text-center">
+      <h5 class="mb-2">لا يوجد رابط مزاد مباشر</h5>
+      <div class="text-muted">سيقوم الأدمن بإضافة الرابط من لوحة التحكم.</div>
+    </div>
+  </div>
+<% } else { %>
+  <div class="card border-0 shadow-sm mb-3">
+    <div class="card-body">
+      <div class="mb-2">
+        <div class="text-muted mb-1">رابط المزاد:</div>
+        <a href="<%= liveAuctionUrl %>" target="_blank" rel="noopener" class="text-decoration-none"><%= liveAuctionUrl %></a>
+      </div>
+      <% if (snapshot && snapshot.updatedAt) { %>
+        <div class="text-muted">آخر تحديث: <%= new Date(snapshot.updatedAt).toLocaleString('en-US') %></div>
+      <% } %>
+      <% if (snapshot && snapshot.error) { %>
+        <div class="alert alert-warning mt-2 mb-0"><%= snapshot.error %></div>
+      <% } %>
+    </div>
+  </div>
+
+  <% if (snapshot && snapshot.cars && snapshot.cars.length) { %>
+    <div class="row g-3">
+      <% snapshot.cars.forEach((c, idx) => { %>
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="card border-0 shadow-sm h-100">
+            <% if (c.imageUrl) { %>
+              <img src="<%= c.imageUrl %>" class="card-img-top" alt="" loading="lazy" decoding="async" />
+            <% } %>
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-start gap-2">
+                <h6 class="mb-1"><%= c.title || 'سيارة' %></h6>
+                <small class="text-muted">#<%= idx + 1 %></small>
+              </div>
+
+              <% if (c.currentPriceText) { %>
+                <div class="text-muted mb-2">السعر الحالي: <%= c.currentPriceText %></div>
+              <% } %>
+
+              <div class="d-flex gap-2 flex-wrap">
+                <% if (c.externalUrl) { %>
+                  <a class="btn btn-sm btn-outline-secondary" href="<%= c.externalUrl %>" target="_blank" rel="noopener">فتح في Lotte</a>
+                <% } %>
+
+                <% if (waNumber) { %>
+                  <% const lines = [
+                    'طلب سيارة من مزاد كوريا (Lotte) عبر HM CAR',
+                    `السيارة: ${c.title || ''}`,
+                    c.currentPriceText ? `السعر الحالي: ${c.currentPriceText}` : '',
+                    c.externalUrl ? `رابط السيارة في Lotte: ${c.externalUrl}` : '',
+                    `رابط المزاد داخل HM CAR: ${pageUrl}`
+                  ].filter(Boolean); %>
+                  <a class="btn btn-sm btn-success" href="https://wa.me/<%= waNumber %>?text=<%= encodeURIComponent(lines.join('\n')) %>" target="_blank" rel="noopener">واتساب للإدارة</a>
+                <% } %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  <% } else { %>
+    <div class="card border-0 shadow-sm">
+      <div class="card-body py-5 text-center">
+        <h5 class="mb-2">جاري تحميل سيارات المزاد</h5>
+        <div class="text-muted">إذا كان هذا أول تشغيل اليوم، انتظر قليلاً ثم أعد تحديث الصفحة.</div>
+      </div>
+    </div>
+  <% } %>
+<% } %>

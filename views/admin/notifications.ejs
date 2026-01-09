@@ -1,0 +1,178 @@
+<% layout('layout') -%>
+<% var bodyClass = 'modern-admin-dashboard'; %>
+
+<aside class="modern-sidebar" id="modernSidebar">
+  <div class="modern-sidebar-header">
+    <img src="/public/images/navbar-logo.png" alt="HM CAR" class="modern-sidebar-logo" onerror="this.onerror=null;this.src='/public/images/logo.png';">
+    <button class="modern-sidebar-toggle" id="sidebarToggle" aria-label="تبديل القائمة">
+      <i class="fas fa-bars"></i>
+    </button>
+  </div>
+  
+  <nav class="modern-sidebar-nav">
+    <div class="modern-nav-section">
+      <div class="modern-nav-section-title">القائمة الرئيسية</div>
+      <a href="/admin" class="modern-nav-item">
+        <i class="fas fa-home"></i>
+        <span>الرئيسية</span>
+      </a>
+    </div>
+
+    <div class="modern-nav-section">
+      <div class="modern-nav-section-title">الإدارة</div>
+      <a href="/admin/cars" class="modern-nav-item">
+        <i class="fas fa-car"></i>
+        <span>السيارات</span>
+      </a>
+      <a href="/admin/orders" class="modern-nav-item">
+        <i class="fas fa-shopping-cart"></i>
+        <span>الطلبات</span>
+      </a>
+      <a href="/admin/users-management" class="modern-nav-item">
+        <i class="fas fa-users-cog"></i>
+        <span>المشرفين</span>
+      </a>
+    </div>
+
+    <div class="modern-nav-section">
+      <div class="modern-nav-section-title">الإعدادات</div>
+      <a href="/admin/notifications" class="modern-nav-item active">
+        <i class="fas fa-bell"></i>
+        <span>الإشعارات</span>
+      </a>
+      <a href="/admin/settings/whatsapp" class="modern-nav-item">
+        <i class="fab fa-whatsapp"></i>
+        <span>الواتساب</span>
+      </a>
+      <a href="/admin/settings/footer" class="modern-nav-item">
+        <i class="fas fa-grip-lines"></i>
+        <span>الشريط السفلي</span>
+      </a>
+    </div>
+  </nav>
+</aside>
+
+<main class="modern-main-content">
+  <header class="modern-header">
+    <div class="modern-header-content">
+      <div class="modern-header-left">
+        <div>
+          <h1 class="modern-header-title"><i class="fas fa-bell"></i> إدارة الإشعارات</h1>
+          <p class="modern-header-subtitle">إرسال وإدارة الإشعارات للمستخدمين</p>
+        </div>
+      </div>
+
+      <div class="modern-header-actions">
+        <div class="modern-user-menu">
+          <div class="modern-user-avatar">
+            <%= currentUser && currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'A' %>
+          </div>
+          <div class="modern-user-info">
+            <div class="modern-user-name"><%= currentUser ? currentUser.name : 'المدير' %></div>
+            <div class="modern-user-role">مدير النظام</div>
+          </div>
+        </div>
+
+        <a href="/auth/logout" class="modern-btn modern-btn-secondary modern-btn-sm">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>خروج</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="modern-dashboard-content">
+    <% if (flash && flash.message) { %>
+      <div class="modern-card" style="background: <%= flash.type === 'success' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)' %>; border-color: <%= flash.type === 'success' ? 'var(--success)' : 'var(--danger)' %>;">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <i class="fas fa-<%= flash.type === 'success' ? 'check-circle' : 'exclamation-triangle' %>" style="font-size: 1.5rem; color: <%= flash.type === 'success' ? 'var(--success)' : 'var(--danger)' %>;"></i>
+          <div style="flex: 1;">
+            <strong><%= flash.message %></strong>
+          </div>
+        </div>
+      </div>
+    <% } %>
+
+    <div class="modern-card">
+      <h3 class="modern-card-title">إرسال إشعار جديد</h3>
+      
+      <form action="/admin/notifications/send" method="POST" style="margin-top: var(--spacing-lg);">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">العنوان</label>
+            <input type="text" name="title" class="form-control" required placeholder="عنوان الإشعار">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">النوع</label>
+            <select name="type" class="form-control" required>
+              <option value="info">معلومات</option>
+              <option value="success">نجاح</option>
+              <option value="warning">تحذير</option>
+              <option value="error">خطأ</option>
+            </select>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">الرسالة</label>
+            <textarea name="message" class="form-control" rows="4" required placeholder="محتوى الإشعار"></textarea>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">المستلمون</label>
+            <select name="recipients" class="form-control" required>
+              <option value="all">جميع المستخدمين</option>
+              <option value="buyers">المشترين فقط</option>
+              <option value="sellers">البائعين فقط</option>
+              <option value="admins">المشرفين فقط</option>
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">الرابط (اختياري)</label>
+            <input type="text" name="link" class="form-control" placeholder="/cars">
+          </div>
+
+          <div class="col-12">
+            <button type="submit" class="modern-btn modern-btn-primary">
+              <i class="fas fa-paper-plane"></i>
+              إرسال الإشعار
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="modern-card" style="margin-top: var(--spacing-xl);">
+      <h3 class="modern-card-title">الإشعارات الأخيرة</h3>
+      
+      <div class="table-responsive" style="margin-top: var(--spacing-lg);">
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th>العنوان</th>
+              <th>النوع</th>
+              <th>المستلمون</th>
+              <th>التاريخ</th>
+              <th>الحالة</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colspan="5" style="text-align: center; padding: var(--spacing-xl); color: var(--text-secondary);">
+                لا توجد إشعارات حتى الآن
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+// Sidebar Toggle
+document.getElementById('sidebarToggle')?.addEventListener('click', function() {
+  document.getElementById('modernSidebar')?.classList.toggle('active');
+});
+</script>

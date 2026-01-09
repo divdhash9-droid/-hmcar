@@ -1,0 +1,45 @@
+<% layout('layout') -%>
+<% var hideNavbar = true; %>
+<% var hideSearch = true; %>
+<% var fullWidth = true; %>
+
+<link href="/public/css/error-page.css" rel="stylesheet">
+
+<div class="error-container">
+  <div class="error-content">
+    <div class="error-icon">🚨</div>
+    <h1 class="error-title">حدث خطأ في الخادم</h1>
+    
+    <% if (process.env.NODE_ENV === 'development' && error) { %>
+      <div class="error-details">
+        <h3>تفاصيل الخطأ (وضع التطوير):</h3>
+        <pre><%= error.stack || error.message || JSON.stringify(error, null, 2) %></pre>
+      </div>
+    <% } else { %>
+      <p style="font-size: 1.1rem; margin-bottom: 30px; line-height: 1.6;">
+        نحن نعمل على إصلاح المشكلة. يرجى المحاولة مرة أخرى لاحقاً.
+      </p>
+    <% } %>
+    
+    <div class="error-actions">
+      <a href="/" class="error-btn">
+        <i class="fas fa-home"></i>
+        الصفحة الرئيسية
+      </a>
+      <a href="/auth/login" class="error-btn error-btn-secondary">
+        <i class="fas fa-sign-in-alt"></i>
+        تسجيل الدخول
+      </a>
+      <a href="/admin" class="error-btn error-btn-secondary">
+        <i class="fas fa-tachometer-alt"></i>
+        لوحة التحكم
+      </a>
+    </div>
+    
+    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+      <p style="font-size: 0.9rem; opacity: 0.7; margin: 0;">
+        إذا استمرت المشكلة، يرجى التواصل مع الدعم الفني
+      </p>
+    </div>
+  </div>
+</div>

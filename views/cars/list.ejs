@@ -1,0 +1,86 @@
+<% layout('layout') -%>
+
+<div class="modern-container">
+    <header class="page-header">
+        <h1>مجموعة السيارات</h1>
+        <p>اكتشف مجموعتنا الحصرية من السيارات المعروضة للبيع والمزادات.</p>
+    </header>
+
+    <div class="cars-layout">
+        <!-- Sidebar for Filters -->
+        <aside class="filters-sidebar">
+            <h3><i class="fas fa-filter"></i> تصفية النتائج</h3>
+            <form method="GET" action="/cars/list" class="filter-form">
+                <div class="form-group">
+                    <label for="make">الشركة المصنعة</label>
+                    <select name="make" id="make" class="form-control">
+                        <option value="">الكل</option>
+                        <% const makes = [...new Set(cars.map(c => c.make))]; %>
+                        <% makes.forEach(make => { %>
+                            <option value="<%= make %>" <%= (filters && filters.make === make) ? 'selected' : '' %>><%= make %></option>
+                        <% }); %>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="minPrice">السعر</label>
+                    <div class="price-range">
+                        <input type="number" name="minPrice" id="minPrice" class="form-control" placeholder="من" value="<%= filters && filters.minPrice ? filters.minPrice : '' %>">
+                        <input type="number" name="maxPrice" class="form-control" placeholder="إلى" value="<%= filters && filters.maxPrice ? filters.maxPrice : '' %>">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="year">سنة الصنع</label>
+                    <select name="year" id="year" class="form-control">
+                        <option value="">الكل</option>
+                        <% const years = [...new Set(cars.map(c => c.year))].sort((a, b) => b - a); %>
+                        <% years.forEach(year => { %>
+                            <option value="<%= year %>" <%= (filters && filters.year == year) ? 'selected' : '' %>><%= year %></option>
+                        <% }); %>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">تطبيق الفلتر</button>
+            </form>
+        </aside>
+
+        <!-- Main Content for Cars Grid -->
+        <main class="cars-grid-container">
+            <% if (!cars || cars.length === 0) { %>
+                <div class="empty-state">
+                    <i class="fas fa-car-side fa-3x"></i>
+                    <h4>لا توجد سيارات تطابق بحثك</h4>
+                    <p>حاول تغيير معايير التصفية أو عرض جميع السيارات.</p>
+                    <a href="/cars/list" class="btn btn-secondary">عرض الكل</a>
+                </div>
+            <% } else { %>
+                <div class="car-grid">
+                    <% cars.forEach(car => { %>
+                        <%- include('../partials/car-card', { car: car }) %>
+                    <% }) %>
+                </div>
+
+                <!-- Pagination -->
+                <% if (pagination && pagination.totalPages > 1) { %>
+                    <nav aria-label="صفحات السيارات" class="pagination-container">
+                        <ul class="pagination">
+                            <% if (pagination.currentPage > 1) { %>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=<%= pagination.currentPage - 1 %>&<%= new URLSearchParams(filters).toString() %>">السابق</a>
+                                </li>
+                            <% } %>
+                            <% for (let i = 1; i <= pagination.totalPages; i++) { %>
+                                <li class="page-item <%= i === pagination.currentPage ? 'active' : '' %>">
+                                    <a class="page-link" href="?page=<%= i %>&<%= new URLSearchParams(filters).toString() %>"><%= i %></a>
+                                </li>
+                            <% } %>
+                            <% if (pagination.currentPage < pagination.totalPages) { %>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=<%= pagination.currentPage + 1 %>&<%= new URLSearchParams(filters).toString() %>">التالي</a>
+                                </li>
+                            <% } %>
+                        </ul>
+                    </nav>
+                <% } %>
+            <% } %>
+        </main>
+    </div>
+</div>

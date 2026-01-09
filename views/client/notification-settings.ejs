@@ -1,0 +1,199 @@
+<% layout('layout') -%>
+
+<div class="container mt-5">
+    <h2>Notification Preferences</h2>
+    <p>Manage how you receive notifications from CarAuction.</p>
+    <hr>
+
+    <form id="preferences-form">
+        <div id="alert-container"></div>
+
+        <h4>Auction Notifications</h4>
+        <p class="text-muted">Choose which auction-related events you want to be notified about.</p>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="outbid" name="outbid">
+                    <label class="form-check-label" for="outbid">When I'm outbid</label>
+                </div>
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="auctionEndingSoon" name="auctionEndingSoon">
+                    <label class="form-check-label" for="auctionEndingSoon">Watched auctions are ending soon</label>
+                </div>
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="newBidOnWatched" name="newBidOnWatched">
+                    <label class="form-check-label" for="newBidOnWatched">New bids on my watched items</label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="auctionWon" name="auctionWon">
+                    <label class="form-check-label" for="auctionWon">When I win an auction</label>
+                </div>
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="auctionLost" name="auctionLost">
+                    <label class="form-check-label" for="auctionLost">When an auction I bid on is lost</label>
+                </div>
+            </div>
+        </div>
+
+        <hr class="my-4">
+
+        <h4>Communication</h4>
+        <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" id="newMessage" name="newMessage">
+            <label class="form-check-label" for="newMessage">New messages in my inbox</label>
+        </div>
+
+        <hr class="my-4">
+
+        <h4>Platform Updates</h4>
+        <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" id="systemUpdates" name="systemUpdates">
+            <label class="form-check-label" for="systemUpdates">System updates and security announcements</label>
+        </div>
+        <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" id="promotions" name="promotions">
+            <label class="form-check-label" for="promotions">Promotions, special offers, and new features</label>
+        </div>
+
+        <hr class="my-4">
+
+        <h4>Delivery Channels</h4>
+        <p class="text-muted">Choose how you want to receive these notifications. Note: Some critical notifications may still be sent via email.</p>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <h5><i class="fas fa-envelope me-2"></i>Email Notifications</h5>
+                <div class="form-check">
+                    <input class="form-check-input email-channel" type="checkbox" id="email-outbid" data-key="outbid">
+                    <label class="form-check-label" for="email-outbid">When I'm outbid</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input email-channel" type="checkbox" id="email-auctionWon" data-key="auctionWon">
+                    <label class="form-check-label" for="email-auctionWon">When I win an auction</label>
+                </div>
+                 <div class="form-check">
+                    <input class="form-check-input email-channel" type="checkbox" id="email-promotions" data-key="promotions">
+                    <label class="form-check-label" for="email-promotions">Promotions & Offers</label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h5><i class="fas fa-bell me-2"></i>Push Notifications (Web)</h5>
+                <div class="form-check">
+                    <input class="form-check-input push-channel" type="checkbox" id="push-outbid" data-key="outbid">
+                    <label class="form-check-label" for="push-outbid">When I'm outbid</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input push-channel" type="checkbox" id="push-newMessage" data-key="newMessage">
+                    <label class="form-check-label" for="push-newMessage">New messages</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input push-channel" type="checkbox" id="push-auctionEndingSoon" data-key="auctionEndingSoon">
+                    <label class="form-check-label" for="push-auctionEndingSoon">Auctions ending soon</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-5">
+            <button type="submit" class="btn btn-primary btn-gold">Save Preferences</button>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('preferences-form');
+    const alertContainer = document.getElementById('alert-container');
+
+    // Fetch and populate existing preferences
+    fetch('/api/notifications/preferences')
+        .then(res => res.json())
+        .then(data => {
+            if (data) {
+                // Main toggles
+                Object.keys(data).forEach(key => {
+                    const input = document.getElementById(key);
+                    if (input && typeof data[key] === 'boolean') {
+                        input.checked = data[key];
+                    }
+                });
+                // Email channel toggles
+                if(data.emailNotifications){
+                    document.querySelectorAll('.email-channel').forEach(input => {
+                        const key = input.dataset.key;
+                        if(data.emailNotifications[key] !== undefined){
+                            input.checked = data.emailNotifications[key];
+                        }
+                    });
+                }
+                // Push channel toggles
+                 if(data.pushNotifications){
+                    document.querySelectorAll('.push-channel').forEach(input => {
+                        const key = input.dataset.key;
+                        if(data.pushNotifications[key] !== undefined){
+                            input.checked = data.pushNotifications[key];
+                        }
+                    });
+                }
+            }
+        })
+        .catch(err => console.error('Failed to load preferences:', err));
+
+    // Handle form submission
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(form);
+        const data = {};
+        const emailNotifications = {};
+        const pushNotifications = {};
+
+        // Main toggles
+        for (let [key, value] of formData.entries()) {
+            const input = document.getElementById(key);
+            if (input.type === 'checkbox') {
+                 data[key] = input.checked;
+            }
+        }
+        
+        // Channel toggles
+        document.querySelectorAll('.email-channel').forEach(input => {
+            emailNotifications[input.dataset.key] = input.checked;
+        });
+        document.querySelectorAll('.push-channel').forEach(input => {
+            pushNotifications[input.dataset.key] = input.checked;
+        });
+
+        data.emailNotifications = emailNotifications;
+        data.pushNotifications = pushNotifications;
+
+        fetch('/api/notifications/preferences', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': '<%= csrfToken %>'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(result => {
+            if (result) {
+                showAlert('Preferences saved successfully!', 'success');
+            } else {
+                showAlert('Failed to save preferences.', 'danger');
+            }
+        })
+        .catch(err => {
+            console.error('Error saving preferences:', err);
+            showAlert('An error occurred. Please try again.', 'danger');
+        });
+    });
+
+    function showAlert(message, type) {
+        alertContainer.innerHTML = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>`;
+    }
+});
+</script>

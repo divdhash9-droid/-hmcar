@@ -1,0 +1,99 @@
+<% layout('layout') -%>
+
+<!-- صفحة مشترياتي: تعرض السيارات التي تم تأكيد بيعها وربطها بحساب المستخدم (buyer) -->
+
+<% const _banners = customerBanners || []; %>
+
+<% if (_banners.length) { %>
+  <!-- بنرات/إعلانات العملاء: Carousel يظهر أعلى الصفحة (إن وُجدت بنرات) -->
+  <div id="customerBannersCarousel" class="carousel slide mb-3" data-bs-ride="carousel">
+    <div class="carousel-inner rounded overflow-hidden">
+      <% _banners.forEach((b, idx) => { %>
+        <div class="carousel-item <%= idx === 0 ? 'active' : '' %>">
+          <% if (b.linkUrl) { %>
+            <!-- لو كان للبانر رابط: نجعل الصورة قابلة للنقر -->
+            <a href="<%= b.linkUrl %>" class="d-block text-decoration-none">
+              <img src="<%= b.imageUrl %>" class="d-block w-100 hm-banner-img" alt="banner" loading="lazy" decoding="async" />
+            </a>
+          <% } else { %>
+            <img src="<%= b.imageUrl %>" class="d-block w-100 hm-banner-img" alt="banner" />
+          <% } %>
+          <% if (b.title) { %>
+            <div class="carousel-caption d-none d-md-block">
+              <h5><%= b.title %></h5>
+            </div>
+          <% } %>
+        </div>
+      <% }) %>
+    </div>
+    <% if (_banners.length > 1) { %>
+      <!-- أزرار السابق/التالي تظهر فقط إذا كان هناك أكثر من بانر -->
+      <button class="carousel-control-prev" type="button" data-bs-target="#customerBannersCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#customerBannersCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
+    <% } %>
+  </div>
+<% } %>
+
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2 mb-3">
+  <div>
+    <h3 class="mb-1">مشترياتي</h3>
+    <div class="text-muted">السيارات التي تم تأكيد بيعها وربطها بحسابك.</div>
+  </div>
+  <a class="btn btn-outline-secondary" href="/cars">العودة للسيارات</a>
+</div>
+
+<% if (!cars || cars.length === 0) { %>
+  <!-- حالة عدم وجود مشتريات: قد لا يكون هناك سيارات مؤكدة البيع بعد -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-body py-5 text-center">
+      <h5 class="mb-2">لا توجد سيارات مشتراة بعد</h5>
+      <div class="text-muted">بعد تأكيد البيع من خدمة العملاء ستظهر السيارة هنا.</div>
+    </div>
+  </div>
+<% } else { %>
+  <!-- عرض المشتريات كبطاقات -->
+  <div class="row g-3">
+    <% cars.forEach(car => { %>
+      <div class="col-sm-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm overflow-hidden">
+          <% if (car.images && car.images[0]) { %>
+            <!-- صورة الغلاف: نعرض أول صورة إن وجدت -->
+            <img src="<%= car.images[0] %>" class="card-img-top hm-car-card-img" alt="صورة سيارة" loading="lazy" decoding="async" />
+          <% } else { %>
+            <!-- بديل الصورة عند عدم وجود صور -->
+            <div class="bg-body-tertiary d-flex align-items-center justify-content-center hm-car-card-placeholder">
+              <span class="text-muted">لا توجد صورة</span>
+            </div>
+          <% } %>
+          <div class="card-body">
+            <h5 class="card-title mb-1"><%= car.title %></h5>
+            <div class="text-muted mb-2"><%= car.make %> - <%= car.model %> - <%= car.year %></div>
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <div class="text-muted">السعر</div>
+              <div class="fw-semibold">
+                <!-- عرض السعر: نفضل priceSar/priceUsd إن كانت متوفرة، وإلا نرجع للحقل القديم price -->
+                <% const sar = (car.priceSar !== undefined && car.priceSar !== null) ? car.priceSar : null; %>
+                <% const usd = (car.priceUsd !== undefined && car.priceUsd !== null) ? car.priceUsd : null; %>
+                <% if (sar !== null || usd !== null) { %>
+                  <%= sar !== null ? sar.toLocaleString('en-US') + ' SAR' : '' %>
+                  <%= (sar !== null && usd !== null) ? ' | ' : '' %>
+                  <%= usd !== null ? usd.toLocaleString('en-US') + ' USD' : '' %>
+                <% } else { %>
+                  <%= car.price ? car.price.toLocaleString('en-US') : 'غير محدد' %>
+                <% } %>
+              </div>
+            </div>
+            <!-- تاريخ البيع/التأكيد إن توفر -->
+            <div class="small text-muted">تم البيع: <%= car.soldAt ? new Date(car.soldAt).toLocaleString('ar') : '-' %></div>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+<% } %>

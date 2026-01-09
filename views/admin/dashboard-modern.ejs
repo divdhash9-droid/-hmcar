@@ -1,0 +1,253 @@
+<% layout('layout') -%>
+<% var hideNavbar = true; %>
+<% var hideSearch = true; %>
+<% var fullWidth = true; %>
+<% var bodyClass = 'admin-modern-grid'; %>
+
+
+<!-- Top Bar -->
+<header class="admin-topbar">
+  <div class="admin-topbar__logo">
+    <img src="/public/images/navbar-logo.png" alt="HM CAR" height="40" />
+  </div>
+  <div class="admin-topbar__user">
+    <div class="admin-topbar__user-info">
+      <div class="admin-topbar__user-name"><%= user?.name || 'الأدمن' %></div>
+      <div class="admin-topbar__user-role">مدير النظام</div>
+    </div>
+  </div>
+</header>
+
+<!-- Welcome Section -->
+<section class="admin-welcome">
+  <div class="admin-welcome__content">
+    <h1>مرحباً في لوحة التحكم</h1>
+    <p>تحكم كامل، أرقام فورية، وإدارة احترافية</p>
+  </div>
+  <div class="admin-welcome__stats">
+    <div class="welcome-stat">
+      <div class="welcome-stat__value"><%= Number(stats?.totalCars || 0) %></div>
+      <div class="welcome-stat__label">سيارة</div>
+    </div>
+    <div class="welcome-stat">
+      <div class="welcome-stat__value"><%= Number(stats?.totalUsers || 0) %></div>
+      <div class="welcome-stat__label">مستخدم</div>
+    </div>
+    <div class="welcome-stat">
+      <div class="welcome-stat__value"><%= Number(stats?.unseenCount || 0) %></div>
+      <div class="welcome-stat__label">إشعار</div>
+    </div>
+  </div>
+</section>
+
+<!-- Quick Stats Grid -->
+<section class="admin-stats-grid">
+  <div class="stat-card">
+    <div class="stat-card__icon">
+      <i class="fas fa-car"></i>
+    </div>
+    <div class="stat-card__value"><%= Number(stats?.totalCars || 0) %></div>
+    <div class="stat-card__label">إجمالي السيارات</div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-card__icon">
+      <i class="fas fa-users"></i>
+    </div>
+    <div class="stat-card__value"><%= Number(stats?.totalUsers || 0) %></div>
+    <div class="stat-card__label">إجمالي المستخدمين</div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-card__icon">
+      <i class="fas fa-gavel"></i>
+    </div>
+    <div class="stat-card__value"><%= Number(stats?.activeAuctions || 0) %></div>
+    <div class="stat-card__label">مزادات نشطة</div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-card__icon">
+      <i class="fas fa-shopping-cart"></i>
+    </div>
+    <div class="stat-card__value"><%= Number(stats?.totalOrders || 0) %></div>
+    <div class="stat-card__label">إجمالي الطلبات</div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-card__icon">
+      <i class="fas fa-bell"></i>
+    </div>
+    <div class="stat-card__value"><%= Number(stats?.unseenCount || 0) %></div>
+    <div class="stat-card__label">إشعارات جديدة</div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-card__icon">
+      <i class="fas fa-chart-line"></i>
+    </div>
+    <div class="stat-card__value"><%= Number(stats?.revenue || 0) %></div>
+    <div class="stat-card__label">الإيرادات</div>
+  </div>
+</section>
+
+<!-- Main Tables Grid -->
+<section class="admin-tables-grid">
+  <!-- Cars Table -->
+  <div class="table-section">
+    <div class="table-section__header">
+      <h3 class="table-section__title">السيارات</h3>
+      <a href="/admin/cars" class="table-section__action">عرض الكل</a>
+    </div>
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>السيارة</th>
+          <th>السعر</th>
+          <th>الحالة</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (recentCars && recentCars.length) { %>
+          <% recentCars.slice(0, 5).forEach(function(car) { %>
+            <tr>
+              <td><%= car.title || 'سيارة' %></td>
+              <td><%= car.price || '0' %> ريال</td>
+              <td>
+                <span class="table-status table-status--<%= car.status || 'active' %>">
+                  <%= car.status === 'active' ? 'نشطة' : 'غير نشطة' %>
+                </span>
+              </td>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="3" style="text-align: center; color: var(--text-muted);">
+              لا توجد سيارات
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Users Table -->
+  <div class="table-section">
+    <div class="table-section__header">
+      <h3 class="table-section__title">المستخدمون</h3>
+      <a href="/admin/users" class="table-section__action">عرض الكل</a>
+    </div>
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>الاسم</th>
+          <th>الهاتف</th>
+          <th>الحالة</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (recentUsers && recentUsers.length) { %>
+          <% recentUsers.slice(0, 5).forEach(function(user) { %>
+            <tr>
+              <td><%= user.name || 'مستخدم' %></td>
+              <td><%= user.phone || '-' %></td>
+              <td>
+                <span class="table-status table-status--<%= user.status || 'active' %>">
+                  <%= user.status === 'active' ? 'نشط' : 'غير نشط' %>
+                </span>
+              </td>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="3" style="text-align: center; color: var(--text-muted);">
+              لا يوجد مستخدمون
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Auctions Table -->
+  <div class="table-section">
+    <div class="table-section__header">
+      <h3 class="table-section__title">المزادات</h3>
+      <a href="/admin/auctions" class="table-section__action">عرض الكل</a>
+    </div>
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>السيارة</th>
+          <th>أعلى مزايدة</th>
+          <th>الحالة</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (recentAuctions && recentAuctions.length) { %>
+          <% recentAuctions.slice(0, 5).forEach(function(auction) { %>
+            <tr>
+              <td><%= (auction.car && auction.car.title) ? auction.car.title : 'مزاد' %></td>
+              <td><%= auction.currentBid || '0' %> ريال</td>
+              <td>
+                <span class="table-status table-status--<%= auction.status || 'active' %>">
+                  <%= auction.status === 'active' ? 'نشط' : (auction.status === 'ended' ? 'منتهي' : 'قيد الانتظار') %>
+                </span>
+              </td>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="3" style="text-align: center; color: var(--text-muted);">
+              لا توجد مزادات
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Charts Section -->
+<section class="admin-charts">
+  <div class="charts-grid">
+    <div class="chart-card">
+      <div class="chart-card__header">
+        <h3 class="chart-card__title">إحصائيات السيارات</h3>
+        <select class="chart-card__period">
+          <option>آخر 7 أيام</option>
+          <option>آخر 30 يوم</option>
+          <option>آخر 3 أشهر</option>
+        </select>
+      </div>
+      <div class="chart-container">
+        <i class="fas fa-chart-line" style="font-size: 3rem; opacity: 0.3;"></i>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-card__header">
+        <h3 class="chart-card__title">إحصائيات المستخدمين</h3>
+        <select class="chart-card__period">
+          <option>آخر 7 أيام</option>
+          <option>آخر 30 يوم</option>
+          <option>آخر 3 أشهر</option>
+        </select>
+      </div>
+      <div class="chart-container">
+        <i class="fas fa-chart-bar" style="font-size: 3rem; opacity: 0.3;"></i>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Flash Messages -->
+<% if (flash && flash.message) { %>
+  <div style="position: fixed; top: 100px; right: 20px; z-index: 9999; min-width: 300px;">
+    <div class="alert alert-<%= flash.type || 'info' %> alert-dismissible fade show" role="alert" 
+         style="background: var(--bg-card); border: 1px solid var(--border-primary); color: var(--text-primary);">
+      <%= flash.message %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  </div>
+<% } %>

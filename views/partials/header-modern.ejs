@@ -1,0 +1,41 @@
+<header class="main-header">
+    <div class="container">
+        <a href="/" class="logo" aria-label="HM CAR">
+            <img class="logo-img" src="/public/images/navbar-logo.png" alt="HM CAR" loading="eager" decoding="async" onerror="this.onerror=null;this.src='/public/images/logo.png';" />
+        </a>
+        <nav class="main-nav">
+            <ul>
+                <li><a href="/" class="<%= (typeof bodyClass !== 'undefined' && bodyClass === 'hm-home') ? 'active' : '' %>"><%= __('navigation.home') %></a></li>
+                <li><a href="/auctions"><%= __('navigation.auctions') %></a></li>
+                <li><a href="/cars"><%= __('navigation.cars') %></a></li>
+                <li><a href="/about"><%= __('navigation.about') %></a></li>
+                <li><a href="/contact"><%= __('navigation.contact') %></a></li>
+                <% if (typeof user !== 'undefined' && user) { %>
+                                    <% if (user.role === 'admin' || user.role === 'super_admin' || user.role === 'manager') { %>
+                                        <li><a href="/admin/notifications"><%= __('navigation.notifications') %></a></li>
+                                    <% } %>
+                <% } %>
+            </ul>
+        </nav>
+        <div class="header-actions">
+            <!-- Language Switcher -->
+            <div class="language-switcher">
+                <% if (typeof locale !== 'undefined' && locale === 'ar') { %>
+                    <a href="?lang=en" class="lang-btn" title="<%= __('ui.switch_to_english') %>">EN</a>
+                <% } else { %>
+                    <a href="?lang=ar" class="lang-btn" title="<%= __('ui.switch_to_arabic') %>">عر</a>
+                <% } %>
+            </div>
+            <div class="auth-buttons">
+                <% if (typeof user !== 'undefined' && user) { %>
+                    <% const dash = (user.role === 'admin' || user.role === 'super_admin' || user.role === 'manager') ? '/admin' : '/cars'; %>
+                    <a href="<%= dash %>" class="login-btn"><%= __('navigation.dashboard') %></a>
+                    <a href="/auth/logout" class="signup-btn"><%= __('navigation.logout') %></a>
+                <% } else { %>
+                    <a href="/auth/login" class="login-btn"><%= __('navigation.login') %></a>
+                    <a href="/auth/register" class="signup-btn"><%= __('navigation.register') %></a>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</header>

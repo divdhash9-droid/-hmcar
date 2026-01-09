@@ -1,0 +1,330 @@
+<% layout('layout') -%>
+<% var hideNavbar = true; %>
+<% var hideSearch = true; %>
+<% var fullWidth = true; %>
+
+<!-- PWA Meta Tags -->
+<meta name="theme-color" content="#d4af37">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="HM CAR">
+<meta name="application-name" content="HM CAR">
+<meta name="msapplication-TileColor" content="#d4af37">
+<meta name="msapplication-config" content="/browserconfig.xml">
+
+<!-- PWA Icons -->
+<link rel="apple-touch-icon" sizes="180x180" href="/public/images/icons/icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/public/images/icons/icon-192x192.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/public/images/icons/icon-192x192.png">
+<link rel="manifest" href="/public/manifest.json">
+
+<link href="/public/css/single-section.css" rel="stylesheet">
+
+<div class="main-container">
+  <div class="single-section">
+    <!-- Header Section -->
+    <div class="header-section">
+      <h1 class="hero-title">HM CAR</h1>
+      <p class="hero-subtitle">مزادات السيارات الفاخرة في المملكة العربية السعودية</p>
+      
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <a href="/auctions" class="cta-button primary">
+          <i class="fas fa-gavel"></i>
+          استكشف المزادات
+        </a>
+        <a href="/cars" class="cta-button">
+          <i class="fas fa-car"></i>
+          تصفح السيارات
+        </a>
+        <a href="/auth/register" class="cta-button primary">
+          <i class="fas fa-user-plus"></i>
+          إنشاء حساب
+        </a>
+        <a href="/auth/login" class="cta-button">
+          <i class="fas fa-sign-in-alt"></i>
+          تسجيل الدخول
+        </a>
+      </div>
+    </div>
+
+    <!-- Search Section -->
+    <div class="search-section">
+      <h2 class="search-title">
+        <i class="fas fa-search"></i>
+        ابحث عن سيارتك أحلامك
+      </h2>
+      <form action="/search" method="GET" class="search-form">
+        <div class="search-grid">
+          <div class="search-item">
+            <i class="fas fa-search"></i>
+            <input type="text" name="q" placeholder="اكتب اسم السيارة..." class="search-input">
+          </div>
+          <div class="search-item">
+            <i class="fas fa-car"></i>
+            <select name="brand" class="search-select">
+              <option value="">اختر الماركة</option>
+              <% if (brands && brands.length > 0) { %>
+                <% brands.forEach(brand => { %>
+                  <option value="<%= brand._id %>"><%= brand.name %></option>
+                <% }); %>
+              <% } %>
+            </select>
+          </div>
+          <div class="search-item">
+            <i class="fas fa-money-bill-wave"></i>
+            <select name="minPrice" class="search-select">
+              <option value="">السعر من</option>
+              <option value="50000">50,000 ريال</option>
+              <option value="100000">100,000 ريال</option>
+              <option value="200000">200,000 ريال</option>
+              <option value="300000">300,000 ريال</option>
+              <option value="500000">500,000 ريال</option>
+            </select>
+          </div>
+          <div class="search-item">
+            <i class="fas fa-money-bill-wave"></i>
+            <select name="maxPrice" class="search-select">
+              <option value="">السعر إلى</option>
+              <option value="100000">100,000 ريال</option>
+              <option value="200000">200,000 ريال</option>
+              <option value="300000">300,000 ريال</option>
+              <option value="500000">500,000 ريال</option>
+              <option value="1000000">1,000,000 ريال</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="search-button">
+          <i class="fas fa-search"></i>
+          بحث متقدم
+        </button>
+      </form>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="stats-section">
+      <h2 class="stats-title">أرقامنا تتحدث عنا</h2>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <i class="fas fa-car"></i>
+          <span class="stat-number"><%= (stats && typeof stats.totalCars !== 'undefined') ? stats.totalCars : '500+' %></span>
+          <span class="stat-label">سيارة فاخرة</span>
+        </div>
+        <div class="stat-item">
+          <i class="fas fa-gavel"></i>
+          <span class="stat-number"><%= (stats && typeof stats.activeAuctions !== 'undefined') ? stats.activeAuctions : '50+' %></span>
+          <span class="stat-label">مزاد نشط</span>
+        </div>
+        <div class="stat-item">
+          <i class="fas fa-users"></i>
+          <span class="stat-number"><%= (stats && typeof stats.totalUsers !== 'undefined') ? stats.totalUsers : '10K+' %></span>
+          <span class="stat-label">مستخدم</span>
+        </div>
+        <div class="stat-item">
+          <i class="fas fa-trophy"></i>
+          <span class="stat-number"><%= (stats && typeof stats.completedAuctions !== 'undefined') ? stats.completedAuctions : '200+' %></span>
+          <span class="stat-label">مزاد مكتمل</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cars Section -->
+    <div class="cars-section">
+      <h2 class="cars-title">
+        <i class="fas fa-star"></i>
+        سيارات مميزة
+      </h2>
+      <div class="cars-grid">
+        <% if (cars && cars.length > 0) { %>
+          <% cars.slice(0, 3).forEach(car => { %>
+            <div class="car-card">
+              <div class="car-thumb">
+                <img class="car-thumb-img" src="<%= (car.images && car.images[0] && car.images[0].url) ? car.images[0].url : '/images/default-car.jpg' %>" alt="<%= car.make %> <%= car.model %>">
+                <div class="car-thumb-badge" title="مميز">
+                  <i class="fas fa-crown"></i>
+                </div>
+              </div>
+              <div class="car-info">
+                <div class="car-name"><%= car.make %> <%= car.model %></div>
+                <div class="car-meta">
+                  <span><i class="fas fa-calendar-alt"></i> <%= car.year || '—' %></span>
+                  <span><i class="fas fa-tag"></i> <%= (typeof car.startPrice !== 'undefined' && car.startPrice) ? (new Intl.NumberFormat('en-US').format(car.startPrice) + ' $') : (car.price ? (car.price.toLocaleString() + ' ريال') : 'عند الطلب') %></span>
+                </div>
+                <a class="car-link" href="/cars/<%= car._id %>">
+                  <i class="fas fa-arrow-left"></i>
+                  عرض التفاصيل
+                </a>
+              </div>
+            </div>
+          <% }); %>
+        <% } else { %>
+          <div class="no-cars-message">
+            <i class="fas fa-car-side"></i>
+            <h3>لا توجد سيارات مميزة حالياً</h3>
+            <p>سيتم إضافة سيارات جديدة قريباً</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PWA Installation Script -->
+<script>
+// PWA Installation
+let deferredPrompt;
+const installButton = document.createElement('button');
+installButton.innerHTML = '<i class="fas fa-download"></i> تثبيت التطبيق';
+installButton.className = 'pwa-install-btn';
+installButton.style.cssText = `
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: linear-gradient(135deg, #d4af37, #ffd700);
+  color: #000;
+  border: none;
+  padding: 15px 20px;
+  border-radius: 15px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+`;
+
+installButton.addEventListener('click', async () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(`User response to the install prompt: ${outcome}`);
+    deferredPrompt = null;
+    installButton.style.display = 'none';
+  }
+});
+
+document.body.appendChild(installButton);
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  installButton.style.display = 'flex';
+});
+
+// Hide install button if app is already installed
+window.addEventListener('appinstalled', () => {
+  installButton.style.display = 'none';
+});
+
+// Service Worker Registration
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/public/sw.js')
+      .then(registration => {
+        console.log('SW registered: ', registration);
+        
+        // Check for updates
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // Show update notification
+              const updateNotification = document.createElement('div');
+              updateNotification.innerHTML = `
+                <div style="
+                  position: fixed;
+                  top: 20px;
+                  right: 20px;
+                  background: linear-gradient(135deg, #d4af37, #ffd700);
+                  color: #000;
+                  padding: 15px 20px;
+                  border-radius: 15px;
+                  font-weight: 700;
+                  box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+                  z-index: 1001;
+                  max-width: 300px;
+                ">
+                  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>تحديث متاح!</span>
+                  </div>
+                  <button onclick="location.reload()" style="
+                    background: #000;
+                    color: #ffd700;
+                    border: none;
+                    padding: 8px 15px;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    cursor: pointer;
+                  ">تحديث الآن</button>
+                </div>
+              `;
+              document.body.appendChild(updateNotification);
+              
+              setTimeout(() => {
+                if (updateNotification.parentNode) {
+                  updateNotification.parentNode.removeChild(updateNotification);
+                }
+              }, 10000);
+            }
+          });
+        });
+      })
+      .catch(registrationError => {
+        console.log('SW registration failed: ', registrationError);
+      });
+  });
+}
+
+// PWA Features
+if ('standalone' in window.navigator && window.navigator.standalone) {
+  document.body.classList.add('pwa-standalone');
+}
+
+// Network Status
+function updateNetworkStatus() {
+  const networkStatus = document.createElement('div');
+  networkStatus.id = 'network-status';
+  networkStatus.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: ${navigator.onLine ? '#4CAF50' : '#f44336'};
+    color: white;
+    text-align: center;
+    padding: 10px;
+    font-weight: 600;
+    z-index: 1002;
+    display: none;
+  `;
+  networkStatus.textContent = navigator.onLine ? 'متصل بالإنترنت' : 'غير متصل بالإنترنت';
+  
+  if (!document.getElementById('network-status')) {
+    document.body.appendChild(networkStatus);
+  }
+  
+  networkStatus.style.display = 'block';
+  setTimeout(() => {
+    networkStatus.style.display = 'none';
+  }, 3000);
+}
+
+window.addEventListener('online', updateNetworkStatus);
+window.addEventListener('offline', updateNetworkStatus);
+
+// App Lifecycle Events
+window.addEventListener('DOMContentLoaded', () => {
+  // Hide splash screen
+  setTimeout(() => {
+    const splash = document.querySelector('.splash-screen');
+    if (splash) {
+      splash.style.opacity = '0';
+      setTimeout(() => splash.remove(), 300);
+    }
+  }, 1000);
+});
+</script>

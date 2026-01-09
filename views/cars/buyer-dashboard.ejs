@@ -1,0 +1,121 @@
+<% layout('layout') -%>
+<% var hideNavbar = true; %>
+<% var fullWidth = true; %>
+<% var buyerFullWidth = true; %>
+<% var bodyClass = 'hm-buyer-dashboard'; %>
+
+<div class="hm-dashboard">
+  <div class="hm-dashboard__container">
+    <header class="hm-hero" aria-label="لوحة العميل">
+      <div class="hm-hero__top">
+        <div class="hm-hero__brand">
+          <img class="hm-hero__logo" src="/public/images/navbar-logo.png" alt="HM CAR" loading="eager" decoding="async" onerror="this.onerror=null;this.src='/public/images/logo.png';" />
+          <div class="hm-hero__titles">
+            <h1 class="hm-hero__title">مرحباً بك، <%= (currentUser && currentUser.name) ? currentUser.name : '' %></h1>
+            <div class="hm-hero__subtitle">لوحة العميل الفاخرة: كل خدمات HM CAR في مكان واحد</div>
+          </div>
+        </div>
+
+        <nav class="hm-hero__actions" aria-label="إجراءات سريعة">
+          <a class="hm-pill" href="/orders/my" aria-label="مشترياتي">
+            <i class="fas fa-shopping-cart"></i>
+            <span>مشترياتي</span>
+          </a>
+          <a class="hm-pill" href="/spare-parts/cart" aria-label="سلة المشتريات">
+            <i class="fas fa-shopping-basket"></i>
+            <span>سلة المشتريات</span>
+          </a>
+          <a class="hm-pill hm-pill--danger" href="/auth/logout" aria-label="خروج">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>خروج</span>
+          </a>
+        </nav>
+      </div>
+
+      <section class="hm-kpis" aria-label="إحصائيات">
+        <div class="hm-kpi">
+          <div class="hm-kpi__row">
+            <div>
+              <div class="hm-kpi__label">السيارات المتاحة</div>
+              <div class="hm-kpi__value"><%= Number(counts?.availableCars || 0) %></div>
+            </div>
+            <div class="hm-kpi__icon" aria-hidden="true"><i class="fas fa-car"></i></div>
+          </div>
+        </div>
+
+        <div class="hm-kpi">
+          <div class="hm-kpi__row">
+            <div>
+              <div class="hm-kpi__label">سياراتي المباعة</div>
+              <div class="hm-kpi__value"><%= Number(counts?.myCars || 0) %></div>
+            </div>
+            <div class="hm-kpi__icon" aria-hidden="true"><i class="fas fa-crown"></i></div>
+          </div>
+        </div>
+
+        <div class="hm-kpi">
+          <div class="hm-kpi__row">
+            <div>
+              <div class="hm-kpi__label">الطلبات</div>
+              <div class="hm-kpi__value"><%= Number(counts?.ordersAll || 0) %></div>
+            </div>
+            <div class="hm-kpi__icon" aria-hidden="true"><i class="fas fa-file-invoice"></i></div>
+          </div>
+        </div>
+
+        <div class="hm-kpi">
+          <div class="hm-kpi__row">
+            <div>
+              <div class="hm-kpi__label">المزادات الحية</div>
+              <div class="hm-kpi__value"><%= Number(counts?.liveAuctions || 0) %></div>
+            </div>
+            <div class="hm-kpi__icon" aria-hidden="true"><i class="fas fa-gavel"></i></div>
+          </div>
+        </div>
+      </section>
+    </header>
+
+    <% if (flash && flash.message) { %>
+      <div class="mt-3">
+        <div class="alert alert-<%= flash.type || 'info' %> alert-dismissible fade show" role="alert">
+          <%= flash.message %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      </div>
+    <% } %>
+
+    <section class="hm-section" aria-label="الخدمات">
+      <h2 class="hm-section__title">خدمات فخمة وسريعة</h2>
+      <div class="hm-grid">
+        <div class="hm-card" role="button" tabindex="0" data-embed-src="/cars/list?embed=1" aria-label="السيارات المتوفرة">
+          <div class="hm-card__icon" aria-hidden="true"><i class="fas fa-car" style="font-size:1.6rem"></i></div>
+          <div class="hm-card__title">السيارات المتوفرة</div>
+          <div class="hm-card__subtitle">استعرض جميع السيارات المتاحة</div>
+          <div class="mt-2"><span class="hm-badge"><%= Number(counts?.availableCars || 0) %></span></div>
+        </div>
+
+        <div class="hm-card" role="button" tabindex="0" data-embed-src="/spare-parts?embed=1" aria-label="قطع الغيار">
+          <div class="hm-card__icon" aria-hidden="true"><i class="fas fa-tools" style="font-size:1.6rem"></i></div>
+          <div class="hm-card__title">قطع الغيار</div>
+          <div class="hm-card__subtitle">قطع أصلية بجودة عالية</div>
+          <div class="mt-2"><span class="hm-badge"><%= Number(counts?.ordersPending || 0) %></span></div>
+        </div>
+
+        <div class="hm-card" role="button" tabindex="0" data-embed-src="/auctions/live?embed=1" aria-label="المزاد المباشر">
+          <div class="hm-card__icon" aria-hidden="true"><i class="fas fa-gavel" style="font-size:1.6rem"></i></div>
+          <div class="hm-card__title">المزاد المباشر</div>
+          <div class="hm-card__subtitle">شارك في المزادات الحية</div>
+          <div class="mt-2"><span class="hm-badge"><%= Number(counts?.liveAuctions || 0) %></span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="hm-embed" aria-label="محتوى داخل الصفحة">
+      <div class="hm-embed__bar">
+        <div class="hm-chip hm-chip--new"><i class="fas fa-layer-group"></i><span>عرض داخل الصفحة</span></div>
+        <button class="hm-embed__close" type="button" aria-label="إغلاق">إغلاق</button>
+      </div>
+      <iframe class="hm-embed__frame" title="محتوى" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+    </section>
+  </div>
+</div>

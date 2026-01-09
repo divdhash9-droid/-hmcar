@@ -1,0 +1,68 @@
+{
+  "name": "car-auction",
+  "version": "1.0.0",
+  "main": "server.js",
+  "bin": {
+    "set-admin-claim": "scripts/setAdminClaim.js"
+  },
+  "scripts": {
+    "set-admin-claim": "node scripts/setAdminClaim.js",
+    "create-local-admin": "node scripts/createLocalAdmin.js",
+    "create-firebase-admin": "node scripts/createFirebaseAdmin.js",
+    "link-local-to-firebase": "node scripts/linkLocalToFirebase.js",
+    "create-full-admin": "node createFullAdmin.js",
+    "list-db": "node listCollections.js",
+    "start": "node server.js",
+    "dev": "nodemon --ext js,ejs --watch routes --watch views server.js",
+    "seed": "node seed.js",
+    "seed:auctions": "node seed_auctions_bids.js",
+    "test": "mocha --timeout 10000 --recursive test --exit",
+    "optimize:db": "node scripts/addDatabaseIndexes.js"
+  },
+  "dependencies": {
+    "axios": "^1.13.2",
+    "bcrypt": "^5.1.1",
+    "cheerio": "^1.1.2",
+    "cloudinary": "^1.41.0",
+    "connect-flash": "^0.1.1",
+    "connect-mongo": "^5.1.0",
+    "cookie-parser": "^1.4.6",
+    "csurf": "^1.11.0",
+    "dotenv": "^17.2.3",
+    "ejs": "^3.1.10",
+    "ejs-mate": "^4.0.0",
+    "express": "^4.18.2",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^7.4.1",
+    "express-session": "^1.17.3",
+    "helmet": "^7.1.0",
+    "i18n": "^0.15.3",
+    "ioredis": "^5.4.1",
+    "jsonwebtoken": "^9.0.3",
+    "method-override": "^3.0.0",
+    "mongoose": "^8.7.0",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "node-fetch": "^2.7.0",
+    "nodemailer": "^6.9.8",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0",
+    "puppeteer": "^24.34.0",
+    "redis": "^4.7.0",
+    "sharp": "^0.34.5",
+    "socket.io": "^4.7.5",
+    "swagger-ui-express": "^4.6.3",
+    "validator": "^13.12.0",
+    "yamljs": "^0.3.0"
+  },
+  "devDependencies": {
+    "chai": "^4.3.7",
+    "mocha": "^10.2.0",
+    "mongodb-memory-server": "^8.12.0",
+    "nodemon": "^3.1.11",
+    "supertest": "^6.3.3"
+  },
+  "engines": {
+    "node": "20"
+  }
+}

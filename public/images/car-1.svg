@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" role="img" aria-label="Car 1">
+  <defs>
+    <linearGradient id="bg1" x1="0" x2="1">
+      <stop offset="0" stop-color="#081226"/>
+      <stop offset="1" stop-color="#132034"/>
+    </linearGradient>
+    <linearGradient id="g1" x1="0" x2="1">
+      <stop offset="0" stop-color="#d4af37" />
+      <stop offset="1" stop-color="#ffd97a" />
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#bg1)"/>
+  <g transform="translate(60,120) scale(1.2)">
+    <path d="M40 160 C80 110, 230 90, 360 120 C460 140, 560 160, 660 150 L660 210 L40 210 Z" fill="#0f1720" opacity="0.85"/>
+    <path d="M80 140 C140 100, 300 86, 420 110 C520 130, 620 150, 680 145" stroke="url(#g1)" stroke-width="6" fill="none" stroke-linecap="round"/>
+  </g>
+  <text x="40" y="420" font-family="Inter, sans-serif" font-size="28" fill="#ffd97a">مرسيدس S-Class — 2020</text>
+</svg>

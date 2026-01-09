@@ -1,0 +1,61 @@
+<% layout('layout') -%>
+
+<!-- صفحة تأكيد بيع السيارة (للأدمن):
+     يتم الوصول لها عبر رابط التوكن الذي تم إنشاؤه عند طلب الشراء من العميل.
+     عند التأكيد سيتم وضع السيارة كمباعة وربطها بالمشتري وإخفاؤها من المتجر.
+-->
+
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2 mb-3">
+  <div>
+    <h3 class="mb-1">تأكيد بيع السيارة</h3>
+    <div class="text-muted">هذه الخطوة مخصصة لخدمة العملاء بعد الاتفاق عبر واتساب.</div>
+  </div>
+  <a href="/admin" class="btn btn-outline-secondary">العودة للوحة التحكم</a>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    <div class="row g-3 align-items-start">
+      <div class="col-md-5">
+        <% if (car.images && car.images[0]) { %>
+          <img src="<%= car.images[0] %>" class="img-fluid rounded" style="width:100%;max-height:320px;object-fit:cover" alt="صورة سيارة" loading="lazy" decoding="async" />
+        <% } else { %>
+          <div class="bg-body-tertiary d-flex align-items-center justify-content-center rounded" style="height: 240px;">
+            <span class="text-muted">لا توجد صورة</span>
+          </div>
+        <% } %>
+      </div>
+      <div class="col-md-7">
+        <h4 class="mb-2"><%= car.title %></h4>
+        <div class="text-muted mb-3"><%= car.make %> - <%= car.model %> - <%= car.year %></div>
+
+        <div class="mb-2">
+          <span class="text-muted">السعر:</span>
+          <span class="fw-semibold">
+            <% const sar = (car.priceSar !== undefined && car.priceSar !== null) ? car.priceSar : null; %>
+            <% const usd = (car.priceUsd !== undefined && car.priceUsd !== null) ? car.priceUsd : null; %>
+            <% if (sar !== null || usd !== null) { %>
+              <%= sar !== null ? sar.toLocaleString('en-US') + ' SAR' : '' %>
+              <%= (sar !== null && usd !== null) ? ' | ' : '' %>
+              <%= usd !== null ? usd.toLocaleString('en-US') + ' USD' : '' %>
+            <% } else { %>
+              <%= car.price ? car.price.toLocaleString('en-US') : 'غير محدد' %>
+            <% } %>
+          </span>
+        </div>
+        <div class="mb-3"><span class="text-muted">المشتري:</span> <span class="fw-semibold"><%= car.pendingSaleBuyer ? car.pendingSaleBuyer.name : 'غير معروف' %></span></div>
+
+        <div class="alert alert-warning">
+          عند الضغط على "تم البيع" سيتم إخفاء السيارة من المتجر وربطها بالمشتري.
+        </div>
+
+        <form method="post" action="/cars/sale/confirm/<%= car._id %>/<%= token %>" class="d-flex gap-2 flex-wrap">
+          <!-- حماية CSRF للطلبات POST -->
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <button class="btn btn-success">تم البيع</button>
+          <a class="btn btn-outline-secondary" href="/admin">إلغاء</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

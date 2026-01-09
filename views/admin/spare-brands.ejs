@@ -1,0 +1,96 @@
+<% layout('layout') -%>
+<link rel="stylesheet" href="/public/css/admin-unified.css" />
+<% var hideNavbar = true; %>
+<% var hideSearch = true; %>
+<% var fullWidth = true; %>
+<% var bodyClass = 'admin-unified-bg' %>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h3 class="mb-1">شركات قطع الغيار</h3>
+    <div class="text-muted">أضف شركة (قسم) مع صورة ليتم ربط قطع الغيار بها.</div>
+  </div>
+  <a href="/admin" class="back-btn">
+    <i class="fas fa-arrow-right me-2"></i>عودة للوحة التحكم
+  </a>
+</div>
+
+<div class="spare-brands-card">
+  <div class="spare-brands-header">
+    <h5 class="mb-0">
+      <i class="fas fa-building me-2"></i>
+      شركات قطع الغيار
+    </h5>
+  </div>
+  
+  <div class="row g-0">
+    <!-- نموذج إضافة شركة -->
+    <div class="col-lg-5">
+      <div class="p-4 border-start">
+        <h6 class="mb-3">إضافة شركة جديدة</h6>
+        <form method="post" action="/admin/spare-brands" enctype="multipart/form-data">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <div class="mb-3">
+            <label class="form-label">اسم الشركة</label>
+            <input name="name" class="form-control" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">شعار الشركة</label>
+            <input name="logo" type="file" class="form-control" accept="image/*" />
+          </div>
+          <button class="btn btn-primary w-100">حفظ</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- قائمة الشركات -->
+    <div class="col-lg-7">
+      <div class="spare-brands-header fw-semibold d-flex justify-content-between align-items-center">
+        <span>قائمة الشركات</span>
+        <small class="text-muted"><%= (brands || []).length %> شركة</small>
+      </div>
+      <div class="card-body p-0">
+        <% if (!brands || !brands.length) { %>
+          <!-- لا توجد شركات -->
+          <div class="p-4 text-center">
+            <div class="h5 mb-1">لا توجد شركات</div>
+            <div class="text-muted">أضف شركة من النموذج على اليمين.</div>
+          </div>
+        <% } else { %>
+          <!-- جدول الشركات -->
+          <div class="table-responsive">
+            <table class="table table-striped mb-0 align-middle">
+              <thead>
+                <tr>
+                  <th>الشعار</th>
+                  <th>الاسم</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <% brands.forEach(brand => { %>
+                  <tr>
+                    <td>
+                      <% if (brand.logo) { %>
+                        <img src="<%= brand.logo %>" alt="" class="rounded" style="width:56px;height:40px;object-fit:contain" width="56" height="40" loading="lazy" decoding="async" />
+                      <% } else { %>
+                        <span class="text-muted">-</span>
+                      <% } %>
+                    </td>
+                    <td><%= brand.name %></td>
+                    <td>
+                      <form method="post" action="/admin/spare-brands/<%= brand._id %>/delete" onsubmit="return confirm('حذف الشركة؟');">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                        <button class="btn btn-sm btn-outline-danger">حذف</button>
+                      </form>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>

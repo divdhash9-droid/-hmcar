@@ -1,0 +1,95 @@
+<% layout('layout') -%>
+<link rel="stylesheet" href="/public/css/admin-unified.css" />
+<% var hideNavbar = true; %>
+<% var hideSearch = true; %>
+<% var fullWidth = true; %>
+<% var bodyClass = 'admin-unified-bg' %>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h3 class="mb-1">إدارة فئات السيارات</h3>
+    <div class="text-muted">أضف فئات جديدة لإظهارها في نماذج إضافة السيارات.</div>
+  </div>
+  <a href="/admin" class="back-btn">
+    <i class="fas fa-arrow-right me-2"></i>عودة للوحة التحكم
+  </a>
+</div>
+
+<div class="categories-card">
+  <div class="categories-header">
+    <h5 class="mb-0">
+      <i class="fas fa-list me-2"></i>
+      إدارة فئات السيارات
+    </h5>
+  </div>
+  
+  <div class="row g-0">
+    <!-- نموذج إضافة فئة -->
+    <div class="col-lg-5">
+      <div class="p-4 border-start">
+        <h6 class="mb-3">إضافة فئة جديدة</h6>
+        <form method="post" action="/admin/categories">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <div class="mb-3">
+            <label class="form-label">اسم الفئة</label>
+            <input name="name" class="form-control" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">الوصف</label>
+            <textarea name="description" class="form-control" rows="3"></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">رابط صورة الغلاف (اختياري)</label>
+            <input name="coverImage" class="form-control" placeholder="https://..." />
+          </div>
+          <button class="btn btn-primary w-100">حفظ</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- قائمة الفئات -->
+    <div class="col-lg-7">
+      <div class="categories-header fw-semibold d-flex justify-content-between align-items-center">
+        <span>قائمة الفئات</span>
+        <small class="text-muted"><%= (categories || []).length %> فئة</small>
+      </div>
+      <div class="card-body p-0">
+        <% if (!categories || !categories.length) { %>
+          <!-- لا توجد فئات بعد -->
+          <div class="p-4 text-center">
+            <div class="h5 mb-1">لا توجد فئات بعد</div>
+            <div class="text-muted">أضف فئة من النموذج على اليمين.</div>
+          </div>
+        <% } else { %>
+          <!-- جدول الفئات -->
+          <div class="table-responsive">
+            <table class="table table-striped mb-0 align-middle">
+              <thead>
+                <tr>
+                  <th>الصورة</th>
+                  <th>الاسم</th>
+                  <th>الوصف</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% categories.forEach(cat => { %>
+                  <tr>
+                    <td>
+                      <% if (cat.coverImage) { %>
+                        <img src="<%= cat.coverImage %>" alt="" class="rounded" style="width:56px;height:40px;object-fit:cover" width="56" height="40" loading="lazy" decoding="async" />
+                      <% } else { %>
+                        <span class="text-muted">-</span>
+                      <% } %>
+                    </td>
+                    <td><%= cat.name %></td>
+                    <td><small class="text-muted"><%= cat.description || '-' %></small></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,557 @@
+<div class="payment-modal" id="paymentModal">
+  <div class="payment-modal-content">
+    <div class="payment-header">
+      <h5><i class="fas fa-credit-card"></i> إتمام الدفع</h5>
+      <button class="btn-close" id="closePaymentModal">&times;</button>
+    </div>
+
+    <div class="payment-body">
+      <!-- Order Summary -->
+      <div class="order-summary">
+        <h6>ملخص الطلب</h6>
+        <div class="summary-item">
+          <span>رقم الطلب:</span>
+          <span id="orderNumber">#12345</span>
+        </div>
+        <div class="summary-item">
+          <span>المبلغ الإجمالي:</span>
+          <span id="totalAmount" class="amount">0 ريال</span>
+        </div>
+      </div>
+
+      <!-- Payment Methods -->
+      <div class="payment-methods">
+        <h6>اختر طريقة الدفع</h6>
+        <div class="method-options">
+          <div class="method-option active" data-method="credit_card">
+            <div class="method-icon">
+              <i class="fas fa-credit-card"></i>
+            </div>
+            <div class="method-info">
+              <div class="method-name">بطاقة ائتمان/خصم مباشر</div>
+              <div class="method-desc">فيزا، ماستر كارد، مادا</div>
+            </div>
+            <div class="method-fees">2.9%</div>
+          </div>
+
+          <div class="method-option" data-method="apple_pay">
+            <div class="method-icon">
+              <i class="fab fa-apple"></i>
+            </div>
+            <div class="method-info">
+              <div class="method-name">Apple Pay</div>
+              <div class="method-desc">دفع آمن وسريع</div>
+            </div>
+            <div class="method-fees">2.9%</div>
+          </div>
+
+          <div class="method-option" data-method="google_pay">
+            <div class="method-icon">
+              <i class="fab fa-google"></i>
+            </div>
+            <div class="method-info">
+              <div class="method-name">Google Pay</div>
+              <div class="method-desc">دفع آمن وسريع</div>
+            </div>
+            <div class="method-fees">2.9%</div>
+          </div>
+
+          <div class="method-option" data-method="bank_transfer">
+            <div class="method-icon">
+              <i class="fas fa-university"></i>
+            </div>
+            <div class="method-info">
+              <div class="method-name">تحويل بنكي</div>
+              <div class="method-desc">تحويل مباشر للحساب البنكي</div>
+            </div>
+            <div class="method-fees">مجاني</div>
+          </div>
+
+          <div class="method-option" data-method="cash_on_delivery">
+            <div class="method-icon">
+              <i class="fas fa-truck"></i>
+            </div>
+            <div class="method-info">
+              <div class="method-name">الدفع عند الاستلام</div>
+              <div class="method-desc">الدفع نقداً عند استلام الطلب</div>
+            </div>
+            <div class="method-fees">مجاني</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Form -->
+      <div class="payment-form" id="paymentForm">
+        <!-- Card Payment Form -->
+        <div class="card-form" id="cardForm">
+          <div class="form-row">
+            <div class="form-group col-12">
+              <label for="cardNumber">رقم البطاقة</label>
+              <input type="text" id="cardNumber" class="form-control" placeholder="1234 5678 9012 3456" maxlength="19">
+              <div class="card-icons">
+                <i class="fab fa-cc-visa" title="Visa"></i>
+                <i class="fab fa-cc-mastercard" title="Mastercard"></i>
+                <i class="fab fa-cc-amex" title="American Express"></i>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group col-6">
+              <label for="cardExpiry">تاريخ الانتهاء</label>
+              <input type="text" id="cardExpiry" class="form-control" placeholder="MM/YY" maxlength="5">
+            </div>
+            <div class="form-group col-6">
+              <label for="cardCvv">رمز الأمان</label>
+              <input type="text" id="cardCvv" class="form-control" placeholder="123" maxlength="4">
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group col-12">
+              <label for="cardholderName">الاسم على البطاقة</label>
+              <input type="text" id="cardholderName" class="form-control" placeholder="الاسم الكامل">
+            </div>
+          </div>
+        </div>
+
+        <!-- Bank Transfer Form -->
+        <div class="bank-transfer-form" id="bankTransferForm" style="display: none;">
+          <div class="bank-details">
+            <h6>تفاصيل التحويل البنكي</h6>
+            <div class="detail-item">
+              <span>اسم الحساب:</span>
+              <span>HM CAR Auction</span>
+            </div>
+            <div class="detail-item">
+              <span>رقم الحساب:</span>
+              <span>SA1234567890123456</span>
+            </div>
+            <div class="detail-item">
+              <span>البنك:</span>
+              <span>Riyad Bank</span>
+            </div>
+            <div class="detail-item">
+              <span>الآيبان:</span>
+              <span>SA8910000001234567890123</span>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group col-12">
+              <label for="transferReference">رقم التحويل</label>
+              <input type="text" id="transferReference" class="form-control" placeholder="أدخل رقم التحويل">
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group col-12">
+              <label for="transferDate">تاريخ التحويل</label>
+              <input type="date" id="transferDate" class="form-control">
+            </div>
+          </div>
+        </div>
+
+        <!-- Digital Wallet Forms (Apple Pay, Google Pay) -->
+        <div class="digital-wallet-form" id="digitalWalletForm" style="display: none;">
+          <div class="wallet-info">
+            <p>سيتم توجيهك إلى بوابة الدفع الآمنة لإتمام عملية الدفع.</p>
+            <button class="btn btn-primary wallet-btn" id="walletPayBtn">
+              <i class="fab fa-apple" id="walletIcon"></i>
+              <span id="walletText">الدفع بـ Apple Pay</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Cash on Delivery Form -->
+        <div class="cod-form" id="codForm" style="display: none;">
+          <div class="cod-info">
+            <div class="alert alert-info">
+              <i class="fas fa-info-circle"></i>
+              <strong>ملاحظات الدفع عند الاستلام:</strong>
+              <ul>
+                <li>الدفع نقداً عند استلام الطلب</li>
+                <li>الرجاء التأكد من توفر المبلغ النقدي</li>
+                <li>سيتم تأكيد الطلب بعد استلام الدفع</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Billing Address -->
+      <div class="billing-address">
+        <h6>عنوان الفوترة</h6>
+        <div class="form-row">
+          <div class="form-group col-12">
+            <label for="billingName">الاسم الكامل</label>
+            <input type="text" id="billingName" class="form-control" placeholder="الاسم الكامل">
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group col-6">
+            <label for="billingPhone">رقم الهاتف</label>
+            <input type="tel" id="billingPhone" class="form-control" placeholder="05xxxxxxxx">
+          </div>
+          <div class="form-group col-6">
+            <label for="billingEmail">البريد الإلكتروني</label>
+            <input type="email" id="billingEmail" class="form-control" placeholder="example@email.com">
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group col-12">
+            <label for="billingAddress">العنوان</label>
+            <input type="text" id="billingAddress" class="form-control" placeholder="الشارع، المبنى، رقم الشقة">
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group col-4">
+            <label for="billingCity">المدينة</label>
+            <input type="text" id="billingCity" class="form-control" placeholder="الرياض">
+          </div>
+          <div class="form-group col-4">
+            <label for="billingCountry">الدولة</label>
+            <select id="billingCountry" class="form-select">
+              <option value="SA">المملكة العربية السعودية</option>
+              <option value="AE">الإمارات العربية المتحدة</option>
+              <option value="KW">الكويت</option>
+              <option value="BH">البحرين</option>
+              <option value="QA">قطر</option>
+              <option value="OM">عمان</option>
+            </select>
+          </div>
+          <div class="form-group col-4">
+            <label for="billingPostal">الرمز البريدي</label>
+            <input type="text" id="billingPostal" class="form-control" placeholder="12345">
+          </div>
+        </div>
+      </div>
+
+      <!-- Installment Option -->
+      <div class="installment-option">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="installmentPlan">
+          <label class="form-check-label" for="installmentPlan">
+            التقسيط على 3 أشهر (بفائدة 5%)
+          </label>
+        </div>
+        <div class="installment-details" id="installmentDetails" style="display: none;">
+          <div class="detail-item">
+            <span>القسط الشهري:</span>
+            <span id="monthlyInstallment">0 ريال</span>
+          </div>
+          <div class="detail-item">
+            <span>إجمالي الفوائد:</span>
+            <span id="totalInterest">0 ريال</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="payment-footer">
+      <div class="payment-security">
+        <i class="fas fa-lock"></i>
+        <span>دفع آمن ومشفر</span>
+      </div>
+      <div class="payment-actions">
+        <button class="btn btn-secondary" id="cancelPayment">إلغاء</button>
+        <button class="btn btn-primary" id="confirmPayment">
+          <i class="fas fa-lock"></i>
+          تأكيد الدفع
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.payment-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.payment-modal.active {
+  display: flex;
+}
+
+.payment-modal .payment-modal-content {
+  background: var(--background-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--gold-shadow);
+}
+
+.payment-modal .payment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.payment-modal .payment-header h5 {
+  margin: 0;
+  color: var(--primary-color);
+  font-weight: 800;
+}
+
+.payment-modal .btn-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--text-color-secondary);
+}
+
+.payment-modal .payment-body {
+  padding: 20px;
+}
+
+.payment-modal .order-summary {
+  background: var(--section-bg-color);
+  padding: 15px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  margin-bottom: 20px;
+}
+
+.payment-modal .order-summary h6 {
+  margin-bottom: 10px;
+  color: var(--primary-color);
+  font-weight: 800;
+}
+
+.payment-modal .summary-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.payment-modal .summary-item .amount {
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+.payment-modal .payment-methods h6 {
+  margin-bottom: 15px;
+  color: var(--primary-color);
+  font-weight: 800;
+}
+
+.payment-modal .method-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.payment-modal .method-option {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.payment-modal .method-option:hover {
+  border-color: var(--primary-color-light);
+  box-shadow: var(--shadow-sm);
+}
+
+.payment-modal .method-option.active {
+  border-color: var(--primary-color);
+  background: var(--section-bg-color);
+}
+
+.payment-modal .method-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--background-color);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  margin-left: 15px;
+  font-size: 18px;
+  color: var(--primary-color);
+}
+
+.payment-modal .method-info {
+  flex: 1;
+}
+
+.payment-modal .method-name {
+  font-weight: 600;
+  margin-bottom: 2px;
+  color: var(--primary-color);
+}
+
+.payment-modal .method-desc {
+  font-size: 13px;
+  color: var(--text-color-secondary);
+}
+
+.payment-modal .method-fees {
+  font-size: 12px;
+  color: var(--success-color);
+  font-weight: 600;
+}
+
+.payment-modal .payment-form {
+  margin-bottom: 20px;
+}
+
+.payment-modal .form-row {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.payment-modal .form-group {
+  flex: 1;
+}
+
+.payment-modal .form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: var(--primary-color);
+}
+
+.payment-modal .form-control {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  font-size: 14px;
+  background: var(--background-color);
+  color: var(--dark-text-color);
+}
+
+.payment-modal .form-control:focus {
+  outline: none;
+  border-color: var(--primary-color-light);
+  box-shadow: 0 0 0 3px rgba(19, 59, 107, 0.12);
+}
+
+.payment-modal .card-icons {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 5px;
+}
+
+.payment-modal .card-icons i {
+  font-size: 20px;
+  color: var(--text-color-secondary);
+}
+
+.payment-modal .bank-details {
+  background: var(--section-bg-color);
+  padding: 15px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  margin-bottom: 15px;
+}
+
+.payment-modal .detail-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.payment-modal .wallet-info {
+  text-align: center;
+  padding: 20px;
+}
+
+.payment-modal .wallet-btn {
+  padding: 15px 30px;
+  font-size: 16px;
+  border-radius: var(--border-radius);
+}
+
+.payment-modal .cod-info .alert {
+  margin-bottom: 0;
+}
+
+.payment-modal .billing-address {
+  margin-bottom: 20px;
+}
+
+.payment-modal .installment-option {
+  margin-bottom: 20px;
+}
+
+.payment-modal .installment-details {
+  background: var(--section-bg-color);
+  padding: 15px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  margin-top: 10px;
+}
+
+.payment-modal .payment-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.payment-modal .payment-security {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-color-secondary);
+  font-size: 14px;
+}
+
+.payment-modal .payment-actions {
+  display: flex;
+  gap: 10px;
+}
+
+@media (max-width: 768px) {
+  .payment-modal .payment-modal-content {
+    width: 95%;
+    margin: 10px;
+  }
+  
+  .payment-modal .form-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .payment-modal .payment-footer {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .payment-modal .payment-actions {
+    justify-content: center;
+  }
+}
+</style>

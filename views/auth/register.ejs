@@ -1,0 +1,52 @@
+<% layout('layout') -%>
+<% var hideNavbar = true; %>
+<% var bodyClass = 'auth-page'; %>
+
+<div class="auth-container">
+    <div class="auth-info-section">
+        <div class="logo"><%= __('auth.brand') %></div>
+        <h3><%= __('auth.registerPage.sideTitle') %></h3>
+        <p><%= __('auth.registerPage.sideDescription') %></p>
+    </div>
+    <div class="auth-form-section">
+        <h2><%= __('auth.registerPage.title') %></h2>
+        <p class="sub-heading"><%= __('auth.registerPage.subtitle') %></p>
+
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div class="alert alert-danger mb-4"><%= error %></div>
+        <% } %>
+        <% if (typeof success !== 'undefined' && success) { %>
+            <div class="alert alert-success mb-4"><%= success %></div>
+        <% } %>
+
+        <form method="POST" action="/auth/register">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            
+            <div class="form-group">
+                <label for="name"><%= __('auth.fields.fullName') %></label>
+                <input type="text" id="name" name="name" class="form-control" placeholder="<%= __('auth.registerPage.placeholders.fullName') %>" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email"><%= __('auth.fields.email') %></label>
+                <input type="email" id="email" name="email" class="form-control" placeholder="<%= __('auth.registerPage.placeholders.email') %>" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password"><%= __('auth.fields.password') %></label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="<%= __('auth.registerPage.placeholders.password') %>" required>
+            </div>
+
+            <div class="form-group">
+                <label for="passwordConfirm"><%= __('auth.fields.confirmPassword') %></label>
+                <input type="password" id="passwordConfirm" name="passwordConfirm" class="form-control" placeholder="<%= __('auth.registerPage.placeholders.confirmPassword') %>" required>
+            </div>
+
+            <button type="submit" class="auth-btn"><%= __('auth.createAccount') %></button>
+        </form>
+
+        <div class="auth-switch-link">
+            <p><%= __('auth.haveAccount') %> <a href="/auth/login"><%= __('auth.login') %></a></p>
+        </div>
+    </div>
+</div>

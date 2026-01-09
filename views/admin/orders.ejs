@@ -1,0 +1,151 @@
+<% layout('layout') -%>
+<link rel="stylesheet" href="/public/css/admin-unified.css" />
+<% var hideNavbar = true; %>
+<% var hideSearch = true; %>
+<% var fullWidth = true; %>
+<% var bodyClass = 'admin-unified-bg' %>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h3 class="mb-1">إدارة الطلبات</h3>
+    <div class="text-muted">متابعة الطلبات وتغيير حالتها بسرعة.</div>
+  </div>
+  <a href="/admin" class="back-btn">
+    <i class="fas fa-arrow-right me-2"></i>عودة للوحة التحكم
+  </a>
+</div>
+
+<div class="orders-card">
+  <div class="orders-header">
+    <h5 class="mb-0">
+      <i class="fas fa-shopping-cart me-2"></i>
+      قائمة الطلبات
+    </h5>
+  </div>
+  
+  <div class="p-4">
+    <!-- إدارة الطلبات (للأدمن): فلترة/بحث + تغيير حالة الطلب + فك ربط جهاز العميل -->
+
+    <% const statusLabel = (s) => {
+      if (s === 'pending') return 'قيد الانتظار';
+      if (s === 'confirmed') return 'مؤكد';
+      if (s === 'cancelled') return 'ملغي';
+      if (s === 'completed') return 'مكتمل';
+      return s || '';
+    }; %>
+
+    <% const statusClass = (s) => {
+      if (s === 'pending') return 'bg-warning text-dark';
+      if (s === 'confirmed') return 'bg-primary';
+      if (s === 'cancelled') return 'bg-danger';
+      if (s === 'completed') return 'bg-success';
+      return 'bg-secondary';
+    }; %>
+
+    <form class="mb-4" method="get" action="/admin/orders">
+      <div class="row g-3">
+        <!-- فلتر الحالة + نص البحث -->
+        <div class="col-md-4">
+          <label class="form-label">الحالة</label>
+          <select name="status" class="form-select">
+            <option value="" <%= !filters.status ? 'selected' : '' %>>كل الحالات</option>
+            <option value="pending" <%= filters.status === 'pending' ? 'selected' : '' %>>قيد الانتظار</option>
+            <option value="confirmed" <%= filters.status === 'confirmed' ? 'selected' : '' %>>مؤكد</option>
+            <option value="completed" <%= filters.status === 'completed' ? 'selected' : '' %>>مكتمل</option>
+            <option value="cancelled" <%= filters.status === 'cancelled' ? 'selected' : '' %>>ملغي</option>
+          </select>
+        </div>
+        <div class="col-md-8">
+          <label class="form-label">بحث (رقم الطلب أو اسم العميل)</label>
+          <input name="q" class="form-control" value="<%= filters.q || '' %>" placeholder="HM-2025-000123 أو أحمد" />
+        </div>
+        <div class="col-12 d-flex gap-2 justify-content-end">
+          <button class="btn btn-primary">بحث</button>
+          <a class="btn btn-outline-secondary" href="/admin/orders">إزالة الفلاتر</a>
+        </div>
+      </div>
+    </form>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+        <span>قائمة الطلبات</span>
+        <small class="text-muted"><%= (orders || []).length %> طلب</small>
+      </div>
+      <div class="card-body p-0">
+        <% if (!orders || !orders.length) { %>
+          <!-- لا توجد نتائج -->
+          <div class="p-4 text-center">
+            <div class="h5 mb-1">لا توجد طلبات</div>
+            <div class="text-muted">جرّب تغيير الفلاتر.</div>
+          </div>
+        <% } else { %>
+          <!-- جدول الطلبات + أزرار إجراءات سريعة -->
+          <div class="table-responsive">
+            <table class="table table-striped mb-0 align-middle">
+              <thead>
+                <tr>
+                  <th>رقم الطلب</th>
+                  <th>العميل</th>
+                  <th>الحالة</th>
+                  <th>العناصر</th>
+                  <th>التاريخ</th>
+                  <th>إجراء سريع</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% orders.forEach(o => { %>
+                  <tr>
+                    <td>
+                      <a href="/orders/<%= o._id %>/invoice"><%= o.orderNumber %></a>
+                    </td>
+                    <td>
+                      <div class="fw-semibold"><%= o.buyer?.name || '-' %></div>
+                      <% if (o.buyer && o.buyer.role === 'buyer' && o.buyer.buyerDeviceId) { %>
+                        <small class="text-muted">Device linked</small>
+                      <% } %>
+                    </td>
+                    <td>
+                      <span class="badge <%= statusClass(o.status) %>"><%= statusLabel(o.status) %></span>
+                    </td>
+                <td>
+                  <small class="text-muted"><%= (o.items || []).map(i => i.titleSnapshot).join(' | ') %></small>
+                </td>
+                <td>
+                  <small class="text-muted"><%= new Date(o.createdAt).toLocaleString('ar-YE') %></small>
+                </td>
+                <td>
+                  <div class="d-flex gap-2 flex-wrap">
+                    <!-- تغيير الحالة يتم عبر /orders/:id/status (POST) ويتطلب CSRF -->
+                    <form method="post" action="/orders/<%= o._id %>/status">
+                      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                      <input type="hidden" name="status" value="confirmed" />
+                      <button class="btn btn-sm btn-primary" type="submit" <%= o.status === 'confirmed' ? 'disabled' : '' %>>تأكيد</button>
+                    </form>
+                    <form method="post" action="/orders/<%= o._id %>/status">
+                      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                      <input type="hidden" name="status" value="completed" />
+                      <button class="btn btn-sm btn-success" type="submit" <%= o.status === 'completed' ? 'disabled' : '' %>>تم التسليم</button>
+                    </form>
+                    <form method="post" action="/orders/<%= o._id %>/status" onsubmit="return confirm('هل تريد إلغاء الطلب؟');">
+                      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                      <input type="hidden" name="status" value="cancelled" />
+                      <button class="btn btn-sm btn-danger" type="submit" <%= o.status === 'cancelled' ? 'disabled' : '' %>>إلغاء</button>
+                    </form>
+
+                    <% if (o.buyer && o.buyer.role === 'buyer') { %>
+                      <!-- فك ربط الجهاز: يسمح للعميل بتسجيل الدخول من جهاز آخر (buyerDeviceId/activeSessionId) -->
+                      <form method="post" action="/admin/buyers/<%= o.buyer._id %>/unbind-device" onsubmit="return confirm('فك ربط الجهاز للعميل؟');">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                        <button class="btn btn-sm btn-outline-secondary" type="submit">فك ربط الجهاز</button>
+                      </form>
+                    <% } %>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+</div>

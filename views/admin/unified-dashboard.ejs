@@ -698,19 +698,19 @@
 }
 
 .master-btn-warning {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%);
+  background: linear-gradient(135deg, var(--primary-color-light) 0%, var(--primary-color) 50%, var(--primary-color-light) 100%);
   color: white;
   box-shadow: 
-    0 4px 12px rgba(245, 158, 11, 0.3),
+    0 4px 12px rgba(11, 31, 58, 0.22),
     0 2px 6px rgba(0, 0, 0, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .master-btn-warning:hover {
-  background: linear-gradient(135deg, #d97706 0%, #b45309 50%, #92400e 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color-light) 50%, var(--primary-color) 100%);
   transform: translateY(-2px);
   box-shadow: 
-    0 8px 25px rgba(245, 158, 11, 0.4),
+    0 8px 25px rgba(11, 31, 58, 0.28),
     0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
@@ -1044,7 +1044,7 @@
 }
 
 .master-badge-success { background: rgba(16, 185, 129, 0.1); color: #10b981; }
-.master-badge-warning { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+.master-badge-warning { background: rgba(11, 31, 58, 0.08); color: var(--primary-color); }
 .master-badge-danger { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
 .master-badge-info { background: rgba(255, 255, 255, 0.12); color: var(--primary-color); }
 
@@ -1181,9 +1181,9 @@
 }
 
 .master-alert-warning {
-  background: rgba(245, 158, 11, 0.1);
-  color: #f59e0b;
-  border: 1px solid rgba(245, 158, 11, 0.2);
+  background: rgba(11, 31, 58, 0.08);
+  color: var(--primary-color);
+  border: 1px solid rgba(11, 31, 58, 0.14);
 }
 
 /* Loading */
@@ -1235,7 +1235,7 @@
 }
 
 .master-simple-icon.is-success { background: rgba(16, 185, 129, 0.12); color: #10b981; }
-.master-simple-icon.is-warning { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
+.master-simple-icon.is-warning { background: rgba(11, 31, 58, 0.10); color: var(--primary-color); }
 
 .master-simple-content { flex: 1; }
 .master-simple-title { font-weight: 500; }
@@ -2182,7 +2182,7 @@
             <div class="master-summary-label">الطلبات هذا الشهر</div>
           </div>
           <div class="master-summary-card">
-            <div class="master-summary-value" style="color: #f59e0b;">45</div>
+            <div class="master-summary-value" style="color: var(--primary-color);">45</div>
             <div class="master-summary-label">المزادات النشطة</div>
           </div>
           <div class="master-summary-card">

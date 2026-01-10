@@ -20,9 +20,10 @@
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
+  <% var safeCurrentUrl = (typeof currentUrl !== 'undefined') ? currentUrl : ''; %>
   <% var isAdminPage = !!(typeof currentUser !== 'undefined' && currentUser && (currentUser.role === 'admin' || currentUser.role === 'super_admin' || currentUser.role === 'manager') && (
     ((typeof bodyClass !== 'undefined' && bodyClass) && (String(bodyClass).indexOf('admin-dashboard-luxury') !== -1 || String(bodyClass).indexOf('modern-admin-dashboard') !== -1 || String(bodyClass).indexOf('admin-body') !== -1 || String(bodyClass).indexOf('admin-modern-grid') !== -1)) ||
-    ((currentUrl || '').startsWith('/admin'))
+    ((safeCurrentUrl || '').startsWith('/admin'))
   )); %>
 
   <!-- Stylesheets -->
@@ -40,7 +41,7 @@
     <link href="/public/css/admin-enhancements.css?v=<%= Date.now() %>" rel="stylesheet">
     <link href="/public/css/admin-ultra.css?v=<%= Date.now() %>" rel="stylesheet">
   <% } %>
-  <link rel="manifest" href="/public/manifest.json">
+  <link rel="manifest" href="/manifest.json">
   
 </head>
 
@@ -52,6 +53,9 @@
   <% } %>
 
   <main id="main-content">
+      <% if (!(typeof isEmbed !== 'undefined' && isEmbed)) { %>
+        <%- include('partials/back-button') %>
+      <% } %>
       <% if (!(typeof isEmbed !== 'undefined' && isEmbed) && typeof flash !== 'undefined' && flash && flash.message) { %>
         <div class="container mt-4">
           <div class="alert alert-<%= flash.type || 'info' %> alert-dismissible fade show" role="alert">
@@ -89,11 +93,28 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/public/sw.js')
+        navigator.serviceWorker.register('/sw.js')
           .then(reg => console.log('Service Worker Registered!', reg))
           .catch(err => console.error('Service Worker Registration Failed:', err));
       });
     }
+  </script>
+
+  <script>
+    document.addEventListener('click', function (e) {
+      const btn = e.target && e.target.closest ? e.target.closest('[data-hm-back="1"]') : null;
+      if (!btn) return;
+      e.preventDefault();
+      try {
+        if (window.history && window.history.length > 1) {
+          window.history.back();
+        } else {
+          window.location.href = '/';
+        }
+      } catch (err) {
+        window.location.href = '/';
+      }
+    }, { passive: false });
   </script>
 </body>
 </html>

@@ -2,41 +2,41 @@
 
 /* ======== متغيرات التصميم الأساسية ======== */
 :root {
-  /* الألوان الفاخرة الجديدة */
-  --primary-gold: #EEF3FB;
-  --primary-gold-light: #FFFFFF;
-  --primary-gold-dark: #0B1F3A;
-  --accent-gold: #FFFFFF;
-  --rose-gold: #EEF3FB;
-  --platinum: #EEF3FB;
+  /* Map legacy luxury "gold" variables to the navy/white theme tokens */
+  --primary-gold: var(--primary-color);
+  --primary-gold-light: var(--secondary-color);
+  --primary-gold-dark: var(--primary-color-light);
+  --accent-gold: var(--secondary-color);
+  --rose-gold: var(--gold-color);
+  --platinum: var(--gold-color);
 
-  /* RGB helpers (للتحكم بالشفافية بدون ألوان صلبة جديدة) */
+  /* RGB helpers (retain navy RGB for translucency) */
   --accent-rgb: 11, 31, 58;
   --accent-rgb-soft: 238, 243, 251;
-  
-  /* ألوان الخلفية الفاخرة - Dark Mode */
+
+  /* Dark mode backgrounds (keep as-is but favor theme tokens when possible) */
   --bg-dark: #000000;
   --bg-secondary: #0D0D0D;
   --bg-tertiary: #1A1A1A;
   --bg-card: #0F0F0F;
-  
-  /* ألوان النصوص - Dark Mode */
-  --text-primary: #FFFFFF;
-  --text-secondary: #E0E0E0;
+
+  /* Text colors (inherit light/dark variants from modern design tokens) */
+  --text-primary: var(--text-primary, #FFFFFF);
+  --text-secondary: var(--text-color-secondary, #E0E0E0);
   --text-muted: #A0A0A0;
-  --text-gold: #EEF3FB;
-  
-  /* الحدود والظلال الفاخرة */
-  --border-gold: rgba(var(--accent-rgb-soft), 0.28);
-  --border-gold-bright: rgba(var(--accent-rgb-soft), 0.45);
-  --shadow-gold: 0 10px 40px rgba(var(--accent-rgb), 0.28);
-  --shadow-gold-intense: 0 15px 60px rgba(var(--accent-rgb), 0.45);
+  --text-gold: var(--primary-color);
+
+  /* Borders & shadows that previously used gold now use navy-based translucency */
+  --border-gold: rgba(var(--accent-rgb-soft), 0.22);
+  --border-gold-bright: rgba(var(--accent-rgb-soft), 0.35);
+  --shadow-gold: 0 10px 40px rgba(var(--accent-rgb), 0.18);
+  --shadow-gold-intense: 0 15px 60px rgba(var(--accent-rgb), 0.28);
   --shadow-dark: 0 8px 32px rgba(0, 0, 0, 0.8);
-  --glow-gold: 0 0 20px rgba(var(--accent-rgb), 0.55), 0 0 40px rgba(var(--accent-rgb), 0.35);
-  
-  /* التدرجات الفاخرة */
-  --gradient-primary: linear-gradient(135deg, #0B1F3A 0%, #EEF3FB 50%, #0B1F3A 100%);
-  --gradient-gold-shine: linear-gradient(135deg, #0B1F3A 0%, #EEF3FB 25%, #FFFFFF 50%, #EEF3FB 75%, #0B1F3A 100%);
+  --glow-gold: 0 0 20px rgba(var(--accent-rgb), 0.28), 0 0 40px rgba(var(--accent-rgb), 0.16);
+
+  /* Gradients: prefer central navy gradient already defined in modern-design.css */
+  --gradient-primary: var(--gold-gradient);
+  --gradient-gold-shine: var(--gold-gradient);
   --gradient-bg: radial-gradient(ellipse at top, #1A1A1A 0%, #0D0D0D 50%, #000000 100%);
   --gradient-card: linear-gradient(145deg, rgba(var(--accent-rgb), 0.14) 0%, rgba(var(--accent-rgb), 0.05) 100%);
   --gradient-overlay: linear-gradient(180deg, rgba(var(--accent-rgb), 0.12) 0%, transparent 100%);
@@ -121,7 +121,7 @@ body::before {
   background: var(--gradient-card);
   border: 2px solid var(--border-gold);
   border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-gold), inset 0 1px 0 rgba(212, 175, 55, 0.1);
+  box-shadow: var(--shadow-gold), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
   padding: 2rem;
@@ -150,7 +150,7 @@ body::before {
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(var(--accent-rgb), 0.08) 0%, transparent 70%);
   opacity: 0;
   transition: opacity 0.5s ease;
   pointer-events: none;
@@ -158,7 +158,7 @@ body::before {
 
 .luxury-card:hover {
   transform: translateY(-8px) scale(1.02);
-  box-shadow: var(--shadow-gold-intense), var(--glow-gold), inset 0 1px 0 rgba(212, 175, 55, 0.15);
+  box-shadow: var(--shadow-gold-intense), var(--glow-gold), inset 0 1px 0 rgba(255, 255, 255, 0.12);
   border-color: var(--border-gold-bright);
 }
 
@@ -191,7 +191,7 @@ body::before {
   font-size: 1rem;
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  box-shadow: var(--shadow-gold), inset 0 1px 0 rgba(212, 175, 55, 0.3);
+  box-shadow: var(--shadow-gold), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .luxury-btn::before {
@@ -201,7 +201,7 @@ body::before {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
   transition: left 0.6s ease;
 }
 
@@ -231,7 +231,7 @@ body::before {
 .luxury-btn:hover {
   background: var(--gradient-gold-shine);
   transform: translateY(-3px) scale(1.05);
-  box-shadow: var(--shadow-gold-intense), var(--glow-gold), inset 0 1px 0 rgba(212, 175, 55, 0.5);
+  box-shadow: var(--shadow-gold-intense), var(--glow-gold), inset 0 1px 0 rgba(255, 255, 255, 0.14);
   color: #000000;
   border-color: var(--primary-gold-light);
 }
@@ -248,13 +248,13 @@ body::before {
 }
 
 .luxury-btn-secondary {
-  background: rgba(212, 175, 55, 0.1);
+  background: rgba(var(--accent-rgb), 0.1);
   color: var(--text-primary);
   border: 1px solid var(--border-gold);
 }
 
 .luxury-btn-secondary:hover {
-  background: rgba(212, 175, 55, 0.15);
+  background: rgba(var(--accent-rgb), 0.14);
   border-color: var(--primary-gold);
   color: var(--primary-gold);
 }
@@ -262,7 +262,7 @@ body::before {
 /* ======== النماذج الفاخرة ======== */
 .luxury-input,
 .luxury-select {
-  background: rgba(212, 175, 55, 0.05);
+  background: rgba(var(--accent-rgb), 0.06);
   border: 1px solid var(--border-gold);
   border-radius: var(--radius-md);
   color: var(--text-primary);
@@ -274,9 +274,9 @@ body::before {
 
 .luxury-input:focus,
 .luxury-select:focus {
-  background: rgba(212, 175, 55, 0.08);
+  background: rgba(var(--accent-rgb), 0.08);
   border-color: var(--primary-gold);
-  box-shadow: 0 0 0 0.2rem rgba(212, 175, 55, 0.25);
+  box-shadow: 0 0 0 0.2rem rgba(var(--accent-rgb), 0.2);
   outline: none;
   transform: translateY(-1px);
 }
@@ -297,7 +297,7 @@ body::before {
 }
 
 .luxury-table th {
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(212, 175, 55, 0.08));
+  background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.14), rgba(var(--accent-rgb), 0.08));
   color: var(--primary-gold);
   font-weight: 600;
   text-transform: uppercase;
@@ -316,7 +316,7 @@ body::before {
 }
 
 .luxury-table tbody tr:hover {
-  background: rgba(212, 175, 55, 0.05);
+  background: rgba(var(--accent-rgb), 0.05);
 }
 
 .luxury-table tbody tr:last-child td {

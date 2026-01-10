@@ -202,7 +202,7 @@ class AdvancedAnimations {
     // Text effects
     document.querySelectorAll('.text-hover').forEach(text => {
       text.addEventListener('mouseenter', (e) => {
-        e.target.style.color = 'var(--gold-primary)';
+        e.target.style.color = 'var(--primary-color)';
         e.target.style.transform = 'translateX(5px)';
       });
 

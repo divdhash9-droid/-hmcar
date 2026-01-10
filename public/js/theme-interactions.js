@@ -106,7 +106,7 @@ class InteractionManager {
       height: ${size}px;
       left: ${x}px;
       top: ${y}px;
-      background: rgba(255, 215, 0, 0.5);
+      background: rgba(255, 255, 255, 0.35);
       border-radius: 50%;
       transform: scale(0);
       animation: ripple 0.6s linear;
@@ -209,16 +209,16 @@ class NotificationManager {
 
   addNotificationStyles(notification) {
     notification.style.cssText = `
-      background: var(--bg-card);
-      border: 2px solid var(--border-gold);
-      border-radius: var(--radius-md);
+      background: var(--bg-card, #ffffff);
+      border: 2px solid var(--border-gold, rgba(11, 31, 58, 0.18));
+      border-radius: var(--radius-md, 12px);
       padding: 16px;
       margin-bottom: 12px;
-      box-shadow: var(--shadow-gold);
+      box-shadow: var(--shadow-gold, 0 10px 30px rgba(11, 31, 58, 0.18));
       backdrop-filter: blur(10px);
       transform: translateX(100%);
       opacity: 0;
-      transition: var(--transition-smooth);
+      transition: var(--transition-smooth, all 0.3s ease);
       pointer-events: all;
       max-width: 400px;
     `;
@@ -228,14 +228,14 @@ class NotificationManager {
       display: flex;
       align-items: center;
       gap: 12px;
-      color: var(--text-primary);
+      color: var(--text-primary, #0b1f3a);
     `;
 
     const closeBtn = notification.querySelector('.notification-close');
     closeBtn.style.cssText = `
       background: none;
       border: none;
-      color: var(--text-muted);
+      color: var(--text-muted, rgba(11, 31, 58, 0.65));
       cursor: pointer;
       padding: 4px;
       margin-right: 8px;

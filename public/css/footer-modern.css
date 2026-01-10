@@ -1,10 +1,21 @@
 /* Modern Footer Styles */
 .main-footer {
-  background: linear-gradient(135deg, #07162a 0%, #0b1f3a 100%);
-  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  background:
+    radial-gradient(900px 420px at 20% 0%, rgba(255, 184, 77, 0.12) 0%, transparent 60%),
+    radial-gradient(900px 420px at 85% 10%, rgba(35, 96, 190, 0.16) 0%, transparent 55%),
+    linear-gradient(135deg, #061325 0%, #0b1f3a 55%, #07162a 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
   padding: 3rem 0 1rem;
   margin-top: 4rem;
   color: rgba(255, 255, 255, 0.92);
+}
+
+.main-footer::before {
+  content: '';
+  display: block;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255, 210, 122, 0.75), transparent);
+  opacity: 0.9;
 }
 
 .main-footer .container {
@@ -45,7 +56,7 @@
   width: 40px;
   height: 40px;
   background: rgba(255, 255, 255, 0.10);
-  border: 1px solid rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.24);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -56,10 +67,10 @@
 }
 
 .social-links a:hover {
-  background: #ffffff;
-  color: #0b1f3a;
+  background: rgba(255, 210, 122, 0.92);
+  color: #07162a;
   transform: translateY(-3px);
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.22);
 }
 
 .footer-section.links ul {
@@ -85,7 +96,7 @@
 .footer-section.links ul li a::before {
   content: '←';
   margin-left: 0.5rem;
-  color: rgba(255, 255, 255, 0.92);
+  color: rgba(255, 210, 122, 0.92);
   transition: transform 0.3s ease;
 }
 
@@ -105,7 +116,7 @@
 }
 
 .footer-section.contact p i {
-  color: #ffffff;
+  color: rgba(255, 210, 122, 0.92);
   width: 16px;
   text-align: center;
 }
@@ -113,10 +124,14 @@
 .footer-bottom {
   text-align: center;
   padding-top: 2rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.14);
-  color: rgba(255, 255, 255, 0.60);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(238, 243, 251, 0.66);
   font-family: 'Montserrat', sans-serif;
   font-size: 0.85rem;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.04), rgba(255, 210, 122, 0.06), rgba(255, 255, 255, 0.04));
+  border-radius: 14px;
+  margin-top: 1.75rem;
+  padding-bottom: 1.25rem;
 }
 
 /* Responsive Design */

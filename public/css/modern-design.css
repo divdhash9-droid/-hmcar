@@ -15,6 +15,15 @@
     --gold-color: #eef3fb;
     --gold-gradient: linear-gradient(135deg, #0b1f3a 0%, #133b6b 50%, #0b1f3a 100%);
     --gold-shadow: 0 6px 18px rgba(11, 31, 58, 0.22);
+    /* Legacy/JS compatibility (remove gold look globally) */
+    --gold-primary: var(--primary-color);
+    --border-gold: rgba(11, 31, 58, 0.18);
+    --shadow-gold: 0 10px 30px rgba(11, 31, 58, 0.18);
+    --bg-card: #ffffff;
+    --text-primary: var(--dark-text-color);
+    --text-muted: rgba(11, 31, 58, 0.65);
+    --radius-md: 12px;
+    --transition-smooth: all 0.3s ease;
     --border-radius: 8px;
     --border-radius-sm: 6px;
     --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -33,6 +42,128 @@ body {
     background-color: var(--secondary-color);
     color: var(--dark-text-color);
     line-height: 1.6;
+}
+
+/* --- Buttons: 3D, readable text + icons --- */
+:root {
+    --btn-3d-shadow: 0 12px 22px rgba(11, 31, 58, 0.18);
+    --btn-3d-shadow-hover: 0 16px 30px rgba(11, 31, 58, 0.22);
+    --btn-3d-inset: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+button.btn:not(.btn-close):not(.btn-link),
+a.btn:not(.btn-link),
+.cta-button,
+.login-btn,
+.signup-btn {
+    position: relative;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    transform: translateY(0);
+    box-shadow: var(--btn-3d-inset), var(--btn-3d-shadow);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+
+button.btn:not(.btn-close):not(.btn-link):hover,
+a.btn:not(.btn-link):hover,
+.cta-button:hover,
+.login-btn:hover,
+.signup-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--btn-3d-inset), var(--btn-3d-shadow-hover);
+}
+
+button.btn:not(.btn-close):not(.btn-link):active,
+a.btn:not(.btn-link):active,
+.cta-button:active,
+.login-btn:active,
+.signup-btn:active {
+    transform: translateY(1px);
+    box-shadow: var(--btn-3d-inset), 0 8px 16px rgba(11, 31, 58, 0.16);
+}
+
+.btn i,
+.cta-button i,
+.login-btn i,
+.signup-btn i {
+    color: currentColor;
+    opacity: 1;
+    display: inline-block;
+}
+
+/* Improve contrast for primary buttons on this theme */
+.btn.btn-primary {
+    background: var(--gold-gradient);
+    border-color: rgba(11, 31, 58, 0.25);
+    color: #ffffff;
+}
+
+.btn.btn-outline-secondary {
+    border-color: rgba(11, 31, 58, 0.22);
+    color: var(--primary-color);
+    background: #ffffff;
+}
+
+.btn.btn-outline-secondary:hover {
+    color: #ffffff;
+    background: var(--gold-gradient);
+    border-color: rgba(11, 31, 58, 0.25);
+}
+
+/* Global back button (رجوع) */
+.hm-backbar {
+    max-width: 1200px;
+    margin: 14px auto 0;
+    padding: 0 20px;
+}
+
+/* Auth pages: keep back button usable without shifting layout */
+.auth-page .hm-backbar {
+    position: fixed;
+    top: 14px;
+    left: 0;
+    right: 0;
+    z-index: 2000;
+    margin: 0 auto;
+    pointer-events: none;
+}
+
+.auth-page .hm-backbar .hm-btn {
+    pointer-events: auto;
+}
+
+.hm-btn {
+    border: 1px solid rgba(11, 31, 58, 0.18);
+    background: #ffffff;
+    color: var(--primary-color);
+    border-radius: 14px;
+    padding: 0.55rem 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    line-height: 1;
+}
+
+.hm-btn.hm-btn-3d {
+    box-shadow: var(--btn-3d-inset), var(--btn-3d-shadow);
+}
+
+.hm-btn.hm-btn-back {
+    min-height: 42px;
+}
+
+.hm-btn.hm-btn-back span {
+    font-weight: 800;
+}
+
+@media (max-width: 768px) {
+    .hm-backbar {
+        padding: 0 14px;
+    }
+    .hm-btn.hm-btn-back {
+        width: 100%;
+        justify-content: center;
+    }
 }
 
 /* Customer page layout helpers */

@@ -97,10 +97,10 @@ body::before {
 
 @keyframes gentleGlow {
   0% { 
-    filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.4));
+    filter: drop-shadow(0 0 15px rgba(11, 31, 58, 0.35));
   }
   100% { 
-    filter: drop-shadow(0 0 25px rgba(212, 175, 55, 0.6));
+    filter: drop-shadow(0 0 25px rgba(11, 31, 58, 0.55));
   }
 }
 
@@ -738,4 +738,98 @@ body::before {
   .hero-subtitle {
     font-size: 1.8rem;
   }
+}
+
+/* ======== Navy/White Theme Overrides (remove gold look) ======== */
+body {
+  background: linear-gradient(135deg, #020814 0%, #0b1f3a 30%, #051429 70%, #020814 100%);
+}
+
+body::before {
+  background:
+    radial-gradient(circle at 30% 40%, rgba(11, 31, 58, 0.18) 0%, transparent 50%),
+    radial-gradient(circle at 70% 60%, rgba(238, 243, 251, 0.06) 0%, transparent 50%);
+}
+
+.hero-title,
+.hero-title::before {
+  background: linear-gradient(135deg, var(--gold-color) 0%, var(--secondary-color) 50%, var(--gold-color) 100%);
+  text-shadow: 0 8px 30px rgba(11, 31, 58, 0.55);
+  filter: drop-shadow(0 0 25px rgba(11, 31, 58, 0.55));
+}
+
+.hero-subtitle {
+  border-color: rgba(238, 243, 251, 0.25);
+  background: rgba(11, 31, 58, 0.18);
+}
+
+.search-box {
+  background: rgba(11, 31, 58, 0.22);
+  border-color: rgba(238, 243, 251, 0.35);
+  box-shadow: 0 10px 30px rgba(11, 31, 58, 0.22);
+}
+
+.search-title,
+.search-title i,
+.search-item i,
+.cars-preview-title,
+.cars-preview-title i,
+.stat-item i,
+.stat-number {
+  color: var(--gold-color);
+  text-shadow: 0 3px 15px rgba(11, 31, 58, 0.35);
+}
+
+.search-input,
+.search-select {
+  border-color: rgba(238, 243, 251, 0.32);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.search-input:focus,
+.search-select:focus {
+  border-color: rgba(238, 243, 251, 0.6);
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 0 0.2rem rgba(11, 31, 58, 0.22);
+}
+
+.search-button {
+  background: var(--gold-gradient);
+  color: #ffffff;
+  box-shadow: var(--gold-shadow);
+}
+
+.search-button i {
+  color: #ffffff;
+}
+
+.stat-item,
+.cars-preview {
+  border-color: rgba(238, 243, 251, 0.22);
+}
+
+.stat-item:hover {
+  border-color: rgba(238, 243, 251, 0.45);
+  box-shadow: 0 8px 20px rgba(11, 31, 58, 0.18);
+}
+
+.cta-button {
+  border-color: rgba(238, 243, 251, 0.32);
+  color: var(--gold-color);
+}
+
+.cta-button:hover {
+  background: rgba(238, 243, 251, 0.1);
+  border-color: rgba(238, 243, 251, 0.5);
+  box-shadow: 0 8px 20px rgba(11, 31, 58, 0.2);
+}
+
+.cta-button.primary {
+  background: var(--gold-gradient);
+  color: #ffffff;
+}
+
+.cta-button.primary:hover {
+  background: var(--gold-gradient);
+  box-shadow: var(--gold-shadow);
 }

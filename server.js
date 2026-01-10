@@ -408,6 +408,7 @@ app.use((err, req, res, next) => {
 });
 
 let serverInstance;
+let appReady = false;
 
 async function connectToDatabase() {
   if (mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2) {
@@ -442,6 +443,13 @@ async function startServer() {
   return serverInstance;
 }
 
+async function ensureAppReady() {
+  if (appReady) return;
+  await connectToDatabase();
+  await initializeSystem();
+  appReady = true;
+}
+
 if (require.main === module) {
   startServer().catch((err) => {
     console.error('Failed to start server:', err);
@@ -449,12 +457,13 @@ if (require.main === module) {
   });
 }
 
-// Vercel serverless export
-module.exports = async (req, res) => {
-  if (!serverInstance || !serverInstance.listening) {
-    await startServer();
-  }
+// Vercel / serverless export
+// Note: In serverless mode we must NOT call httpServer.listen().
+const handler = async (req, res) => {
+  await ensureAppReady();
   return app(req, res);
 };
 
-module.exports = { app, startServer };
+module.exports = handler;
+module.exports.app = app;
+module.exports.startServer = startServer;

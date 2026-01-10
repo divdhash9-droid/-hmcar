@@ -16,60 +16,142 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/public/images/icons/icon-192x192.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/public/images/icons/icon-192x192.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/public/images/icons/icon-192x192.png">
-<link rel="manifest" href="/public/manifest.json">
+<link rel="manifest" href="/manifest.json">
 
 <link href="/public/css/single-section.css" rel="stylesheet">
 
-<div class="main-container">
-  <div class="single-section">
-    <!-- Header Section -->
-    <div class="header-section">
-      <h1 class="hero-title">HM CAR</h1>
-      <p class="hero-subtitle">مزادات السيارات الفاخرة في المملكة العربية السعودية</p>
-      
-      <!-- Action Buttons -->
-      <div class="action-buttons">
-        <a href="/auctions" class="cta-button primary">
-          <i class="fas fa-gavel"></i>
-          استكشف المزادات
+<% const isLoggedIn = !!(typeof currentUser !== 'undefined' && currentUser); %>
+<% const loginWithReturnTo = (path) => `/auth/login?returnTo=${encodeURIComponent(path)}`; %>
+
+<div class="main-container hm-landing">
+  <div class="single-section hm-shell">
+    <!-- Top Bar -->
+    <div class="hm-topbar" aria-label="Top bar">
+      <div class="hm-topbar__left">
+        <a class="hm-topbar__logoLink" href="/" aria-label="HM CAR">
+          <img class="hm-topbar__logo" src="/public/images/navbar-logo.png" alt="HM CAR" loading="eager" decoding="async" onerror="this.onerror=null;this.src='/public/images/logo.png';" />
         </a>
-        <a href="/cars" class="cta-button">
-          <i class="fas fa-car"></i>
-          تصفح السيارات
-        </a>
-        <a href="/auth/register" class="cta-button primary">
-          <i class="fas fa-user-plus"></i>
-          إنشاء حساب
-        </a>
-        <a href="/auth/login" class="cta-button">
-          <i class="fas fa-sign-in-alt"></i>
-          تسجيل الدخول
+      </div>
+      <div class="hm-topbar__right">
+        <div class="hm-topbar__lang">
+          <% if (typeof locale !== 'undefined' && locale === 'ar') { %>
+            <a class="hm-topbar__langBtn" href="?lang=en" title="English">EN</a>
+          <% } else { %>
+            <a class="hm-topbar__langBtn" href="?lang=ar" title="العربية">عر</a>
+          <% } %>
+        </div>
+        <a href="/auth/login" class="hm-topbar__login">
+          <i class="fas fa-right-to-bracket"></i>
+          <span>تسجيل الدخول / Login</span>
         </a>
       </div>
     </div>
 
+    <!-- Hero / Brand -->
+    <section class="hm-hero hm-hero--v2" aria-label="HM CAR">
+      <div class="hm-hero2">
+        <div class="hm-hero2__brand">
+          <div class="hm-hero2__logoWrap">
+            <img class="hm-hero2__logo" src="/public/images/navbar-logo.png" alt="HM CAR" loading="eager" decoding="async" onerror="this.onerror=null;this.src='/public/images/logo.png';" />
+          </div>
+          <div class="hm-hero2__text">
+            <h1 class="hm-hero2__title">HM CAR</h1>
+            <p class="hm-hero2__subtitle">
+              تصدير السيارات وقطع الغيار من كوريا إلى جميع دول العالم<br>
+              <span class="hm-hero2__subtitleEn">Exporting cars and spare parts from Korea to all countries of the world</span>
+            </p>
+          </div>
+        </div>
+
+        <div class="hm-hero2__cta">
+          <div class="hm-hero2__cards" aria-label="Main categories">
+            <a class="hm-card" href="<%= isLoggedIn ? '/auctions' : loginWithReturnTo('/auctions') %>">
+              <div class="hm-card__icon"><i class="fas fa-gavel"></i></div>
+              <div class="hm-card__title">المزاد / Auctions</div>
+              <div class="hm-card__text">مزادات مباشرة وعروض مميزة</div>
+            </a>
+            <a class="hm-card" href="<%= isLoggedIn ? '/cars' : loginWithReturnTo('/cars') %>">
+              <div class="hm-card__icon"><i class="fas fa-car"></i></div>
+              <div class="hm-card__title">السيارات / Cars</div>
+              <div class="hm-card__text">سيارات مختارة للتصدير والفحص</div>
+            </a>
+            <a class="hm-card" href="<%= isLoggedIn ? '/spare-parts' : loginWithReturnTo('/spare-parts') %>">
+              <div class="hm-card__icon"><i class="fas fa-gears"></i></div>
+              <div class="hm-card__title">قطع الغيار / Spare Parts</div>
+              <div class="hm-card__text">بحث حسب الموديل والسنة</div>
+            </a>
+          </div>
+
+          <div class="hm-hero2__highlights" aria-label="Highlights">
+            <div class="hm-chip"><i class="fas fa-plane"></i><span>تصدير دولي / Export</span></div>
+            <div class="hm-chip"><i class="fas fa-clipboard-check"></i><span>فحص وتجهيز / Inspection</span></div>
+            <div class="hm-chip"><i class="fas fa-shield-halved"></i><span>دفع آمن / Secure</span></div>
+            <div class="hm-chip"><i class="fas fa-headset"></i><span>دعم / Support</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="hm-steps" aria-label="How it works">
+      <div class="hm-sectionHead">
+        <h2 class="hm-sectionHead__title">كيف نعمل / How it works</h2>
+        <p class="hm-sectionHead__text">خطوات واضحة من اختيار السيارة إلى الشحن والتسليم</p>
+      </div>
+      <div class="hm-steps__grid">
+        <div class="hm-step">
+          <div class="hm-step__num">1</div>
+          <div class="hm-step__icon"><i class="fas fa-magnifying-glass"></i></div>
+          <div class="hm-step__title">اختيار / Select</div>
+          <div class="hm-step__text">اختر سيارة أو قطعة غيار أو مزاد</div>
+        </div>
+        <div class="hm-step">
+          <div class="hm-step__num">2</div>
+          <div class="hm-step__icon"><i class="fas fa-clipboard-check"></i></div>
+          <div class="hm-step__title">فحص / Inspect</div>
+          <div class="hm-step__text">تجهيز وفحص حسب الطلب قبل الشحن</div>
+        </div>
+        <div class="hm-step">
+          <div class="hm-step__num">3</div>
+          <div class="hm-step__icon"><i class="fas fa-file-signature"></i></div>
+          <div class="hm-step__title">إجراءات / Documents</div>
+          <div class="hm-step__text">تجهيز الأوراق والتخليص بوضوح</div>
+        </div>
+        <div class="hm-step">
+          <div class="hm-step__num">4</div>
+          <div class="hm-step__icon"><i class="fas fa-ship"></i></div>
+          <div class="hm-step__title">شحن / Ship</div>
+          <div class="hm-step__text">شحن وتحديثات حتى وصول الطلب</div>
+        </div>
+      </div>
+    </section>
+
     <!-- Search Section -->
-    <div class="search-section">
+    <div class="search-section" aria-label="Search">
       <h2 class="search-title">
         <i class="fas fa-search"></i>
-        ابحث عن سيارتك أحلامك
+        ابحث بسرعة
       </h2>
       <form action="/search" method="GET" class="search-form">
         <div class="search-grid">
           <div class="search-item">
             <i class="fas fa-search"></i>
-            <input type="text" name="q" placeholder="اكتب اسم السيارة..." class="search-input">
+            <input type="text" name="q" placeholder="اكتب كلمة البحث (مثال: Sonata / Hyundai)" class="search-input">
           </div>
           <div class="search-item">
             <i class="fas fa-car"></i>
-            <select name="brand" class="search-select">
-              <option value="">اختر الماركة</option>
+            <select name="make" class="search-select">
+              <option value="">الماركة (اختياري)</option>
               <% if (brands && brands.length > 0) { %>
                 <% brands.forEach(brand => { %>
-                  <option value="<%= brand._id %>"><%= brand.name %></option>
+                  <option value="<%= brand.name %>"><%= brand.name %></option>
                 <% }); %>
               <% } %>
             </select>
+          </div>
+          <div class="search-item">
+            <i class="fas fa-car-side"></i>
+            <input type="text" name="model" placeholder="الموديل (اختياري)" class="search-input">
           </div>
           <div class="search-item">
             <i class="fas fa-money-bill-wave"></i>
@@ -96,14 +178,54 @@
         </div>
         <button type="submit" class="search-button">
           <i class="fas fa-search"></i>
-          بحث متقدم
+          بحث
         </button>
       </form>
     </div>
 
+    <!-- Live auctions preview -->
+    <section class="hm-live" aria-label="Live auctions">
+      <div class="hm-sectionHead hm-sectionHead--row">
+        <h2 class="hm-sectionHead__title">مزادات مباشرة / Live auctions</h2>
+        <a class="hm-linkBtn" href="<%= isLoggedIn ? '/auctions' : loginWithReturnTo('/auctions') %>">
+          مشاهدة الكل / View all
+          <i class="fas fa-arrow-left"></i>
+        </a>
+      </div>
+
+      <% if (liveAuctions && liveAuctions.length > 0) { %>
+        <div class="hm-live__grid">
+          <% liveAuctions.slice(0, 3).forEach(a => { %>
+            <a class="hm-liveCard" href="<%= isLoggedIn ? ('/auctions/' + a._id) : loginWithReturnTo('/auctions/' + a._id) %>">
+              <div class="hm-liveCard__thumb">
+                <img src="<%= (a.car && a.car.images && a.car.images[0] && a.car.images[0].url) ? a.car.images[0].url : '/public/images/default-car.jpg' %>" alt="Auction" loading="lazy" decoding="async" />
+              </div>
+              <div class="hm-liveCard__body">
+                <div class="hm-liveCard__title">
+                  <%= (a.car && (a.car.make || a.car.model)) ? ((a.car.make || '') + ' ' + (a.car.model || '')) : 'Auction' %>
+                </div>
+                <div class="hm-liveCard__meta">
+                  <span><i class="fas fa-clock"></i> Live</span>
+                  <span><i class="fas fa-gavel"></i> مزاد</span>
+                </div>
+              </div>
+            </a>
+          <% }); %>
+        </div>
+      <% } else { %>
+        <div class="hm-empty">
+          <i class="fas fa-gavel"></i>
+          <div>
+            <div class="hm-empty__title">لا توجد مزادات مباشرة حالياً</div>
+            <div class="hm-empty__text">تابعنا قريباً / Check back soon</div>
+          </div>
+        </div>
+      <% } %>
+    </section>
+
     <!-- Stats Section -->
     <div class="stats-section">
-      <h2 class="stats-title">أرقامنا تتحدث عنا</h2>
+      <h2 class="stats-title">أرقامنا تتحدث</h2>
       <div class="stats-grid">
         <div class="stat-item">
           <i class="fas fa-car"></i>
@@ -222,7 +344,7 @@ window.addEventListener('appinstalled', () => {
 // Service Worker Registration
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/public/sw.js')
+    navigator.serviceWorker.register('/sw.js')
       .then(registration => {
         console.log('SW registered: ', registration);
         
@@ -327,4 +449,25 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }, 1000);
 });
+</script>
+
+<script>
+  (function () {
+    const isLoggedIn = <%= isLoggedIn ? 'true' : 'false' %>;
+    if (isLoggedIn) return;
+
+    const form = document.querySelector('.search-form');
+    if (!form) return;
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const fd = new FormData(form);
+      const params = new URLSearchParams();
+      for (const [k, v] of fd.entries()) {
+        if (v !== null && String(v).trim() !== '') params.append(k, String(v));
+      }
+      const returnTo = '/search' + (params.toString() ? ('?' + params.toString()) : '');
+      window.location.href = '/auth/login?returnTo=' + encodeURIComponent(returnTo);
+    });
+  })();
 </script>

@@ -1,102 +1,535 @@
-﻿<% layout('layout') -%>
+<% layout('layout') -%>
 <% var hideNavbar = true; %>
-<% var bodyClass = 'auth-page modern-auth'; %>
+<% var bodyClass = 'auth-page modern-auth hm-login-v2'; %>
 
-<div class="auth-wrapper">
-    <div class="auth-left">
-        <div class="auth-left-inner">
-            <div class="logo-container">
-                <i class="fas fa-car-side logo-icon"></i>
-                <h1 class="logo-text"><%= __('auth.brand') %></h1>
-            </div>
-            <h2><%- String(__('auth.loginPage.sideTitle')).replace(/\n/g, '<br>') %></h2>
-            <p><%= __('auth.loginPage.sideDescription') %></p>
-            <div class="features">
-                <div class="feature">
-                    <i class="fas fa-gavel"></i>
-                    <span><%= __('auth.loginPage.features.liveAuctions') %></span>
-                </div>
-                <div class="feature">
-                    <i class="fas fa-shield-alt"></i>
-                    <span><%= __('auth.loginPage.features.verifiedSellers') %></span>
-                </div>
-                <div class="feature">
-                    <i class="fas fa-globe-americas"></i>
-                    <span><%= __('auth.loginPage.features.globalBidding') %></span>
-                </div>
-            </div>
+<div class="hm-login2">
+  <div class="hm-login2__shell">
+    <section class="hm-login2__brand" aria-label="HM CAR">
+      <div class="hm-login2__logoWrap">
+        <img class="hm-login2__logo" src="/public/images/navbar-logo.png" alt="HM CAR" loading="eager" decoding="async" onerror="this.onerror=null;this.src='/public/images/logo.png';" />
+      </div>
+      <div class="hm-login2__tag">
+        <div class="hm-login2__name">HM CAR</div>
+        <div class="hm-login2__desc">
+          تصدير السيارات وقطع الغيار من كوريا إلى جميع دول العالم<br>
+          Exporting cars and spare parts from Korea to all countries of the world
         </div>
-    </div>
-    <div class="auth-right">
-        <div class="auth-form-container">
-            <div class="auth-header">
-                <h2><%= __('auth.loginPage.title') %></h2>
-                <p><%= __('auth.loginPage.subtitle') %></p>
-            </div>
+      </div>
+      <div class="hm-login2__chips" aria-label="Highlights">
+        <div class="hm-chip"><i class="fas fa-gavel"></i><span>مزاد</span></div>
+        <div class="hm-chip"><i class="fas fa-car"></i><span>سيارات</span></div>
+        <div class="hm-chip"><i class="fas fa-gears"></i><span>قطع غيار</span></div>
+        <div class="hm-chip"><i class="fas fa-globe"></i><span>تصدير عالمي</span></div>
+      </div>
+    </section>
 
-            <% if (typeof error !== 'undefined' && error) { %>
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <%= error %>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            <% } %>
-            <% if (typeof success !== 'undefined' && success) { %>
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <%= success %>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            <% } %>
+    <section class="hm-login2__card" aria-label="Login">
+      <div class="hm-login2__header">
+        <h2 class="hm-login2__title"><%= __('auth.loginPage.title') %></h2>
+        <p class="hm-login2__subtitle"><%= isAdminLogin ? 'تسجيل دخول الإدارة' : 'تسجيل دخول العميل' %></p>
+      </div>
 
-            <form method="POST" action="/auth/login" class="auth-form">
-                <input type="hidden" name="loginRole" value="<%= isAdminLogin ? 'admin' : 'buyer' %>">
-                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                
-                <div class="form-floating mb-3">
-                    <input type="text" id="name" name="name" class="form-control" 
-                           placeholder="<%= isAdminLogin ? __('auth.fields.email') : __('auth.fields.username') %>" required>
-                    <label for="name"><%= isAdminLogin ? __('auth.fields.email') : __('auth.fields.username') %></label>
-                </div>
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger" role="alert"><%= error %></div>
+      <% } %>
+      <% if (typeof success !== 'undefined' && success) { %>
+        <div class="alert alert-success" role="alert"><%= success %></div>
+      <% } %>
 
-                <div class="form-floating mb-3">
-                    <input type="password" id="password" name="password" class="form-control" 
-                           placeholder="<%= __('auth.fields.password') %>" required>
-                    <label for="password"><%= __('auth.fields.password') %></label>
-                </div>
+      <form method="POST" action="/auth/login" class="auth-form">
+        <input type="hidden" name="loginRole" value="<%= isAdminLogin ? 'admin' : 'buyer' %>">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
-                <div class="form-options">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="remember" name="remember">
-                        <label class="form-check-label" for="remember">
-                            <%= __('auth.rememberMe') %>
-                        </label>
-                    </div>
-                    <a href="/auth/forgot-password" class="forgot-password-link"><%= __('auth.forgotPassword') %></a>
-                </div>
+        <% if (!isAdminLogin) { %>
+          <div class="form-floating mb-3">
+            <input type="text" id="name" name="name" class="form-control" placeholder="الاسم الكامل" required>
+            <label for="name">الاسم الكامل (اسمين على الأقل)</label>
+          </div>
+        <% } else { %>
+          <div class="form-floating mb-3">
+            <input type="email" id="email" name="email" class="form-control" placeholder="البريد الإلكتروني" required>
+            <label for="email">البريد الإلكتروني</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input type="password" id="password" name="password" class="form-control" placeholder="<%= __('auth.fields.password') %>" required>
+            <label for="password"><%= __('auth.fields.password') %></label>
+          </div>
+        <% } %>
 
-                <button type="submit" class="btn btn-primary btn-gold w-100"><%= __('auth.loginPage.button') %></button>
-            </form>
-
-            <div class="social-login-divider">
-                <span><%= __('common.or') %></span>
-            </div>
-
-            <div class="social-login-buttons">
-                <button class="btn btn-outline-secondary w-100 mb-2"><i class="fab fa-google me-2"></i> <%= __('auth.continueWithGoogle') %></button>
-                <button class="btn btn-outline-secondary w-100"><i class="fab fa-facebook me-2"></i> <%= __('auth.continueWithFacebook') %></button>
-            </div>
-
-            <div class="auth-switch">
-                                <p><%= __('auth.noAccount') %> <a href="/auth/register"><%= __('auth.signUpNow') %></a></p>
-                <% if (!isAdminLogin) { %>
-                                    <p><a href="/auth/login?admin=true"><%= __('auth.loginAsAdmin') %></a></p>
-                <% } else { %>
-                                    <p><a href="/auth/login"><%= __('auth.loginAsCustomer') %></a></p>
-                <% } %>
-            </div>
+        <div class="form-options">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="remember" name="remember">
+            <label class="form-check-label" for="remember"><%= __('auth.rememberMe') %></label>
+          </div>
+          <% if (isAdminLogin) { %>
+            <a href="/auth/forgot-password" class="forgot-password-link"><%= __('auth.forgotPassword') %></a>
+          <% } else { %>
+            <span></span>
+          <% } %>
         </div>
-        <div class="auth-footer">
-            <p>&copy; <%= new Date().getFullYear() %> <%= __('auth.brand') %>. <%= __('auth.copyright') %></p>
-        </div>
-    </div>
+
+        <button type="submit" class="btn btn-primary btn-gold w-100">
+          <i class="fas fa-right-to-bracket"></i>
+          <%= __('auth.loginPage.button') %>
+        </button>
+      </form>
+
+      <div class="hm-login2__switch">
+        <% const rt = (typeof returnTo !== 'undefined' && returnTo) ? ('&returnTo=' + encodeURIComponent(String(returnTo))) : ''; %>
+        <% if (!isAdminLogin) { %>
+          <a class="hm-link" href="/auth/login?admin=true<%= rt %>"><i class="fas fa-user-shield"></i> <%= __('auth.loginAsAdmin') %></a>
+        <% } else { %>
+          <a class="hm-link" href="/auth/login?<%= rt ? ('returnTo=' + encodeURIComponent(String(returnTo))) : '' %>"><i class="fas fa-user"></i> <%= __('auth.loginAsCustomer') %></a>
+        <% } %>
+      </div>
+
+      <div class="hm-login2__footer">
+        <span>© <%= new Date().getFullYear() %> HM CAR</span>
+      </div>
+    </section>
+  </div>
 </div>
 
+.hm-particle--4 {
+  width: 40px;
+  height: 40px;
+  top: 20%;
+  left: 70%;
+  animation-delay: 1s;
+}
+
+.hm-particle--5 {
+  width: 70px;
+  height: 70px;
+  top: 80%;
+  left: 20%;
+  animation-delay: 3s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(180deg); }
+}
+
+/* Main Content */
+.hm-login__content {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+/* Brand Section */
+.hm-login__brand {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  background: rgba(11, 31, 58, 0.5);
+  backdrop-filter: blur(10px);
+}
+
+.hm-brand__inner {
+  max-width: 500px;
+  text-align: center;
+}
+
+.hm-brand__logo {
+  margin-bottom: 3rem;
+}
+
+.hm-logo__img {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  margin-bottom: 1rem;
+  filter: drop-shadow(0 4px 20px rgba(212, 175, 55, 0.3));
+}
+
+.hm-brand__title {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #d4af37;
+  margin: 0 0 0.5rem 0;
+  text-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
+}
+
+.hm-brand__subtitle {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+}
+
+.hm-brand__features {
+  margin-top: 3rem;
+}
+
+.hm-feature {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+  text-align: right;
+}
+
+.hm-feature__icon {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #d4af37, #ffd700);
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 1.5rem;
+  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
+}
+
+.hm-feature__icon i {
+  font-size: 1.5rem;
+  color: #0b1f3a;
+}
+
+.hm-feature__content h3 {
+  font-size: 1.2rem;
+  color: #fff;
+  margin: 0 0 0.25rem 0;
+}
+
+.hm-feature__content p {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+/* Form Section */
+.hm-login__form {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+}
+
+.hm-form__container {
+  width: 100%;
+  max-width: 400px;
+}
+
+.hm-form__header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.hm-form__title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 0.5rem 0;
+}
+
+.hm-form__subtitle {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+/* Alerts */
+.hm-alert {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  position: relative;
+  animation: slideIn 0.3s ease-out;
+}
+
+.hm-alert--error {
+  background: rgba(220, 53, 69, 0.1);
+  border: 1px solid rgba(220, 53, 69, 0.3);
+  color: #ff6b6b;
+}
+
+.hm-alert--success {
+  background: rgba(40, 167, 69, 0.1);
+  border: 1px solid rgba(40, 167, 69, 0.3);
+  color: #51cf66;
+}
+
+.hm-alert i {
+  margin-left: 0.75rem;
+  font-size: 1.1rem;
+}
+
+.hm-alert__close {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.hm-alert__close:hover {
+  opacity: 1;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Form Groups */
+.hm-form__group {
+  margin-bottom: 1.5rem;
+}
+
+.hm-input__wrapper {
+  position: relative;
+}
+
+.hm-input__icon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #d4af37;
+  font-size: 1.1rem;
+  z-index: 2;
+}
+
+.hm-input {
+  width: 100%;
+  padding: 1rem 3rem 1rem 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(212, 175, 55, 0.2);
+  border-radius: 12px;
+  color: #fff;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.hm-input:focus {
+  outline: none;
+  border-color: #d4af37;
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1);
+}
+
+.hm-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.hm-input__label {
+  position: absolute;
+  right: 3rem;
+  top: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.hm-input:focus ~ .hm-input__label,
+.hm-input:not(:placeholder-shown) ~ .hm-input__label {
+  top: -0.5rem;
+  right: 1rem;
+  font-size: 0.8rem;
+  background: #0b1f3a;
+  padding: 0 0.5rem;
+  color: #d4af37;
+}
+
+.hm-input__toggle {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.hm-input__toggle:hover {
+  color: #d4af37;
+}
+
+/* Form Options */
+.hm-form__options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.hm-checkbox {
+  display: flex;
+  align-items: center;
+}
+
+.hm-checkbox__input {
+  display: none;
+}
+
+.hm-checkbox__label {
+  display: flex;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.hm-checkbox__checkmark {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(212, 175, 55, 0.3);
+  border-radius: 4px;
+  margin-left: 0.5rem;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.hm-checkbox__input:checked ~ .hm-checkbox__label .hm-checkbox__checkmark {
+  background: #d4af37;
+  border-color: #d4af37;
+}
+
+.hm-checkbox__input:checked ~ .hm-checkbox__label .hm-checkbox__checkmark::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #0b1f3a;
+  font-weight: bold;
+}
+
+.hm-link {
+  color: #d4af37;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+
+.hm-link:hover {
+  color: #ffd700;
+  text-decoration: underline;
+}
+
+.hm-link--primary {
+  font-weight: 600;
+}
+
+/* Buttons */
+.hm-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  gap: 0.5rem;
+}
+
+.hm-btn--primary {
+  background: linear-gradient(135deg, #d4af37, #ffd700);
+  color: #0b1f3a;
+  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
+}
+
+.hm-btn--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(212, 175, 55, 0.4);
+}
+
+.hm-btn--full {
+  width: 100%;
+}
+
+/* Form Switch & Register */
+.hm-form__switch,
+.hm-form__register {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.hm-form__switch p,
+.hm-form__register p {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hm-login__content {
+    flex-direction: column;
+  }
+  
+  .hm-login__brand {
+    padding: 2rem;
+  }
+  
+  .hm-login__form {
+    padding: 2rem;
+  }
+  
+  .hm-brand__title {
+    font-size: 2rem;
+  }
+  
+  .hm-form__title {
+    font-size: 2rem;
+  }
+  
+  .hm-form__options {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+}
+</style>
+
+<script>
+function togglePassword(inputId) {
+  const input = document.getElementById(inputId);
+  const toggle = input.nextElementSibling;
+  const icon = toggle.querySelector('i');
+  
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.classList.remove('fa-eye');
+    icon.classList.add('fa-eye-slash');
+  } else {
+    input.type = 'password';
+    icon.classList.remove('fa-eye-slash');
+    icon.classList.add('fa-eye');
+  }
+}
+
+// Add floating animation to particles
+document.addEventListener('DOMContentLoaded', function() {
+  const particles = document.querySelectorAll('.hm-particle');
+  particles.forEach((particle, index) => {
+    particle.style.animationDelay = `${index * 0.5}s`;
+  });
+});
+</script>

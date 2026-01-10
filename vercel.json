@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "name": "hm-car-auction",
   "builds": [
     {
       "src": "vercel-server.js",
@@ -12,13 +11,5 @@
       "src": "/(.*)",
       "dest": "vercel-server.js"
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  },
-  "functions": {
-    "vercel-server.js": {
-      "maxDuration": 30
-    }
-  }
+  ]
 }

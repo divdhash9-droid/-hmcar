@@ -178,7 +178,7 @@ app.use((req, res, next) => {
   res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
   res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
   res.setHeader('Cross-Origin-Resource-Policy', 'same-origin');
-  res.setHeader('Content-Security-Policy', `default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; font-src 'self' https://cdn.jsdelivr.net data:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors ${isEmbed ? "'self'" : "'none'"}`);
+  res.setHeader('Content-Security-Policy', `default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; font-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.gstatic.com data:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors ${isEmbed ? "'self'" : "'none'"}`);
   next();
 });
 
@@ -188,6 +188,16 @@ app.use('/css', express.static(path.join(__dirname, 'public/css'), { maxAge: '1d
 app.use('/js', express.static(path.join(__dirname, 'public/js'), { maxAge: '1d', immutable: true }));
 app.use('/images', express.static(path.join(__dirname, 'public/images'), { maxAge: '1d', immutable: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// PWA assets should be available at the site root
+app.get('/manifest.json', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'manifest.json'));
+});
+
+app.get('/sw.js', (req, res) => {
+  res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+  res.sendFile(path.join(__dirname, 'public', 'sw.js'));
+});
 
 // Session configuration
 const mongoUriForSession = (process.env.MONGO_URI && String(process.env.MONGO_URI).trim()) ? String(process.env.MONGO_URI).trim() : '';
@@ -228,6 +238,7 @@ app.use((req, res, next) => {
   }
   res.locals.currentUser = req.session.user;
   res.locals.csrfToken = typeof req.csrfToken === 'function' ? req.csrfToken() : '';
+    res.locals.currentUrl = req.originalUrl || req.url || '';
   next();
 });
 
@@ -244,40 +255,39 @@ app.get('/', async (req, res) => {
   try {
     // Get featured cars
     const cars = await Car.find({ isActive: true })
-      .populate('brand')
       .sort({ createdAt: -1 })
       .limit(6)
       .lean();
 
     // Get brands for search
-    const brands = await Brand.find({ isActive: true })
+    const brands = await Brand.find({})
       .sort({ name: 1 })
       .lean();
 
     // Get platform statistics
     const totalCars = await Car.countDocuments({ isActive: true });
+    const now = new Date();
     const activeAuctions = await Auction.countDocuments({
-      status: 'active',
-      endDate: { $gt: new Date() }
+      status: 'running',
+      endsAt: { $gt: now }
     });
-    const totalUsers = await User.countDocuments({ isActive: true });
-    const completedAuctions = await Auction.countDocuments({ status: 'completed' });
+    const totalUsers = await User.countDocuments({});
+    const completedAuctions = await Auction.countDocuments({ status: 'ended' });
 
     // Get live auctions
     const liveAuctions = await Auction.find({
-      status: 'active',
-      endDate: { $gt: new Date() }
+      status: 'running',
+      endsAt: { $gt: now }
     })
       .populate({
-        path: 'car',
-        populate: { path: 'brand' }
+        path: 'car'
       })
-      .sort({ endDate: 1 })
+      .sort({ endsAt: 1 })
       .limit(3)
       .lean();
 
     // Get recent reviews
-    const recentReviews = await Review.find({ isApproved: true })
+    const recentReviews = await Review.find({ status: 'approved' })
       .populate('user', 'name')
       .populate('car', 'make model')
       .sort({ createdAt: -1 })
@@ -291,9 +301,9 @@ app.get('/', async (req, res) => {
       completedAuctions
     };
 
-    res.render('single-home', {
+    res.render('home', {
       layout: 'layout',
-      bodyClass: 'single-home',
+      bodyClass: 'home',
       cars,
       brands,
       stats,
@@ -303,9 +313,9 @@ app.get('/', async (req, res) => {
     });
   } catch (error) {
     console.error('Error loading home page:', error);
-    res.render('single-home', {
+    res.render('home', {
       layout: 'layout',
-      bodyClass: 'single-home',
+      bodyClass: 'home',
       cars: [],
       brands: [],
       stats: null,
@@ -438,5 +448,13 @@ if (require.main === module) {
     process.exit(1);
   });
 }
+
+// Vercel serverless export
+module.exports = async (req, res) => {
+  if (!serverInstance || !serverInstance.listening) {
+    await startServer();
+  }
+  return app(req, res);
+};
 
 module.exports = { app, startServer };

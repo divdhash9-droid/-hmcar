@@ -460,8 +460,13 @@ if (require.main === module) {
 // Vercel / serverless export
 // Note: In serverless mode we must NOT call httpServer.listen().
 const handler = async (req, res) => {
-  await ensureAppReady();
-  return app(req, res);
+  try {
+    await ensureAppReady();
+    return app(req, res);
+  } catch (error) {
+    console.error('Serverless handler error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 };
 
 module.exports = handler;

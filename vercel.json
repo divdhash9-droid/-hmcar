@@ -3,25 +3,21 @@
   "name": "hm-car-auction",
   "builds": [
     {
-      "src": "server.js",
+      "src": "vercel-server.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
-      "src": "/public/(.*)",
-      "dest": "/public/$1"
-    },
-    {
       "src": "/(.*)",
-      "dest": "server.js"
+      "dest": "vercel-server.js"
     }
   ],
   "env": {
     "NODE_ENV": "production"
   },
   "functions": {
-    "server.js": {
+    "vercel-server.js": {
       "maxDuration": 30
     }
   }

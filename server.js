@@ -301,7 +301,7 @@ app.get('/', async (req, res) => {
       completedAuctions
     };
 
-    res.render('home', {
+    res.render('home-light', {
       layout: 'layout',
       bodyClass: 'home',
       cars,
@@ -313,7 +313,7 @@ app.get('/', async (req, res) => {
     });
   } catch (error) {
     console.error('Error loading home page:', error);
-    res.render('home', {
+    res.render('home-light', {
       layout: 'layout',
       bodyClass: 'home',
       cars: [],

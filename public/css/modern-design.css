@@ -8,7 +8,7 @@
     --text-color: #ffffff;
     --dark-text-color: #0b1f3a;
     --primary-color-light: #133b6b;
-    --text-color-secondary: rgba(11, 31, 58, 0.72);
+    --text-color-secondary: rgba(11, 31, 58, 0.78);
     --section-bg-color: #f6f8fc;
     --border-color: rgba(11, 31, 58, 0.14);
     /* Keep variable names for compatibility */
@@ -21,7 +21,7 @@
     --shadow-gold: 0 10px 30px rgba(11, 31, 58, 0.18);
     --bg-card: #ffffff;
     --text-primary: var(--dark-text-color);
-    --text-muted: rgba(11, 31, 58, 0.65);
+    --text-muted: rgba(11, 31, 58, 0.72);
     --radius-md: 12px;
     --transition-smooth: all 0.3s ease;
     --border-radius: 8px;
@@ -36,12 +36,54 @@
     --success-color: #2ecc71;
 }
 
+
+/* --- Global readability / typography --- */
+html {
+    font-size: 16px;
+}
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     background-color: var(--secondary-color);
     color: var(--dark-text-color);
-    line-height: 1.6;
+    line-height: 1.7;
+    text-rendering: optimizeLegibility;
+}
+
+p,
+li {
+    line-height: 1.75;
+}
+
+/* Make Bootstrap muted text more readable on white */
+.text-muted,
+.form-text,
+.text-secondary {
+    color: var(--text-muted) !important;
+}
+
+/* Links: clearer affordance without breaking buttons */
+a:not(.btn):not(.nav-link):not(.dropdown-item) {
+    color: var(--primary-color);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+}
+
+a:not(.btn):not(.nav-link):not(.dropdown-item):hover {
+    color: var(--primary-color-light);
+}
+
+/* Forms: ensure labels/placeholders are readable */
+.form-label,
+.form-floating > label {
+    color: rgba(11, 31, 58, 0.78);
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: rgba(11, 31, 58, 0.55);
+    opacity: 1;
 }
 
 /* --- Buttons: 3D, readable text + icons --- */

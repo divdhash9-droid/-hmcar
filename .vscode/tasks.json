@@ -1,0 +1,60 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "smoke localhost:4001",
+			"type": "process",
+			"command": "powershell.exe",
+			"args": [
+				"-NoProfile",
+				"-ExecutionPolicy",
+				"Bypass",
+				"-Command",
+				"$base='http://localhost:4001'; Write-Output \"SMOKE TEST -> $base\"; $paths=@('/','/auth/login','/manifest.json','/sw.js','/public/css/modern-design.css'); foreach($p in $paths){ try{ $r=Invoke-WebRequest -Uri ($base+$p) -UseBasicParsing -Method GET -TimeoutSec 10; Write-Output \"OK  $p -> $($r.StatusCode)\" } catch { Write-Output \"FAIL $p -> $($_.Exception.Message)\" } } ; Write-Output 'LISTENERS:'; netstat -ano | Select-String ':4001' | Select-Object -First 5 | ForEach-Object { $_.ToString() }"
+			],
+			"isBackground": false
+		},
+		{
+			"label": "smoke localhost:4001 (node)",
+			"type": "shell",
+			"command": "node",
+			"args": [
+				"-e",
+				"const http=require('http');const base='http://localhost:4001';const paths=['/','/auth/login','/manifest.json','/sw.js','/public/css/modern-design.css'];function get(p){return new Promise((resolve)=>{const req=http.get(base+p,(res)=>{res.resume();resolve({p,code:res.statusCode});});req.on('error',(e)=>resolve({p,error:e.message}));req.setTimeout(10000,()=>{req.destroy(new Error('timeout'));});});} (async()=>{let fail=false;console.log('SMOKE TEST ->',base);for(const p of paths){const r=await get(p);if(r.error){fail=true;console.log('FAIL',p,'->',r.error);}else{const ok=r.code>=200&&r.code<400;console.log(ok?'OK ': 'BAD',p,'->',r.code);if(!ok) fail=true;}}process.exit(fail?1:0);})();"
+			],
+			"isBackground": false
+		},
+		{
+			"label": "smoke localhost:4001 (script)",
+			"type": "shell",
+			"command": "node",
+			"args": [
+				"scripts/smoke-localhost.js"
+			],
+			"isBackground": false
+		},
+		{
+			"label": "check port 4001",
+			"type": "process",
+			"command": "powershell.exe",
+			"args": [
+				"-NoProfile",
+				"-ExecutionPolicy",
+				"Bypass",
+				"-Command",
+				"netstat -ano | Select-String ':4001' | Select-Object -First 5 | ForEach-Object { $_.ToString() }"
+			],
+			"isBackground": false
+		},
+		{
+			"label": "netstat 4001",
+			"type": "shell",
+			"command": "cmd.exe",
+			"args": [
+				"/c",
+				"netstat -ano | findstr :4001"
+			],
+			"isBackground": false
+		}
+	]
+}

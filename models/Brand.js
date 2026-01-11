@@ -1,0 +1,26 @@
+// models/Brand.js
+const mongoose = require('mongoose');
+
+const brandSchema = new mongoose.Schema({
+  // اسم الشركة/الماركة المعروض للمستخدم
+  name: { type: String, required: true, trim: true },
+  // مفتاح فريد (عادة lowercase) لاستخدامه في البحث والربط
+  key: { type: String, required: true, unique: true, lowercase: true, trim: true },
+  // رابط/مسار شعار الشركة
+  logoUrl: { type: String, default: '' },
+  createdByFirebaseUid: { type: String, required: false, default: '' },
+  updatedByFirebaseUid: { type: String, required: false, default: '' }
+}, { timestamps: true }); 
+
+brandSchema.pre('validate', function (next) {
+  // تجهيز key تلقائياً من name إن لم يُرسل
+  if (!this.key && this.name) {
+    this.key = String(this.name).trim().toLowerCase();
+  }
+  // ضمان التطبيع (lowercase/trim)
+  if (this.key) this.key = String(this.key).trim().toLowerCase();
+  if (this.name) this.name = String(this.name).trim();
+  next();
+});
+
+module.exports = mongoose.model('Brand', brandSchema);

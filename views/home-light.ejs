@@ -1,0 +1,78 @@
+<% layout('layout') -%>
+<% var hideNavbar = true; %>
+<% var hideSearch = true; %>
+<% var fullWidth = true; %>
+
+<link href="/public/css/home-v3.css" rel="stylesheet">
+
+<% const isLoggedIn = !!(typeof currentUser !== 'undefined' && currentUser); %>
+<% const role = (isLoggedIn && currentUser && currentUser.role) ? String(currentUser.role) : ''; %>
+<% const dashboard = (role === 'admin' || role === 'super_admin' || role === 'manager') ? '/admin' : '/cars'; %>
+<% const loginWithReturnTo = (path) => `/auth/login?returnTo=${encodeURIComponent(path)}`; %>
+
+<div class="hm-home">
+  <header class="hm-home__top" aria-label="Top bar">
+    <a class="hm-home__brand" href="/" aria-label="HM CAR">
+      <img class="hm-home__logo" src="/public/images/navbar-logo.png" alt="HM CAR" loading="eager" decoding="async" onerror="this.onerror=null;this.src='/public/images/logo.png';" />
+    </a>
+
+    <div class="hm-home__topRight">
+      <div class="hm-home__lang">
+        <% if (typeof locale !== 'undefined' && locale === 'ar') { %>
+          <a class="hm-home__langBtn" href="?lang=en" title="English">EN</a>
+        <% } else { %>
+          <a class="hm-home__langBtn" href="?lang=ar" title="العربية">عر</a>
+        <% } %>
+      </div>
+
+      <% if (isLoggedIn) { %>
+        <a class="hm-home__login" href="<%= dashboard %>">
+          <i class="fas fa-grid-2"></i>
+          <span>لوحة التحكم</span>
+        </a>
+      <% } else { %>
+        <a class="hm-home__login" href="/auth/login">
+          <i class="fas fa-right-to-bracket"></i>
+          <span>تسجيل الدخول / Login</span>
+        </a>
+      <% } %>
+    </div>
+  </header>
+
+  <section class="hm-home__hero" aria-label="Hero">
+    <div class="hm-home__heroText">
+      <h1 class="hm-home__title">HM CAR</h1>
+      <p class="hm-home__subtitle">
+        تصدير السيارات وقطع الغيار من كوريا إلى جميع دول العالم<br>
+        <span>Exporting cars and spare parts from Korea to all countries of the world</span>
+      </p>
+    </div>
+
+    <div class="hm-home__cards" aria-label="Main options">
+      <a class="hm-homeCard" href="<%= isLoggedIn ? '/auctions' : loginWithReturnTo('/auctions') %>">
+        <div class="hm-homeCard__icon"><i class="fas fa-gavel"></i></div>
+        <div class="hm-homeCard__title">المزاد / Auctions</div>
+        <div class="hm-homeCard__text">مزادات مباشرة وعروض يومية</div>
+      </a>
+
+      <a class="hm-homeCard" href="<%= isLoggedIn ? '/cars' : loginWithReturnTo('/cars') %>">
+        <div class="hm-homeCard__icon"><i class="fas fa-car"></i></div>
+        <div class="hm-homeCard__title">السيارات / Cars</div>
+        <div class="hm-homeCard__text">سيارات جاهزة للتصدير والفحص</div>
+      </a>
+
+      <a class="hm-homeCard" href="<%= isLoggedIn ? '/spare-parts' : loginWithReturnTo('/spare-parts') %>">
+        <div class="hm-homeCard__icon"><i class="fas fa-gears"></i></div>
+        <div class="hm-homeCard__title">قطع الغيار / Spare Parts</div>
+        <div class="hm-homeCard__text">ابحث حسب الموديل والسنة</div>
+      </a>
+    </div>
+
+    <div class="hm-home__chips" aria-label="Highlights">
+      <div class="hm-homeChip"><i class="fas fa-plane"></i><span>تصدير دولي / Export</span></div>
+      <div class="hm-homeChip"><i class="fas fa-clipboard-check"></i><span>فحص وتجهيز / Inspection</span></div>
+      <div class="hm-homeChip"><i class="fas fa-shield-halved"></i><span>دفع آمن / Secure</span></div>
+      <div class="hm-homeChip"><i class="fas fa-headset"></i><span>دعم / Support</span></div>
+    </div>
+  </section>
+</div>

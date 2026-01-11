@@ -219,6 +219,42 @@
         linear-gradient(135deg, #061325 0%, #0b2450 55%, #07162a 100%);
 }
 
+/* ===== Login V2 (light) ===== */
+.hm-login-v2.hm-login-v2--light.modern-auth {
+    background: #ffffff;
+}
+
+.hm-login-v2.hm-login-v2--light .hm-login2__brand {
+    background: #ffffff;
+    border: 1px solid rgba(11, 31, 58, 0.10);
+    box-shadow: 0 22px 60px rgba(11, 31, 58, 0.14);
+    color: rgba(11, 31, 58, 0.92);
+}
+
+.hm-login-v2.hm-login-v2--light .hm-login2__name {
+    color: #0b1f3a;
+    text-shadow: 0 12px 28px rgba(11, 31, 58, 0.10);
+}
+
+.hm-login-v2.hm-login-v2--light .hm-login2__desc {
+    color: rgba(11, 31, 58, 0.74);
+    text-shadow: none;
+}
+
+.hm-login-v2.hm-login-v2--light .hm-chip {
+    background: rgba(255, 255, 255, 0.86);
+    border: 1px solid rgba(11, 31, 58, 0.12);
+    color: rgba(11, 31, 58, 0.90);
+}
+
+.hm-login-v2.hm-login-v2--light .hm-chip i {
+    color: rgba(11, 31, 58, 0.90);
+}
+
+.hm-login-v2.hm-login-v2--light .hm-login2__card {
+    box-shadow: 0 22px 60px rgba(11, 31, 58, 0.14);
+}
+
 .hm-login-v2 .hm-login2 {
     min-height: 100vh;
     display: flex;

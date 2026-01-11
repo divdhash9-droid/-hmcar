@@ -12,10 +12,7 @@
 .hm-home {
   min-height: 100vh;
   padding: 1.2rem 1rem 2.2rem;
-  background:
-    radial-gradient(circle at 20% 15%, rgba(244, 208, 63, 0.16) 0%, transparent 52%),
-    radial-gradient(circle at 80% 25%, rgba(23, 128, 255, 0.12) 0%, transparent 50%),
-    linear-gradient(180deg, #f7fbff 0%, #eef5ff 45%, #ffffff 100%);
+  background: #ffffff;
   color: var(--hm-ink);
 }
 
@@ -55,8 +52,8 @@
   width: 44px;
   height: 40px;
   border-radius: 12px;
-  background: var(--hm-surface);
-  border: 1px solid var(--hm-border);
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(11, 31, 58, 0.14);
   color: var(--hm-ink);
   text-decoration: none;
   font-weight: 900;
@@ -64,6 +61,7 @@
 
 .hm-home__langBtn:hover {
   background: #ffffff;
+  border-color: rgba(11, 31, 58, 0.22);
 }
 
 .hm-home__login {
@@ -75,8 +73,8 @@
   text-decoration: none;
   font-weight: 900;
   color: var(--hm-ink);
-  background: var(--hm-surface);
-  border: 1px solid var(--hm-border);
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(11, 31, 58, 0.14);
   box-shadow: 0 14px 34px rgba(11, 31, 58, 0.16);
   transition: transform 0.18s ease, background-color 0.18s ease;
 }
@@ -84,6 +82,7 @@
 .hm-home__login:hover {
   transform: translateY(-1px);
   background: #ffffff;
+  border-color: rgba(11, 31, 58, 0.22);
 }
 
 .hm-home__hero {
@@ -91,9 +90,9 @@
   margin: 0 auto;
   padding: 1.35rem;
   border-radius: 24px;
-  background: var(--hm-surface);
-  border: 1px solid var(--hm-border);
-  box-shadow: 0 18px 50px rgba(11, 31, 58, 0.12);
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(11, 31, 58, 0.12);
+  box-shadow: 0 18px 50px rgba(11, 31, 58, 0.10);
 }
 
 .hm-home__heroText {
@@ -137,17 +136,17 @@
   padding: 1rem;
   border-radius: 18px;
   background: #ffffff;
-  border: 1px solid var(--hm-border);
+  border: 1px solid rgba(11, 31, 58, 0.12);
   text-decoration: none;
   color: var(--hm-ink);
-  box-shadow: 0 18px 40px rgba(11, 31, 58, 0.10);
+  box-shadow: 0 18px 40px rgba(11, 31, 58, 0.09);
   transition: transform 0.18s ease, background-color 0.18s ease, border-color 0.18s ease;
 }
 
 .hm-homeCard:hover {
   transform: translateY(-2px);
   background: #ffffff;
-  border-color: rgba(11, 31, 58, 0.18);
+  border-color: rgba(11, 31, 58, 0.22);
 }
 
 .hm-homeCard__icon {
@@ -157,12 +156,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(244, 208, 63, 0.18);
-  border: 1px solid rgba(212, 175, 55, 0.28);
+  background: rgba(11, 31, 58, 0.05);
+  border: 1px solid rgba(11, 31, 58, 0.12);
 }
 
 .hm-homeCard__icon i {
-  color: rgba(11, 31, 58, 0.90);
+  color: rgba(11, 31, 58, 0.92);
   font-size: 1.15rem;
 }
 
@@ -192,8 +191,8 @@
   gap: 0.55rem;
   padding: 0.55rem 0.75rem;
   border-radius: 999px;
-  background: var(--hm-surface-2);
-  border: 1px solid var(--hm-border);
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(11, 31, 58, 0.12);
   color: var(--hm-ink);
   font-weight: 800;
 }
@@ -206,15 +205,9 @@
   .hm-home__cards {
     grid-template-columns: 1fr;
   }
-  .hm-homeSteps {
-    grid-template-columns: 1fr 1fr;
-  }
 }
 
 @media (max-width: 520px) {
-  .hm-homeSteps {
-    grid-template-columns: 1fr;
-  }
   .hm-home__login span {
     display: none;
   }

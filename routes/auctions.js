@@ -13,6 +13,31 @@ const Order = require('../models/Order');
 const User = require('../models/User');
 const Brand = require('../models/Brand');
 
+// الصفحة الرئيسية للمزادات
+router.get('/', async (req, res) => {
+  try {
+    // جلب المزادات النشطة
+    const auctions = await Auction.find({ status: 'running' })
+      .populate('car')
+      .sort({ createdAt: -1 })
+      .limit(20);
+    
+    // جلب سيارات المزاد
+    const cars = await Car.find({ listingType: 'auction', isSold: { $ne: true } })
+      .sort({ createdAt: -1 })
+      .limit(20);
+    
+    res.render('auctions/cars', { 
+      auctions, 
+      cars,
+      title: 'المزادات'
+    });
+  } catch (error) {
+    console.error('Error loading auctions:', error);
+    res.status(500).render('errors/500');
+  }
+});
+
 router.get('/live', async (req, res) => {
   const [setting, endsAtSetting, snapshotSetting, whatsappSetting] = await Promise.all([
     SiteSetting.findOne({ key: 'liveAuctionUrl' }),

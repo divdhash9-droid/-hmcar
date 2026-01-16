@@ -311,14 +311,27 @@ app.get('/', async (req, res) => {
     const settings = await Settings.getSettings();
     const siteSettings = settings ? settings.footer : {};
 
+    // جلب السيارات المميزة للصفحة الرئيسية
+    const featuredCars = await Car.find({ 
+      isActive: true, 
+      isSold: false,
+      listingType: 'store'
+    })
+      .sort({ createdAt: -1 })
+      .limit(8)
+      .lean();
+
     res.render('home', {
       layout: 'layout',
       bodyClass: 'home',
+      hideNavbar: true,
+      hideFooter: true,
       cars,
       brands,
       stats,
       liveAuctions,
       recentReviews,
+      featuredCars,
       currentUser: req.session.user,
       siteSettings
     });
@@ -327,11 +340,14 @@ app.get('/', async (req, res) => {
     res.render('home', {
       layout: 'layout',
       bodyClass: 'home',
+      hideNavbar: true,
+      hideFooter: true,
       cars: [],
       brands: [],
       stats: null,
       liveAuctions: [],
       recentReviews: [],
+      featuredCars: [],
       currentUser: req.session.user,
       siteSettings: {}
     });

@@ -1,5 +1,6 @@
 <!-- views/cars/form.ejs -->
 <% layout('layout') -%>
+<% const isEdit = typeof car !== 'undefined' && car && car._id; %>
 
 <!-- HM Design System CSS -->
 <link rel="stylesheet" href="/css/design-system.css">

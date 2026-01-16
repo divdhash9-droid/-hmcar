@@ -77,7 +77,7 @@
 .main-nav ul li a {
   color: #ffffff;
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 700;
   font-family: 'Cairo', 'Tajawal', sans-serif;
   font-size: 0.95rem;
   transition: all 0.3s ease;
@@ -85,12 +85,17 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  border-radius: 10px;
-  background: linear-gradient(145deg, #001f3f 0%, #003366 100%);
-  border: 1px solid rgba(0, 123, 255, 0.3);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  background: linear-gradient(145deg, #0056b3 0%, #007bff 50%, #0056b3 100%);
+  border: none;
+  box-shadow: 
+    0 6px 20px rgba(0, 123, 255, 0.4),
+    0 3px 6px rgba(0, 0, 0, 0.3),
+    inset 0 2px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.2);
   position: relative;
   overflow: hidden;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .main-nav ul li a::before {
@@ -110,7 +115,7 @@
 
 .main-nav ul li a i {
   font-size: 1.1rem;
-  color: #4da3ff;
+  color: #ffffff;
   transition: all 0.3s ease;
   min-width: 18px;
   text-align: center;
@@ -121,10 +126,13 @@
 }
 
 .main-nav ul li a:hover {
-  background: linear-gradient(145deg, #007bff 0%, #0056b3 100%);
-  border-color: #007bff;
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  background: linear-gradient(145deg, #0069d9 0%, #0056b3 100%);
+  transform: translateY(-4px);
+  box-shadow: 
+    0 10px 30px rgba(0, 123, 255, 0.5),
+    0 6px 10px rgba(0, 0, 0, 0.3),
+    inset 0 2px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.2);
   color: #ffffff;
 }
 

@@ -3,6 +3,7 @@
 <% const _filters = filters || {}; %>
 <% const _safe = (v) => (v === undefined || v === null) ? '' : String(v); %>
 <% const _makes = makes || []; %>
+<% const isEmbed = typeof embed !== 'undefined' && embed; %>
 
 <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2 mb-3">
   <div>

@@ -106,11 +106,13 @@ app.use((req, res, next) => {
   next();
 });
 
-// Rate limiting
+// Rate limiting (more permissive in development)
+const isDev = process.env.NODE_ENV !== 'production';
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.'
+  max: isDev ? 1000 : 100, // 1000 requests in dev, 100 in production
+  message: 'Too many requests from this IP, please try again later.',
+  skip: (req) => isDev // Skip rate limiting entirely in development
 });
 app.use(limiter);
 
@@ -136,14 +138,15 @@ app.use(methodOverride((req, res) => {
 // Logging
 app.use(morgan(process.env.NODE_ENV === 'test' ? 'tiny' : 'dev'));
 
-// Rate limiters
-const globalLimiter = rateLimit({ windowMs: 60 * 1000, max: 120, standardHeaders: true, legacyHeaders: false });
-const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100, standardHeaders: true, legacyHeaders: false });
-const bidsLimiter = rateLimit({ windowMs: 60 * 1000, max: 30, standardHeaders: true, legacyHeaders: false });
+// Rate limiters (more permissive in development)
+const globalLimiter = rateLimit({ windowMs: 60 * 1000, max: isDev ? 1000 : 120, standardHeaders: true, legacyHeaders: false, skip: () => isDev });
+const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: isDev ? 500 : 100, standardHeaders: true, legacyHeaders: false });
+const bidsLimiter = rateLimit({ windowMs: 60 * 1000, max: isDev ? 200 : 30, standardHeaders: true, legacyHeaders: false });
 
+const limiterBypassPrefixes = ['/public', '/uploads', '/socket.io', '/vendor'];
 app.use((req, res, next) => {
   const p = req.path || '';
-  if (p.startsWith('/public') || p.startsWith('/uploads') || p.startsWith('/socket.io')) {
+  if (limiterBypassPrefixes.some(prefix => p.startsWith(prefix))) {
     return next();
   }
   return globalLimiter(req, res, next);
@@ -188,6 +191,8 @@ app.use('/css', express.static(path.join(__dirname, 'public/css'), { maxAge: '1d
 app.use('/js', express.static(path.join(__dirname, 'public/js'), { maxAge: '1d', immutable: true }));
 app.use('/images', express.static(path.join(__dirname, 'public/images'), { maxAge: '1d', immutable: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/vendor/fontawesome', express.static(path.join(__dirname, 'node_modules', '@fortawesome', 'fontawesome-free'), { maxAge: '1d', immutable: true }));
+app.use('/vendor/bootstrap-icons', express.static(path.join(__dirname, 'node_modules', 'bootstrap-icons'), { maxAge: '1d', immutable: true }));
 
 // PWA assets should be available at the site root
 app.get('/manifest.json', (req, res) => {
@@ -301,7 +306,12 @@ app.get('/', async (req, res) => {
       completedAuctions
     };
 
-    res.render('home-light', {
+    // جلب إعدادات الموقع
+    const Settings = require('./models/Settings');
+    const settings = await Settings.getSettings();
+    const siteSettings = settings ? settings.footer : {};
+
+    res.render('home', {
       layout: 'layout',
       bodyClass: 'home',
       cars,
@@ -309,11 +319,12 @@ app.get('/', async (req, res) => {
       stats,
       liveAuctions,
       recentReviews,
-      currentUser: req.session.user
+      currentUser: req.session.user,
+      siteSettings
     });
   } catch (error) {
     console.error('Error loading home page:', error);
-    res.render('home-light', {
+    res.render('home', {
       layout: 'layout',
       bodyClass: 'home',
       cars: [],
@@ -321,7 +332,8 @@ app.get('/', async (req, res) => {
       stats: null,
       liveAuctions: [],
       recentReviews: [],
-      currentUser: req.session.user
+      currentUser: req.session.user,
+      siteSettings: {}
     });
   }
 });
@@ -342,6 +354,48 @@ app.get('/contact', (req, res) => {
     bodyClass: 'contact-page',
     title: 'Contact Us - Car Auction Platform'
   });
+});
+
+// Client Dashboard
+app.get('/client/dashboard', async (req, res) => {
+  // التحقق من تسجيل الدخول
+  if (!req.session.user) {
+    req.session.returnTo = '/client/dashboard';
+    return res.redirect('/auth/login');
+  }
+
+  try {
+    const user = req.session.user;
+    const Order = require('./models/Order');
+    const Auction = require('./models/Auction');
+
+    const [availableCars, myCars, ordersAll, ordersPending, liveAuctions] = await Promise.all([
+      Car.countDocuments({ isSold: { $ne: true } }),
+      Car.countDocuments({ isSold: true, soldTo: user._id }),
+      Order.countDocuments({ buyer: user._id }),
+      Order.countDocuments({ buyer: user._id, status: 'pending' }),
+      Auction.countDocuments({ status: 'running' })
+    ]);
+
+    res.render('client/dashboard', {
+      layout: 'layout',
+      hideNavbar: true,
+      fullWidth: true,
+      bodyClass: 'hm-client-dashboard',
+      currentUser: user,
+      counts: { availableCars, myCars, ordersAll, ordersPending, liveAuctions }
+    });
+  } catch (error) {
+    console.error('Error loading client dashboard:', error);
+    res.render('client/dashboard', {
+      layout: 'layout',
+      hideNavbar: true,
+      fullWidth: true,
+      bodyClass: 'hm-client-dashboard',
+      currentUser: req.session.user,
+      counts: { availableCars: 0, myCars: 0, ordersAll: 0, ordersPending: 0, liveAuctions: 0 }
+    });
+  }
 });
 
 // API v2
@@ -415,8 +469,21 @@ async function connectToDatabase() {
     return mongoose.connection;
   }
   const mongoUri = (process.env.MONGO_URI && String(process.env.MONGO_URI).trim()) ? String(process.env.MONGO_URI).trim() : 'mongodb://127.0.0.1:27017/car-auction';
-  await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 10000 });
-  return mongoose.connection;
+  
+  try {
+    await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 10000 });
+    console.log('✅ Database connected successfully');
+    return mongoose.connection;
+  } catch (error) {
+    console.error('❌ Database connection failed:', error.message);
+    
+    // In production, we should still allow the app to start even if DB fails
+    if (process.env.NODE_ENV === 'production') {
+      console.warn('⚠️ Starting app without database connection');
+      return null;
+    }
+    throw error;
+  }
 }
 
 async function startServer() {

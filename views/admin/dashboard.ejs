@@ -2,211 +2,497 @@
 <% var hideNavbar = true; %>
 <% var hideSearch = true; %>
 <% var fullWidth = true; %>
-<% var bodyClass = 'admin-dashboard-luxury admin-ultra-dashboard'; %>
+<% var bodyClass = 'hm-admin-page'; %>
 
-<div class="hm-dashboard">
-  <div class="hm-dashboard__container">
-    <header class="hm-hero hm-hero--ultra" aria-label="لوحة الإدارة">
-      <div class="hm-hero__layout">
-        <div class="hm-hero__meta">
-          <span class="hm-hero__highlight"><i class="fas fa-crown"></i> تحكم فائق</span>
-          <span class="hm-hero__badge"><i class="fas fa-shield-halved"></i> أمان محسّن</span>
-          <span class="hm-hero__badge"><i class="fas fa-bolt"></i> تحديثات فورية</span>
-        </div>
+<link rel="stylesheet" href="/css/admin-luxury.css">
 
-        <nav class="hm-hero__actions hero-cta hero-cta--vertical" aria-label="إجراءات سريعة">
-          <a class="btn btn-primary" href="/cars/new" aria-label="إضافة سيارة"><i class="fas fa-plus me-1"></i>إضافة سيارة</a>
-          <a class="btn btn-outline-light" href="/auctions/cars/new" aria-label="إنشاء مزاد"><i class="fas fa-gavel me-1"></i>إنشاء مزاد</a>
-          <a class="btn btn-outline-light" href="/admin/orders" aria-label="الطلبات"><i class="fas fa-file-invoice me-1"></i>الطلبات</a>
-          <a class="btn btn-outline-light" href="/auth/logout" aria-label="خروج"><i class="fas fa-sign-out-alt me-1"></i>خروج</a>
-        </nav>
+<div class="hm-admin-layout">
+  <!-- Animated Background -->
+  <div class="hm-admin-bg">
+    <div class="hm-admin-bg-gradient"></div>
+    <div class="hm-admin-bg-glow"></div>
+  </div>
+
+  <!-- Mobile Toggle -->
+  <button class="hm-mobile-toggle" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Sidebar -->
+  <aside class="hm-admin-sidebar" id="adminSidebar">
+    <!-- Sidebar Header -->
+    <div class="hm-sidebar-header">
+      <div class="hm-sidebar-logo">
+        <img src="/images/logo.png" alt="HM CAR" onerror="this.onerror=null;this.src='/public/images/logo.png';">
+      </div>
+      <div class="hm-sidebar-brand">
+        <h1>HM CAR</h1>
+        <p>لوحة الإدارة</p>
+      </div>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <nav class="hm-sidebar-nav">
+      <!-- Main Section -->
+      <div class="hm-nav-section">
+        <div class="hm-nav-section-title">الرئيسية</div>
+        <a href="/admin" class="hm-nav-item active">
+          <i class="fas fa-gauge-high"></i>
+          <span>لوحة التحكم</span>
+        </a>
+        <a href="/" class="hm-nav-item">
+          <i class="fas fa-home"></i>
+          <span>الموقع الرئيسي</span>
+        </a>
       </div>
 
-      <div class="hm-hero__top hm-hero__top--compact">
-        <div class="hm-hero__brand hm-hero__brand--small">
-          <img class="hm-hero__logo" src="/images/navbar-logo.png" alt="HM CAR" loading="eager" decoding="async" onerror="this.onerror=null;this.src='/images/logo.png';" />
-          <div class="hm-hero__titles">
-            <h1 class="hm-hero__title">لوحة الإدارة الفاخرة</h1>
-            <div class="hm-hero__subtitle">إدارة سلسة، أرقام واضحة، وقرارات أسرع</div>
-          </div>
-        </div>
+      <!-- Products Section -->
+      <div class="hm-nav-section">
+        <div class="hm-nav-section-title">المنتجات</div>
+        <a href="/admin/cars" class="hm-nav-item">
+          <i class="fas fa-car"></i>
+          <span>السيارات</span>
+          <span class="hm-nav-badge"><%= stats?.totalCars || 0 %></span>
+        </a>
+        <a href="/cars/new" class="hm-nav-item">
+          <i class="fas fa-plus-circle"></i>
+          <span>إضافة سيارة</span>
+        </a>
+        <a href="/admin/spare-parts" class="hm-nav-item">
+          <i class="fas fa-cogs"></i>
+          <span>قطع الغيار</span>
+        </a>
+        <a href="/admin/spare-brands" class="hm-nav-item">
+          <i class="fas fa-industry"></i>
+          <span>ماركات القطع</span>
+        </a>
       </div>
 
-      <section class="stat-grid stat-grid--compact" aria-label="إحصائيات سريعة">
-        <div class="stat-tile stat-tile--small">
-          <div class="d-flex justify-content-between align-items-start">
-            <div>
-              <div class="stat-label">إجمالي السيارات</div>
-              <div class="stat-value"><%= Number(stats?.totalCars || 0) %></div>
-            </div>
-            <span class="hm-pill"><i class="fas fa-car"></i></span>
-          </div>
-          <div class="stat-sub">مخزون محدث</div>
+      <!-- Auctions Section -->
+      <div class="hm-nav-section">
+        <div class="hm-nav-section-title">المزادات</div>
+        <a href="/admin/auctions" class="hm-nav-item">
+          <i class="fas fa-gavel"></i>
+          <span>إدارة المزادات</span>
+        </a>
+        <a href="/admin/auctions/new" class="hm-nav-item">
+          <i class="fas fa-plus"></i>
+          <span>إنشاء مزاد</span>
+        </a>
+        <a href="/admin/live-auction" class="hm-nav-item">
+          <i class="fas fa-broadcast-tower"></i>
+          <span>المزاد المباشر</span>
+        </a>
+      </div>
+
+      <!-- Orders & Users Section -->
+      <div class="hm-nav-section">
+        <div class="hm-nav-section-title">الطلبات والعملاء</div>
+        <a href="/admin/orders" class="hm-nav-item">
+          <i class="fas fa-shopping-cart"></i>
+          <span>الطلبات</span>
+          <% if (stats?.unseenCount > 0) { %>
+          <span class="hm-nav-badge"><%= stats.unseenCount %></span>
+          <% } %>
+        </a>
+        <a href="/admin/users" class="hm-nav-item">
+          <i class="fas fa-users"></i>
+          <span>العملاء</span>
+          <span class="hm-nav-badge"><%= stats?.totalUsers || 0 %></span>
+        </a>
+        <a href="/admin/users-management" class="hm-nav-item">
+          <i class="fas fa-user-shield"></i>
+          <span>إدارة المشرفين</span>
+        </a>
+      </div>
+
+      <!-- Categories Section -->
+      <div class="hm-nav-section">
+        <div class="hm-nav-section-title">التصنيفات</div>
+        <a href="/admin/brands" class="hm-nav-item">
+          <i class="fas fa-copyright"></i>
+          <span>الماركات</span>
+        </a>
+        <a href="/admin/categories" class="hm-nav-item">
+          <i class="fas fa-tags"></i>
+          <span>الفئات</span>
+        </a>
+      </div>
+
+      <!-- Communication Section -->
+      <div class="hm-nav-section">
+        <div class="hm-nav-section-title">التواصل</div>
+        <a href="/admin/notifications" class="hm-nav-item">
+          <i class="fas fa-bell"></i>
+          <span>الإشعارات</span>
+          <% if (stats?.unseenCount > 0) { %>
+          <span class="hm-nav-badge"><%= stats.unseenCount %></span>
+          <% } %>
+        </a>
+        <a href="/admin/support" class="hm-nav-item">
+          <i class="fas fa-headset"></i>
+          <span>الدعم الفني</span>
+        </a>
+      </div>
+
+      <!-- Settings Section -->
+      <div class="hm-nav-section">
+        <div class="hm-nav-section-title">الإعدادات</div>
+        <a href="/admin/settings" class="hm-nav-item">
+          <i class="fas fa-cog"></i>
+          <span>الإعدادات العامة</span>
+        </a>
+        <a href="/admin/settings/whatsapp" class="hm-nav-item">
+          <i class="fab fa-whatsapp"></i>
+          <span>الواتساب</span>
+        </a>
+        <a href="/admin/settings/footer" class="hm-nav-item">
+          <i class="fas fa-window-maximize"></i>
+          <span>الشريط السفلي</span>
+        </a>
+        <a href="/admin/exchange-rate" class="hm-nav-item">
+          <i class="fas fa-dollar-sign"></i>
+          <span>سعر الصرف</span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- Sidebar Footer -->
+    <div class="hm-sidebar-footer">
+      <div class="hm-sidebar-user">
+        <div class="hm-sidebar-avatar">
+          <%= currentUser?.name ? currentUser.name.charAt(0).toUpperCase() : 'A' %>
         </div>
-        <div class="stat-tile stat-tile--small">
-          <div class="d-flex justify-content-between align-items-start">
-            <div>
-              <div class="stat-label">إجمالي المستخدمين</div>
-              <div class="stat-value"><%= Number(stats?.totalUsers || 0) %></div>
-            </div>
-            <span class="hm-pill"><i class="fas fa-users"></i></span>
-          </div>
-          <div class="stat-sub">فريق وعملاء</div>
+        <div class="hm-sidebar-user-info">
+          <p class="hm-sidebar-user-name"><%= currentUser?.name || 'المدير' %></p>
+          <p class="hm-sidebar-user-role"><%= currentUser?.role === 'super_admin' ? 'مدير عام' : 'مدير' %></p>
         </div>
-        <div class="stat-tile stat-tile--small">
-          <div class="d-flex justify-content-between align-items-start">
-            <div>
-              <div class="stat-label">إشعارات جديدة</div>
-              <div class="stat-value"><%= Number(stats?.unseenCount || 0) %></div>
-            </div>
-            <span class="hm-pill"><i class="fas fa-bell"></i></span>
-          </div>
-          <div class="stat-sub">أحدث التنبيهات</div>
+      </div>
+      <a href="/auth/logout" class="hm-sidebar-logout">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>تسجيل الخروج</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="hm-admin-main">
+    <!-- Header -->
+    <header class="hm-admin-header">
+      <div class="hm-header-title">
+        <h1>لوحة التحكم</h1>
+        <div class="hm-header-breadcrumb">
+          <a href="/">الرئيسية</a>
+          <i class="fas fa-chevron-left"></i>
+          <span>لوحة التحكم</span>
         </div>
-      </section>
+      </div>
+      <div class="hm-header-actions">
+        <a href="/admin/notifications" class="hm-header-btn">
+          <i class="fas fa-bell"></i>
+          <% if (stats?.unseenCount > 0) { %>
+          <span class="badge"><%= stats.unseenCount %></span>
+          <% } %>
+        </a>
+        <a href="/admin/settings" class="hm-header-btn">
+          <i class="fas fa-cog"></i>
+        </a>
+      </div>
     </header>
 
-    <section class="admin-quick-links" aria-label="روابط سريعة">
-      <a class="aq-link" href="/admin" aria-label="لوحة التحكم"><i class="fas fa-gauge-high"></i><span>لوحة التحكم</span></a>
-      <a class="aq-link" href="/admin/cars" aria-label="السيارات"><i class="fas fa-car"></i><span>السيارات</span></a>
-      <a class="aq-link" href="/admin/spare-parts" aria-label="قطع الغيار"><i class="fas fa-cog"></i><span>قطع الغيار</span></a>
-      <a class="aq-link" href="/admin/orders" aria-label="الطلبات"><i class="fas fa-file-invoice"></i><span>الطلبات</span></a>
-      <a class="aq-link" href="/admin/auctions" aria-label="المزادات"><i class="fas fa-gavel"></i><span>المزادات</span></a>
-      <a class="aq-link" href="/admin/notifications" aria-label="الإشعارات"><i class="fas fa-bell"></i><span>الإشعارات</span></a>
-      <a class="aq-link" href="/admin/settings" aria-label="الإعدادات"><i class="fas fa-gear"></i><span>الإعدادات</span></a>
-    </section>
+    <!-- Content -->
+    <div class="hm-admin-content">
+      <!-- Flash Messages -->
+      <% if (flash && flash.message) { %>
+      <div class="hm-admin-alert hm-admin-alert-<%= flash.type || 'info' %>">
+        <i class="fas <%= flash.type === 'success' ? 'fa-check-circle' : flash.type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle' %>"></i>
+        <span><%= flash.message %></span>
+      </div>
+      <% } %>
 
-    <% if (flash && flash.message) { %>
-      <div class="mt-3">
-        <div class="alert alert-<%= flash.type || 'info' %> alert-dismissible fade show" role="alert">
-          <%= flash.message %>
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      <!-- Stats Grid -->
+      <div class="hm-stats-grid hm-animate-in">
+        <div class="hm-stat-card">
+          <div class="hm-stat-icon">
+            <i class="fas fa-car"></i>
+          </div>
+          <div class="hm-stat-info">
+            <div class="hm-stat-label">إجمالي السيارات</div>
+            <div class="hm-stat-value"><%= stats?.totalCars || 0 %></div>
+            <div class="hm-stat-change up">
+              <i class="fas fa-arrow-up"></i>
+              <span>مخزون محدث</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hm-stat-card">
+          <div class="hm-stat-icon success">
+            <i class="fas fa-users"></i>
+          </div>
+          <div class="hm-stat-info">
+            <div class="hm-stat-label">إجمالي المستخدمين</div>
+            <div class="hm-stat-value"><%= stats?.totalUsers || 0 %></div>
+            <div class="hm-stat-change up">
+              <i class="fas fa-arrow-up"></i>
+              <span>عملاء نشطون</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hm-stat-card">
+          <div class="hm-stat-icon warning">
+            <i class="fas fa-bell"></i>
+          </div>
+          <div class="hm-stat-info">
+            <div class="hm-stat-label">إشعارات جديدة</div>
+            <div class="hm-stat-value"><%= stats?.unseenCount || 0 %></div>
+            <div class="hm-stat-change">
+              <span>تحتاج مراجعة</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hm-stat-card">
+          <div class="hm-stat-icon danger">
+            <i class="fas fa-gavel"></i>
+          </div>
+          <div class="hm-stat-info">
+            <div class="hm-stat-label">مزادات نشطة</div>
+            <div class="hm-stat-value">0</div>
+            <div class="hm-stat-change">
+              <span>قيد التنفيذ</span>
+            </div>
+          </div>
         </div>
       </div>
-    <% } %>
 
-    <section class="hm-section" aria-label="إدارة سريعة">
-      <h2 class="hm-section__title">إدارة سريعة</h2>
-      <div class="hm-grid hm-grid--modern">
-        <a class="hm-card" href="/admin/cars" aria-label="إدارة السيارات">
-          <div class="hm-card__icon" aria-hidden="true"><i class="fas fa-car"></i></div>
-          <div class="hm-card__title">إدارة السيارات</div>
-          <div class="hm-card__subtitle">قائمة، تعديل، وحذف</div>
-          <div class="hm-card__value"><%= Number(stats?.totalCars || 0) %></div>
-        </a>
-
-        <a class="hm-card" href="/admin/orders" aria-label="إدارة الطلبات">
-          <div class="hm-card__icon" aria-hidden="true"><i class="fas fa-file-invoice"></i></div>
-          <div class="hm-card__title">إدارة الطلبات</div>
-          <div class="hm-card__subtitle">متابعة حالة الطلب</div>
-          <div class="hm-card__value"><%= Number(stats?.unseenCount || 0) %></div>
-        </a>
-
-        <a class="hm-card" href="/admin/users" aria-label="إدارة المستخدمين">
-          <div class="hm-card__icon" aria-hidden="true"><i class="fas fa-users"></i></div>
-          <div class="hm-card__title">إدارة المستخدمين</div>
-          <div class="hm-card__subtitle">التحكم بالحسابات</div>
-          <div class="hm-card__value"><%= Number(stats?.totalUsers || 0) %></div>
-        </a>
-      </div>
-    </section>
-
-    <section class="hm-section" aria-label="الإشعارات">
-      <h2 class="hm-section__title">آخر الإشعارات</h2>
-      
-      <!-- Enhanced Stats Widget -->
-      <%- include('widgets/admin-stats-enhanced') %>
-      
-      <!-- Enhanced Quick Actions Widget -->
-      <%- include('widgets/admin-quick-actions') %>
-      
-      <!-- Enhanced Activity Monitor Widget -->
-      <%- include('widgets/admin-activity-monitor') %>
-      
-      <!-- Enhanced Performance Dashboard Widget -->
-      <%- include('widgets/admin-performance-dashboard') %>
-      
-      <!-- Enhanced Real-Time Notifications Widget -->
-      <%- include('widgets/admin-real-time-notifications') %>
-      
-      <!-- Navigation Fix Widget -->
-      <%- include('widgets/admin-navigation-fix') %>
-      
-      <!-- Background Test Widget -->
-      <%- include('widgets/admin-background-test') %>
-      
-      <div class="hm-list">
-        <% if (notifications && notifications.length) { %>
-          <% notifications.slice(0, 8).forEach(function(n){ %>
-            <div class="hm-list__item">
-              <div>
-                <h3 class="hm-list__title">
-                  <%= (n.car && n.car.title) ? n.car.title : 'إشعار' %>
-                </h3>
-                <div class="hm-list__meta">
-                  <%= (n.user && n.user.name) ? n.user.name : '' %>
-                  <%= (n.user && n.user.phone) ? (' - ' + n.user.phone) : '' %>
-                  <%= (n.createdAt) ? (' - ' + new Date(n.createdAt).toLocaleString('ar')) : '' %>
-                </div>
+      <!-- Quick Actions -->
+      <div class="hm-admin-card hm-animate-in hm-animate-delay-1">
+        <div class="hm-card-header">
+          <h2 class="hm-card-title">
+            <i class="fas fa-bolt"></i>
+            إجراءات سريعة
+          </h2>
+        </div>
+        <div class="hm-card-body">
+          <div class="hm-actions-grid">
+            <a href="/cars/new" class="hm-action-card">
+              <div class="hm-action-icon">
+                <i class="fas fa-plus"></i>
               </div>
-              <div class="d-flex flex-column align-items-end gap-2">
-                <span class="hm-chip <%= (n.status === 'new') ? 'hm-chip--new' : '' %>">
-                  <i class="fas <%= (n.status === 'new') ? 'fa-star' : 'fa-check' %>"></i>
-                  <span><%= (n.status === 'new') ? 'جديد' : 'تمت المشاهدة' %></span>
-                </span>
-                <% if (n.status === 'new') { %>
-                  <form method="POST" action="/admin/notifications/<%= n._id %>/seen">
+              <span class="hm-action-label">إضافة سيارة</span>
+            </a>
+            <a href="/admin/auctions/new" class="hm-action-card">
+              <div class="hm-action-icon">
+                <i class="fas fa-gavel"></i>
+              </div>
+              <span class="hm-action-label">إنشاء مزاد</span>
+            </a>
+            <a href="/admin/spare-parts" class="hm-action-card">
+              <div class="hm-action-icon">
+                <i class="fas fa-cogs"></i>
+              </div>
+              <span class="hm-action-label">قطع الغيار</span>
+            </a>
+            <a href="/admin/orders" class="hm-action-card">
+              <div class="hm-action-icon">
+                <i class="fas fa-shopping-cart"></i>
+              </div>
+              <span class="hm-action-label">الطلبات</span>
+            </a>
+            <a href="/admin/users" class="hm-action-card">
+              <div class="hm-action-icon">
+                <i class="fas fa-users"></i>
+              </div>
+              <span class="hm-action-label">العملاء</span>
+            </a>
+            <a href="/admin/brands" class="hm-action-card">
+              <div class="hm-action-icon">
+                <i class="fas fa-copyright"></i>
+              </div>
+              <span class="hm-action-label">الماركات</span>
+            </a>
+            <a href="/admin/notifications" class="hm-action-card">
+              <div class="hm-action-icon">
+                <i class="fas fa-bell"></i>
+              </div>
+              <span class="hm-action-label">الإشعارات</span>
+            </a>
+            <a href="/admin/settings" class="hm-action-card">
+              <div class="hm-action-icon">
+                <i class="fas fa-cog"></i>
+              </div>
+              <span class="hm-action-label">الإعدادات</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Notifications -->
+      <div class="hm-admin-card hm-animate-in hm-animate-delay-2">
+        <div class="hm-card-header">
+          <h2 class="hm-card-title">
+            <i class="fas fa-bell"></i>
+            آخر الإشعارات
+          </h2>
+          <a href="/admin/notifications" class="hm-btn-admin hm-btn-admin-secondary hm-btn-admin-sm">
+            عرض الكل
+          </a>
+        </div>
+        <div class="hm-card-body">
+          <% if (notifications && notifications.length) { %>
+          <table class="hm-admin-table">
+            <thead>
+              <tr>
+                <th>العنوان</th>
+                <th>المستخدم</th>
+                <th>التاريخ</th>
+                <th>الحالة</th>
+                <th>إجراء</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% notifications.slice(0, 5).forEach(function(n) { %>
+              <tr>
+                <td><%= (n.car && n.car.title) ? n.car.title : 'إشعار جديد' %></td>
+                <td><%= (n.user && n.user.name) ? n.user.name : '-' %></td>
+                <td><%= n.createdAt ? new Date(n.createdAt).toLocaleDateString('ar-SA') : '-' %></td>
+                <td>
+                  <span class="hm-admin-badge <%= n.status === 'new' ? 'hm-admin-badge-warning' : 'hm-admin-badge-success' %>">
+                    <i class="fas <%= n.status === 'new' ? 'fa-star' : 'fa-check' %>"></i>
+                    <%= n.status === 'new' ? 'جديد' : 'تمت المشاهدة' %>
+                  </span>
+                </td>
+                <td>
+                  <% if (n.status === 'new') { %>
+                  <form method="POST" action="/admin/notifications/<%= n._id %>/seen" style="display: inline;">
                     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                    <button class="hm-embed__close" type="submit">تعليم كمشاهد</button>
+                    <button type="submit" class="hm-btn-admin hm-btn-admin-primary hm-btn-admin-sm">
+                      <i class="fas fa-eye"></i>
+                    </button>
                   </form>
-                <% } %>
-              </div>
+                  <% } %>
+                </td>
+              </tr>
+              <% }); %>
+            </tbody>
+          </table>
+          <% } else { %>
+          <div class="hm-empty-state">
+            <div class="hm-empty-icon">
+              <i class="fas fa-bell-slash"></i>
             </div>
-          <% }) %>
-        <% } else { %>
-          <div class="hm-list__item">
-            <div>
-              <h3 class="hm-list__title">لا توجد إشعارات حالياً</h3>
-              <div class="hm-list__meta">كل شيء تحت السيطرة</div>
-            </div>
+            <h3 class="hm-empty-title">لا توجد إشعارات</h3>
+            <p class="hm-empty-text">كل شيء تحت السيطرة</p>
           </div>
+          <% } %>
+        </div>
+        <% if (notifications && notifications.length) { %>
+        <div class="hm-card-footer" style="display: flex; gap: 1rem;">
+          <form method="POST" action="/admin/notifications/mark-all-seen">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <button type="submit" class="hm-btn-admin hm-btn-admin-secondary hm-btn-admin-sm">
+              <i class="fas fa-check-double"></i>
+              تعليم الكل كمشاهد
+            </button>
+          </form>
+        </div>
         <% } %>
       </div>
 
-      <div class="mt-3 d-flex gap-2 flex-wrap">
-        <form method="POST" action="/admin/notifications/mark-all-seen">
-          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-          <button class="hm-embed__close" type="submit">تعليم الكل كمشاهد</button>
-        </form>
-        <a class="hm-embed__close" href="/admin/notifications">إدارة الإشعارات</a>
-      </div>
-    </section>
-
-    <section class="hm-section" aria-label="فريق الإدارة">
-      <h2 class="hm-section__title">فريق الإدارة</h2>
-      <div class="hm-list">
-        <% if (users && users.length) { %>
-          <% users.slice(0, 8).forEach(function(u){ %>
-            <div class="hm-list__item">
-              <div>
-                <h3 class="hm-list__title"><%= u.name || 'مستخدم' %></h3>
-                <div class="hm-list__meta"><%= u.email || '' %> <%= u.phone ? (' - ' + u.phone) : '' %></div>
-              </div>
-              <span class="hm-chip"><i class="fas fa-user-shield"></i><span><%= u.role || 'admin' %></span></span>
+      <!-- Admin Team -->
+      <div class="hm-admin-card hm-animate-in hm-animate-delay-3">
+        <div class="hm-card-header">
+          <h2 class="hm-card-title">
+            <i class="fas fa-user-shield"></i>
+            فريق الإدارة
+          </h2>
+          <a href="/admin/users-management" class="hm-btn-admin hm-btn-admin-secondary hm-btn-admin-sm">
+            إدارة الفريق
+          </a>
+        </div>
+        <div class="hm-card-body">
+          <% if (users && users.length) { %>
+          <table class="hm-admin-table">
+            <thead>
+              <tr>
+                <th>الاسم</th>
+                <th>البريد الإلكتروني</th>
+                <th>الهاتف</th>
+                <th>الدور</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% users.slice(0, 5).forEach(function(u) { %>
+              <tr>
+                <td style="color: var(--hm-white); font-weight: 600;"><%= u.name || 'مستخدم' %></td>
+                <td><%= u.email || '-' %></td>
+                <td><%= u.phone || '-' %></td>
+                <td>
+                  <span class="hm-admin-badge hm-admin-badge-primary">
+                    <i class="fas fa-user-shield"></i>
+                    <%= u.role === 'super_admin' ? 'مدير عام' : u.role === 'admin' ? 'مدير' : 'مشرف' %>
+                  </span>
+                </td>
+              </tr>
+              <% }); %>
+            </tbody>
+          </table>
+          <% } else { %>
+          <div class="hm-empty-state">
+            <div class="hm-empty-icon">
+              <i class="fas fa-users-slash"></i>
             </div>
-          <% }) %>
-        <% } else { %>
-          <div class="hm-list__item">
-            <div>
-              <h3 class="hm-list__title">لا يوجد مستخدمون إداريون</h3>
-              <div class="hm-list__meta">أضف فريق الإدارة من صفحة المستخدمين</div>
-            </div>
+            <h3 class="hm-empty-title">لا يوجد مشرفون</h3>
+            <p class="hm-empty-text">أضف فريق الإدارة من صفحة المستخدمين</p>
           </div>
-        <% } %>
+          <% } %>
+        </div>
       </div>
-      <div class="mt-3">
-        <a class="hm-embed__close" href="/admin/users">عرض كل المستخدمين</a>
-      </div>
-    </section>
-  </div>
+    </div>
+  </main>
 </div>
+
+<script>
+// Toggle Sidebar
+function toggleSidebar() {
+  const sidebar = document.getElementById('adminSidebar');
+  sidebar.classList.toggle('open');
+}
+
+// Close sidebar when clicking outside on mobile
+document.addEventListener('click', function(e) {
+  const sidebar = document.getElementById('adminSidebar');
+  const toggle = document.querySelector('.hm-mobile-toggle');
+  
+  if (window.innerWidth <= 1024) {
+    if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+      sidebar.classList.remove('open');
+    }
+  }
+});
+
+// Highlight active nav item based on current URL
+document.addEventListener('DOMContentLoaded', function() {
+  const currentPath = window.location.pathname;
+  const navItems = document.querySelectorAll('.hm-nav-item');
+  
+  navItems.forEach(item => {
+    item.classList.remove('active');
+    const href = item.getAttribute('href');
+    if (href === currentPath || (currentPath.startsWith(href) && href !== '/')) {
+      item.classList.add('active');
+    }
+  });
+  
+  // Make sure dashboard is active on /admin
+  if (currentPath === '/admin' || currentPath === '/admin/') {
+    const dashboardLink = document.querySelector('.hm-nav-item[href="/admin"]');
+    if (dashboardLink) {
+      navItems.forEach(item => item.classList.remove('active'));
+      dashboardLink.classList.add('active');
+    }
+  }
+});
+</script>

@@ -19,11 +19,13 @@
 <link rel="manifest" href="/manifest.json">
 
 <link href="/public/css/single-section.css" rel="stylesheet">
+<!-- Add design system CSS for consistent variables -->
+<link href="/public/css/design-system.css" rel="stylesheet">
 
 <% const isLoggedIn = !!(typeof currentUser !== 'undefined' && currentUser); %>
 <% const loginWithReturnTo = (path) => `/auth/login?returnTo=${encodeURIComponent(path)}`; %>
 
-<div class="main-container hm-landing">
+<div class="main-container hm-landing" data-is-logged-in="<%= isLoggedIn ? 'true' : 'false' %>">
   <div class="single-section hm-shell">
     <!-- Top Bar -->
     <div class="hm-topbar" aria-label="Top bar">
@@ -68,7 +70,7 @@
             <a class="hm-card" href="<%= isLoggedIn ? '/auctions' : loginWithReturnTo('/auctions') %>">
               <div class="hm-card__icon"><i class="fas fa-gavel"></i></div>
               <div class="hm-card__title">المزاد / Auctions</div>
-              <div class="hm-card__text">مزادات مباشرة وعروض مميزة</div>
+              <div class="hm-card__text">MZادات مباشرة وعروض مميزة</div>
             </a>
             <a class="hm-card" href="<%= isLoggedIn ? '/cars' : loginWithReturnTo('/cars') %>">
               <div class="hm-card__icon"><i class="fas fa-car"></i></div>
@@ -186,7 +188,7 @@
     <!-- Live auctions preview -->
     <section class="hm-live" aria-label="Live auctions">
       <div class="hm-sectionHead hm-sectionHead--row">
-        <h2 class="hm-sectionHead__title">مزادات مباشرة / Live auctions</h2>
+        <h2 class="hm-sectionHead__title">MZادات مباشرة / Live auctions</h2>
         <a class="hm-linkBtn" href="<%= isLoggedIn ? '/auctions' : loginWithReturnTo('/auctions') %>">
           مشاهدة الكل / View all
           <i class="fas fa-arrow-left"></i>
@@ -235,7 +237,7 @@
         <div class="stat-item">
           <i class="fas fa-gavel"></i>
           <span class="stat-number"><%= (stats && typeof stats.activeAuctions !== 'undefined') ? stats.activeAuctions : '50+' %></span>
-          <span class="stat-label">مزاد نشط</span>
+          <span class="stat-label">MZاد نشط</span>
         </div>
         <div class="stat-item">
           <i class="fas fa-users"></i>
@@ -245,7 +247,7 @@
         <div class="stat-item">
           <i class="fas fa-trophy"></i>
           <span class="stat-number"><%= (stats && typeof stats.completedAuctions !== 'undefined') ? stats.completedAuctions : '200+' %></span>
-          <span class="stat-label">مزاد مكتمل</span>
+          <span class="stat-label">MZاد مكتمل</span>
         </div>
       </div>
     </div>
@@ -302,15 +304,15 @@ installButton.style.cssText = `
   position: fixed;
   bottom: 20px;
   left: 20px;
-  background: var(--gold-gradient);
-  color: #fff;
+  background: var(--hm-bg-gold);
+  color: var(--hm-blue-primary);
   border: 1px solid rgba(255, 255, 255, 0.22);
   padding: 15px 20px;
   border-radius: 15px;
   font-weight: 700;
   font-size: 14px;
   cursor: pointer;
-  box-shadow: var(--gold-shadow);
+  box-shadow: var(--hm-shadow-gold);
   z-index: 1000;
   display: none;
   align-items: center;
@@ -360,12 +362,12 @@ if ('serviceWorker' in navigator) {
                   position: fixed;
                   top: 20px;
                   right: 20px;
-                  background: var(--gold-gradient);
-                  color: #fff;
+                  background: var(--hm-bg-gold);
+                  color: var(--hm-blue-primary);
                   padding: 15px 20px;
                   border-radius: 15px;
                   font-weight: 700;
-                  box-shadow: var(--gold-shadow);
+                  box-shadow: var(--hm-shadow-gold);
                   z-index: 1001;
                   max-width: 300px;
                 ">
@@ -374,9 +376,9 @@ if ('serviceWorker' in navigator) {
                     <span>تحديث متاح!</span>
                   </div>
                   <button onclick="location.reload()" style="
-                    background: #fff;
-                    color: #0b1f3a;
-                    border: 1px solid rgba(11, 31, 58, 0.18);
+                    background: var(--hm-blue-primary);
+                    color: var(--hm-gold-primary);
+                    border: 1px solid var(--hm-border-medium);
                     padding: 8px 15px;
                     border-radius: 8px;
                     font-weight: 600;
@@ -452,22 +454,22 @@ window.addEventListener('DOMContentLoaded', () => {
 </script>
 
 <script>
-  (function () {
-    const isLoggedIn = <%= isLoggedIn ? 'true' : 'false' %>;
-    if (isLoggedIn) return;
-
+  // Get isLoggedIn from the data attribute on the body
+  const isLoggedIn = document.querySelector('.main-container').dataset.isLoggedIn === 'true';
+  
+  if (!isLoggedIn) {
     const form = document.querySelector('.search-form');
-    if (!form) return;
-
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      const fd = new FormData(form);
-      const params = new URLSearchParams();
-      for (const [k, v] of fd.entries()) {
-        if (v !== null && String(v).trim() !== '') params.append(k, String(v));
-      }
-      const returnTo = '/search' + (params.toString() ? ('?' + params.toString()) : '');
-      window.location.href = '/auth/login?returnTo=' + encodeURIComponent(returnTo);
-    });
-  })();
+    if (form) {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const fd = new FormData(form);
+        const params = new URLSearchParams();
+        for (const [k, v] of fd.entries()) {
+          if (v !== null && String(v).trim() !== '') params.append(k, String(v));
+        }
+        const returnTo = '/search' + (params.toString() ? ('?' + params.toString()) : '');
+        window.location.href = '/auth/login?returnTo=' + encodeURIComponent(returnTo);
+      });
+    }
+  }
 </script>

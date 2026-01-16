@@ -13,6 +13,12 @@ async function initializeSystem() {
       return;
     }
 
+    // Check if database is available
+    if (mongoose.connection.readyState !== 1) {
+      console.warn('⚠️ Database not available - skipping system initialization');
+      return;
+    }
+
     // إنشاء أو تحديث الإعدادات الافتراضية (باستخدام findOneAndUpdate للأسرع)
     let settings = await Settings.findOneAndUpdate(
       {},

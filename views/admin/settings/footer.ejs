@@ -68,12 +68,37 @@
                 <textarea class="form-control" name="description" rows="3"><%= footer && footer.description ? footer.description : '' %></textarea>
               </div>
               <div class="col-md-6">
-                <label class="form-label text-light">الروابط (JSON)</label>
-                <textarea class="form-control" name="links" rows="6" placeholder='[{"name":"السيارات","url":"/cars"}]'><%= footer && footer.links ? JSON.stringify(footer.links, null, 2) : '[]' %></textarea>
+                <label class="form-label text-light">الروابط السريعة (JSON)</label>
+                <textarea class="form-control" name="links" rows="4" placeholder='[{"name":"السيارات","url":"/cars"}]'><%= footer && footer.links ? JSON.stringify(footer.links, null, 2) : '[]' %></textarea>
+              </div>
+              
+              <!-- روابط التواصل الاجتماعي -->
+              <div class="col-12 mt-4">
+                <h5 class="text-light mb-3"><i class="fas fa-share-alt me-2"></i>روابط التواصل الاجتماعي</h5>
               </div>
               <div class="col-md-6">
-                <label class="form-label text-light">التواصل الاجتماعي (JSON)</label>
-                <textarea class="form-control" name="socialMedia" rows="6" placeholder='[{"name":"Twitter","url":"https://..."}]'><%= footer && footer.socialMedia ? JSON.stringify(footer.socialMedia, null, 2) : '[]' %></textarea>
+                <label class="form-label text-light"><i class="fab fa-facebook text-primary me-2"></i>رابط فيسبوك</label>
+                <input class="form-control" name="facebookUrl" placeholder="https://facebook.com/yourpage" value="<%= footer && footer.facebookUrl ? footer.facebookUrl : '' %>">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label text-light"><i class="fab fa-twitter text-info me-2"></i>رابط تويتر</label>
+                <input class="form-control" name="twitterUrl" placeholder="https://twitter.com/yourpage" value="<%= footer && footer.twitterUrl ? footer.twitterUrl : '' %>">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label text-light"><i class="fab fa-instagram text-danger me-2"></i>رابط انستقرام</label>
+                <input class="form-control" name="instagramUrl" placeholder="https://instagram.com/yourpage" value="<%= footer && footer.instagramUrl ? footer.instagramUrl : '' %>">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label text-light"><i class="fab fa-whatsapp text-success me-2"></i>رقم الواتساب (بدون +)</label>
+                <input class="form-control" name="whatsappNumber" placeholder="821012345678" value="<%= footer && footer.whatsappNumber ? footer.whatsappNumber : '' %>">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label text-light"><i class="fab fa-youtube text-danger me-2"></i>رابط يوتيوب</label>
+                <input class="form-control" name="youtubeUrl" placeholder="https://youtube.com/yourchannel" value="<%= footer && footer.youtubeUrl ? footer.youtubeUrl : '' %>">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label text-light"><i class="fab fa-tiktok me-2"></i>رابط تيك توك</label>
+                <input class="form-control" name="tiktokUrl" placeholder="https://tiktok.com/@yourpage" value="<%= footer && footer.tiktokUrl ? footer.tiktokUrl : '' %>">
               </div>
               <div class="col-12">
                 <button class="hm-embed__close" type="submit">حفظ</button>

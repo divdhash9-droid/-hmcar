@@ -2,51 +2,167 @@
 <% var hideNavbar = true; %>
 <% var hideSearch = true; %>
 <% var fullWidth = true; %>
-<% var bodyClass = 'admin-dashboard-luxury'; %>
+<% var bodyClass = 'hm-admin-page'; %>
 
-<div class="hm-dashboard">
-  <div class="hm-dashboard__container">
-    <header class="hm-hero" aria-label="الإعدادات">
-      <div class="hm-hero__top">
-        <div class="hm-hero__brand">
-          <img class="hm-hero__logo" src="/public/images/navbar-logo.png" alt="HM CAR" loading="eager" decoding="async" onerror="this.onerror=null;this.src='/public/images/logo.png';" />
-          <div class="hm-hero__titles">
-            <h1 class="hm-hero__title">إعدادات النظام</h1>
-            <div class="hm-hero__subtitle">تحكم فاخر بكل تفاصيل المنصة</div>
-          </div>
+<link rel="stylesheet" href="/css/admin-luxury.css">
+
+<div class="hm-admin-layout">
+  <!-- Animated Background -->
+  <div class="hm-admin-bg">
+    <div class="hm-admin-bg-gradient"></div>
+    <div class="hm-admin-bg-glow"></div>
+  </div>
+
+  <!-- Mobile Toggle -->
+  <button class="hm-mobile-toggle" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Sidebar -->
+  <%- include('../partials/admin-sidebar') %>
+
+  <!-- Main Content -->
+  <main class="hm-admin-main">
+    <!-- Header -->
+    <header class="hm-admin-header">
+      <div class="hm-header-title">
+        <h1>إعدادات النظام</h1>
+        <div class="hm-header-breadcrumb">
+          <a href="/admin">لوحة التحكم</a>
+          <i class="fas fa-chevron-left"></i>
+          <span>الإعدادات</span>
         </div>
-
-        <nav class="hm-hero__actions" aria-label="روابط">
-          <a class="hm-pill" href="/admin" aria-label="لوحة الإدارة"><i class="fas fa-tachometer-alt"></i><span>لوحة الإدارة</span></a>
-          <a class="hm-pill" href="/admin/notifications" aria-label="الإشعارات"><i class="fas fa-bell"></i><span>الإشعارات</span></a>
-          <a class="hm-pill hm-pill--danger" href="/auth/logout" aria-label="خروج"><i class="fas fa-sign-out-alt"></i><span>خروج</span></a>
-        </nav>
       </div>
-
-      <section class="hm-kpis" aria-label="حالة">
-        <div class="hm-kpi hm-kpi--security"><div class="hm-kpi__row"><div><div class="hm-kpi__label">الأمان</div><div class="hm-kpi__value">CSRF</div></div><div class="hm-kpi__icon" aria-hidden="true"><i class="fas fa-shield-alt"></i></div></div></div>
-        <div class="hm-kpi"><div class="hm-kpi__row"><div><div class="hm-kpi__label">واجهة</div><div class="hm-kpi__value">LUX</div></div><div class="hm-kpi__icon" aria-hidden="true"><i class="fas fa-gem"></i></div></div></div>
-        <div class="hm-kpi"><div class="hm-kpi__row"><div><div class="hm-kpi__label">التحديثات</div><div class="hm-kpi__value">LIVE</div></div><div class="hm-kpi__icon" aria-hidden="true"><i class="fas fa-bolt"></i></div></div></div>
-        <div class="hm-kpi"><div class="hm-kpi__row"><div><div class="hm-kpi__label">التحكم</div><div class="hm-kpi__value">FULL</div></div><div class="hm-kpi__icon" aria-hidden="true"><i class="fas fa-cogs"></i></div></div></div>
-      </section>
     </header>
 
-    <% if (flash && flash.message) { %>
-      <div class="mt-3">
-        <div class="alert alert-<%= flash.type || 'info' %> alert-dismissible fade show" role="alert">
-          <%= flash.message %>
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <!-- Content -->
+    <div class="hm-admin-content">
+      <!-- Flash Messages -->
+      <% if (flash && flash.message) { %>
+      <div class="hm-admin-alert hm-admin-alert-<%= flash.type || 'info' %>">
+        <i class="fas <%= flash.type === 'success' ? 'fa-check-circle' : flash.type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle' %>"></i>
+        <span><%= flash.message %></span>
+      </div>
+      <% } %>
+
+      <!-- Stats -->
+      <div class="hm-stats-grid">
+        <div class="hm-stat-card">
+          <div class="hm-stat-icon">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <div class="hm-stat-info">
+            <div class="hm-stat-label">الأمان</div>
+            <div class="hm-stat-value">CSRF</div>
+          </div>
+        </div>
+        <div class="hm-stat-card">
+          <div class="hm-stat-icon success">
+            <i class="fas fa-gem"></i>
+          </div>
+          <div class="hm-stat-info">
+            <div class="hm-stat-label">الواجهة</div>
+            <div class="hm-stat-value">فاخرة</div>
+          </div>
+        </div>
+        <div class="hm-stat-card">
+          <div class="hm-stat-icon warning">
+            <i class="fas fa-bolt"></i>
+          </div>
+          <div class="hm-stat-info">
+            <div class="hm-stat-label">التحديثات</div>
+            <div class="hm-stat-value">مباشر</div>
+          </div>
+        </div>
+        <div class="hm-stat-card">
+          <div class="hm-stat-icon danger">
+            <i class="fas fa-cogs"></i>
+          </div>
+          <div class="hm-stat-info">
+            <div class="hm-stat-label">التحكم</div>
+            <div class="hm-stat-value">كامل</div>
+          </div>
         </div>
       </div>
-    <% } %>
 
-    <section class="hm-section" aria-label="خيارات">
-      <h2 class="hm-section__title">خيارات الإعدادات</h2>
-      <div class="hm-grid">
-        <a class="hm-card" href="/admin/settings/whatsapp" aria-label="إعدادات الواتساب"><div class="hm-card__icon" aria-hidden="true"><i class="fab fa-whatsapp" style="font-size:1.6rem"></i></div><div class="hm-card__title">WhatsApp</div><div class="hm-card__subtitle">رقم + رسالة + تفعيل</div></a>
-        <a class="hm-card" href="/admin/settings/footer" aria-label="إعدادات الفوتر"><div class="hm-card__icon" aria-hidden="true"><i class="fas fa-grip-lines" style="font-size:1.6rem"></i></div><div class="hm-card__title">Footer</div><div class="hm-card__subtitle">معلومات وروابط</div></a>
-        <a class="hm-card" href="/admin/exchange-rate" aria-label="سعر الصرف"><div class="hm-card__icon" aria-hidden="true"><i class="fas fa-dollar-sign" style="font-size:1.6rem"></i></div><div class="hm-card__title">سعر الصرف</div><div class="hm-card__subtitle">USD -> SAR</div></a>
+      <!-- Settings Options -->
+      <div class="hm-admin-card">
+        <div class="hm-card-header">
+          <h2 class="hm-card-title">
+            <i class="fas fa-sliders-h"></i>
+            خيارات الإعدادات
+          </h2>
+        </div>
+        <div class="hm-card-body">
+          <div class="hm-actions-grid">
+            <a href="/admin/settings/whatsapp" class="hm-action-card">
+              <div class="hm-action-icon" style="background: linear-gradient(135deg, #25d366, #128c7e);">
+                <i class="fab fa-whatsapp" style="color: white;"></i>
+              </div>
+              <span class="hm-action-label">واتساب</span>
+              <small style="color: var(--hm-gray); font-size: 0.75rem; margin-top: 0.25rem;">رقم + رسالة + تفعيل</small>
+            </a>
+            
+            <a href="/admin/settings/footer" class="hm-action-card">
+              <div class="hm-action-icon">
+                <i class="fas fa-grip-lines"></i>
+              </div>
+              <span class="hm-action-label">الشريط السفلي</span>
+              <small style="color: var(--hm-gray); font-size: 0.75rem; margin-top: 0.25rem;">معلومات وروابط</small>
+            </a>
+            
+            <a href="/admin/exchange-rate" class="hm-action-card">
+              <div class="hm-action-icon" style="background: linear-gradient(135deg, #22c55e, #16a34a);">
+                <i class="fas fa-dollar-sign" style="color: white;"></i>
+              </div>
+              <span class="hm-action-label">سعر الصرف</span>
+              <small style="color: var(--hm-gray); font-size: 0.75rem; margin-top: 0.25rem;">USD -> SAR</small>
+            </a>
+            
+            <a href="/admin/brands" class="hm-action-card">
+              <div class="hm-action-icon">
+                <i class="fas fa-copyright"></i>
+              </div>
+              <span class="hm-action-label">الماركات</span>
+              <small style="color: var(--hm-gray); font-size: 0.75rem; margin-top: 0.25rem;">إدارة العلامات التجارية</small>
+            </a>
+            
+            <a href="/admin/categories" class="hm-action-card">
+              <div class="hm-action-icon">
+                <i class="fas fa-tags"></i>
+              </div>
+              <span class="hm-action-label">الفئات</span>
+              <small style="color: var(--hm-gray); font-size: 0.75rem; margin-top: 0.25rem;">تصنيفات السيارات</small>
+            </a>
+            
+            <a href="/admin/users-management" class="hm-action-card">
+              <div class="hm-action-icon" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                <i class="fas fa-user-shield" style="color: white;"></i>
+              </div>
+              <span class="hm-action-label">المشرفون</span>
+              <small style="color: var(--hm-gray); font-size: 0.75rem; margin-top: 0.25rem;">إدارة الصلاحيات</small>
+            </a>
+          </div>
+        </div>
       </div>
-    </section>
-  </div>
+    </div>
+  </main>
 </div>
+
+<script>
+function toggleSidebar() {
+  const sidebar = document.getElementById('adminSidebar');
+  sidebar.classList.toggle('open');
+}
+
+document.addEventListener('click', function(e) {
+  const sidebar = document.getElementById('adminSidebar');
+  const toggle = document.querySelector('.hm-mobile-toggle');
+  
+  if (window.innerWidth <= 1024) {
+    if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+      sidebar.classList.remove('open');
+    }
+  }
+});
+</script>

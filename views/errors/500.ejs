@@ -3,43 +3,45 @@
 <% var hideSearch = true; %>
 <% var fullWidth = true; %>
 
-<link href="/public/css/error-page.css" rel="stylesheet">
-
-<div class="error-container">
-  <div class="error-content">
-    <div class="error-icon">🚨</div>
-    <h1 class="error-title">حدث خطأ في الخادم</h1>
-    
-    <% if (process.env.NODE_ENV === 'development' && error) { %>
-      <div class="error-details">
-        <h3>تفاصيل الخطأ (وضع التطوير):</h3>
-        <pre><%= error.stack || error.message || JSON.stringify(error, null, 2) %></pre>
+<div class="hm-dashboard">
+  <div class="hm-dashboard__container text-center" style="padding: 100px 0;">
+    <div class="hm-card mx-auto" style="max-width: 700px;">
+      <div class="hm-icon-container hm-icon-container-light mx-auto mb-4">
+        <i class="fas fa-exclamation-circle hm-icon-3xl hm-icon-muted"></i>
       </div>
-    <% } else { %>
-      <p style="font-size: 1.1rem; margin-bottom: 30px; line-height: 1.6;">
-        نحن نعمل على إصلاح المشكلة. يرجى المحاولة مرة أخرى لاحقاً.
-      </p>
-    <% } %>
-    
-    <div class="error-actions">
-      <a href="/" class="error-btn">
-        <i class="fas fa-home"></i>
-        الصفحة الرئيسية
-      </a>
-      <a href="/auth/login" class="error-btn error-btn-secondary">
-        <i class="fas fa-sign-in-alt"></i>
-        تسجيل الدخول
-      </a>
-      <a href="/admin" class="error-btn error-btn-secondary">
-        <i class="fas fa-tachometer-alt"></i>
-        لوحة التحكم
-      </a>
-    </div>
-    
-    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border-color);">
-      <p style="font-size: 0.9rem; opacity: 0.7; margin: 0;">
-        إذا استمرت المشكلة، يرجى التواصل مع الدعم الفني
-      </p>
+      <h1 class="hm-text-gold" style="font-size: 3rem; margin-bottom: 20px;">حدث خطأ في الخادم</h1>
+      
+      <% if (process.env.NODE_ENV === 'development' && error) { %>
+        <div class="hm-card p-4 mb-4 text-start">
+          <h3 class="hm-text-blue mb-3">تفاصيل الخطأ (وضع التطوير):</h3>
+          <pre class="mb-0" style="white-space: pre-wrap; word-break: break-word;"><%= error.stack || error.message || JSON.stringify(error, null, 2) %></pre>
+        </div>
+      <% } else { %>
+        <p class="mb-4" style="font-size: 1.2rem;">
+          نحن نعمل على إصلاح المشكلة. يرجى المحاولة مرة أخرى لاحقاً.
+        </p>
+      <% } %>
+      
+      <div class="d-flex flex-wrap justify-content-center gap-3 mb-4">
+        <a href="/" class="hm-btn hm-btn-primary">
+          <i class="fas fa-home"></i>
+          الصفحة الرئيسية
+        </a>
+        <a href="/auth/login" class="hm-btn hm-btn-outline">
+          <i class="fas fa-sign-in-alt"></i>
+          تسجيل الدخول
+        </a>
+        <a href="/admin" class="hm-btn hm-btn-outline">
+          <i class="fas fa-tachometer-alt"></i>
+          لوحة التحكم
+        </a>
+      </div>
+      
+      <div class="pt-3 mt-4 border-top" style="border-color: var(--hm-border-medium) !important;">
+        <p class="mb-0" style="font-size: 0.9rem; color: var(--hm-text-muted);">
+          إذا استمرت المشكلة، يرجى التواصل مع الدعم الفني
+        </p>
+      </div>
     </div>
   </div>
 </div>

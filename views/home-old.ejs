@@ -4,6 +4,8 @@
 <% var fullWidth = true; %>
 
 <link href="/public/css/home-v3.css" rel="stylesheet">
+<!-- Add design system CSS for consistent variables -->
+<link href="/public/css/design-system.css" rel="stylesheet">
 
 <% const isLoggedIn = !!(typeof currentUser !== 'undefined' && currentUser); %>
 <% const loginWithReturnTo = (path) => `/auth/login?returnTo=${encodeURIComponent(path)}`; %>

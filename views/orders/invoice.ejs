@@ -1,0 +1,440 @@
+<% layout('layout') -%>
+<% var hideNavbar = false; %>
+<% var bodyClass = 'invoice-page'; %>
+
+<link rel="stylesheet" href="/public/css/design-system.css">
+
+<style>
+/* Invoice Page Styles */
+.hm-invoice-container {
+  min-height: 100vh;
+  padding: 2rem;
+  background: linear-gradient(135deg, #0a1628 0%, #001f3f 50%, #0a1628 100%);
+}
+
+.hm-invoice-card {
+  max-width: 900px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  border: 1px solid rgba(0, 123, 255, 0.2);
+  overflow: hidden;
+}
+
+.hm-invoice-header {
+  background: linear-gradient(145deg, #001f3f 0%, #003366 100%);
+  padding: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid rgba(0, 123, 255, 0.3);
+}
+
+.hm-invoice-logo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hm-invoice-logo img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #fff;
+  padding: 5px;
+}
+
+.hm-invoice-logo-text {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #ffffff;
+  font-family: 'Cairo', sans-serif;
+}
+
+.hm-invoice-info {
+  text-align: left;
+}
+
+.hm-invoice-number {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #4da3ff;
+  margin-bottom: 0.3rem;
+}
+
+.hm-invoice-date {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+}
+
+.hm-invoice-body {
+  padding: 2rem;
+}
+
+.hm-invoice-section {
+  margin-bottom: 2rem;
+}
+
+.hm-invoice-section-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #4da3ff;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(0, 123, 255, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hm-invoice-customer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.hm-invoice-field {
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+
+.hm-invoice-field-label {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 0.3rem;
+}
+
+.hm-invoice-field-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.hm-invoice-items-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.hm-invoice-items-table th {
+  background: rgba(0, 123, 255, 0.2);
+  padding: 1rem;
+  text-align: right;
+  font-weight: 700;
+  color: #4da3ff;
+  font-size: 0.9rem;
+}
+
+.hm-invoice-items-table td {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+.hm-invoice-items-table tbody tr:hover {
+  background: rgba(0, 123, 255, 0.1);
+}
+
+.hm-invoice-totals {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  background: rgba(0, 123, 255, 0.1);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 123, 255, 0.2);
+}
+
+.hm-invoice-total-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.hm-invoice-total-row.grand {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #ffffff;
+  border-top: 2px solid rgba(0, 123, 255, 0.3);
+  padding-top: 1rem;
+  margin-top: 0.5rem;
+}
+
+.hm-invoice-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.2rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.hm-invoice-status.pending {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+}
+
+.hm-invoice-status.confirmed {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+}
+
+.hm-invoice-status.completed {
+  background: rgba(0, 123, 255, 0.2);
+  color: #4da3ff;
+}
+
+.hm-invoice-status.cancelled {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
+.hm-invoice-footer {
+  padding: 1.5rem 2rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-top: 1px solid rgba(0, 123, 255, 0.2);
+}
+
+.hm-invoice-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.hm-invoice-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.5rem;
+  border-radius: 10px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-family: 'Cairo', sans-serif;
+}
+
+.hm-invoice-btn-primary {
+  background: linear-gradient(145deg, #007bff 0%, #0056b3 100%);
+  color: #ffffff;
+  border: 1px solid #4da3ff;
+}
+
+.hm-invoice-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+  color: #ffffff;
+}
+
+.hm-invoice-btn-success {
+  background: linear-gradient(145deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  border: 1px solid #34d399;
+}
+
+.hm-invoice-btn-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+  color: #ffffff;
+}
+
+.hm-invoice-btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.hm-invoice-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+@media print {
+  .hm-invoice-container {
+    background: #fff;
+    padding: 0;
+  }
+  .hm-invoice-card {
+    box-shadow: none;
+    border: none;
+  }
+  .hm-invoice-footer {
+    display: none;
+  }
+  * {
+    color: #000 !important;
+    background: transparent !important;
+  }
+}
+</style>
+
+<div class="hm-invoice-container">
+  <div class="hm-invoice-card">
+    <!-- Header -->
+    <div class="hm-invoice-header">
+      <div class="hm-invoice-logo">
+        <img src="/public/images/logo.png" alt="HM CAR" onerror="this.style.display='none'">
+        <span class="hm-invoice-logo-text">HM CAR</span>
+      </div>
+      <div class="hm-invoice-info">
+        <div class="hm-invoice-number">
+          <i class="fas fa-hashtag"></i>
+          فاتورة رقم: <%= order.orderNumber || order._id %>
+        </div>
+        <div class="hm-invoice-date">
+          <%= order.createdAt ? new Date(order.createdAt).toLocaleDateString('ar-SA') : '-' %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="hm-invoice-body">
+      <!-- Customer Info -->
+      <div class="hm-invoice-section">
+        <h3 class="hm-invoice-section-title">
+          <i class="fas fa-user"></i>
+          معلومات العميل
+        </h3>
+        <div class="hm-invoice-customer">
+          <div class="hm-invoice-field">
+            <div class="hm-invoice-field-label">الاسم</div>
+            <div class="hm-invoice-field-value"><%= order.buyer?.name || 'غير محدد' %></div>
+          </div>
+          <div class="hm-invoice-field">
+            <div class="hm-invoice-field-label">حالة الطلب</div>
+            <div class="hm-invoice-field-value">
+              <span class="hm-invoice-status <%= order.status || 'pending' %>">
+                <% if (order.status === 'pending') { %>
+                  <i class="fas fa-clock"></i> قيد الانتظار
+                <% } else if (order.status === 'confirmed') { %>
+                  <i class="fas fa-check"></i> مؤكد
+                <% } else if (order.status === 'completed') { %>
+                  <i class="fas fa-check-double"></i> مكتمل
+                <% } else if (order.status === 'cancelled') { %>
+                  <i class="fas fa-times"></i> ملغي
+                <% } else { %>
+                  <%= order.status %>
+                <% } %>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Items -->
+      <div class="hm-invoice-section">
+        <h3 class="hm-invoice-section-title">
+          <i class="fas fa-shopping-cart"></i>
+          عناصر الطلب
+        </h3>
+        <table class="hm-invoice-items-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>العنصر</th>
+              <th>النوع</th>
+              <th>الكمية</th>
+              <th>السعر</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (order.items && order.items.length > 0) { %>
+              <% order.items.forEach(function(item, index) { %>
+                <tr>
+                  <td><%= index + 1 %></td>
+                  <td><%= item.title || item.name || 'عنصر' %></td>
+                  <td>
+                    <% if (item.itemType === 'car') { %>
+                      <i class="fas fa-car"></i> سيارة
+                    <% } else if (item.itemType === 'sparePart') { %>
+                      <i class="fas fa-cogs"></i> قطعة غيار
+                    <% } else if (item.itemType === 'auctionWin') { %>
+                      <i class="fas fa-gavel"></i> فوز مزاد
+                    <% } else { %>
+                      <%= item.itemType %>
+                    <% } %>
+                  </td>
+                  <td><%= item.qty || 1 %></td>
+                  <td><%= item.priceSar ? Number(item.priceSar).toLocaleString('en-US') + ' ر.س' : '-' %></td>
+                </tr>
+              <% }); %>
+            <% } else { %>
+              <tr>
+                <td colspan="5" style="text-align: center; color: rgba(255,255,255,0.5);">لا توجد عناصر</td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+
+        <!-- Totals -->
+        <div class="hm-invoice-totals">
+          <div class="hm-invoice-total-row">
+            <span>المجموع الفرعي (ريال)</span>
+            <span><%= order.pricing?.subtotalSar ? Number(order.pricing.subtotalSar).toLocaleString('en-US') : '0' %> ر.س</span>
+          </div>
+          <% if (order.pricing?.shippingSar) { %>
+          <div class="hm-invoice-total-row">
+            <span>الشحن</span>
+            <span><%= Number(order.pricing.shippingSar).toLocaleString('en-US') %> ر.س</span>
+          </div>
+          <% } %>
+          <div class="hm-invoice-total-row grand">
+            <span>الإجمالي (ريال)</span>
+            <span><%= order.pricing?.grandTotalSar ? Number(order.pricing.grandTotalSar).toLocaleString('en-US') : '0' %> ر.س</span>
+          </div>
+          <div class="hm-invoice-total-row grand">
+            <span>الإجمالي (دولار)</span>
+            <span>$<%= order.pricing?.grandTotalUsd ? Number(order.pricing.grandTotalUsd).toLocaleString('en-US') : '0' %></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Spare Parts Links -->
+      <% if (spareLinks && spareLinks.length > 0) { %>
+      <div class="hm-invoice-section">
+        <h3 class="hm-invoice-section-title">
+          <i class="fas fa-link"></i>
+          روابط قطع الغيار
+        </h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+          <% spareLinks.forEach(function(link) { %>
+            <a href="<%= link.url %>" target="_blank" class="hm-invoice-btn hm-invoice-btn-secondary" style="font-size: 0.85rem;">
+              <i class="fas fa-external-link-alt"></i>
+              <%= link.name %>
+            </a>
+          <% }); %>
+        </div>
+      </div>
+      <% } %>
+    </div>
+
+    <!-- Footer -->
+    <div class="hm-invoice-footer">
+      <div class="hm-invoice-actions">
+        <a href="/orders/my" class="hm-invoice-btn hm-invoice-btn-secondary">
+          <i class="fas fa-arrow-right"></i>
+          العودة للطلبات
+        </a>
+        <button onclick="window.print()" class="hm-invoice-btn hm-invoice-btn-primary">
+          <i class="fas fa-print"></i>
+          طباعة الفاتورة
+        </button>
+        <% if (whatsappUrl) { %>
+        <a href="<%= whatsappUrl %>" target="_blank" class="hm-invoice-btn hm-invoice-btn-success">
+          <i class="fab fa-whatsapp"></i>
+          مشاركة عبر واتساب
+        </a>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% if (openWhatsApp && whatsappUrl) { %>
+<script>
+  window.open('<%= whatsappUrl %>', '_blank');
+</script>
+<% } %>

@@ -1,68 +1,139 @@
-<% layout('layout') -%>
-
-<section class="contact-hero">
-    <div class="container">
-        <h1><%= __('contact.title') %></h1>
-        <p><%= __('contact.subtitle') %></p>
-    </div>
-</section>
-
-<section class="contact-content">
-    <div class="container">
-        <div class="contact-grid">
-            <div class="contact-form">
-                <h2><%= __('contact.send_message') %></h2>
-                <form action="/contact" method="POST">
-                    <div class="form-group">
-                        <label for="name"><%= __('contact.full_name') %></label>
-                        <input type="text" id="name" name="name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email"><%= __('contact.email') %></label>
-                        <input type="email" id="email" name="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="subject"><%= __('contact.subject') %></label>
-                        <input type="text" id="subject" name="subject" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="message"><%= __('contact.message') %></label>
-                        <textarea id="message" name="message" rows="5" required></textarea>
-                    </div>
-                    <button type="submit" class="cta-button"><%= __('contact.send') %></button>
-                </form>
-            </div>
-            <div class="contact-info">
-                <h2><%= __('contact.get_in_touch') %></h2>
-                <div class="info-item">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <div>
-                        <h4><%= __('contact.address') %></h4>
-                        <p>123 Car Auction Street<br>Auto City, AC 12345</p>
-                    </div>
-                </div>
-                <div class="info-item">
-                    <i class="fas fa-phone"></i>
-                    <div>
-                        <h4><%= __('contact.phone') %></h4>
-                        <p>+1 (555) 123-4567</p>
-                    </div>
-                </div>
-                <div class="info-item">
-                    <i class="fas fa-envelope"></i>
-                    <div>
-                        <h4>Email</h4>
-                        <p>info@caraauction.com</p>
-                    </div>
-                </div>
-                <div class="info-item">
-                    <i class="fas fa-clock"></i>
-                    <div>
-                        <h4><%= __('contact.business_hours') %></h4>
-                        <p>Mon - Fri: 9:00 AM - 6:00 PM<br>Sat: 10:00 AM - 4:00 PM</p>
-                    </div>
-                </div>
-            </div>
+<div class="hm-dashboard">
+  <div class="hm-dashboard__container">
+    <header class="hm-hero hm-bg-gold" aria-label="اتصل بنا">
+      <div class="hm-hero__top">
+        <div class="hm-hero__brand">
+          <img class="hm-hero__logo" src="/images/navbar-logo.png" alt="HM CAR" loading="eager" decoding="async" onerror="this.onerror=null;this.src='/images/logo.png';" />
+          <div class="hm-hero__titles">
+            <h1 class="hm-hero__title hm-text-white"><%= __('contact.title') %></h1>
+            <div class="hm-hero__subtitle hm-text-white"><%= __('contact.subtitle') %></div>
+          </div>
         </div>
-    </div>
-</section>
+      </div>
+    </header>
+    
+    <section class="hm-section">
+      <div class="hm-grid hm-grid--responsive">
+        <div class="col-md-6">
+          <div class="hm-card">
+            <h2 class="hm-section__title hm-text-blue mb-4"><%= __('contact.send_message') %></h2>
+            <form action="/contact" method="POST">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <div class="hm-form-group mb-3">
+                <div class="hm-input-wrapper">
+                  <i class="hm-input-icon fas fa-user hm-icon hm-icon-sm hm-icon-muted"></i>
+                  <input type="text" 
+                         id="name" 
+                         name="name" 
+                         class="hm-input" 
+                         placeholder="<%= __('contact.full_name') %>" 
+                         required>
+                  <label for="name" class="hm-input-label">
+                    <%= __('contact.full_name') %>
+                  </label>
+                </div>
+              </div>
+              
+              <div class="hm-form-group mb-3">
+                <div class="hm-input-wrapper">
+                  <i class="hm-input-icon fas fa-envelope hm-icon hm-icon-sm hm-icon-muted"></i>
+                  <input type="email" 
+                         id="email" 
+                         name="email" 
+                         class="hm-input" 
+                         placeholder="<%= __('contact.email') %>" 
+                         required>
+                  <label for="email" class="hm-input-label">
+                    <%= __('contact.email') %>
+                  </label>
+                </div>
+              </div>
+              
+              <div class="hm-form-group mb-3">
+                <div class="hm-input-wrapper">
+                  <i class="hm-input-icon fas fa-tag hm-icon hm-icon-sm hm-icon-muted"></i>
+                  <input type="text" 
+                         id="subject" 
+                         name="subject" 
+                         class="hm-input" 
+                         placeholder="<%= __('contact.subject') %>" 
+                         required>
+                  <label for="subject" class="hm-input-label">
+                    <%= __('contact.subject') %>
+                  </label>
+                </div>
+              </div>
+              
+              <div class="hm-form-group mb-3">
+                <div class="hm-input-wrapper">
+                  <i class="hm-input-icon fas fa-comment hm-icon hm-icon-sm hm-icon-muted"></i>
+                  <textarea id="message" 
+                          name="message" 
+                          class="hm-input" 
+                          rows="5" 
+                          placeholder="<%= __('contact.message') %>" 
+                          required></textarea>
+                  <label for="message" class="hm-input-label">
+                    <%= __('contact.message') %>
+                  </label>
+                </div>
+              </div>
+              
+              <div class="mt-4">
+                <button type="submit" class="hm-btn hm-btn-primary w-100">
+                  <i class="fas fa-paper-plane"></i> <%= __('contact.send') %>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="hm-card">
+            <h2 class="hm-section__title hm-text-blue mb-4"><%= __('contact.get_in_touch') %></h2>
+            
+            <div class="d-flex align-items-start mb-4">
+              <div class="hm-icon-container hm-icon-container-gold hm-icon-container-sm me-3">
+                <i class="fas fa-map-marker-alt hm-icon-lg"></i>
+              </div>
+              <div>
+                <h4 class="mb-1 hm-text-blue"><%= __('contact.address') %></h4>
+                <p class="mb-0">123 Car Auction Street<br>Auto City, AC 12345</p>
+              </div>
+            </div>
+            
+            <div class="d-flex align-items-start mb-4">
+              <div class="hm-icon-container hm-icon-container-gold hm-icon-container-sm me-3">
+                <i class="fas fa-phone hm-icon-lg"></i>
+              </div>
+              <div>
+                <h4 class="mb-1 hm-text-blue"><%= __('contact.phone') %></h4>
+                <p class="mb-0">+1 (555) 123-4567</p>
+              </div>
+            </div>
+            
+            <div class="d-flex align-items-start mb-4">
+              <div class="hm-icon-container hm-icon-container-gold hm-icon-container-sm me-3">
+                <i class="fas fa-envelope hm-icon-lg"></i>
+              </div>
+              <div>
+                <h4 class="mb-1 hm-text-blue">Email</h4>
+                <p class="mb-0">info@caraauction.com</p>
+              </div>
+            </div>
+            
+            <div class="d-flex align-items-start">
+              <div class="hm-icon-container hm-icon-container-gold hm-icon-container-sm me-3">
+                <i class="fas fa-clock hm-icon-lg"></i>
+              </div>
+              <div>
+                <h4 class="mb-1 hm-text-blue"><%= __('contact.business_hours') %></h4>
+                <p class="mb-0">Mon - Fri: 9:00 AM - 6:00 PM<br>Sat: 10:00 AM - 4:00 PM</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

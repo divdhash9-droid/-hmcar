@@ -1,38 +1,47 @@
 /* ===== Admin Dashboard - Gold + White Luxury ===== */
 :root {
-  /* Primary Colors - Gold + White Luxury */
-  --primary-gold: var(--primary-color-light);
-  --primary-gold-light: var(--accent-color);
-  --primary-gold-dark: var(--primary-color);
+  /* Primary Colors - Navy Blue + Snow White */
+  --primary-navy: #001f3f;
+  --primary-navy-light: #003366;
+  --primary-navy-dark: #001429;
+  --accent-blue: #007bff;
+  --accent-blue-light: #3395ff;
+  --accent-blue-dark: #0056b3;
   
-  /* Background Colors - White Theme */
-  --bg-primary: #FFFFFF;
-  --bg-secondary: #F8F9FA;
-  --bg-tertiary: #F1F3F4;
-  --bg-card: #FFFFFF;
-  --bg-hover: #F8F9FA;
+  /* Snow White Colors */
+  --snow-white: #ffffff;
+  --snow-offwhite: #f8f9fa;
+  --snow-pearl: #f5f7fa;
+  --snow-cream: #fdfdfd;
+  
+  /* Background Colors - Snow White Theme */
+  --bg-primary: var(--snow-white);
+  --bg-secondary: var(--snow-pearl);
+  --bg-tertiary: var(--snow-offwhite);
+  --bg-card: var(--snow-white);
+  --bg-hover: var(--snow-offwhite);
   
   /* Text Colors */
-  --text-primary: #212529;
-  --text-secondary: #6C757D;
-  --text-muted: #ADB5BD;
+  --text-primary: var(--primary-navy);
+  --text-secondary: var(--primary-navy-light);
+  --text-muted: #6c757d;
   
   /* Border Colors */
-  --border-primary: var(--border-color);
-  --border-secondary: #DEE2E6;
-  --border-card: #E9ECEF;
+  --border-primary: rgba(0, 31, 63, 0.12);
+  --border-secondary: #dee2e6;
+  --border-card: #e9ecef;
   
   /* Shadow Colors */
-  --shadow-gold: 0 4px 20px rgba(11, 31, 58, 0.14);
-  --shadow-gold-intense: 0 8px 40px rgba(11, 31, 58, 0.22);
+  --shadow-navy: 0 4px 20px rgba(0, 31, 63, 0.14);
+  --shadow-navy-intense: 0 8px 40px rgba(0, 31, 63, 0.22);
   --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.08);
   --shadow-medium: 0 4px 20px rgba(0, 0, 0, 0.12);
   
   /* Gradients */
-  --gradient-primary: var(--gold-gradient);
-  --gradient-gold-shine: var(--gold-gradient);
-  --gradient-card: linear-gradient(145deg, #FFFFFF 0%, #F8F9FA 100%);
-  --gradient-hero: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color-light) 50%, #FFFFFF 100%);
+  --gradient-primary: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-blue-light) 100%);
+  --gradient-navy: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-navy-light) 100%);
+  --gradient-card: linear-gradient(145deg, var(--snow-white) 0%, var(--snow-pearl) 100%);
+  --gradient-hero: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-navy-light) 50%, var(--snow-white) 100%);
   
   /* Transitions */
   --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -53,11 +62,11 @@
 
 /* ===== Hero Section ===== */
 .hm-hero {
-  background: var(--gradient-hero) !important;
+  background: var(--gradient-navy) !important;
   border-radius: var(--radius-lg) !important;
   margin: 2rem !important;
   padding: 2rem !important;
-  box-shadow: var(--shadow-gold) !important;
+  box-shadow: var(--shadow-navy) !important;
   border: 1px solid var(--border-primary) !important;
 }
 
@@ -121,7 +130,7 @@
 .hm-pill:hover {
   background: rgba(255, 255, 255, 0.3) !important;
   transform: translateY(-2px) !important;
-  box-shadow: var(--shadow-gold) !important;
+  box-shadow: var(--shadow-navy) !important;
 }
 
 .hm-pill--danger {
@@ -231,7 +240,7 @@
 
 .hm-section__action:hover {
   transform: translateY(-2px) !important;
-  box-shadow: var(--shadow-gold) !important;
+  box-shadow: var(--shadow-navy) !important;
 }
 
 /* ===== Grid ===== */

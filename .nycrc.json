@@ -1,0 +1,25 @@
+{
+  "all": true,
+  "check-coverage": false,
+  "include": [
+    "models/**/*.js",
+    "routes/**/*.js",
+    "services/**/*.js",
+    "middleware/**/*.js"
+  ],
+  "exclude": [
+    "test/**",
+    "scripts/**",
+    "config/**",
+    "**/*.test.js",
+    "node_modules/**"
+  ],
+  "reporter": [
+    "html",
+    "text",
+    "text-summary",
+    "lcov"
+  ],
+  "report-dir": "./coverage",
+  "temp-dir": "./.nyc_output"
+}

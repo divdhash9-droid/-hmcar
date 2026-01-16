@@ -328,7 +328,7 @@ body::before {
   background: var(--gradient-card);
   border: 2px solid var(--border-gold);
   border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-gold), inset 0 1px 0 rgba(212, 175, 55, 0.1);
+  box-shadow: var(--shadow-gold), inset 0 1px 0 rgba(0, 123, 255, 0.1);
   padding: 2.5rem;
   text-align: center;
   transition: var(--transition-smooth);
@@ -355,7 +355,7 @@ body::before {
   left: 50%;
   width: 300px;
   height: 300px;
-  background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(0, 123, 255, 0.15) 0%, transparent 70%);
   transform: translate(-50%, -50%);
   opacity: 0;
   transition: opacity 0.5s ease;
@@ -364,7 +364,7 @@ body::before {
 
 .luxury-stat:hover {
   transform: translateY(-8px) scale(1.03);
-  box-shadow: var(--shadow-gold-intense), var(--glow-gold), inset 0 1px 0 rgba(212, 175, 55, 0.15);
+  box-shadow: var(--shadow-gold-intense), var(--glow-gold), inset 0 1px 0 rgba(0, 123, 255, 0.15);
   border-color: var(--border-gold-bright);
 }
 
@@ -380,14 +380,14 @@ body::before {
   -webkit-text-fill-color: transparent;
   background-clip: text;
   margin-bottom: 0.5rem;
-  text-shadow: 0 4px 8px rgba(212, 175, 55, 0.3);
-  filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.5));
+  text-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+  filter: drop-shadow(0 0 10px rgba(0, 123, 255, 0.5));
   animation: pulseGlow 3s ease-in-out infinite;
 }
 
 @keyframes pulseGlow {
-  0%, 100% { filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.5)); }
-  50% { filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.8)); }
+  0%, 100% { filter: drop-shadow(0 0 10px rgba(0, 123, 255, 0.5)); }
+  50% { filter: drop-shadow(0 0 20px rgba(0, 123, 255, 0.8)); }
 }
 
 .luxury-stat-label {
@@ -407,10 +407,10 @@ body::before {
   align-items: center;
   justify-content: center;
   margin: 0 auto 1.5rem;
-  color: #000000;
+  color: #ffffff;
   font-size: 2rem;
   box-shadow: var(--shadow-gold), var(--glow-gold);
-  border: 3px solid rgba(212, 175, 55, 0.3);
+  border: 3px solid rgba(0, 123, 255, 0.3);
   position: relative;
   overflow: hidden;
 }
@@ -419,7 +419,7 @@ body::before {
   content: '';
   position: absolute;
   inset: -50%;
-  background: conic-gradient(from 0deg, transparent, rgba(212, 175, 55, 0.3), transparent 30%);
+  background: conic-gradient(from 0deg, transparent, rgba(0, 123, 255, 0.3), transparent 30%);
   animation: rotate 3s linear infinite;
 }
 
@@ -429,7 +429,7 @@ body::before {
 
 /* ======== الشريط الجانبي ======== */
 .luxury-sidebar {
-  background: linear-gradient(180deg, #0D0D0D 0%, #000000 100%);
+  background: linear-gradient(180deg, #001f3f 0%, #00152a 100%);
   border-left: 2px solid var(--border-gold);
   width: 300px;
   min-height: 100vh;
@@ -441,7 +441,7 @@ body::before {
   transition: var(--transition-smooth);
   overflow-y: auto;
   overflow-x: hidden;
-  box-shadow: -5px 0 30px rgba(0, 0, 0, 0.8), inset 1px 0 0 rgba(212, 175, 55, 0.1);
+  box-shadow: -5px 0 30px rgba(0, 0, 0, 0.8), inset 1px 0 0 rgba(0, 123, 255, 0.1);
 }
 
 .luxury-sidebar::before {
@@ -467,7 +467,7 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%);
+  background: linear-gradient(135deg, rgba(0, 123, 255, 0.1) 0%, rgba(0, 123, 255, 0.05) 100%);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -478,12 +478,12 @@ body::before {
 
 .luxury-sidebar-logo {
   height: 50px;
-  filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.8)) drop-shadow(0 4px 8px rgba(212, 175, 55, 0.6));
+  filter: drop-shadow(0 0 15px rgba(0, 123, 255, 0.8)) drop-shadow(0 4px 8px rgba(0, 123, 255, 0.6));
   transition: var(--transition-smooth);
 }
 
 .luxury-sidebar-logo:hover {
-  filter: drop-shadow(0 0 25px rgba(212, 175, 55, 1)) drop-shadow(0 4px 12px rgba(212, 175, 55, 0.8));
+  filter: drop-shadow(0 0 25px rgba(0, 123, 255, 1)) drop-shadow(0 4px 12px rgba(0, 123, 255, 0.8));
   transform: scale(1.05);
 }
 
@@ -518,9 +518,9 @@ body::before {
 }
 
 .luxury-nav-item:hover {
-  color: #000000;
+  color: #ffffff;
   transform: translateX(-5px);
-  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
 }
 
 .luxury-nav-item:hover::before {
@@ -528,7 +528,7 @@ body::before {
 }
 
 .luxury-nav-item.active {
-  color: #000000;
+  color: #ffffff;
   background: var(--gradient-primary);
   border-right-color: var(--primary-gold-light);
   font-weight: 700;
@@ -560,7 +560,7 @@ body::before {
   background: var(--gradient-primary);
   padding: 2rem 2.5rem;
   border-bottom: 3px solid var(--primary-gold-light);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 40px rgba(212, 175, 55, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 123, 255, 0.3);
   -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
   position: relative;
@@ -571,7 +571,7 @@ body::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.1), transparent);
+  background: linear-gradient(90deg, transparent, rgba(0, 123, 255, 0.1), transparent);
   animation: slideShine 3s ease-in-out infinite;
 }
 
@@ -588,7 +588,7 @@ body::before {
 }
 
 .luxury-header-title {
-  color: #000000;
+  color: #ffffff;
   font-size: 1.75rem;
   font-weight: 900;
   margin: 0;
@@ -607,7 +607,7 @@ body::before {
 
 /* ======== التنبيهات ======== */
 .luxury-alert {
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(212, 175, 55, 0.03) 100%);
+  background: linear-gradient(135deg, rgba(0, 123, 255, 0.08) 0%, rgba(0, 123, 255, 0.03) 100%);
   border: 2px solid var(--border-gold);
   border-radius: var(--radius-lg);
   padding: 1.25rem 1.5rem;
@@ -615,7 +615,7 @@ body::before {
   display: flex;
   align-items: center;
   gap: 1rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(212, 175, 55, 0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(0, 123, 255, 0.1);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   position: relative;
@@ -660,7 +660,7 @@ body::before {
 
 /* ======== الشارات ======== */
 .luxury-badge {
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0.1) 100%);
+  background: linear-gradient(135deg, rgba(0, 123, 255, 0.2) 0%, rgba(0, 123, 255, 0.1) 100%);
   color: var(--primary-gold);
   border: 2px solid var(--border-gold);
   border-radius: var(--radius-full);
@@ -669,7 +669,7 @@ body::before {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3), inset 0 1px 0 rgba(212, 175, 55, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3), inset 0 1px 0 rgba(0, 123, 255, 0.2);
   position: relative;
   overflow: hidden;
 }
@@ -678,7 +678,7 @@ body::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.2), transparent);
+  background: linear-gradient(90deg, transparent, rgba(0, 123, 255, 0.2), transparent);
   transform: translateX(-100%);
   animation: badgeShine 2s ease-in-out infinite;
 }
@@ -778,7 +778,7 @@ body::before {
 }
 
 .luxury-shimmer {
-  background: linear-gradient(90deg, var(--gradient-card) 0%, rgba(212, 175, 55, 0.05) 50%, var(--gradient-card) 100%);
+  background: linear-gradient(90deg, var(--gradient-card) 0%, rgba(0, 123, 255, 0.05) 50%, var(--gradient-card) 100%);
   background-size: 1000px 100%;
   animation: shimmer 2s infinite;
 }

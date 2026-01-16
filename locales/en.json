@@ -11,6 +11,34 @@
     "logout": "Logout",
     "register": "Register"
   },
+  "about": {
+    "title": "About Us",
+    "subtitle": "Learn about our story and vision",
+    "our_story": "Our Story",
+    "secure_transactions": "Secure Transactions",
+    "secure_desc": "We ensure the highest levels of security in all your transactions",
+    "global_reach": "Global Reach",
+    "global_desc": "We reach all parts of the world with our premium services",
+    "support": "24/7 Support",
+    "support_desc": "Our support team is available to help you anytime",
+    "quality": "High Quality",
+    "quality_desc": "We offer you the best inspected and certified vehicles"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "We are here to help you",
+    "send_message": "Send a Message",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "subject": "Subject",
+    "message": "Message",
+    "submit": "Submit",
+    "success": "Your message has been sent successfully",
+    "info_title": "Contact Information",
+    "address": "Address",
+    "working_hours": "Working Hours"
+  },
   "accessibility": {
     "skipToContent": "Skip to content"
   },

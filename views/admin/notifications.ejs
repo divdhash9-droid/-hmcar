@@ -1,178 +1,231 @@
 <% layout('layout') -%>
-<% var bodyClass = 'modern-admin-dashboard'; %>
+<% var hideNavbar = true; %>
+<% var hideSearch = true; %>
+<% var fullWidth = true; %>
+<% var bodyClass = 'hm-admin-page'; %>
 
-<aside class="modern-sidebar" id="modernSidebar">
-  <div class="modern-sidebar-header">
-    <img src="/public/images/navbar-logo.png" alt="HM CAR" class="modern-sidebar-logo" onerror="this.onerror=null;this.src='/public/images/logo.png';">
-    <button class="modern-sidebar-toggle" id="sidebarToggle" aria-label="تبديل القائمة">
-      <i class="fas fa-bars"></i>
-    </button>
+<link rel="stylesheet" href="/css/admin-luxury.css">
+
+<div class="hm-admin-layout">
+  <!-- Animated Background -->
+  <div class="hm-admin-bg">
+    <div class="hm-admin-bg-gradient"></div>
+    <div class="hm-admin-bg-glow"></div>
   </div>
-  
-  <nav class="modern-sidebar-nav">
-    <div class="modern-nav-section">
-      <div class="modern-nav-section-title">القائمة الرئيسية</div>
-      <a href="/admin" class="modern-nav-item">
-        <i class="fas fa-home"></i>
-        <span>الرئيسية</span>
-      </a>
-    </div>
 
-    <div class="modern-nav-section">
-      <div class="modern-nav-section-title">الإدارة</div>
-      <a href="/admin/cars" class="modern-nav-item">
-        <i class="fas fa-car"></i>
-        <span>السيارات</span>
-      </a>
-      <a href="/admin/orders" class="modern-nav-item">
-        <i class="fas fa-shopping-cart"></i>
-        <span>الطلبات</span>
-      </a>
-      <a href="/admin/users-management" class="modern-nav-item">
-        <i class="fas fa-users-cog"></i>
-        <span>المشرفين</span>
-      </a>
-    </div>
+  <!-- Mobile Toggle -->
+  <button class="hm-mobile-toggle" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+  </button>
 
-    <div class="modern-nav-section">
-      <div class="modern-nav-section-title">الإعدادات</div>
-      <a href="/admin/notifications" class="modern-nav-item active">
-        <i class="fas fa-bell"></i>
-        <span>الإشعارات</span>
-      </a>
-      <a href="/admin/settings/whatsapp" class="modern-nav-item">
-        <i class="fab fa-whatsapp"></i>
-        <span>الواتساب</span>
-      </a>
-      <a href="/admin/settings/footer" class="modern-nav-item">
-        <i class="fas fa-grip-lines"></i>
-        <span>الشريط السفلي</span>
-      </a>
-    </div>
-  </nav>
-</aside>
+  <!-- Sidebar -->
+  <%- include('../partials/admin-sidebar') %>
 
-<main class="modern-main-content">
-  <header class="modern-header">
-    <div class="modern-header-content">
-      <div class="modern-header-left">
-        <div>
-          <h1 class="modern-header-title"><i class="fas fa-bell"></i> إدارة الإشعارات</h1>
-          <p class="modern-header-subtitle">إرسال وإدارة الإشعارات للمستخدمين</p>
+  <!-- Main Content -->
+  <main class="hm-admin-main">
+    <!-- Header -->
+    <header class="hm-admin-header">
+      <div class="hm-header-title">
+        <h1>إدارة الإشعارات</h1>
+        <div class="hm-header-breadcrumb">
+          <a href="/admin">لوحة التحكم</a>
+          <i class="fas fa-chevron-left"></i>
+          <span>الإشعارات</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <div class="hm-admin-content">
+      <!-- Flash Messages -->
+      <% if (flash && flash.message) { %>
+      <div class="hm-admin-alert hm-admin-alert-<%= flash.type || 'info' %>">
+        <i class="fas <%= flash.type === 'success' ? 'fa-check-circle' : flash.type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle' %>"></i>
+        <span><%= flash.message %></span>
+      </div>
+      <% } %>
+
+      <!-- Stats -->
+      <div class="hm-stats-grid">
+        <div class="hm-stat-card">
+          <div class="hm-stat-icon">
+            <i class="fas fa-bell"></i>
+          </div>
+          <div class="hm-stat-info">
+            <div class="hm-stat-label">إجمالي الإشعارات</div>
+            <div class="hm-stat-value"><%= (notifications && notifications.length) || 0 %></div>
+          </div>
+        </div>
+        <div class="hm-stat-card">
+          <div class="hm-stat-icon warning">
+            <i class="fas fa-star"></i>
+          </div>
+          <div class="hm-stat-info">
+            <div class="hm-stat-label">غير مقروءة</div>
+            <div class="hm-stat-value"><%= notifications ? notifications.filter(n => n.status === 'new').length : 0 %></div>
+          </div>
         </div>
       </div>
 
-      <div class="modern-header-actions">
-        <div class="modern-user-menu">
-          <div class="modern-user-avatar">
-            <%= currentUser && currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'A' %>
-          </div>
-          <div class="modern-user-info">
-            <div class="modern-user-name"><%= currentUser ? currentUser.name : 'المدير' %></div>
-            <div class="modern-user-role">مدير النظام</div>
-          </div>
+      <!-- Send Notification Form -->
+      <div class="hm-admin-card">
+        <div class="hm-card-header">
+          <h2 class="hm-card-title">
+            <i class="fas fa-paper-plane"></i>
+            إرسال إشعار جديد
+          </h2>
         </div>
-
-        <a href="/auth/logout" class="modern-btn modern-btn-secondary modern-btn-sm">
-          <i class="fas fa-sign-out-alt"></i>
-          <span>خروج</span>
-        </a>
-      </div>
-    </div>
-  </header>
-
-  <div class="modern-dashboard-content">
-    <% if (flash && flash.message) { %>
-      <div class="modern-card" style="background: <%= flash.type === 'success' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)' %>; border-color: <%= flash.type === 'success' ? 'var(--success)' : 'var(--danger)' %>;">
-        <div style="display: flex; align-items: center; gap: 1rem;">
-          <i class="fas fa-<%= flash.type === 'success' ? 'check-circle' : 'exclamation-triangle' %>" style="font-size: 1.5rem; color: <%= flash.type === 'success' ? 'var(--success)' : 'var(--danger)' %>;"></i>
-          <div style="flex: 1;">
-            <strong><%= flash.message %></strong>
-          </div>
-        </div>
-      </div>
-    <% } %>
-
-    <div class="modern-card">
-      <h3 class="modern-card-title">إرسال إشعار جديد</h3>
-      
-      <form action="/admin/notifications/send" method="POST" style="margin-top: var(--spacing-lg);">
-        <div class="row g-3">
-          <div class="col-md-6">
-            <label class="form-label">العنوان</label>
-            <input type="text" name="title" class="form-control" required placeholder="عنوان الإشعار">
-          </div>
-
-          <div class="col-md-6">
-            <label class="form-label">النوع</label>
-            <select name="type" class="form-control" required>
-              <option value="info">معلومات</option>
-              <option value="success">نجاح</option>
-              <option value="warning">تحذير</option>
-              <option value="error">خطأ</option>
-            </select>
-          </div>
-
-          <div class="col-12">
-            <label class="form-label">الرسالة</label>
-            <textarea name="message" class="form-control" rows="4" required placeholder="محتوى الإشعار"></textarea>
-          </div>
-
-          <div class="col-md-6">
-            <label class="form-label">المستلمون</label>
-            <select name="recipients" class="form-control" required>
-              <option value="all">جميع المستخدمين</option>
-              <option value="buyers">المشترين فقط</option>
-              <option value="sellers">البائعين فقط</option>
-              <option value="admins">المشرفين فقط</option>
-            </select>
-          </div>
-
-          <div class="col-md-6">
-            <label class="form-label">الرابط (اختياري)</label>
-            <input type="text" name="link" class="form-control" placeholder="/cars">
-          </div>
-
-          <div class="col-12">
-            <button type="submit" class="modern-btn modern-btn-primary">
+        <div class="hm-card-body">
+          <form action="/admin/notifications/send" method="POST">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <div class="hm-admin-form-group">
+                <label class="hm-admin-label">العنوان</label>
+                <input type="text" name="title" class="hm-admin-input" required placeholder="عنوان الإشعار">
+              </div>
+              
+              <div class="hm-admin-form-group">
+                <label class="hm-admin-label">النوع</label>
+                <select name="type" class="hm-admin-input" required>
+                  <option value="info">معلومات</option>
+                  <option value="success">نجاح</option>
+                  <option value="warning">تحذير</option>
+                  <option value="error">خطأ</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="hm-admin-form-group">
+              <label class="hm-admin-label">الرسالة</label>
+              <textarea name="message" class="hm-admin-input" rows="4" required placeholder="محتوى الإشعار..."></textarea>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <div class="hm-admin-form-group">
+                <label class="hm-admin-label">المستلمون</label>
+                <select name="recipients" class="hm-admin-input" required>
+                  <option value="all">جميع المستخدمين</option>
+                  <option value="buyers">المشترين فقط</option>
+                  <option value="sellers">البائعين فقط</option>
+                  <option value="admins">المشرفين فقط</option>
+                </select>
+              </div>
+              
+              <div class="hm-admin-form-group">
+                <label class="hm-admin-label">الرابط (اختياري)</label>
+                <input type="text" name="link" class="hm-admin-input" placeholder="/cars">
+              </div>
+            </div>
+            
+            <button type="submit" class="hm-btn-admin hm-btn-admin-primary">
               <i class="fas fa-paper-plane"></i>
               إرسال الإشعار
             </button>
-          </div>
+          </form>
         </div>
-      </form>
-    </div>
+      </div>
 
-    <div class="modern-card" style="margin-top: var(--spacing-xl);">
-      <h3 class="modern-card-title">الإشعارات الأخيرة</h3>
-      
-      <div class="table-responsive" style="margin-top: var(--spacing-lg);">
-        <table class="modern-table">
-          <thead>
-            <tr>
-              <th>العنوان</th>
-              <th>النوع</th>
-              <th>المستلمون</th>
-              <th>التاريخ</th>
-              <th>الحالة</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td colspan="5" style="text-align: center; padding: var(--spacing-xl); color: var(--text-secondary);">
-                لا توجد إشعارات حتى الآن
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <!-- Recent Notifications -->
+      <div class="hm-admin-card">
+        <div class="hm-card-header">
+          <h2 class="hm-card-title">
+            <i class="fas fa-history"></i>
+            الإشعارات الأخيرة
+          </h2>
+          <% if (notifications && notifications.length > 0) { %>
+          <form method="POST" action="/admin/notifications/mark-all-seen" style="display: inline;">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <button type="submit" class="hm-btn-admin hm-btn-admin-secondary hm-btn-admin-sm">
+              <i class="fas fa-check-double"></i>
+              تعليم الكل كمقروء
+            </button>
+          </form>
+          <% } %>
+        </div>
+        <div class="hm-card-body" style="padding: 0;">
+          <% if (notifications && notifications.length > 0) { %>
+          <table class="hm-admin-table">
+            <thead>
+              <tr>
+                <th>العنوان</th>
+                <th>المستخدم</th>
+                <th>التاريخ</th>
+                <th>الحالة</th>
+                <th>إجراء</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% notifications.forEach(function(n) { %>
+              <tr>
+                <td style="color: var(--hm-white); font-weight: 600;">
+                  <%= (n.car && n.car.title) ? n.car.title : (n.title || 'إشعار جديد') %>
+                </td>
+                <td><%= (n.user && n.user.name) ? n.user.name : '-' %></td>
+                <td>
+                  <small style="color: var(--hm-gray);">
+                    <%= n.createdAt ? new Date(n.createdAt).toLocaleDateString('ar-SA') : '-' %>
+                  </small>
+                </td>
+                <td>
+                  <span class="hm-admin-badge <%= n.status === 'new' ? 'hm-admin-badge-warning' : 'hm-admin-badge-success' %>">
+                    <i class="fas <%= n.status === 'new' ? 'fa-star' : 'fa-check' %>"></i>
+                    <%= n.status === 'new' ? 'جديد' : 'مقروء' %>
+                  </span>
+                </td>
+                <td>
+                  <% if (n.status === 'new') { %>
+                  <form method="POST" action="/admin/notifications/<%= n._id %>/seen" style="display: inline;">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <button type="submit" class="hm-btn-admin hm-btn-admin-primary hm-btn-admin-sm" title="تعليم كمقروء">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </form>
+                  <% } else { %>
+                  <span style="color: var(--hm-gray);">-</span>
+                  <% } %>
+                </td>
+              </tr>
+              <% }); %>
+            </tbody>
+          </table>
+          <% } else { %>
+          <div class="hm-empty-state">
+            <div class="hm-empty-icon">
+              <i class="fas fa-bell-slash"></i>
+            </div>
+            <h3 class="hm-empty-title">لا توجد إشعارات</h3>
+            <p class="hm-empty-text">سيتم عرض الإشعارات هنا عند إرسالها</p>
+          </div>
+          <% } %>
+        </div>
       </div>
     </div>
-  </div>
-</main>
+  </main>
+</div>
+
+<style>
+@media (max-width: 768px) {
+  div[style*="grid-template-columns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+</style>
 
 <script>
-// Sidebar Toggle
-document.getElementById('sidebarToggle')?.addEventListener('click', function() {
-  document.getElementById('modernSidebar')?.classList.toggle('active');
+function toggleSidebar() {
+  const sidebar = document.getElementById('adminSidebar');
+  sidebar.classList.toggle('open');
+}
+
+document.addEventListener('click', function(e) {
+  const sidebar = document.getElementById('adminSidebar');
+  const toggle = document.querySelector('.hm-mobile-toggle');
+  
+  if (window.innerWidth <= 1024) {
+    if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+      sidebar.classList.remove('open');
+    }
+  }
 });
 </script>

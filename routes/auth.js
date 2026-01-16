@@ -1,4 +1,4 @@
-﻿﻿﻿﻿// routes/auth.js
+﻿﻿// routes/auth.js
 // مسارات المصادقة (Authentication): تسجيل، تسجيل الدخول/الخروج
 // شرح بالعربي:
 // - هذا الملف يتعامل مع صفحات وعمليات المصادقة: عرض صفحة الدخول، تسجيل الدخول للمشتري والأدمن،
@@ -67,7 +67,7 @@ router.get('/login', (req, res) => {
   const isAdminLogin = req.query.admin === 'true';
   
   console.log('📄 Rendering login page, admin mode:', isAdminLogin);
-  res.render('auth/login-v2', getLoginViewData(req, isAdminLogin, { bodyClass: 'auth-page modern-auth hm-login-v2 hm-login-v2--light' }));
+  res.render('auth/login', getLoginViewData(req, isAdminLogin, { bodyClass: 'auth-page modern-auth hm-login-premium' }));
 });
 
 // تنفيذ تسجيل الدخول
@@ -95,19 +95,19 @@ router.post('/login', async (req, res) => {
 
     if (!['buyer', 'admin', 'super_admin'].includes(role)) {
       console.log('❌ Invalid role:', role);
-      return res.render('auth/login-v2', getLoginViewData(req, role === 'admin' || role === 'super_admin', { bodyClass: 'auth-page modern-auth hm-login-v2 hm-login-v2--light', error: 'نوع المستخدم غير صالح.' }));
+      return res.render('auth/login', getLoginViewData(req, role === 'admin' || role === 'super_admin', { bodyClass: 'auth-page modern-auth hm-login-premium', error: 'نوع المستخدم غير صالح.' }));
     }
 
     // --- تسجيل دخول العميل (Buyer) بالاسم فقط ---
     if (role === 'buyer') {
       if (!identifier) {
-        return res.render('auth/login-v2', getLoginViewData(req, false, { bodyClass: 'auth-page modern-auth hm-login-v2 hm-login-v2--light', error: 'يرجى إدخال اسم المستخدم.' }));
+        return res.render('auth/login', getLoginViewData(req, false, { bodyClass: 'auth-page modern-auth hm-login-premium', error: 'يرجى إدخال اسم المستخدم.' }));
       }
 
       // التحقق من أن الاسم يحتوي على اسمين على الأقل (اسم ولقب)
       const nameParts = identifier.split(/\s+/).filter(Boolean);
       if (nameParts.length < 2) {
-        return res.render('auth/login-v2', getLoginViewData(req, false, { bodyClass: 'auth-page modern-auth hm-login-v2 hm-login-v2--light', error: 'الاسم يجب أن يتكون من اسمين على الأقل.' }));
+        return res.render('auth/login', getLoginViewData(req, false, { bodyClass: 'auth-page modern-auth hm-login-premium', error: 'الاسم يجب أن يتكون من اسمين على الأقل.' }));
       }
 
       // البحث عن المستخدم بالاسم (مفتاح اسم المشتري)
@@ -125,7 +125,7 @@ router.post('/login', async (req, res) => {
       } else {
         // تأكيد الدور وتحديث بيانات الجلسة
         if (user.role !== 'buyer') {
-          return res.render('auth/login-v2', getLoginViewData(req, false, { bodyClass: 'auth-page modern-auth hm-login-v2 hm-login-v2--light', error: 'حساب غير صالح للدخول كمشتري.' }));
+          return res.render('auth/login', getLoginViewData(req, false, { bodyClass: 'auth-page modern-auth hm-login-premium', error: 'حساب غير صالح للدخول كمشتري.' }));
         }
         user.activeSessionId = req.sessionID;
         user.lastLoginAt = new Date();
@@ -159,17 +159,17 @@ router.post('/login', async (req, res) => {
       const suppliedEmail = String(identifier || '').trim().toLowerCase();
 
       if (!suppliedEmail || !suppliedPassword) {
-        return res.render('auth/login-v2', getLoginViewData(req, true, { bodyClass: 'auth-page modern-auth hm-login-v2 hm-login-v2--light', error: 'يرجى إدخال البريد الإلكتروني وكلمة المرور للأدمن.' }));
+        return res.render('auth/login', getLoginViewData(req, true, { bodyClass: 'auth-page modern-auth hm-login-premium', error: 'يرجى إدخال البريد الإلكتروني وكلمة المرور للأدمن.' }));
       }
 
       const adminUser = await User.findOne({ email: suppliedEmail, role: { $in: ['admin', 'super_admin'] } });
       if (!adminUser) {
-        return res.render('auth/login-v2', getLoginViewData(req, true, { bodyClass: 'auth-page modern-auth hm-login-v2 hm-login-v2--light', error: 'بيانات الاعتماد غير صحيحة أو حساب الأدمن غير موجود.' }));
+        return res.render('auth/login', getLoginViewData(req, true, { bodyClass: 'auth-page modern-auth hm-login-premium', error: 'بيانات الاعتماد غير صحيحة أو حساب الأدمن غير موجود.' }));
       }
 
       const passwordMatch = await adminUser.comparePassword(suppliedPassword);
       if (!passwordMatch) {
-        return res.render('auth/login-v2', getLoginViewData(req, true, { bodyClass: 'auth-page modern-auth hm-login-v2 hm-login-v2--light', error: 'بيانات الاعتماد غير صحيحة.' }));
+        return res.render('auth/login', getLoginViewData(req, true, { bodyClass: 'auth-page modern-auth hm-login-premium', error: 'بيانات الاعتماد غير صحيحة.' }));
       }
 
       // تم تعطيل التحقق الإضافي عبر Firebase مؤقتاً للسماح بتسجيل الدخول المحلي للمسؤولين.
@@ -216,7 +216,7 @@ router.post('/login', async (req, res) => {
   } catch (e) {
     console.error('Auth login error:', e);
     const isAdm = req.body.loginRole === 'admin' || !!(req.body.email && req.body.password);
-    res.render('auth/login-v2', getLoginViewData(req, isAdm, { bodyClass: 'auth-page modern-auth hm-login-v2 hm-login-v2--light', error: 'خطأ في تسجيل الدخول' }));
+    res.render('auth/login', getLoginViewData(req, isAdm, { bodyClass: 'auth-page modern-auth hm-login-premium', error: 'خطأ في تسجيل الدخول' }));
   }
 });
 

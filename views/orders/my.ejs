@@ -1,0 +1,289 @@
+<% layout('layout') -%>
+<% var hideNavbar = false; %>
+<% var bodyClass = 'orders-page'; %>
+
+<link rel="stylesheet" href="/public/css/design-system.css">
+
+<style>
+/* Orders Page Styles */
+.hm-orders-container {
+  min-height: 100vh;
+  padding: 2rem;
+  background: linear-gradient(135deg, #0a1628 0%, #001f3f 50%, #0a1628 100%);
+}
+
+.hm-orders-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  border: 1px solid rgba(0, 123, 255, 0.2);
+}
+
+.hm-orders-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+  font-family: 'Cairo', 'Tajawal', sans-serif;
+}
+
+.hm-orders-subtitle {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1rem;
+}
+
+.hm-orders-grid {
+  display: grid;
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.hm-order-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  border: 1px solid rgba(0, 123, 255, 0.2);
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.hm-order-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 123, 255, 0.2);
+  border-color: rgba(0, 123, 255, 0.4);
+}
+
+.hm-order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hm-order-number {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #4da3ff;
+}
+
+.hm-order-status {
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.hm-order-status.pending {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.hm-order-status.confirmed {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.hm-order-status.cancelled {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.hm-order-status.completed {
+  background: rgba(0, 123, 255, 0.2);
+  color: #4da3ff;
+  border: 1px solid rgba(0, 123, 255, 0.3);
+}
+
+.hm-order-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.hm-order-detail {
+  text-align: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+
+.hm-order-detail-label {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 0.3rem;
+}
+
+.hm-order-detail-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.hm-order-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.8rem;
+}
+
+.hm-order-btn {
+  padding: 0.6rem 1.2rem;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  font-family: 'Cairo', sans-serif;
+}
+
+.hm-order-btn-primary {
+  background: linear-gradient(145deg, #007bff 0%, #0056b3 100%);
+  color: #ffffff;
+  border: 1px solid #4da3ff;
+}
+
+.hm-order-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+  color: #ffffff;
+}
+
+.hm-empty-orders {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  border: 1px solid rgba(0, 123, 255, 0.2);
+}
+
+.hm-empty-icon {
+  font-size: 4rem;
+  color: rgba(255, 255, 255, 0.3);
+  margin-bottom: 1rem;
+}
+
+.hm-empty-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+.hm-empty-text {
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 1.5rem;
+}
+
+.hm-empty-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.5rem;
+  background: linear-gradient(145deg, #007bff 0%, #0056b3 100%);
+  color: #ffffff;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.hm-empty-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+  color: #ffffff;
+}
+</style>
+
+<div class="hm-orders-container">
+  <div class="hm-orders-header">
+    <h1 class="hm-orders-title">
+      <i class="fas fa-receipt"></i>
+      طلباتي
+    </h1>
+    <p class="hm-orders-subtitle">عرض جميع طلباتك وفواتيرك</p>
+  </div>
+
+  <% if (orders && orders.length > 0) { %>
+    <div class="hm-orders-grid">
+      <% orders.forEach(function(order) { %>
+        <div class="hm-order-card">
+          <div class="hm-order-header">
+            <span class="hm-order-number">
+              <i class="fas fa-hashtag"></i>
+              <%= order.orderNumber || order._id %>
+            </span>
+            <span class="hm-order-status <%= order.status || 'pending' %>">
+              <% if (order.status === 'pending') { %>
+                <i class="fas fa-clock"></i> قيد الانتظار
+              <% } else if (order.status === 'confirmed') { %>
+                <i class="fas fa-check"></i> مؤكد
+              <% } else if (order.status === 'completed') { %>
+                <i class="fas fa-check-double"></i> مكتمل
+              <% } else if (order.status === 'cancelled') { %>
+                <i class="fas fa-times"></i> ملغي
+              <% } else { %>
+                <i class="fas fa-question"></i> <%= order.status %>
+              <% } %>
+            </span>
+          </div>
+          
+          <div class="hm-order-details">
+            <div class="hm-order-detail">
+              <div class="hm-order-detail-label">التاريخ</div>
+              <div class="hm-order-detail-value">
+                <%= order.createdAt ? new Date(order.createdAt).toLocaleDateString('ar-SA') : '-' %>
+              </div>
+            </div>
+            <div class="hm-order-detail">
+              <div class="hm-order-detail-label">عدد العناصر</div>
+              <div class="hm-order-detail-value">
+                <%= order.items ? order.items.length : 0 %>
+              </div>
+            </div>
+            <div class="hm-order-detail">
+              <div class="hm-order-detail-label">الإجمالي (ريال)</div>
+              <div class="hm-order-detail-value">
+                <%= order.pricing && order.pricing.grandTotalSar ? Number(order.pricing.grandTotalSar).toLocaleString('en-US') : '0' %>
+              </div>
+            </div>
+            <div class="hm-order-detail">
+              <div class="hm-order-detail-label">الإجمالي (دولار)</div>
+              <div class="hm-order-detail-value">
+                $<%= order.pricing && order.pricing.grandTotalUsd ? Number(order.pricing.grandTotalUsd).toLocaleString('en-US') : '0' %>
+              </div>
+            </div>
+          </div>
+          
+          <div class="hm-order-actions">
+            <a href="/orders/<%= order._id %>/invoice" class="hm-order-btn hm-order-btn-primary">
+              <i class="fas fa-file-invoice"></i>
+              عرض الفاتورة
+            </a>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  <% } else { %>
+    <div class="hm-empty-orders">
+      <div class="hm-empty-icon">
+        <i class="fas fa-shopping-cart"></i>
+      </div>
+      <h2 class="hm-empty-title">لا توجد طلبات</h2>
+      <p class="hm-empty-text">لم تقم بإجراء أي طلبات بعد</p>
+      <a href="/cars" class="hm-empty-btn">
+        <i class="fas fa-car"></i>
+        تصفح السيارات
+      </a>
+    </div>
+  <% } %>
+</div>

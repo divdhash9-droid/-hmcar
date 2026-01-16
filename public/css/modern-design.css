@@ -1,36 +1,61 @@
 /* public/css/modern-design.css */
 
 :root {
-    /* Luxury Navy + White theme */
-    --primary-color: #0b1f3a;
+    /* Navy Blue + Snow White Theme - الأزرق الكحلي والأبيض الثلجي */
+    --primary-color: #001f3f;
+    --primary-color-light: #003366;
+    --primary-color-lighter: #004080;
     --secondary-color: #ffffff;
-    --accent-color: #e9eef6;
+    --accent-color: #007bff;
+    --accent-color-light: #3395ff;
+    --accent-color-dark: #0056b3;
+    
+    /* Snow White Colors */
+    --snow-white: #ffffff;
+    --snow-offwhite: #f8f9fa;
+    --snow-pearl: #f5f7fa;
+    
+    /* Text Colors */
     --text-color: #ffffff;
-    --dark-text-color: #0b1f3a;
-    --primary-color-light: #133b6b;
-    --text-color-secondary: rgba(11, 31, 58, 0.78);
-    --section-bg-color: #f6f8fc;
-    --border-color: rgba(11, 31, 58, 0.14);
-    /* Keep variable names for compatibility */
-    --gold-color: #eef3fb;
-    --gold-gradient: linear-gradient(135deg, #0b1f3a 0%, #133b6b 50%, #0b1f3a 100%);
-    --gold-shadow: 0 6px 18px rgba(11, 31, 58, 0.22);
-    /* Legacy/JS compatibility (remove gold look globally) */
-    --gold-primary: var(--primary-color);
-    --border-gold: rgba(11, 31, 58, 0.18);
-    --shadow-gold: 0 10px 30px rgba(11, 31, 58, 0.18);
-    --bg-card: #ffffff;
+    --dark-text-color: #001f3f;
+    --text-color-secondary: rgba(0, 31, 63, 0.78);
+    --text-muted: rgba(0, 31, 63, 0.72);
     --text-primary: var(--dark-text-color);
-    --text-muted: rgba(11, 31, 58, 0.72);
+    
+    /* Background Colors */
+    --section-bg-color: var(--snow-pearl);
+    --background-color: var(--snow-white);
+    --bg-card: var(--snow-white);
+    
+    /* Border Colors */
+    --border-color: rgba(0, 31, 63, 0.14);
+    --border-gold: rgba(0, 31, 63, 0.18);
+    
+    /* Gradients */
+    --gold-gradient: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-color-light) 100%);
+    --navy-gradient: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color-light) 100%);
+    
+    /* Shadows */
+    --gold-shadow: 0 6px 18px rgba(0, 31, 63, 0.22);
+    --shadow-gold: 0 10px 30px rgba(0, 31, 63, 0.18);
+    --shadow-sm: 0 2px 4px rgba(0, 31, 63, 0.1);
+    --shadow-md: 0 4px 8px rgba(0, 31, 63, 0.2);
+    --box-shadow: 0 4px 8px rgba(0, 31, 63, 0.1);
+    
+    /* Legacy compatibility */
+    --gold-primary: var(--accent-color);
+    --gold-color: var(--snow-pearl);
+    
+    /* Border Radius */
     --radius-md: 12px;
-    --transition-smooth: all 0.3s ease;
     --border-radius: 8px;
     --border-radius-sm: 6px;
-    --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    
+    /* Transitions */
+    --transition-smooth: all 0.3s ease;
     --transition-speed: 0.3s;
-    --background-color: #ffffff;
-    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
-    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.2);
+    
+    /* Status Colors */
     --danger-color: #e74c3c;
     --warning-color: #f39c12;
     --success-color: #2ecc71;
@@ -77,19 +102,19 @@ a:not(.btn):not(.nav-link):not(.dropdown-item):hover {
 /* Forms: ensure labels/placeholders are readable */
 .form-label,
 .form-floating > label {
-    color: rgba(11, 31, 58, 0.78);
+    color: rgba(0, 31, 63, 0.78);
 }
 
 input::placeholder,
 textarea::placeholder {
-    color: rgba(11, 31, 58, 0.55);
+    color: rgba(0, 31, 63, 0.55);
     opacity: 1;
 }
 
 /* --- Buttons: 3D, readable text + icons --- */
 :root {
-    --btn-3d-shadow: 0 12px 22px rgba(11, 31, 58, 0.18);
-    --btn-3d-shadow-hover: 0 16px 30px rgba(11, 31, 58, 0.22);
+    --btn-3d-shadow: 0 12px 22px rgba(0, 31, 63, 0.18);
+    --btn-3d-shadow-hover: 0 16px 30px rgba(0, 31, 63, 0.22);
     --btn-3d-inset: inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
@@ -121,7 +146,7 @@ a.btn:not(.btn-link):active,
 .login-btn:active,
 .signup-btn:active {
     transform: translateY(1px);
-    box-shadow: var(--btn-3d-inset), 0 8px 16px rgba(11, 31, 58, 0.16);
+    box-shadow: var(--btn-3d-inset), 0 8px 16px rgba(0, 31, 63, 0.16);
 }
 
 .btn i,
@@ -136,12 +161,12 @@ a.btn:not(.btn-link):active,
 /* Improve contrast for primary buttons on this theme */
 .btn.btn-primary {
     background: var(--gold-gradient);
-    border-color: rgba(11, 31, 58, 0.25);
+    border-color: rgba(0, 31, 63, 0.25);
     color: #ffffff;
 }
 
 .btn.btn-outline-secondary {
-    border-color: rgba(11, 31, 58, 0.22);
+    border-color: rgba(0, 31, 63, 0.22);
     color: var(--primary-color);
     background: #ffffff;
 }
@@ -149,7 +174,7 @@ a.btn:not(.btn-link):active,
 .btn.btn-outline-secondary:hover {
     color: #ffffff;
     background: var(--gold-gradient);
-    border-color: rgba(11, 31, 58, 0.25);
+    border-color: rgba(0, 31, 63, 0.25);
 }
 
 /* Global back button (رجوع) */
@@ -175,7 +200,7 @@ a.btn:not(.btn-link):active,
 }
 
 .hm-btn {
-    border: 1px solid rgba(11, 31, 58, 0.18);
+    border: 1px solid rgba(0, 31, 63, 0.18);
     background: #ffffff;
     color: var(--primary-color);
     border-radius: 14px;

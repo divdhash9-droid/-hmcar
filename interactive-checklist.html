@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>قائمة التحقق من نشر HM CAR - تفاعلية</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #d4af37;
+            --black: #0a0a0a;
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--black) 0%, #1a1a1a 100%);
+            color: var(--white);
+            min-height: 100vh;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: rgba(212, 175, 55, 0.1);
+            border-radius: 15px;
+            border: 1px solid var(--gold);
+        }
+
+        .header h1 {
+            color: var(--gold);
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .progress-container {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .progress {
+            height: 25px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, var(--gold), #f4e4bc);
+            transition: width 0.5s ease;
+        }
+
+        .checklist-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .section-title {
+            color: var(--gold);
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .checklist-item:hover {
+            background: rgba(212, 175, 55, 0.1);
+            transform: translateX(5px);
+        }
+
+        .checklist-item.checked {
+            background: rgba(212, 175, 55, 0.15);
+            border-left: 3px solid var(--gold);
+        }
+
+        .checklist-checkbox {
+            width: 20px;
+            height: 20px;
+            margin-left: 1rem;
+            cursor: pointer;
+        }
+
+        .checklist-text {
+            flex: 1;
+            font-size: 1rem;
+        }
+
+        .checklist-item.checked .checklist-text {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        .action-buttons {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 1000;
+        }
+
+        .btn-custom {
+            background: var(--gold);
+            color: var(--black);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-custom:hover {
+            background: #f4e4bc;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(212, 175, 55, 0.1);
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid var(--gold);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--gold);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .save-indicator {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            padding: 0.5rem 1rem;
+            background: rgba(76, 175, 80, 0.9);
+            color: white;
+            border-radius: 20px;
+            display: none;
+            z-index: 1001;
+        }
+
+        .save-indicator.show {
+            display: block;
+            animation: fadeInOut 2s ease;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1rem;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .action-buttons {
+                bottom: 1rem;
+                flex-direction: column;
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="save-indicator" id="saveIndicator">
+        <i class="fas fa-check"></i> تم الحفظ تلقائياً
+    </div>
+
+    <div class="main-container">
+        <div class="header">
+            <h1><i class="fas fa-clipboard-check"></i> قائمة التحقق من نشر HM CAR</h1>
+            <p class="lead">قائمة تفاعلية للتحقق من جميع جوانب المنصة بعد النشر</p>
+        </div>
+
+        <div class="progress-container">
+            <h3>نسبة الإنجاز</h3>
+            <div class="progress">
+                <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%">
+                    0%
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-number" id="totalItems">0</div>
+                <div class="stat-label">إجمالي العناصر</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="checkedItems">0</div>
+                <div class="stat-label">عناصر مكتملة</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="remainingItems">0</div>
+                <div class="stat-label">عناصر متبقية</div>
+            </div>
+        </div>
+
+        <div id="checklistContainer">
+            <!-- سيتم تحميل القائمة هنا -->
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <button class="btn btn-custom" onclick="resetChecklist()">
+            <i class="fas fa-redo"></i> إعادة تعيين
+        </button>
+        <button class="btn btn-custom" onclick="exportResults()">
+            <i class="fas fa-download"></i> تصدير النتائج
+        </button>
+        <button class="btn btn-custom" onclick="printChecklist()">
+            <i class="fas fa-print"></i> طباعة
+        </button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // بيانات القائمة
+        const checklistData = [
+            {
+                title: "الموقع الأساسي",
+                icon: "fas fa-globe",
+                items: [
+                    { id: "main-link", text: "يفتح الرابط الرئيسي: https://-hmcar.vercel.app", checked: false },
+                    { id: "logo-display", text: "يظهر شعار HM CAR بشكل واضح", checked: false },
+                    { id: "colors-correct", text: "الألوان صحيحة (ذهبي وأسود فاخر)", checked: false },
+                    { id: "text-clear", text: "النصوص واضحة باللغة العربية وبدعم RTL", checked: false },
+                    { id: "no-errors", text: "لا يوجد أخطاء في كونسول المتصفح", checked: false }
+                ]
+            },
+            {
+                title: "تطبيق الويب التقدمي (PWA)",
+                icon: "fas fa-mobile-alt",
+                items: [
+                    { id: "install-button", text: "يظهر زر 'تثبيت التطبيق' في المتصفح", checked: false },
+                    { id: "install-works", text: "التثبيت يعمل على الهاتف المحمول", checked: false },
+                    { id: "icon-shows", text: "الأيقونة تظهر على الشاشة الرئيسية", checked: false },
+                    { id: "app-opens", text: "يفتح كتطبيق حقيقي بدون شريط المتصفح", checked: false },
+                    { id: "offline-works", text: "يعمل بدون إنترنت (الصفحات المخزنة مؤقتاً)", checked: false }
+                ]
+            },
+            {
+                title: "الصفحات الرئيسية والوظائف",
+                icon: "fas fa-home",
+                items: [
+                    { id: "explore-buttons", text: "أزرار 'استكشف المزادات' تعمل وتنتقل للصفحة الصحيحة", checked: false },
+                    { id: "login-buttons", text: "أزرار 'تسجيل الدخول' تعمل وتظهر النموذج", checked: false },
+                    { id: "search-works", text: "البحث يعمل ويعرض نتائج صحيحة", checked: false },
+                    { id: "stats-show", text: "الإحصائيات تظهر على الصفحة الرئيسية", checked: false },
+                    { id: "navigation-smooth", text: "التنقل بين الصفحات سلس وسريع", checked: false }
+                ]
+            },
+            {
+                title: "التصميم والتجاوب",
+                icon: "fas fa-palette",
+                items: [
+                    { id: "responsive", text: "متجاوب على جميع الأجهزة (موبايل، تابلت، ديسكتوب)", checked: false },
+                    { id: "gold-colors", text: "الألوان ذهبية فاخرة متسقة في جميع الصفحات", checked: false },
+                    { id: "fonts-clear", text: "الخطوط واضحة وسهلة القراءة", checked: false },
+                    { id: "animations-smooth", text: "الحركات سلسة وليست بطيئة", checked: false },
+                    { id: "rtl-works", text: "الواجهة RTL تعمل بشكل صحيح", checked: false }
+                ]
+            },
+            {
+                title: "الأداء والسرعة",
+                icon: "fas fa-tachometer-alt",
+                items: [
+                    { id: "fast-loading", text: "الموقع سريع (أقل من 3 ثواني للتحميل)", checked: false },
+                    { id: "images-load", text: "الصور تتحمل بسرعة", checked: false },
+                    { id: "no-console-errors", text: "لا يوجد أخطاء في كونسول المتصفح", checked: false },
+                    { id: "links-work", text: "الروابط الداخلية تعمل جميعها", checked: false },
+                    { id: "forms-submit", text: "النماذج ترسل البيانات بشكل صحيح", checked: false }
+                ]
+            },
+            {
+                title: "وظائف المستخدمين",
+                icon: "fas fa-users",
+                items: [
+                    { id: "register-works", text: "التسجيل الجديد يعمل", checked: false },
+                    { id: "login-works", text: "تسجيل الدخول يعمل", checked: false },
+                    { id: "password-reset", text: "استعادة كلمة المرور تعمل", checked: false },
+                    { id: "profile-update", text: "تحديث الملف الشخصي يعمل", checked: false },
+                    { id: "logout-works", text: "تسجيل الخروج يعمل", checked: false }
+                ]
+            },
+            {
+                title: "وظائف المزادات",
+                icon: "fas fa-gavel",
+                items: [
+                    { id: "cars-display", text: "عرض السيارات يعمل", checked: false },
+                    { id: "parts-display", text: "عرض قطع الغيار يعمل", checked: false },
+                    { id: "advanced-search", text: "البحث المتقدم يعمل", checked: false },
+                    { id: "category-filter", text: "الفلترة حسب الفئة تعمل", checked: false },
+                    { id: "price-sort", text: "الفرز حسب السعر يعمل", checked: false }
+                ]
+            },
+            {
+                title: "لوحة التحكم (للأدمن)",
+                icon: "fas fa-cog",
+                items: [
+                    { id: "admin-login", text: "دخول الأدمن يعمل", checked: false },
+                    { id: "stats-display", text: "عرض الإحصائيات يعمل", checked: false },
+                    { id: "car-management", text: "إدارة السيارات تعمل", checked: false },
+                    { id: "user-management", text: "إدارة المستخدمين تعمل", checked: false },
+                    { id: "auction-management", text: "إدارة المزادات تعمل", checked: false }
+                ]
+            }
+        ];
+
+        // تحميل القائمة عند بدء الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            loadChecklist();
+            renderChecklist();
+            updateStats();
+        });
+
+        // تحميل القائمة من التخزين المحلي
+        function loadChecklist() {
+            const saved = localStorage.getItem('hmcar-checklist');
+            if (saved) {
+                const savedData = JSON.parse(saved);
+                checklistData.forEach((section, sectionIndex) => {
+                    section.items.forEach((item, itemIndex) => {
+                        if (savedData[sectionIndex] && savedData[sectionIndex].items[itemIndex]) {
+                            item.checked = savedData[sectionIndex].items[itemIndex].checked;
+                        }
+                    });
+                });
+            }
+        }
+
+        // حفظ القائمة في التخزين المحلي
+        function saveChecklist() {
+            localStorage.setItem('hmcar-checklist', JSON.stringify(checklistData));
+            showSaveIndicator();
+        }
+
+        // عرض مؤشر الحفظ
+        function showSaveIndicator() {
+            const indicator = document.getElementById('saveIndicator');
+            indicator.classList.add('show');
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 2000);
+        }
+
+        // عرض القائمة
+        function renderChecklist() {
+            const container = document.getElementById('checklistContainer');
+            container.innerHTML = '';
+
+            checklistData.forEach((section, sectionIndex) => {
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = 'checklist-section';
+                
+                const titleDiv = document.createElement('div');
+                titleDiv.className = 'section-title';
+                titleDiv.innerHTML = `<i class="${section.icon}"></i> ${section.title}`;
+                sectionDiv.appendChild(titleDiv);
+
+                section.items.forEach((item, itemIndex) => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = `checklist-item ${item.checked ? 'checked' : ''}`;
+                    itemDiv.onclick = () => toggleItem(sectionIndex, itemIndex);
+                    
+                    itemDiv.innerHTML = `
+                        <input type="checkbox" 
+                               class="checklist-checkbox" 
+                               id="item-${sectionIndex}-${itemIndex}"
+                               ${item.checked ? 'checked' : ''}
+                               onclick="event.stopPropagation()">
+                        <label class="checklist-text" for="item-${sectionIndex}-${itemIndex}">
+                            ${item.text}
+                        </label>
+                    `;
+                    
+                    sectionDiv.appendChild(itemDiv);
+                });
+
+                container.appendChild(sectionDiv);
+            });
+        }
+
+        // تبديل حالة العنصر
+        function toggleItem(sectionIndex, itemIndex) {
+            checklistData[sectionIndex].items[itemIndex].checked = !checklistData[sectionIndex].items[itemIndex].checked;
+            renderChecklist();
+            updateStats();
+            saveChecklist();
+        }
+
+        // تحديث الإحصائيات
+        function updateStats() {
+            let totalItems = 0;
+            let checkedItems = 0;
+
+            checklistData.forEach(section => {
+                section.items.forEach(item => {
+                    totalItems++;
+                    if (item.checked) checkedItems++;
+                });
+            });
+
+            const remainingItems = totalItems - checkedItems;
+            const percentage = totalItems > 0 ? Math.round((checkedItems / totalItems) * 100) : 0;
+
+            document.getElementById('totalItems').textContent = totalItems;
+            document.getElementById('checkedItems').textContent = checkedItems;
+            document.getElementById('remainingItems').textContent = remainingItems;
+            
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = percentage + '%';
+            progressBar.textContent = percentage + '%';
+        }
+
+        // إعادة تعيين القائمة
+        function resetChecklist() {
+            if (confirm('هل أنت متأكد من إعادة تعيين جميع العناصر؟')) {
+                checklistData.forEach(section => {
+                    section.items.forEach(item => {
+                        item.checked = false;
+                    });
+                });
+                renderChecklist();
+                updateStats();
+                saveChecklist();
+            }
+        }
+
+        // تصدير النتائج
+        function exportResults() {
+            let results = 'تقرير التحقق من نشر HM CAR\n';
+            results += '=============================\n\n';
+            
+            let totalItems = 0;
+            let checkedItems = 0;
+
+            checklistData.forEach(section => {
+                results += `## ${section.title}\n`;
+                section.items.forEach(item => {
+                    totalItems++;
+                    const status = item.checked ? '✅' : '❌';
+                    results += `${status} ${item.text}\n`;
+                    if (item.checked) checkedItems++;
+                });
+                results += '\n';
+            });
+
+            const percentage = Math.round((checkedItems / totalItems) * 100);
+            results += `\n## ملخص\n`;
+            results += `إجمالي العناصر: ${totalItems}\n`;
+            results += `العناصر المكتملة: ${checkedItems}\n`;
+            results += `نسبة الإنجاز: ${percentage}%\n`;
+
+            // إنشاء ملف وتحميله
+            const blob = new Blob([results], { type: 'text/plain;charset=utf-8' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `HM-CAR-Checklist-${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        // طباعة القائمة
+        function printChecklist() {
+            window.print();
+        }
+    </script>
+</body>
+</html>

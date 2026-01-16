@@ -13,26 +13,31 @@
 <div class="hm-home">
   <header class="hm-home__top" aria-label="Top bar">
     <a class="hm-home__brand" href="/" aria-label="HM CAR">
-      <img class="hm-home__logo" src="/public/images/navbar-logo.png" alt="HM CAR" loading="eager" decoding="async" onerror="this.onerror=null;this.src='/public/images/logo.png';" />
+      <img class="hm-home__logo" src="/public/images/logo.svg" alt="HM CAR" loading="eager" decoding="async" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+      <span class="logo-fallback" style="display:none; font-size:1.8rem; font-weight:700; color:var(--hm-ink);">🚗 HM CAR</span>
     </a>
 
     <div class="hm-home__topRight">
       <div class="hm-home__lang">
         <% if (typeof locale !== 'undefined' && locale === 'ar') { %>
-          <a class="hm-home__langBtn" href="?lang=en" title="English">EN</a>
+          <a class="hm-btn hm-btn-outline" href="?lang=en" title="English">
+            <i class="fas fa-globe hm-icon hm-icon-sm"></i><span class="icon-fallback">🌐</span> EN
+          </a>
         <% } else { %>
-          <a class="hm-home__langBtn" href="?lang=ar" title="العربية">عر</a>
+          <a class="hm-btn hm-btn-outline" href="?lang=ar" title="العربية">
+            <i class="fas fa-globe hm-icon hm-icon-sm"></i><span class="icon-fallback">🌐</span> عر
+          </a>
         <% } %>
       </div>
 
       <% if (isLoggedIn) { %>
-        <a class="hm-home__login" href="<%= dashboard %>">
-          <i class="fas fa-grid-2"></i>
+        <a class="hm-btn hm-btn-primary" href="<%= dashboard %>">
+          <i class="fas fa-tachometer-alt hm-icon hm-icon-sm"></i><span class="icon-fallback">📊</span>
           <span>لوحة التحكم</span>
         </a>
       <% } else { %>
-        <a class="hm-home__login" href="/auth/login">
-          <i class="fas fa-right-to-bracket"></i>
+        <a class="hm-btn hm-btn-primary" href="/auth/login">
+          <i class="fas fa-sign-in-alt hm-icon hm-icon-sm"></i><span class="icon-fallback">🔐</span>
           <span>تسجيل الدخول / Login</span>
         </a>
       <% } %>
@@ -50,29 +55,47 @@
 
     <div class="hm-home__cards" aria-label="Main options">
       <a class="hm-homeCard" href="<%= isLoggedIn ? '/auctions' : loginWithReturnTo('/auctions') %>">
-        <div class="hm-homeCard__icon"><i class="fas fa-gavel"></i></div>
+        <div class="hm-homeCard__icon hm-icon-container hm-icon-container-gold">
+          <i class="fas fa-gavel hm-icon hm-icon-lg"></i><span class="icon-fallback">🔨</span>
+        </div>
         <div class="hm-homeCard__title">المزاد / Auctions</div>
         <div class="hm-homeCard__text">مزادات مباشرة وعروض يومية</div>
       </a>
 
       <a class="hm-homeCard" href="<%= isLoggedIn ? '/cars' : loginWithReturnTo('/cars') %>">
-        <div class="hm-homeCard__icon"><i class="fas fa-car"></i></div>
+        <div class="hm-homeCard__icon hm-icon-container hm-icon-container-gold">
+          <i class="fas fa-car hm-icon hm-icon-lg"></i><span class="icon-fallback">🚗</span>
+        </div>
         <div class="hm-homeCard__title">السيارات / Cars</div>
         <div class="hm-homeCard__text">سيارات جاهزة للتصدير والفحص</div>
       </a>
 
       <a class="hm-homeCard" href="<%= isLoggedIn ? '/spare-parts' : loginWithReturnTo('/spare-parts') %>">
-        <div class="hm-homeCard__icon"><i class="fas fa-gears"></i></div>
+        <div class="hm-homeCard__icon hm-icon-container hm-icon-container-gold">
+          <i class="fas fa-gears hm-icon hm-icon-lg"></i><span class="icon-fallback">⚙️</span>
+        </div>
         <div class="hm-homeCard__title">قطع الغيار / Spare Parts</div>
         <div class="hm-homeCard__text">ابحث حسب الموديل والسنة</div>
       </a>
     </div>
 
     <div class="hm-home__chips" aria-label="Highlights">
-      <div class="hm-homeChip"><i class="fas fa-plane"></i><span>تصدير دولي / Export</span></div>
-      <div class="hm-homeChip"><i class="fas fa-clipboard-check"></i><span>فحص وتجهيز / Inspection</span></div>
-      <div class="hm-homeChip"><i class="fas fa-shield-halved"></i><span>دفع آمن / Secure</span></div>
-      <div class="hm-homeChip"><i class="fas fa-headset"></i><span>دعم / Support</span></div>
+      <div class="hm-homeChip hm-chip hm-chip-gold">
+        <i class="fas fa-plane hm-icon hm-icon-sm"></i><span class="icon-fallback">✈️</span>
+        <span>تصدير دولي / Export</span>
+      </div>
+      <div class="hm-homeChip hm-chip hm-chip-gold">
+        <i class="fas fa-clipboard-check hm-icon hm-icon-sm"></i><span class="icon-fallback">✅</span>
+        <span>فحص وتجهيز / Inspection</span>
+      </div>
+      <div class="hm-homeChip hm-chip hm-chip-gold">
+        <i class="fas fa-shield-halved hm-icon hm-icon-sm"></i><span class="icon-fallback">🛡️</span>
+        <span>دفع آمن / Secure</span>
+      </div>
+      <div class="hm-homeChip hm-chip hm-chip-gold">
+        <i class="fas fa-headset hm-icon hm-icon-sm"></i><span class="icon-fallback">🎧</span>
+        <span>دعم / Support</span>
+      </div>
     </div>
   </section>
 </div>

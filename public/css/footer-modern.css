@@ -1,9 +1,9 @@
 /* Modern Footer Styles */
 .main-footer {
   background:
-    radial-gradient(900px 420px at 20% 0%, rgba(255, 184, 77, 0.12) 0%, transparent 60%),
+    radial-gradient(900px 420px at 20% 0%, rgba(0, 123, 255, 0.12) 0%, transparent 60%),
     radial-gradient(900px 420px at 85% 10%, rgba(35, 96, 190, 0.16) 0%, transparent 55%),
-    linear-gradient(135deg, #061325 0%, #0b1f3a 55%, #07162a 100%);
+    linear-gradient(135deg, #001f3f 0%, #003366 55%, #001f3f 100%);
   border-top: 1px solid rgba(255, 255, 255, 0.16);
   padding: 3rem 0 1rem;
   margin-top: 4rem;
@@ -14,7 +14,7 @@
   content: '';
   display: block;
   height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(255, 210, 122, 0.75), transparent);
+  background: linear-gradient(90deg, transparent, rgba(0, 123, 255, 0.75), transparent);
   opacity: 0.9;
 }
 
@@ -67,8 +67,8 @@
 }
 
 .social-links a:hover {
-  background: rgba(255, 210, 122, 0.92);
-  color: #07162a;
+  background: rgba(0, 123, 255, 0.92);
+  color: #ffffff;
   transform: translateY(-3px);
   box-shadow: 0 14px 32px rgba(0, 0, 0, 0.22);
 }
@@ -96,7 +96,7 @@
 .footer-section.links ul li a::before {
   content: '←';
   margin-left: 0.5rem;
-  color: rgba(255, 210, 122, 0.92);
+  color: rgba(0, 123, 255, 0.92);
   transition: transform 0.3s ease;
 }
 
@@ -116,7 +116,7 @@
 }
 
 .footer-section.contact p i {
-  color: rgba(255, 210, 122, 0.92);
+  color: rgba(0, 123, 255, 0.92);
   width: 16px;
   text-align: center;
 }
@@ -128,7 +128,7 @@
   color: rgba(238, 243, 251, 0.66);
   font-family: 'Montserrat', sans-serif;
   font-size: 0.85rem;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.04), rgba(255, 210, 122, 0.06), rgba(255, 255, 255, 0.04));
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.04), rgba(0, 123, 255, 0.06), rgba(255, 255, 255, 0.04));
   border-radius: 14px;
   margin-top: 1.75rem;
   padding-bottom: 1.25rem;

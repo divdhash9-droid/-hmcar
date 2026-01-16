@@ -1,97 +1,213 @@
 <!-- views/cars/form.ejs -->
 <% layout('layout') -%>
-<h3 class="mb-3"><%= isEdit ? 'تعديل سيارة' : 'إضافة سيارة' %></h3>
-<form method="post" enctype="multipart/form-data" action="<%= isEdit ? '/cars/' + car._id + '/edit' : '/cars/new' %>">
-  <!-- حقل مخفي لحماية CSRF: يتم توليده من السيرفر ويُرسل مع الفورم للتأكد أن الطلب موثوق -->
-  <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-  <!-- شبكة الحقول: نقسم المدخلات إلى أعمدة باستخدام Bootstrap -->
-  <div class="row">
-    <div class="col-md-6 mb-3">
-      <!-- عنوان الإعلان/السيارة كما سيظهر للمستخدمين -->
-      <label class="form-label">عنوان السيارة</label>
-      <input name="title" class="form-control" required value="<%= isEdit && car ? car.title : '' %>" />
-    </div>
-    <div class="col-md-3 mb-3">
-      <!-- الشركة المصنعة (اختياري) -->
-      <label class="form-label">الشركة</label>
-      <input name="make" class="form-control" value="<%= isEdit && car ? car.make : '' %>" />
-    </div>
-    <div class="col-md-3 mb-3">
-      <!-- موديل السيارة (اختياري) -->
-      <label class="form-label">الموديل</label>
-      <input name="model" class="form-control" value="<%= isEdit && car ? car.model : '' %>" />
-    </div>
-    <div class="col-md-6 mb-3">
-      <!-- رابط شعار الشركة: يُستخدم لعرض شعار بجانب بيانات السيارة إن توفر -->
-      <label class="form-label">شعار الشركة (رابط اختياري)</label>
-      <input name="makeLogoUrl" class="form-control" placeholder="https://..." value="<%= isEdit && car ? car.makeLogoUrl : '' %>" />
-    </div>
-    <div class="col-md-3 mb-3">
-      <!-- سنة الصنع (اختياري) -->
-      <label class="form-label">السنة</label>
-      <input name="year" type="number" class="form-control" value="<%= isEdit && car ? car.year : '' %>" />
-    </div>
-    <div class="col-md-3 mb-3">
-      <!-- السعر بالريال: يمكن أن يعتمد عليه المزاد/العرض حسب منطق الباك إند -->
-      <label class="form-label">السعر (SAR)</label>
-      <input name="priceSar" type="number" step="0.01" class="form-control" value="<%= isEdit && car ? car.priceSar : '' %>" />
-    </div>
-    <div class="col-md-3 mb-3">
-      <!-- السعر بالدولار: نفس الفكرة لكن بعملة مختلفة -->
-      <label class="form-label">السعر (USD)</label>
-      <input name="priceUsd" type="number" step="0.01" class="form-control" value="<%= isEdit && car ? car.priceUsd : '' %>" />
-    </div>
-    <div class="col-md-3 mb-3">
-      <!-- حقل سعر قديم/متوافق مع بيانات سابقة (اختياري) -->
-      <label class="form-label">السعر (قديم/اختياري)</label>
-      <input name="price" type="number" step="0.01" class="form-control" value="<%= isEdit && car ? car.price : '' %>" />
-    </div>
-    <div class="col-md-6 mb-3">
-      <!-- اختيار فئة السيارة: يتم تعبئة الخيارات من المتغير categories القادم من السيرفر -->
-      <label class="form-label">فئة السيارة</label>
-      <select name="categoryId" class="form-select">
-        <option value="">بدون فئة</option>
-        <% (categories || []).forEach(cat => { %>
-          <option value="<%= cat._id %>" <%= (isEdit && car && car.category && car.category._id.toString() === cat._id.toString()) ? 'selected' : '' %>><%= cat.name %></option>
-        <% }) %>
-      </select>
-    </div>
-    <div class="col-md-3 mb-3">
-      <!-- عدد الكيلومترات/الممشى (اختياري) -->
-      <label class="form-label">الممشى</label>
-      <input name="mileage" type="number" class="form-control" value="<%= isEdit && car ? car.mileage : '' %>" />
-    </div>
-    <div class="col-md-3 mb-3">
-      <!-- حالة السيارة: قيم option هي التي تُرسل للباك إند (بالإنجليزية) بينما النص المعروض بالعربي -->
-      <label class="form-label">الحالة</label>
-      <select name="condition" class="form-select">
-        <option value="excellent" <%= (isEdit && car && car.condition === 'excellent') ? 'selected' : '' %>>ممتاز</option>
-        <option value="good" <%= (isEdit && car && car.condition === 'good') ? 'selected' : '' %>>جيد</option>
-        <option value="fair" <%= (isEdit && car && car.condition === 'fair') ? 'selected' : '' %>>متوسط</option>
-        <option value="needs work" <%= (isEdit && car && car.condition === 'needs work') ? 'selected' : '' %>>يحتاج صيانة</option>
-      </select>
-    </div>
-    <div class="col-12 mb-3">
-      <!-- وصف تفصيلي: يفضّل كتابة أهم المواصفات والعيوب إن وجدت -->
-      <label class="form-label">الوصف</label>
-      <textarea name="description" rows="3" class="form-control"><%= isEdit && car ? car.description : '' %></textarea>
-    </div>
-    <div class="col-12 mb-3">
-      <!-- رفع صور متعددة: اسم الحقل images، والسيرفر عادة يقيّد العدد (مثلاً حتى 5) -->
-      <label class="form-label">صور السيارة (حتى 5 صور)</label>
-      <div class="border rounded p-3 bg-light">
-        <input name="images" type="file" multiple class="form-control" accept="image/jpeg,image/png,image/webp" />
-        <div class="form-text text-muted mt-2">
-          <i class="fas fa-info-circle me-1"></i>
-          يمكنك اختيار حتى 5 صور من جهازك. الصيغ المسموحة: JPG, PNG, WEBP. الحد الأقصى للحجم: 5MB لكل صورة.
+
+<!-- HM Design System CSS -->
+<link rel="stylesheet" href="/css/design-system.css">
+<div class="hm-card">
+  <div class="p-4">
+    <h2 class="hm-section__title hm-text-blue mb-4"><%= isEdit ? 'تعديل سيارة' : 'إضافة سيارة جديدة' %></h2>
+    
+    <form method="post" enctype="multipart/form-data" action="<%= isEdit ? '/cars/' + car._id + '/edit' : '/cars/new' %>" class="auth-form">
+      <!-- حقل مخفي لحماية CSRF -->
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+      
+      <div class="row g-4">
+        <div class="col-md-6">
+          <div class="hm-form-group">
+            <div class="hm-input-wrapper">
+              <i class="hm-input-icon fas fa-car hm-icon hm-icon-sm hm-icon-muted"></i>
+              <input name="title" 
+                     class="hm-input" 
+                     placeholder="عنوان السيارة" 
+                     required 
+                     value="<%= isEdit && car ? car.title : '' %>" />
+              <label for="title" class="hm-input-label">عنوان السيارة</label>
+            </div>
+          </div>
         </div>
-        <div id="imagePreview" class="mt-3"></div>
+        
+        <div class="col-md-3">
+          <div class="hm-form-group">
+            <div class="hm-input-wrapper">
+              <i class="hm-input-icon fas fa-building hm-icon hm-icon-sm hm-icon-muted"></i>
+              <input name="make" 
+                     class="hm-input" 
+                     placeholder="الشركة" 
+                     value="<%= isEdit && car ? car.make : '' %>" />
+              <label for="make" class="hm-input-label">الشركة</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-3">
+          <div class="hm-form-group">
+            <div class="hm-input-wrapper">
+              <i class="hm-input-icon fas fa-car hm-icon hm-icon-sm hm-icon-muted"></i>
+              <input name="model" 
+                     class="hm-input" 
+                     placeholder="الموديل" 
+                     value="<%= isEdit && car ? car.model : '' %>" />
+              <label for="model" class="hm-input-label">الموديل</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="hm-form-group">
+            <div class="hm-input-wrapper">
+              <i class="hm-input-icon fas fa-image hm-icon hm-icon-sm hm-icon-muted"></i>
+              <input name="makeLogoUrl" 
+                     class="hm-input" 
+                     placeholder="https://..." 
+                     value="<%= isEdit && car ? car.makeLogoUrl : '' %>" />
+              <label for="makeLogoUrl" class="hm-input-label">شعار الشركة (رابط اختياري)</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-3">
+          <div class="hm-form-group">
+            <div class="hm-input-wrapper">
+              <i class="hm-input-icon fas fa-calendar hm-icon hm-icon-sm hm-icon-muted"></i>
+              <input name="year" 
+                     type="number" 
+                     class="hm-input" 
+                     placeholder="السنة" 
+                     value="<%= isEdit && car ? car.year : '' %>" />
+              <label for="year" class="hm-input-label">السنة</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-3">
+          <div class="hm-form-group">
+            <div class="hm-input-wrapper">
+              <i class="hm-input-icon fas fa-money-bill-wave hm-icon hm-icon-sm hm-icon-muted"></i>
+              <input name="priceSar" 
+                     type="number" 
+                     step="0.01" 
+                     class="hm-input" 
+                     placeholder="السعر (SAR)" 
+                     value="<%= isEdit && car ? car.priceSar : '' %>" />
+              <label for="priceSar" class="hm-input-label">السعر (SAR)</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-3">
+          <div class="hm-form-group">
+            <div class="hm-input-wrapper">
+              <i class="hm-input-icon fas fa-dollar-sign hm-icon hm-icon-sm hm-icon-muted"></i>
+              <input name="priceUsd" 
+                     type="number" 
+                     step="0.01" 
+                     class="hm-input" 
+                     placeholder="السعر (USD)" 
+                     value="<%= isEdit && car ? car.priceUsd : '' %>" />
+              <label for="priceUsd" class="hm-input-label">السعر (USD)</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-3">
+          <div class="hm-form-group">
+            <div class="hm-input-wrapper">
+              <i class="hm-input-icon fas fa-tag hm-icon hm-icon-sm hm-icon-muted"></i>
+              <input name="price" 
+                     type="number" 
+                     step="0.01" 
+                     class="hm-input" 
+                     placeholder="السعر (قديم/اختياري)" 
+                     value="<%= isEdit && car ? car.price : '' %>" />
+              <label for="price" class="hm-input-label">السعر (قديم/اختياري)</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="hm-form-group">
+            <div class="hm-input-wrapper">
+              <i class="hm-input-icon fas fa-tags hm-icon hm-icon-sm hm-icon-muted"></i>
+              <select name="categoryId" class="hm-input">
+                <option value="">بدون فئة</option>
+                <% (categories || []).forEach(cat => { %>
+                  <option value="<%= cat._id %>" <%= (isEdit && car && car.category && car.category._id.toString() === cat._id.toString()) ? 'selected' : '' %>><%= cat.name %></option>
+                <% }) %>
+              </select>
+              <label for="categoryId" class="hm-input-label">فئة السيارة</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-3">
+          <div class="hm-form-group">
+            <div class="hm-input-wrapper">
+              <i class="hm-input-icon fas fa-tachometer-alt hm-icon hm-icon-sm hm-icon-muted"></i>
+              <input name="mileage" 
+                     type="number" 
+                     class="hm-input" 
+                     placeholder="الممشى" 
+                     value="<%= isEdit && car ? car.mileage : '' %>" />
+              <label for="mileage" class="hm-input-label">الممشى</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-3">
+          <div class="hm-form-group">
+            <div class="hm-input-wrapper">
+              <i class="hm-input-icon fas fa-star hm-icon hm-icon-sm hm-icon-muted"></i>
+              <select name="condition" class="hm-input">
+                <option value="excellent" <%= (isEdit && car && car.condition === 'excellent') ? 'selected' : '' %>>ممتاز</option>
+                <option value="good" <%= (isEdit && car && car.condition === 'good') ? 'selected' : '' %>>جيد</option>
+                <option value="fair" <%= (isEdit && car && car.condition === 'fair') ? 'selected' : '' %>>متوسط</option>
+                <option value="needs work" <%= (isEdit && car && car.condition === 'needs work') ? 'selected' : '' %>>يحتاج صيانة</option>
+              </select>
+              <label for="condition" class="hm-input-label">الحالة</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-12">
+          <div class="hm-form-group">
+            <div class="hm-input-wrapper">
+              <i class="hm-input-icon fas fa-align-left hm-icon hm-icon-sm hm-icon-muted"></i>
+              <textarea name="description" 
+                      rows="4" 
+                      class="hm-input" 
+                      placeholder="الوصف"> <%= isEdit && car ? car.description : '' %></textarea>
+              <label for="description" class="hm-input-label">الوصف</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-12">
+          <div class="hm-form-group">
+            <label class="hm-input-label mb-2">صور السيارة (حتى 5 صور)</label>
+            <div class="hm-card hm-border">
+              <div class="p-3">
+                <input name="images" type="file" multiple class="hm-input" accept="image/jpeg,image/png,image/webp" />
+                <div class="hm-text-muted small mt-2">
+                  <i class="fas fa-info-circle me-1"></i>
+                  يمكنك اختيار حتى 5 صور من جهازك. الصيغ المسموحة: JPG, PNG, WEBP. الحد الأقصى للحجم: 5MB لكل صورة.
+                </div>
+                <div id="imagePreview" class="mt-3"></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+      
+      <!-- زر الإرسال -->
+      <div class="mt-4">
+        <button type="submit" class="hm-btn hm-btn-primary">
+          <i class="fas fa-save hm-icon hm-icon-sm"></i>
+          <span><%= isEdit ? 'تحديث السيارة' : 'إضافة السيارة ومتابعة' %></span>
+        </button>
+      </div>
+    </form>
   </div>
-  <!-- زر الإرسال: بعد الحفظ يتم الانتقال عادة لخطوة إنشاء المزاد -->
-  <button class="btn btn-primary">حفظ ومتابعة لإنشاء المزاد</button>
-</form>
+</div>
 
 <script>
 // Image Preview Functionality

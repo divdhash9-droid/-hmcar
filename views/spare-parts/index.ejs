@@ -1,100 +1,138 @@
-<% layout('layout') -%>
-<!-- صفحة قديمة/بديلة لقائمة قطع الغيار مع فلاتر نصية بسيطة.
-     حالياً يوجد أيضاً: views/spare-parts/list.ejs (نسخة أحدث بفلاتر تفاعلية)
--->
-<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2 mb-3">
-  <div>
-    <h3 class="mb-1">قطع الغيار</h3>
-    <div class="text-muted">ابحث عن القطع حسب الاسم أو الشركة أو موديل السيارة.</div>
-  </div>
-  <a href="/" class="btn btn-outline-secondary">العودة للصفحة الرئيسية</a>
-</div>
-
-<form class="card border-0 shadow-sm mb-3" method="get">
-  <!-- فلاتر البحث (q/make/model) عبر QueryString -->
-  <div class="card-body row g-3">
-    <% if (isEmbed) { %>
-      <input type="hidden" name="embed" value="1" />
-    <% } %>
-    <div class="col-md-4">
-      <label class="form-label">اسم القطعة أو نوعها</label>
-      <input name="q" class="form-control" placeholder="فلتر، مكابح..." value="<%= filters.q %>" />
-    </div>
-    <div class="col-md-4">
-      <label class="form-label">الشركة</label>
-      <input name="make" class="form-control" placeholder="Toyota" value="<%= filters.make %>" />
-    </div>
-    <div class="col-md-4">
-      <label class="form-label">الموديل</label>
-      <input name="model" class="form-control" placeholder="Camry" value="<%= filters.model %>" />
-    </div>
-    <div class="col-12 d-flex gap-2 justify-content-end">
-      <button class="btn btn-primary">بحث</button>
-      <a class="btn btn-outline-secondary" href="/spare-parts<%= isEmbed ? '?embed=1' : '' %>">إزالة الفلاتر</a>
-    </div>
-  </div>
-</form>
-
-<div class="row g-3">
-  <% if (!parts.length) { %>
-    <div class="col-12">
-      <div class="card border-0 shadow-sm">
-        <div class="card-body text-center py-5">
-          <h5 class="mb-2">لا توجد نتائج</h5>
-          <div class="text-muted">جرّب تغيير كلمات البحث أو إزالة الفلاتر.</div>
+<div class="hm-dashboard">
+  <div class="hm-dashboard__container">
+    <header class="hm-hero hm-bg-gold" aria-label="قطع الغيار">
+      <div class="hm-hero__top">
+        <div class="hm-hero__brand">
+          <img class="hm-hero__logo" src="/images/navbar-logo.png" alt="HM CAR" loading="eager" decoding="async" onerror="this.onerror=null;this.src='/images/logo.png';" />
+          <div class="hm-hero__titles">
+            <h1 class="hm-hero__title hm-text-white">قطع الغيار</h1>
+            <div class="hm-hero__subtitle hm-text-white">ابحث عن القطع حسب الاسم أو الشركة أو موديل السيارة.</div>
+          </div>
         </div>
+        <nav class="hm-hero__actions" aria-label="إجراءات">
+          <a class="hm-btn hm-btn-outline" href="/" aria-label="العودة للرئيسية"><i class="fas fa-home"></i><span>الرئيسية</span></a>
+        </nav>
       </div>
-    </div>
-  <% } %>
-  <% parts.forEach(part => { %>
-    <!-- بطاقة قطعة غيار -->
-    <div class="col-md-4">
-      <div class="card h-100 border-0 shadow-sm overflow-hidden">
-        <% if (part.images && part.images[0]) { %>
-          <img src="<%= part.images[0] %>" class="card-img-top hm-part-card-img" alt="صورة قطعة" loading="lazy" decoding="async" />
-        <% } else { %>
-          <div class="hm-part-placeholder hm-part-placeholder--220">
-            <img class="hm-part-placeholder__img" src="/public/images/spare-parts.png" alt="" width="88" height="88" loading="lazy" decoding="async" />
-            <div class="hm-part-placeholder__text">صورة القطعة غير متوفرة</div>
+    </header>
+    
+    <section class="hm-section">
+      <form method="get" class="mb-4">
+        <!-- فلاتر البحث (q/make/model) عبر QueryString -->
+        <div class="hm-card p-4">
+          <% if (isEmbed) { %>
+            <input type="hidden" name="embed" value="1" />
+          <% } %>
+          <div class="row g-4">
+            <div class="col-md-4">
+              <div class="hm-form-group">
+                <div class="hm-input-wrapper">
+                  <i class="hm-input-icon fas fa-search hm-icon hm-icon-sm hm-icon-muted"></i>
+                  <input name="q" 
+                         class="hm-input" 
+                         placeholder="اسم القطعة أو نوعها" 
+                         value="<%= filters.q %>" />
+                  <label for="q" class="hm-input-label">اسم القطعة أو نوعها</label>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="hm-form-group">
+                <div class="hm-input-wrapper">
+                  <i class="hm-input-icon fas fa-building hm-icon hm-icon-sm hm-icon-muted"></i>
+                  <input name="make" 
+                         class="hm-input" 
+                         placeholder="Toyota" 
+                         value="<%= filters.make %>" />
+                  <label for="make" class="hm-input-label">الشركة</label>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="hm-form-group">
+                <div class="hm-input-wrapper">
+                  <i class="hm-input-icon fas fa-car hm-icon hm-icon-sm hm-icon-muted"></i>
+                  <input name="model" 
+                         class="hm-input" 
+                         placeholder="Camry" 
+                         value="<%= filters.model %>" />
+                  <label for="model" class="hm-input-label">الموديل</label>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 d-flex gap-2 justify-content-end">
+              <button class="hm-btn hm-btn-primary">بحث</button>
+              <a class="hm-btn hm-btn-outline" href="/spare-parts<%= isEmbed ? '?embed=1' : '' %>">إزالة الفلاتر</a>
+            </div>
+          </div>
+        </div>
+      </form>
+      
+      <div class="hm-grid hm-grid--responsive">
+        <% if (!parts.length) { %>
+          <div class="col-12">
+            <div class="hm-card text-center py-5">
+              <div class="hm-icon-container hm-icon-container-light mx-auto mb-3">
+                <i class="fas fa-box-open hm-icon-2xl hm-icon-muted"></i>
+              </div>
+              <h5 class="mb-2 hm-text-blue">لا توجد نتائج</h5>
+              <div class="hm-text-muted">جرّب تغيير كلمات البحث أو إزالة الفلاتر.</div>
+            </div>
           </div>
         <% } %>
-        <div class="card-body d-flex flex-column">
-          <h5 class="card-title"><%= part.name %></h5>
-          <p class="text-muted mb-1"><%= part.partType || 'نوع غير محدد' %></p>
-          <p class="mb-1">المركبة: <%= [part.carMake, part.carModel, part.carYear].filter(Boolean).join(' - ') || 'عام' %></p>
-          <p class="fw-semibold">
-            السعر:
-            <% const sar = (part.priceSar !== undefined && part.priceSar !== null) ? part.priceSar : null; %>
-            <% const usd = (part.priceUsd !== undefined && part.priceUsd !== null) ? part.priceUsd : null; %>
-            <% if (sar !== null || usd !== null) { %>
-              <span class="price-display" data-sar="<%= sar %>" data-usd="<%= usd %>">
-                <span class="price-current">
-                  <%= sar !== null ? sar.toLocaleString('en-US') + ' SAR' : '' %>
-                  <%= (sar !== null && usd !== null) ? ' | ' : '' %>
-                  <%= usd !== null ? usd.toLocaleString('en-US') + ' USD' : '' %>
-                </span>
-                <button class="btn btn-sm btn-outline-secondary ms-2 convert-price" type="button">
-                  <i class="fas fa-exchange-alt"></i> تحويل
-                </button>
-              </span>
-            <% } else { %>
-              <%= part.price.toLocaleString('en-US') %>
-            <% } %>
-          </p>
-          <p class="flex-grow-1"><%= part.description || '' %></p>
-          <div class="d-flex align-items-center justify-content-between gap-2 mt-auto">
-            <span class="badge <%= part.inStock ? 'bg-success' : 'bg-secondary' %>"><%= part.inStock ? 'متوفر' : 'غير متوفر' %></span>
-            <% if (currentUser && currentUser.role === 'buyer') { %>
-              <form method="post" action="/spare-parts/buy/<%= part._id %>">
-                <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-                <button class="btn btn-sm btn-success" type="submit" <%= part.inStock ? '' : 'disabled' %>>شراء</button>
-              </form>
-            <% } %>
+        <% parts.forEach(part => { %>
+          <!-- بطاقة قطعة غيار -->
+          <div class="col-md-4">
+            <div class="hm-card h-100">
+              <% if (part.images && part.images[0]) { %>
+                <img src="<%= part.images[0] %>" class="card-img-top" style="height: 200px; object-fit: cover; border-radius: var(--hm-radius-lg) var(--hm-radius-lg) 0 0;" alt="صورة قطعة" loading="lazy" decoding="async" />
+              <% } else { %>
+                <div class="hm-part-placeholder" style="height: 200px; display: flex; align-items: center; justify-content: center; background-color: var(--hm-gray-100);">
+                  <div class="text-center">
+                    <i class="fas fa-image hm-icon-2xl hm-icon-muted mb-2"></i>
+                    <div class="hm-text-muted small">صورة القطعة غير متوفرة</div>
+                  </div>
+                </div>
+              <% } %>
+              <div class="p-3 d-flex flex-column">
+                <h5 class="mb-2"><%= part.name %></h5>
+                <p class="hm-text-muted mb-1 small"><%= part.partType || 'نوع غير محدد' %></p>
+                <p class="mb-2 small">المركبة: <%= [part.carMake, part.carModel, part.carYear].filter(Boolean).join(' - ') || 'عام' %></p>
+                <p class="fw-semibold mb-2">
+                  السعر:
+                  <% const sar = (part.priceSar !== undefined && part.priceSar !== null) ? part.priceSar : null; %>
+                  <% const usd = (part.priceUsd !== undefined && part.priceUsd !== null) ? part.priceUsd : null; %>
+                  <% if (sar !== null || usd !== null) { %>
+                    <span class="price-display" data-sar="<%= sar %>" data-usd="<%= usd %>">
+                      <span class="price-current">
+                        <%= sar !== null ? sar.toLocaleString('en-US') + ' SAR' : '' %>
+                        <%= (sar !== null && usd !== null) ? ' | ' : '' %>
+                        <%= usd !== null ? usd.toLocaleString('en-US') + ' USD' : '' %>
+                      </span>
+                      <button class="hm-btn hm-btn-sm hm-btn-outline ms-2 convert-price" type="button">
+                        <i class="fas fa-exchange-alt"></i> تحويل
+                      </button>
+                    </span>
+                  <% } else { %>
+                    <%= part.price.toLocaleString('en-US') %>
+                  <% } %>
+                </p>
+                <p class="flex-grow-1 small mb-2"><%= part.description || '' %></p>
+                <div class="d-flex align-items-center justify-content-between gap-2 mt-auto pt-2">
+                  <span class="hm-chip <%= part.inStock ? 'hm-chip-gold' : 'hm-chip-light' %>"><%= part.inStock ? 'متوفر' : 'غير متوفر' %></span>
+                  <% if (currentUser && currentUser.role === 'buyer') { %>
+                    <form method="post" action="/spare-parts/buy/<%= part._id %>">
+                      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                      <button class="hm-btn hm-btn-sm hm-btn-primary" type="submit" <%= part.inStock ? '' : 'disabled' %>>شراء</button>
+                    </form>
+                  <% } %>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        <% }) %>
       </div>
-    </div>
-  <% }) %>
+    </section>
+  </div>
 </div>
 
 <script>

@@ -4,90 +4,97 @@
 <% var fullWidth = true; %>
 <% var bodyClass = 'admin-dashboard-luxury'; %>
 
+<!-- HM Design System CSS -->
+<link rel="stylesheet" href="/css/design-system.css">
+
 <div class="hm-dashboard">
   <div class="hm-dashboard__container">
-    <header class="hm-hero" aria-label="إنشاء مزاد جديد">
+    <header class="hm-hero hm-bg-gold" aria-label="إنشاء مزاد جديد">
       <div class="hm-hero__top">
         <div class="hm-hero__brand">
           <img class="hm-hero__logo" src="/public/images/navbar-logo.png" alt="HM CAR" loading="eager" decoding="async" onerror="this.onerror=null;this.src='/public/images/logo.png';" />
           <div class="hm-hero__titles">
-            <h1 class="hm-hero__title">إنشاء مزاد جديد</h1>
-            <div class="hm-hero__subtitle">إضافة يدوية أو استيراد من رابط</div>
+            <h1 class="hm-hero__title hm-text-white">إنشاء مزاد جديد</h1>
+            <div class="hm-hero__subtitle hm-text-white">إضافة يدوية أو استيراد من رابط</div>
           </div>
         </div>
         <nav class="hm-hero__actions" aria-label="إجراءات">
-          <a class="hm-pill" href="/admin/auctions" aria-label="العودة إلى المزادات"><i class="fas fa-arrow-left"></i><span>عودة</span></a>
+          <a class="hm-btn hm-btn-outline" href="/admin/auctions" aria-label="العودة إلى المزادات"><i class="fas fa-arrow-left"></i><span>عودة</span></a>
         </nav>
       </div>
     </header>
 
     <section class="hm-section" aria-label="نموذج إضافة مزاد">
-      <div class="add-auction-container">
-        <div class="tabs">
-          <button class="tab-link <%= !importedData ? 'active' : '' %>" onclick="showTab('manual')">
+      <div class="hm-card">
+        <div class="d-flex border-bottom mb-4">
+          <button class="hm-btn hm-btn-outline <%= !importedData ? 'hm-btn-primary' : 'hm-btn-outline' %>" onclick="showTab('manual')" id="manual-tab">
             <i class="fas fa-edit"></i> إضافة يدوية
           </button>
-          <button class="tab-link <%= importedData ? 'active' : '' %>" onclick="showTab('import')">
+          <button class="hm-btn hm-btn-outline <%= importedData ? 'hm-btn-primary' : 'hm-btn-outline' %>" onclick="showTab('import')" id="import-tab">
             <i class="fas fa-link"></i> استيراد من رابط
           </button>
         </div>
 
-        <div id="manual" class="tab-content <%= !importedData ? 'active' : '' %>">
-          <form action="/auctions/cars/new" method="POST" class="modern-form">
-            <div class="form-grid">
-              <div class="form-group">
-                <label for="title">عنوان السيارة</label>
-                <input type="text" id="title" name="title" class="form-control" value="<%= importedData ? importedData.title : '' %>" required>
+        <div id="manual" class="tab-content <%= !importedData ? 'active' : '' %>" style="display: block;">
+          <form action="/auctions/cars/new" method="POST" class="p-4">
+            <div class="row g-4">
+              <div class="col-md-6">
+                <label for="title" class="form-label">عنوان السيارة</label>
+                <input type="text" id="title" name="title" class="form-control hm-border" style="width:100%;" value="<%= importedData ? importedData.title : '' %>" required>
               </div>
-              <div class="form-group">
-                <label for="make">الشركة المصنعة</label>
-                <input type="text" id="make" name="make" class="form-control" required>
+              <div class="col-md-6">
+                <label for="make" class="form-label">الشركة المصنعة</label>
+                <input type="text" id="make" name="make" class="form-control hm-border" style="width:100%;" required>
               </div>
-              <div class="form-group">
-                <label for="model">الموديل</label>
-                <input type="text" id="model" name="model" class="form-control" required>
+              <div class="col-md-6">
+                <label for="model" class="form-label">الموديل</label>
+                <input type="text" id="model" name="model" class="form-control hm-border" style="width:100%;" required>
               </div>
-              <div class="form-group">
-                <label for="year">سنة الصنع</label>
-                <input type="number" id="year" name="year" class="form-control">
+              <div class="col-md-6">
+                <label for="year" class="form-label">سنة الصنع</label>
+                <input type="number" id="year" name="year" class="form-control hm-border" style="width:100%;">
               </div>
-              <div class="form-group">
-                <label for="priceSar">السعر (SAR)</label>
-                <input type="number" id="priceSar" name="priceSar" class="form-control" step="any" value="<%= (importedData && importedData.currency === 'SAR') ? importedData.price : '' %>">
+              <div class="col-md-6">
+                <label for="priceSar" class="form-label">السعر (SAR)</label>
+                <input type="number" id="priceSar" name="priceSar" class="form-control hm-border" style="width:100%;" step="any" value="<%= (importedData && importedData.currency === 'SAR') ? importedData.price : '' %>">
               </div>
-              <div class="form-group">
-                <label for="priceUsd">السعر (USD)</label>
-                <input type="number" id="priceUsd" name="priceUsd" class="form-control" step="any" value="<%= (importedData && importedData.currency === 'USD') ? importedData.price : '' %>">
+              <div class="col-md-6">
+                <label for="priceUsd" class="form-label">السعر (USD)</label>
+                <input type="number" id="priceUsd" name="priceUsd" class="form-control hm-border" style="width:100%;" step="any" value="<%= (importedData && importedData.currency === 'USD') ? importedData.price : '' %>">
               </div>
             </div>
-            <div class="form-group">
-              <label for="description">الوصف</label>
-              <textarea id="description" name="description" class="form-control" rows="3"><%= importedData ? importedData.description : '' %></textarea>
+            <div class="mb-3">
+              <label for="description" class="form-label">الوصف</label>
+              <textarea id="description" name="description" class="form-control hm-border" style="width:100%;" rows="3"><%= importedData ? importedData.description : '' %></textarea>
             </div>
-            <div class="form-group">
-              <label for="images">روابط الصور (كل رابط في سطر)</label>
-              <textarea id="images" name="images" class="form-control" rows="5"><%= importedData ? importedData.images : '' %></textarea>
+            <div class="mb-3">
+              <label for="images" class="form-label">روابط الصور (كل رابط في سطر)</label>
+              <textarea id="images" name="images" class="form-control hm-border" style="width:100%;" rows="5"><%= importedData ? importedData.images : '' %></textarea>
             </div>
-            <div class="form-group">
-                <label for="externalUrl">رابط المزاد الخارجي (اختياري)</label>
-                <input type="url" id="externalUrl" name="externalUrl" class="form-control" value="<%= importedData ? importedData.externalUrl : '' %>">
+            <div class="mb-3">
+                <label for="externalUrl" class="form-label">رابط المزاد الخارجي (اختياري)</label>
+                <input type="url" id="externalUrl" name="externalUrl" class="form-control hm-border" style="width:100%;" value="<%= importedData ? importedData.externalUrl : '' %>">
             </div>
-            <div class="form-group">
-                <label for="carMakeLogoUrl">رابط شعار الشركة (اختياري)</label>
-                <input type="url" id="carMakeLogoUrl" name="carMakeLogoUrl" class="form-control">
+            <div class="mb-3">
+                <label for="carMakeLogoUrl" class="form-label">رابط شعار الشركة (اختياري)</label>
+                <input type="url" id="carMakeLogoUrl" name="carMakeLogoUrl" class="form-control hm-border" style="width:100%;">
             </div>
-            <button type="submit" class="btn btn-primary">إنشاء المزاد</button>
+            <div class="mt-4">
+              <button type="submit" class="hm-btn hm-btn-primary">إنشاء المزاد</button>
+            </div>
           </form>
         </div>
 
-        <div id="import" class="tab-content <%= importedData ? 'active' : '' %>">
-          <form action="/admin/auctions/import" method="POST" class="modern-form">
-            <p>أدخل رابط المزاد من موقع آخر لجلب البيانات تلقائيًا.</p>
-            <div class="form-group">
-              <label for="importUrl">رابط المزاد</label>
-              <input type="url" id="importUrl" name="importUrl" class="form-control" required>
+        <div id="import" class="tab-content <%= importedData ? 'active' : '' %>" style="display: block;">
+          <form action="/admin/auctions/import" method="POST" class="p-4">
+            <p class="mb-3">أدخل رابط المزاد من موقع آخر لجلب البيانات تلقائيًا.</p>
+            <div class="mb-3">
+              <label for="importUrl" class="form-label">رابط المزاد</label>
+              <input type="url" id="importUrl" name="importUrl" class="form-control hm-border" style="width:100%;" required>
             </div>
-            <button type="submit" class="btn btn-primary">استيراد البيانات</button>
+            <div class="mt-4">
+              <button type="submit" class="hm-btn hm-btn-primary">استيراد البيانات</button>
+            </div>
           </form>
         </div>
       </div>
@@ -161,15 +168,36 @@
   function showTab(tabName) {
     const tabContents = document.querySelectorAll('.tab-content');
     tabContents.forEach(content => {
-      content.classList.remove('active');
+      content.style.display = 'none';
     });
 
     const tabLinks = document.querySelectorAll('.tab-link');
     tabLinks.forEach(link => {
-      link.classList.remove('active');
+      link.classList.remove('hm-btn-primary');
+      link.classList.add('hm-btn-outline');
     });
 
-    document.getElementById(tabName).classList.add('active');
-    event.currentTarget.classList.add('active');
+    document.getElementById(tabName).style.display = 'block';
+    event.currentTarget.classList.add('hm-btn-primary');
+    event.currentTarget.classList.remove('hm-btn-outline');
   }
+
+  // Set initial active tab based on server data
+  document.addEventListener('DOMContentLoaded', function() {
+    if (<%= !!importedData %>) {
+      document.getElementById('import').style.display = 'block';
+      document.getElementById('manual').style.display = 'none';
+      document.getElementById('import-tab').classList.add('hm-btn-primary');
+      document.getElementById('import-tab').classList.remove('hm-btn-outline');
+      document.getElementById('manual-tab').classList.add('hm-btn-outline');
+      document.getElementById('manual-tab').classList.remove('hm-btn-primary');
+    } else {
+      document.getElementById('manual').style.display = 'block';
+      document.getElementById('import').style.display = 'none';
+      document.getElementById('manual-tab').classList.add('hm-btn-primary');
+      document.getElementById('manual-tab').classList.remove('hm-btn-outline');
+      document.getElementById('import-tab').classList.add('hm-btn-outline');
+      document.getElementById('import-tab').classList.remove('hm-btn-primary');
+    }
+  });
 </script>

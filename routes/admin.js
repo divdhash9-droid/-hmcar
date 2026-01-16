@@ -1054,9 +1054,8 @@ router.get('/settings/footer', requireAuth, requireRole(['admin', 'super_admin']
 // تحديث إعدادات الشريط السفلي
 router.post('/settings/footer', requireAuth, requireRole(['admin', 'super_admin']), async (req, res) => {
   try {
-    const { title, description, email, phone, address } = req.body;
+    const { title, description, email, phone, address, facebookUrl, twitterUrl, instagramUrl, whatsappNumber, youtubeUrl, tiktokUrl } = req.body;
     const links = JSON.parse(req.body.links || '[]');
-    const socialMedia = JSON.parse(req.body.socialMedia || '[]');
     
     const settings = await Settings.getSettings();
     settings.footer.title = title;
@@ -1065,7 +1064,14 @@ router.post('/settings/footer', requireAuth, requireRole(['admin', 'super_admin'
     settings.footer.contactInfo.phone = phone;
     settings.footer.contactInfo.address = address;
     settings.footer.links = links;
-    settings.footer.socialMedia = socialMedia;
+    
+    // روابط التواصل الاجتماعي
+    settings.footer.facebookUrl = facebookUrl || '';
+    settings.footer.twitterUrl = twitterUrl || '';
+    settings.footer.instagramUrl = instagramUrl || '';
+    settings.footer.whatsappNumber = whatsappNumber || '';
+    settings.footer.youtubeUrl = youtubeUrl || '';
+    settings.footer.tiktokUrl = tiktokUrl || '';
     
     await settings.save();
     

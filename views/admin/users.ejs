@@ -2,98 +2,181 @@
 <% var hideNavbar = true; %>
 <% var hideSearch = true; %>
 <% var fullWidth = true; %>
-<% var bodyClass = 'admin-dashboard-luxury'; %>
+<% var bodyClass = 'hm-admin-page'; %>
 
-<div class="hm-dashboard">
-  <div class="hm-dashboard__container">
-    <header class="hm-hero" aria-label="إدارة المستخدمين">
-      <div class="hm-hero__top">
-        <div class="hm-hero__brand">
-          <img class="hm-hero__logo" src="/public/images/navbar-logo.png" alt="HM CAR" loading="eager" decoding="async" onerror="this.onerror=null;this.src='/public/images/logo.png';" />
-          <div class="hm-hero__titles">
-            <h1 class="hm-hero__title">إدارة المستخدمين</h1>
-            <div class="hm-hero__subtitle">إدارة جميع الحسابات والصلاحيات بكل فخامة</div>
-          </div>
+<link rel="stylesheet" href="/css/admin-luxury.css">
+
+<div class="hm-admin-layout">
+  <!-- Animated Background -->
+  <div class="hm-admin-bg">
+    <div class="hm-admin-bg-gradient"></div>
+    <div class="hm-admin-bg-glow"></div>
+  </div>
+
+  <!-- Mobile Toggle -->
+  <button class="hm-mobile-toggle" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Sidebar -->
+  <%- include('../partials/admin-sidebar') %>
+
+  <!-- Main Content -->
+  <main class="hm-admin-main">
+    <!-- Header -->
+    <header class="hm-admin-header">
+      <div class="hm-header-title">
+        <h1>إدارة العملاء</h1>
+        <div class="hm-header-breadcrumb">
+          <a href="/admin">لوحة التحكم</a>
+          <i class="fas fa-chevron-left"></i>
+          <span>العملاء</span>
         </div>
-
-        <nav class="hm-hero__actions" aria-label="إجراءات">
-          <a class="hm-pill" href="/admin" aria-label="رجوع للوحة الإدارة"><i class="fas fa-arrow-right"></i><span>لوحة الإدارة</span></a>
-          <a class="hm-pill" href="/admin/users-management" aria-label="إدارة المشرفين"><i class="fas fa-user-shield"></i><span>المشرفين</span></a>
-          <a class="hm-pill hm-pill--danger" href="/auth/logout" aria-label="خروج"><i class="fas fa-sign-out-alt"></i><span>خروج</span></a>
-        </nav>
       </div>
-
-      <section class="hm-kpis" aria-label="إحصائيات">
-        <div class="hm-kpi">
-          <div class="hm-kpi__row">
-            <div>
-              <div class="hm-kpi__label">عدد المستخدمين</div>
-              <div class="hm-kpi__value"><%= Array.isArray(users) ? users.length : 0 %></div>
-            </div>
-            <div class="hm-kpi__icon" aria-hidden="true"><i class="fas fa-users"></i></div>
-          </div>
-        </div>
-        <div class="hm-kpi">
-          <div class="hm-kpi__row">
-            <div>
-              <div class="hm-kpi__label">صلاحيات الأدمن</div>
-              <div class="hm-kpi__value">ON</div>
-            </div>
-            <div class="hm-kpi__icon" aria-hidden="true"><i class="fas fa-shield-alt"></i></div>
-          </div>
-        </div>
-        <div class="hm-kpi hm-kpi--security">
-          <div class="hm-kpi__row">
-            <div>
-              <div class="hm-kpi__label">الأمان</div>
-              <div class="hm-kpi__value">CSRF</div>
-            </div>
-            <div class="hm-kpi__icon" aria-hidden="true"><i class="fas fa-lock"></i></div>
-          </div>
-        </div>
-        <div class="hm-kpi">
-          <div class="hm-kpi__row">
-            <div>
-              <div class="hm-kpi__label">الإشعارات</div>
-              <div class="hm-kpi__value"><%= Number(adminNewNotificationsCount || 0) %></div>
-            </div>
-            <div class="hm-kpi__icon" aria-hidden="true"><i class="fas fa-bell"></i></div>
-          </div>
-        </div>
-      </section>
+      <div class="hm-header-actions">
+        <a href="/admin/users-management" class="hm-btn-admin hm-btn-admin-primary">
+          <i class="fas fa-user-shield"></i>
+          إدارة المشرفين
+        </a>
+      </div>
     </header>
 
-    <% if (flash && flash.message) { %>
-      <div class="mt-3">
-        <div class="alert alert-<%= flash.type || 'info' %> alert-dismissible fade show" role="alert">
-          <%= flash.message %>
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <!-- Content -->
+    <div class="hm-admin-content">
+      <!-- Flash Messages -->
+      <% if (flash && flash.message) { %>
+      <div class="hm-admin-alert hm-admin-alert-<%= flash.type || 'info' %>">
+        <i class="fas <%= flash.type === 'success' ? 'fa-check-circle' : flash.type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle' %>"></i>
+        <span><%= flash.message %></span>
+      </div>
+      <% } %>
+
+      <!-- Stats -->
+      <div class="hm-stats-grid">
+        <div class="hm-stat-card">
+          <div class="hm-stat-icon">
+            <i class="fas fa-users"></i>
+          </div>
+          <div class="hm-stat-info">
+            <div class="hm-stat-label">إجمالي المستخدمين</div>
+            <div class="hm-stat-value"><%= users ? users.length : 0 %></div>
+          </div>
+        </div>
+        <div class="hm-stat-card">
+          <div class="hm-stat-icon success">
+            <i class="fas fa-user-check"></i>
+          </div>
+          <div class="hm-stat-info">
+            <div class="hm-stat-label">عملاء نشطون</div>
+            <div class="hm-stat-value"><%= users ? users.filter(u => u.role === 'buyer').length : 0 %></div>
+          </div>
+        </div>
+        <div class="hm-stat-card">
+          <div class="hm-stat-icon warning">
+            <i class="fas fa-user-shield"></i>
+          </div>
+          <div class="hm-stat-info">
+            <div class="hm-stat-label">المشرفون</div>
+            <div class="hm-stat-value"><%= users ? users.filter(u => ['admin', 'super_admin', 'manager'].includes(u.role)).length : 0 %></div>
+          </div>
         </div>
       </div>
-    <% } %>
 
-    <section class="hm-section" aria-label="قائمة المستخدمين">
-      <h2 class="hm-section__title">قائمة المستخدمين</h2>
-      <div class="hm-list">
-        <% if (users && users.length) { %>
-          <% users.forEach(function(u){ %>
-            <div class="hm-list__item">
-              <div>
-                <h3 class="hm-list__title"><%= u.name || 'مستخدم' %></h3>
-                <div class="hm-list__meta"><%= u.email || '' %><%= u.phone ? (' - ' + u.phone) : '' %></div>
-              </div>
-              <span class="hm-chip"><i class="fas fa-user"></i><span><%= u.role || 'user' %></span></span>
+      <!-- Users List -->
+      <div class="hm-admin-card">
+        <div class="hm-card-header">
+          <h2 class="hm-card-title">
+            <i class="fas fa-users"></i>
+            قائمة المستخدمين
+          </h2>
+          <span class="hm-admin-badge hm-admin-badge-primary">
+            <%= users ? users.length : 0 %> مستخدم
+          </span>
+        </div>
+        <div class="hm-card-body" style="padding: 0;">
+          <% if (users && users.length > 0) { %>
+          <table class="hm-admin-table">
+            <thead>
+              <tr>
+                <th>المستخدم</th>
+                <th>البريد الإلكتروني</th>
+                <th>الهاتف</th>
+                <th>الدور</th>
+                <th>تاريخ التسجيل</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% users.forEach(function(u) { %>
+              <tr>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--hm-blue), var(--hm-blue-light)); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">
+                      <%= u.name ? u.name.charAt(0).toUpperCase() : 'U' %>
+                    </div>
+                    <div>
+                      <div style="color: var(--hm-white); font-weight: 600;"><%= u.name || 'مستخدم' %></div>
+                    </div>
+                  </div>
+                </td>
+                <td><%= u.email || '-' %></td>
+                <td><%= u.phone || '-' %></td>
+                <td>
+                  <% if (u.role === 'super_admin') { %>
+                  <span class="hm-admin-badge hm-admin-badge-danger">
+                    <i class="fas fa-crown"></i> مدير عام
+                  </span>
+                  <% } else if (u.role === 'admin') { %>
+                  <span class="hm-admin-badge hm-admin-badge-warning">
+                    <i class="fas fa-user-shield"></i> مدير
+                  </span>
+                  <% } else if (u.role === 'manager') { %>
+                  <span class="hm-admin-badge hm-admin-badge-primary">
+                    <i class="fas fa-user-tie"></i> مشرف
+                  </span>
+                  <% } else { %>
+                  <span class="hm-admin-badge hm-admin-badge-success">
+                    <i class="fas fa-user"></i> عميل
+                  </span>
+                  <% } %>
+                </td>
+                <td>
+                  <small style="color: var(--hm-gray);">
+                    <%= u.createdAt ? new Date(u.createdAt).toLocaleDateString('ar-SA') : '-' %>
+                  </small>
+                </td>
+              </tr>
+              <% }); %>
+            </tbody>
+          </table>
+          <% } else { %>
+          <div class="hm-empty-state">
+            <div class="hm-empty-icon">
+              <i class="fas fa-users"></i>
             </div>
-          <% }) %>
-        <% } else { %>
-          <div class="hm-list__item">
-            <div>
-              <h3 class="hm-list__title">لا يوجد مستخدمون</h3>
-              <div class="hm-list__meta">سيظهر المستخدمون هنا بعد التسجيل</div>
-            </div>
+            <h3 class="hm-empty-title">لا يوجد مستخدمون</h3>
+            <p class="hm-empty-text">سيظهر المستخدمون هنا بعد التسجيل</p>
           </div>
-        <% } %>
+          <% } %>
+        </div>
       </div>
-    </section>
-  </div>
+    </div>
+  </main>
 </div>
+
+<script>
+function toggleSidebar() {
+  const sidebar = document.getElementById('adminSidebar');
+  sidebar.classList.toggle('open');
+}
+
+document.addEventListener('click', function(e) {
+  const sidebar = document.getElementById('adminSidebar');
+  const toggle = document.querySelector('.hm-mobile-toggle');
+  
+  if (window.innerWidth <= 1024) {
+    if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+      sidebar.classList.remove('open');
+    }
+  }
+});
+</script>

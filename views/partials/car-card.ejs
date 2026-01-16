@@ -1,52 +1,78 @@
-<div class="car-card">
-    <a href="/cars/<%= car._id %>" class="card-link">
-        <div class="card-image-container">
+<div class="hm-card hm-card-elevated">
+    <a href="/cars/<%= car._id %>" class="hm-card-link">
+        <div class="hm-card-image-container">
             <% if (car.images && car.images.length > 0) { %>
-                <img src="<%= car.images[0] %>" alt="<%= car.title %>" class="card-image" loading="lazy">
+                <img src="<%= car.images[0] %>" alt="<%= car.title %>" class="hm-card-image" loading="lazy">
             <% } else { %>
-                <div class="image-placeholder">
-                    <i class="fas fa-image"></i>
+                <div class="hm-image-placeholder">
+                    <i class="fas fa-car hm-icon hm-icon-xl hm-icon-muted"></i>
+                    <span>لا توجد صورة</span>
                 </div>
             <% } %>
-            <div class="card-overlay">
+            <div class="hm-card-overlay">
                 <% if (car.isSold) { %>
-                    <span class="badge sold">تم البيع</span>
+                    <span class="hm-badge hm-badge-danger">تم البيع</span>
                 <% } else if (car.listingType === 'auction') { %>
-                    <span class="badge auction">مزاد</span>
+                    <span class="hm-badge hm-badge-warning">مزاد</span>
                 <% } else { %>
-                    <span class="badge available">متوفر</span>
+                    <span class="hm-badge hm-badge-success">متوفر</span>
                 <% } %>
             </div>
         </div>
-        <div class="card-content">
-            <div class="card-title-make">
+        <div class="hm-card-content">
+            <div class="hm-card-title-make">
                 <% if (car.makeLogoUrl) { %>
-                    <img src="<%= car.makeLogoUrl %>" alt="<%= car.make %>" class="make-logo">
+                    <img src="<%= car.makeLogoUrl %>" alt="<%= car.make %>" class="hm-make-logo">
                 <% } %>
-                <h3 class="card-title"><%= car.title %></h3>
+                <h3 class="hm-card-title"><%= car.title %></h3>
             </div>
-            <p class="card-model"><%= car.make %> <%= car.model %></p>
-            <div class="card-specs">
-                <span><i class="fas fa-calendar-alt"></i> <%= car.year || 'N/A' %></span>
-                <span><i class="fas fa-tachometer-alt"></i> <%= car.mileage ? car.mileage.toLocaleString() + ' كم' : 'N/A' %></span>
+            <p class="hm-card-model"><%= car.make %> <%= car.model %></p>
+            <div class="hm-card-specs">
+                <span class="hm-spec-item">
+                    <i class="fas fa-calendar-alt hm-icon hm-icon-sm hm-icon-muted"></i>
+                    <%= car.year || 'N/A' %>
+                </span>
+                <span class="hm-spec-item">
+                    <i class="fas fa-tachometer-alt hm-icon hm-icon-sm hm-icon-muted"></i>
+                    <%= car.mileage ? car.mileage.toLocaleString() + ' كم' : 'N/A' %>
+                </span>
             </div>
-            <div class="card-price">
+            <div class="hm-card-price">
                 <% if (car.priceSar) { %>
-                    <%= car.priceSar.toLocaleString() %> ريال
+                    <strong><%= car.priceSar.toLocaleString() %> ريال</strong>
                 <% } else if (car.price) { %>
-                    <%= car.price.toLocaleString() %> ريال
+                    <strong><%= car.price.toLocaleString() %> ريال</strong>
                 <% } else { %>
-                    السعر عند الطلب
+                    <strong>السعر عند الطلب</strong>
                 <% } %>
             </div>
         </div>
     </a>
-    <div class="card-actions">
-        <a href="/cars/<%= car._id %>" class="btn btn-primary">التفاصيل</a>
+    <div class="hm-card-actions">
+        <a href="/cars/<%= car._id %>" class="hm-btn hm-btn-primary hm-btn-sm">
+            <i class="fas fa-eye"></i> التفاصيل
+        </a>
         <% if (currentUser && currentUser.role === 'buyer' && !car.isSold) { %>
-            <button class="btn btn-secondary favorite-btn" data-car-id="<%= car._id %>">
-                <i class="far fa-heart"></i>
+            <button class="hm-btn hm-btn-outline hm-btn-icon" data-car-id="<%= car._id %>" onclick="toggleFavorite(this)">
+                <i class="far fa-heart hm-icon hm-icon-sm"></i>
             </button>
         <% } %>
     </div>
 </div>
+
+<script>
+function toggleFavorite(button) {
+    const carId = button.getAttribute('data-car-id');
+    const icon = button.querySelector('i');
+    
+    // تبديل بين أيقونة القلب الممتلئ والفارغ
+    if (icon.classList.contains('fa-heart')) {
+        icon.className = 'far fa-heart hm-icon hm-icon-sm';
+    } else {
+        icon.className = 'fas fa-heart hm-icon hm-icon-sm hm-icon-danger';
+    }
+    
+    // في الواقع، يجب إرسال طلب إلى الخادم لحفظ التفضيل
+    // هذا فقط للعرض التفاعلي
+}
+</script>

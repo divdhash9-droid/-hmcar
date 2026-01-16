@@ -28,7 +28,14 @@ const settingsSchema = new mongoose.Schema({
       email: { type: String, default: 'info@hmcar.com' },
       phone: { type: String, default: '+966500000001' },
       address: { type: String, default: 'الرياض، المملكة العربية السعودية' }
-    }
+    },
+    // روابط التواصل الاجتماعي المباشرة
+    facebookUrl: { type: String, default: '' },
+    twitterUrl: { type: String, default: '' },
+    instagramUrl: { type: String, default: '' },
+    whatsappNumber: { type: String, default: '' },
+    youtubeUrl: { type: String, default: '' },
+    tiktokUrl: { type: String, default: '' }
   },
 
   // إعدادات عامة

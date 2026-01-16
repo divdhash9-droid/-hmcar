@@ -1,104 +1,174 @@
-<aside class="hm-admin-sidebar" aria-label="قائمة الإدارة">
-  <div class="hm-admin-sidebar__brand">
-    <a class="hm-admin-sidebar__brand-link" href="/admin" aria-label="HM CAR Admin">
-      <img class="hm-admin-sidebar__logo" src="/public/images/navbar-logo.png" alt="HM CAR" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/public/images/logo.png';" />
-      <div class="hm-admin-sidebar__brand-text">
-        <div class="hm-admin-sidebar__brand-title">HM CAR</div>
-        <div class="hm-admin-sidebar__brand-subtitle">Admin Panel</div>
-      </div>
-    </a>
+<!-- Admin Sidebar Partial -->
+<aside class="hm-admin-sidebar" id="adminSidebar">
+  <!-- Sidebar Header -->
+  <div class="hm-sidebar-header">
+    <div class="hm-sidebar-logo">
+      <img src="/images/logo.png" alt="HM CAR" onerror="this.onerror=null;this.src='/public/images/logo.png';">
+    </div>
+    <div class="hm-sidebar-brand">
+      <h1>HM CAR</h1>
+      <p>لوحة الإدارة</p>
+    </div>
   </div>
 
-  <nav class="hm-admin-sidebar__nav" aria-label="روابط الإدارة">
-    <a class="hm-admin-link <%= (currentUrl || '') === '/admin' ? 'is-active' : '' %>" href="/admin">
-      <i class="fas fa-tachometer-alt" aria-hidden="true"></i>
-      <span>لوحة التحكم</span>
-    </a>
-
-    <a class="hm-admin-link <%= (currentUrl || '').startsWith('/admin/cars') ? 'is-active' : '' %>" href="/admin/cars">
-      <i class="fas fa-car" aria-hidden="true"></i>
-      <span>السيارات</span>
-    </a>
-
-    <a class="hm-admin-link <%= (currentUrl || '').startsWith('/admin/orders') ? 'is-active' : '' %>" href="/admin/orders">
-      <i class="fas fa-file-invoice" aria-hidden="true"></i>
-      <span>الطلبات</span>
-    </a>
-
-    <a class="hm-admin-link <%= (currentUrl || '').startsWith('/admin/auctions') ? 'is-active' : '' %>" href="/admin/auctions">
-      <i class="fas fa-gavel" aria-hidden="true"></i>
-      <span>المزادات</span>
-    </a>
-
-    <a class="hm-admin-link <%= (currentUrl || '').startsWith('/admin/notifications') ? 'is-active' : '' %>" href="/admin/notifications">
-      <i class="fas fa-bell" aria-hidden="true"></i>
-      <span>الإشعارات</span>
-      <% if ((adminNewNotificationsCount || 0) > 0) { %>
-        <span class="hm-admin-badge" aria-label="إشعارات جديدة"><%= adminNewNotificationsCount %></span>
-      <% } %>
-    </a>
-
-    <div class="hm-admin-sidebar__divider" role="separator"></div>
-
-    <a class="hm-admin-link <%= (currentUrl || '').startsWith('/admin/brands') ? 'is-active' : '' %>" href="/admin/brands">
-      <i class="fas fa-industry" aria-hidden="true"></i>
-      <span>الشركات</span>
-    </a>
-
-    <a class="hm-admin-link <%= (currentUrl || '').startsWith('/admin/categories') ? 'is-active' : '' %>" href="/admin/categories">
-      <i class="fas fa-tags" aria-hidden="true"></i>
-      <span>الفئات</span>
-    </a>
-
-    <a class="hm-admin-link <%= (currentUrl || '').startsWith('/admin/spare-parts') ? 'is-active' : '' %>" href="/admin/spare-parts">
-      <i class="fas fa-cogs" aria-hidden="true"></i>
-      <span>قطع الغيار</span>
-    </a>
-
-    <a class="hm-admin-link <%= (currentUrl || '').startsWith('/admin/spare-brands') ? 'is-active' : '' %>" href="/admin/spare-brands">
-      <i class="fas fa-warehouse" aria-hidden="true"></i>
-      <span>شركات القطع</span>
-    </a>
-
-    <a class="hm-admin-link <%= (currentUrl || '').startsWith('/admin/live-auction') ? 'is-active' : '' %>" href="/admin/live-auction">
-      <i class="fas fa-satellite-dish" aria-hidden="true"></i>
-      <span>مزامنة المزاد</span>
-    </a>
-
-    <a class="hm-admin-link <%= (currentUrl || '').startsWith('/admin/support') ? 'is-active' : '' %>" href="/admin/support">
-      <i class="fas fa-headset" aria-hidden="true"></i>
-      <span>الدعم</span>
-    </a>
-
-    <a class="hm-admin-link <%= (currentUrl || '').startsWith('/admin/settings') ? 'is-active' : '' %>" href="/admin/settings">
-      <i class="fas fa-sliders-h" aria-hidden="true"></i>
-      <span>الإعدادات</span>
-    </a>
-
-    <a class="hm-admin-link <%= (currentUrl || '').startsWith('/admin/users') ? 'is-active' : '' %>" href="/admin/users">
-      <i class="fas fa-users" aria-hidden="true"></i>
-      <span>المستخدمون</span>
-    </a>
-
-    <% if (currentUser && currentUser.role === 'super_admin') { %>
-      <a class="hm-admin-link <%= (currentUrl || '').startsWith('/admin/users-management') ? 'is-active' : '' %>" href="/admin/users-management">
-        <i class="fas fa-user-shield" aria-hidden="true"></i>
-        <span>صلاحيات المشرفين</span>
+  <!-- Sidebar Navigation -->
+  <nav class="hm-sidebar-nav">
+    <!-- Main Section -->
+    <div class="hm-nav-section">
+      <div class="hm-nav-section-title">الرئيسية</div>
+      <a href="/admin" class="hm-nav-item" data-page="dashboard">
+        <i class="fas fa-gauge-high"></i>
+        <span>لوحة التحكم</span>
       </a>
-    <% } %>
+      <a href="/" class="hm-nav-item" data-page="home">
+        <i class="fas fa-home"></i>
+        <span>الموقع الرئيسي</span>
+      </a>
+    </div>
 
+    <!-- Products Section -->
+    <div class="hm-nav-section">
+      <div class="hm-nav-section-title">المنتجات</div>
+      <a href="/admin/cars" class="hm-nav-item" data-page="cars">
+        <i class="fas fa-car"></i>
+        <span>السيارات</span>
+      </a>
+      <a href="/cars/new" class="hm-nav-item" data-page="cars-new">
+        <i class="fas fa-plus-circle"></i>
+        <span>إضافة سيارة</span>
+      </a>
+      <a href="/admin/spare-parts" class="hm-nav-item" data-page="spare-parts">
+        <i class="fas fa-cogs"></i>
+        <span>قطع الغيار</span>
+      </a>
+      <a href="/admin/spare-brands" class="hm-nav-item" data-page="spare-brands">
+        <i class="fas fa-industry"></i>
+        <span>ماركات القطع</span>
+      </a>
+    </div>
+
+    <!-- Auctions Section -->
+    <div class="hm-nav-section">
+      <div class="hm-nav-section-title">المزادات</div>
+      <a href="/admin/auctions" class="hm-nav-item" data-page="auctions">
+        <i class="fas fa-gavel"></i>
+        <span>إدارة المزادات</span>
+      </a>
+      <a href="/admin/auctions/new" class="hm-nav-item" data-page="auctions-new">
+        <i class="fas fa-plus"></i>
+        <span>إنشاء مزاد</span>
+      </a>
+      <a href="/admin/live-auction" class="hm-nav-item" data-page="live-auction">
+        <i class="fas fa-broadcast-tower"></i>
+        <span>المزاد المباشر</span>
+      </a>
+    </div>
+
+    <!-- Orders & Users Section -->
+    <div class="hm-nav-section">
+      <div class="hm-nav-section-title">الطلبات والعملاء</div>
+      <a href="/admin/orders" class="hm-nav-item" data-page="orders">
+        <i class="fas fa-shopping-cart"></i>
+        <span>الطلبات</span>
+      </a>
+      <a href="/admin/users" class="hm-nav-item" data-page="users">
+        <i class="fas fa-users"></i>
+        <span>العملاء</span>
+      </a>
+      <a href="/admin/users-management" class="hm-nav-item" data-page="users-management">
+        <i class="fas fa-user-shield"></i>
+        <span>إدارة المشرفين</span>
+      </a>
+    </div>
+
+    <!-- Categories Section -->
+    <div class="hm-nav-section">
+      <div class="hm-nav-section-title">التصنيفات</div>
+      <a href="/admin/brands" class="hm-nav-item" data-page="brands">
+        <i class="fas fa-copyright"></i>
+        <span>الماركات</span>
+      </a>
+      <a href="/admin/categories" class="hm-nav-item" data-page="categories">
+        <i class="fas fa-tags"></i>
+        <span>الفئات</span>
+      </a>
+    </div>
+
+    <!-- Communication Section -->
+    <div class="hm-nav-section">
+      <div class="hm-nav-section-title">التواصل</div>
+      <a href="/admin/notifications" class="hm-nav-item" data-page="notifications">
+        <i class="fas fa-bell"></i>
+        <span>الإشعارات</span>
+      </a>
+      <a href="/admin/support" class="hm-nav-item" data-page="support">
+        <i class="fas fa-headset"></i>
+        <span>الدعم الفني</span>
+      </a>
+    </div>
+
+    <!-- Settings Section -->
+    <div class="hm-nav-section">
+      <div class="hm-nav-section-title">الإعدادات</div>
+      <a href="/admin/settings" class="hm-nav-item" data-page="settings">
+        <i class="fas fa-cog"></i>
+        <span>الإعدادات العامة</span>
+      </a>
+      <a href="/admin/settings/whatsapp" class="hm-nav-item" data-page="settings-whatsapp">
+        <i class="fab fa-whatsapp"></i>
+        <span>الواتساب</span>
+      </a>
+      <a href="/admin/settings/footer" class="hm-nav-item" data-page="settings-footer">
+        <i class="fas fa-window-maximize"></i>
+        <span>الشريط السفلي</span>
+      </a>
+      <a href="/admin/exchange-rate" class="hm-nav-item" data-page="exchange-rate">
+        <i class="fas fa-dollar-sign"></i>
+        <span>سعر الصرف</span>
+      </a>
+    </div>
   </nav>
 
-  <div class="hm-admin-sidebar__footer">
-    <div class="hm-admin-sidebar__user">
-      <div class="hm-admin-sidebar__user-name"><%= (currentUser && currentUser.name) ? currentUser.name : 'Admin' %></div>
-      <div class="hm-admin-sidebar__user-role"><%= (currentUser && currentUser.role) ? currentUser.role : '' %></div>
+  <!-- Sidebar Footer -->
+  <div class="hm-sidebar-footer">
+    <div class="hm-sidebar-user">
+      <div class="hm-sidebar-avatar">
+        <%= currentUser?.name ? currentUser.name.charAt(0).toUpperCase() : 'A' %>
+      </div>
+      <div class="hm-sidebar-user-info">
+        <p class="hm-sidebar-user-name"><%= currentUser?.name || 'المدير' %></p>
+        <p class="hm-sidebar-user-role"><%= currentUser?.role === 'super_admin' ? 'مدير عام' : 'مدير' %></p>
+      </div>
     </div>
-    <a class="hm-admin-logout" href="/auth/logout" aria-label="تسجيل خروج">
-      <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
-      <span>خروج</span>
+    <a href="/auth/logout" class="hm-sidebar-logout">
+      <i class="fas fa-sign-out-alt"></i>
+      <span>تسجيل الخروج</span>
     </a>
   </div>
 </aside>
 
-<div class="hm-admin-backdrop" data-admin-sidebar-backdrop hidden></div>
+<script>
+// Highlight active nav item
+(function() {
+  const currentPath = window.location.pathname;
+  const navItems = document.querySelectorAll('.hm-nav-item');
+  
+  navItems.forEach(item => {
+    item.classList.remove('active');
+    const href = item.getAttribute('href');
+    
+    // Exact match or starts with (for sub-pages)
+    if (href === currentPath || 
+        (currentPath.startsWith(href) && href !== '/' && href.length > 1)) {
+      item.classList.add('active');
+    }
+  });
+  
+  // Special case for /admin dashboard
+  if (currentPath === '/admin' || currentPath === '/admin/') {
+    navItems.forEach(item => item.classList.remove('active'));
+    const dashboardLink = document.querySelector('.hm-nav-item[data-page="dashboard"]');
+    if (dashboardLink) dashboardLink.classList.add('active');
+  }
+})();
+</script>

@@ -1,96 +1,124 @@
-<% layout('layout') -%>
-
-<!-- صفحة المزاد المباشر: تعرض رابط مزاد خارجي (وقد يتم تضمينه داخل iframe إن سمح الموقع) -->
-
-<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2 mb-3">
-  <div>
-    <h3 class="mb-1">المزاد المباشر</h3>
-    <div class="text-muted">رابط المزاد المباشر الذي حدده الأدمن.</div>
-  </div>
-  <% if (!(typeof isEmbed !== 'undefined' && isEmbed)) { %>
-    <div class="d-flex gap-2">
-      <a class="btn btn-outline-secondary" href="/auctions/cars">سيارات المزاد</a>
-      <a class="btn btn-outline-secondary" href="/cars">العودة للسيارات</a>
-    </div>
-  <% } %>
-</div>
-
-<% if (isEnded) { %>
-  <div class="card border-0 shadow-sm">
-    <div class="card-body py-5 text-center">
-      <h5 class="mb-2">انتظروا المزاد الآخر قريباً</h5>
-      <div class="text-muted">انتهى مزاد اليوم. سيتم إضافة رابط المزاد القادم قريباً.</div>
-    </div>
-  </div>
-<% } else if (!liveAuctionUrl) { %>
-  <!-- في حال لم يتم ضبط رابط المزاد المباشر من الإدارة -->
-  <div class="card border-0 shadow-sm">
-    <div class="card-body py-5 text-center">
-      <h5 class="mb-2">لا يوجد رابط مزاد مباشر</h5>
-      <div class="text-muted">سيقوم الأدمن بإضافة الرابط من لوحة التحكم.</div>
-    </div>
-  </div>
-<% } else { %>
-  <div class="card border-0 shadow-sm mb-3">
-    <div class="card-body">
-      <div class="mb-2">
-        <div class="text-muted mb-1">رابط المزاد:</div>
-        <a href="<%= liveAuctionUrl %>" target="_blank" rel="noopener" class="text-decoration-none"><%= liveAuctionUrl %></a>
-      </div>
-      <% if (snapshot && snapshot.updatedAt) { %>
-        <div class="text-muted">آخر تحديث: <%= new Date(snapshot.updatedAt).toLocaleString('en-US') %></div>
-      <% } %>
-      <% if (snapshot && snapshot.error) { %>
-        <div class="alert alert-warning mt-2 mb-0"><%= snapshot.error %></div>
-      <% } %>
-    </div>
-  </div>
-
-  <% if (snapshot && snapshot.cars && snapshot.cars.length) { %>
-    <div class="row g-3">
-      <% snapshot.cars.forEach((c, idx) => { %>
-        <div class="col-12 col-md-6 col-lg-4">
-          <div class="card border-0 shadow-sm h-100">
-            <% if (c.imageUrl) { %>
-              <img src="<%= c.imageUrl %>" class="card-img-top" alt="" loading="lazy" decoding="async" />
-            <% } %>
-            <div class="card-body">
-              <div class="d-flex justify-content-between align-items-start gap-2">
-                <h6 class="mb-1"><%= c.title || 'سيارة' %></h6>
-                <small class="text-muted">#<%= idx + 1 %></small>
-              </div>
-
-              <% if (c.currentPriceText) { %>
-                <div class="text-muted mb-2">السعر الحالي: <%= c.currentPriceText %></div>
-              <% } %>
-
-              <div class="d-flex gap-2 flex-wrap">
-                <% if (c.externalUrl) { %>
-                  <a class="btn btn-sm btn-outline-secondary" href="<%= c.externalUrl %>" target="_blank" rel="noopener">فتح في Lotte</a>
-                <% } %>
-
-                <% if (waNumber) { %>
-                  <% const lines = [
-                    'طلب سيارة من مزاد كوريا (Lotte) عبر HM CAR',
-                    `السيارة: ${c.title || ''}`,
-                    c.currentPriceText ? `السعر الحالي: ${c.currentPriceText}` : '',
-                    c.externalUrl ? `رابط السيارة في Lotte: ${c.externalUrl}` : '',
-                    `رابط المزاد داخل HM CAR: ${pageUrl}`
-                  ].filter(Boolean); %>
-                  <a class="btn btn-sm btn-success" href="https://wa.me/<%= waNumber %>?text=<%= encodeURIComponent(lines.join('\n')) %>" target="_blank" rel="noopener">واتساب للإدارة</a>
-                <% } %>
-              </div>
-            </div>
+<div class="hm-dashboard">
+  <div class="hm-dashboard__container">
+    <header class="hm-hero hm-bg-gold" aria-label="المزادات المباشرة">
+      <div class="hm-hero__top">
+        <div class="hm-hero__brand">
+          <img class="hm-hero__logo" src="/images/navbar-logo.png" alt="HM CAR" loading="eager" decoding="async" onerror="this.onerror=null;this.src='/images/logo.png';" />
+          <div class="hm-hero__titles">
+            <h1 class="hm-hero__title hm-text-white">المزادات المباشرة</h1>
+            <div class="hm-hero__subtitle hm-text-white">شاهد المزادات الحية وشارك فيها</div>
           </div>
         </div>
-      <% }); %>
-    </div>
-  <% } else { %>
-    <div class="card border-0 shadow-sm">
-      <div class="card-body py-5 text-center">
-        <h5 class="mb-2">جاري تحميل سيارات المزاد</h5>
-        <div class="text-muted">إذا كان هذا أول تشغيل اليوم، انتظر قليلاً ثم أعد تحديث الصفحة.</div>
       </div>
+    </header>
+    
+    <!-- Live Auction Content -->
+    <div class="hm-section">
+      <% if (isEnded) { %>
+        <div class="hm-card text-center py-5">
+          <div class="hm-icon-container hm-icon-container-light mx-auto mb-3">
+            <i class="fas fa-clock hm-icon-2xl hm-icon-muted"></i>
+          </div>
+          <h5 class="hm-text-blue">المزاد انتهى</h5>
+          <div class="hm-text-muted">هذا المزاد قد انتهى. يمكنك مشاهدة النتائج.</div>
+        </div>
+      <% } else if (!liveAuctionUrl) { %>
+        <div class="hm-card text-center py-5">
+          <div class="hm-icon-container hm-icon-container-light mx-auto mb-3">
+            <i class="fas fa-exclamation-triangle hm-icon-2xl hm-icon-muted"></i>
+          </div>
+          <h5 class="hm-text-blue">المزاد غير متاح</h5>
+          <div class="hm-text-muted">المزاد غير متاح حالياً. يرجى المحاولة لاحقاً.</div>
+        </div>
+      <% } else { %>
+        <div class="hm-card p-3 mb-4">
+          <iframe 
+            src="<%= liveAuctionUrl %>" 
+            class="w-100"
+            style="height: 600px; border: none; border-radius: var(--hm-radius-lg);"
+            frameborder="0"
+            allowfullscreen
+            loading="lazy"
+          ></iframe>
+        </div>
+
+        <div class="mb-4">
+          <a href="<%= liveAuctionUrl %>" target="_blank" rel="noopener" class="hm-btn hm-btn-outline w-100">
+            <i class="fas fa-external-link-alt"></i> <%= liveAuctionUrl %>
+          </a>
+        </div>
+
+        <!-- Snapshot Info -->
+        <% if (snapshot && snapshot.updatedAt) { %>
+          <div class="hm-card p-3 mb-3">
+            <i class="fas fa-sync me-2"></i> آخر تحديث: <%= new Date(snapshot.updatedAt).toLocaleString('en-US') %>
+          </div>
+        <% } %>
+
+        <% if (snapshot && snapshot.error) { %>
+          <div class="hm-card p-3 mb-3">
+            <i class="fas fa-exclamation-triangle me-2"></i> <%= snapshot.error %>
+          </div>
+        <% } %>
+
+        <!-- Cars from Snapshot -->
+        <% if (snapshot && snapshot.cars && snapshot.cars.length) { %>
+          <div class="hm-grid hm-grid--responsive">
+            <% snapshot.cars.forEach((c, idx) => { %>
+              <div class="hm-card">
+                <% if (c.imageUrl) { %>
+                  <img src="<%= c.imageUrl %>" class="w-100" style="height: 200px; object-fit: cover; border-radius: var(--hm-radius-lg) var(--hm-radius-lg) 0 0;" alt="<%= c.title || 'سيارة' %>" loading="lazy" decoding="async" />
+                <% } %>
+                
+                <div class="p-3">
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h6 class="mb-0"><%= c.title || 'سيارة' %></h6>
+                    <span class="hm-text-muted small">#<%= idx + 1 %></span>
+                  </div>
+                  
+                  <% if (c.currentPriceText) { %>
+                    <div class="hm-text-muted small mb-2">السعر الحالي: <%= c.currentPriceText %></div>
+                  <% } %>
+                  
+                  <div class="d-flex flex-wrap gap-2">
+                    <% if (c.externalUrl) { %>
+                      <a class="hm-btn hm-btn-sm hm-btn-outline" href="<%= c.externalUrl %>" target="_blank" rel="noopener">
+                        <i class="fas fa-external-link-alt"></i> عرض في Lotte
+                      </a>
+                    <% } %>
+
+                    <% if (waNumber) { %>
+                      <% 
+                        const lines = [
+                          'طلب سيارة من مزاد كوريا (Lotte) عبر HM CAR',
+                          `السيارة: ${c.title || ''}`,
+                          c.currentPriceText ? `السعر الحالي: ${c.currentPriceText}` : '',
+                          c.externalUrl ? `رابط السيارة في Lotte: ${c.externalUrl}` : '',
+                          `رابط المزاد داخل HM CAR: ${pageUrl}`
+                        ].filter(Boolean); 
+                      %>
+                      <a class="hm-btn hm-btn-sm hm-btn-success" href="https://wa.me/<%= waNumber %>?text=<%= encodeURIComponent(lines.join('\\n')) %>" target="_blank" rel="noopener">
+                        <i class="fab fa-whatsapp"></i> واتساب للإدارة
+                      </a>
+                    <% } %>
+                  </div>
+                </div>
+              </div>
+            <% }); %>
+          </div>
+        <% } %>
+      <% } %>
     </div>
-  <% } %>
-<% } %>
+
+    <!-- Loading State -->
+    <% if (!snapshot && !isEnded && liveAuctionUrl) { %>
+      <div class="hm-card text-center py-5">
+        <div class="hm-icon-container hm-icon-container-light mx-auto mb-3">
+          <i class="fas fa-spinner hm-icon-2xl hm-icon-muted"></i>
+        </div>
+        <h5 class="hm-text-blue">جاري تحميل سيارات المزاد</h5>
+        <div class="hm-text-muted">إذا كان هذا أول تشغيل اليوم، انتظر قليلاً ثم أعد تحديث الصفحة.</div>
+      </div>
+    <% } %>
+  </div>
+</div>

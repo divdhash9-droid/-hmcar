@@ -163,8 +163,48 @@ class WebSocketService {
   getOnlineUsersCount() {
     return this.connectedUsers.size;
   }
-}
 
-module.exports = new WebSocketService();
+  /**
+   * Get online users list (for admin monitoring)
+   */
+  getOnlineUsers() {
+    return Array.from(this.connectedUsers.entries()).map(([userId, socketId]) => ({
+      userId,
+      socketId,
+      connectedAt: new Date() // يمكن تحسينها بحفظ وقت الاتصال
+    }));
+  }
+
+  /**
+   * Disconnect user forcefully (admin action)
+   */
+  disconnectUser(userId) {
+    const socketId = this.connectedUsers.get(userId.toString());
+    if (socketId && this.io) {
+      const socket = this.io.sockets.sockets.get(socketId);
+      if (socket) {
+        socket.disconnect(true);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Send typing indicator for chat
+   */
+  sendTyping(roomId, userId, isTyping) {
+    this.emitToRoom(roomId, 'user_typing', { userId, isTyping });
+  }
+
+  /**
+   * Get room size (number of connected clients)
+   */
+  getRoomSize(roomName) {
+    if (!this.io) return 0;
+    const room = this.io.sockets.adapter.rooms.get(roomName);
+    return room ? room.size : 0;
+  }
+}
 
 module.exports = new WebSocketService();

@@ -27,16 +27,21 @@ async function addIndexes() {
     console.log('\n📊 إضافة Indexes للسيارات...');
     await db.collection('cars').createIndex({ make: 1, model: 1 });
     await db.collection('cars').createIndex({ price: 1 });
+    await db.collection('cars').createIndex({ priceSar: 1 });
+    await db.collection('cars').createIndex({ priceUsd: 1 });
     await db.collection('cars').createIndex({ year: -1 });
-    await db.collection('cars').createIndex({ status: 1 });
+    await db.collection('cars').createIndex({ isActive: 1, isSold: 1 });
+    await db.collection('cars').createIndex({ condition: 1 });
+    await db.collection('cars').createIndex({ listingType: 1 });
     await db.collection('cars').createIndex({ createdAt: -1 });
     await db.collection('cars').createIndex({ mileage: 1 });
-    await db.collection('cars').createIndex({ transmission: 1 });
-    await db.collection('cars').createIndex({ fuelType: 1 });
-    await db.collection('cars').createIndex({ 'location.city': 1 });
+    await db.collection('cars').createIndex({ seller: 1 });
+    // Compound indexes لتحسين الاستعلامات المعقدة
+    await db.collection('cars').createIndex({ isActive: 1, listingType: 1, createdAt: -1 });
+    await db.collection('cars').createIndex({ make: 1, year: -1, price: 1 });
     // Text index للبحث
     await db.collection('cars').createIndex({ 
-      name: 'text', 
+      title: 'text', 
       make: 'text', 
       model: 'text', 
       description: 'text' 
@@ -49,10 +54,14 @@ async function addIndexes() {
     if (auctionsExists) {
       await db.collection('auctions').createIndex({ car: 1 });
       await db.collection('auctions').createIndex({ status: 1 });
-      await db.collection('auctions').createIndex({ startDate: 1 });
-      await db.collection('auctions').createIndex({ endDate: 1 });
-      await db.collection('auctions').createIndex({ currentBid: -1 });
+      await db.collection('auctions').createIndex({ startsAt: 1 });
+      await db.collection('auctions').createIndex({ endsAt: 1 });
+      await db.collection('auctions').createIndex({ currentPrice: -1 });
+      await db.collection('auctions').createIndex({ highestBidder: 1 });
       await db.collection('auctions').createIndex({ createdAt: -1 });
+      // Compound indexes للاستعلامات الشائعة
+      await db.collection('auctions').createIndex({ status: 1, endsAt: 1 });
+      await db.collection('auctions').createIndex({ status: 1, startsAt: 1, endsAt: 1 });
       console.log('✅ تم إضافة Indexes للمزادات');
     } else {
       console.log('⚠️  جدول المزادات غير موجود');

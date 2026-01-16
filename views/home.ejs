@@ -1,659 +1,1635 @@
 <% layout('layout') -%>
 <% var hideNavbar = true; %>
+<% var hideFooter = true; %>
 <% var hideSearch = true; %>
 <% var fullWidth = true; %>
 
-<link href="/public/css/home-v3.css" rel="stylesheet">
+<!-- Google Fonts - Cairo & Tajawal -->
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+
+<% const isLoggedIn = !!(typeof currentUser !== 'undefined' && currentUser); %>
+<% const isAdmin = isLoggedIn && currentUser.role === 'admin'; %>
+
+<div class="hm-pro-home">
+  <!-- ============================================
+       SECTION 1: NAVIGATION BAR (Fixed)
+       ============================================ -->
+  <nav class="hm-navbar">
+    <div class="hm-navbar__container">
+      <!-- Logo -->
+      <a href="/" class="hm-navbar__brand">
+        <div class="hm-navbar__logo-wrap">
+          <img src="/public/images/logo.png" alt="HM CAR" class="hm-navbar__logo" />
+        </div>
+      </a>
+
+      <!-- Navigation Links -->
+      <ul class="hm-navbar__menu">
+        <li><a href="/" class="hm-nav-link active" data-ar="الرئيسية" data-en="Home"><i class="fas fa-home"></i><span>الرئيسية</span></a></li>
+        <li><a href="/cars" class="hm-nav-link" data-ar="السيارات" data-en="Cars"><i class="fas fa-car"></i><span>السيارات</span></a></li>
+        <li><a href="/auctions" class="hm-nav-link" data-ar="المزادات" data-en="Auctions"><i class="fas fa-gavel"></i><span>المزادات</span></a></li>
+        <li><a href="/spare-parts" class="hm-nav-link" data-ar="قطع الغيار" data-en="Spare Parts"><i class="fas fa-cogs"></i><span>قطع الغيار</span></a></li>
+        <li><a href="/about" class="hm-nav-link" data-ar="من نحن" data-en="About Us"><i class="fas fa-info-circle"></i><span>من نحن</span></a></li>
+        <li><a href="/contact" class="hm-nav-link" data-ar="اتصل بنا" data-en="Contact"><i class="fas fa-envelope"></i><span>اتصل بنا</span></a></li>
+      </ul>
+
+      <!-- Right Actions -->
+      <div class="hm-navbar__actions">
+        <!-- Language Switcher -->
+        <button class="hm-btn-3d hm-btn-lang" onclick="toggleLanguage()" title="تغيير اللغة">
+          <i class="fas fa-globe"></i>
+          <span id="currentLang">EN</span>
+        </button>
+
+        <!-- Auth Buttons -->
+        <% if (isLoggedIn) { %>
+          <a href="/client/dashboard" class="hm-btn-3d hm-btn-outline-3d">
+            <i class="fas fa-user"></i>
+            <span data-ar="حسابي" data-en="My Account">حسابي</span>
+          </a>
+          <% if (isAdmin) { %>
+            <a href="/admin" class="hm-btn-3d hm-btn-admin-3d">
+              <i class="fas fa-cog"></i>
+              <span data-ar="لوحة التحكم" data-en="Admin Panel">لوحة التحكم</span>
+            </a>
+          <% } %>
+        <% } else { %>
+          <a href="/auth/login" class="hm-btn-3d hm-btn-outline-3d">
+            <i class="fas fa-sign-in-alt"></i>
+            <span data-ar="دخول" data-en="Login">دخول</span>
+          </a>
+          <a href="/auth/login" class="hm-btn-3d hm-btn-primary-3d">
+            <i class="fas fa-user-plus"></i>
+            <span data-ar="تسجيل" data-en="Register">تسجيل</span>
+          </a>
+        <% } %>
+
+        <!-- Mobile Menu Toggle -->
+        <button class="hm-navbar__toggle" onclick="toggleMobileMenu()">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ============================================
+       SECTION 2: HERO SECTION
+       ============================================ -->
+  <section class="hm-hero">
+    <div class="hm-hero__bg">
+      <div class="hm-hero__gradient"></div>
+      <div class="hm-hero__particles">
+        <div class="particle p1"></div>
+        <div class="particle p2"></div>
+        <div class="particle p3"></div>
+        <div class="particle p4"></div>
+        <div class="particle p5"></div>
+      </div>
+    </div>
+
+    <div class="hm-hero__content">
+      <div class="hm-hero__logo-section">
+        <div class="hm-hero__logo-container">
+          <div class="hm-hero__logo-glow"></div>
+          <div class="hm-hero__logo-ring"></div>
+          <div class="hm-hero__logo-wrap">
+            <img src="/public/images/logo.png" alt="HM CAR" class="hm-hero__logo" />
+          </div>
+        </div>
+      </div>
+
+      <h1 class="hm-hero__title" data-ar="منصة HM CAR لتصدير السيارات" data-en="HM CAR Export Platform">
+        منصة HM CAR لتصدير السيارات
+      </h1>
+      <p class="hm-hero__subtitle" data-ar="تصدير السيارات وقطع الغيار من كوريا إلى جميع دول العالم" data-en="Exporting cars and spare parts from Korea to all countries of the world">
+        تصدير السيارات وقطع الغيار من كوريا إلى جميع دول العالم
+      </p>
+
+      <div class="hm-hero__cta">
+        <a href="/cars" class="hm-btn-3d hm-btn-hero-primary">
+          <i class="fas fa-car"></i>
+          <span data-ar="تسوق الآن" data-en="Shop Now">تسوق الآن</span>
+        </a>
+        <a href="/auctions" class="hm-btn-3d hm-btn-hero-secondary">
+          <i class="fas fa-gavel"></i>
+          <span data-ar="ابدأ المزايدة" data-en="Start Bidding">ابدأ المزايدة</span>
+        </a>
+      </div>
+
+      <!-- Quick Search -->
+      <div class="hm-hero__search">
+        <form action="/search" method="GET" class="hm-search-form-3d">
+          <div class="hm-search-input-wrap">
+            <i class="fas fa-search"></i>
+            <input type="text" name="q" placeholder="ابحث عن سيارتك المثالية..." data-placeholder-ar="ابحث عن سيارتك المثالية..." data-placeholder-en="Search for your perfect car...">
+          </div>
+          <button type="submit" class="hm-btn-3d hm-btn-search-3d">
+            <span data-ar="بحث" data-en="Search">بحث</span>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Scroll Indicator -->
+    <div class="hm-hero__scroll" onclick="scrollToSection('services')">
+      <i class="fas fa-chevron-down"></i>
+    </div>
+  </section>
+
+  <!-- ============================================
+       SECTION 3: PRODUCTS / SERVICES
+       ============================================ -->
+  <section class="hm-services" id="services">
+    <div class="hm-container">
+      <div class="hm-section-header">
+        <h2 class="hm-section-title" data-ar="خدماتنا" data-en="Our Services">خدماتنا</h2>
+        <p class="hm-section-subtitle" data-ar="اكتشف ما نقدمه لك" data-en="Discover what we offer">اكتشف ما نقدمه لك</p>
+      </div>
+
+      <div class="hm-services__grid">
+        <!-- Service Card 1: Cars -->
+        <div class="hm-service-card-3d">
+          <div class="hm-service-card__icon">
+            <i class="fas fa-car-side"></i>
+          </div>
+          <h3 class="hm-service-card__title" data-ar="سيارات فاخرة" data-en="Luxury Cars">سيارات فاخرة</h3>
+          <p class="hm-service-card__desc" data-ar="مجموعة واسعة من السيارات الفاخرة المستوردة من كوريا" data-en="Wide range of luxury cars imported from Korea">
+            مجموعة واسعة من السيارات الفاخرة المستوردة من كوريا
+          </p>
+          <a href="/cars" class="hm-btn-3d hm-btn-card">
+            <span data-ar="استعرض السيارات" data-en="Browse Cars">استعرض السيارات</span>
+            <i class="fas fa-arrow-left"></i>
+          </a>
+        </div>
+
+        <!-- Service Card 2: Auctions -->
+        <div class="hm-service-card-3d">
+          <div class="hm-service-card__icon">
+            <i class="fas fa-gavel"></i>
+          </div>
+          <h3 class="hm-service-card__title" data-ar="مزادات حية" data-en="Live Auctions">مزادات حية</h3>
+          <p class="hm-service-card__desc" data-ar="شارك في مزاداتنا الحية واحصل على أفضل الأسعار" data-en="Participate in our live auctions and get the best prices">
+            شارك في مزاداتنا الحية واحصل على أفضل الأسعار
+          </p>
+          <a href="/auctions" class="hm-btn-3d hm-btn-card">
+            <span data-ar="عرض المزادات" data-en="View Auctions">عرض المزادات</span>
+            <i class="fas fa-arrow-left"></i>
+          </a>
+        </div>
+
+        <!-- Service Card 3: Spare Parts -->
+        <div class="hm-service-card-3d">
+          <div class="hm-service-card__icon">
+            <i class="fas fa-cogs"></i>
+          </div>
+          <h3 class="hm-service-card__title" data-ar="قطع الغيار" data-en="Spare Parts">قطع الغيار</h3>
+          <p class="hm-service-card__desc" data-ar="قطع غيار أصلية لجميع أنواع السيارات الكورية" data-en="Original spare parts for all types of Korean cars">
+            قطع غيار أصلية لجميع أنواع السيارات الكورية
+          </p>
+          <a href="/spare-parts" class="hm-btn-3d hm-btn-card">
+            <span data-ar="تصفح القطع" data-en="Browse Parts">تصفح القطع</span>
+            <i class="fas fa-arrow-left"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       SECTION 4: FEATURES
+       ============================================ -->
+  <section class="hm-features" id="features">
+    <div class="hm-container">
+      <div class="hm-section-header">
+        <h2 class="hm-section-title" data-ar="لماذا تختارنا؟" data-en="Why Choose Us?">لماذا تختارنا؟</h2>
+        <p class="hm-section-subtitle" data-ar="مميزات تجعلنا الخيار الأفضل" data-en="Features that make us the best choice">مميزات تجعلنا الخيار الأفضل</p>
+      </div>
+
+      <div class="hm-features__grid">
+        <div class="hm-feature-item">
+          <div class="hm-feature-item__icon">
+            <i class="fas fa-headset"></i>
+          </div>
+          <h4 data-ar="دعم مباشر 24/7" data-en="24/7 Live Support">دعم مباشر 24/7</h4>
+          <p data-ar="فريق دعم متاح على مدار الساعة" data-en="Support team available around the clock">فريق دعم متاح على مدار الساعة</p>
+        </div>
+
+        <div class="hm-feature-item">
+          <div class="hm-feature-item__icon">
+            <i class="fas fa-clipboard-check"></i>
+          </div>
+          <h4 data-ar="فحص قبل التصدير" data-en="Pre-Export Inspection">فحص قبل التصدير</h4>
+          <p data-ar="فحص شامل لكل سيارة قبل الشحن" data-en="Comprehensive inspection for every car before shipping">فحص شامل لكل سيارة قبل الشحن</p>
+        </div>
+
+        <div class="hm-feature-item">
+          <div class="hm-feature-item__icon">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <h4 data-ar="دفع آمن" data-en="Secure Payment">دفع آمن</h4>
+          <p data-ar="طرق دفع آمنة ومضمونة" data-en="Safe and guaranteed payment methods">طرق دفع آمنة ومضمونة</p>
+        </div>
+
+        <div class="hm-feature-item">
+          <div class="hm-feature-item__icon">
+            <i class="fas fa-globe-americas"></i>
+          </div>
+          <h4 data-ar="شحن عالمي" data-en="Global Shipping">شحن عالمي</h4>
+          <p data-ar="نصدر إلى جميع دول العالم" data-en="We export to all countries of the world">نصدر إلى جميع دول العالم</p>
+        </div>
+
+        <div class="hm-feature-item">
+          <div class="hm-feature-item__icon">
+            <i class="fas fa-certificate"></i>
+          </div>
+          <h4 data-ar="ضمان الجودة" data-en="Quality Guarantee">ضمان الجودة</h4>
+          <p data-ar="ضمان شامل على جميع السيارات" data-en="Comprehensive warranty on all cars">ضمان شامل على جميع السيارات</p>
+        </div>
+
+        <div class="hm-feature-item">
+          <div class="hm-feature-item__icon">
+            <i class="fas fa-tag"></i>
+          </div>
+          <h4 data-ar="أسعار تنافسية" data-en="Competitive Prices">أسعار تنافسية</h4>
+          <p data-ar="أفضل الأسعار في السوق" data-en="Best prices in the market">أفضل الأسعار في السوق</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       SECTION 5: STATISTICS
+       ============================================ -->
+  <section class="hm-stats">
+    <div class="hm-container">
+      <div class="hm-stats__grid">
+        <div class="hm-stat-item">
+          <div class="hm-stat-item__number" data-count="<%= (typeof stats !== 'undefined' && stats.totalCars) || 500 %>">0</div>
+          <div class="hm-stat-item__label" data-ar="سيارة متاحة" data-en="Available Cars">سيارة متاحة</div>
+        </div>
+        <div class="hm-stat-item">
+          <div class="hm-stat-item__number" data-count="<%= (typeof stats !== 'undefined' && stats.activeAuctions) || 50 %>">0</div>
+          <div class="hm-stat-item__label" data-ar="مزاد نشط" data-en="Active Auctions">مزاد نشط</div>
+        </div>
+        <div class="hm-stat-item">
+          <div class="hm-stat-item__number" data-count="<%= (typeof stats !== 'undefined' && stats.happyCustomers) || 1200 %>">0</div>
+          <div class="hm-stat-item__label" data-ar="عميل سعيد" data-en="Happy Customers">عميل سعيد</div>
+        </div>
+        <div class="hm-stat-item">
+          <div class="hm-stat-item__number" data-count="<%= (typeof stats !== 'undefined' && stats.countries) || 45 %>">0</div>
+          <div class="hm-stat-item__label" data-ar="دولة نصدر إليها" data-en="Countries We Export To">دولة نصدر إليها</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       SECTION 6: CALL TO ACTION
+       ============================================ -->
+  <section class="hm-cta">
+    <div class="hm-container">
+      <div class="hm-cta__content">
+        <h2 class="hm-cta__title" data-ar="هل أنت مستعد للبدء؟" data-en="Ready to Get Started?">هل أنت مستعد للبدء؟</h2>
+        <p class="hm-cta__desc" data-ar="انضم إلينا اليوم واكتشف عالم السيارات الفاخرة" data-en="Join us today and discover the world of luxury cars">
+          انضم إلينا اليوم واكتشف عالم السيارات الفاخرة
+        </p>
+        <div class="hm-cta__buttons">
+          <a href="/auth/register" class="hm-btn-3d hm-btn-cta-primary">
+            <i class="fas fa-user-plus"></i>
+            <span data-ar="سجل الآن مجاناً" data-en="Register Now - Free">سجل الآن مجاناً</span>
+          </a>
+          <a href="/contact" class="hm-btn-3d hm-btn-cta-secondary">
+            <i class="fas fa-phone-alt"></i>
+            <span data-ar="تواصل معنا" data-en="Contact Us">تواصل معنا</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       SECTION 7: FOOTER
+       ============================================ -->
+  <footer class="hm-footer">
+    <div class="hm-container">
+      <div class="hm-footer__grid">
+        <!-- Footer Logo & About -->
+        <div class="hm-footer__brand">
+          <img src="/public/images/logo.png" alt="HM CAR" class="hm-footer__logo" />
+          <p data-ar="منصة HM CAR لتصدير السيارات وقطع الغيار من كوريا إلى جميع دول العالم" data-en="HM CAR platform for exporting cars and spare parts from Korea to all countries of the world">
+            منصة HM CAR لتصدير السيارات وقطع الغيار من كوريا إلى جميع دول العالم
+          </p>
+          <div class="hm-footer__social">
+            <a href="<%= (typeof siteSettings !== 'undefined' && siteSettings.facebookUrl) || '#' %>" class="hm-social-btn" target="_blank" title="Facebook">
+              <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="<%= (typeof siteSettings !== 'undefined' && siteSettings.twitterUrl) || '#' %>" class="hm-social-btn" target="_blank" title="Twitter">
+              <i class="fab fa-twitter"></i>
+            </a>
+            <a href="<%= (typeof siteSettings !== 'undefined' && siteSettings.instagramUrl) || '#' %>" class="hm-social-btn" target="_blank" title="Instagram">
+              <i class="fab fa-instagram"></i>
+            </a>
+            <a href="https://wa.me/<%= (typeof siteSettings !== 'undefined' && siteSettings.whatsappNumber) || '' %>" class="hm-social-btn" target="_blank" title="WhatsApp">
+              <i class="fab fa-whatsapp"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="hm-footer__links">
+          <h4 data-ar="روابط سريعة" data-en="Quick Links">روابط سريعة</h4>
+          <ul>
+            <li><a href="/cars" data-ar="السيارات" data-en="Cars">السيارات</a></li>
+            <li><a href="/auctions" data-ar="المزادات" data-en="Auctions">المزادات</a></li>
+            <li><a href="/spare-parts" data-ar="قطع الغيار" data-en="Spare Parts">قطع الغيار</a></li>
+            <li><a href="/about" data-ar="من نحن" data-en="About Us">من نحن</a></li>
+          </ul>
+        </div>
+
+        <!-- Support -->
+        <div class="hm-footer__links">
+          <h4 data-ar="الدعم" data-en="Support">الدعم</h4>
+          <ul>
+            <li><a href="/contact" data-ar="اتصل بنا" data-en="Contact Us">اتصل بنا</a></li>
+            <li><a href="/faq" data-ar="الأسئلة الشائعة" data-en="FAQ">الأسئلة الشائعة</a></li>
+            <li><a href="/privacy" data-ar="سياسة الخصوصية" data-en="Privacy Policy">سياسة الخصوصية</a></li>
+            <li><a href="/terms" data-ar="الشروط والأحكام" data-en="Terms & Conditions">الشروط والأحكام</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact Info -->
+        <div class="hm-footer__contact">
+          <h4 data-ar="تواصل معنا" data-en="Contact Us">تواصل معنا</h4>
+          <ul>
+            <li><i class="fas fa-map-marker-alt"></i> <span data-ar="كوريا الجنوبية، سيول" data-en="South Korea, Seoul">كوريا الجنوبية، سيول</span></li>
+            <li><i class="fas fa-phone"></i> <span>+82 10 1234 5678</span></li>
+            <li><i class="fas fa-envelope"></i> <span>info@hmcar.com</span></li>
+            <li><i class="fas fa-clock"></i> <span data-ar="24/7 متاح" data-en="24/7 Available">24/7 متاح</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Copyright -->
+      <div class="hm-footer__bottom">
+        <p data-ar="© 2026 HM CAR. جميع الحقوق محفوظة" data-en="© 2026 HM CAR. All rights reserved">© 2026 HM CAR. جميع الحقوق محفوظة</p>
+      </div>
+    </div>
+  </footer>
+</div>
 
 <style>
-/* Enhanced Home Page Styles */
-.hm-home {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #0b1f3a 0%, #1a3a52 50%, #0d2339 100%);
-  position: relative;
-  overflow: hidden;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+/* ============================================
+   HM CAR Professional Homepage
+   Navy Blue & Snow White Theme
+   3D Buttons & Luxury Design
+   ============================================ */
+
+/* CSS Variables */
+:root {
+  --hm-navy: #001f3f;
+  --hm-navy-light: #003366;
+  --hm-navy-dark: #00152a;
+  --hm-blue: #007bff;
+  --hm-blue-light: #3395ff;
+  --hm-blue-dark: #0056b3;
+  --hm-white: #ffffff;
+  --hm-snow: #f8fafc;
+  --hm-gray: #94a3b8;
+  --hm-gray-light: #e2e8f0;
+  --hm-shadow: rgba(0, 31, 63, 0.2);
+  --hm-font-ar: 'Cairo', 'Tajawal', sans-serif;
+  --hm-font-en: 'Segoe UI', Tahoma, sans-serif;
 }
 
-/* Background Particles */
-.hm-home::before {
-  content: '';
+/* Base Styles */
+.hm-pro-home {
+  font-family: var(--hm-font-ar);
+  direction: rtl;
+  background: var(--hm-snow);
+  color: var(--hm-navy);
+  overflow-x: hidden;
+}
+
+.hm-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* ============================================
+   3D Buttons
+   ============================================ */
+.hm-btn-3d {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Primary 3D Button */
+.hm-btn-primary-3d {
+  background: linear-gradient(145deg, var(--hm-blue), var(--hm-blue-light));
+  color: var(--hm-white);
+  box-shadow: 
+    0 6px 20px rgba(0, 123, 255, 0.4),
+    0 3px 6px rgba(0, 0, 0, 0.15),
+    inset 0 2px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.1);
+}
+
+.hm-btn-primary-3d:hover {
+  transform: translateY(-3px);
+  box-shadow: 
+    0 10px 30px rgba(0, 123, 255, 0.5),
+    0 5px 10px rgba(0, 0, 0, 0.2),
+    inset 0 2px 0 rgba(255, 255, 255, 0.3);
+}
+
+.hm-btn-primary-3d:active {
+  transform: translateY(1px);
+  box-shadow: 
+    0 3px 10px rgba(0, 123, 255, 0.3),
+    inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Outline 3D Button */
+.hm-btn-outline-3d {
+  background: var(--hm-white);
+  color: var(--hm-navy);
+  border: 2px solid var(--hm-navy);
+  box-shadow: 
+    0 4px 12px rgba(0, 31, 63, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.hm-btn-outline-3d:hover {
+  background: var(--hm-navy);
+  color: var(--hm-white);
+  transform: translateY(-3px);
+  box-shadow: 
+    0 8px 20px rgba(0, 31, 63, 0.3);
+}
+
+/* Admin 3D Button */
+.hm-btn-admin-3d {
+  background: linear-gradient(145deg, var(--hm-navy), var(--hm-navy-light));
+  color: var(--hm-white);
+  box-shadow: 
+    0 6px 20px rgba(0, 31, 63, 0.4),
+    inset 0 2px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Language Button */
+.hm-btn-lang {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--hm-white);
+  color: var(--hm-navy);
+  box-shadow: 0 4px 12px rgba(0, 31, 63, 0.15);
+}
+
+.hm-btn-lang span {
+  font-size: 0.75rem;
+}
+
+/* ============================================
+   NAVBAR - Navy Theme with 3D Buttons
+   ============================================ */
+.hm-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: linear-gradient(180deg, var(--hm-navy-dark) 0%, var(--hm-navy) 100%);
+  backdrop-filter: blur(20px);
+  box-shadow: 
+    0 4px 30px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(0, 123, 255, 0.2);
+}
+
+.hm-navbar__container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0.75rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hm-navbar__brand {
+  display: flex;
+  align-items: center;
+}
+
+.hm-navbar__logo-wrap {
+  width: 55px;
+  height: 55px;
+  background: linear-gradient(145deg, #ffffff, #e8e8e8);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 
+    0 6px 20px rgba(0, 0, 0, 0.3),
+    inset 0 2px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.hm-navbar__logo-wrap:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 10px 30px rgba(0, 123, 255, 0.3),
+    inset 0 2px 0 rgba(255, 255, 255, 0.9);
+}
+
+.hm-navbar__logo {
+  width: 42px;
+  height: auto;
+}
+
+/* Navigation Menu with 3D Links */
+.hm-navbar__menu {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.hm-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.1rem;
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.hm-nav-link i {
+  font-size: 1rem;
+  color: var(--hm-blue-light);
+}
+
+.hm-nav-link:hover {
+  background: rgba(0, 123, 255, 0.2);
+  color: var(--hm-white);
+  border-color: rgba(0, 123, 255, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 6px 20px rgba(0, 123, 255, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.hm-nav-link.active {
+  background: linear-gradient(145deg, var(--hm-blue), var(--hm-blue-light));
+  color: var(--hm-white);
+  border-color: transparent;
+  box-shadow: 
+    0 6px 20px rgba(0, 123, 255, 0.4),
+    inset 0 2px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.1);
+}
+
+.hm-nav-link.active i {
+  color: var(--hm-white);
+}
+
+/* Navbar Actions */
+.hm-navbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* 3D Action Buttons in Navbar */
+.hm-navbar__actions .hm-btn-3d {
+  padding: 0.65rem 1.2rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  border-radius: 12px;
+  gap: 0.5rem;
+}
+
+.hm-navbar__actions .hm-btn-3d i {
+  font-size: 1rem;
+}
+
+.hm-navbar__actions .hm-btn-outline-3d {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--hm-white);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 4px 15px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.hm-navbar__actions .hm-btn-outline-3d:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-3px);
+  box-shadow: 
+    0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.hm-navbar__actions .hm-btn-primary-3d {
+  background: linear-gradient(145deg, var(--hm-blue), var(--hm-blue-light));
+  color: var(--hm-white);
+  border: none;
+  box-shadow: 
+    0 6px 20px rgba(0, 123, 255, 0.5),
+    inset 0 2px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.1);
+}
+
+.hm-navbar__actions .hm-btn-primary-3d:hover {
+  transform: translateY(-3px);
+  box-shadow: 
+    0 10px 30px rgba(0, 123, 255, 0.6),
+    inset 0 2px 0 rgba(255, 255, 255, 0.3);
+}
+
+.hm-navbar__actions .hm-btn-admin-3d {
+  background: linear-gradient(145deg, #10b981, #34d399);
+  color: var(--hm-white);
+  box-shadow: 
+    0 6px 20px rgba(16, 185, 129, 0.4),
+    inset 0 2px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Language Button 3D */
+.hm-btn-lang {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border-radius: 14px;
+  background: linear-gradient(145deg, #ffffff, #e8e8e8);
+  color: var(--hm-navy);
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  box-shadow: 
+    0 6px 20px rgba(0, 0, 0, 0.25),
+    inset 0 2px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.hm-btn-lang:hover {
+  transform: translateY(-3px);
+  box-shadow: 
+    0 10px 30px rgba(0, 123, 255, 0.3),
+    inset 0 2px 0 rgba(255, 255, 255, 0.9);
+}
+
+.hm-btn-lang i {
+  font-size: 1.1rem;
+  color: var(--hm-blue);
+}
+
+.hm-btn-lang span {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--hm-navy);
+}
+
+/* Mobile Toggle */
+.hm-navbar__toggle {
+  display: none;
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(145deg, var(--hm-blue), var(--hm-blue-light));
+  border: none;
+  border-radius: 12px;
+  color: var(--hm-white);
+  font-size: 1.3rem;
+  cursor: pointer;
+  box-shadow: 
+    0 6px 20px rgba(0, 123, 255, 0.4),
+    inset 0 2px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.hm-navbar__toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 10px 30px rgba(0, 123, 255, 0.5);
+}
+
+/* ============================================
+   HERO SECTION
+   ============================================ */
+.hm-hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 120px 2rem 4rem;
+  overflow: hidden;
+}
+
+.hm-hero__bg {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: 
-    radial-gradient(circle at 20% 20%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 40% 60%, rgba(212, 175, 55, 0.05) 0%, transparent 50%);
-  animation: floatParticles 20s ease-in-out infinite;
+  z-index: 0;
 }
 
-@keyframes floatParticles {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-20px) rotate(180deg); }
-}
-
-/* Top Navigation */
-.hm-home__top {
+.hm-hero__gradient {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem 2rem;
-  background: rgba(11, 31, 58, 0.3);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--hm-navy) 0%, var(--hm-navy-light) 50%, var(--hm-navy-dark) 100%);
 }
 
-.hm-home__brand {
-  display: flex;
-  align-items: center;
-  text-decoration: none;
+.hm-hero__particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }
 
-.hm-home__logo {
-  width: 60px;
-  height: 60px;
-  object-fit: contain;
-  filter: drop-shadow(0 4px 15px rgba(212, 175, 55, 0.4));
-  transition: transform 0.3s ease;
-}
-
-.hm-home__logo:hover {
-  transform: scale(1.05) rotate(5deg);
-}
-
-.hm-home__topRight {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-.hm-home__langBtn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(212, 175, 55, 0.3);
+.particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: rgba(0, 123, 255, 0.5);
   border-radius: 50%;
-  color: #d4af37;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.9rem;
-  transition: all 0.3s ease;
+  animation: floatParticle 20s infinite ease-in-out;
 }
 
-.hm-home__langBtn:hover {
-  background: rgba(212, 175, 55, 0.2);
-  border-color: #d4af37;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
+.p1 { top: 20%; right: 15%; animation-delay: 0s; }
+.p2 { top: 60%; right: 75%; animation-delay: 3s; }
+.p3 { top: 80%; right: 25%; animation-delay: 6s; }
+.p4 { top: 35%; right: 60%; animation-delay: 9s; }
+.p5 { top: 50%; right: 45%; animation-delay: 12s; }
+
+@keyframes floatParticle {
+  0%, 100% { transform: translateY(0) translateX(0); opacity: 0.5; }
+  50% { transform: translateY(-50px) translateX(30px); opacity: 1; }
 }
 
-.hm-home__login {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #d4af37, #ffd700);
-  color: #0b1f3a;
-  text-decoration: none;
-  border-radius: 25px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
-}
-
-.hm-home__login:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 35px rgba(212, 175, 55, 0.4);
-  background: linear-gradient(135deg, #ffd700, #d4af37);
-}
-
-.hm-home__login i {
-  font-size: 1.1rem;
-}
-
-/* Hero Section */
-.hm-home__hero {
+.hm-hero__content {
   position: relative;
   z-index: 10;
+  text-align: center;
+  max-width: 900px;
+}
+
+/* Hero Logo */
+.hm-hero__logo-section {
+  margin-bottom: 2rem;
+}
+
+.hm-hero__logo-container {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  margin: 0 auto;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  padding: 2rem;
-  text-align: center;
 }
 
-.hm-home__title {
-  font-size: 4rem;
+.hm-hero__logo-glow {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 123, 255, 0.4) 0%, transparent 70%);
+  animation: logoGlow 3s ease-in-out infinite;
+}
+
+@keyframes logoGlow {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.3); opacity: 1; }
+}
+
+.hm-hero__logo-ring {
+  position: absolute;
+  width: 160px;
+  height: 160px;
+  border: 3px solid rgba(0, 123, 255, 0.3);
+  border-radius: 50%;
+  animation: ringRotate 15s linear infinite;
+}
+
+@keyframes ringRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.hm-hero__logo-wrap {
+  position: relative;
+  z-index: 2;
+  width: 140px;
+  height: 140px;
+  background: transparent;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: none;
+  animation: logoFloat 4s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.hm-hero__logo {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 15px;
+  box-shadow: 
+    0 20px 50px rgba(0, 0, 0, 0.3),
+    inset 0 2px 0 rgba(255, 255, 255, 0.9);
+}
+
+.hm-hero__title {
+  font-size: 3rem;
   font-weight: 800;
-  color: #d4af37;
-  margin: 0 0 1rem 0;
-  text-shadow: 0 4px 20px rgba(212, 175, 55, 0.5);
-  letter-spacing: 2px;
-  animation: glowText 2s ease-in-out infinite alternate;
+  color: var(--hm-white);
+  margin: 0 0 1rem;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
-@keyframes glowText {
-  from { text-shadow: 0 4px 20px rgba(212, 175, 55, 0.5); }
-  to { text-shadow: 0 4px 30px rgba(212, 175, 55, 0.8); }
-}
-
-.hm-home__subtitle {
-  font-size: 1.5rem;
+.hm-hero__subtitle {
+  font-size: 1.3rem;
   color: rgba(255, 255, 255, 0.9);
-  margin: 0 0 3rem 0;
-  max-width: 600px;
+  margin: 0 0 2.5rem;
   line-height: 1.6;
 }
 
-/* Search Section */
-.hm-home__search {
-  width: 100%;
-  max-width: 800px;
+/* Hero CTA Buttons */
+.hm-hero__cta {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
   margin-bottom: 3rem;
 }
 
-.hm-search__form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+.hm-btn-hero-primary {
+  padding: 1.25rem 2.5rem;
+  font-size: 1.1rem;
+  background: linear-gradient(145deg, var(--hm-blue), var(--hm-blue-light));
+  color: var(--hm-white);
+  box-shadow: 
+    0 8px 30px rgba(0, 123, 255, 0.5),
+    inset 0 2px 0 rgba(255, 255, 255, 0.2);
+}
+
+.hm-btn-hero-primary:hover {
+  transform: translateY(-4px);
+  box-shadow: 
+    0 15px 40px rgba(0, 123, 255, 0.6);
+}
+
+.hm-btn-hero-secondary {
+  padding: 1.25rem 2.5rem;
+  font-size: 1.1rem;
   background: rgba(255, 255, 255, 0.1);
+  color: var(--hm-white);
+  border: 2px solid rgba(255, 255, 255, 0.3);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(212, 175, 55, 0.2);
-  border-radius: 20px;
-  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
-.hm-search__row {
+.hm-btn-hero-secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-4px);
+}
+
+/* Hero Search */
+.hm-hero__search {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.hm-search-form-3d {
   display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 0.75rem;
 }
 
-.hm-search__group {
+.hm-search-input-wrap {
   flex: 1;
-  min-width: 200px;
   position: relative;
+  display: flex;
+  align-items: center;
 }
 
-.hm-search__icon {
+.hm-search-input-wrap i {
   position: absolute;
   right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #d4af37;
-  font-size: 1.1rem;
-  z-index: 2;
+  color: rgba(255, 255, 255, 0.6);
 }
 
-.hm-search__input,
-.hm-search__select {
+.hm-search-input-wrap input {
   width: 100%;
   padding: 1rem 3rem 1rem 1rem;
   background: rgba(255, 255, 255, 0.1);
-  border: 2px solid rgba(212, 175, 55, 0.2);
+  border: none;
   border-radius: 12px;
-  color: #fff;
+  color: var(--hm-white);
   font-size: 1rem;
-  transition: all 0.3s ease;
+  font-family: inherit;
 }
 
-.hm-search__input:focus,
-.hm-search__select:focus {
-  outline: none;
-  border-color: #d4af37;
-  background: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1);
-  transform: translateY(-2px);
-}
-
-.hm-search__input::placeholder {
+.hm-search-input-wrap input::placeholder {
   color: rgba(255, 255, 255, 0.5);
 }
 
-.hm-search__select option {
-  background: #0b1f3a;
-  color: #fff;
+.hm-search-input-wrap input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.15);
 }
 
-.hm-search__button {
+.hm-btn-search-3d {
+  padding: 1rem 2rem;
+  background: linear-gradient(145deg, var(--hm-blue), var(--hm-blue-light));
+  color: var(--hm-white);
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
+}
+
+/* Hero Scroll Indicator */
+.hm-hero__scroll {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 50px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
-  padding: 1rem 2rem;
-  background: linear-gradient(135deg, #d4af37, #ffd700);
-  color: #0b1f3a;
-  border: none;
-  border-radius: 12px;
-  font-size: 1.1rem;
-  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
   cursor: pointer;
+  animation: bounce 2s infinite;
   transition: all 0.3s ease;
-  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
 }
 
-.hm-search__button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 35px rgba(212, 175, 55, 0.4);
-  background: linear-gradient(135deg, #ffd700, #d4af37);
+.hm-hero__scroll:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: var(--hm-white);
 }
 
-/* Features Section */
-.hm-home__features {
+@keyframes bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(10px); }
+}
+
+/* ============================================
+   SECTION HEADERS
+   ============================================ */
+.hm-section-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.hm-section-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--hm-navy);
+  margin: 0 0 0.75rem;
+}
+
+.hm-section-subtitle {
+  font-size: 1.1rem;
+  color: var(--hm-gray);
+  margin: 0;
+}
+
+/* ============================================
+   SERVICES SECTION
+   ============================================ */
+.hm-services {
+  padding: 6rem 0;
+  background: var(--hm-white);
+}
+
+.hm-services__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 2rem;
-  width: 100%;
-  max-width: 1200px;
+}
+
+.hm-service-card-3d {
+  background: var(--hm-white);
+  border-radius: 24px;
+  padding: 2.5rem;
+  text-align: center;
+  transition: all 0.4s ease;
+  box-shadow: 
+    0 10px 40px rgba(0, 31, 63, 0.08),
+    0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 31, 63, 0.05);
+}
+
+.hm-service-card-3d:hover {
+  transform: translateY(-10px);
+  box-shadow: 
+    0 20px 60px rgba(0, 31, 63, 0.15),
+    0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.hm-service-card__icon {
+  width: 90px;
+  height: 90px;
+  margin: 0 auto 1.5rem;
+  background: linear-gradient(145deg, var(--hm-blue), var(--hm-blue-light));
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  color: var(--hm-white);
+  box-shadow: 0 10px 30px rgba(0, 123, 255, 0.3);
+}
+
+.hm-service-card__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--hm-navy);
+  margin: 0 0 1rem;
+}
+
+.hm-service-card__desc {
+  font-size: 1rem;
+  color: var(--hm-gray);
+  margin: 0 0 1.5rem;
+  line-height: 1.7;
+}
+
+.hm-btn-card {
+  background: var(--hm-snow);
+  color: var(--hm-navy);
+  border: 2px solid var(--hm-gray-light);
+  box-shadow: 0 4px 12px rgba(0, 31, 63, 0.08);
+}
+
+.hm-btn-card:hover {
+  background: var(--hm-blue);
+  color: var(--hm-white);
+  border-color: var(--hm-blue);
+  transform: translateY(-3px);
+}
+
+/* ============================================
+   FEATURES SECTION
+   ============================================ */
+.hm-features {
+  padding: 6rem 0;
+  background: var(--hm-snow);
+}
+
+.hm-features__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.hm-feature-item {
+  text-align: center;
+  padding: 2rem;
+  background: var(--hm-white);
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0, 31, 63, 0.05);
+}
+
+.hm-feature-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 31, 63, 0.1);
+}
+
+.hm-feature-item__icon {
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 1.25rem;
+  background: linear-gradient(145deg, var(--hm-navy), var(--hm-navy-light));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  color: var(--hm-white);
+  box-shadow: 0 8px 25px rgba(0, 31, 63, 0.3);
+}
+
+.hm-feature-item h4 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--hm-navy);
+  margin: 0 0 0.5rem;
+}
+
+.hm-feature-item p {
+  font-size: 0.95rem;
+  color: var(--hm-gray);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ============================================
+   STATISTICS SECTION
+   ============================================ */
+.hm-stats {
+  padding: 5rem 0;
+  background: linear-gradient(135deg, var(--hm-navy) 0%, var(--hm-navy-light) 100%);
+}
+
+.hm-stats__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+}
+
+.hm-stat-item {
+  text-align: center;
+  padding: 2rem;
+}
+
+.hm-stat-item__number {
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: var(--hm-white);
+  margin: 0 0 0.5rem;
+  text-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
+}
+
+.hm-stat-item__label {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ============================================
+   CTA SECTION
+   ============================================ */
+.hm-cta {
+  padding: 6rem 0;
+  background: var(--hm-white);
+}
+
+.hm-cta__content {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.hm-cta__title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--hm-navy);
+  margin: 0 0 1rem;
+}
+
+.hm-cta__desc {
+  font-size: 1.2rem;
+  color: var(--hm-gray);
+  margin: 0 0 2.5rem;
+}
+
+.hm-cta__buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.hm-btn-cta-primary {
+  padding: 1.25rem 2.5rem;
+  font-size: 1.1rem;
+  background: linear-gradient(145deg, var(--hm-blue), var(--hm-blue-light));
+  color: var(--hm-white);
+  box-shadow: 0 8px 30px rgba(0, 123, 255, 0.4);
+}
+
+.hm-btn-cta-secondary {
+  padding: 1.25rem 2.5rem;
+  font-size: 1.1rem;
+  background: var(--hm-white);
+  color: var(--hm-navy);
+  border: 2px solid var(--hm-navy);
+  box-shadow: 0 4px 15px rgba(0, 31, 63, 0.1);
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+.hm-footer {
+  padding: 5rem 0 2rem;
+  background: var(--hm-navy);
+  color: var(--hm-white);
+}
+
+.hm-footer__grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.5fr;
+  gap: 3rem;
   margin-bottom: 3rem;
 }
 
-.hm-feature {
+.hm-footer__logo {
+  width: 100px;
+  margin-bottom: 1.5rem;
+  background: var(--hm-white);
+  padding: 0.5rem;
+  border-radius: 12px;
+}
+
+.hm-footer__brand p {
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.7;
+  margin: 0 0 1.5rem;
+}
+
+.hm-footer__social {
   display: flex;
-  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.hm-social-btn {
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
   align-items: center;
-  text-align: center;
-  padding: 2rem;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(212, 175, 55, 0.2);
-  border-radius: 20px;
+  justify-content: center;
+  color: var(--hm-white);
+  text-decoration: none;
   transition: all 0.3s ease;
+  font-size: 1.2rem;
 }
 
-.hm-feature:hover {
-  transform: translateY(-5px);
-  background: rgba(255, 255, 255, 0.1);
-  border-color: #d4af37;
-  box-shadow: 0 15px 40px rgba(212, 175, 55, 0.3);
+.hm-social-btn i {
+  font-size: 1.2rem;
+  color: var(--hm-white);
 }
 
-.hm-feature__icon {
-  font-size: 3rem;
-  color: #d4af37;
+.hm-social-btn:hover {
+  background: var(--hm-blue);
+  border-color: var(--hm-blue);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 123, 255, 0.4);
+}
+
+.hm-social-btn:hover i {
+  color: var(--hm-white);
+}
+
+.hm-footer__links h4,
+.hm-footer__contact h4 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--hm-white);
+  margin: 0 0 1.5rem;
+}
+
+.hm-footer__links ul,
+.hm-footer__contact ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.hm-footer__links li,
+.hm-footer__contact li {
   margin-bottom: 1rem;
 }
 
-.hm-feature__title {
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: #fff;
-  margin: 0 0 0.5rem 0;
+.hm-footer__links a {
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  transition: color 0.3s ease;
 }
 
-.hm-feature__desc {
-  font-size: 1rem;
-  color: rgba(255, 255, 255, 0.8);
-  margin: 0;
-  line-height: 1.5;
+.hm-footer__links a:hover {
+  color: var(--hm-blue-light);
 }
 
-/* Stats Section */
-.hm-home__stats {
+.hm-footer__contact li {
   display: flex;
-  justify-content: center;
-  gap: 3rem;
-  flex-wrap: wrap;
-  margin-bottom: 3rem;
-}
-
-.hm-stat {
-  text-align: center;
-}
-
-.hm-stat__number {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #d4af37;
-  margin: 0 0 0.5rem 0;
-  text-shadow: 0 2px 10px rgba(212, 175, 55, 0.5);
-}
-
-.hm-stat__label {
-  font-size: 1rem;
-  color: rgba(255, 255, 255, 0.8);
-  margin: 0;
-}
-
-/* CTA Section */
-.hm-home__cta {
-  text-align: center;
-  margin-bottom: 3rem;
-}
-
-.hm-home__ctaButton {
-  display: inline-flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 1.25rem 2.5rem;
-  background: linear-gradient(135deg, #d4af37, #ffd700);
-  color: #0b1f3a;
-  text-decoration: none;
-  border-radius: 30px;
-  font-size: 1.2rem;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+  color: rgba(255, 255, 255, 0.7);
 }
 
-.hm-home__ctaButton:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 15px 40px rgba(212, 175, 55, 0.5);
-  background: linear-gradient(135deg, #ffd700, #d4af37);
+.hm-footer__contact i {
+  color: var(--hm-blue-light);
+  width: 20px;
 }
 
-/* Responsive Design */
+.hm-footer__bottom {
+  text-align: center;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hm-footer__bottom p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+@media (max-width: 1024px) {
+  .hm-navbar__menu {
+    display: none;
+  }
+  
+  .hm-navbar__toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .hm-services__grid,
+  .hm-features__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .hm-stats__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .hm-footer__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
-  .hm-home__top {
-    padding: 1rem;
+  .hm-hero__title {
+    font-size: 2rem;
   }
   
-  .hm-home__logo {
-    width: 50px;
-    height: 50px;
+  .hm-hero__subtitle {
+    font-size: 1.1rem;
   }
   
-  .hm-home__title {
-    font-size: 2.5rem;
+  .hm-hero__logo-container {
+    width: 150px;
+    height: 150px;
   }
   
-  .hm-home__subtitle {
-    font-size: 1.2rem;
+  .hm-hero__logo-wrap {
+    width: 120px;
+    height: 120px;
   }
   
-  .hm-search__form {
-    padding: 1.5rem;
+  .hm-hero__logo {
+    width: 100px;
   }
   
-  .hm-search__row {
-    flex-direction: column;
-  }
-  
-  .hm-home__features {
+  .hm-services__grid,
+  .hm-features__grid {
     grid-template-columns: 1fr;
   }
   
-  .hm-home__stats {
-    gap: 2rem;
+  .hm-section-title {
+    font-size: 2rem;
   }
   
-  .hm-stat__number {
-    font-size: 2rem;
+  .hm-search-form-3d {
+    flex-direction: column;
+  }
+  
+  .hm-footer__grid {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  
+  .hm-footer__social {
+    justify-content: center;
+  }
+  
+  .hm-footer__contact li {
+    justify-content: center;
   }
 }
 
 @media (max-width: 480px) {
-  .hm-home__top {
-    padding: 0.75rem;
+  .hm-container {
+    padding: 0 1rem;
   }
   
-  .hm-home__logo {
-    width: 40px;
-    height: 40px;
-  }
-  
-  .hm-home__topRight {
-    gap: 1rem;
-  }
-  
-  .hm-home__login {
+  .hm-navbar__container {
     padding: 0.5rem 1rem;
-    font-size: 0.9rem;
   }
   
-  .hm-home__title {
-    font-size: 2rem;
+  .hm-navbar__logo-wrap {
+    width: 50px;
+    height: 50px;
   }
   
-  .hm-home__subtitle {
-    font-size: 1rem;
+  .hm-navbar__logo {
+    width: 40px;
   }
   
-  .hm-search__form {
-    padding: 1rem;
+  .hm-hero {
+    padding: 100px 1rem 3rem;
   }
   
-  .hm-feature {
-    padding: 1.5rem;
+  .hm-hero__title {
+    font-size: 1.75rem;
   }
   
-  .hm-feature__icon {
+  .hm-hero__cta {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .hm-btn-hero-primary,
+  .hm-btn-hero-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .hm-stat-item__number {
     font-size: 2.5rem;
   }
+  
+  .hm-cta__buttons {
+    flex-direction: column;
+  }
 }
 
-/* Performance Optimizations */
-.hm-home {
+/* ============================================
+   MOBILE MENU
+   ============================================ */
+.hm-navbar__menu.mobile-open {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--hm-white);
+  padding: 1rem;
+  box-shadow: 0 10px 30px rgba(0, 31, 63, 0.15);
+  border-radius: 0 0 20px 20px;
+}
+
+/* ============================================
+   ANIMATIONS & PERFORMANCE
+   ============================================ */
+.hm-btn-3d,
+.hm-service-card-3d,
+.hm-feature-item {
   will-change: transform;
   backface-visibility: hidden;
 }
 
-.hm-home__logo,
-.hm-home__login,
-.hm-search__button,
-.hm-feature {
-  will-change: transform;
-  backface-visibility: hidden;
-}
-
-/* Smooth Animations */
 * {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 </style>
 
-<% const isLoggedIn = !!(typeof currentUser !== 'undefined' && currentUser); %>
-<% const loginWithReturnTo = (path) => `/auth/login?returnTo=${encodeURIComponent(path)}`; %>
-
-<div class="hm-home">
-  <header class="hm-home__top">
-    <a class="hm-home__brand" href="/" aria-label="HM CAR">
-      <img class="hm-home__logo" src="/public/images/navbar-logo.png" alt="HM CAR" loading="eager" decoding="async" onerror="this.onerror=null;this.src='/public/images/logo.png';" />
-    </a>
-
-    <div class="hm-home__topRight">
-      <div class="hm-home__lang">
-        <% if (typeof locale !== 'undefined' && locale === 'ar') { %>
-          <a class="hm-home__langBtn" href="?lang=en" title="English">EN</a>
-        <% } else { %>
-          <a class="hm-home__langBtn" href="?lang=ar" title="العربية">عر</a>
-        <% } %>
-      </div>
-
-      <a class="hm-home__login" href="/auth/login">
-        <i class="fas fa-right-to-bracket"></i>
-        <span>تسجيل الدخول / Login</span>
-      </a>
-    </div>
-  </header>
-
-  <main class="hm-home__hero">
-    <h1 class="hm-home__title">HM CAR</h1>
-    <p class="hm-home__subtitle">
-      مزادات السيارات الفاخرة في المملكة العربية السعودية<br>
-      Luxury Car Auctions in Saudi Arabia
-    </p>
-
-    <div class="hm-home__search">
-      <form class="hm-search__form" action="/search" method="GET">
-        <div class="hm-search__row">
-          <div class="hm-search__group">
-            <i class="hm-search__icon fas fa-search"></i>
-            <input type="text" name="q" class="hm-search__input" placeholder="ابحث عن سيارتك أحلامك...">
-          </div>
-          <div class="hm-search__group">
-            <i class="hm-search__icon fas fa-car"></i>
-            <select name="brand" class="hm-search__select">
-              <option value="">جميع الماركات</option>
-              <option value="toyota">تويوتا</option>
-              <option value="mercedes">مرسيدس</option>
-              <option value="bmw">بي إم دبليو</option>
-              <option value="audi">أودي</option>
-              <option value="lexus">لكزس</option>
-            </select>
-          </div>
-          <div class="hm-search__group">
-            <i class="hm-search__icon fas fa-money-bill-wave"></i>
-            <select name="minPrice" class="hm-search__select">
-              <option value="">السعر الأدنى</option>
-              <option value="50000">50,000 ريال</option>
-              <option value="100000">100,000 ريال</option>
-              <option value="200000">200,000 ريال</option>
-              <option value="300000">300,000 ريال</option>
-            </select>
-          </div>
-          <div class="hm-search__group">
-            <i class="hm-search__icon fas fa-money-bill-wave"></i>
-            <select name="maxPrice" class="hm-search__select">
-              <option value="">السعر الأعلى</option>
-              <option value="100000">100,000 ريال</option>
-              <option value="200000">200,000 ريال</option>
-              <option value="300000">300,000 ريال</option>
-              <option value="500000">500,000 ريال</option>
-            </select>
-          </div>
-        </div>
-        <button type="submit" class="hm-search__button">
-          <i class="fas fa-search"></i>
-          <span>بحث</span>
-        </button>
-      </form>
-    </div>
-
-    <div class="hm-home__features">
-      <div class="hm-feature">
-        <i class="hm-feature__icon fas fa-gavel"></i>
-        <h3 class="hm-feature__title">مزادات حية</h3>
-        <p class="hm-feature__desc">شارك في مزادات سيارات فاخرة في الوقت الفعلي</p>
-      </div>
-      <div class="hm-feature">
-        <i class="hm-feature__icon fas fa-shield-alt"></i>
-        <h3 class="hm-feature__title">آمن وموثوق</h3>
-        <p class="hm-feature__desc">منصة آمنة للمعاملات المالية وتبادل المعلومات</p>
-      </div>
-      <div class="hm-feature">
-        <i class="hm-feature__icon fas fa-globe"></i>
-        <h3 class="hm-feature__title">تصدير عالمي</h3>
-        <p class="hm-feature__desc">تصدير السيارات وقطع الغيار إلى جميع دول العالم</p>
-      </div>
-    </div>
-
-    <% if (stats) { %>
-    <div class="hm-home__stats">
-      <div class="hm-stat">
-        <div class="hm-stat__number"><%= stats.totalCars || 0 %></div>
-        <div class="hm-stat__label">سيارة متاحة</div>
-      </div>
-      <div class="hm-stat">
-        <div class="hm-stat__number"><%= stats.activeAuctions || 0 %></div>
-        <div class="hm-stat__label">مزاد نشط</div>
-      </div>
-      <div class="hm-stat">
-        <div class="hm-stat__number"><%= stats.happyCustomers || 0 %></div>
-        <div class="hm-stat__label">عميل سعيد</div>
-      </div>
-    </div>
-    <% } %>
-
-    <div class="hm-home__cta">
-      <a href="/cars" class="hm-home__ctaButton">
-        <i class="fas fa-car"></i>
-        <span>استكشف السيارات</span>
-      </a>
-    </div>
-  </main>
-</div>
-
 <script>
-// Enhanced Home Page Interactions
+// Language Toggle
+let currentLanguage = 'ar';
+
+function toggleLanguage() {
+  currentLanguage = currentLanguage === 'ar' ? 'en' : 'ar';
+  updateLanguage();
+  localStorage.setItem('preferredLanguage', currentLanguage);
+}
+
+function updateLanguage() {
+  const elements = document.querySelectorAll('[data-ar][data-en]');
+  const langBtn = document.getElementById('currentLang');
+  const searchInput = document.querySelector('.hm-search-input-wrap input');
+  
+  elements.forEach(element => {
+    const text = element.getAttribute(`data-${currentLanguage}`);
+    element.textContent = text;
+  });
+  
+  if (searchInput) {
+    searchInput.placeholder = searchInput.getAttribute(`data-placeholder-${currentLanguage}`);
+  }
+  
+  langBtn.textContent = currentLanguage === 'ar' ? 'EN' : 'عر';
+  
+  document.querySelector('.hm-pro-home').style.direction = currentLanguage === 'ar' ? 'rtl' : 'ltr';
+  document.documentElement.lang = currentLanguage;
+}
+
+// Initialize language
 document.addEventListener('DOMContentLoaded', function() {
-  // Smooth scroll for anchor links
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-      e.preventDefault();
-      const target = document.querySelector(this.getAttribute('href'));
-      if (target) {
-        target.scrollIntoView({ behavior: 'smooth' });
-      }
-    });
-  });
-
-  // Form validation
-  const searchForm = document.querySelector('.hm-search__form');
-  if (searchForm) {
-    searchForm.addEventListener('submit', function(e) {
-      const searchInput = this.querySelector('.hm-search__input');
-      if (searchInput && searchInput.value.trim() === '') {
-        e.preventDefault();
-        searchInput.focus();
-        searchInput.style.borderColor = '#ff6b6b';
-        setTimeout(() => {
-          searchInput.style.borderColor = '';
-        }, 2000);
-      }
-    });
+  const savedLang = localStorage.getItem('preferredLanguage');
+  if (savedLang && savedLang !== currentLanguage) {
+    currentLanguage = savedLang;
+    updateLanguage();
   }
-
-  // Add loading states
-  const buttons = document.querySelectorAll('.hm-search__button, .hm-home__ctaButton');
-  buttons.forEach(button => {
-    button.addEventListener('click', function() {
-      if (!this.classList.contains('loading')) {
-        this.classList.add('loading');
-        const originalContent = this.innerHTML;
-        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>جاري التحميل...</span>';
-        
-        setTimeout(() => {
-          this.classList.remove('loading');
-          this.innerHTML = originalContent;
-        }, 2000);
-      }
-    });
-  });
-
-  // Performance optimizations
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  if (prefersReducedMotion.matches) {
-    document.querySelectorAll('*').forEach(el => {
-      el.style.animation = 'none';
-      el.style.transition = 'none';
-    });
-  }
-
-  // Lazy load images
-  const images = document.querySelectorAll('img[loading="lazy"]');
-  images.forEach(img => {
-    if (img.dataset.src) {
-      img.src = img.dataset.src;
-    }
-  });
-
-  // Add smooth scrolling
+  
+  // Animate stats
+  animateStats();
+  
+  // Smooth scroll
   document.documentElement.style.scrollBehavior = 'smooth';
 });
 
-// Add hover effects dynamically
-document.querySelectorAll('.hm-feature').forEach(feature => {
-  feature.addEventListener('mouseenter', function() {
-    this.style.transform = 'translateY(-5px) scale(1.02)';
-  });
+// Mobile Menu Toggle
+function toggleMobileMenu() {
+  const menu = document.querySelector('.hm-navbar__menu');
+  menu.classList.toggle('mobile-open');
+}
+
+// Scroll to Section
+function scrollToSection(sectionId) {
+  const section = document.getElementById(sectionId);
+  if (section) {
+    section.scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
+// Animate Statistics
+function animateStats() {
+  const statNumbers = document.querySelectorAll('.hm-stat-item__number');
   
-  feature.addEventListener('mouseleave', function() {
-    this.style.transform = 'translateY(0) scale(1)';
-  });
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const target = entry.target;
+        const count = parseInt(target.getAttribute('data-count'));
+        animateNumber(target, count);
+        observer.unobserve(target);
+      }
+    });
+  }, { threshold: 0.5 });
+  
+  statNumbers.forEach(stat => observer.observe(stat));
+}
+
+function animateNumber(element, target) {
+  let current = 0;
+  const increment = target / 50;
+  const timer = setInterval(() => {
+    current += increment;
+    if (current >= target) {
+      element.textContent = target.toLocaleString();
+      clearInterval(timer);
+    } else {
+      element.textContent = Math.floor(current).toLocaleString();
+    }
+  }, 30);
+}
+
+// Navbar scroll effect
+window.addEventListener('scroll', function() {
+  const navbar = document.querySelector('.hm-navbar');
+  if (window.scrollY > 50) {
+    navbar.style.boxShadow = '0 4px 30px rgba(0, 31, 63, 0.15)';
+  } else {
+    navbar.style.boxShadow = '0 2px 20px rgba(0, 31, 63, 0.1)';
+  }
 });
 </script>

@@ -1,151 +1,272 @@
 <% layout('layout') -%>
-<link rel="stylesheet" href="/public/css/admin-unified.css" />
 <% var hideNavbar = true; %>
 <% var hideSearch = true; %>
 <% var fullWidth = true; %>
-<% var bodyClass = 'admin-unified-bg' %>
+<% var bodyClass = 'hm-admin-page'; %>
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <div>
-    <h3 class="mb-1">إدارة الطلبات</h3>
-    <div class="text-muted">متابعة الطلبات وتغيير حالتها بسرعة.</div>
+<link rel="stylesheet" href="/css/admin-luxury.css">
+
+<%
+const statusLabel = (s) => {
+  if (s === 'pending') return 'قيد الانتظار';
+  if (s === 'confirmed') return 'مؤكد';
+  if (s === 'cancelled') return 'ملغي';
+  if (s === 'completed') return 'مكتمل';
+  return s || '';
+};
+
+const statusBadge = (s) => {
+  if (s === 'pending') return 'hm-admin-badge-warning';
+  if (s === 'confirmed') return 'hm-admin-badge-primary';
+  if (s === 'cancelled') return 'hm-admin-badge-danger';
+  if (s === 'completed') return 'hm-admin-badge-success';
+  return '';
+};
+%>
+
+<div class="hm-admin-layout">
+  <!-- Animated Background -->
+  <div class="hm-admin-bg">
+    <div class="hm-admin-bg-gradient"></div>
+    <div class="hm-admin-bg-glow"></div>
   </div>
-  <a href="/admin" class="back-btn">
-    <i class="fas fa-arrow-right me-2"></i>عودة للوحة التحكم
-  </a>
-</div>
 
-<div class="orders-card">
-  <div class="orders-header">
-    <h5 class="mb-0">
-      <i class="fas fa-shopping-cart me-2"></i>
-      قائمة الطلبات
-    </h5>
-  </div>
-  
-  <div class="p-4">
-    <!-- إدارة الطلبات (للأدمن): فلترة/بحث + تغيير حالة الطلب + فك ربط جهاز العميل -->
+  <!-- Mobile Toggle -->
+  <button class="hm-mobile-toggle" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+  </button>
 
-    <% const statusLabel = (s) => {
-      if (s === 'pending') return 'قيد الانتظار';
-      if (s === 'confirmed') return 'مؤكد';
-      if (s === 'cancelled') return 'ملغي';
-      if (s === 'completed') return 'مكتمل';
-      return s || '';
-    }; %>
+  <!-- Sidebar -->
+  <%- include('../partials/admin-sidebar') %>
 
-    <% const statusClass = (s) => {
-      if (s === 'pending') return 'bg-warning text-dark';
-      if (s === 'confirmed') return 'bg-primary';
-      if (s === 'cancelled') return 'bg-danger';
-      if (s === 'completed') return 'bg-success';
-      return 'bg-secondary';
-    }; %>
-
-    <form class="mb-4" method="get" action="/admin/orders">
-      <div class="row g-3">
-        <!-- فلتر الحالة + نص البحث -->
-        <div class="col-md-4">
-          <label class="form-label">الحالة</label>
-          <select name="status" class="form-select">
-            <option value="" <%= !filters.status ? 'selected' : '' %>>كل الحالات</option>
-            <option value="pending" <%= filters.status === 'pending' ? 'selected' : '' %>>قيد الانتظار</option>
-            <option value="confirmed" <%= filters.status === 'confirmed' ? 'selected' : '' %>>مؤكد</option>
-            <option value="completed" <%= filters.status === 'completed' ? 'selected' : '' %>>مكتمل</option>
-            <option value="cancelled" <%= filters.status === 'cancelled' ? 'selected' : '' %>>ملغي</option>
-          </select>
-        </div>
-        <div class="col-md-8">
-          <label class="form-label">بحث (رقم الطلب أو اسم العميل)</label>
-          <input name="q" class="form-control" value="<%= filters.q || '' %>" placeholder="HM-2025-000123 أو أحمد" />
-        </div>
-        <div class="col-12 d-flex gap-2 justify-content-end">
-          <button class="btn btn-primary">بحث</button>
-          <a class="btn btn-outline-secondary" href="/admin/orders">إزالة الفلاتر</a>
+  <!-- Main Content -->
+  <main class="hm-admin-main">
+    <!-- Header -->
+    <header class="hm-admin-header">
+      <div class="hm-header-title">
+        <h1>إدارة الطلبات</h1>
+        <div class="hm-header-breadcrumb">
+          <a href="/admin">لوحة التحكم</a>
+          <i class="fas fa-chevron-left"></i>
+          <span>الطلبات</span>
         </div>
       </div>
-    </form>
+    </header>
 
-    <div class="card border-0 shadow-sm">
-      <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
-        <span>قائمة الطلبات</span>
-        <small class="text-muted"><%= (orders || []).length %> طلب</small>
+    <!-- Content -->
+    <div class="hm-admin-content">
+      <!-- Flash Messages -->
+      <% if (flash && flash.message) { %>
+      <div class="hm-admin-alert hm-admin-alert-<%= flash.type || 'info' %>">
+        <i class="fas <%= flash.type === 'success' ? 'fa-check-circle' : flash.type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle' %>"></i>
+        <span><%= flash.message %></span>
       </div>
-      <div class="card-body p-0">
-        <% if (!orders || !orders.length) { %>
-          <!-- لا توجد نتائج -->
-          <div class="p-4 text-center">
-            <div class="h5 mb-1">لا توجد طلبات</div>
-            <div class="text-muted">جرّب تغيير الفلاتر.</div>
+      <% } %>
+
+      <!-- Stats -->
+      <div class="hm-stats-grid">
+        <div class="hm-stat-card">
+          <div class="hm-stat-icon">
+            <i class="fas fa-shopping-cart"></i>
           </div>
-        <% } else { %>
-          <!-- جدول الطلبات + أزرار إجراءات سريعة -->
-          <div class="table-responsive">
-            <table class="table table-striped mb-0 align-middle">
-              <thead>
-                <tr>
-                  <th>رقم الطلب</th>
-                  <th>العميل</th>
-                  <th>الحالة</th>
-                  <th>العناصر</th>
-                  <th>التاريخ</th>
-                  <th>إجراء سريع</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% orders.forEach(o => { %>
-                  <tr>
-                    <td>
-                      <a href="/orders/<%= o._id %>/invoice"><%= o.orderNumber %></a>
-                    </td>
-                    <td>
-                      <div class="fw-semibold"><%= o.buyer?.name || '-' %></div>
-                      <% if (o.buyer && o.buyer.role === 'buyer' && o.buyer.buyerDeviceId) { %>
-                        <small class="text-muted">Device linked</small>
-                      <% } %>
-                    </td>
-                    <td>
-                      <span class="badge <%= statusClass(o.status) %>"><%= statusLabel(o.status) %></span>
-                    </td>
-                <td>
-                  <small class="text-muted"><%= (o.items || []).map(i => i.titleSnapshot).join(' | ') %></small>
-                </td>
-                <td>
-                  <small class="text-muted"><%= new Date(o.createdAt).toLocaleString('ar-YE') %></small>
-                </td>
-                <td>
-                  <div class="d-flex gap-2 flex-wrap">
-                    <!-- تغيير الحالة يتم عبر /orders/:id/status (POST) ويتطلب CSRF -->
-                    <form method="post" action="/orders/<%= o._id %>/status">
-                      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-                      <input type="hidden" name="status" value="confirmed" />
-                      <button class="btn btn-sm btn-primary" type="submit" <%= o.status === 'confirmed' ? 'disabled' : '' %>>تأكيد</button>
-                    </form>
-                    <form method="post" action="/orders/<%= o._id %>/status">
-                      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-                      <input type="hidden" name="status" value="completed" />
-                      <button class="btn btn-sm btn-success" type="submit" <%= o.status === 'completed' ? 'disabled' : '' %>>تم التسليم</button>
-                    </form>
-                    <form method="post" action="/orders/<%= o._id %>/status" onsubmit="return confirm('هل تريد إلغاء الطلب؟');">
-                      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-                      <input type="hidden" name="status" value="cancelled" />
-                      <button class="btn btn-sm btn-danger" type="submit" <%= o.status === 'cancelled' ? 'disabled' : '' %>>إلغاء</button>
-                    </form>
+          <div class="hm-stat-info">
+            <div class="hm-stat-label">إجمالي الطلبات</div>
+            <div class="hm-stat-value"><%= orders ? orders.length : 0 %></div>
+          </div>
+        </div>
+        <div class="hm-stat-card">
+          <div class="hm-stat-icon warning">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div class="hm-stat-info">
+            <div class="hm-stat-label">قيد الانتظار</div>
+            <div class="hm-stat-value"><%= orders ? orders.filter(o => o.status === 'pending').length : 0 %></div>
+          </div>
+        </div>
+        <div class="hm-stat-card">
+          <div class="hm-stat-icon success">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <div class="hm-stat-info">
+            <div class="hm-stat-label">مكتملة</div>
+            <div class="hm-stat-value"><%= orders ? orders.filter(o => o.status === 'completed').length : 0 %></div>
+          </div>
+        </div>
+        <div class="hm-stat-card">
+          <div class="hm-stat-icon danger">
+            <i class="fas fa-times-circle"></i>
+          </div>
+          <div class="hm-stat-info">
+            <div class="hm-stat-label">ملغاة</div>
+            <div class="hm-stat-value"><%= orders ? orders.filter(o => o.status === 'cancelled').length : 0 %></div>
+          </div>
+        </div>
+      </div>
 
+      <!-- Filter Card -->
+      <div class="hm-admin-card">
+        <div class="hm-card-header">
+          <h2 class="hm-card-title">
+            <i class="fas fa-filter"></i>
+            تصفية وبحث
+          </h2>
+        </div>
+        <div class="hm-card-body">
+          <form method="GET" action="/admin/orders" style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end;">
+            <div class="hm-admin-form-group" style="min-width: 180px; margin-bottom: 0;">
+              <label class="hm-admin-label">الحالة</label>
+              <select name="status" class="hm-admin-input">
+                <option value="" <%= !filters?.status ? 'selected' : '' %>>كل الحالات</option>
+                <option value="pending" <%= filters?.status === 'pending' ? 'selected' : '' %>>قيد الانتظار</option>
+                <option value="confirmed" <%= filters?.status === 'confirmed' ? 'selected' : '' %>>مؤكد</option>
+                <option value="completed" <%= filters?.status === 'completed' ? 'selected' : '' %>>مكتمل</option>
+                <option value="cancelled" <%= filters?.status === 'cancelled' ? 'selected' : '' %>>ملغي</option>
+              </select>
+            </div>
+            <div class="hm-admin-form-group" style="flex: 1; min-width: 200px; margin-bottom: 0;">
+              <label class="hm-admin-label">بحث</label>
+              <input type="text" name="q" class="hm-admin-input" placeholder="رقم الطلب أو اسم العميل..." value="<%= filters?.q || '' %>">
+            </div>
+            <button type="submit" class="hm-btn-admin hm-btn-admin-primary">
+              <i class="fas fa-search"></i>
+              بحث
+            </button>
+            <a href="/admin/orders" class="hm-btn-admin hm-btn-admin-secondary">
+              <i class="fas fa-redo"></i>
+              إعادة تعيين
+            </a>
+          </form>
+        </div>
+      </div>
+
+      <!-- Orders List -->
+      <div class="hm-admin-card">
+        <div class="hm-card-header">
+          <h2 class="hm-card-title">
+            <i class="fas fa-shopping-cart"></i>
+            قائمة الطلبات
+          </h2>
+          <span class="hm-admin-badge hm-admin-badge-primary">
+            <%= orders ? orders.length : 0 %> طلب
+          </span>
+        </div>
+        <div class="hm-card-body" style="padding: 0;">
+          <% if (orders && orders.length > 0) { %>
+          <table class="hm-admin-table">
+            <thead>
+              <tr>
+                <th>رقم الطلب</th>
+                <th>العميل</th>
+                <th>الحالة</th>
+                <th>العناصر</th>
+                <th>التاريخ</th>
+                <th>إجراءات</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% orders.forEach(function(o) { %>
+              <tr>
+                <td>
+                  <a href="/orders/<%= o._id %>/invoice" style="color: var(--hm-blue-light); text-decoration: none; font-weight: 600;">
+                    <%= o.orderNumber %>
+                  </a>
+                </td>
+                <td>
+                  <div style="color: var(--hm-white); font-weight: 600;"><%= o.buyer?.name || '-' %></div>
+                  <% if (o.buyer && o.buyer.role === 'buyer' && o.buyer.buyerDeviceId) { %>
+                  <small style="color: var(--hm-gray); font-size: 0.75rem;">جهاز مرتبط</small>
+                  <% } %>
+                </td>
+                <td>
+                  <span class="hm-admin-badge <%= statusBadge(o.status) %>">
+                    <%= statusLabel(o.status) %>
+                  </span>
+                </td>
+                <td>
+                  <small style="color: var(--hm-silver);">
+                    <%= (o.items || []).map(i => i.titleSnapshot).join(' | ') || '-' %>
+                  </small>
+                </td>
+                <td>
+                  <small style="color: var(--hm-gray);">
+                    <%= new Date(o.createdAt).toLocaleDateString('ar-SA') %>
+                  </small>
+                </td>
+                <td>
+                  <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <% if (o.status !== 'confirmed') { %>
+                    <form method="POST" action="/orders/<%= o._id %>/status" style="display: inline;">
+                      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                      <input type="hidden" name="status" value="confirmed">
+                      <button type="submit" class="hm-btn-admin hm-btn-admin-primary hm-btn-admin-sm" title="تأكيد">
+                        <i class="fas fa-check"></i>
+                      </button>
+                    </form>
+                    <% } %>
+                    
+                    <% if (o.status !== 'completed') { %>
+                    <form method="POST" action="/orders/<%= o._id %>/status" style="display: inline;">
+                      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                      <input type="hidden" name="status" value="completed">
+                      <button type="submit" class="hm-btn-admin hm-btn-admin-success hm-btn-admin-sm" title="تم التسليم">
+                        <i class="fas fa-check-double"></i>
+                      </button>
+                    </form>
+                    <% } %>
+                    
+                    <% if (o.status !== 'cancelled') { %>
+                    <form method="POST" action="/orders/<%= o._id %>/status" style="display: inline;" onsubmit="return confirm('هل تريد إلغاء الطلب؟');">
+                      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                      <input type="hidden" name="status" value="cancelled">
+                      <button type="submit" class="hm-btn-admin hm-btn-admin-danger hm-btn-admin-sm" title="إلغاء">
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </form>
+                    <% } %>
+                    
                     <% if (o.buyer && o.buyer.role === 'buyer') { %>
-                      <!-- فك ربط الجهاز: يسمح للعميل بتسجيل الدخول من جهاز آخر (buyerDeviceId/activeSessionId) -->
-                      <form method="post" action="/admin/buyers/<%= o.buyer._id %>/unbind-device" onsubmit="return confirm('فك ربط الجهاز للعميل؟');">
-                        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-                        <button class="btn btn-sm btn-outline-secondary" type="submit">فك ربط الجهاز</button>
-                      </form>
+                    <form method="POST" action="/admin/buyers/<%= o.buyer._id %>/unbind-device" style="display: inline;" onsubmit="return confirm('فك ربط الجهاز للعميل؟');">
+                      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                      <button type="submit" class="hm-btn-admin hm-btn-admin-secondary hm-btn-admin-sm" title="فك ربط الجهاز">
+                        <i class="fas fa-unlink"></i>
+                      </button>
+                    </form>
                     <% } %>
                   </div>
                 </td>
               </tr>
-            <% }) %>
-          </tbody>
-        </table>
+              <% }); %>
+            </tbody>
+          </table>
+          <% } else { %>
+          <div class="hm-empty-state">
+            <div class="hm-empty-icon">
+              <i class="fas fa-shopping-cart"></i>
+            </div>
+            <h3 class="hm-empty-title">لا توجد طلبات</h3>
+            <p class="hm-empty-text">جرب تغيير معايير البحث</p>
+          </div>
+          <% } %>
+        </div>
       </div>
-    <% } %>
-  </div>
+    </div>
+  </main>
 </div>
+
+<script>
+function toggleSidebar() {
+  const sidebar = document.getElementById('adminSidebar');
+  sidebar.classList.toggle('open');
+}
+
+document.addEventListener('click', function(e) {
+  const sidebar = document.getElementById('adminSidebar');
+  const toggle = document.querySelector('.hm-mobile-toggle');
+  
+  if (window.innerWidth <= 1024) {
+    if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+      sidebar.classList.remove('open');
+    }
+  }
+});
+</script>

@@ -43,7 +43,12 @@ const userSchema = new mongoose.Schema({
   // محاولات الدخول الفاشلة
   loginAttempts: { type: Number, default: 0 },
   // وقت قفل الحساب
-  lockUntil: { type: Date, default: null }
+  lockUntil: { type: Date, default: null },
+  // Two-Factor Authentication
+  twoFactorEnabled: { type: Boolean, default: false },
+  twoFactorSecret: { type: String, default: '' },
+  twoFactorBackupCodes: [{ type: String }],
+  twoFactorEnabledAt: { type: Date, default: null }
 }, { timestamps: true });
 
 userSchema.pre('save', async function(next) {

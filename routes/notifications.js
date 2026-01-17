@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (routes/notifications.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const express = require('express');
 const router = express.Router();
 const UserNotification = require('../models/UserNotification');

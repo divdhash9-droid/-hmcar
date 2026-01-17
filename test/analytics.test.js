@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (test/analytics.test.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const mongoose = require('mongoose');
 const chai = require('chai');

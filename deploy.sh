@@ -1,4 +1,5 @@
 #!/bin/bash
+# [[ARABIC_HEADER]] هذا الملف (deploy.sh) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
 
 # HM CAR Deployment Script
 # This script automates the deployment process

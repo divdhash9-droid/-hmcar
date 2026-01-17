@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (config/redis.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const redis = require('redis');
 
 let client = null;

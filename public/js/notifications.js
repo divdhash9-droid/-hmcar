@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (public/js/notifications.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 // public/js/notifications.js
 // Handle real-time notifications via WebSocket
 

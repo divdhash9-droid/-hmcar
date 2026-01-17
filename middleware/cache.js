@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (middleware/cache.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const cacheService = require('../services/CacheService');
 
 /**

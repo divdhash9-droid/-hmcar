@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (models/Order.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const mongoose = require('mongoose');
 
 // عنصر داخل الطلب: يمثل سيارة أو قطعة غيار أو فوز مزاد

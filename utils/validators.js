@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (utils/validators.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 /**
  * utils/validators.js
  * وحدة التحقق من صحة البيانات

@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (public/js/advanced-animations.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 class AdvancedAnimations {
   constructor() {
     this.init();

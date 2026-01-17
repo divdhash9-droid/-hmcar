@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (public/js/accessibility.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 (function(){
   function onEscape(e){
     if(e.key !== 'Escape') return;

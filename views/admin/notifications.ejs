@@ -1,3 +1,5 @@
+<!-- [[ARABIC_HEADER]] هذا الملف (views/admin/notifications.ejs) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. -->
+
 <% layout('layout') -%>
 <% var hideNavbar = true; %>
 <% var hideSearch = true; %>
@@ -62,7 +64,7 @@
           </div>
           <div class="hm-stat-info">
             <div class="hm-stat-label">غير مقروءة</div>
-            <div class="hm-stat-value"><%= notifications ? notifications.filter(n => n.status === 'new').length : 0 %></div>
+            <div class="hm-stat-value"><%= notifications ? notifications.filter(n => n.status === 'new' || !n.read).length : 0 %></div>
           </div>
         </div>
       </div>
@@ -149,6 +151,7 @@
             <thead>
               <tr>
                 <th>العنوان</th>
+                <th>الرسالة</th>
                 <th>المستخدم</th>
                 <th>التاريخ</th>
                 <th>الحالة</th>
@@ -159,7 +162,10 @@
               <% notifications.forEach(function(n) { %>
               <tr>
                 <td style="color: var(--hm-white); font-weight: 600;">
-                  <%= (n.car && n.car.title) ? n.car.title : (n.title || 'إشعار جديد') %>
+                  <%= n.title || 'إشعار جديد' %>
+                </td>
+                <td style="color: var(--hm-gray); max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                  <%= n.message || '-' %>
                 </td>
                 <td><%= (n.user && n.user.name) ? n.user.name : '-' %></td>
                 <td>

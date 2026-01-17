@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (services/AnalyticsService.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const User = require('../models/User');
 const Auction = require('../models/Auction');
 const Car = require('../models/Car');

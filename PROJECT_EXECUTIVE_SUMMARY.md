@@ -1,3 +1,5 @@
+> [[ARABIC_HEADER]] هذا الملف (PROJECT_EXECUTIVE_SUMMARY.md) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 # ملخص تنفيذي - منصة HM CAR للمزادات
 
 ## 🎯 نظرة عامة

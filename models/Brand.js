@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (models/Brand.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 // models/Brand.js
 const mongoose = require('mongoose');
 

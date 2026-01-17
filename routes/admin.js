@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (routes/admin.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
@@ -5,7 +7,7 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const { requireAuth } = require('../middleware/auth');
 const { requireRole } = require('../middleware/roles');
-const { requirePermission, getDefaultPermissions } = require('../middleware/permissions');
+// const { requirePermission, getDefaultPermissions } = require('../middleware/permissions');
 const Car = require('../models/Car');
 const SparePart = require('../models/SparePart');
 const User = require('../models/User');
@@ -1130,9 +1132,20 @@ router.get('/settings', requireAuth, requireRole(['admin', 'super_admin']), asyn
 // صفحة الإشعارات
 router.get('/notifications', requireAuth, requireRole(['admin', 'super_admin']), async (req, res) => {
   try {
+    const Notification = require('../models/Notification');
+    
+    // جلب جميع الإشعارات مع بيانات المستخدم والسيارة
+    const notifications = await Notification.find()
+      .populate('user', 'name email')
+      .populate('car', 'title make model')
+      .sort({ createdAt: -1 })
+      .limit(50);
+    
     res.render('admin/notifications', {
       currentUser: req.session.user,
-      flash: req.session.flash || null
+      notifications,
+      flash: req.session.flash || null,
+      csrfToken: req.csrfToken()
     });
     req.session.flash = null;
   } catch (error) {
@@ -1149,13 +1162,38 @@ router.get('/notifications', requireAuth, requireRole(['admin', 'super_admin']),
 router.post('/notifications/send', requireAuth, requireRole(['admin', 'super_admin']), async (req, res) => {
   try {
     const { title, message, type, recipients, link } = req.body;
+    const Notification = require('../models/Notification');
+    const User = require('../models/User');
     
-    // هنا يمكن إضافة منطق إرسال الإشعارات
-    // مثلاً حفظ في قاعدة البيانات أو إرسال عبر Socket.IO
+    // تحديد المستلمين بناءً على الاختيار
+    let targetUsers = [];
+    if (recipients === 'all') {
+      targetUsers = await User.find({}).select('_id');
+    } else if (recipients === 'buyers') {
+      targetUsers = await User.find({ role: 'buyer' }).select('_id');
+    } else if (recipients === 'sellers') {
+      targetUsers = await User.find({ role: 'seller' }).select('_id');
+    } else if (recipients === 'admins') {
+      targetUsers = await User.find({ role: { $in: ['admin', 'super_admin'] } }).select('_id');
+    }
+    
+    // إنشاء إشعارات لكل مستخدم
+    const notifications = targetUsers.map(userId => ({
+      user: userId._id,
+      title,
+      message,
+      type,
+      link,
+      status: 'new'
+    }));
+    
+    if (notifications.length > 0) {
+      await Notification.insertMany(notifications);
+    }
     
     req.session.flash = {
       type: 'success',
-      message: 'تم إرسال الإشعار بنجاح'
+      message: `تم إرسال الإشعار بنجاح إلى ${notifications.length} مستخدم`
     };
     res.redirect('/admin/notifications');
   } catch (error) {

@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (routes/sitemap.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 // routes/sitemap.js - Dynamic Sitemap Generator
 const express = require('express');
 const router = express.Router();

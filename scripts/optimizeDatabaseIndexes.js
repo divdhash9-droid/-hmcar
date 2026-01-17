@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (scripts/optimizeDatabaseIndexes.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 /**
  * scripts/optimizeDatabaseIndexes.js
  * سكربت متقدم لتحسين فهارس قاعدة البيانات وتحليل الأداء

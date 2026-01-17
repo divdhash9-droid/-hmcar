@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (services/cache/connection.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const redis = require('redis');
 
 class CacheConnection {

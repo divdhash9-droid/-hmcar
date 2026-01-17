@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (models/Message.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const mongoose = require('mongoose');
 
 const messageSchema = new mongoose.Schema({

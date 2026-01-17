@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (middleware/adminAuth.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 // middleware/adminAuth.js
 const { requireAuth } = require('./auth');
 

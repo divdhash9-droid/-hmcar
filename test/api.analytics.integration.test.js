@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (test/api.analytics.integration.test.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const request = require('supertest');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const mongoose = require('mongoose');

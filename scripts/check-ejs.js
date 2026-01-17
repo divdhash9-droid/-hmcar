@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (scripts/check-ejs.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const fs = require('fs');
 const path = require('path');
 const ejs = require('ejs');

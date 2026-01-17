@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (public/js/countdown.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 // public/js/countdown.js
 (function() {
   // سكربت لعرض العد التنازلي لانتهاء المزادات

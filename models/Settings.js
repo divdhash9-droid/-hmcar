@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (models/Settings.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const mongoose = require('mongoose');
 
 const settingsSchema = new mongoose.Schema({

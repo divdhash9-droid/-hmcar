@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (public/js/theme-interactions.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 // ======== Theme Toggle System ========
 class ThemeManager {
   constructor() {

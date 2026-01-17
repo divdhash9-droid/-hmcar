@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (services/CacheService.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 /**
  * services/CacheService.js
  * خدمة التخزين المؤقت باستخدام Redis

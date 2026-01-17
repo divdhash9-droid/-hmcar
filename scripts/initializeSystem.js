@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (scripts/initializeSystem.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const mongoose = require('mongoose');
 const User = require('../models/User');
 const Settings = require('../models/Settings');

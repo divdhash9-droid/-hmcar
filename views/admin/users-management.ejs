@@ -1,151 +1,370 @@
+<!-- [[ARABIC_HEADER]] هذا الملف (views/admin/users-management.ejs) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. -->
+
 <% layout('layout') -%>
 <% var hideNavbar = true; %>
 <% var hideSearch = true; %>
 <% var fullWidth = true; %>
-<% var bodyClass = 'admin-dashboard-luxury'; %>
 
-<div class="hm-dashboard">
-  <div class="hm-dashboard__container">
-    <header class="hm-hero" aria-label="إدارة المشرفين والصلاحيات">
-      <div class="hm-hero__top">
-        <div class="hm-hero__brand">
-          <img class="hm-hero__logo" src="/public/images/navbar-logo.png" alt="HM CAR" loading="eager" decoding="async" onerror="this.onerror=null;this.src='/public/images/logo.png';" />
-          <div class="hm-hero__titles">
-            <h1 class="hm-hero__title">إدارة المشرفين والصلاحيات</h1>
-            <div class="hm-hero__subtitle">تحكم كامل بالصلاحيات — Super Admin فقط</div>
+<div class="hm-pro-home">
+  <!-- Hero Section -->
+  <section class="hm-hero" style="min-height: 35vh; padding: 3rem 2rem 2rem;">
+    <div class="hm-hero__bg">
+      <div class="hm-hero__gradient"></div>
+      <div class="hm-hero__particles">
+        <div class="particle p1"></div>
+        <div class="particle p2"></div>
+        <div class="particle p3"></div>
+      </div>
+    </div>
+
+    <div class="hm-hero__content" style="max-width: 1400px; margin: 0 auto;">
+      <!-- Top Navigation -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <img src="/public/images/logo.png" alt="HM CAR" style="width: 60px; height: 60px;" />
+          <div>
+            <h1 class="hm-hero__title" style="font-size: 2rem; margin: 0;" data-ar="إدارة المشرفين والصلاحيات" data-en="Admin & Permissions Management">
+              إدارة المشرفين والصلاحيات
+            </h1>
+            <p class="hm-hero__subtitle" style="font-size: 1rem; margin: 0.5rem 0 0;" data-ar="تحكم كامل بالصلاحيات — Super Admin فقط" data-en="Full Control - Super Admin Only">
+              تحكم كامل بالصلاحيات — Super Admin فقط
+            </p>
           </div>
         </div>
 
-        <nav class="hm-hero__actions" aria-label="روابط">
-          <a class="hm-pill" href="/admin" aria-label="لوحة الإدارة"><i class="fas fa-tachometer-alt"></i><span>لوحة الإدارة</span></a>
-          <a class="hm-pill" href="/admin/users" aria-label="المستخدمين"><i class="fas fa-users"></i><span>المستخدمين</span></a>
-          <a class="hm-pill hm-pill--danger" href="/auth/logout" aria-label="خروج"><i class="fas fa-sign-out-alt"></i><span>خروج</span></a>
+        <nav style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+          <a href="/admin" class="hm-btn-3d hm-btn-hero-secondary" style="padding: 0.6rem 1.2rem; font-size: 0.9rem;">
+            <i class="fas fa-tachometer-alt"></i> <span>لوحة الإدارة</span>
+          </a>
+          <a href="/admin/users" class="hm-btn-3d hm-btn-hero-secondary" style="padding: 0.6rem 1.2rem; font-size: 0.9rem;">
+            <i class="fas fa-users"></i> <span>المستخدمين</span>
+          </a>
+          <a href="/auth/logout" class="hm-btn-3d" style="background: rgba(220,53,69,0.8); padding: 0.6rem 1.2rem; font-size: 0.9rem;">
+            <i class="fas fa-sign-out-alt"></i> <span>خروج</span>
+          </a>
         </nav>
       </div>
 
-      <section class="hm-kpis" aria-label="إحصائيات">
-        <div class="hm-kpi"><div class="hm-kpi__row"><div><div class="hm-kpi__label">عدد المشرفين</div><div class="hm-kpi__value"><%= Array.isArray(users) ? users.length : 0 %></div></div><div class="hm-kpi__icon" aria-hidden="true"><i class="fas fa-user-shield"></i></div></div></div>
-        <div class="hm-kpi"><div class="hm-kpi__row"><div><div class="hm-kpi__label">أدوار متاحة</div><div class="hm-kpi__value"><%= Array.isArray(roles) ? roles.length : 0 %></div></div><div class="hm-kpi__icon" aria-hidden="true"><i class="fas fa-id-badge"></i></div></div></div>
-        <div class="hm-kpi"><div class="hm-kpi__row"><div><div class="hm-kpi__label">صلاحيات</div><div class="hm-kpi__value"><%= Array.isArray(permissions) ? permissions.length : 0 %></div></div><div class="hm-kpi__icon" aria-hidden="true"><i class="fas fa-key"></i></div></div></div>
-        <div class="hm-kpi hm-kpi--security"><div class="hm-kpi__row"><div><div class="hm-kpi__label">الأمان</div><div class="hm-kpi__value">CSRF</div></div><div class="hm-kpi__icon" aria-hidden="true"><i class="fas fa-lock"></i></div></div></div>
-      </section>
-    </header>
-
-    <% if (flash && flash.message) { %>
-      <div class="mt-3">
-        <div class="alert alert-<%= flash.type || 'info' %> alert-dismissible fade show" role="alert">
-          <%= flash.message %>
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-      </div>
-    <% } %>
-
-    <section class="hm-section" aria-label="إنشاء مشرف">
-      <h2 class="hm-section__title">إنشاء مشرف جديد</h2>
-      <div class="hm-list">
-        <div class="hm-list__item">
-          <form id="createAdminForm" class="w-100">
-            <input type="hidden" id="csrfToken" value="<%= csrfToken %>">
-            <div class="row g-3">
-              <div class="col-md-4">
-                <label class="form-label text-light">الاسم</label>
-                <input class="form-control" name="name" required>
-              </div>
-              <div class="col-md-4">
-                <label class="form-label text-light">البريد</label>
-                <input class="form-control" name="email" type="email" required>
-              </div>
-              <div class="col-md-4">
-                <label class="form-label text-light">الهاتف</label>
-                <input class="form-control" name="phone" required>
-              </div>
-              <div class="col-md-4">
-                <label class="form-label text-light">كلمة المرور</label>
-                <input class="form-control" name="password" type="password" required>
-              </div>
-              <div class="col-md-4">
-                <label class="form-label text-light">الدور</label>
-                <select class="form-select" name="role">
-                  <% (roles || []).forEach(function(r){ %>
-                    <option value="<%= r %>"><%= r %></option>
-                  <% }) %>
-                </select>
-              </div>
-              <div class="col-md-4">
-                <label class="form-label text-light">صلاحيات</label>
-                <select class="form-select" name="permissions" multiple>
-                  <% (permissions || []).forEach(function(p){ %>
-                    <option value="<%= p %>"><%= p %></option>
-                  <% }) %>
-                </select>
-                <div class="form-text text-light" style="opacity:.7">يمكن اختيار أكثر من صلاحية</div>
-              </div>
-              <div class="col-12">
-                <button class="hm-embed__close" type="submit">إنشاء</button>
-              </div>
+      <!-- Stats KPIs -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-top: 2rem;">
+        <div style="background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border-radius: 15px; padding: 1.5rem; border: 1px solid rgba(255,255,255,0.1);">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="color: rgba(255,255,255,0.7); font-size: 0.9rem; margin-bottom: 0.5rem;">عدد المشرفين</div>
+              <div style="color: #fff; font-size: 2rem; font-weight: 700;"><%= Array.isArray(users) ? users.length : 0 %></div>
             </div>
-          </form>
+            <div style="font-size: 2.5rem; color: #0ea5e9; opacity: 0.5;">
+              <i class="fas fa-user-shield"></i>
+            </div>
+          </div>
+        </div>
+
+        <div style="background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border-radius: 15px; padding: 1.5rem; border: 1px solid rgba(255,255,255,0.1);">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="color: rgba(255,255,255,0.7); font-size: 0.9rem; margin-bottom: 0.5rem;">أدوار متاحة</div>
+              <div style="color: #fff; font-size: 2rem; font-weight: 700;"><%= Array.isArray(roles) ? roles.length : 0 %></div>
+            </div>
+            <div style="font-size: 2.5rem; color: #28a745; opacity: 0.5;">
+              <i class="fas fa-id-badge"></i>
+            </div>
+          </div>
+        </div>
+
+        <div style="background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border-radius: 15px; padding: 1.5rem; border: 1px solid rgba(255,255,255,0.1);">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="color: rgba(255,255,255,0.7); font-size: 0.9rem; margin-bottom: 0.5rem;">صلاحيات</div>
+              <div style="color: #fff; font-size: 2rem; font-weight: 700;"><%= Array.isArray(permissions) ? permissions.length : 0 %></div>
+            </div>
+            <div style="font-size: 2.5rem; color: #ffc107; opacity: 0.5;">
+              <i class="fas fa-key"></i>
+            </div>
+          </div>
+        </div>
+
+        <div style="background: rgba(40,167,69,0.1); backdrop-filter: blur(10px); border-radius: 15px; padding: 1.5rem; border: 1px solid rgba(40,167,69,0.3);">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="color: rgba(255,255,255,0.7); font-size: 0.9rem; margin-bottom: 0.5rem;">الأمان</div>
+              <div style="color: #28a745; font-size: 2rem; font-weight: 700;">CSRF ✓</div>
+            </div>
+            <div style="font-size: 2.5rem; color: #28a745; opacity: 0.5;">
+              <i class="fas fa-lock"></i>
+            </div>
+          </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section class="hm-section" aria-label="قائمة المشرفين">
-      <h2 class="hm-section__title">قائمة المشرفين</h2>
-      <div class="hm-list" id="adminsList">
+  <!-- Flash Messages -->
+  <% if (flash && flash.message) { %>
+    <div class="hm-container" style="margin-top: 2rem;">
+      <div style="background: <%= flash.type === 'success' ? 'rgba(40,167,69,0.1)' : 'rgba(220,53,69,0.1)' %>; border: 2px solid <%= flash.type === 'success' ? '#28a745' : '#dc3545' %>; border-radius: 15px; padding: 1.5rem; color: #fff;">
+        <i class="fas fa-<%= flash.type === 'success' ? 'check-circle' : 'exclamation-circle' %>"></i>
+        <%= flash.message %>
+      </div>
+    </div>
+  <% } %>
+
+  <!-- Create Admin Form -->
+  <section class="hm-featured-cars" style="padding: 3rem 0;">
+    <div class="hm-container">
+      <div style="background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border-radius: 20px; padding: 2.5rem; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 3rem;">
+        <h2 style="color: #fff; font-size: 1.8rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 0.75rem;">
+          <i class="fas fa-user-plus" style="color: #0ea5e9;"></i>
+          <span data-ar="إنشاء مشرف جديد" data-en="Create New Admin">إنشاء مشرف جديد</span>
+        </h2>
+
+        <form id="createAdminForm">
+          <input type="hidden" id="csrfToken" value="<%= csrfToken %>">
+          
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+            <!-- Name -->
+            <div>
+              <label style="color: rgba(255,255,255,0.9); font-size: 0.95rem; margin-bottom: 0.5rem; display: block; font-weight: 600;">
+                <i class="fas fa-user"></i> الاسم الكامل
+              </label>
+              <input type="text" name="name" required
+                style="width: 100%; padding: 0.9rem 1rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: #fff; font-size: 1rem;"
+                placeholder="أدخل الاسم الكامل">
+            </div>
+
+            <!-- Email -->
+            <div>
+              <label style="color: rgba(255,255,255,0.9); font-size: 0.95rem; margin-bottom: 0.5rem; display: block; font-weight: 600;">
+                <i class="fas fa-envelope"></i> البريد الإلكتروني
+              </label>
+              <input type="email" name="email" required
+                style="width: 100%; padding: 0.9rem 1rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: #fff; font-size: 1rem;"
+                placeholder="admin@example.com">
+            </div>
+
+            <!-- Phone -->
+            <div>
+              <label style="color: rgba(255,255,255,0.9); font-size: 0.95rem; margin-bottom: 0.5rem; display: block; font-weight: 600;">
+                <i class="fas fa-phone"></i> رقم الهاتف
+              </label>
+              <input type="tel" name="phone" required
+                style="width: 100%; padding: 0.9rem 1rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: #fff; font-size: 1rem;"
+                placeholder="+966 5X XXX XXXX">
+            </div>
+
+            <!-- Password -->
+            <div>
+              <label style="color: rgba(255,255,255,0.9); font-size: 0.95rem; margin-bottom: 0.5rem; display: block; font-weight: 600;">
+                <i class="fas fa-lock"></i> كلمة المرور
+              </label>
+              <input type="password" name="password" required minlength="6"
+                style="width: 100%; padding: 0.9rem 1rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: #fff; font-size: 1rem;"
+                placeholder="كلمة مرور قوية">
+            </div>
+
+            <!-- Role -->
+            <div>
+              <label style="color: rgba(255,255,255,0.9); font-size: 0.95rem; margin-bottom: 0.5rem; display: block; font-weight: 600;">
+                <i class="fas fa-id-badge"></i> الدور الوظيفي
+              </label>
+              <select name="role" required
+                style="width: 100%; padding: 0.9rem 1rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: #fff; font-size: 1rem;">
+                <% (roles || []).forEach(function(r){ %>
+                  <option value="<%= r %>" style="background: #001f3f; color: #fff;"><%= r %></option>
+                <% }) %>
+              </select>
+            </div>
+          </div>
+
+          <!-- Permissions -->
+          <div style="margin-bottom: 2rem;">
+            <label style="color: rgba(255,255,255,0.9); font-size: 1.1rem; margin-bottom: 1rem; display: block; font-weight: 600;">
+              <i class="fas fa-key"></i> الصلاحيات (يمكن اختيار أكثر من صلاحية)
+            </label>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem;">
+              <% 
+                const permissionGroups = {
+                  'إدارة المستخدمين': ['manage_users', 'view_users', 'edit_users', 'delete_users'],
+                  'إدارة السيارات': ['manage_cars', 'view_cars', 'edit_cars', 'delete_cars', 'approve_cars'],
+                  'إدارة قطع الغيار': ['manage_parts', 'view_parts', 'edit_parts', 'delete_parts'],
+                  'إدارة المزادات': ['manage_auctions', 'view_auctions', 'edit_auctions', 'delete_auctions', 'end_auctions'],
+                  'إدارة الطلبات': ['manage_orders', 'view_orders', 'edit_orders', 'delete_orders', 'approve_orders'],
+                  'إدارة المدفوعات': ['manage_payments', 'view_payments', 'process_payments', 'refund_payments'],
+                  'التحليلات والتقارير': ['view_analytics', 'view_reports', 'export_reports', 'manage_reports'],
+                  'إدارة المحتوى': ['manage_content', 'edit_content', 'publish_content', 'delete_content'],
+                  'إعدادات النظام': ['manage_settings', 'manage_footer', 'manage_whatsapp', 'manage_social'],
+                  'الإشعارات': ['manage_notifications', 'send_notifications', 'view_notifications'],
+                  'الدعم والرسائل': ['manage_support', 'view_support', 'reply_support'],
+                  'النسخ الاحتياطي': ['manage_backups', 'create_backups', 'restore_backups'],
+                  'الصلاحيات المتقدمة': ['manage_roles', 'manage_permissions', 'view_logs', 'manage_api']
+                };
+
+                Object.keys(permissionGroups).forEach(function(groupName) {
+                  const groupPerms = permissionGroups[groupName];
+              %>
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1.2rem;">
+                  <h4 style="color: #0ea5e9; font-size: 0.95rem; margin-bottom: 0.8rem; font-weight: 600;">
+                    <%= groupName %>
+                  </h4>
+                  <% groupPerms.forEach(function(perm) { 
+                    const permExists = (permissions || []).includes(perm);
+                    if (!permExists) return;
+                  %>
+                    <label style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.6rem; cursor: pointer; padding: 0.4rem; border-radius: 6px; transition: background 0.2s;"
+                      onmouseover="this.style.background='rgba(255,255,255,0.05)'"
+                      onmouseout="this.style.background='transparent'">
+                      <input type="checkbox" name="permissions" value="<%= perm %>"
+                        style="width: 18px; height: 18px; accent-color: #0ea5e9; cursor: pointer;">
+                      <span style="color: rgba(255,255,255,0.9); font-size: 0.9rem;"><%= perm.replace(/_/g, ' ') %></span>
+                    </label>
+                  <% }); %>
+                </div>
+              <% }); %>
+            </div>
+          </div>
+
+          <button type="submit" class="hm-btn-3d hm-btn-hero-primary" style="width: 100%; padding: 1.2rem; font-size: 1.1rem; font-weight: 700;">
+            <i class="fas fa-plus-circle"></i>
+            <span data-ar="إنشاء المشرف الآن" data-en="Create Admin Now">إنشاء المشرف الآن</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Admins List -->
+      <div style="background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border-radius: 20px; padding: 2.5rem; border: 1px solid rgba(255,255,255,0.1);">
+        <h2 style="color: #fff; font-size: 1.8rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 0.75rem;">
+          <i class="fas fa-users-cog" style="color: #0ea5e9;"></i>
+          <span data-ar="قائمة المشرفين الحاليين" data-en="Current Admins List">قائمة المشرفين الحاليين</span>
+        </h2>
+
         <% if (users && users.length) { %>
-          <% users.forEach(function(u){ %>
-            <div class="hm-list__item">
-              <div>
-                <h3 class="hm-list__title"><%= u.name || 'مشرف' %></h3>
-                <div class="hm-list__meta"><%= u.email || '' %><%= u.phone ? (' - ' + u.phone) : '' %></div>
+          <div style="display: grid; gap: 1.5rem;">
+            <% users.forEach(function(u){ %>
+              <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; padding: 1.8rem; transition: all 0.3s;"
+                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 30px rgba(14,165,233,0.2)'"
+                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 1rem;">
+                  <div style="flex: 1; min-width: 250px;">
+                    <h3 style="color: #fff; font-size: 1.3rem; margin-bottom: 0.5rem; font-weight: 700;">
+                      <i class="fas fa-user-circle" style="color: #0ea5e9; margin-right: 0.5rem;"></i>
+                      <%= u.name || 'مشرف' %>
+                    </h3>
+                    <div style="color: rgba(255,255,255,0.7); font-size: 0.95rem; margin-bottom: 0.3rem;">
+                      <i class="fas fa-envelope" style="margin-right: 0.3rem;"></i>
+                      <%= u.email || 'لا يوجد بريد' %>
+                    </div>
+                    <% if (u.phone) { %>
+                      <div style="color: rgba(255,255,255,0.7); font-size: 0.95rem;">
+                        <i class="fas fa-phone" style="margin-right: 0.3rem;"></i>
+                        <%= u.phone %>
+                      </div>
+                    <% } %>
+                    
+                    <% if (u.permissions && u.permissions.length) { %>
+                      <div style="margin-top: 1rem;">
+                        <div style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 0.5rem;">
+                          <i class="fas fa-key"></i> الصلاحيات (<%= u.permissions.length %>):
+                        </div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
+                          <% u.permissions.slice(0, 5).forEach(function(perm) { %>
+                            <span style="background: rgba(14,165,233,0.2); color: #0ea5e9; padding: 0.3rem 0.7rem; border-radius: 6px; font-size: 0.8rem; border: 1px solid rgba(14,165,233,0.3);">
+                              <%= perm.replace(/_/g, ' ') %>
+                            </span>
+                          <% }); %>
+                          <% if (u.permissions.length > 5) { %>
+                            <span style="background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); padding: 0.3rem 0.7rem; border-radius: 6px; font-size: 0.8rem;">
+                              +<%= u.permissions.length - 5 %> المزيد
+                            </span>
+                          <% } %>
+                        </div>
+                      </div>
+                    <% } %>
+                  </div>
+
+                  <div style="text-align: right;">
+                    <div style="display: inline-block; padding: 0.6rem 1.5rem; border-radius: 25px; font-weight: 700; font-size: 0.95rem; margin-bottom: 1rem;
+                      <%= u.role === 'super_admin' ? 'background: rgba(220,53,69,0.2); color: #dc3545; border: 2px solid rgba(220,53,69,0.4);' : 
+                          u.role === 'admin' ? 'background: rgba(14,165,233,0.2); color: #0ea5e9; border: 2px solid rgba(14,165,233,0.4);' : 
+                          'background: rgba(40,167,69,0.2); color: #28a745; border: 2px solid rgba(40,167,69,0.4);' %>">
+                      <i class="fas fa-<%= u.role === 'super_admin' ? 'crown' : u.role === 'admin' ? 'user-shield' : 'user-tie' %>"></i>
+                      <%= u.role || 'admin' %>
+                    </div>
+
+                    <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                      <button onclick="editAdmin('<%= u._id %>')" class="hm-btn-3d" style="padding: 0.5rem 1rem; font-size: 0.85rem; background: rgba(40,167,69,0.8);">
+                        <i class="fas fa-edit"></i> تعديل
+                      </button>
+                      <% if (u.role !== 'super_admin') { %>
+                        <button onclick="deleteAdmin('<%= u._id %>')" class="hm-btn-3d" style="padding: 0.5rem 1rem; font-size: 0.85rem; background: rgba(220,53,69,0.8);">
+                          <i class="fas fa-trash"></i> حذف
+                        </button>
+                      <% } %>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <span class="hm-chip"><i class="fas fa-user-shield"></i><span><%= u.role || 'admin' %></span></span>
-            </div>
-          <% }) %>
+            <% }); %>
+          </div>
         <% } else { %>
-          <div class="hm-list__item"><div><h3 class="hm-list__title">لا يوجد مشرفون</h3><div class="hm-list__meta">أنشئ مشرفاً من النموذج أعلاه</div></div></div>
+          <div style="text-align: center; padding: 4rem 2rem; background: rgba(255,255,255,0.03); border-radius: 15px; border: 2px dashed rgba(255,255,255,0.1);">
+            <div style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.3;">
+              <i class="fas fa-user-slash"></i>
+            </div>
+            <h3 style="color: #fff; font-size: 1.5rem; margin-bottom: 0.5rem;">لا يوجد مشرفون</h3>
+            <p style="color: rgba(255,255,255,0.6); font-size: 1rem;">أنشئ أول مشرف من النموذج أعلاه</p>
+          </div>
         <% } %>
       </div>
-    </section>
-  </div>
+    </div>
+  </section>
 </div>
 
 <script>
-  (function(){
-    const form = document.getElementById('createAdminForm');
-    if(!form) return;
+(function(){
+  const form = document.getElementById('createAdminForm');
+  if(!form) return;
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const csrf = document.getElementById('csrfToken')?.value || '';
-      const fd = new FormData(form);
-      const payload = {
-        name: fd.get('name'),
-        email: fd.get('email'),
-        phone: fd.get('phone'),
-        password: fd.get('password'),
-        role: fd.get('role'),
-        permissions: fd.getAll('permissions')
-      };
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const csrf = document.getElementById('csrfToken')?.value || '';
+    const fd = new FormData(form);
+    const payload = {
+      name: fd.get('name'),
+      email: fd.get('email'),
+      phone: fd.get('phone'),
+      password: fd.get('password'),
+      role: fd.get('role'),
+      permissions: fd.getAll('permissions')
+    };
 
-      try{
-        const res = await fetch('/admin/users-management/create', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'csrf-token': csrf
-          },
-          body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-        if(!data.success){
-          alert(data.message || 'فشل إنشاء المشرف');
-          return;
-        }
-        location.reload();
-      }catch(err){
-        alert('حدث خطأ أثناء إنشاء المشرف');
+    try{
+      const res = await fetch('/admin/users-management/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'csrf-token': csrf
+        },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if(!data.success){
+        alert(data.message || 'فشل إنشاء المشرف');
+        return;
       }
-    });
-  })();
+      location.reload();
+    }catch(err){
+      alert('حدث خطأ أثناء إنشاء المشرف');
+    }
+  });
+})();
+
+function editAdmin(id) {
+  alert('سيتم إضافة صفحة التعديل قريباً');
+}
+
+function deleteAdmin(id) {
+  if (confirm('هل أنت متأكد من حذف هذا المشرف؟')) {
+    alert('سيتم إضافة وظيفة الحذف قريباً');
+  }
+}
 </script>

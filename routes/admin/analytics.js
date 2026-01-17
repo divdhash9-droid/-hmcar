@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (routes/admin/analytics.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const express = require('express');
 const router = express.Router();
 const AnalyticsService = require('../../services/AnalyticsService');

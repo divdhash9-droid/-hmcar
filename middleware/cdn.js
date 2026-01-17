@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (middleware/cdn.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const cdnService = require('../services/CDNService');
 
 // CDN middleware for image optimization

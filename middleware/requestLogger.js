@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (middleware/requestLogger.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 /**
  * Request Logging Middleware
  * تسجيل تفصيلي لجميع الطلبات

@@ -1,4 +1,5 @@
 #!/bin/bash
+# [[ARABIC_HEADER]] هذا الملف (scripts/clean-project.sh) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
 
 # Script to clean old project data
 # تنظيف جميع البيانات القديمة من المشروع

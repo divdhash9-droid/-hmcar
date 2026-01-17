@@ -1,69 +1,141 @@
+<!-- [[ARABIC_HEADER]] هذا الملف (views/auctions/cars.ejs) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. -->
+
 <% layout('layout') -%>
 
-<!-- صفحة سيارات المزاد: قائمة السيارات المُضافة من الإدارة للمزاد/المزايدات -->
-
-<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2 mb-3">
-  <div>
-    <h3 class="mb-1">سيارات المزاد</h3>
-    <div class="text-muted">سيارات تم إدخالها من الإدارة لعرضها للعملاء مع المزايدات.</div>
-  </div>
-  <div class="d-flex gap-2">
-    <a class="btn btn-outline-secondary" href="/auctions/live">العودة للمزاد المباشر</a>
-    <% if (currentUser && currentUser.role === 'admin') { %>
-      <!-- زر إداري لإضافة سيارة مزاد جديدة -->
-      <a class="btn btn-primary" href="/auctions/cars/new">إضافة سيارة مزاد</a>
-    <% } %>
-  </div>
-</div>
-
-<% if (!cars || cars.length === 0) { %>
-  <!-- حالة عدم وجود سيارات مزاد -->
-  <div class="card border-0 shadow-sm">
-    <div class="card-body py-5 text-center">
-      <h5 class="mb-2">لا توجد سيارات مزاد حالياً</h5>
-      <div class="text-muted">سيقوم الأدمن بإضافة السيارات من لوحة المزاد.</div>
-    </div>
-  </div>
-<% } else { %>
-  <!-- عرض السيارات كبطاقات -->
-  <div class="row g-3">
-    <% cars.forEach(c => { %>
-      <div class="col-md-6 col-lg-4">
-        <div class="card border-0 shadow-sm h-100 overflow-hidden">
-          <% if (c.images && c.images.length) { %>
-            <!-- صورة الغلاف: أول صورة إن وجدت -->
-            <img src="<%= c.images[0] %>" class="img-fluid" style="height: 220px; width: 100%; object-fit: cover;" alt="صورة سيارة" loading="lazy" decoding="async" />
-          <% } else { %>
-            <!-- بديل الصورة عند عدم وجود صور -->
-            <div class="bg-body-tertiary d-flex align-items-center justify-content-center" style="height: 220px;">
-              <span class="text-muted">لا توجد صورة</span>
-            </div>
-          <% } %>
-          <div class="card-body">
-            <h5 class="mb-1"><%= c.title %></h5>
-            <div class="text-muted small mb-2"><%= c.make %> - <%= c.model %> - <%= c.year %></div>
-            <div class="text-muted mb-3">
-              <!-- عرض السعر: نفضل priceSar/priceUsd إن كانت متوفرة، وإلا نرجع للحقل القديم price -->
-              <% const sar = (c.priceSar !== undefined && c.priceSar !== null) ? c.priceSar : null; %>
-              <% const usd = (c.priceUsd !== undefined && c.priceUsd !== null) ? c.priceUsd : null; %>
-              <% if (sar !== null || usd !== null) { %>
-                <%= sar !== null ? sar.toLocaleString('en-US') + ' SAR' : '' %>
-                <%= (sar !== null && usd !== null) ? ' | ' : '' %>
-                <%= usd !== null ? usd.toLocaleString('en-US') + ' USD' : '' %>
-              <% } else { %>
-                <%= c.price ? c.price.toLocaleString('en-US') : '' %>
-              <% } %>
-            </div>
-
-            <!-- الانتقال لصفحة عرض المزايدات لهذه السيارة -->
-            <a class="btn btn-outline-primary w-100" href="/auctions/car/<%= c._id %>">عرض المزايدات</a>
-            <% if (c.externalUrl) { %>
-              <!-- رابط خارجي (اختياري) لصفحة المزاد الأصلية -->
-              <a class="btn btn-link w-100 mt-2" href="<%= c.externalUrl %>" target="_blank" rel="noopener">فتح رابط المزاد الخارجي</a>
-            <% } %>
-          </div>
-        </div>
+<div class="hm-pro-home">
+  <!-- Hero Section -->
+  <section class="hm-hero" style="min-height: 40vh; padding: 4rem 2rem 2rem;">
+    <div class="hm-hero__bg">
+      <div class="hm-hero__gradient"></div>
+      <div class="hm-hero__particles">
+        <div class="particle p1"></div>
+        <div class="particle p2"></div>
+        <div class="particle p3"></div>
       </div>
-    <% }) %>
-  </div>
-<% } %>
+    </div>
+
+    <div class="hm-hero__content" style="max-width: 1200px; margin: 0 auto;">
+      <h1 class="hm-hero__title" style="font-size: 2.5rem; margin-bottom: 1rem;" data-ar="سيارات المزاد" data-en="Auction Cars">
+        سيارات المزاد
+      </h1>
+      <p class="hm-hero__subtitle" style="font-size: 1.1rem; margin-bottom: 2rem;" data-ar="سيارات مميزة تم إدخالها من الإدارة للمزايدات" data-en="Premium cars for bidding">
+        سيارات مميزة تم إدخالها من الإدارة للمزايدات
+      </p>
+
+      <!-- Action Buttons -->
+      <div class="hm-hero__cta" style="gap: 1rem;">
+        <a href="/auctions/live" class="hm-btn-3d hm-btn-hero-primary">
+          <i class="fas fa-broadcast-tower"></i>
+          <span data-ar="المزاد المباشر" data-en="Live Auction">المزاد المباشر</span>
+        </a>
+        <% if (currentUser && currentUser.role === 'admin') { %>
+          <a href="/admin/auctions" class="hm-btn-3d hm-btn-hero-secondary">
+            <i class="fas fa-plus"></i>
+            <span data-ar="إضافة سيارة مزاد" data-en="Add Auction Car">إضافة سيارة مزاد</span>
+          </a>
+        <% } %>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cars Section -->
+  <section class="hm-featured-cars" style="padding: 3rem 0;">
+    <div class="hm-container">
+      <% if (!cars || cars.length === 0) { %>
+        <!-- Empty State -->
+        <div class="hm-empty-state" style="text-align: center; padding: 5rem 2rem; background: rgba(255,255,255,0.05); border-radius: 20px; backdrop-filter: blur(10px);">
+          <div style="font-size: 4rem; margin-bottom: 1.5rem; opacity: 0.3;">
+            <i class="fas fa-gavel"></i>
+          </div>
+          <h3 style="color: var(--hm-white); margin-bottom: 1rem; font-size: 1.8rem;">لا توجد سيارات مزاد حالياً</h3>
+          <p style="color: rgba(255,255,255,0.7); font-size: 1.1rem; margin-bottom: 2rem;">سيقوم الأدمن بإضافة السيارات من لوحة المزاد</p>
+          <% if (currentUser && currentUser.role === 'admin') { %>
+            <a href="/admin/auctions" class="hm-btn-3d hm-btn-hero-primary">
+              <i class="fas fa-plus"></i>
+              <span>إضافة أول سيارة</span>
+            </a>
+          <% } %>
+        </div>
+      <% } else { %>
+        <!-- Cars Grid -->
+        <div class="hm-cars-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2rem;">
+          <% cars.forEach(c => { %>
+            <div class="hm-car-card">
+              <div class="hm-car-card__image">
+                <% if (c.images && c.images.length) { %>
+                  <img src="<%= c.images[0] %>" alt="<%= c.title %>" loading="lazy">
+                <% } else { %>
+                  <div style="width: 100%; height: 100%; background: var(--hm-gradient-dark); display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-car" style="font-size: 3rem; color: rgba(255,255,255,0.3);"></i>
+                  </div>
+                <% } %>
+                <div class="hm-car-card__badge">
+                  <span data-ar="مزاد" data-en="Auction">مزاد</span>
+                </div>
+              </div>
+
+              <div class="hm-car-card__content">
+                <h3 class="hm-car-card__title"><%= c.title %></h3>
+                
+                <div class="hm-car-card__specs">
+                  <span><i class="fas fa-car"></i> <%= c.make %></span>
+                  <span><i class="fas fa-cog"></i> <%= c.model %></span>
+                </div>
+
+                <div class="hm-car-card__specs" style="margin-top: 0.5rem;">
+                  <% if (c.year) { %>
+                    <span><i class="fas fa-calendar"></i> <%= c.year %></span>
+                  <% } %>
+                  <% if (c.mileage) { %>
+                    <span><i class="fas fa-road"></i> <%= c.mileage.toLocaleString() %> km</span>
+                  <% } %>
+                </div>
+
+                <div class="hm-car-card__price">
+                  <% const sar = (c.priceSar !== undefined && c.priceSar !== null) ? c.priceSar : null; %>
+                  <% const usd = (c.priceUsd !== undefined && c.priceUsd !== null) ? c.priceUsd : null; %>
+                  <% if (sar !== null || usd !== null) { %>
+                    <span class="hm-price-value">
+                      <%= sar !== null ? sar.toLocaleString('en-US') + ' SAR' : '' %>
+                      <%= (sar !== null && usd !== null) ? ' | ' : '' %>
+                      <%= usd !== null ? '$' + usd.toLocaleString('en-US') : '' %>
+                    </span>
+                  <% } else if (c.price) { %>
+                    <span class="hm-price-value">
+                      <%= c.price.toLocaleString('en-US') %>
+                    </span>
+                  <% } else { %>
+                    <span class="hm-price-value" style="font-size: 0.9rem;">السعر عند الطلب</span>
+                  <% } %>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem;">
+                  <a href="/auctions/car/<%= c._id %>" class="hm-btn-3d hm-btn-view-car">
+                    <i class="fas fa-gavel"></i>
+                    <span data-ar="عرض المزايدات" data-en="View Bids">عرض المزايدات</span>
+                  </a>
+                  <% if (c.externalUrl) { %>
+                    <a href="<%= c.externalUrl %>" target="_blank" rel="noopener" class="hm-btn-3d" style="background: rgba(255,255,255,0.1); font-size: 0.85rem; padding: 0.6rem 1rem;">
+                      <i class="fas fa-external-link-alt"></i>
+                      <span data-ar="رابط خارجي" data-en="External Link">رابط خارجي</span>
+                    </a>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+  </section>
+
+  <!-- Back to Home -->
+  <section style="padding: 2rem 0 4rem;">
+    <div class="hm-container" style="text-align: center;">
+      <a href="/" class="hm-btn-3d hm-btn-hero-secondary">
+        <i class="fas fa-home"></i>
+        <span data-ar="العودة للصفحة الرئيسية" data-en="Back to Home">العودة للصفحة الرئيسية</span>
+      </a>
+    </div>
+  </section>
+</div>

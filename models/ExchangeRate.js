@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (models/ExchangeRate.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 // models/ExchangeRate.js
 const mongoose = require('mongoose');
 

@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (middleware/autoCache.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 /**
  * Auto-Caching Middleware
  * Middleware للتخزين التلقائي للاستجابات

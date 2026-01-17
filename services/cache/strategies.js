@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (services/cache/strategies.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 /**
  * Advanced Caching Strategies
  * استراتيجيات تخزين متقدمة للأداء الأمثل

@@ -1,8 +1,10 @@
+// [[ARABIC_HEADER]] هذا الملف (routes/backup.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const express = require('express');
 const router = express.Router();
 const Backup = require('../models/Backup');
 const { requireAuth } = require('../middleware/auth');
-const { requirePermission } = require('../middleware/permissions');
+// const { requirePermission } = require('../middleware/permissions');
 const fs = require('fs');
 const path = require('path');
 

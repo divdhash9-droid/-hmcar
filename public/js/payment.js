@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (public/js/payment.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 // public/js/payment.js - Payment processing
 document.addEventListener('DOMContentLoaded', function() {
     const paymentForm = document.querySelector('.payment-form');

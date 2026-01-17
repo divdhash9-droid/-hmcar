@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (public/sw.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const CACHE_NAME = 'hmcar-cache-v2';
 
 self.addEventListener('install', (event) => {

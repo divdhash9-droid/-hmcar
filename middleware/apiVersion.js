@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (middleware/apiVersion.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 /**
  * API Versioning Middleware
  * إدارة إصدارات الـ API

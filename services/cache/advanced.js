@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (services/cache/advanced.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const connection = require('./connection');
 const { set, get, increment } = require('./basic');
 

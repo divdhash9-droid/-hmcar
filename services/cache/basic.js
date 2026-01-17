@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (services/cache/basic.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const connection = require('./connection');
 
 const defaultTTL = 3600; // 1 hour

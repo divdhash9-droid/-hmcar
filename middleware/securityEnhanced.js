@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (middleware/securityEnhanced.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 /**
  * middleware/securityEnhanced.js
  * ميدلوير الأمان المحسن

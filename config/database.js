@@ -1,46 +1,78 @@
+// [[ARABIC_HEADER]] هذا الملف (config/database.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 /**
  * config/database.js
- * قاعدة بيانات وهمية للتطوير المحلي - بدون Firebase
+ * تهيئة قاعدة بيانات MongoDB Atlas
  * 
  * الوصف:
- * - هذا الملف يوفر واجهة وهمية (Mock) لقاعدة البيانات
- * - يُستخدم عند التطوير المحلي بدلاً من Firebase Realtime Database
- * - جميع العمليات ترجع Promise فارغ للتوافق مع الكود الموجود
- * 
- * ملاحظة: المشروع يستخدم MongoDB كقاعدة بيانات رئيسية
+ * - هذا الملف يهتم بتهيئة الاتصال بقاعدة بيانات MongoDB Atlas
+ * - يتضمن إعدادات الاتصال ووظائف إدارة الاتصال
  */
 
-const mockDatabase = {
-  // إنشاء مرجع لمسار معين في قاعدة البيانات الوهمية
-  ref: (path) => ({
-    // حفظ بيانات
-    set: (data) => Promise.resolve(),
-    // جلب بيانات
-    get: () => Promise.resolve({ exists: () => false }),
-    // إضافة عنصر جديد بمعرف تلقائي
-    push: (data) => Promise.resolve({ key: Math.random().toString(36) }),
-    // تحديث بيانات
-    update: (data) => Promise.resolve(),
-    // حذف بيانات
-    remove: () => Promise.resolve(),
-    // الاستماع للتغييرات (Realtime)
-    onValue: (callback) => {
-      callback({ exists: () => false });
-      return () => {}; // دالة إلغاء الاشتراك
-    }
-  })
+const mongoose = require('mongoose');
+
+// تهيئة الاتصال بقاعدة البيانات
+const connectDB = async () => {
+  try {
+    // استخدام متغير البيئة MONGO_URI للاتصال بـ MongoDB Atlas
+    const mongoUri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/car-auction';
+    
+    // خيارات الاتصال الموصى بها من MongoDB
+    const options = {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 30000, // 30 seconds timeout
+      bufferCommands: false, // Disable mongoose buffering
+      maxPoolSize: 10, // Maintain up to 10 socket connections
+      socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+    };
+
+    const conn = await mongoose.connect(mongoUri, options);
+    
+    console.log(`✅ Database Connected: ${conn.connection.host}`);
+    
+    // إعداد أحداث الاتصال
+    mongoose.connection.on('connected', () => {
+      console.log('MongoDB connection established');
+    });
+
+    mongoose.connection.on('error', (err) => {
+      console.error('MongoDB connection error:', err);
+    });
+
+    mongoose.connection.on('disconnected', () => {
+      console.log('MongoDB connection disconnected');
+    });
+
+    // التعامل مع إغلاق العملية
+    process.on('SIGINT', async () => {
+      await mongoose.connection.close();
+      console.log('MongoDB connection closed through app termination');
+      process.exit(0);
+    });
+    
+    return conn;
+  } catch (error) {
+    console.error('❌ Database connection failed:', error.message);
+    process.exit(1); // إنهاء العملية في حالة فشل الاتصال
+  }
+};
+
+// دالة للحصول على حالة الاتصال
+const getConnectionStatus = () => {
+  return mongoose.connection.readyState;
+};
+
+// خرائط حالة الاتصال
+const connectionStates = {
+  0: 'Disconnected',
+  1: 'Connected',
+  2: 'Connecting',
+  3: 'Disconnecting'
 };
 
 module.exports = { 
-  database: mockDatabase, 
-  ref: mockDatabase.ref, 
-  set: () => Promise.resolve(), 
-  get: () => Promise.resolve({ exists: () => false }), 
-  push: () => Promise.resolve({ key: Math.random().toString(36) }), 
-  update: () => Promise.resolve(), 
-  remove: () => Promise.resolve(), 
-  onValue: (callback) => {
-    callback({ exists: () => false });
-    return () => {};
-  }
+  connectDB, 
+  getConnectionStatus, 
+  connectionStates 
 };

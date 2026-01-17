@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (public/js/chat.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 // public/js/chat.js - Chat functionality
 document.addEventListener('DOMContentLoaded', function() {
     const chatContainer = document.querySelector('.chat-container');

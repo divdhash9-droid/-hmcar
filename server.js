@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (server.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 ﻿require('dotenv').config();
 const express = require('express');
 const path = require('path');
@@ -36,6 +38,7 @@ i18n.configure({
 
 // Routes
 const authRoutes = require('./routes/auth');
+const clientRoutes = require('./routes/client');
 const adminRoutes = require('./routes/admin');
 const auctionsRoutes = require('./routes/auctions');
 const bidsRoutes = require('./routes/bids');
@@ -55,10 +58,13 @@ const sparePartsRoutes = require('./routes/spareParts');
 const superAdminRoutes = require('./routes/superAdmin');
 const supportRoutes = require('./routes/support');
 const analyticsRoutes = require('./routes/analytics');
-const backupRoutes = require('./routes/backup');
-const auditRoutes = require('./routes/audit');
-const permissionsRoutes = require('./routes/permissions');
+// const backupRoutes = require('./routes/backup');
+// const auditRoutes = require('./routes/audit');
+// const permissionsRoutes = require('./routes/permissions');
 const apiV2Routes = require('./routes/api/v2');
+
+// Database connection
+const { connectDB } = require('./config/database');
 
 // Models
 const Car = require('./models/Car');
@@ -419,6 +425,7 @@ app.use('/api/v2', apiV2Routes);
 
 // Mount routers
 app.use('/auth', authRoutes);
+app.use('/client', clientRoutes);
 app.use('/admin', adminRoutes);
 app.use('/auctions', auctionsRoutes);
 app.use('/bids', bidsRoutes);
@@ -438,9 +445,9 @@ app.use('/spare-parts', sparePartsRoutes);
 app.use('/super-admin', superAdminRoutes);
 app.use('/support', supportRoutes);
 app.use('/api/analytics', analyticsRoutes);
-app.use('/backup', backupRoutes);
-app.use('/audit', auditRoutes);
-app.use('/permissions', permissionsRoutes);
+// app.use('/backup', backupRoutes);
+// app.use('/audit', auditRoutes);
+// app.use('/permissions', permissionsRoutes);
 
 // Not found handler
 app.use((req, res) => {
@@ -484,11 +491,9 @@ async function connectToDatabase() {
   if (mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2) {
     return mongoose.connection;
   }
-  const mongoUri = (process.env.MONGO_URI && String(process.env.MONGO_URI).trim()) ? String(process.env.MONGO_URI).trim() : 'mongodb://127.0.0.1:27017/car-auction';
   
   try {
-    await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 10000 });
-    console.log('✅ Database connected successfully');
+    await connectDB();
     return mongoose.connection;
   } catch (error) {
     console.error('❌ Database connection failed:', error.message);

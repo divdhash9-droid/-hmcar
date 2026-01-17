@@ -1,3 +1,5 @@
+# [[ARABIC_HEADER]] هذا الملف (scripts/install-mongodb.ps1) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 # MongoDB Installation Script for Windows
 Write-Host "Installing MongoDB Community Edition..."
 

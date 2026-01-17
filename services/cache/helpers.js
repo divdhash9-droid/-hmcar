@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (services/cache/helpers.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const connection = require('./connection');
 const { set, get } = require('./basic');
 

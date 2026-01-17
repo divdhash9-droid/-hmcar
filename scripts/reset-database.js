@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (scripts/reset-database.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 # MongoDB Database Reset Script
 # إعادة تعيين قاعدة البيانات - حذف جميع البيانات القديمة
 

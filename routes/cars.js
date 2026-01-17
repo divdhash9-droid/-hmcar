@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (routes/cars.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 ﻿﻿// routes/cars.js
 // مسارات السيارات (Cars):
 // - صفحة الشركات (brands) + البنرات
@@ -233,9 +235,9 @@ router.get('/list', async (req, res) => {
 });
 
 router.get('/new', requireAuth, requireRole('admin'), async (req, res) => {
-  // نموذج إضافة سيارة (admin)
+  // نموذج إضافة سيارة (admin) - استخدام التصميم الفخم الجديد
   const categories = await VehicleCategory.find().sort({ name: 1 });
-  res.render('cars/form', { categories });
+  res.render('cars/form-luxury', { categories });
 });
 
 router.get('/my-cars', requireAuth, requireRole('buyer'), async (req, res) => {

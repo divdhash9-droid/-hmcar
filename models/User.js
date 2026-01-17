@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (models/User.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 ﻿// models/User.js
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
@@ -48,7 +50,28 @@ const userSchema = new mongoose.Schema({
   twoFactorEnabled: { type: Boolean, default: false },
   twoFactorSecret: { type: String, default: '' },
   twoFactorBackupCodes: [{ type: String }],
-  twoFactorEnabledAt: { type: Date, default: null }
+  twoFactorEnabledAt: { type: Date, default: null },
+  
+  // Device Binding and Security
+  deviceId: { type: String, default: '' },
+  deviceInfo: {
+    browser: String,
+    os: String,
+    userAgent: String,
+    ip: String,
+    lastAccessTime: { type: Date, default: Date.now }
+  },
+  boundDevices: [{
+    deviceId: String,
+    browser: String,
+    os: String,
+    ip: String,
+    firstUsedAt: { type: Date, default: Date.now },
+    lastUsedAt: { type: Date, default: Date.now },
+    isActive: { type: Boolean, default: true }
+  }],
+  securityLevel: { type: String, enum: ['basic', 'standard', 'enhanced'], default: 'standard' },
+  allowMultipleSessions: { type: Boolean, default: false }
 }, { timestamps: true });
 
 userSchema.pre('save', async function(next) {

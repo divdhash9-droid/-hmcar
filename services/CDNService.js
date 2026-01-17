@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (services/CDNService.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const cloudinary = require('cloudinary').v2;
 const path = require('path');
 const fs = require('fs').promises;

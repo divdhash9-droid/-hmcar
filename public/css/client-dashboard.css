@@ -1,0 +1,383 @@
+/* [[ARABIC_HEADER]] هذا الملف (public/css/client-dashboard.css) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. */
+
+/* 
+ * Client Dashboard CSS - Navy Blue & Snow White Theme
+ * نفس ألوان المشروع - الأزرق الداكن والأبيض الثلجي
+ */
+
+:root {
+  /* Using project colors */
+  --client-primary: #001f3f;
+  --client-primary-light: #003366;
+  --client-accent: #007bff;
+  --client-accent-light: #3395ff;
+  --client-white: #ffffff;
+  --client-snow: #f8f9fa;
+  --client-pearl: #f5f7fa;
+  --client-border: rgba(0, 31, 63, 0.12);
+  --client-shadow: 0 4px 16px rgba(0, 31, 63, 0.12);
+  --client-shadow-hover: 0 8px 24px rgba(0, 31, 63, 0.18);
+}
+
+/* Dashboard Container */
+.hm-client-dashboard .hm-dashboard {
+  min-height: 100vh;
+  background: var(--client-pearl);
+  position: relative;
+  overflow-x: hidden;
+}
+
+.hm-client-dashboard .hm-dashboard__container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* Hero Section */
+.hm-client-dashboard .hm-hero {
+  background: linear-gradient(135deg, var(--client-primary) 0%, var(--client-primary-light) 100%);
+  border-radius: 20px;
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--client-shadow-hover);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.hm-client-dashboard .hm-hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(0, 123, 255, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hm-client-dashboard .hm-hero__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 2;
+}
+
+.hm-client-dashboard .hm-hero__brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hm-client-dashboard .hm-hero__logo {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.hm-client-dashboard .hm-hero__titles {
+  line-height: 1.2;
+}
+
+.hm-client-dashboard .hm-hero__title {
+  font-family: 'Playfair Display', serif;
+  color: var(--client-white);
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.hm-client-dashboard .hm-hero__subtitle {
+  color: rgba(255, 255, 255, 0.85);
+  margin-top: 0.25rem;
+  font-size: 1rem;
+}
+
+.hm-client-dashboard .hm-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  position: relative;
+  z-index: 2;
+}
+
+/* Pills/Buttons */
+.hm-client-dashboard .hm-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  color: var(--client-white);
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.hm-client-dashboard .hm-pill:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  color: var(--client-white);
+}
+
+.hm-client-dashboard .hm-pill--danger {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.hm-client-dashboard .hm-pill--danger:hover {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+/* KPIs Section */
+.hm-client-dashboard .hm-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+  position: relative;
+  z-index: 2;
+}
+
+.hm-client-dashboard .hm-kpi {
+  background: var(--client-white);
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 2px solid var(--client-border);
+  box-shadow: var(--client-shadow);
+  transition: all 0.3s ease;
+}
+
+.hm-client-dashboard .hm-kpi:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--client-shadow-hover);
+  border-color: var(--client-accent);
+}
+
+.hm-client-dashboard .hm-kpi__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.hm-client-dashboard .hm-kpi__label {
+  color: var(--client-primary);
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.hm-client-dashboard .hm-kpi__value {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--client-primary);
+}
+
+.hm-client-dashboard .hm-kpi__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--client-accent) 0%, var(--client-accent-light) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--client-white);
+  font-size: 1.25rem;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+/* Section */
+.hm-client-dashboard .hm-section {
+  margin-top: 2rem;
+}
+
+.hm-client-dashboard .hm-section__title {
+  font-family: 'Playfair Display', serif;
+  color: var(--client-primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 1.5rem;
+}
+
+/* Grid */
+.hm-client-dashboard .hm-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Cards */
+.hm-client-dashboard .hm-card {
+  background: var(--client-white);
+  border-radius: 16px;
+  padding: 2rem;
+  border: 2px solid var(--client-border);
+  box-shadow: var(--client-shadow);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.hm-client-dashboard .hm-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--client-shadow-hover);
+  border-color: var(--client-accent);
+}
+
+.hm-client-dashboard .hm-card__icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--client-accent) 0%, var(--client-accent-light) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--client-white);
+  margin: 0 auto 1rem;
+  font-size: 1.75rem;
+  box-shadow: 0 6px 16px rgba(0, 123, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.hm-client-dashboard .hm-card:hover .hm-card__icon {
+  transform: scale(1.1);
+  box-shadow: 0 8px 20px rgba(0, 123, 255, 0.4);
+}
+
+.hm-client-dashboard .hm-card__title {
+  color: var(--client-primary);
+  font-weight: 700;
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.hm-client-dashboard .hm-card__subtitle {
+  color: rgba(0, 31, 63, 0.7);
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Badge */
+.hm-client-dashboard .hm-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--client-accent) 0%, var(--client-accent-light) 100%);
+  color: var(--client-white);
+  font-weight: 700;
+  min-width: 48px;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+/* Embed */
+.hm-client-dashboard .hm-embed {
+  margin-top: 2rem;
+  border-radius: 16px;
+  border: 2px solid var(--client-border);
+  background: var(--client-white);
+  overflow: hidden;
+  box-shadow: var(--client-shadow);
+  display: none;
+}
+
+.hm-client-dashboard .hm-embed.is-open {
+  display: block;
+}
+
+.hm-client-dashboard .hm-embed__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  background: var(--client-pearl);
+  border-bottom: 2px solid var(--client-border);
+}
+
+.hm-client-dashboard .hm-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, var(--client-accent) 0%, var(--client-accent-light) 100%);
+  color: var(--client-white);
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.hm-client-dashboard .hm-embed__close {
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  border: 2px solid var(--client-border);
+  background: var(--client-white);
+  color: var(--client-primary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.hm-client-dashboard .hm-embed__close:hover {
+  background: var(--client-pearl);
+  border-color: var(--client-accent);
+}
+
+.hm-client-dashboard .hm-embed__frame {
+  width: 100%;
+  min-height: 600px;
+  border: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hm-client-dashboard .hm-hero {
+    padding: 1.5rem;
+  }
+
+  .hm-client-dashboard .hm-hero__title {
+    font-size: 1.5rem;
+  }
+
+  .hm-client-dashboard .hm-kpis {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+
+  .hm-client-dashboard .hm-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hm-client-dashboard .hm-card {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hm-client-dashboard .hm-kpis {
+    grid-template-columns: 1fr;
+  }
+
+  .hm-client-dashboard .hm-pill {
+    font-size: 0.9rem;
+    padding: 0.625rem 1rem;
+  }
+}

@@ -1,3 +1,5 @@
+# [[ARABIC_HEADER]] هذا الملف (docker-compose.yml) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 version: '3.8'
 
 services:

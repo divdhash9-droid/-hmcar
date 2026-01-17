@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (models/AuditLog.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const mongoose = require('mongoose');
 
 const auditLogSchema = new mongoose.Schema({

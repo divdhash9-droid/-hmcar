@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (public/js/voice-search.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 (function () {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) return;

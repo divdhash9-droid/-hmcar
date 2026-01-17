@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (middleware/seo.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const SEOService = require('../services/SEOService');
 
 // SEO middleware for dynamic meta tags

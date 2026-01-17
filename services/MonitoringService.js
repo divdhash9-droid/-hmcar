@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (services/MonitoringService.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 /**
  * Monitoring Service
  * خدمة مراقبة أداء النظام

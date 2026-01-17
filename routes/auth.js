@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (routes/auth.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 ﻿﻿// routes/auth.js
 // مسارات المصادقة (Authentication): تسجيل، تسجيل الدخول/الخروج
 // شرح بالعربي:
@@ -58,8 +60,8 @@ router.get('/login', (req, res) => {
       console.log('👨‍💼 Redirecting admin to /admin');
       return res.redirect('/admin');
     } else if (req.session.user.role === 'buyer') {
-      console.log('🛒 Redirecting buyer to /cars');
-      return res.redirect('/cars');
+      console.log('🛒 Redirecting buyer to /client/dashboard');
+      return res.redirect('/client/dashboard');
     }
   }
   
@@ -127,8 +129,55 @@ router.post('/login', async (req, res) => {
         if (user.role !== 'buyer') {
           return res.render('auth/login', getLoginViewData(req, false, { bodyClass: 'auth-page modern-auth hm-login-premium', error: 'حساب غير صالح للدخول كمشتري.' }));
         }
+        
+        // التحقق من ربط الجهاز (Device Binding)
+        if (!user.allowMultipleSessions && user.deviceId && user.deviceId !== req.sessionID) {
+          // التحقق مما إذا كان الجهاز مرتبطًا مسبقًا
+          const isKnownDevice = user.boundDevices.some(device => 
+            device.deviceId === req.sessionID || 
+            device.ip === req.ip
+          );
+          
+          if (!isKnownDevice) {
+            return res.render('auth/login', getLoginViewData(req, false, { bodyClass: 'auth-page modern-auth hm-login-premium', error: 'تم تسجيل الدخول إلى هذا الحساب من جهاز آخر. يرجى الاتصال بالدعم للمساعدة.' }));
+          }
+        }
+        
+        // تحديث معلومات الجهاز
         user.activeSessionId = req.sessionID;
         user.lastLoginAt = new Date();
+        
+        // تحديث معلومات الجهاز
+        const deviceInfo = {
+          browser: req.get('User-Agent') || '',
+          os: req.get('User-Agent') || '',
+          userAgent: req.get('User-Agent') || '',
+          ip: req.ip || req.connection.remoteAddress || '',
+          lastUsedAt: new Date()
+        };
+        
+        user.deviceInfo = deviceInfo;
+        
+        // إضافة الجهاز إلى قائمة الأجهزة المرتبطة
+        const existingDeviceIndex = user.boundDevices.findIndex(device => 
+          device.deviceId === req.sessionID || device.ip === deviceInfo.ip
+        );
+        
+        if (existingDeviceIndex === -1) {
+          // إضافة جهاز جديد
+          user.boundDevices.push({
+            deviceId: req.sessionID,
+            browser: deviceInfo.browser,
+            os: deviceInfo.os,
+            ip: deviceInfo.ip,
+            firstUsedAt: new Date(),
+            lastUsedAt: new Date()
+          });
+        } else {
+          // تحديث معلومات الجهاز الموجود
+          user.boundDevices[existingDeviceIndex].lastUsedAt = new Date();
+        }
+        
         await user.save();
       }
 
@@ -140,7 +189,7 @@ router.post('/login', async (req, res) => {
         req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days
       }
 
-      const returnTo = (req.session && req.session.returnTo) ? String(req.session.returnTo) : '/cars';
+      const returnTo = (req.session && req.session.returnTo) ? String(req.session.returnTo) : '/client/dashboard';
       delete req.session.returnTo;
       return res.redirect(returnTo);
     }
@@ -270,7 +319,7 @@ router.post('/register', async (req, res) => {
     // تسجيل دخول المستخدم الجديد مباشرة
     req.session.user = { _id: user._id, name: user.name, role: user.role };
     req.session.flash = { type: 'success', message: 'تم إنشاء حسابك بنجاح! مرحباً بك.' };
-    const returnTo = (req.session && req.session.returnTo) ? String(req.session.returnTo) : '/cars';
+    const returnTo = (req.session && req.session.returnTo) ? String(req.session.returnTo) : '/client/dashboard';
     delete req.session.returnTo;
     res.redirect(returnTo);
 

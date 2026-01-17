@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (models/Car.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 ﻿﻿// models/Car.js
 const mongoose = require('mongoose');
 

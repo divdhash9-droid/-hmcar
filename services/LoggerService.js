@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (services/LoggerService.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 /**
  * Advanced Logging Service
  * نظام تسجيل متقدم باستخدام Winston

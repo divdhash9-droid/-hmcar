@@ -1,3 +1,5 @@
+<!-- [[ARABIC_HEADER]] هذا الملف (views/home.ejs) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. -->
+
 <% layout('layout') -%>
 <% var hideNavbar = true; %>
 <% var hideFooter = true; %>
@@ -9,6 +11,16 @@
 
 <% const isLoggedIn = !!(typeof currentUser !== 'undefined' && currentUser); %>
 <% const isAdmin = isLoggedIn && currentUser.role === 'admin'; %>
+<% const heroQuickLinks = [
+  { href: '/cars', icon: 'fas fa-car-side', ar: 'السيارات', en: 'Cars', descAr: 'جاهزة للتصدير والفحص', descEn: 'Ready for export & inspection' },
+  { href: '/auctions', icon: 'fas fa-gavel', ar: 'المزادات', en: 'Auctions', descAr: 'جلسات مباشرة وعروض يومية', descEn: 'Live sessions & daily deals' },
+  { href: '/spare-parts', icon: 'fas fa-cogs', ar: 'قطع الغيار', en: 'Spare Parts', descAr: 'أصليـة مع ضمان', descEn: 'Genuine with warranty' }
+]; %>
+<% const portalCards = [
+  { href: '/cars', icon: 'fas fa-car', badge: 'حصري', titleAr: 'تصفح المخزون الفاخر', titleEn: 'Explore Luxury Fleet', descAr: 'مركبات منتقاة مع تقارير فحص مفصلة وتسليم عالمي.', descEn: 'Curated inventory with detailed inspections and worldwide delivery.' },
+  { href: '/auctions', icon: 'fas fa-hammer', badge: 'مباشر الآن', titleAr: 'مزادات مباشرة يومية', titleEn: 'Daily Live Auctions', descAr: 'انضم إلى المزادات الكورية مع بث مباشر وترجمة فورية.', descEn: 'Join Korean auctions with live streaming and instant translation.' },
+  { href: '/spare-parts', icon: 'fas fa-tools', badge: 'ضمان', titleAr: 'قسم قطع الغيار', titleEn: 'Spare Parts Hub', descAr: 'أطلب القطعة بحسب الشاصي مع تتبع آلي ودعم 24/7.', descEn: 'Order by VIN with automated tracking and 24/7 concierge.' }
+]; %>
 
 <div class="hm-pro-home">
   <!-- ============================================
@@ -26,63 +38,102 @@
       </div>
     </div>
 
-    <!-- Top Actions (Language + Login) -->
+    <!-- Top Actions (Language Only) -->
     <div class="hm-hero__top-actions">
+      <div></div> <!-- Empty div for spacing -->
       <button class="hm-btn-3d hm-btn-lang" onclick="toggleLanguage()" title="تغيير اللغة">
         <i class="fas fa-globe"></i>
         <span id="currentLang">EN</span>
       </button>
-      <% if (isLoggedIn) { %>
-        <a href="/client/dashboard" class="hm-btn-3d hm-btn-login">
-          <i class="fas fa-sign-in-alt"></i>
-          <span data-ar="تسجيل الدخول" data-en="Login">تسجيل الدخول</span>
-        </a>
-      <% } else { %>
-        <a href="/auth/login" class="hm-btn-3d hm-btn-login">
-          <i class="fas fa-sign-in-alt"></i>
-          <span data-ar="تسجيل الدخول" data-en="Login">تسجيل الدخول</span>
-        </a>
-      <% } %>
     </div>
 
-    <div class="hm-hero__content hm-hero__content--elevated">
-      <!-- Large Logo -->
+    <div class="hm-hero__content hm-hero__content--compact">
+      <!-- Compact Logo -->
       <div class="hm-hero__logo-section">
-        <div class="hm-hero__logo-container hm-hero__logo-container--large">
+        <div class="hm-hero__logo-container hm-hero__logo-container--compact">
           <div class="hm-hero__logo-glow"></div>
-          <div class="hm-hero__logo-ring"></div>
-          <div class="hm-hero__logo-wrap hm-hero__logo-wrap--large">
-            <img src="/public/images/logo.png" alt="HM CAR" class="hm-hero__logo hm-hero__logo--large" />
+          <div class="hm-hero__logo-wrap hm-hero__logo-wrap--compact">
+            <img src="/public/images/logo.png" alt="HM CAR" class="hm-hero__logo hm-hero__logo--compact" />
           </div>
         </div>
       </div>
 
-      <h1 class="hm-hero__title" data-ar="مرحبا بك في HM CAR لتصدير السيارات" data-en="Welcome to HM CAR for Car Export">
+      <h1 class="hm-hero__title hm-hero__title--compact" data-ar="مرحبا بك في HM CAR لتصدير السيارات" data-en="Welcome to HM CAR for Car Export">
         مرحبا بك في HM CAR لتصدير السيارات
       </h1>
-      <p class="hm-hero__subtitle" data-ar="تصدير السيارات وقطع الغيار من كوريا إلى جميع دول العالم" data-en="Exporting cars and spare parts from Korea to all countries of the world">
+      <p class="hm-hero__subtitle hm-hero__subtitle--compact" data-ar="تصدير السيارات وقطع الغيار من كوريا إلى جميع دول العالم" data-en="Exporting cars and spare parts from Korea to all countries of the world">
         تصدير السيارات وقطع الغيار من كوريا إلى جميع دول العالم
       </p>
 
-      <!-- Single Login Button -->
-      <div class="hm-hero__single-cta">
-        <% if (isLoggedIn) { %>
-          <a href="<%= isAdmin ? '/admin' : '/client/dashboard' %>" class="hm-btn-3d hm-btn-main-login">
-            <i class="fas fa-tachometer-alt"></i>
-            <span data-ar="لوحة التحكم" data-en="Dashboard">لوحة التحكم</span>
+      <div class="hm-hero__nav-grid">
+        <% heroQuickLinks.forEach(function(link) { %>
+          <a href="<%= link.href %>" class="hm-hero-link-card">
+            <span class="hm-hero-link-icon" aria-hidden="true">
+              <i class="<%= link.icon %>"></i>
+            </span>
+            <span class="hm-hero-link-text">
+              <strong data-ar="<%= link.ar %>" data-en="<%= link.en %>"><%= link.ar %></strong>
+              <small data-ar="<%= link.descAr %>" data-en="<%= link.descEn %>"><%= link.descAr %></small>
+            </span>
+            <span class="hm-hero-link-arrow" aria-hidden="true">
+              <i class="fas fa-arrow-left"></i>
+            </span>
           </a>
-        <% } else { %>
-          <a href="/auth/login" class="hm-btn-3d hm-btn-main-login">
-            <i class="fas fa-sign-in-alt"></i>
-            <span data-ar="تسجيل الدخول" data-en="Login">تسجيل الدخول</span>
-          </a>
-        <% } %>
+        <% }) %>
+      </div>
+
+      <!-- Enhanced Login Button -->
+      <div class="hm-hero__cta-compact">
+        <a href="/auth/login" class="hm-btn-3d hm-btn-login-enhanced">
+          <div class="hm-btn-content">
+            <i class="fas fa-sign-in-alt hm-btn-icon"></i>
+            <span class="hm-btn-text" data-ar="تسجيل الدخول" data-en="Login">تسجيل الدخول</span>
+          </div>
+          <div class="hm-btn-glow"></div>
+          <div class="hm-btn-particles">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </a>
+        <a href="/cars" class="hm-btn-3d hm-btn-ghost-primary">
+          <i class="fas fa-compass"></i>
+          <span data-ar="استكشف السيارات" data-en="Explore Cars">استكشف السيارات</span>
+        </a>
       </div>
     </div>
 
     <!-- Scroll Indicator -->
     <div class="hm-hero__scroll" onclick="document.getElementById('featured-cars').scrollIntoView({behavior: 'smooth'})">
       <i class="fas fa-chevron-down"></i>
+    </div>
+  </section>
+
+  <!-- PORTAL LINKS SECTION -->
+  <section class="hm-portal-links">
+    <div class="hm-container">
+      <div class="hm-portal-header">
+        <p class="hm-portal-eyebrow">HM CAR EXPERIENCE</p>
+        <h2 data-ar="اختر رحلتك" data-en="Choose your journey">اختر رحلتك</h2>
+        <p data-ar="منصة موحدة للسيارات والمزادات وقطع الغيار بنفس الهوية الفاخرة." data-en="One destination for cars, auctions, and spare parts with a single luxurious identity.">
+          منصة موحدة للسيارات والمزادات وقطع الغيار بنفس الهوية الفاخرة.
+        </p>
+      </div>
+      <div class="hm-portal-grid">
+        <% portalCards.forEach(function(card) { %>
+          <a href="<%= card.href %>" class="hm-portal-card">
+            <span class="hm-portal-badge"><%= card.badge %></span>
+            <span class="hm-portal-icon" aria-hidden="true"><i class="<%= card.icon %>"></i></span>
+            <h3 data-ar="<%= card.titleAr %>" data-en="<%= card.titleEn %>"><%= card.titleAr %></h3>
+            <p data-ar="<%= card.descAr %>" data-en="<%= card.descEn %>"><%= card.descAr %></p>
+            <span class="hm-portal-link" aria-hidden="true">
+              <span data-ar="تفاصيل أكثر" data-en="More details">تفاصيل أكثر</span>
+              <i class="fas fa-arrow-left"></i>
+            </span>
+          </a>
+        <% }) %>
+      </div>
     </div>
   </section>
 
@@ -105,6 +156,50 @@
     </div>
   </section>
 
+  <!-- STATISTICS SECTION -->
+  <section class="hm-stats-section">
+    <div class="hm-container">
+      <div class="hm-stats-grid">
+        <% if (stats && stats.totalCars) { %>
+          <div class="hm-stat-item">
+            <div class="hm-stat-item__icon">
+              <i class="fas fa-car"></i>
+            </div>
+            <div class="hm-stat-item__number" data-count="<%= stats.totalCars || 0 %>">0</div>
+            <div class="hm-stat-item__label" data-ar="سيارة" data-en="Cars">سيارة</div>
+          </div>
+        <% } %>
+        <% if (stats && stats.activeAuctions) { %>
+          <div class="hm-stat-item">
+            <div class="hm-stat-item__icon">
+              <i class="fas fa-gavel"></i>
+            </div>
+            <div class="hm-stat-item__number" data-count="<%= stats.activeAuctions || 0 %>">0</div>
+            <div class="hm-stat-item__label" data-ar="مزاد نشط" data-en="Active Auctions">مزاد نشط</div>
+          </div>
+        <% } %>
+        <% if (stats && stats.totalUsers) { %>
+          <div class="hm-stat-item">
+            <div class="hm-stat-item__icon">
+              <i class="fas fa-users"></i>
+            </div>
+            <div class="hm-stat-item__number" data-count="<%= stats.totalUsers || 0 %>">0</div>
+            <div class="hm-stat-item__label" data-ar="عميل" data-en="Customers">عميل</div>
+          </div>
+        <% } %>
+        <% if (stats && stats.completedAuctions) { %>
+          <div class="hm-stat-item">
+            <div class="hm-stat-item__icon">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="hm-stat-item__number" data-count="<%= stats.completedAuctions || 0 %>">0</div>
+            <div class="hm-stat-item__label" data-ar="صفقة مكتملة" data-en="Completed Deals">صفقة مكتملة</div>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </section>
+
   <!-- FEATURED CARS -->
   <section class="hm-featured-cars" id="featured-cars">
     <div class="hm-container">
@@ -115,22 +210,65 @@
       <div class="hm-cars-slider-wrapper">
         <button class="hm-slider-btn hm-slider-btn--prev" onclick="slideFeaturedCars(-1)"><i class="fas fa-chevron-right"></i></button>
         <div class="hm-cars-slider" id="featuredCarsSlider">
-          <% for(var i = 0; i < 6; i++) { %>
-            <div class="hm-car-card">
-              <div class="hm-car-card__image">
-                <img src="/public/images/car-placeholder.png" alt="Car">
-                <div class="hm-car-card__badge"><span>مميز</span></div>
-              </div>
-              <div class="hm-car-card__content">
-                <h3 class="hm-car-card__title">سيارة مميزة</h3>
-                <div class="hm-car-card__specs">
-                  <span><i class="fas fa-calendar"></i> 2024</span>
-                  <span><i class="fas fa-road"></i> 0 km</span>
+          <% if (featuredCars && featuredCars.length > 0) { %>
+            <% featuredCars.forEach(car => { %>
+              <div class="hm-car-card">
+                <div class="hm-car-card__image">
+                  <% if (car.images && car.images.length > 0) { %>
+                    <img src="<%= car.images[0] %>" alt="<%= car.title || car.make + ' ' + car.model %>">
+                  <% } else { %>
+                    <img src="/public/images/car-placeholder.png" alt="Car">
+                  <% } %>
+                  <div class="hm-car-card__badge">
+                    <% if (car.isFeatured) { %>
+                      <span>مميز</span>
+                    <% } else if (car.price && car.price < 20000) { %>
+                      <span>أفضل سعر</span>
+                    <% } else { %>
+                      <span>متاح</span>
+                    <% } %>
+                  </div>
                 </div>
-                <div class="hm-car-card__price"><span class="hm-price-value">$25,000</span></div>
-                <a href="/cars" class="hm-btn-3d hm-btn-view-car"><i class="fas fa-eye"></i><span>عرض التفاصيل</span></a>
+                <div class="hm-car-card__content">
+                  <h3 class="hm-car-card__title">
+                    <%= car.title || (car.make + ' ' + car.model + ' ' + car.year) %>
+                  </h3>
+                  <div class="hm-car-card__specs">
+                    <span><i class="fas fa-calendar"></i> <%= car.year || 'N/A' %></span>
+                    <span><i class="fas fa-road"></i> <%= car.mileage ? car.mileage.toLocaleString() + ' km' : 'N/A' %></span>
+                  </div>
+                  <div class="hm-car-card__price">
+                    <span class="hm-price-value">
+                      <%= car.price ? '$' + car.price.toLocaleString() : 'Price on Request' %>
+                    </span>
+                  </div>
+                  <a href="/cars/<%= car._id %>" class="hm-btn-3d hm-btn-view-car">
+                    <i class="fas fa-eye"></i><span>عرض التفاصيل</span>
+                  </a>
+                </div>
               </div>
-            </div>
+            <% }); %>
+          <% } else { %>
+            <!-- Fallback to placeholder cars if no data -->
+            <% for(var i = 0; i < 6; i++) { %>
+              <div class="hm-car-card">
+                <div class="hm-car-card__image">
+                  <img src="/public/images/car-placeholder.png" alt="Car">
+                  <div class="hm-car-card__badge"><span>مميز</span></div>
+                </div>
+                <div class="hm-car-card__content">
+                  <h3 class="hm-car-card__title">سيارة مميزة</h3>
+                  <div class="hm-car-card__specs">
+                    <span><i class="fas fa-calendar"></i> 2024</span>
+                    <span><i class="fas fa-road"></i> 0 km</span>
+                  </div>
+                  <div class="hm-car-card__price"><span class="hm-price-value">$25,000</span></div>
+                  <a href="/cars" class="hm-btn-3d hm-btn-view-car">
+                    <i class="fas fa-eye"></i><span>عرض التفاصيل</span>
+                  </a>
+                </div>
+              </div>
+            <% } %>
           <% } %>
         </div>
         <button class="hm-slider-btn hm-slider-btn--next" onclick="slideFeaturedCars(1)"><i class="fas fa-chevron-left"></i></button>

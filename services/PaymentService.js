@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (services/PaymentService.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const Payment = require('../models/Payment');
 const Order = require('../models/Order');
 const UserNotification = require('../models/UserNotification');

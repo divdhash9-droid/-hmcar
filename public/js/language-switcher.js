@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (public/js/language-switcher.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 // public/js/language-switcher.js - Global Language switcher functionality
 (function() {
     'use strict';

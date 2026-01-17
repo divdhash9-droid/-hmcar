@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (routes/bids.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 // routes/bids.js
 // مسارات المزايدات (Bids): حالياً إضافة مزايدة يدوياً من الإدارة فقط
 const express = require('express');

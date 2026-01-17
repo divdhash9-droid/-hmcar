@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (models/SiteSetting.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const mongoose = require('mongoose');
 
 // إعدادات عامة للموقع تُخزن كـ Key/Value داخل قاعدة البيانات

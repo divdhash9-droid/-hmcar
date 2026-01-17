@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (test/integration/cars.integration.test.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const request = require('supertest');
 const { expect } = require('chai');
 const mongoose = require('mongoose');

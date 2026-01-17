@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (routes/analytics.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const express = require('express');
 const router = express.Router();
 const Analytics = require('../models/Analytics');

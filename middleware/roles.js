@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (middleware/roles.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 // middleware/roles.js
 module.exports.requireRole = (...roles) => (req, res, next) => {
   // حارس صلاحيات: يسمح فقط لأدوار محددة (مع استثناء admin دائماً)

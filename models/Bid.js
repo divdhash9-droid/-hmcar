@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (models/Bid.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 // models/Bid.js
 const mongoose = require('mongoose');
 

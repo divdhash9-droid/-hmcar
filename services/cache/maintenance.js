@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (services/cache/maintenance.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const connection = require('./connection');
 const { set, get, defaultTTL } = require('./basic');
 const helpers = require('./helpers');

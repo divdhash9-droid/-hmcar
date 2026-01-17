@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (services/lotteAuctionSync.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const puppeteer = require('puppeteer');
 const SiteSetting = require('../models/SiteSetting');
 

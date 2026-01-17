@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (scripts/auto-deploy.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 /**
  * HM CAR - Auto Deploy Script
  * النشر التلقائي للتغييرات

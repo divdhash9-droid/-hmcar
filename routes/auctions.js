@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (routes/auctions.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 // routes/auctions.js
 // مسارات المزادات: عرض مزاد مباشر (رابط)، سيارات المزاد، إنشاء مزاد، عرض تفاصيل المزاد
 const express = require('express');

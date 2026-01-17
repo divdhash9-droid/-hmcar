@@ -1,3 +1,5 @@
+# [[ARABIC_HEADER]] هذا الملف (scripts/clean-project.ps1) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 # Clean Project Script (Windows PowerShell)
 # تنظيف جميع البيانات القديمة من المشروع
 

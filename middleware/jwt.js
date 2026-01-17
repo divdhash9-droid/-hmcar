@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (middleware/jwt.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const jwt = require('jsonwebtoken');
 
 /**

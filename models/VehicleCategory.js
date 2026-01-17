@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (models/VehicleCategory.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 // models/VehicleCategory.js
 const mongoose = require('mongoose');
 

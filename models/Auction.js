@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (models/Auction.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 // models/Auction.js
 const mongoose = require('mongoose');
 

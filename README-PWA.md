@@ -1,3 +1,5 @@
+> [[ARABIC_HEADER]] هذا الملف (README-PWA.md) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 # HM CAR Auction - PWA Setup
 
 ## 🚀 تم إعداد PWA بنجاح!

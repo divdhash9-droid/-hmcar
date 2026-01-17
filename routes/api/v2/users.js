@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (routes/api/v2/users.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const express = require('express');
 const router = express.Router();
 const User = require('../../models/User');

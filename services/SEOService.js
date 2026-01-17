@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (services/SEOService.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 class SEOService {
   static generateMetaTags(data) {
     const {

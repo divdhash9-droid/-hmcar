@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (middleware/auth.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 // middleware/auth.js
 const requireAuth = (req, res, next) => {
   // حارس (Guard): يمنع الوصول للصفحات المحمية إذا لم يكن المستخدم مسجل دخول

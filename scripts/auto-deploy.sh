@@ -1,4 +1,5 @@
 #!/bin/bash
+# [[ARABIC_HEADER]] هذا الملف (scripts/auto-deploy.sh) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
 
 # Auto Deployment Script for Car Auction
 # يمكن استخدامه مع webhook أو cron job

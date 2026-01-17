@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (utils/imageOptimizer.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const sharp = require('sharp');
 const path = require('path');
 const fs = require('fs').promises;

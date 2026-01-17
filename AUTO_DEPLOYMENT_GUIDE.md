@@ -1,3 +1,5 @@
+> [[ARABIC_HEADER]] هذا الملف (AUTO_DEPLOYMENT_GUIDE.md) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 # 🚀 دليل النشر التلقائي - Auto Deployment Guide
 
 ## 📋 نظرة عامة

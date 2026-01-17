@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (services/WebSocketService.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 /**
  * services/WebSocketService.js
  * خدمة WebSocket للاتصال الفوري (Realtime)

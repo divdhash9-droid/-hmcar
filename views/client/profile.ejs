@@ -1,0 +1,472 @@
+<!-- [[ARABIC_HEADER]] هذا الملف (views/client/profile.ejs) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. -->
+
+<% layout('layout') -%>
+
+<div class="hm-pro-home">
+  <!-- Hero Section -->
+  <section class="hm-hero" style="min-height: 30vh; padding: 3rem 2rem 2rem;">
+    <div class="hm-hero__bg">
+      <div class="hm-hero__gradient"></div>
+      <div class="hm-hero__particles">
+        <div class="particle p1"></div>
+        <div class="particle p2"></div>
+        <div class="particle p3"></div>
+      </div>
+    </div>
+
+    <div class="hm-hero__content" style="max-width: 1200px; margin: 0 auto;">
+      <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem;">
+        <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #0ea5e9, #0284c7); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white; font-weight: bold;">
+          <%= currentUser.name.charAt(0).toUpperCase() %>
+        </div>
+        <div>
+          <h1 style="color: #fff; font-size: 2.2rem; margin: 0;" data-ar="مرحباً" data-en="Welcome">مرحباً، <%= currentUser.name %></h1>
+          <p style="color: rgba(255,255,255,0.8); font-size: 1.1rem; margin: 0.5rem 0 0;">العضو منذ: <%= new Date(currentUser.createdAt).toLocaleDateString('ar-SA') %></p>
+        </div>
+      </div>
+
+      <!-- Profile Navigation -->
+      <nav style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 2rem;">
+        <a href="/client/profile" class="hm-btn-3d" style="background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); padding: 0.8rem 1.5rem; font-size: 1rem;">
+          <i class="fas fa-user"></i> <span>الملف الشخصي</span>
+        </a>
+        <a href="/client/settings" class="hm-btn-3d" style="background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); padding: 0.8rem 1.5rem; font-size: 1rem;">
+          <i class="fas fa-cog"></i> <span>الإعدادات</span>
+        </a>
+        <a href="/client/security" class="hm-btn-3d" style="background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); padding: 0.8rem 1.5rem; font-size: 1rem;">
+          <i class="fas fa-shield-alt"></i> <span>الأمان</span>
+        </a>
+        <a href="/client/devices" class="hm-btn-3d" style="background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); padding: 0.8rem 1.5rem; font-size: 1rem;">
+          <i class="fas fa-laptop"></i> <span>الأجهزة</span>
+        </a>
+      </nav>
+    </div>
+  </section>
+
+  <!-- Profile Content -->
+  <section class="hm-featured-cars" style="padding: 3rem 0;">
+    <div class="hm-container">
+      <div class="hm-tabs" style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
+        <button class="hm-tab-btn active" onclick="showTab('profile')" style="padding: 1rem 2rem; background: rgba(14,165,233,0.2); border: 2px solid #0ea5e9; color: #fff; border-radius: 10px; cursor: pointer; font-weight: 600;">
+          <i class="fas fa-user"></i> الملف الشخصي
+        </button>
+        <button class="hm-tab-btn" onclick="showTab('security')" style="padding: 1rem 2rem; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.7); border-radius: 10px; cursor: pointer; font-weight: 600;">
+          <i class="fas fa-shield-alt"></i> الأمان
+        </button>
+        <button class="hm-tab-btn" onclick="showTab('devices')" style="padding: 1rem 2rem; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.7); border-radius: 10px; cursor: pointer; font-weight: 600;">
+          <i class="fas fa-laptop"></i> الأجهزة
+        </button>
+      </div>
+
+      <!-- Profile Tab -->
+      <div id="profile-tab" class="hm-tab-content" style="display: block;">
+        <div style="background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border-radius: 20px; padding: 2.5rem; border: 1px solid rgba(255,255,255,0.1);">
+          <h2 style="color: #fff; font-size: 1.8rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 0.75rem;">
+            <i class="fas fa-user-circle" style="color: #0ea5e9;"></i>
+            <span>معلومات الحساب</span>
+          </h2>
+
+          <form id="profileForm" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+            <input type="hidden" id="csrfToken" value="<%= csrfToken %>">
+
+            <div>
+              <label style="color: rgba(255,255,255,0.9); font-size: 0.95rem; margin-bottom: 0.5rem; display: block; font-weight: 600;">الاسم الكامل</label>
+              <input type="text" id="name" value="<%= currentUser.name %>"
+                style="width: 100%; padding: 0.9rem 1rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: #fff; font-size: 1rem;"
+                placeholder="أدخل الاسم الكامل">
+            </div>
+
+            <div>
+              <label style="color: rgba(255,255,255,0.9); font-size: 0.95rem; margin-bottom: 0.5rem; display: block; font-weight: 600;">البريد الإلكتروني</label>
+              <input type="email" id="email" value="<%= currentUser.email || '' %>"
+                style="width: 100%; padding: 0.9rem 1rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: #fff; font-size: 1rem;"
+                placeholder="admin@example.com">
+            </div>
+
+            <div>
+              <label style="color: rgba(255,255,255,0.9); font-size: 0.95rem; margin-bottom: 0.5rem; display: block; font-weight: 600;">رقم الهاتف</label>
+              <input type="tel" id="phone" value="<%= currentUser.phone || '' %>"
+                style="width: 100%; padding: 0.9rem 1rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: #fff; font-size: 1rem;"
+                placeholder="+966 5X XXX XXXX">
+            </div>
+
+            <div>
+              <label style="color: rgba(255,255,255,0.9); font-size: 0.95rem; margin-bottom: 0.5rem; display: block; font-weight: 600;">تاريخ التسجيل</label>
+              <div style="width: 100%; padding: 0.9rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: rgba(255,255,255,0.7); font-size: 1rem;">
+                <%= new Date(currentUser.createdAt).toLocaleDateString('ar-SA') %>
+              </div>
+            </div>
+
+            <div>
+              <label style="color: rgba(255,255,255,0.9); font-size: 0.95rem; margin-bottom: 0.5rem; display: block; font-weight: 600;">آخر تسجيل دخول</label>
+              <div style="width: 100%; padding: 0.9rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: rgba(255,255,255,0.7); font-size: 1rem;">
+                <%= currentUser.lastLoginAt ? new Date(currentUser.lastLoginAt).toLocaleString('ar-SA') : 'أول تسجيل دخول' %>
+              </div>
+            </div>
+
+            <div>
+              <label style="color: rgba(255,255,255,0.9); font-size: 0.95rem; margin-bottom: 0.5rem; display: block; font-weight: 600;">مستوى الأمان</label>
+              <select id="securityLevel" value="<%= currentUser.securityLevel || 'standard' %>"
+                style="width: 100%; padding: 0.9rem 1rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: #fff; font-size: 1rem;">
+                <option value="basic" <%= (currentUser.securityLevel || 'standard') === 'basic' ? 'selected' : '' %>>أساسي</option>
+                <option value="standard" <%= (currentUser.securityLevel || 'standard') === 'standard' ? 'selected' : '' %>>قياسي</option>
+                <option value="enhanced" <%= (currentUser.securityLevel || 'standard') === 'enhanced' ? 'selected' : '' %>>معزز</option>
+              </select>
+            </div>
+          </form>
+
+          <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: flex-end;">
+            <button onclick="saveProfile()" class="hm-btn-3d hm-btn-hero-primary" style="padding: 1rem 2rem; font-size: 1.1rem; font-weight: 700;">
+              <i class="fas fa-save"></i> حفظ التغييرات
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Security Tab -->
+      <div id="security-tab" class="hm-tab-content" style="display: none;">
+        <div style="background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border-radius: 20px; padding: 2.5rem; border: 1px solid rgba(255,255,255,0.1);">
+          <h2 style="color: #fff; font-size: 1.8rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 0.75rem;">
+            <i class="fas fa-shield-alt" style="color: #0ea5e9;"></i>
+            <span>إعدادات الأمان</span>
+          </h2>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+            <!-- Change Password -->
+            <div style="background: rgba(255,255,255,0.03); border-radius: 15px; padding: 2rem; border: 1px solid rgba(255,255,255,0.1);">
+              <h3 style="color: #fff; font-size: 1.3rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fas fa-key" style="color: #0ea5e9;"></i>
+                تغيير كلمة المرور
+              </h3>
+              
+              <form id="changePasswordForm">
+                <input type="hidden" id="csrfToken2" value="<%= csrfToken %>">
+                
+                <div style="margin-bottom: 1.5rem;">
+                  <label style="color: rgba(255,255,255,0.9); font-size: 0.95rem; margin-bottom: 0.5rem; display: block; font-weight: 600;">كلمة المرور الحالية</label>
+                  <input type="password" id="currentPassword" 
+                    style="width: 100%; padding: 0.9rem 1rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: #fff; font-size: 1rem;"
+                    placeholder="أدخل كلمة المرور الحالية">
+                </div>
+                
+                <div style="margin-bottom: 1.5rem;">
+                  <label style="color: rgba(255,255,255,0.9); font-size: 0.95rem; margin-bottom: 0.5rem; display: block; font-weight: 600;">كلمة المرور الجديدة</label>
+                  <input type="password" id="newPassword" 
+                    style="width: 100%; padding: 0.9rem 1rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: #fff; font-size: 1rem;"
+                    placeholder="أدخل كلمة المرور الجديدة">
+                </div>
+                
+                <div style="margin-bottom: 1.5rem;">
+                  <label style="color: rgba(255,255,255,0.9); font-size: 0.95rem; margin-bottom: 0.5rem; display: block; font-weight: 600;">تأكيد كلمة المرور الجديدة</label>
+                  <input type="password" id="confirmNewPassword" 
+                    style="width: 100%; padding: 0.9rem 1rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: #fff; font-size: 1rem;"
+                    placeholder="أعد كتابة كلمة المرور الجديدة">
+                </div>
+                
+                <button type="submit" class="hm-btn-3d hm-btn-hero-primary" style="width: 100%; padding: 1rem; font-size: 1.1rem; font-weight: 700;">
+                  <i class="fas fa-sync-alt"></i> تغيير كلمة المرور
+                </button>
+              </form>
+            </div>
+
+            <!-- Two-Factor Authentication -->
+            <div style="background: rgba(255,255,255,0.03); border-radius: 15px; padding: 2rem; border: 1px solid rgba(255,255,255,0.1);">
+              <h3 style="color: #fff; font-size: 1.3rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fas fa-mobile-alt" style="color: #0ea5e9;"></i>
+                المصادقة الثنائية
+              </h3>
+              
+              <div style="margin-bottom: 1.5rem;">
+                <label class="hm-switch" style="display: flex; align-items: center; gap: 1rem; cursor: pointer;">
+                  <input type="checkbox" id="twoFactorToggle" <%= currentUser.twoFactorEnabled ? 'checked' : '' %>>
+                  <span class="hm-slider" style="width: 60px; height: 30px; background: <%= currentUser.twoFactorEnabled ? '#0ea5e9' : 'rgba(255,255,255,0.2)' %>; border-radius: 15px; position: relative; display: inline-block;">
+                    <span style="position: absolute; top: 2px; left: 2px; width: 26px; height: 26px; background: white; border-radius: 50%; transition: 0.4s; <%= currentUser.twoFactorEnabled ? 'transform: translateX(30px);' : '' %>"></span>
+                  </span>
+                  <span style="color: #fff; font-size: 1.1rem;">تفعيل المصادقة الثنائية</span>
+                </label>
+              </div>
+              
+              <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem; margin-bottom: 1rem;">
+                عند التفعيل، سيُطلب منك رمز مكون من 6 أرقام من تطبيق Google Authenticator أو Microsoft Authenticator.
+              </p>
+            </div>
+
+            <!-- Device Binding -->
+            <div style="background: rgba(255,255,255,0.03); border-radius: 15px; padding: 2rem; border: 1px solid rgba(255,255,255,0.1);">
+              <h3 style="color: #fff; font-size: 1.3rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fas fa-laptop" style="color: #0ea5e9;"></i>
+                ربط الأجهزة
+              </h3>
+              
+              <div style="margin-bottom: 1.5rem;">
+                <label class="hm-switch" style="display: flex; align-items: center; gap: 1rem; cursor: pointer;">
+                  <input type="checkbox" id="deviceBindingToggle" <%= !currentUser.allowMultipleSessions ? 'checked' : '' %>>
+                  <span class="hm-slider" style="width: 60px; height: 30px; background: <%= !currentUser.allowMultipleSessions ? '#0ea5e9' : 'rgba(255,255,255,0.2)' %>; border-radius: 15px; position: relative; display: inline-block;">
+                    <span style="position: absolute; top: 2px; left: 2px; width: 26px; height: 26px; background: white; border-radius: 50%; transition: 0.4s; <%= !currentUser.allowMultipleSessions ? 'transform: translateX(30px);' : '' %>"></span>
+                  </span>
+                  <span style="color: #fff; font-size: 1.1rem;">السماح بجهاز واحد فقط</span>
+                </label>
+              </div>
+              
+              <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem; margin-bottom: 1rem;">
+                عند التفعيل، لن تتمكن من تسجيل الدخول من أكثر من جهاز في نفس الوقت.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Devices Tab -->
+      <div id="devices-tab" class="hm-tab-content" style="display: none;">
+        <div style="background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border-radius: 20px; padding: 2.5rem; border: 1px solid rgba(255,255,255,0.1);">
+          <h2 style="color: #fff; font-size: 1.8rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 0.75rem;">
+            <i class="fas fa-laptop" style="color: #0ea5e9;"></i>
+            <span>الأجهزة المرتبطة</span>
+          </h2>
+
+          <div style="background: rgba(255,255,255,0.03); border-radius: 15px; padding: 2rem; border: 1px solid rgba(255,255,255,0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+              <h3 style="color: #fff; font-size: 1.3rem; margin: 0;">قائمة الأجهزة</h3>
+              <span style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">
+                <%= (currentUser.boundDevices || []).length %> جهاز مرتبط
+              </span>
+            </div>
+
+            <div style="display: grid; gap: 1rem;">
+              <% if (currentUser.boundDevices && currentUser.boundDevices.length > 0) { %>
+                <% currentUser.boundDevices.forEach(function(device, index) { %>
+                  <div style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 1.5rem; border: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                      <h4 style="color: #fff; font-size: 1.1rem; margin: 0; display: flex; align-items: center; gap: 0.75rem;">
+                        <i class="fas fa-<%= device.browser && device.browser.includes('Mobile') ? 'mobile' : 'laptop' %>"></i>
+                        <%= device.browser ? device.browser.substring(0, 30) + '...' : 'جهاز غير معروف' %>
+                      </h4>
+                      <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem; margin: 0.5rem 0 0;">
+                        IP: <%= device.ip || 'غير معروف' %> • 
+                        أول استخدام: <%= new Date(device.firstUsedAt).toLocaleDateString('ar-SA') %> • 
+                        آخر استخدام: <%= new Date(device.lastUsedAt).toLocaleDateString('ar-SA') %>
+                      </p>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                      <% if (device.isActive) { %>
+                        <span style="background: rgba(40,167,69,0.2); color: #28a745; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; border: 1px solid rgba(40,167,69,0.3);">
+                          نشط
+                        </span>
+                      <% } else { %>
+                        <span style="background: rgba(220,53,69,0.2); color: #dc3545; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; border: 1px solid rgba(220,53,69,0.3);">
+                          غير نشط
+                        </span>
+                      <% } %>
+                      <button onclick="removeDevice('<%= device._id %>')" class="hm-btn-3d" style="background: rgba(220,53,69,0.8); padding: 0.5rem 1rem; font-size: 0.9rem;">
+                        <i class="fas fa-trash"></i> إزالة
+                      </button>
+                    </div>
+                  </div>
+                <% }); %>
+              <% } else { %>
+                <div style="text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);">
+                  <i class="fas fa-laptop" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                  <h4 style="color: #fff; margin: 1rem 0 0.5rem;">لا توجد أجهزة مرتبطة</h4>
+                  <p>سيتم عرض الأجهزة التي سجلت الدخول إلى حسابك هنا</p>
+                </div>
+              <% } %>
+            </div>
+
+            <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
+              <button onclick="refreshDevices()" class="hm-btn-3d" style="background: rgba(255,255,255,0.1); padding: 1rem 2rem; font-size: 1.1rem;">
+                <i class="fas fa-sync"></i> تحديث القائمة
+              </button>
+              <button onclick="clearAllDevices()" class="hm-btn-3d" style="background: rgba(220,53,69,0.8); padding: 1rem 2rem; font-size: 1.1rem;">
+                <i class="fas fa-trash-alt"></i> مسح جميع الأجهزة
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+function showTab(tabName) {
+  // Hide all tabs
+  document.querySelectorAll('.hm-tab-content').forEach(tab => {
+    tab.style.display = 'none';
+  });
+  
+  // Remove active class from all buttons
+  document.querySelectorAll('.hm-tab-btn').forEach(btn => {
+    btn.style.background = 'rgba(255,255,255,0.1)';
+    btn.style.borderColor = 'rgba(255,255,255,0.2)';
+    btn.style.color = 'rgba(255,255,255,0.7)';
+  });
+  
+  // Show selected tab
+  document.getElementById(tabName + '-tab').style.display = 'block';
+  
+  // Add active class to clicked button
+  event.target.style.background = 'rgba(14,165,233,0.2)';
+  event.target.style.borderColor = '#0ea5e9';
+  event.target.style.color = '#fff';
+}
+
+function saveProfile() {
+  const formData = {
+    name: document.getElementById('name').value,
+    email: document.getElementById('email').value,
+    phone: document.getElementById('phone').value,
+    securityLevel: document.getElementById('securityLevel').value,
+    _csrf: document.getElementById('csrfToken').value
+  };
+  
+  fetch('/client/profile/update', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(formData)
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert('تم تحديث الملف الشخصي بنجاح!');
+      location.reload();
+    } else {
+      alert('حدث خطأ: ' + data.message);
+    }
+  })
+  .catch(error => {
+    alert('حدث خطأ في الاتصال');
+  });
+}
+
+document.getElementById('changePasswordForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  const formData = {
+    currentPassword: document.getElementById('currentPassword').value,
+    newPassword: document.getElementById('newPassword').value,
+    confirmNewPassword: document.getElementById('confirmNewPassword').value,
+    _csrf: document.getElementById('csrfToken2').value
+  };
+  
+  fetch('/client/profile/change-password', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(formData)
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert('تم تغيير كلمة المرور بنجاح!');
+      document.getElementById('changePasswordForm').reset();
+    } else {
+      alert('حدث خطأ: ' + data.message);
+    }
+  })
+  .catch(error => {
+    alert('حدث خطأ في الاتصال');
+  });
+});
+
+// Two-factor toggle
+document.getElementById('twoFactorToggle').addEventListener('change', function() {
+  const formData = {
+    enabled: this.checked,
+    _csrf: document.getElementById('csrfToken').value
+  };
+  
+  fetch('/client/profile/toggle-2fa', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(formData)
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (!data.success) {
+      this.checked = !this.checked; // Revert the toggle
+      alert('حدث خطأ: ' + data.message);
+    }
+  });
+});
+
+// Device binding toggle
+document.getElementById('deviceBindingToggle').addEventListener('change', function() {
+  const formData = {
+    allowMultiple: !this.checked,
+    _csrf: document.getElementById('csrfToken').value
+  };
+  
+  fetch('/client/profile/toggle-device-binding', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(formData)
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (!data.success) {
+      this.checked = !this.checked; // Revert the toggle
+      alert('حدث خطأ: ' + data.message);
+    }
+  });
+});
+
+function removeDevice(deviceId) {
+  if (confirm('هل أنت متأكد من إزالة هذا الجهاز؟')) {
+    const formData = {
+      deviceId: deviceId,
+      _csrf: document.getElementById('csrfToken').value
+    };
+    
+    fetch('/client/profile/remove-device', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        location.reload();
+      } else {
+        alert('حدث خطأ: ' + data.message);
+      }
+    });
+  }
+}
+
+function refreshDevices() {
+  location.reload();
+}
+
+function clearAllDevices() {
+  if (confirm('هل أنت متأكد من مسح جميع الأجهزة؟ سيؤدي هذا إلى تسجيل الخروج من جميع الأجهزة الأخرى.')) {
+    const formData = {
+      _csrf: document.getElementById('csrfToken').value
+    };
+    
+    fetch('/client/profile/clear-all-devices', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        location.reload();
+      } else {
+        alert('حدث خطأ: ' + data.message);
+      }
+    });
+  }
+}
+</script>

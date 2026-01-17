@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (models/SparePart.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 // models/SparePart.js
 const mongoose = require('mongoose');
 

@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (services/TwoFactorAuthService.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 /**
  * Two-Factor Authentication Service
  * خدمة المصادقة الثنائية (2FA)

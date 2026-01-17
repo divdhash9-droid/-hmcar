@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (public/js/auction-live.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 // public/js/auction-live.js
 (function() {
   // سكربت التحديث اللحظي للمزاد:

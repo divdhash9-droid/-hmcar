@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (public/js/dashboard-luxury.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 /**
  * public/js/dashboard-luxury.js
  * تفاعلات لوحة التحكم الفخمة

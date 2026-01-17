@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (public/js/home-scripts.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 // ============================================
 // HM CAR Professional Homepage Scripts
 // ============================================
@@ -15,20 +17,33 @@ function updateLanguage() {
   const elements = document.querySelectorAll('[data-ar][data-en]');
   const langBtn = document.getElementById('currentLang');
   const searchInput = document.querySelector('.hm-search-input-wrap input');
+  const homeContainer = document.querySelector('.hm-pro-home');
   
   elements.forEach(element => {
     const text = element.getAttribute(`data-${currentLanguage}`);
-    element.textContent = text;
+    if (text) {
+      element.textContent = text;
+    }
   });
   
   if (searchInput) {
-    searchInput.placeholder = searchInput.getAttribute(`data-placeholder-${currentLanguage}`);
+    const placeholder = searchInput.getAttribute(`data-placeholder-${currentLanguage}`);
+    if (placeholder) {
+      searchInput.placeholder = placeholder;
+    }
   }
   
-  langBtn.textContent = currentLanguage === 'ar' ? 'EN' : 'عر';
+  if (langBtn) {
+    langBtn.textContent = currentLanguage === 'ar' ? 'EN' : 'عر';
+  }
   
-  document.querySelector('.hm-pro-home').style.direction = currentLanguage === 'ar' ? 'rtl' : 'ltr';
-  document.documentElement.lang = currentLanguage;
+  if (homeContainer) {
+    homeContainer.style.direction = currentLanguage === 'ar' ? 'rtl' : 'ltr';
+  }
+  
+  if (document.documentElement) {
+    document.documentElement.lang = currentLanguage;
+  }
 }
 
 // Initialize language
@@ -49,7 +64,11 @@ document.addEventListener('DOMContentLoaded', function() {
 // Mobile Menu Toggle
 function toggleMobileMenu() {
   const menu = document.querySelector('.hm-navbar__menu');
-  menu.classList.toggle('mobile-open');
+  if (menu) {
+    menu.classList.toggle('mobile-open');
+  } else {
+    console.log('Mobile menu not found');
+  }
 }
 
 // Scroll to Section
@@ -57,6 +76,8 @@ function scrollToSection(sectionId) {
   const section = document.getElementById(sectionId);
   if (section) {
     section.scrollIntoView({ behavior: 'smooth' });
+  } else {
+    console.log('Section not found:', sectionId);
   }
 }
 
@@ -64,18 +85,31 @@ function scrollToSection(sectionId) {
 function animateStats() {
   const statNumbers = document.querySelectorAll('.hm-stat-item__number');
   
+  // Only proceed if stats elements exist
+  if (statNumbers.length === 0) {
+    console.log('No stats elements found for animation');
+    return;
+  }
+  
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         const target = entry.target;
         const count = parseInt(target.getAttribute('data-count'));
-        animateNumber(target, count);
+        if (!isNaN(count)) {
+          animateNumber(target, count);
+        }
         observer.unobserve(target);
       }
     });
   }, { threshold: 0.5 });
   
-  statNumbers.forEach(stat => observer.observe(stat));
+  statNumbers.forEach(stat => {
+    const count = parseInt(stat.getAttribute('data-count'));
+    if (!isNaN(count)) {
+      observer.observe(stat);
+    }
+  });
 }
 
 function animateNumber(element, target) {
@@ -108,16 +142,22 @@ window.addEventListener('scroll', function() {
 let currentSlide = 0;
 function slideFeaturedCars(direction) {
   const slider = document.getElementById('featuredCarsSlider');
-  if (!slider) return;
+  if (!slider) {
+    console.log('Featured cars slider not found');
+    return;
+  }
   
   const cards = slider.querySelectorAll('.hm-car-card');
-  if (cards.length === 0) return;
+  if (cards.length === 0) {
+    console.log('No car cards found in slider');
+    return;
+  }
   
   const cardWidth = cards[0].offsetWidth + 32; // card width + gap
   
   currentSlide += direction;
   if (currentSlide < 0) currentSlide = 0;
-  if (currentSlide >= cards.length - 2) currentSlide = cards.length - 3;
+  if (currentSlide > cards.length - 3) currentSlide = cards.length - 3;
   
   slider.style.transform = `translateX(-${currentSlide * cardWidth}px)`;
   slider.style.transition = 'transform 0.5s ease';

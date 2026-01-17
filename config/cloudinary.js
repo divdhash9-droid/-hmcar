@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (config/cloudinary.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const path = require('path');
 const fs = require('fs');
 const multer = require('multer');

@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (test/models/user.test.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const { expect } = require('chai');
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');

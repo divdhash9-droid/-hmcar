@@ -36,7 +36,10 @@
     "pm2:monit": "pm2 monit",
     "clean": "node scripts/clean-project.ps1",
     "clean:db": "node scripts/reset-database.js",
-    "fresh-start": "npm run clean && npm install && npm run clean:db && npm run dev"
+    "fresh-start": "npm run clean && npm install && npm run clean:db && npm run dev",
+    "check:env": "node scripts/checkEnvironment.js",
+    "check:health": "node scripts/healthCheck.js",
+    "fix:assets": "node scripts/fixAssetPaths.js"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.5.2",
@@ -45,6 +48,7 @@
     "bootstrap-icons": "^1.11.3",
     "cheerio": "^1.1.2",
     "cloudinary": "^1.41.0",
+    "compression": "^1.8.1",
     "connect-flash": "^0.1.1",
     "connect-mongo": "^5.1.0",
     "cookie-parser": "^1.4.6",
@@ -61,7 +65,6 @@
     "ioredis": "^5.4.1",
     "jsonwebtoken": "^9.0.3",
     "method-override": "^3.0.0",
-    "mongodb": "^7.0.0",
     "mongoose": "^8.7.0",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
@@ -90,6 +93,6 @@
     "supertest": "^6.3.3"
   },
   "engines": {
-    "node": "18"
+    "node": "24.x"
   }
 }

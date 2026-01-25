@@ -82,8 +82,9 @@ const Review = require('./models/Review');
 const app = express();
 
 // Trust reverse proxy headers (required on Vercel for secure cookies/sessions)
+// Vercel sits behind one or more proxies; trusting them ensures req.secure works.
 if (process.env.VERCEL || process.env.NOW_REGION || process.env.NODE_ENV === 'production') {
-  app.set('trust proxy', 1);
+  app.set('trust proxy', true);
 }
 
 // Cookies (must be before any middleware that reads req.cookies)

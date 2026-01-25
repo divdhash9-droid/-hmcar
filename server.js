@@ -17,6 +17,7 @@ const csurf = require('csurf');
 const swaggerUi = require('swagger-ui-express');
 const mongoose = require('mongoose');
 const http = require('http');
+const compression = require('compression');
 
 const swaggerDocument = require('./swagger.json');
 const { initializeSystem } = require('./scripts/initializeSystem');
@@ -62,6 +63,11 @@ const analyticsRoutes = require('./routes/analytics');
 // const auditRoutes = require('./routes/audit');
 // const permissionsRoutes = require('./routes/permissions');
 const apiV2Routes = require('./routes/api/v2');
+const apiCarsRoutes = require('./routes/api/cars');
+
+// Configuration
+const serverConfig = require('./config/serverConfig');
+const assetHelper = require('./helpers/assetHelper');
 
 // Database connection
 const { connectDB } = require('./config/database');
@@ -75,51 +81,46 @@ const Review = require('./models/Review');
 
 const app = express();
 
+// Trust reverse proxy headers (required on Vercel for secure cookies/sessions)
+if (process.env.VERCEL || process.env.NOW_REGION || process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
 // Cookies (must be before any middleware that reads req.cookies)
 app.use(cookieParser());
 
 // Initialize i18n
 app.use(i18n.init);
 
-// Language detection middleware
+// Locale selection middleware
 app.use((req, res, next) => {
-  // Check for language in query parameter, cookie, or Accept-Language header
-  const cookieLocale = req.cookies ? req.cookies.locale : undefined;
-  let locale = req.query.lang || cookieLocale;
-  
+  let locale = (req.query && req.query.lang) ? String(req.query.lang).trim().toLowerCase() : '';
   if (!locale) {
-    // Detect from Accept-Language header
+    locale = (req.cookies && req.cookies.locale) ? String(req.cookies.locale).trim().toLowerCase() : '';
+  }
+  if (!locale) {
     const acceptLanguage = req.headers['accept-language'] || '';
     locale = acceptLanguage.includes('ar') ? 'ar' : 'en';
   }
-  
-  // Validate locale
+
   if (!['ar', 'en'].includes(locale)) {
-    locale = 'ar'; // Default to Arabic
+    locale = 'ar';
   }
-  
-  // Set locale for i18n
+
   req.setLocale(locale);
   res.locals.locale = locale;
-  
-  // Save to cookie
+
   res.cookie('locale', locale, {
-    maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
+    maxAge: 1000 * 60 * 60 * 24 * 30,
     httpOnly: true,
     sameSite: 'lax'
   });
-  
+
   next();
 });
 
-// Rate limiting (more permissive in development)
-const isDev = process.env.NODE_ENV !== 'production';
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: isDev ? 1000 : 100, // 1000 requests in dev, 100 in production
-  message: 'Too many requests from this IP, please try again later.',
-  skip: (req) => isDev // Skip rate limiting entirely in development
-});
+// Rate limiting using server config
+const limiter = rateLimit(serverConfig.security.rateLimit);
 app.use(limiter);
 
 // Basic security
@@ -141,13 +142,17 @@ app.use(methodOverride((req, res) => {
   }
 }));
 
-// Logging
-app.use(morgan(process.env.NODE_ENV === 'test' ? 'tiny' : 'dev'));
+// Compression middleware for performance
+app.use(compression());
+
+// Logging using server config
+const loggerConfig = serverConfig.getLoggerConfig();
+app.use(morgan(loggerConfig.format, { skip: loggerConfig.skip }));
 
 // Rate limiters (more permissive in development)
-const globalLimiter = rateLimit({ windowMs: 60 * 1000, max: isDev ? 1000 : 120, standardHeaders: true, legacyHeaders: false, skip: () => isDev });
-const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: isDev ? 500 : 100, standardHeaders: true, legacyHeaders: false });
-const bidsLimiter = rateLimit({ windowMs: 60 * 1000, max: isDev ? 200 : 30, standardHeaders: true, legacyHeaders: false });
+const globalLimiter = rateLimit({ windowMs: 60 * 1000, max: process.env.NODE_ENV === 'development' ? 1000 : 120, standardHeaders: true, legacyHeaders: false, skip: () => process.env.NODE_ENV === 'development' });
+const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: process.env.NODE_ENV === 'development' ? 500 : 100, standardHeaders: true, legacyHeaders: false });
+const bidsLimiter = rateLimit({ windowMs: 60 * 1000, max: process.env.NODE_ENV === 'development' ? 200 : 30, standardHeaders: true, legacyHeaders: false });
 
 const limiterBypassPrefixes = ['/public', '/uploads', '/socket.io', '/vendor'];
 app.use((req, res, next) => {
@@ -178,27 +183,42 @@ app.use((req, res, next) => {
 // Sanitize Mongo queries
 app.use(mongoSanitize());
 
-// Additional security headers
+// Security headers using server config
 app.use((req, res, next) => {
-  const isEmbed = String(req.query && req.query.embed ? req.query.embed : '') === '1';
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', isEmbed ? 'SAMEORIGIN' : 'DENY');
-  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
-  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
-  res.setHeader('Cross-Origin-Resource-Policy', 'same-origin');
-  res.setHeader('Content-Security-Policy', `default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; font-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.gstatic.com data:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors ${isEmbed ? "'self'" : "'none'"}`);
-  next();
+  const isEmbed = String(req.query?.embed || '') === '1';
+  
+  // تطبيق إعدادات Helmet
+  helmet(serverConfig.security.helmet)(req, res, () => {
+    // إعدادات إضافية مخصصة
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', isEmbed ? 'SAMEORIGIN' : 'DENY');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+    
+    // تعديل CSP حسب البيئة
+    const cspDirectives = serverConfig.security.helmet.contentSecurityPolicy.directives;
+    const cspValue = Object.entries(cspDirectives)
+      .map(([key, values]) => `${key} ${values.join(' ')}`)
+      .join('; ');
+    
+    res.setHeader('Content-Security-Policy', cspValue);
+    next();
+  });
 });
 
-// Static files
-app.use('/public', express.static(path.join(__dirname, 'public'), { maxAge: '1d', etag: true, lastModified: true, immutable: true }));
-app.use('/css', express.static(path.join(__dirname, 'public/css'), { maxAge: '1d', immutable: true }));
-app.use('/js', express.static(path.join(__dirname, 'public/js'), { maxAge: '1d', immutable: true }));
-app.use('/images', express.static(path.join(__dirname, 'public/images'), { maxAge: '1d', immutable: true }));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-app.use('/vendor/fontawesome', express.static(path.join(__dirname, 'node_modules', '@fortawesome', 'fontawesome-free'), { maxAge: '1d', immutable: true }));
-app.use('/vendor/bootstrap-icons', express.static(path.join(__dirname, 'node_modules', 'bootstrap-icons'), { maxAge: '1d', immutable: true }));
+// Static files with unified configuration
+const staticConfig = serverConfig.getStaticFileConfig();
+
+app.use('/public', express.static(path.join(__dirname, 'public'), staticConfig));
+app.use('/css', express.static(path.join(__dirname, 'public/css'), staticConfig));
+app.use('/js', express.static(path.join(__dirname, 'public/js'), staticConfig));
+app.use('/images', express.static(path.join(__dirname, 'public/images'), staticConfig));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
+  ...staticConfig,
+  maxAge: '7d' // أطول فترة للملفات المرفوعة
+}));
+app.use('/vendor/fontawesome', express.static(path.join(__dirname, 'node_modules', '@fortawesome', 'fontawesome-free'), staticConfig));
+app.use('/vendor/bootstrap-icons', express.static(path.join(__dirname, 'node_modules', 'bootstrap-icons'), staticConfig));
 
 // PWA assets should be available at the site root
 app.get('/manifest.json', (req, res) => {
@@ -210,20 +230,12 @@ app.get('/sw.js', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'sw.js'));
 });
 
-// Session configuration
-const mongoUriForSession = (process.env.MONGO_URI && String(process.env.MONGO_URI).trim()) ? String(process.env.MONGO_URI).trim() : '';
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'secret_key_here',
-  resave: false,
-  saveUninitialized: false,
-  ...(mongoUriForSession ? { store: MongoStore.create({ mongoUrl: mongoUriForSession }) } : {}),
-  cookie: {
-    httpOnly: true,
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 1000 * 60 * 60 * 24
-  }
-}));
+app.get('/favicon.ico', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'images', 'favicon.ico'));
+});
+
+// Session configuration using server config
+app.use(session(serverConfig.session));
 
 app.use(flash());
 
@@ -264,68 +276,87 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // Simple home
 app.get('/', async (req, res) => {
   try {
-    // Get featured cars
-    const cars = await Car.find({ isActive: true })
-      .sort({ createdAt: -1 })
-      .limit(6)
-      .lean();
+    let cars = [], brands = [], stats = null, liveAuctions = [], recentReviews = [], featuredCars = [], siteSettings = {};
 
-    // Get brands for search
-    const brands = await Brand.find({})
-      .sort({ name: 1 })
-      .lean();
+    // Check if we have local database
+    if (global.localDB) {
+      // Use local database operations
+      cars = await global.localDB.Car.find({ isActive: true }) || [];
+      brands = await global.localDB.Brand.find({}) || [];
+      stats = {
+        totalCars: cars.length,
+        activeAuctions: 0,
+        totalUsers: 0,
+        completedAuctions: 0
+      };
+      liveAuctions = [];
+      recentReviews = [];
+      featuredCars = cars.slice(0, 8);
+    } else {
+      // Use MongoDB/Mongoose models
+      // Get featured cars
+      cars = await Car.find({ isActive: true })
+        .sort({ createdAt: -1 })
+        .limit(6)
+        .lean();
 
-    // Get platform statistics
-    const totalCars = await Car.countDocuments({ isActive: true });
-    const now = new Date();
-    const activeAuctions = await Auction.countDocuments({
-      status: 'running',
-      endsAt: { $gt: now }
-    });
-    const totalUsers = await User.countDocuments({});
-    const completedAuctions = await Auction.countDocuments({ status: 'ended' });
+      // Get brands for search
+      brands = await Brand.find({})
+        .sort({ name: 1 })
+        .lean();
 
-    // Get live auctions
-    const liveAuctions = await Auction.find({
-      status: 'running',
-      endsAt: { $gt: now }
-    })
-      .populate({
-        path: 'car'
+      // Get platform statistics
+      const totalCars = await Car.countDocuments({ isActive: true });
+      const now = new Date();
+      const activeAuctions = await Auction.countDocuments({
+        status: 'running',
+        endsAt: { $gt: now }
+      });
+      const totalUsers = await User.countDocuments({});
+      const completedAuctions = await Auction.countDocuments({ status: 'ended' });
+
+      // Get live auctions
+      liveAuctions = await Auction.find({
+        status: 'running',
+        endsAt: { $gt: now }
       })
-      .sort({ endsAt: 1 })
-      .limit(3)
-      .lean();
+        .populate({
+          path: 'car'
+        })
+        .sort({ endsAt: 1 })
+        .limit(3)
+        .lean();
 
-    // Get recent reviews
-    const recentReviews = await Review.find({ status: 'approved' })
-      .populate('user', 'name')
-      .populate('car', 'make model')
-      .sort({ createdAt: -1 })
-      .limit(3)
-      .lean();
+      // Get recent reviews
+      recentReviews = await Review.find({ status: 'approved' })
+        .populate('user', 'name')
+        .populate('car', 'make model')
+        .sort({ createdAt: -1 })
+        .limit(3)
+        .lean();
 
-    const stats = {
-      totalCars,
-      activeAuctions,
-      totalUsers,
-      completedAuctions
-    };
+      stats = {
+        totalCars,
+        activeAuctions,
+        totalUsers,
+        completedAuctions
+      };
 
-    // جلب إعدادات الموقع
-    const Settings = require('./models/Settings');
-    const settings = await Settings.getSettings();
-    const siteSettings = settings ? settings.footer : {};
+      // جلب إعدادات الموقع
+      const Settings = require('./models/Settings');
+      const settings = await Settings.getSettings();
+      siteSettings = settings ? settings.footer : {};
 
-    // جلب السيارات المميزة للصفحة الرئيسية
-    const featuredCars = await Car.find({ 
-      isActive: true, 
-      isSold: false,
-      listingType: 'store'
-    })
-      .sort({ createdAt: -1 })
-      .limit(8)
-      .lean();
+      // جلب السيارات المميزة للصفحة الرئيسية
+      featuredCars = await Car.find({
+        isActive: true,
+        isSold: false,
+        listingType: 'store'
+      })
+        .sort({ createdAt: -1 })
+        .limit(8)
+        .lean();
+    }
 
     res.render('home', {
       layout: 'layout',
@@ -386,6 +417,11 @@ app.get('/client/dashboard', async (req, res) => {
     return res.redirect('/auth/login');
   }
 
+  // لوحة العميل الأساسية أصبحت داخل /cars (buyer-dashboard)
+  if (req.session.user && req.session.user.role === 'buyer') {
+    return res.redirect('/cars');
+  }
+
   try {
     const user = req.session.user;
     const Order = require('./models/Order');
@@ -412,6 +448,7 @@ app.get('/client/dashboard', async (req, res) => {
     res.render('client/dashboard', {
       layout: 'layout',
       hideNavbar: true,
+      hideFooter: true,
       fullWidth: true,
       bodyClass: 'hm-client-dashboard',
       currentUser: req.session.user,
@@ -422,6 +459,9 @@ app.get('/client/dashboard', async (req, res) => {
 
 // API v2
 app.use('/api/v2', apiV2Routes);
+
+// Legacy/Client API for cars page
+app.use('/api/cars', apiCarsRoutes);
 
 // Mount routers
 app.use('/auth', authRoutes);
@@ -491,16 +531,22 @@ async function connectToDatabase() {
   if (mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2) {
     return mongoose.connection;
   }
-  
+
   try {
-    await connectDB();
+    const dbResult = await connectDB();
+    if (dbResult && dbResult.type === 'local') {
+      console.log('🏠 Running with local database - limited functionality available');
+      // Store local database operations globally for use by models
+      global.localDB = dbResult.operations;
+      return dbResult.connection;
+    }
     return mongoose.connection;
   } catch (error) {
     console.error('❌ Database connection failed:', error.message);
-    
-    // In production, we should still allow the app to start even if DB fails
-    if (process.env.NODE_ENV === 'production') {
-      console.warn('⚠️ Starting app without database connection');
+
+    // In development, allow app to start with limited functionality
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn('⚠️ Starting app in offline mode - database features will be limited');
       return null;
     }
     throw error;
@@ -512,11 +558,22 @@ async function startServer() {
   if (serverInstance && !serverInstance.listening) {
     serverInstance = undefined;
   }
+  
+  // التحقق من صحة الإعدادات
+  const validation = serverConfig.validate();
+  if (!validation.isValid) {
+    console.error('❌ Configuration errors:', validation.errors);
+    if (serverConfig.isProduction) {
+      process.exit(1);
+    }
+  }
+  
   await connectToDatabase();
   await initializeSystem();
 
-  const port = process.env.PORT || 4001;
+  const port = serverConfig.port;
   const httpServer = http.createServer(app);
+  
   if (typeof webSocketService.initialize === 'function') {
     webSocketService.initialize(httpServer);
     if (webSocketService.io) {
@@ -524,9 +581,25 @@ async function startServer() {
     }
   }
 
-  serverInstance = httpServer.listen(port, () => {
-    console.log(`🚀 Server listening on port ${port}`);
-  });
+  // إظهار معلومات البيئة عند التشغيل
+  const envInfo = serverConfig.getEnvironmentInfo();
+  console.log('\n=== Server Environment Info ===');
+  console.log(`Environment: ${envInfo.environment}`);
+  console.log(`Port: ${port || 'Dynamic (Vercel)'}`);
+  console.log(`Database: ${envInfo.databaseUri}`);
+  console.log(`Node Version: ${envInfo.nodeVersion}`);
+  console.log('===============================\n');
+
+  if (port) {
+    serverInstance = httpServer.listen(port, () => {
+      console.log(`🚀 Server listening on port ${port}`);
+      console.log(`🌍 Access URL: http://localhost:${port}`);
+    });
+  } else {
+    // في بيئة Vercel، لا نحتاج لـ listen()
+    serverInstance = httpServer;
+    console.log('🚀 Server ready for Vercel deployment');
+  }
 
   return serverInstance;
 }

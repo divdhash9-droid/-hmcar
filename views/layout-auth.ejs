@@ -26,6 +26,12 @@
   <!-- PWA & Mobile -->
   <meta name="theme-color" content="#07243b" />
   <link rel="manifest" href="/manifest.json" />
+  
+  <!-- Vercel Web Analytics -->
+  <script>
+    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+  </script>
+  <script defer src="/_vercel/insights/script.js"></script>
 
   <% const _bc = (typeof bodyClass !== 'undefined' && bodyClass) ? String(bodyClass) : ''; %>
   <% if (_bc.includes('login-organized')) { %>

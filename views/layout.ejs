@@ -45,6 +45,9 @@
 
     <!-- Font Awesome (local) -->
     <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css" />
+    
+    <!-- Luxury Theme -->
+    <link rel="stylesheet" href="/css/luxury-theme.css" />
 
     <!-- Bootstrap Icons (local) -->
     <link
@@ -92,10 +95,12 @@
       href="/public/css/rtl-support.css?v=<%= Date.now() %>"
       rel="stylesheet"
     />
+    <% if (!(typeof bodyClass !== 'undefined' && (String(bodyClass).indexOf('login-organized') !== -1 || String(bodyClass).indexOf('hm-client-dashboard') !== -1))) { %>
     <link
       href="/public/css/modern-auth.css?v=<%= Date.now() %>"
       rel="stylesheet"
     />
+    <% } %>
     <link
       href="/public/css/client-dashboard.css?v=<%= Date.now() %>"
       rel="stylesheet"
@@ -136,6 +141,10 @@
       href="/public/css/admin-ultra.css?v=<%= Date.now() %>"
       rel="stylesheet"
     />
+    <link
+      href="/public/css/admin-light-mode.css?v=<%= Date.now() %>"
+      rel="stylesheet"
+    />
     <% } %>
     <link rel="manifest" href="/manifest.json" />
   </head>
@@ -147,10 +156,7 @@
     <a class="skip-link" href="#main-content"
       ><%= __('accessibility.skipToContent') %></a
     >
-    <% } %> <% if (!isAdminPage && !(typeof isEmbed !== 'undefined' && isEmbed)
-    && !(typeof hideNavbar !== 'undefined' && hideNavbar)) { %> <%-
-    include('partials/header-modern', { user: typeof currentUser !== 'undefined'
-    ? currentUser : null }) %> <% } %>
+    <% } %>
 
     <main id="main-content">
       <% if (!(typeof isEmbed !== 'undefined' && isEmbed) && !(typeof

@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 200" role="img" aria-labelledby="title desc">
+  <title id="title">HM CAR Elite Mark</title>
+  <desc id="desc">Minimal luxe wordmark with floating arc.</desc>
+  <defs>
+    <linearGradient id="eliteGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f8e6bd" />
+      <stop offset="50%" stop-color="#f4c96f" />
+      <stop offset="100%" stop-color="#c48a1e" />
+    </linearGradient>
+    <linearGradient id="eliteDeep" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d223f" />
+      <stop offset="100%" stop-color="#081225" />
+    </linearGradient>
+    <filter id="eliteGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="7" result="b" />
+      <feColorMatrix in="b" type="matrix" values="0 0 0 0 0.96 0 0 0 0 0.82 0 0 0 0 0.48 0 0 0 0.35 0" />
+    </filter>
+  </defs>
+
+  <rect x="16" y="18" width="528" height="164" rx="26" fill="#0b1f3a" opacity="0.12" />
+  <rect x="24" y="26" width="512" height="148" rx="22" fill="url(#eliteDeep)" />
+  <rect x="24" y="26" width="512" height="148" rx="22" fill="url(#eliteGold)" opacity="0.06" />
+
+  <g transform="translate(44 32)">
+    <path d="M34 112c36-42 90-66 150-66 64 0 116 22 152 60" fill="none" stroke="url(#eliteGold)" stroke-width="6" stroke-linecap="round" filter="url(#eliteGlow)" opacity="0.85" />
+    <path d="M36 110c42-44 96-66 148-66 64 0 114 24 150 60" fill="none" stroke="url(#eliteGold)" stroke-width="3.5" stroke-linecap="round" />
+    <circle cx="48" cy="110" r="5" fill="url(#eliteGold)" />
+    <circle cx="330" cy="104" r="5" fill="url(#eliteGold)" />
+  </g>
+
+  <g fill="url(#eliteGold)" font-family="'Playfair Display','Cormorant Garamond','Times New Roman',serif" text-rendering="optimizeLegibility">
+    <text x="78" y="132" font-size="58" font-weight="900" letter-spacing="0.12em">HM CAR</text>
+  </g>
+  <g fill="#fefefe" opacity="0.92" font-family="'Poppins','Segoe UI',sans-serif" font-size="16" font-weight="600" letter-spacing="0.18em">
+    <text x="80" y="156">PREMIUM AUCTIONS &amp; MOTORS</text>
+  </g>
+</svg>

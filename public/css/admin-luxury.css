@@ -399,6 +399,390 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+.hm-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hm-header-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  font-weight: 600;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.hm-header-chip i {
+  color: var(--hm-blue-light);
+}
+
+.hm-dashboard-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.hm-dashboard-hero {
+  background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(13,25,52,0.4));
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 28px;
+  padding: 2.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 2rem;
+  box-shadow: 0 45px 85px rgba(4,9,21,0.45);
+  position: relative;
+  overflow: hidden;
+}
+
+.hm-dashboard-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08), transparent 55%);
+  pointer-events: none;
+}
+
+.hm-dashboard-eyebrow {
+  color: var(--hm-blue-light);
+  font-weight: 800;
+  letter-spacing: 0.25rem;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.hm-dashboard-hero h2 {
+  margin: 0 0 1rem;
+  font-size: 2rem;
+  color: #ffffff;
+}
+
+.hm-dashboard-subtitle {
+  color: var(--hm-silver);
+  margin-bottom: 1.5rem;
+  line-height: 1.8;
+}
+
+.hm-dashboard-hero__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.hm-dashboard-hero__tags span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  font-size: 0.85rem;
+  color: #ffffff;
+}
+
+.hm-dashboard-hero__stats {
+  display: grid;
+  gap: 1rem;
+}
+
+.hm-dashboard-stat {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 20px;
+  padding: 1.25rem;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+}
+
+.hm-dashboard-stat span {
+  display: block;
+  color: var(--hm-silver);
+  font-size: 0.9rem;
+}
+
+.hm-dashboard-stat strong {
+  display: block;
+  color: #ffffff;
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin: 0.25rem 0;
+}
+
+.hm-dashboard-stat small {
+  color: var(--hm-gray);
+}
+
+.hm-dashboard-grid {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.hm-dashboard-grid--quick {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.hm-dashboard-grid--info {
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+
+.hm-dashboard-action {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.1rem 1.4rem;
+  border-radius: 20px;
+  text-decoration: none;
+  color: #ffffff;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.04);
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.hm-dashboard-action__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  background: rgba(0,0,0,0.25);
+}
+
+.hm-dashboard-action__content span {
+  font-weight: 700;
+  font-size: 1rem;
+  display: block;
+}
+
+.hm-dashboard-action__content small {
+  color: var(--hm-silver);
+}
+
+.hm-dashboard-action__chevron {
+  margin-right: auto;
+  color: rgba(255,255,255,0.6);
+}
+
+.hm-dashboard-action:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255,255,255,0.25);
+  box-shadow: 0 25px 55px rgba(0,0,0,0.35);
+}
+
+.hm-dashboard-action-primary { background: linear-gradient(120deg, #1b2548, #1e3a8a); }
+.hm-dashboard-action-warning { background: linear-gradient(120deg, #f59e0b, #d97706); }
+.hm-dashboard-action-info { background: linear-gradient(120deg, #0ea5e9, #2563eb); }
+.hm-dashboard-action-success { background: linear-gradient(120deg, #10b981, #059669); }
+.hm-dashboard-action-danger { background: linear-gradient(120deg, #ef4444, #b91c1c); }
+.hm-dashboard-action-secondary { background: linear-gradient(120deg, #475569, #1f2937); }
+
+.hm-dashboard-panels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.25rem;
+}
+
+.hm-dashboard-card {
+  background: rgba(5,9,21,0.72);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 26px;
+  padding: 1.5rem;
+  box-shadow: 0 35px 75px rgba(0,0,0,0.35);
+}
+
+.hm-dashboard-card--team {
+  background: linear-gradient(145deg, rgba(13,25,52,0.9), rgba(5,9,21,0.8));
+}
+
+.hm-notification-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.hm-notification-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.08);
+  align-items: flex-start;
+}
+
+.hm-notification-item.is-new {
+  border-color: rgba(244, 63, 94, 0.5);
+  box-shadow: 0 12px 30px rgba(244, 63, 94, 0.2);
+}
+
+.hm-notification-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.08);
+  font-size: 1.3rem;
+  color: #ffffff;
+}
+
+.hm-notification-title {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.hm-notification-text {
+  margin: 0.3rem 0;
+  color: var(--hm-silver);
+  line-height: 1.6;
+}
+
+.hm-notification-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  color: var(--hm-gray);
+  font-size: 0.85rem;
+}
+
+.hm-team-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.hm-team-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.hm-team-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #4c1d95, #2563eb);
+  font-weight: 800;
+  font-size: 1.4rem;
+  color: #ffffff;
+}
+
+.hm-team-info strong {
+  color: #ffffff;
+}
+
+.hm-team-info small {
+  color: var(--hm-silver);
+}
+
+.hm-team-meta {
+  margin-right: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  color: var(--hm-gray);
+  font-size: 0.85rem;
+}
+
+.hm-dashboard-insights {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  margin-bottom: 1.25rem;
+}
+
+.hm-dashboard-insights span {
+  color: var(--hm-gray);
+  font-size: 0.9rem;
+}
+
+.hm-dashboard-insights strong {
+  color: #ffffff;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.hm-dashboard-chart-placeholder {
+  border: 1px dashed rgba(255,255,255,0.2);
+  border-radius: 18px;
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--hm-silver);
+}
+
+.hm-dashboard-chart-placeholder i {
+  font-size: 2rem;
+  color: rgba(255,255,255,0.3);
+  margin-bottom: 0.5rem;
+}
+
+.hm-health-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.hm-health-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.hm-health-pill {
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.hm-health-pill.is-success { background: linear-gradient(135deg, #22c55e, #16a34a); }
+.hm-health-pill.is-info { background: linear-gradient(135deg, #0ea5e9, #2563eb); }
+.hm-health-pill.is-warning { background: linear-gradient(135deg, #eab308, #c2410c); }
+
+@media (max-width: 768px) {
+  .hm-dashboard-hero {
+    padding: 1.5rem;
+  }
+  .hm-dashboard-hero__stats {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
+  .hm-dashboard-action {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
 .hm-header-breadcrumb a:hover {
   background: #f0f0f0;
   color: #0a1628;
@@ -1027,3 +1411,5 @@ select.hm-admin-input option:checked {
 .hm-admin-layout ::-webkit-scrollbar-thumb:hover {
   background: var(--hm-blue);
 }
+
+/* ===== Admin Dashboard 2026 refresh ===== */

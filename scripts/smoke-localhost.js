@@ -1,6 +1,6 @@
 // [[ARABIC_HEADER]] هذا الملف (scripts/smoke-localhost.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
 
-const base = process.env.SMOKE_BASE_URL || 'http://localhost:4001';
+const base = process.env.SMOKE_BASE_URL || 'http://localhost:4000';
 const baseUrl = new URL(base);
 const httpModule = baseUrl.protocol === 'https:' ? require('https') : require('http');
 const paths = [

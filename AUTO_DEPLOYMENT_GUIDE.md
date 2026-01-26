@@ -209,8 +209,8 @@ docker-compose ps
 docker-compose logs -f
 
 # Health check
-curl http://localhost:4001/health
-curl http://localhost:4001/metrics
+curl http://localhost:4000/health
+curl http://localhost:4000/metrics
 ```
 
 ### Logs:
@@ -291,7 +291,7 @@ git push origin main
 
 ### التطبيق لا يعمل بعد النشر:
 1. فحص logs: `pm2 logs` أو `docker-compose logs`
-2. فحص health: `curl localhost:4001/health`
+2. فحص health: `curl localhost:4000/health`
 3. إعادة تشغيل: `pm2 restart car-auction` أو `docker-compose restart`
 
 ---

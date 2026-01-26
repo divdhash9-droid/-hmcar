@@ -16,13 +16,13 @@ vercel login
 
 ```
 MONGO_URI=mongodb+srv://<zz7310430_db_user>:<QtDSn1S3V4Z8OfNL>@cluster0.mongodb.net/car-auction?retryWrites=true&w=majority
-SESSION_SECRET=super_secret_key_firebase
+SESSION_SECRET=change_me_to_a_secure_random_string
 NODE_ENV=production
-FIREBASE_STORAGE_BUCKET=myapplication-9c116dfa.appspot.com
+FIREBASE_STORAGE_BUCKET=your-project.appspot.com
 JWT_SECRET=your_jwt_secret_key_change_in_production_12345
 JWT_EXPIRES_IN=7d
-ADMIN_NAME=أحمد الزمزمي
-ADMIN_PHONE=781007805
+ADMIN_NAME=Your Name
+ADMIN_PHONE=+0000000000
 ```
 
 ### 3. نشر المشروع

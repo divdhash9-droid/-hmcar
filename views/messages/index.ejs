@@ -1,0 +1,268 @@
+<!-- [[ARABIC_HEADER]] هذا الملف (views/messages/index.ejs) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. -->
+
+<% layout('layout') -%>
+
+<div class="container" style="padding-top: 24px; padding-bottom: 48px; direction: rtl;" data-current-user-id="<%= currentUserId || '' %>">
+  <header class="hm-hero" style="min-height:auto; padding: 22px 18px; margin-bottom: 14px;">
+    <div class="hm-hero__top">
+      <div class="hm-hero__brand">
+        <div class="hm-hero__titles">
+          <h1 class="hm-hero__title">الرسائل</h1>
+          <div class="hm-hero__subtitle">محادثاتك وطلباتك في مكان واحد</div>
+        </div>
+      </div>
+
+      <nav class="hm-hero__actions" aria-label="إجراءات">
+        <a class="hm-pill" href="/cars" aria-label="العودة للوحة العميل">
+          <i class="fas fa-arrow-right"></i>
+          <span>العودة</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hm-section" aria-label="الرسائل">
+    <div class="hm-card" style="padding: 0; overflow:hidden;">
+      <div style="display:grid; grid-template-columns: 360px 1fr; min-height: 70vh;">
+        <aside style="border-left: 1px solid rgba(11,31,58,0.10); background: rgba(255,255,255,0.7);">
+          <div style="padding: 14px 14px 10px; border-bottom: 1px solid rgba(11,31,58,0.10);">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap: 10px;">
+              <div style="font-weight: 900; color: #0b1f3a;">المحادثات</div>
+              <button id="refreshConversations" class="btn btn-sm btn-outline-primary" type="button">
+                <i class="fas fa-sync"></i>
+              </button>
+            </div>
+            <div class="text-muted" style="margin-top:6px; font-size:.92rem;">اضغط على محادثة لعرض الرسائل</div>
+          </div>
+
+          <div id="conversations" style="padding: 10px; display:flex; flex-direction:column; gap: 8px;"></div>
+
+          <div id="conversationsEmpty" class="text-muted" style="padding: 16px; display:none;">
+            لا توجد محادثات حالياً.
+          </div>
+        </aside>
+
+        <main style="background:#fff; display:flex; flex-direction:column;">
+          <div style="padding: 14px 14px 10px; border-bottom: 1px solid rgba(11,31,58,0.10);">
+            <div id="chatTitle" style="font-weight: 900; color:#0b1f3a;">اختر محادثة</div>
+            <div id="chatMeta" class="text-muted" style="margin-top:6px; font-size:.92rem;"></div>
+          </div>
+
+          <div id="messages" style="flex:1; padding: 14px; overflow:auto; display:flex; flex-direction:column; gap: 10px;"></div>
+
+          <div style="padding: 12px; border-top: 1px solid rgba(11,31,58,0.10);">
+            <form id="sendForm" style="display:flex; gap: 10px; align-items:center;" autocomplete="off">
+              <input id="messageInput" class="form-control" type="text" placeholder="اكتب رسالة..." style="flex:1;" disabled />
+              <button id="sendBtn" class="btn btn-primary" type="submit" disabled>
+                <i class="fas fa-paper-plane"></i>
+                إرسال
+              </button>
+            </form>
+            <div id="sendHint" class="text-muted" style="margin-top:8px; font-size:.9rem;">اختر محادثة أولاً لبدء الإرسال.</div>
+          </div>
+        </main>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+  (function(){
+    const currentUserId = document.querySelector('[data-current-user-id]')?.getAttribute('data-current-user-id') || '';
+
+    const els = {
+      conversations: document.getElementById('conversations'),
+      conversationsEmpty: document.getElementById('conversationsEmpty'),
+      refreshConversations: document.getElementById('refreshConversations'),
+      messages: document.getElementById('messages'),
+      chatTitle: document.getElementById('chatTitle'),
+      chatMeta: document.getElementById('chatMeta'),
+      sendForm: document.getElementById('sendForm'),
+      messageInput: document.getElementById('messageInput'),
+      sendBtn: document.getElementById('sendBtn'),
+      sendHint: document.getElementById('sendHint')
+    };
+
+    let selectedConversation = null;
+    let selectedReceiverId = null;
+
+    function escapeHtml(str){
+      return String(str ?? '')
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;')
+        .replace(/'/g,'&#039;');
+    }
+
+    function setComposerEnabled(enabled){
+      els.messageInput.disabled = !enabled;
+      els.sendBtn.disabled = !enabled;
+      els.sendHint.style.display = enabled ? 'none' : 'block';
+      if(enabled){
+        els.messageInput.focus();
+      }
+    }
+
+    function renderConversationItem(conv){
+      const participants = Array.isArray(conv.participants) ? conv.participants : [];
+      const other = participants.find(p => String(p?._id || p) !== String(currentUserId)) || participants[0] || null;
+
+      const name = other && other.name ? other.name : 'محادثة';
+      const phone = other && other.phone ? other.phone : '';
+      const last = conv.lastMessage && conv.lastMessage.content ? conv.lastMessage.content : '';
+      const updated = conv.updatedAt ? new Date(conv.updatedAt) : null;
+      const time = updated && !Number.isNaN(updated.getTime()) ? updated.toLocaleString('ar-SA') : '';
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'hm-card';
+      btn.style.cssText = 'text-align:right; padding: 12px; border: 1px solid rgba(11,31,58,0.12); background:#fff; cursor:pointer;';
+      btn.innerHTML = `
+        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap: 10px;">
+          <div style="font-weight: 900; color:#0b1f3a;">${escapeHtml(name)}</div>
+          <div class="text-muted" style="font-size:.82rem;">${escapeHtml(time)}</div>
+        </div>
+        ${phone ? `<div class="text-muted" style="margin-top:4px; font-size:.86rem;">${escapeHtml(phone)}</div>` : ''}
+        ${last ? `<div style="margin-top:8px; color:#0b1f3a; opacity:.85; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(last)}</div>` : '<div class="text-muted" style="margin-top:8px;">لا توجد رسائل بعد</div>'}
+      `;
+
+      btn.addEventListener('click', () => selectConversation(conv));
+      return btn;
+    }
+
+    async function fetchJson(url, options){
+      const res = await fetch(url, {
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        ...options
+      });
+      const text = await res.text();
+      let data = null;
+      try { data = text ? JSON.parse(text) : null; } catch(e) { data = null; }
+      if(!res.ok){
+        const msg = data && data.error ? data.error : (text || `HTTP ${res.status}`);
+        throw new Error(msg);
+      }
+      return data;
+    }
+
+    async function loadConversations(){
+      els.conversations.innerHTML = '';
+      els.conversationsEmpty.style.display = 'none';
+
+      try {
+        const conversations = await fetchJson('/messages/conversations');
+        if(!conversations || conversations.length === 0){
+          els.conversationsEmpty.style.display = 'block';
+          return;
+        }
+        conversations.forEach(conv => {
+          els.conversations.appendChild(renderConversationItem(conv));
+        });
+      } catch(err){
+        els.conversationsEmpty.style.display = 'block';
+        els.conversationsEmpty.textContent = 'تعذر تحميل المحادثات: ' + err.message;
+      }
+    }
+
+    function renderMessageBubble(msg){
+      const isMine = String(msg.sender?._id || msg.sender) === String(currentUserId);
+      const wrap = document.createElement('div');
+      wrap.style.cssText = `display:flex; justify-content:${isMine ? 'flex-start' : 'flex-end'};`;
+
+      const bubble = document.createElement('div');
+      bubble.style.cssText = `max-width: 70%; padding: 10px 12px; border-radius: 14px; border: 1px solid rgba(11,31,58,0.12); background:${isMine ? 'rgba(11,31,58,0.06)' : '#fff'};`;
+
+      const content = document.createElement('div');
+      content.innerHTML = escapeHtml(msg.content || '');
+      bubble.appendChild(content);
+
+      const time = msg.createdAt ? new Date(msg.createdAt) : null;
+      const timeStr = time && !Number.isNaN(time.getTime()) ? time.toLocaleString('ar-SA') : '';
+      if(timeStr){
+        const meta = document.createElement('div');
+        meta.className = 'text-muted';
+        meta.style.cssText = 'margin-top:6px; font-size:.78rem;';
+        meta.textContent = timeStr;
+        bubble.appendChild(meta);
+      }
+
+      wrap.appendChild(bubble);
+      return wrap;
+    }
+
+    async function selectConversation(conv){
+      selectedConversation = conv;
+
+      const participants = Array.isArray(conv.participants) ? conv.participants : [];
+      const other = participants.find(p => String(p?._id || p) !== String(currentUserId)) || participants[0] || null;
+      selectedReceiverId = other && other._id ? String(other._id) : null;
+
+      els.chatTitle.textContent = other && other.name ? other.name : 'محادثة';
+      els.chatMeta.textContent = other && other.phone ? other.phone : '';
+
+      setComposerEnabled(Boolean(selectedReceiverId));
+
+      await loadMessages(conv._id);
+    }
+
+    async function loadMessages(conversationId){
+      els.messages.innerHTML = '';
+      try {
+        const msgs = await fetchJson(`/messages/conversation/${encodeURIComponent(conversationId)}`);
+        if(!msgs || msgs.length === 0){
+          const empty = document.createElement('div');
+          empty.className = 'text-muted';
+          empty.textContent = 'لا توجد رسائل بعد. ابدأ المحادثة الآن.';
+          els.messages.appendChild(empty);
+          return;
+        }
+        msgs.forEach(m => els.messages.appendChild(renderMessageBubble(m)));
+        els.messages.scrollTop = els.messages.scrollHeight;
+      } catch(err){
+        const fail = document.createElement('div');
+        fail.className = 'text-muted';
+        fail.textContent = 'تعذر تحميل الرسائل: ' + err.message;
+        els.messages.appendChild(fail);
+      }
+    }
+
+    els.refreshConversations.addEventListener('click', loadConversations);
+
+    els.sendForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const content = els.messageInput.value.trim();
+      if(!content || !selectedReceiverId) return;
+
+      els.sendBtn.disabled = true;
+      try {
+        await fetchJson('/messages/send', {
+          method: 'POST',
+          body: JSON.stringify({ receiverId: selectedReceiverId, content })
+        });
+        els.messageInput.value = '';
+        if(selectedConversation && selectedConversation._id){
+          await loadMessages(selectedConversation._id);
+          await loadConversations();
+        }
+      } catch(err){
+        alert('فشل الإرسال: ' + err.message);
+      } finally {
+        els.sendBtn.disabled = false;
+      }
+    });
+
+    // Initial load
+    setComposerEnabled(false);
+    loadConversations();
+  })();
+</script>
+
+<style>
+  /* تحسين استجابة الجوال دون التأثير على باقي الموقع */
+  @media (max-width: 900px){
+    .hm-card > div[style*="grid-template-columns"]{ grid-template-columns: 1fr !important; }
+    aside{ border-left: 0 !important; border-bottom: 1px solid rgba(11,31,58,0.10); }
+  }
+</style>

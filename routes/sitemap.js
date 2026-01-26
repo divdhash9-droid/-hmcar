@@ -9,7 +9,7 @@ const Auction = require('../models/Auction');
 // Generate XML Sitemap
 router.get('/sitemap.xml', async (req, res) => {
   try {
-    const baseUrl = process.env.BASE_URL || 'http://localhost:4001';
+    const baseUrl = process.env.BASE_URL || 'http://localhost:4000';
     
     // Static pages
     const staticPages = [
@@ -79,7 +79,7 @@ router.get('/sitemap.xml', async (req, res) => {
 
 // Robots.txt
 router.get('/robots.txt', (req, res) => {
-  const baseUrl = process.env.BASE_URL || 'http://localhost:4001';
+  const baseUrl = process.env.BASE_URL || 'http://localhost:4000';
   
   const robotsTxt = `# HM CAR - Robots.txt
 User-agent: *

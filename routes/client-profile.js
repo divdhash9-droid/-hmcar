@@ -7,6 +7,19 @@ const router = express.Router();
 const { requireAuth } = require('../middleware/auth');
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 2 * 1024 * 1024, files: 1 },
+  fileFilter: (req, file, cb) => {
+    const ok = ['image/jpeg', 'image/png', 'image/webp'].includes(file.mimetype);
+    if (!ok) return cb(new Error('Invalid file type'));
+    cb(null, true);
+  }
+});
 
 // عرض صفحة الملف الشخصي
 router.get('/profile', requireAuth, async (req, res) => {
@@ -46,11 +59,56 @@ router.post('/profile/update', requireAuth, async (req, res) => {
     
     // تحديث معلومات الجلسة
     req.session.user.name = user.name;
+    if (user.avatar !== undefined) req.session.user.avatar = user.avatar;
     
     res.json({ success: true, message: 'تم تحديث الملف الشخصي بنجاح', user });
   } catch (error) {
     console.error('Error updating profile:', error);
     res.json({ success: false, message: 'حدث خطأ أثناء تحديث الملف الشخصي' });
+  }
+});
+
+// تحديث صورة الملف الشخصي
+router.post('/profile/avatar', requireAuth, upload.single('avatar'), async (req, res) => {
+  try {
+    const userId = req.session.user._id;
+    const user = await User.findById(userId);
+
+    if (!user || user.role !== 'buyer') {
+      return res.status(403).json({ success: false, message: 'غير مصرح' });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'يرجى اختيار صورة' });
+    }
+
+    const ext = req.file.mimetype === 'image/png'
+      ? '.png'
+      : (req.file.mimetype === 'image/webp' ? '.webp' : '.jpg');
+
+    const fileName = `avatar_${String(userId)}_${Date.now()}${ext}`;
+    const relativePath = path.join('avatars', fileName);
+    const absolutePath = path.join(__dirname, '..', 'uploads', relativePath);
+
+    // Ensure directory exists
+    const dir = path.dirname(absolutePath);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+
+    fs.writeFileSync(absolutePath, req.file.buffer);
+
+    const avatarUrl = `/uploads/${relativePath.replace(/\\/g, '/')}`;
+    user.avatar = avatarUrl;
+    await user.save();
+
+    // تحديث الجلسة
+    req.session.user.avatar = avatarUrl;
+
+    return res.json({ success: true, message: 'تم تحديث صورة الملف الشخصي', avatarUrl });
+  } catch (error) {
+    console.error('Error updating avatar:', error);
+    return res.status(500).json({ success: false, message: 'حدث خطأ أثناء تحديث الصورة' });
   }
 });
 

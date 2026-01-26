@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 200" role="img" aria-labelledby="title desc">
+  <title id="title">HM CAR Emblem</title>
+  <desc id="desc">Badge-style emblem with shield and metallic gold highlights.</desc>
+  <defs>
+    <linearGradient id="emGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f9e7c0" />
+      <stop offset="45%" stop-color="#f7d48b" />
+      <stop offset="100%" stop-color="#c48a1e" />
+    </linearGradient>
+    <linearGradient id="emDeep" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0c1f3d" />
+      <stop offset="100%" stop-color="#081225" />
+    </linearGradient>
+    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="b" />
+      <feColorMatrix in="b" type="matrix" values="0 0 0 0 0.95 0 0 0 0 0.82 0 0 0 0 0.52 0 0 0 0.38 0" />
+    </filter>
+  </defs>
+
+  <rect x="12" y="18" width="536" height="164" rx="34" fill="#0b1f3a" opacity="0.12" />
+  <rect x="20" y="24" width="520" height="152" rx="30" fill="url(#emDeep)" />
+  <rect x="20" y="24" width="520" height="152" rx="30" fill="url(#emGold)" opacity="0.07" />
+
+  <g transform="translate(48 30)">
+    <path d="M116 10c-28 0-52 20-56 48l-10 76 66-22 66 22-10-76c-4-28-28-48-56-48z" fill="#0d233f" stroke="url(#emGold)" stroke-width="4" />
+    <path d="M116 26c-18 0-34 13-37 32l-6 48 43-14 43 14-6-48c-3-19-19-32-37-32z" fill="url(#emDeep)" stroke="url(#emGold)" stroke-width="2.5" />
+    <path d="M78 86c14-12 28-18 42-18 20 0 40 10 60 30" fill="none" stroke="url(#emGold)" stroke-width="4" stroke-linecap="round" />
+    <circle cx="88" cy="84" r="6" fill="url(#emGold)" filter="url(#softGlow)" />
+    <circle cx="154" cy="102" r="6" fill="url(#emGold)" filter="url(#softGlow)" />
+    <text x="116" y="78" text-anchor="middle" fill="#fefefe" font-family="'Poppins','Montserrat','Segoe UI',sans-serif" font-size="22" font-weight="800">HM</text>
+    <text x="116" y="102" text-anchor="middle" fill="url(#emGold)" font-family="'Poppins','Montserrat','Segoe UI',sans-serif" font-size="16" font-weight="700" letter-spacing="0.08em">CAR</text>
+  </g>
+
+  <g fill="url(#emGold)" font-family="'Playfair Display','Cormorant Garamond','Times New Roman',serif" text-rendering="optimizeLegibility">
+    <text x="250" y="120" font-size="54" font-weight="900" letter-spacing="0.12em">HM CAR</text>
+  </g>
+  <g fill="#fefefe" opacity="0.92" font-family="'Poppins','Segoe UI',sans-serif" font-size="15" font-weight="600" letter-spacing="0.18em">
+    <text x="252" y="146">PREMIUM AUCTIONS &amp; MOTORS</text>
+  </g>
+</svg>

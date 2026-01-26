@@ -3,6 +3,7 @@
 const express = require('express');
 const router = express.Router();
 const UserNotification = require('../models/UserNotification');
+const UserNotificationPreference = require('../models/UserNotificationPreference');
 const { requireAuthAPI } = require('../middleware/auth');
 
 // Get all notifications for current user
@@ -133,14 +134,12 @@ router.post('/', requireAuthAPI, async (req, res) => {
 // Get notification preferences
 router.get('/preferences', requireAuthAPI, async (req, res) => {
   try {
-    // This would be implemented based on user preferences model
-    res.json({
-      emailNotifications: true,
-      pushNotifications: true,
-      auctionNotifications: true,
-      messageNotifications: true,
-      orderNotifications: true
-    });
+    let prefs = await UserNotificationPreference.findOne({ user: req.user._id });
+    if (!prefs) {
+      prefs = await UserNotificationPreference.create({ user: req.user._id });
+    }
+
+    res.json(prefs);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -149,8 +148,56 @@ router.get('/preferences', requireAuthAPI, async (req, res) => {
 // Update notification preferences
 router.patch('/preferences', requireAuthAPI, async (req, res) => {
   try {
-    // This would update user preferences in database
-    res.json({ message: 'تم تحديث تفضيلات الإشعارات' });
+    const toBool = (value) => {
+      if (typeof value === 'boolean') return value;
+      if (typeof value === 'string') {
+        if (value.toLowerCase() === 'true') return true;
+        if (value.toLowerCase() === 'false') return false;
+      }
+      return undefined;
+    };
+
+    let prefs = await UserNotificationPreference.findOne({ user: req.user._id });
+    if (!prefs) {
+      prefs = new UserNotificationPreference({ user: req.user._id });
+    }
+
+    const allowedTopLevel = [
+      'outbid',
+      'auctionEndingSoon',
+      'newBidOnWatched',
+      'auctionWon',
+      'auctionLost',
+      'newMessage',
+      'systemUpdates',
+      'promotions'
+    ];
+
+    const allowedNested = {
+      emailNotifications: ['outbid', 'auctionWon', 'promotions'],
+      pushNotifications: ['outbid', 'newMessage', 'auctionEndingSoon']
+    };
+
+    for (const key of allowedTopLevel) {
+      if (Object.prototype.hasOwnProperty.call(req.body, key)) {
+        const parsed = toBool(req.body[key]);
+        if (parsed !== undefined) prefs[key] = parsed;
+      }
+    }
+
+    for (const groupKey of Object.keys(allowedNested)) {
+      if (req.body && typeof req.body[groupKey] === 'object' && req.body[groupKey] !== null) {
+        for (const key of allowedNested[groupKey]) {
+          if (Object.prototype.hasOwnProperty.call(req.body[groupKey], key)) {
+            const parsed = toBool(req.body[groupKey][key]);
+            if (parsed !== undefined) prefs[groupKey][key] = parsed;
+          }
+        }
+      }
+    }
+
+    await prefs.save();
+    res.json({ message: 'تم تحديث تفضيلات الإشعارات', preferences: prefs });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

@@ -19,17 +19,43 @@
         </div>
 
         <nav class="hm-hero__actions" aria-label="إجراءات سريعة">
+          <div class="dropdown" style="display:inline-flex;">
+            <button class="hm-pill dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="display:flex; align-items:center; gap:10px;">
+              <span style="width:28px; height:28px; border-radius:50%; overflow:hidden; display:inline-flex; align-items:center; justify-content:center; background: rgba(255,255,255,0.22); border: 1px solid rgba(255,255,255,0.18);">
+                <% if (currentUser && currentUser.avatar) { %>
+                  <img src="<%= currentUser.avatar %>" alt="صورة الحساب" style="width:100%; height:100%; object-fit:cover;" />
+                <% } else { %>
+                  <span style="font-weight:900; color:#fff; font-size:.9rem;"><%= (currentUser && currentUser.name) ? currentUser.name.charAt(0).toUpperCase() : 'U' %></span>
+                <% } %>
+              </span>
+              <span><%= (currentUser && currentUser.name) ? currentUser.name : 'حسابي' %></span>
+            </button>
+            <ul class="dropdown-menu" style="text-align:right;">
+              <li><a class="dropdown-item" href="/client/profile"><i class="fas fa-user"></i> الملف الشخصي</a></li>
+              <li><a class="dropdown-item" href="/orders/my"><i class="fas fa-file-invoice"></i> مشترياتي</a></li>
+              <li><a class="dropdown-item" href="/spare-parts/cart"><i class="fas fa-shopping-basket"></i> سلة المشتريات</a></li>
+              <li><a class="dropdown-item" href="/favorites"><i class="fas fa-heart"></i> المفضلات</a></li>
+              <li><a class="dropdown-item" href="/messages"><i class="fas fa-comments"></i> الرسائل</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="/auth/logout" style="color:#b42318;"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</a></li>
+            </ul>
+          </div>
+
           <a class="hm-pill" href="/orders/my" aria-label="مشترياتي">
             <i class="fas fa-shopping-cart"></i>
             <span>مشترياتي</span>
           </a>
-          <a class="hm-pill" href="/spare-parts/cart" aria-label="سلة المشتريات">
-            <i class="fas fa-shopping-basket"></i>
-            <span>سلة المشتريات</span>
-          </a>
-          <a class="hm-pill hm-pill--danger" href="/auth/logout" aria-label="خروج">
+          <a class="hm-pill" href="/auth/logout" aria-label="تسجيل الخروج">
             <i class="fas fa-sign-out-alt"></i>
-            <span>خروج</span>
+            <span>تسجيل الخروج</span>
+          </a>
+          <a class="hm-pill" href="/favorites" aria-label="المفضلات">
+            <i class="fas fa-heart"></i>
+            <span>المفضلات</span>
+          </a>
+          <a class="hm-pill" href="/messages" aria-label="الرسائل">
+            <i class="fas fa-comments"></i>
+            <span>الرسائل</span>
           </a>
         </nav>
       </div>
@@ -89,26 +115,26 @@
     <section class="hm-section" aria-label="الخدمات">
       <h2 class="hm-section__title">خدمات فخمة وسريعة</h2>
       <div class="hm-grid">
-        <div class="hm-card" role="button" tabindex="0" data-embed-src="/cars/list?embed=1" aria-label="السيارات المتوفرة">
+        <a class="hm-card" href="/cars/list" aria-label="السيارات المتوفرة">
           <div class="hm-card__icon" aria-hidden="true"><i class="fas fa-car" style="font-size:1.6rem"></i></div>
           <div class="hm-card__title">السيارات المتوفرة</div>
           <div class="hm-card__subtitle">استعرض جميع السيارات المتاحة</div>
           <div class="mt-2"><span class="hm-badge"><%= Number(counts?.availableCars || 0) %></span></div>
-        </div>
+        </a>
 
-        <div class="hm-card" role="button" tabindex="0" data-embed-src="/spare-parts?embed=1" aria-label="قطع الغيار">
+        <a class="hm-card" href="/spare-parts" aria-label="قطع الغيار">
           <div class="hm-card__icon" aria-hidden="true"><i class="fas fa-tools" style="font-size:1.6rem"></i></div>
           <div class="hm-card__title">قطع الغيار</div>
           <div class="hm-card__subtitle">قطع أصلية بجودة عالية</div>
           <div class="mt-2"><span class="hm-badge"><%= Number(counts?.ordersPending || 0) %></span></div>
-        </div>
+        </a>
 
-        <div class="hm-card" role="button" tabindex="0" data-embed-src="/auctions/live?embed=1" aria-label="المزاد المباشر">
+        <a class="hm-card" href="/auctions/live" aria-label="المزاد المباشر">
           <div class="hm-card__icon" aria-hidden="true"><i class="fas fa-gavel" style="font-size:1.6rem"></i></div>
           <div class="hm-card__title">المزاد المباشر</div>
           <div class="hm-card__subtitle">شارك في المزادات الحية</div>
           <div class="mt-2"><span class="hm-badge"><%= Number(counts?.liveAuctions || 0) %></span></div>
-        </div>
+        </a>
       </div>
     </section>
 

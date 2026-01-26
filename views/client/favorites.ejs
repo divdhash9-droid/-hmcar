@@ -1,0 +1,830 @@
+<% layout('layout') -%>
+
+<link rel="stylesheet" href="/css/luxury-auth.css" />
+
+<div class="hm-favorites-page">
+  <!-- Header Section -->
+  <div class="hm-page-header">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-6">
+          <div class="hm-header-content">
+            <h1 class="hm-page-title">
+              <i class="fas fa-heart"></i>
+              <span data-ar="المفضلة" data-en="Favorites">المفضلة</span>
+            </h1>
+            <p class="hm-page-subtitle" data-ar="سياراتك المفضلة في مكان واحد" data-en="Your favorite cars in one place">
+              سياراتك المفضلة في مكان واحد
+            </p>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="hm-header-stats">
+            <div class="hm-stat-card">
+              <span class="hm-stat-number" id="favoritesCount">0</span>
+              <span class="hm-stat-label" data-ar="سيارة" data-en="Cars">سيارة</span>
+            </div>
+            <div class="hm-stat-card">
+              <span class="hm-stat-number" id="totalValue">$0</span>
+              <span class="hm-stat-label" data-ar="القيمة الإجمالية" data-en="Total Value">القيمة الإجمالية</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="hm-filters-section">
+    <div class="container">
+      <div class="hm-filters">
+        <div class="hm-filter-group">
+          <label data-ar="الترتيب حسب" data-en="Sort by">الترتيب حسب</label>
+          <select class="hm-filter-select" id="sortSelect">
+            <option value="newest" data-ar="الأحدث" data-en="Newest">الأحدث</option>
+            <option value="price-low" data-ar="السعر: من الأقل للأعلى" data-en="Price: Low to High">السعر: من الأقل للأعلى</option>
+            <option value="price-high" data-ar="السعر: من الأعلى للأقل" data-en="Price: High to Low">السعر: من الأعلى للأقل</option>
+            <option value="name" data-ar="الاسم" data-en="Name">الاسم</option>
+          </select>
+        </div>
+        <div class="hm-filter-group">
+          <label data-ar="الفئة" data-en="Category">الفئة</label>
+          <select class="hm-filter-select" id="categoryFilter">
+            <option value="" data-ar="جميع الفئات" data-en="All Categories">جميع الفئات</option>
+            <option value="sedan" data-ar="سيدان" data-en="Sedan">سيدان</option>
+            <option value="suv" data-ar="SUV" data-en="SUV">SUV</option>
+            <option value="sports" data-ar="رياضية" data-en="Sports">رياضية</option>
+            <option value="luxury" data-ar="فاخرة" data-en="Luxury">فاخرة</option>
+          </select>
+        </div>
+        <div class="hm-filter-actions">
+          <button class="hm-btn hm-btn-outline" id="clearFilters">
+            <i class="fas fa-times"></i>
+            <span data-ar="مسح الفلاتر" data-en="Clear Filters">مسح الفلاتر</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Favorites Grid -->
+  <div class="hm-favorites-content">
+    <div class="container">
+      <!-- Loading State -->
+      <div class="hm-loading" id="loadingState" style="display: none;">
+        <div class="hm-spinner"></div>
+        <p data-ar="جاري التحميل..." data-en="Loading...">جاري التحميل...</p>
+      </div>
+
+      <!-- Empty State -->
+      <div class="hm-empty-state" id="emptyState" style="display: none;">
+        <div class="hm-empty-icon">
+          <i class="fas fa-heart"></i>
+        </div>
+        <h3 data-ar="لا توجد سيارات في المفضلة" data-en="No cars in favorites">لا توجد سيارات في المفضلة</h3>
+        <p data-ar="ابدأ بإضافة السيارات التي تعجبك إلى المفضلة" data-en="Start adding cars you like to favorites">
+          ابدأ بإضافة السيارات التي تعجبك إلى المفضلة
+        </p>
+        <a href="/cars/available" class="hm-btn hm-btn-primary">
+          <i class="fas fa-search"></i>
+          <span data-ar="استكشف السيارات" data-en="Explore Cars">استكشف السيارات</span>
+        </a>
+      </div>
+
+      <!-- Cars Grid -->
+      <div class="hm-cars-grid" id="favoritesGrid">
+        <!-- Cars will be loaded here dynamically -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Car Card Template -->
+<template id="carCardTemplate">
+  <div class="hm-car-card">
+    <div class="hm-car-image">
+      <img src="" alt="" class="hm-car-img">
+      <div class="hm-car-actions">
+        <button class="hm-action-btn hm-btn-remove" data-car-id="">
+          <i class="fas fa-heart"></i>
+        </button>
+        <button class="hm-action-btn hm-btn-view" data-car-id="">
+          <i class="fas fa-eye"></i>
+        </button>
+        <button class="hm-action-btn hm-btn-compare" data-car-id="">
+          <i class="fas fa-balance-scale"></i>
+        </button>
+      </div>
+      <div class="hm-car-badge">
+        <span class="hm-badge-text"></span>
+      </div>
+    </div>
+    <div class="hm-car-details">
+      <div class="hm-car-header">
+        <h3 class="hm-car-title"></h3>
+        <div class="hm-car-price"></div>
+      </div>
+      <div class="hm-car-specs">
+        <div class="hm-spec">
+          <i class="fas fa-calendar"></i>
+          <span class="hm-year"></span>
+        </div>
+        <div class="hm-spec">
+          <i class="fas fa-tachometer-alt"></i>
+          <span class="hm-mileage"></span>
+        </div>
+        <div class="hm-spec">
+          <i class="fas fa-gas-pump"></i>
+          <span class="hm-fuel"></span>
+        </div>
+      </div>
+      <div class="hm-car-footer">
+        <div class="hm-car-location">
+          <i class="fas fa-map-marker-alt"></i>
+          <span class="hm-location"></span>
+        </div>
+        <div class="hm-car-date">
+          <i class="fas fa-clock"></i>
+          <span class="hm-added-date"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style>
+/* Favorites Page Styles */
+.hm-favorites-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%);
+}
+
+/* Header Section */
+.hm-page-header {
+  background: linear-gradient(135deg, #0a192f 0%, #112240 50%, #2366d1 100%);
+  color: white;
+  padding: 4rem 0 3rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hm-page-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.03"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.03"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+  opacity: 0.3;
+}
+
+.hm-header-content {
+  position: relative;
+  z-index: 1;
+}
+
+.hm-page-title {
+  font-size: 3rem;
+  font-weight: 900;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hm-page-title i {
+  color: #ffd700;
+}
+
+.hm-page-subtitle {
+  font-size: 1.25rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.hm-header-stats {
+  display: flex;
+  gap: 2rem;
+  justify-content: flex-end;
+}
+
+.hm-stat-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 1.5rem;
+  text-align: center;
+  min-width: 120px;
+}
+
+.hm-stat-number {
+  display: block;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #ffd700;
+  margin-bottom: 0.5rem;
+}
+
+.hm-stat-label {
+  font-size: 0.875rem;
+  opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Filters Section */
+.hm-filters-section {
+  background: white;
+  padding: 2rem 0;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.hm-filters {
+  display: flex;
+  gap: 2rem;
+  align-items: end;
+  flex-wrap: wrap;
+}
+
+.hm-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.hm-filter-group label {
+  font-weight: 600;
+  color: #0a192f;
+  font-size: 0.875rem;
+}
+
+.hm-filter-select {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 1rem;
+  background: white;
+  min-width: 200px;
+  transition: all 0.3s ease;
+}
+
+.hm-filter-select:focus {
+  outline: none;
+  border-color: #2366d1;
+  box-shadow: 0 0 0 3px rgba(35, 102, 209, 0.1);
+}
+
+.hm-filter-actions {
+  margin-left: auto;
+}
+
+.hm-btn-outline {
+  background: transparent;
+  border: 2px solid #0a192f;
+  color: #0a192f;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hm-btn-outline:hover {
+  background: #0a192f;
+  color: white;
+}
+
+/* Content Section */
+.hm-favorites-content {
+  padding: 3rem 0;
+}
+
+/* Loading State */
+.hm-loading {
+  text-align: center;
+  padding: 4rem 0;
+}
+
+.hm-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #e2e8f0;
+  border-top: 4px solid #2366d1;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Empty State */
+.hm-empty-state {
+  text-align: center;
+  padding: 4rem 0;
+}
+
+.hm-empty-icon {
+  font-size: 4rem;
+  color: #cbd5e1;
+  margin-bottom: 2rem;
+}
+
+.hm-empty-state h3 {
+  font-size: 1.5rem;
+  color: #0a192f;
+  margin-bottom: 1rem;
+}
+
+.hm-empty-state p {
+  color: #64748b;
+  margin-bottom: 2rem;
+}
+
+.hm-btn-primary {
+  background: linear-gradient(135deg, #0a192f 0%, #2366d1 100%);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+
+.hm-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(10, 25, 47, 0.3);
+}
+
+/* Cars Grid */
+.hm-cars-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 2rem;
+}
+
+/* Car Card */
+.hm-car-card {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.hm-car-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.hm-car-image {
+  position: relative;
+  height: 250px;
+  overflow: hidden;
+}
+
+.hm-car-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.hm-car-card:hover .hm-car-img {
+  transform: scale(1.05);
+}
+
+.hm-car-actions {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  opacity: 0;
+  transform: translateX(20px);
+  transition: all 0.3s ease;
+}
+
+.hm-car-card:hover .hm-car-actions {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.hm-action-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.hm-btn-remove {
+  background: rgba(239, 68, 68, 0.9);
+  color: white;
+}
+
+.hm-btn-remove:hover {
+  background: #dc2626;
+  transform: scale(1.1);
+}
+
+.hm-btn-view {
+  background: rgba(35, 102, 209, 0.9);
+  color: white;
+}
+
+.hm-btn-view:hover {
+  background: #1e40af;
+  transform: scale(1.1);
+}
+
+.hm-btn-compare {
+  background: rgba(34, 197, 94, 0.9);
+  color: white;
+}
+
+.hm-btn-compare:hover {
+  background: #16a34a;
+  transform: scale(1.1);
+}
+
+.hm-car-badge {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: rgba(255, 215, 0, 0.9);
+  color: #0a192f;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.hm-car-details {
+  padding: 1.5rem;
+}
+
+.hm-car-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 1rem;
+}
+
+.hm-car-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0a192f;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.hm-car-price {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #2366d1;
+}
+
+.hm-car-specs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.hm-spec {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.hm-spec i {
+  color: #94a3b8;
+}
+
+.hm-car-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.hm-car-location,
+.hm-car-date {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hm-page-title {
+    font-size: 2rem;
+  }
+  
+  .hm-header-stats {
+    justify-content: center;
+    margin-top: 2rem;
+  }
+  
+  .hm-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .hm-filter-actions {
+    margin-left: 0;
+    margin-top: 1rem;
+  }
+  
+  .hm-cars-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .hm-car-specs {
+    flex-wrap: wrap;
+  }
+}
+</style>
+
+<script>
+// Favorites Management
+class FavoritesManager {
+  constructor() {
+    this.favorites = [];
+    this.filteredFavorites = [];
+    this.init();
+  }
+
+  async init() {
+    await this.loadFavorites();
+    this.setupEventListeners();
+    this.updateStats();
+  }
+
+  async loadFavorites() {
+    try {
+      this.showLoading(true);
+      const response = await fetch('/favorites');
+      const data = await response.json();
+      
+      if (response.ok) {
+        this.favorites = data.favorites || [];
+        this.filteredFavorites = [...this.favorites];
+        this.renderFavorites();
+      } else {
+        throw new Error(data.error || 'Failed to load favorites');
+      }
+    } catch (error) {
+      console.error('Error loading favorites:', error);
+      this.showError('فشل في تحميل المفضلات');
+    } finally {
+      this.showLoading(false);
+    }
+  }
+
+  renderFavorites() {
+    const grid = document.getElementById('favoritesGrid');
+    const emptyState = document.getElementById('emptyState');
+
+    if (this.filteredFavorites.length === 0) {
+      grid.style.display = 'none';
+      emptyState.style.display = 'block';
+      return;
+    }
+
+    grid.style.display = 'grid';
+    emptyState.style.display = 'none';
+
+    const template = document.getElementById('carCardTemplate');
+    grid.innerHTML = '';
+
+    this.filteredFavorites.forEach(favorite => {
+      const car = favorite.car;
+      if (!car) return;
+
+      const card = template.content.cloneNode(true);
+      
+      // Set car data
+      const img = card.querySelector('.hm-car-img');
+      img.src = car.images && car.images.length > 0 ? car.images[0] : '/images/car-placeholder.jpg';
+      img.alt = `${car.make?.name || ''} ${car.model?.name || ''}`;
+
+      card.querySelector('.hm-car-title').textContent = `${car.make?.name || ''} ${car.model?.name || ''}`;
+      card.querySelector('.hm-car-price').textContent = this.formatPrice(car.price);
+      
+      // Set specs
+      card.querySelector('.hm-year').textContent = car.year || 'N/A';
+      card.querySelector('.hm-mileage').textContent = this.formatMileage(car.mileage);
+      card.querySelector('.hm-fuel').textContent = car.fuelType || 'N/A';
+      
+      // Set location and date
+      card.querySelector('.hm-location').textContent = car.location || 'غير محدد';
+      card.querySelector('.hm-added-date').textContent = this.formatDate(favorite.addedAt);
+
+      // Set action buttons
+      const removeBtn = card.querySelector('.hm-btn-remove');
+      const viewBtn = card.querySelector('.hm-btn-view');
+      const compareBtn = card.querySelector('.hm-btn-compare');
+
+      removeBtn.setAttribute('data-car-id', car._id);
+      viewBtn.setAttribute('data-car-id', car._id);
+      compareBtn.setAttribute('data-car-id', car._id);
+
+      // Set badge
+      const badge = card.querySelector('.hm-badge-text');
+      if (car.category) {
+        badge.textContent = car.category.name;
+      }
+
+      grid.appendChild(card);
+    });
+
+    this.setupCardEventListeners();
+  }
+
+  setupEventListeners() {
+    // Sort select
+    document.getElementById('sortSelect').addEventListener('change', (e) => {
+      this.sortFavorites(e.target.value);
+    });
+
+    // Category filter
+    document.getElementById('categoryFilter').addEventListener('change', (e) => {
+      this.filterByCategory(e.target.value);
+    });
+
+    // Clear filters
+    document.getElementById('clearFilters').addEventListener('click', () => {
+      this.clearFilters();
+    });
+  }
+
+  setupCardEventListeners() {
+    // Remove from favorites
+    document.querySelectorAll('.hm-btn-remove').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const carId = e.currentTarget.getAttribute('data-car-id');
+        await this.removeFromFavorites(carId);
+      });
+    });
+
+    // View car details
+    document.querySelectorAll('.hm-btn-view').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const carId = e.currentTarget.getAttribute('data-car-id');
+        window.location.href = `/cars/${carId}`;
+      });
+    });
+
+    // Add to comparison
+    document.querySelectorAll('.hm-btn-compare').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const carId = e.currentTarget.getAttribute('data-car-id');
+        this.addToComparison(carId);
+      });
+    });
+  }
+
+  async removeFromFavorites(carId) {
+    try {
+      const response = await fetch(`/favorites/remove/${carId}`, {
+        method: 'DELETE'
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        this.favorites = this.favorites.filter(f => f.car._id !== carId);
+        this.filteredFavorites = this.filteredFavorites.filter(f => f.car._id !== carId);
+        this.renderFavorites();
+        this.updateStats();
+        this.showSuccess('تمت إزالة السيارة من المفضلة');
+      } else {
+        throw new Error(data.error);
+      }
+    } catch (error) {
+      console.error('Error removing from favorites:', error);
+      this.showError('فشل في إزالة السيارة من المفضلة');
+    }
+  }
+
+  sortFavorites(sortBy) {
+    switch (sortBy) {
+      case 'newest':
+        this.filteredFavorites.sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt));
+        break;
+      case 'price-low':
+        this.filteredFavorites.sort((a, b) => (a.car.price || 0) - (b.car.price || 0));
+        break;
+      case 'price-high':
+        this.filteredFavorites.sort((a, b) => (b.car.price || 0) - (a.car.price || 0));
+        break;
+      case 'name':
+        this.filteredFavorites.sort((a, b) => {
+          const nameA = `${a.car.make?.name || ''} ${a.car.model?.name || ''}`;
+          const nameB = `${b.car.make?.name || ''} ${b.car.model?.name || ''}`;
+          return nameA.localeCompare(nameB);
+        });
+        break;
+    }
+    this.renderFavorites();
+  }
+
+  filterByCategory(category) {
+    if (!category) {
+      this.filteredFavorites = [...this.favorites];
+    } else {
+      this.filteredFavorites = this.favorites.filter(f => 
+        f.car.category && f.car.category.name === category
+      );
+    }
+    this.renderFavorites();
+  }
+
+  clearFilters() {
+    document.getElementById('sortSelect').value = 'newest';
+    document.getElementById('categoryFilter').value = '';
+    this.filteredFavorites = [...this.favorites];
+    this.renderFavorites();
+  }
+
+  updateStats() {
+    const count = this.filteredFavorites.length;
+    const totalValue = this.filteredFavorites.reduce((sum, f) => sum + (f.car.price || 0), 0);
+
+    document.getElementById('favoritesCount').textContent = count;
+    document.getElementById('totalValue').textContent = this.formatPrice(totalValue);
+  }
+
+  addToComparison(carId) {
+    // Implementation for adding to comparison
+    window.location.href = `/comparisons?add=${carId}`;
+  }
+
+  formatPrice(price) {
+    return new Intl.NumberFormat('ar-SA', {
+      style: 'currency',
+      currency: 'SAR',
+      minimumFractionDigits: 0
+    }).format(price || 0);
+  }
+
+  formatMileage(mileage) {
+    if (!mileage) return 'N/A';
+    return `${mileage.toLocaleString('ar-SA')} كم`;
+  }
+
+  formatDate(date) {
+    return new Date(date).toLocaleDateString('ar-SA');
+  }
+
+  showLoading(show) {
+    document.getElementById('loadingState').style.display = show ? 'block' : 'none';
+  }
+
+  showError(message) {
+    // Show error notification
+    console.error(message);
+  }
+
+  showSuccess(message) {
+    // Show success notification
+    console.log(message);
+  }
+}
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  new FavoritesManager();
+});
+</script>

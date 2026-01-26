@@ -1,0 +1,93 @@
+<!-- [[ARABIC_HEADER]] هذا الملف (views/auctions/live.ejs) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. -->
+
+<% var hideNavbar = (typeof currentUser !== 'undefined' && currentUser && currentUser.role === 'buyer'); %>
+<% layout('layout') -%>
+
+<div class="container" style="padding-top: 24px; padding-bottom: 48px; direction: rtl;">
+  <div class="hm-dashboard">
+    <div class="hm-dashboard__container">
+      <header class="hm-hero" style="min-height:auto; padding: 28px 18px;">
+        <div class="hm-hero__top">
+          <div class="hm-hero__brand">
+            <img class="hm-hero__logo" src="/public/images/navbar-logo.png" alt="HM CAR" loading="eager" decoding="async" onerror="this.onerror=null;this.src='/public/images/logo.png';" />
+            <div class="hm-hero__titles">
+              <h1 class="hm-hero__title">المزاد المباشر</h1>
+              <div class="hm-hero__subtitle">تابع المزاد الخارجي أو تواصل معنا عبر واتساب</div>
+            </div>
+          </div>
+
+          <nav class="hm-hero__actions" aria-label="إجراءات">
+            <a class="hm-pill" href="/cars" aria-label="لوحة العميل">
+              <i class="fas fa-th-large"></i>
+              <span>لوحة العميل</span>
+            </a>
+            <a class="hm-pill" href="/auctions" aria-label="سيارات المزاد">
+              <i class="fas fa-car"></i>
+              <span>سيارات المزاد</span>
+            </a>
+            <a class="hm-pill" href="/spare-parts" aria-label="قطع الغيار">
+              <i class="fas fa-tools"></i>
+              <span>قطع الغيار</span>
+            </a>
+          </nav>
+        </div>
+      </header>
+
+      <section class="hm-section" style="margin-top: 16px;" aria-label="محتوى المزاد">
+        <div class="hm-card" style="padding: 16px;">
+          <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+            <div class="alert alert-warning" role="alert" style="margin-bottom: 16px;">
+              <%= errorMessage %>
+            </div>
+          <% } %>
+
+          <% if (isEnded) { %>
+            <div class="alert alert-warning" role="alert" style="margin-bottom: 16px;">
+              انتهى هذا المزاد. سيتم تحديث الرابط عند بدء مزاد جديد.
+            </div>
+          <% } %>
+
+          <% if (liveAuctionUrl) { %>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:space-between; align-items:center; margin-bottom: 12px;">
+              <div class="text-muted">الرابط: <a href="<%= liveAuctionUrl %>" target="_blank" rel="noopener"><%= liveAuctionUrl %></a></div>
+              <a class="btn btn-primary" href="<%= liveAuctionUrl %>" target="_blank" rel="noopener">
+                <i class="fas fa-external-link-alt"></i>
+                فتح في نافذة جديدة
+              </a>
+            </div>
+
+            <div style="border-radius: 16px; overflow:hidden; border: 1px solid rgba(11,31,58,0.12); background:#fff;">
+              <iframe
+                title="Live Auction"
+                src="<%= liveAuctionUrl %>"
+                style="width:100%; height: 75vh; border:0;"
+                referrerpolicy="strict-origin-when-cross-origin"
+                loading="lazy"
+              ></iframe>
+            </div>
+          <% } else { %>
+            <div style="text-align:center; padding: 26px 12px;">
+              <div style="font-size: 2.6rem; opacity: .35; margin-bottom: 10px;"><i class="fas fa-broadcast-tower"></i></div>
+              <h3 style="margin:0 0 8px;">لا يوجد رابط للمزاد حالياً</h3>
+              <div class="text-muted">سيتم توفير رابط المزاد من الإدارة عند بدء بث/مزاد جديد.</div>
+            </div>
+          <% } %>
+
+          <% if (waNumber) { %>
+            <hr style="margin: 16px 0;" />
+            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between;">
+              <div>
+                <div style="font-weight:800; color:#0b1f3a;">تواصل واتساب</div>
+                <div class="text-muted">+<%= waNumber %></div>
+              </div>
+              <a class="btn btn-outline-success" href="https://wa.me/<%= waNumber %>" target="_blank" rel="noopener">
+                <i class="fab fa-whatsapp"></i>
+                فتح واتساب
+              </a>
+            </div>
+          <% } %>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>

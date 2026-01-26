@@ -168,6 +168,7 @@
   right: 0;
   z-index: 1000;
   background: linear-gradient(180deg, var(--hm-navy-dark) 0%, var(--hm-navy) 100%);
+  -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
   box-shadow: 
     0 4px 30px rgba(0, 0, 0, 0.3),
@@ -678,6 +679,7 @@
   box-shadow: var(--hm-shadow-lg);
   color: var(--hm-white);
   text-decoration: none;
+  -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
   transition: transform 0.3s ease, border-color 0.3s ease;
 }
@@ -780,6 +782,7 @@
   gap: 0.75rem;
   position: relative;
   overflow: hidden;
+  -webkit-backdrop-filter: blur(18px);
   backdrop-filter: blur(18px);
   box-shadow: 0 20px 30px rgba(0, 0, 0, 0.35);
   transition: transform 0.35s ease, border-color 0.35s ease;
@@ -1352,6 +1355,7 @@
   background: rgba(255, 255, 255, 0.1);
   color: var(--hm-white);
   border: 2px solid rgba(255, 255, 255, 0.3);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
@@ -1372,6 +1376,7 @@
   display: flex;
   gap: 0.75rem;
   background: rgba(255, 255, 255, 0.1);
+  -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 16px;
@@ -1676,6 +1681,44 @@
   font-size: 1.1rem;
   background: linear-gradient(145deg, var(--hm-navy), var(--hm-navy-light));
   color: #fff;
+  box-shadow:
+    0 6px 20px rgba(10, 22, 40, 0.4),
+    0 3px 6px rgba(0, 0, 0, 0.15),
+    inset 0 2px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.1);
+  border: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.hm-btn-view-all::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.hm-btn-view-all:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 10px 30px rgba(10, 22, 40, 0.5),
+    0 5px 10px rgba(0, 0, 0, 0.2),
+    inset 0 2px 0 rgba(255, 255, 255, 0.2);
+}
+
+.hm-btn-view-all:hover::before {
+  left: 100%;
+}
+
+.hm-btn-view-all:active {
+  transform: translateY(-1px);
+  box-shadow:
+    0 3px 10px rgba(10, 22, 40, 0.3),
+    inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* ============================================
@@ -2168,6 +2211,7 @@
   border: 2px solid rgba(255, 255, 255, 0.15);
   border-radius: 20px;
   padding: 2rem;
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
 
@@ -2198,24 +2242,63 @@
   align-items: center;
   gap: 1rem;
   padding: 1rem 1.25rem;
-  background: linear-gradient(135deg, var(--hm-blue), var(--hm-blue-light));
+  background: linear-gradient(145deg, var(--hm-blue), var(--hm-blue-light));
   border-radius: 12px;
   color: var(--hm-white);
   text-decoration: none;
   font-weight: 600;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+  box-shadow:
+    0 6px 20px rgba(0, 123, 255, 0.4),
+    0 3px 6px rgba(0, 0, 0, 0.15),
+    inset 0 2px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.1);
+  border: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.hm-mini-service::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
 }
 
 .hm-mini-service:hover {
-  transform: translateX(-5px);
-  box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+  transform: translateY(-3px) translateX(-5px);
+  box-shadow:
+    0 10px 30px rgba(0, 123, 255, 0.5),
+    0 5px 10px rgba(0, 0, 0, 0.2),
+    inset 0 2px 0 rgba(255, 255, 255, 0.3);
+}
+
+.hm-mini-service:hover::before {
+  left: 100%;
+}
+
+.hm-mini-service:active {
+  transform: translateY(-1px) translateX(-3px);
+  box-shadow:
+    0 3px 10px rgba(0, 123, 255, 0.3),
+    inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .hm-mini-service i {
   font-size: 1.3rem;
   width: 35px;
   text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.hm-mini-service span {
+  position: relative;
+  z-index: 1;
 }
 
 /* Mini Features */

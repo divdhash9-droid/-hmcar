@@ -1,0 +1,11 @@
+{
+    "git.ignoreLimitWarning": true,
+    "files.exclude": {
+        "": true
+    },
+    "search.exclude": {
+        "": true
+    },
+    "search.useParentIgnoreFiles": true,
+    "search.useGlobalIgnoreFiles": true
+}

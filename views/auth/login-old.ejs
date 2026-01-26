@@ -1,537 +1,282 @@
-<!-- [[ARABIC_HEADER]] هذا الملف (views/auth/login-old.ejs) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. -->
+<!-- [[ARABIC_HEADER]] هذا الملف (views/auth/login.ejs) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. -->
 
 <% layout('layout') -%>
 <% var hideNavbar = true; %>
-<% var bodyClass = 'auth-page modern-auth hm-login-v2'; %>
 
-<div class="hm-login2">
-  <div class="hm-login2__shell">
-    <section class="hm-login2__brand" aria-label="HM CAR">
-      <div class="hm-login2__logoWrap">
-        <img class="hm-login2__logo" src="/public/images/navbar-logo.png" alt="HM CAR" loading="eager" decoding="async" onerror="this.onerror=null;this.src='/public/images/logo.png';" />
-      </div>
-      <div class="hm-login2__tag">
-        <div class="hm-login2__name">HM CAR</div>
-        <div class="hm-login2__desc">
-          تصدير السيارات وقطع الغيار من كوريا إلى جميع دول العالم<br>
-          Exporting cars and spare parts from Korea to all countries of the world
+<div class="hm-luxury-login">
+  <!-- خلفية متحركة وأنيقة -->
+  <div class="hm-background">
+    <div class="hm-gradient-orb hm-orb-1"></div>
+    <div class="hm-gradient-orb hm-orb-2"></div>
+    <div class="hm-gradient-orb hm-orb-3"></div>
+    <div class="hm-grid-pattern"></div>
+  </div>
+
+  <!-- الحاوية الرئيسية -->
+  <div class="hm-container">
+    <!-- اللوحة اليسرى - العلامة التجارية -->
+    <div class="hm-brand-panel">
+      <div class="hm-brand-content">
+        <!-- شريط العلوي -->
+        <div class="hm-top-bar">
+          <div class="hm-badge">
+            <i class="fas fa-crown"></i>
+            <span>إصدار 2026</span>
+          </div>
+          <div class="hm-top-actions">
+            <a href="/" class="hm-home-btn" title="العودة إلى الصفحة الرئيسية">
+              <i class="fas fa-home"></i>
+              <span>الرئيسية</span>
+            </a>
+            <button class="hm-lang-btn" onclick="toggleLanguage()">
+              <i class="fas fa-globe"></i>
+              <span id="currentLang">العربية</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- الشعار -->
+        <div class="hm-logo-section">
+          <div class="hm-logo-container">
+            <img class="hm-logo" src="/public/images/logo-classic.svg" alt="HM CAR" loading="eager" decoding="async" onerror="this.onerror=null;this.src='/public/images/logo-signature.svg';" />
+          </div>
+          <h1 class="hm-brand-title" data-ar="HM CAR" data-en="HM CAR">HM CAR</h1>
+          <p class="hm-brand-subtitle" data-ar="منصة مزادات السيارات الفاخرة" data-en="Luxury Car Auction Platform">
+            منصة مزادات السيارات الفاخرة<br>
+            <span class="hm-english-text">Luxury Car Auction Platform</span>
+          </p>
+        </div>
+
+        <!-- المميزات -->
+        <div class="hm-features">
+          <div class="hm-feature-card">
+            <div class="hm-feature-icon">
+              <i class="fas fa-shield-alt"></i>
+            </div>
+            <div class="hm-feature-content">
+              <h3 data-ar="أمان متقدم" data-en="Advanced Security">أمان متقدم</h3>
+              <p data-ar="تشفير AES-256" data-en="AES-256 Encryption">تشفير AES-256</p>
+            </div>
+          </div>
+          <div class="hm-feature-card">
+            <div class="hm-feature-icon">
+              <i class="fas fa-bolt"></i>
+            </div>
+            <div class="hm-feature-content">
+              <h3 data-ar="سرعة فائقة" data-en="Ultra Fast">سرعة فائقة</h3>
+              <p data-ar="استجابة 180ms" data-en="180ms Response">استجابة 180ms</p>
+            </div>
+          </div>
+          <div class="hm-feature-card">
+            <div class="hm-feature-icon">
+              <i class="fas fa-gem"></i>
+            </div>
+            <div class="hm-feature-content">
+              <h3 data-ar="تجربة فاخرة" data-en="Premium Experience">تجربة فاخرة</h3>
+              <p data-ar="واجهة عصرية" data-en="Modern Interface">واجهة عصرية</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- الإحصائيات -->
+        <div class="hm-stats">
+          <div class="hm-stat-item">
+            <span class="hm-stat-number">+1.2M</span>
+            <span class="hm-stat-label" data-ar="مستخدم" data-en="Users">مستخدم</span>
+          </div>
+          <div class="hm-stat-item">
+            <span class="hm-stat-number">99.97%</span>
+            <span class="hm-stat-label" data-ar="جاهزية" data-en="Uptime">جاهزية</span>
+          </div>
+          <div class="hm-stat-item">
+            <span class="hm-stat-number">24/7</span>
+            <span class="hm-stat-label" data-ar="دعم" data-en="Support">دعم</span>
+          </div>
         </div>
       </div>
-      <div class="hm-login2__chips" aria-label="Highlights">
-        <div class="hm-chip"><i class="fas fa-gavel"></i><span>مزاد</span></div>
-        <div class="hm-chip"><i class="fas fa-car"></i><span>سيارات</span></div>
-        <div class="hm-chip"><i class="fas fa-gears"></i><span>قطع غيار</span></div>
-        <div class="hm-chip"><i class="fas fa-globe"></i><span>تصدير عالمي</span></div>
-      </div>
-    </section>
+    </div>
 
-    <section class="hm-login2__card" aria-label="Login">
-      <div class="hm-login2__header">
-        <h2 class="hm-login2__title"><%= __('auth.loginPage.title') %></h2>
-        <p class="hm-login2__subtitle"><%= isAdminLogin ? 'تسجيل دخول الإدارة' : 'تسجيل دخول العميل' %></p>
-      </div>
+    <!-- اللوحة اليمنى - نموذج تسجيل الدخول -->
+    <div class="hm-login-panel">
+      <div class="hm-login-content">
+        <!-- التبويبات -->
+        <div class="hm-tabs">
+          <a href="/auth/login" class="hm-tab <%= !isAdminLogin ? 'active' : '' %>">
+            <i class="fas fa-user"></i>
+            <span data-ar="دخول العملاء" data-en="Client Login">دخول العملاء</span>
+          </a>
+          <a href="/auth/login?admin=true" class="hm-tab <%= isAdminLogin ? 'active' : '' %>">
+            <i class="fas fa-crown"></i>
+            <span data-ar="دخول الأدمن" data-en="Admin Login">دخول الأدمن</span>
+          </a>
+        </div>
 
-      <% if (typeof error !== 'undefined' && error) { %>
-        <div class="alert alert-danger" role="alert"><%= error %></div>
-      <% } %>
-      <% if (typeof success !== 'undefined' && success) { %>
-        <div class="alert alert-success" role="alert"><%= success %></div>
-      <% } %>
+        <!-- العنوان -->
+        <div class="hm-header">
+          <h2 class="hm-title" data-ar="مرحباً بعودتك" data-en="Welcome Back">مرحباً بعودتك</h2>
+          <p class="hm-subtitle" data-ar="سجل دخولك للمتابعة في عالم السيارات الفاخرة" data-en="Sign in to continue in the luxury car world">
+            سجل دخولك للمتابعة في عالم السيارات الفاخرة
+          </p>
+        </div>
 
-      <form method="POST" action="/auth/login" class="auth-form">
-        <input type="hidden" name="loginRole" value="<%= isAdminLogin ? 'admin' : 'buyer' %>">
-        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-
-        <% if (!isAdminLogin) { %>
-          <div class="form-floating mb-3">
-            <input type="text" id="name" name="name" class="form-control" placeholder="الاسم الكامل" required>
-            <label for="name">الاسم الكامل (اسمين على الأقل)</label>
+        <!-- الرسائل -->
+        <% if (typeof error !== 'undefined' && error) { %>
+          <div class="hm-alert hm-alert-error">
+            <i class="fas fa-exclamation-circle"></i>
+            <span><%= error %></span>
+            <button type="button" class="hm-alert-close" onclick="this.parentElement.remove()">
+              <i class="fas fa-times"></i>
+            </button>
           </div>
-        <% } else { %>
-          <div class="form-floating mb-3">
-            <input type="email" id="email" name="email" class="form-control" placeholder="البريد الإلكتروني" required>
-            <label for="email">البريد الإلكتروني</label>
-          </div>
-          <div class="form-floating mb-3">
-            <input type="password" id="password" name="password" class="form-control" placeholder="<%= __('auth.fields.password') %>" required>
-            <label for="password"><%= __('auth.fields.password') %></label>
+        <% } %>
+        <% if (typeof success !== 'undefined' && success) { %>
+          <div class="hm-alert hm-alert-success">
+            <i class="fas fa-check-circle"></i>
+            <span><%= success %></span>
+            <button type="button" class="hm-alert-close" onclick="this.parentElement.remove()">
+              <i class="fas fa-times"></i>
+            </button>
           </div>
         <% } %>
 
-        <div class="form-options">
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="remember" name="remember">
-            <label class="form-check-label" for="remember"><%= __('auth.rememberMe') %></label>
+        <!-- النموذج -->
+        <form method="POST" action="/auth/login" class="hm-form">
+          <input type="hidden" name="loginRole" value="<%= isAdminLogin ? 'admin' : 'buyer' %>">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+          <div class="hm-input-group">
+            <div class="hm-input-wrapper">
+              <i class="hm-input-icon fas fa-user"></i>
+              <input type="<%= isAdminLogin ? 'email' : 'text' %>" 
+                     id="<%= isAdminLogin ? 'email' : 'username' %>" 
+                     name="<%= isAdminLogin ? 'email' : 'name' %>" 
+                     class="hm-input" 
+                     placeholder="<%= isAdminLogin ? 'البريد الإلكتروني' : 'اسم المستخدم' %>" 
+                     required>
+              <label for="<%= isAdminLogin ? 'email' : 'username' %>" class="hm-input-label">
+                <%= isAdminLogin ? 'البريد الإلكتروني' : 'اسم المستخدم' %>
+              </label>
+            </div>
           </div>
-          <% if (isAdminLogin) { %>
-            <a href="/auth/forgot-password" class="forgot-password-link"><%= __('auth.forgotPassword') %></a>
+
+          <div class="hm-input-group">
+            <div class="hm-input-wrapper">
+              <i class="hm-input-icon fas fa-lock"></i>
+              <input type="password" 
+                     id="password" 
+                     name="password" 
+                     class="hm-input" 
+                     placeholder="كلمة المرور" 
+                     required>
+              <button type="button" class="hm-password-toggle" onclick="togglePassword('password')">
+                <i class="fas fa-eye"></i>
+              </button>
+              <label for="password" class="hm-input-label">كلمة المرور</label>
+            </div>
+          </div>
+
+          <div class="hm-options">
+            <div class="hm-checkbox-wrapper">
+              <input type="checkbox" id="remember" name="remember" class="hm-checkbox">
+              <label for="remember" class="hm-checkbox-label">
+                <span class="hm-checkbox-custom"></span>
+                <span data-ar="تذكرني" data-en="Remember me">تذكرني</span>
+              </label>
+            </div>
+            <a href="/auth/forgot-password" class="hm-link" data-ar="نسيت كلمة المرور؟" data-en="Forgot password?">نسيت كلمة المرور؟</a>
+          </div>
+
+          <button type="submit" class="hm-btn hm-btn-3d">
+            <i class="fas fa-sign-in-alt"></i>
+            <span data-ar="تسجيل الدخول" data-en="Sign In">تسجيل الدخول</span>
+          </button>
+        </form>
+
+        <!-- التذييل -->
+        <div class="hm-footer">
+          <p class="hm-no-account" data-ar="ليس لديك حساب؟" data-en="Don't have an account?">ليس لديك حساب؟</p>
+          <a href="/auth/register" class="hm-register-link" data-ar="إنشاء حساب جديد" data-en="Create new account">إنشاء حساب جديد</a>
+        </div>
+
+        <div class="hm-switch">
+          <% if (!isAdminLogin) { %>
+            <p data-ar="مسؤول؟" data-en="Admin?">مسؤول؟ <a href="/auth/login?admin=true" class="hm-switch-link" data-ar="دخول الأدمن" data-en="Admin Login">دخول الأدمن</a></p>
           <% } else { %>
-            <span></span>
+            <p data-ar="عميل؟" data-en="Client?">عميل؟ <a href="/auth/login" class="hm-switch-link" data-ar="دخول العميل" data-en="Client Login">دخول العميل</a></p>
           <% } %>
         </div>
-
-        <button type="submit" class="btn btn-primary btn-gold w-100">
-          <i class="fas fa-right-to-bracket"></i>
-          <%= __('auth.loginPage.button') %>
-        </button>
-      </form>
-
-      <div class="hm-login2__switch">
-        <% const rt = (typeof returnTo !== 'undefined' && returnTo) ? ('&returnTo=' + encodeURIComponent(String(returnTo))) : ''; %>
-        <% if (!isAdminLogin) { %>
-          <a class="hm-link" href="/auth/login?admin=true<%= rt %>"><i class="fas fa-user-shield"></i> <%= __('auth.loginAsAdmin') %></a>
-        <% } else { %>
-          <a class="hm-link" href="/auth/login?<%= rt ? ('returnTo=' + encodeURIComponent(String(returnTo))) : '' %>"><i class="fas fa-user"></i> <%= __('auth.loginAsCustomer') %></a>
-        <% } %>
       </div>
-
-      <div class="hm-login2__footer">
-        <span>© <%= new Date().getFullYear() %> HM CAR</span>
-      </div>
-    </section>
+    </div>
   </div>
 </div>
-
-.hm-particle--4 {
-  width: 40px;
-  height: 40px;
-  top: 20%;
-  left: 70%;
-  animation-delay: 1s;
-}
-
-.hm-particle--5 {
-  width: 70px;
-  height: 70px;
-  top: 80%;
-  left: 20%;
-  animation-delay: 3s;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-20px) rotate(180deg); }
-}
-
-/* Main Content */
-.hm-login__content {
-  display: flex;
-  min-height: 100vh;
-  position: relative;
-  z-index: 1;
-}
-
-/* Brand Section */
-.hm-login__brand {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 3rem;
-  background: rgba(11, 31, 58, 0.5);
-  backdrop-filter: blur(10px);
-}
-
-.hm-brand__inner {
-  max-width: 500px;
-  text-align: center;
-}
-
-.hm-brand__logo {
-  margin-bottom: 3rem;
-}
-
-.hm-logo__img {
-  width: 120px;
-  height: 120px;
-  object-fit: contain;
-  margin-bottom: 1rem;
-  filter: drop-shadow(0 4px 20px rgba(212, 175, 55, 0.3));
-}
-
-.hm-brand__title {
-  font-size: 3rem;
-  font-weight: 700;
-  color: #d4af37;
-  margin: 0 0 0.5rem 0;
-  text-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
-}
-
-.hm-brand__subtitle {
-  font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.8);
-  margin: 0;
-}
-
-.hm-brand__features {
-  margin-top: 3rem;
-}
-
-.hm-feature {
-  display: flex;
-  align-items: center;
-  margin-bottom: 2rem;
-  text-align: right;
-}
-
-.hm-feature__icon {
-  width: 60px;
-  height: 60px;
-  background: linear-gradient(135deg, #d4af37, #ffd700);
-  border-radius: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: 1.5rem;
-  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
-}
-
-.hm-feature__icon i {
-  font-size: 1.5rem;
-  color: #0b1f3a;
-}
-
-.hm-feature__content h3 {
-  font-size: 1.2rem;
-  color: #fff;
-  margin: 0 0 0.25rem 0;
-}
-
-.hm-feature__content p {
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.7);
-  margin: 0;
-}
-
-/* Form Section */
-.hm-login__form {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 3rem;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-}
-
-.hm-form__container {
-  width: 100%;
-  max-width: 400px;
-}
-
-.hm-form__header {
-  text-align: center;
-  margin-bottom: 2.5rem;
-}
-
-.hm-form__title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #fff;
-  margin: 0 0 0.5rem 0;
-}
-
-.hm-form__subtitle {
-  font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.7);
-  margin: 0;
-}
-
-/* Alerts */
-.hm-alert {
-  display: flex;
-  align-items: center;
-  padding: 1rem 1.5rem;
-  border-radius: 12px;
-  margin-bottom: 1.5rem;
-  position: relative;
-  animation: slideIn 0.3s ease-out;
-}
-
-.hm-alert--error {
-  background: rgba(220, 53, 69, 0.1);
-  border: 1px solid rgba(220, 53, 69, 0.3);
-  color: #ff6b6b;
-}
-
-.hm-alert--success {
-  background: rgba(40, 167, 69, 0.1);
-  border: 1px solid rgba(40, 167, 69, 0.3);
-  color: #51cf66;
-}
-
-.hm-alert i {
-  margin-left: 0.75rem;
-  font-size: 1.1rem;
-}
-
-.hm-alert__close {
-  position: absolute;
-  top: 0.5rem;
-  left: 0.5rem;
-  background: none;
-  border: none;
-  color: inherit;
-  cursor: pointer;
-  opacity: 0.7;
-  transition: opacity 0.2s;
-}
-
-.hm-alert__close:hover {
-  opacity: 1;
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateY(-10px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-/* Form Groups */
-.hm-form__group {
-  margin-bottom: 1.5rem;
-}
-
-.hm-input__wrapper {
-  position: relative;
-}
-
-.hm-input__icon {
-  position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #d4af37;
-  font-size: 1.1rem;
-  z-index: 2;
-}
-
-.hm-input {
-  width: 100%;
-  padding: 1rem 3rem 1rem 1rem;
-  background: rgba(255, 255, 255, 0.1);
-  border: 2px solid rgba(212, 175, 55, 0.2);
-  border-radius: 12px;
-  color: #fff;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-}
-
-.hm-input:focus {
-  outline: none;
-  border-color: #d4af37;
-  background: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1);
-}
-
-.hm-input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.hm-input__label {
-  position: absolute;
-  right: 3rem;
-  top: 1rem;
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.9rem;
-  pointer-events: none;
-  transition: all 0.3s ease;
-}
-
-.hm-input:focus ~ .hm-input__label,
-.hm-input:not(:placeholder-shown) ~ .hm-input__label {
-  top: -0.5rem;
-  right: 1rem;
-  font-size: 0.8rem;
-  background: #0b1f3a;
-  padding: 0 0.5rem;
-  color: #d4af37;
-}
-
-.hm-input__toggle {
-  position: absolute;
-  left: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.7);
-  cursor: pointer;
-  transition: color 0.2s;
-}
-
-.hm-input__toggle:hover {
-  color: #d4af37;
-}
-
-/* Form Options */
-.hm-form__options {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-}
-
-.hm-checkbox {
-  display: flex;
-  align-items: center;
-}
-
-.hm-checkbox__input {
-  display: none;
-}
-
-.hm-checkbox__label {
-  display: flex;
-  align-items: center;
-  color: rgba(255, 255, 255, 0.8);
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-
-.hm-checkbox__checkmark {
-  width: 20px;
-  height: 20px;
-  border: 2px solid rgba(212, 175, 55, 0.3);
-  border-radius: 4px;
-  margin-left: 0.5rem;
-  position: relative;
-  transition: all 0.3s ease;
-}
-
-.hm-checkbox__input:checked ~ .hm-checkbox__label .hm-checkbox__checkmark {
-  background: #d4af37;
-  border-color: #d4af37;
-}
-
-.hm-checkbox__input:checked ~ .hm-checkbox__label .hm-checkbox__checkmark::after {
-  content: '✓';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: #0b1f3a;
-  font-weight: bold;
-}
-
-.hm-link {
-  color: #d4af37;
-  text-decoration: none;
-  font-size: 0.9rem;
-  transition: color 0.2s;
-}
-
-.hm-link:hover {
-  color: #ffd700;
-  text-decoration: underline;
-}
-
-.hm-link--primary {
-  font-weight: 600;
-}
-
-/* Buttons */
-.hm-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem 2rem;
-  border: none;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 600;
-  text-decoration: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  gap: 0.5rem;
-}
-
-.hm-btn--primary {
-  background: linear-gradient(135deg, #d4af37, #ffd700);
-  color: #0b1f3a;
-  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
-}
-
-.hm-btn--primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 35px rgba(212, 175, 55, 0.4);
-}
-
-.hm-btn--full {
-  width: 100%;
-}
-
-/* Form Switch & Register */
-.hm-form__switch,
-.hm-form__register {
-  text-align: center;
-  margin-top: 1.5rem;
-}
-
-.hm-form__switch p,
-.hm-form__register p {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.9rem;
-  margin: 0;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .hm-login__content {
-    flex-direction: column;
-  }
-  
-  .hm-login__brand {
-    padding: 2rem;
-  }
-  
-  .hm-login__form {
-    padding: 2rem;
-  }
-  
-  .hm-brand__title {
-    font-size: 2rem;
-  }
-  
-  .hm-form__title {
-    font-size: 2rem;
-  }
-  
-  .hm-form__options {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: stretch;
-  }
-}
-</style>
-
+<link rel="stylesheet" href="/css/luxury-auth.css" />
 <script>
-function togglePassword(inputId) {
-  const input = document.getElementById(inputId);
-  const toggle = input.nextElementSibling;
-  const icon = toggle.querySelector('i');
-  
-  if (input.type === 'password') {
-    input.type = 'text';
-    icon.classList.remove('fa-eye');
-    icon.classList.add('fa-eye-slash');
-  } else {
-    input.type = 'password';
-    icon.classList.remove('fa-eye-slash');
-    icon.classList.add('fa-eye');
-  }
-}
+  // Language Toggle
+  let currentLanguage = "ar";
 
-// Add floating animation to particles
-document.addEventListener('DOMContentLoaded', function() {
-  const particles = document.querySelectorAll('.hm-particle');
-  particles.forEach((particle, index) => {
-    particle.style.animationDelay = `${index * 0.5}s`;
+  function toggleLanguage() {
+    currentLanguage = currentLanguage === "ar" ? "en" : "ar";
+    updateLanguage();
+    localStorage.setItem("preferredLanguage", currentLanguage);
+  }
+
+  function updateLanguage() {
+    const elements = document.querySelectorAll("[data-ar][data-en]");
+    const langBtn = document.getElementById("currentLang");
+
+    elements.forEach((element) => {
+      const text = element.getAttribute(`data-${currentLanguage}`);
+      if (element.tagName === "INPUT" || element.tagName === "TEXTAREA") {
+        element.placeholder = text;
+      } else {
+        element.textContent = text;
+      }
+    });
+
+    langBtn.textContent = currentLanguage === "ar" ? "English" : "العربية";
+
+    // Update text direction
+    document.documentElement.dir = currentLanguage === "ar" ? "rtl" : "ltr";
+    document.documentElement.lang = currentLanguage;
+  }
+
+  // Password Toggle (legacy handler removed; using inline togglePassword in form)
+
+  // Initialize language
+  document.addEventListener("DOMContentLoaded", function () {
+    const savedLang = localStorage.getItem("preferredLanguage");
+    if (savedLang && savedLang !== currentLanguage) {
+      currentLanguage = savedLang;
+      updateLanguage();
+    }
   });
-});
+
+  // Form validation enhancements
+  (function () {
+    const form = document.querySelector(".auth-form");
+    if (!form) return;
+    form.addEventListener("submit", function () {
+      const submitBtn = this.querySelector('button[type="submit"]');
+      if (!submitBtn) return;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري تسجيل الدخول...';
+      setTimeout(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> <span>تسجيل الدخول</span>';
+      }, 3000);
+    });
+  })();
+
+  // Add input animations
+  document.querySelectorAll(".hm-input").forEach((input) => {
+    input.addEventListener("focus", function () {
+      this.parentElement.classList.add("focused");
+    });
+
+    input.addEventListener("blur", function () {
+      if (!this.value) {
+        this.parentElement.classList.remove("focused");
+      }
+    });
+  });
 </script>

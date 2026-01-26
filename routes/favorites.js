@@ -61,6 +61,33 @@ router.delete('/remove/:carId', requireAuth, async (req, res) => {
   }
 });
 
+// عرض صفحة المفضلات للمستخدم
+router.get('/page', requireAuth, async (req, res) => {
+  try {
+    const userId = req.session.user._id;
+    
+    const favorites = await Favorite.find({ user: userId })
+      .populate({
+        path: 'car',
+        populate: [
+          { path: 'make', select: 'name logoUrl' },
+          { path: 'model', select: 'name' },
+          { path: 'category', select: 'name' }
+        ]
+      })
+      .sort({ addedAt: -1 });
+
+    res.render('client/favorites', { 
+      favorites,
+      user: req.session.user,
+      title: 'المفضلة - HM CAR'
+    });
+  } catch (error) {
+    console.error('Error fetching favorites page:', error);
+    res.status(500).render('errors/500', { error: 'حدث خطأ أثناء تحميل صفحة المفضلات' });
+  }
+});
+
 // عرض جميع المفضلات للمستخدم
 router.get('/', requireAuth, async (req, res) => {
   try {

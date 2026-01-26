@@ -2,286 +2,717 @@
 
 <% layout('layout') -%>
 
+<style>
+.hm-pro-home {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 25%, #0ea5e9 50%, #1e3a8a 75%, #1e293b 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.hm-pro-home::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 20% 50%, rgba(248, 250, 252, 0.4) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(14, 165, 233, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 20%, rgba(255, 255, 255, 0.6) 0%, transparent 50%);
+    animation: neuralPulse 8s ease-in-out infinite;
+    z-index: -1;
+}
+
+.hm-pro-home::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(2px 2px at 20px 30px, #0ea5e9, transparent),
+        radial-gradient(2px 2px at 40px 70px, #1e3a8a, transparent),
+        radial-gradient(1px 1px at 50px 50px, #f8fafc, transparent),
+        radial-gradient(1px 1px at 80px 10px, #ffffff, transparent),
+        radial-gradient(2px 2px at 130px 80px, #0ea5e9, transparent);
+    background-repeat: repeat;
+    background-size: 200px 200px;
+    animation: particlesFloat 20s linear infinite;
+    z-index: -1;
+    opacity: 0.3;
+}
+
+@keyframes neuralPulse {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.1); }
+}
+
+@keyframes particlesFloat {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(-200px, -200px); }
+}
+
+.hm-hero {
+    position: relative;
+    padding: 4rem 2rem 3rem;
+    background: transparent;
+}
+
+.hm-hero__content {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.profile-header-card {
+    background: linear-gradient(135deg, rgba(248, 250, 252, 0.95) 0%, rgba(255, 255, 255, 0.9) 50%, rgba(240, 249, 255, 0.95) 100%);
+    backdrop-filter: blur(20px);
+    border-radius: 30px;
+    padding: 3rem;
+    box-shadow: 
+        0 25px 50px rgba(14, 165, 233, 0.15),
+        0 15px 35px rgba(30, 58, 138, 0.1),
+        0 5px 15px rgba(0, 0, 0, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(248, 250, 252, 0.5);
+    transform: perspective(1000px) rotateY(0deg) rotateX(2deg);
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-header-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(248, 250, 252, 0.8), transparent);
+    animation: cardShimmer 3s ease-in-out infinite;
+}
+
+.profile-header-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(from 0deg, transparent, rgba(14, 165, 233, 0.03), transparent);
+    animation: cardRotate 20s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes cardShimmer {
+    0%, 100% { opacity: 0.3; transform: translateX(-100%); }
+    50% { opacity: 0.8; transform: translateX(100%); }
+}
+
+@keyframes cardRotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.profile-header-card:hover {
+    transform: perspective(1000px) rotateY(2deg) rotateX(0deg) translateY(-5px);
+    box-shadow: 
+        0 35px 70px rgba(14, 165, 233, 0.2),
+        0 20px 40px rgba(30, 58, 138, 0.15),
+        0 8px 20px rgba(0, 0, 0, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.03);
+}
+
+.profile-avatar-section {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+}
+
+#profileAvatarWrap {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0ea5e9, #1e3a8a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-shadow: 
+        0 8px 25px rgba(14, 165, 233, 0.3),
+        0 4px 15px rgba(30, 58, 138, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    border: 3px solid rgba(248, 250, 252, 0.5);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+#profileAvatarWrap::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #0ea5e9, #1e3a8a, #0ea5e9);
+    border-radius: 50%;
+    z-index: -1;
+    animation: avatarGlow 2s ease-in-out infinite;
+}
+
+@keyframes avatarGlow {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.05); }
+}
+
+#profileAvatarWrap:hover {
+    transform: scale(1.05) rotate(5deg);
+    box-shadow: 
+        0 12px 35px rgba(14, 165, 233, 0.4),
+        0 6px 20px rgba(30, 58, 138, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+#profileAvatarWrap:hover::before {
+    animation-duration: 1s;
+}
+
+.profile-info h1 {
+    color: #1e3a8a;
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin: 0;
+    background: linear-gradient(45deg, #1e3a8a, #0ea5e9, #64748b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.profile-info p {
+    color: rgba(30, 58, 138, 0.7);
+    font-size: 1.1rem;
+    margin: 0.5rem 0 0;
+    font-weight: 500;
+}
+
+.profile-nav {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+}
+
+.hm-btn-3d {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(248, 250, 252, 0.2) 100%);
+    border: 2px solid rgba(14, 165, 233, 0.3);
+    color: #1e3a8a;
+    text-decoration: none;
+    border-radius: 15px;
+    font-weight: 600;
+    font-size: 1rem;
+    box-shadow: 
+        0 4px 15px rgba(14, 165, 233, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+    transform: perspective(50px) rotateX(2deg);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.hm-btn-3d::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(248, 250, 252, 0.4), transparent);
+    transition: left 0.5s ease;
+}
+
+.hm-btn-3d::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 50%, rgba(0, 0, 0, 0.05) 100%);
+    border-radius: inherit;
+}
+
+.hm-btn-3d:hover::before {
+    left: 100%;
+}
+
+.hm-btn-3d:hover {
+    transform: perspective(50px) rotateX(0deg) translateY(-2px);
+    box-shadow: 
+        0 8px 25px rgba(14, 165, 233, 0.2),
+        0 4px 15px rgba(30, 58, 138, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.7),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.02);
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.2) 0%, rgba(248, 250, 252, 0.3) 100%);
+    border-color: rgba(14, 165, 233, 0.5);
+}
+
+.hm-btn-3d:active {
+    transform: perspective(50px) rotateX(5deg) translateY(-1px);
+    box-shadow: 
+        0 2px 8px rgba(14, 165, 233, 0.15),
+        0 1px 4px rgba(30, 58, 138, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.08);
+}
+
+.hm-btn-3d i {
+    transition: transform 0.3s ease;
+}
+
+.hm-btn-3d:hover i {
+    transform: translateX(-3px);
+}
+
+.hm-featured-cars {
+    padding: 2rem 0;
+}
+
+.hm-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.hm-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.08) 0%, rgba(248, 250, 252, 0.12) 100%);
+    padding: 0.75rem;
+    border-radius: 20px;
+    border: 1px solid rgba(14, 165, 233, 0.15);
+    box-shadow: 0 4px 15px rgba(14, 165, 233, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.hm-tab-btn {
+    flex: 1;
+    padding: 1.25rem 2rem;
+    background: transparent;
+    border: none;
+    border-radius: 15px;
+    color: rgba(30, 58, 138, 0.7);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transform: perspective(50px) rotateX(2deg);
+    position: relative;
+    overflow: hidden;
+}
+
+.hm-tab-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(248, 250, 252, 0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.hm-tab-btn:hover::before {
+    left: 100%;
+}
+
+.hm-tab-btn:hover {
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.15) 0%, rgba(248, 250, 252, 0.2) 100%);
+    color: #1e3a8a;
+    transform: perspective(50px) rotateX(0deg) translateY(-1px);
+    box-shadow: 0 2px 8px rgba(14, 165, 233, 0.1);
+}
+
+.hm-tab-btn.active {
+    background: linear-gradient(135deg, #0ea5e9 0%, #1e3a8a 100%);
+    color: #ffffff;
+    box-shadow: 0 6px 20px rgba(14, 165, 233, 0.3), 0 3px 10px rgba(30, 58, 138, 0.2);
+    transform: perspective(50px) rotateX(0deg) translateY(-2deg);
+    border: 1px solid rgba(248, 250, 252, 0.3);
+}
+
+.hm-tab-content {
+    background: linear-gradient(135deg, rgba(248, 250, 252, 0.95) 0%, rgba(255, 255, 255, 0.9) 50%, rgba(240, 249, 255, 0.95) 100%);
+    backdrop-filter: blur(20px);
+    border-radius: 25px;
+    padding: 3rem;
+    box-shadow: 
+        0 25px 50px rgba(14, 165, 233, 0.15),
+        0 15px 35px rgba(30, 58, 138, 0.1),
+        0 5px 15px rgba(0, 0, 0, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(248, 250, 252, 0.5);
+    transform: perspective(1000px) rotateY(0deg) rotateX(2deg);
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.hm-tab-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(248, 250, 252, 0.8), transparent);
+    animation: cardShimmer 3s ease-in-out infinite;
+}
+
+.hm-tab-content::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(from 0deg, transparent, rgba(14, 165, 233, 0.02), transparent);
+    animation: cardRotate 25s linear infinite;
+    pointer-events: none;
+}
+
+.hm-tab-content:hover {
+    transform: perspective(1000px) rotateY(2deg) rotateX(0deg) translateY(-3px);
+    box-shadow: 
+        0 35px 70px rgba(14, 165, 233, 0.2),
+        0 20px 40px rgba(30, 58, 138, 0.15),
+        0 8px 20px rgba(0, 0, 0, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.03);
+}
+
+.hm-tab-content h2 {
+    color: #1e3a8a;
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: linear-gradient(45deg, #1e3a8a, #0ea5e9, #64748b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 2px 10px rgba(14, 165, 233, 0.2);
+    position: relative;
+}
+
+.hm-tab-content h2::before {
+    content: '';
+    position: absolute;
+    left: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 4px;
+    background: #0ea5e9;
+    border-radius: 50%;
+    animation: titlePulse 2s ease-in-out infinite;
+}
+
+@keyframes titlePulse {
+    0%, 100% { opacity: 0.5; transform: translateY(-50%) scale(1); }
+    50% { opacity: 1; transform: translateY(-50%) scale(1.5); }
+}
+
+.hm-tab-content h2 i {
+    color: #0ea5e9;
+    background: linear-gradient(45deg, #0ea5e9, #1e3a8a);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: iconFloat 3s ease-in-out infinite;
+}
+
+@keyframes iconFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+
+.hm-hero-unified {
+    position: relative;
+    padding: 2rem;
+    background: transparent;
+}
+
+.hm-hero__content {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.profile-nav-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.08) 0%, rgba(248, 250, 252, 0.12) 100%);
+    padding: 0.75rem;
+    border-radius: 20px;
+    border: 1px solid rgba(14, 165, 233, 0.15);
+    box-shadow: 0 4px 15px rgba(14, 165, 233, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.profile-nav-tabs .hm-tab-btn {
+    flex: 1;
+    padding: 1.25rem 2rem;
+    background: transparent;
+    border: none;
+    border-radius: 15px;
+    color: rgba(30, 58, 138, 0.7);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transform: perspective(50px) rotateX(2deg);
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-nav-tabs .hm-tab-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(248, 250, 252, 0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.profile-nav-tabs .hm-tab-btn:hover::before {
+    left: 100%;
+}
+
+.profile-nav-tabs .hm-tab-btn:hover {
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.15) 0%, rgba(248, 250, 252, 0.2) 100%);
+    color: #1e3a8a;
+    transform: perspective(50px) rotateX(0deg) translateY(-1px);
+    box-shadow: 0 2px 8px rgba(14, 165, 233, 0.1);
+}
+
+.profile-nav-tabs .hm-tab-btn.active {
+    background: linear-gradient(135deg, #0ea5e9 0%, #1e3a8a 100%);
+    color: #ffffff;
+    box-shadow: 0 6px 20px rgba(14, 165, 233, 0.3), 0 3px 10px rgba(30, 58, 138, 0.2);
+    transform: perspective(50px) rotateX(0deg) translateY(-2deg);
+    border: 1px solid rgba(248, 250, 252, 0.3);
+}
+
+.hm-tab-content {
+    margin-top: 2rem;
+    background: linear-gradient(135deg, rgba(248, 250, 252, 0.95) 0%, rgba(255, 255, 255, 0.9) 50%, rgba(240, 249, 255, 0.95) 100%);
+    backdrop-filter: blur(20px);
+    border-radius: 25px;
+    padding: 3rem;
+    box-shadow: 
+        0 25px 50px rgba(14, 165, 233, 0.15),
+        0 15px 35px rgba(30, 58, 138, 0.1),
+        0 5px 15px rgba(0, 0, 0, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(248, 250, 252, 0.5);
+    transform: perspective(1000px) rotateY(0deg) rotateX(2deg);
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.hm-tab-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(248, 250, 252, 0.8), transparent);
+    animation: cardShimmer 3s ease-in-out infinite;
+}
+
+.hm-tab-content::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(from 0deg, transparent, rgba(14, 165, 233, 0.02), transparent);
+    animation: cardRotate 25s linear infinite;
+    pointer-events: none;
+}
+
+.hm-tab-content:hover {
+    transform: perspective(1000px) rotateY(2deg) rotateX(0deg) translateY(-3px);
+    box-shadow: 
+        0 35px 70px rgba(14, 165, 233, 0.2),
+        0 20px 40px rgba(30, 58, 138, 0.15),
+        0 8px 20px rgba(0, 0, 0, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.03);
+}
+
+@media (max-width: 768px) {
+    .profile-header-card {
+        padding: 2rem;
+    }
+    
+    .profile-avatar-section {
+        flex-direction: column;
+        text-align: center;
+        gap: 1.5rem;
+    }
+    
+    .profile-info h1 {
+        font-size: 2rem;
+    }
+    
+    .profile-nav-tabs {
+        flex-direction: column;
+    }
+    
+    .hm-tab-content {
+        padding: 2rem;
+    }
+}
+</style>
+
 <div class="hm-pro-home">
-  <!-- Hero Section -->
-  <section class="hm-hero" style="min-height: 30vh; padding: 3rem 2rem 2rem;">
-    <div class="hm-hero__bg">
-      <div class="hm-hero__gradient"></div>
-      <div class="hm-hero__particles">
-        <div class="particle p1"></div>
-        <div class="particle p2"></div>
-        <div class="particle p3"></div>
-      </div>
-    </div>
-
-    <div class="hm-hero__content" style="max-width: 1200px; margin: 0 auto;">
-      <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem;">
-        <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #0ea5e9, #0284c7); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white; font-weight: bold;">
-          <%= currentUser.name.charAt(0).toUpperCase() %>
+  <!-- Unified Hero and Content Section -->
+  <section class="hm-hero-unified">
+    <div class="hm-hero__content">
+      <!-- Profile Header Card -->
+      <div class="profile-header-card">
+        <div class="profile-avatar-section">
+          <div id="profileAvatarWrap">
+            <% if (currentUser.avatar) { %>
+              <img id="profileAvatarImg" src="<%= currentUser.avatar %>" alt="صورة الملف الشخصي" style="width:100%; height:100%; object-fit:cover;" />
+            <% } else { %>
+              <div id="profileAvatarFallback" style="font-size: 2.5rem; color: white; font-weight: bold;">
+                <%= currentUser.name.charAt(0).toUpperCase() %>
+              </div>
+            <% } %>
+          </div>
+          <div class="profile-info">
+            <h1>مرحباً، <%= currentUser.name %></h1>
+            <p>العضو منذ: <%= new Date(currentUser.createdAt).toLocaleDateString('ar-SA') %></p>
+          </div>
         </div>
-        <div>
-          <h1 style="color: #fff; font-size: 2.2rem; margin: 0;" data-ar="مرحباً" data-en="Welcome">مرحباً، <%= currentUser.name %></h1>
-          <p style="color: rgba(255,255,255,0.8); font-size: 1.1rem; margin: 0.5rem 0 0;">العضو منذ: <%= new Date(currentUser.createdAt).toLocaleDateString('ar-SA') %></p>
-        </div>
+
+        <!-- Navigation Tabs -->
+        <nav class="profile-nav-tabs">
+          <button class="hm-tab-btn active" onclick="showTab('profile')">
+            <i class="fas fa-user"></i> الملف الشخصي
+          </button>
+          <button class="hm-tab-btn" onclick="showTab('security')">
+            <i class="fas fa-shield-alt"></i> الأمان
+          </button>
+        </nav>
       </div>
 
-      <!-- Profile Navigation -->
-      <nav style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 2rem;">
-        <a href="/client/profile" class="hm-btn-3d" style="background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); padding: 0.8rem 1.5rem; font-size: 1rem;">
-          <i class="fas fa-user"></i> <span>الملف الشخصي</span>
-        </a>
-        <a href="/client/settings" class="hm-btn-3d" style="background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); padding: 0.8rem 1.5rem; font-size: 1rem;">
-          <i class="fas fa-cog"></i> <span>الإعدادات</span>
-        </a>
-        <a href="/client/security" class="hm-btn-3d" style="background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); padding: 0.8rem 1.5rem; font-size: 1rem;">
-          <i class="fas fa-shield-alt"></i> <span>الأمان</span>
-        </a>
-        <a href="/client/devices" class="hm-btn-3d" style="background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); padding: 0.8rem 1.5rem; font-size: 1rem;">
-          <i class="fas fa-laptop"></i> <span>الأجهزة</span>
-        </a>
-      </nav>
-    </div>
-  </section>
-
-  <!-- Profile Content -->
-  <section class="hm-featured-cars" style="padding: 3rem 0;">
-    <div class="hm-container">
-      <div class="hm-tabs" style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
-        <button class="hm-tab-btn active" onclick="showTab('profile')" style="padding: 1rem 2rem; background: rgba(14,165,233,0.2); border: 2px solid #0ea5e9; color: #fff; border-radius: 10px; cursor: pointer; font-weight: 600;">
-          <i class="fas fa-user"></i> الملف الشخصي
-        </button>
-        <button class="hm-tab-btn" onclick="showTab('security')" style="padding: 1rem 2rem; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.7); border-radius: 10px; cursor: pointer; font-weight: 600;">
-          <i class="fas fa-shield-alt"></i> الأمان
-        </button>
-        <button class="hm-tab-btn" onclick="showTab('devices')" style="padding: 1rem 2rem; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.7); border-radius: 10px; cursor: pointer; font-weight: 600;">
-          <i class="fas fa-laptop"></i> الأجهزة
-        </button>
-      </div>
-
-      <!-- Profile Tab -->
+      <!-- Profile Tab Content -->
       <div id="profile-tab" class="hm-tab-content" style="display: block;">
-        <div style="background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border-radius: 20px; padding: 2.5rem; border: 1px solid rgba(255,255,255,0.1);">
-          <h2 style="color: #fff; font-size: 1.8rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 0.75rem;">
-            <i class="fas fa-user-circle" style="color: #0ea5e9;"></i>
-            <span>معلومات الحساب</span>
-          </h2>
+        <h2>
+          <i class="fas fa-user-circle"></i>
+          <span>معلومات الحساب</span>
+        </h2>
 
-          <form id="profileForm" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
-            <input type="hidden" id="csrfToken" value="<%= csrfToken %>">
-
-            <div>
-              <label style="color: rgba(255,255,255,0.9); font-size: 0.95rem; margin-bottom: 0.5rem; display: block; font-weight: 600;">الاسم الكامل</label>
-              <input type="text" id="name" value="<%= currentUser.name %>"
-                style="width: 100%; padding: 0.9rem 1rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: #fff; font-size: 1rem;"
-                placeholder="أدخل الاسم الكامل">
-            </div>
-
-            <div>
-              <label style="color: rgba(255,255,255,0.9); font-size: 0.95rem; margin-bottom: 0.5rem; display: block; font-weight: 600;">البريد الإلكتروني</label>
-              <input type="email" id="email" value="<%= currentUser.email || '' %>"
-                style="width: 100%; padding: 0.9rem 1rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: #fff; font-size: 1rem;"
-                placeholder="admin@example.com">
-            </div>
-
-            <div>
-              <label style="color: rgba(255,255,255,0.9); font-size: 0.95rem; margin-bottom: 0.5rem; display: block; font-weight: 600;">رقم الهاتف</label>
-              <input type="tel" id="phone" value="<%= currentUser.phone || '' %>"
-                style="width: 100%; padding: 0.9rem 1rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: #fff; font-size: 1rem;"
-                placeholder="+966 5X XXX XXXX">
-            </div>
-
-            <div>
-              <label style="color: rgba(255,255,255,0.9); font-size: 0.95rem; margin-bottom: 0.5rem; display: block; font-weight: 600;">تاريخ التسجيل</label>
-              <div style="width: 100%; padding: 0.9rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: rgba(255,255,255,0.7); font-size: 1rem;">
-                <%= new Date(currentUser.createdAt).toLocaleDateString('ar-SA') %>
+        <!-- Profile Picture Section -->
+        <div style="text-align: center; margin-bottom: 2rem;">
+          <div id="profileAvatarWrap" style="width: 120px; height: 120px; margin: 0 auto 1rem; border-radius: 50%; background: linear-gradient(135deg, #0ea5e9, #1e3a8a); display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 8px 25px rgba(14, 165, 233, 0.3), 0 4px 15px rgba(30, 58, 138, 0.2); border: 3px solid rgba(248, 250, 252, 0.5); transition: all 0.3s ease; position: relative;">
+            <% if (currentUser.avatar) { %>
+              <img id="profileAvatarImg" src="<%= currentUser.avatar %>" alt="صورة الملف الشخصي" style="width:100%; height:100%; object-fit:cover;" />
+            <% } else { %>
+              <div id="profileAvatarFallback" style="font-size: 3rem; color: white; font-weight: bold;">
+                <%= currentUser.name.charAt(0).toUpperCase() %>
               </div>
-            </div>
-
-            <div>
-              <label style="color: rgba(255,255,255,0.9); font-size: 0.95rem; margin-bottom: 0.5rem; display: block; font-weight: 600;">آخر تسجيل دخول</label>
-              <div style="width: 100%; padding: 0.9rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: rgba(255,255,255,0.7); font-size: 1rem;">
-                <%= currentUser.lastLoginAt ? new Date(currentUser.lastLoginAt).toLocaleString('ar-SA') : 'أول تسجيل دخول' %>
-              </div>
-            </div>
-
-            <div>
-              <label style="color: rgba(255,255,255,0.9); font-size: 0.95rem; margin-bottom: 0.5rem; display: block; font-weight: 600;">مستوى الأمان</label>
-              <select id="securityLevel" value="<%= currentUser.securityLevel || 'standard' %>"
-                style="width: 100%; padding: 0.9rem 1rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: #fff; font-size: 1rem;">
-                <option value="basic" <%= (currentUser.securityLevel || 'standard') === 'basic' ? 'selected' : '' %>>أساسي</option>
-                <option value="standard" <%= (currentUser.securityLevel || 'standard') === 'standard' ? 'selected' : '' %>>قياسي</option>
-                <option value="enhanced" <%= (currentUser.securityLevel || 'standard') === 'enhanced' ? 'selected' : '' %>>معزز</option>
-              </select>
-            </div>
-          </form>
-
-          <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: flex-end;">
-            <button onclick="saveProfile()" class="hm-btn-3d hm-btn-hero-primary" style="padding: 1rem 2rem; font-size: 1.1rem; font-weight: 700;">
-              <i class="fas fa-save"></i> حفظ التغييرات
-            </button>
+            <% } %>
           </div>
+          <h3 style="color: #1e3a8a; font-size: 1.5rem; font-weight: 700; margin: 0.5rem 0;"><%= currentUser.name %></h3>
+          <p style="color: rgba(30, 58, 138, 0.7); margin: 0;">العضو منذ: <%= new Date(currentUser.createdAt).toLocaleDateString('ar-SA') %></p>
+        </div>
+
+        <form id="profileForm" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+          <input type="hidden" id="csrfToken" value="<%= csrfToken %>">
+
+          <div>
+            <label style="display: block; color: #1e3a8a; font-weight: 600; margin-bottom: 0.5rem;">الاسم الكامل</label>
+            <input type="text" id="name" value="<%= currentUser.name %>" style="width: 100%; padding: 1rem; background: linear-gradient(135deg, rgba(248, 250, 252, 0.9) 0%, rgba(255, 255, 255, 0.95) 100%); border: 2px solid rgba(14, 165, 233, 0.2); border-radius: 15px; color: #1e3a8a; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(14, 165, 233, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -1px 0 rgba(0, 0, 0, 0.05); transform: perspective(50px) rotateX(2deg);">
+          </div>
+
+          <div>
+            <label style="display: block; color: #1e3a8a; font-weight: 600; margin-bottom: 0.5rem;">رقم الهاتف (اختياري)</label>
+            <input type="tel" id="phone" value="<%= currentUser.phone || '' %>" placeholder="+966 5X XXX XXXX" style="width: 100%; padding: 1rem; background: linear-gradient(135deg, rgba(248, 250, 252, 0.9) 0%, rgba(255, 255, 255, 0.95) 100%); border: 2px solid rgba(14, 165, 233, 0.2); border-radius: 15px; color: #1e3a8a; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(14, 165, 233, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -1px 0 rgba(0, 0, 0, 0.05); transform: perspective(50px) rotateX(2deg);">
+          </div>
+        </form>
+
+        <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: flex-end;">
+          <button onclick="saveProfile()" class="hm-btn-3d" style="background: linear-gradient(135deg, #0ea5e9 0%, #1e3a8a 100%); color: #ffffff; padding: 1rem 2rem; font-size: 1.1rem; font-weight: 700; position: relative; overflow: hidden;">
+            <span style="position: relative; z-index: 1; display: flex; align-items: center; gap: 0.75rem;">
+              <i class="fas fa-save"></i> 
+              <span>حفظ التغييرات</span>
+            </span>
+            <div style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent); transition: left 0.5s ease;"></div>
+          </button>
         </div>
       </div>
 
-      <!-- Security Tab -->
+      <!-- Security Tab Content -->
       <div id="security-tab" class="hm-tab-content" style="display: none;">
-        <div style="background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border-radius: 20px; padding: 2.5rem; border: 1px solid rgba(255,255,255,0.1);">
-          <h2 style="color: #fff; font-size: 1.8rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 0.75rem;">
-            <i class="fas fa-shield-alt" style="color: #0ea5e9;"></i>
-            <span>إعدادات الأمان</span>
-          </h2>
+        <h2>
+          <i class="fas fa-shield-alt"></i>
+          <span>إعدادات الأمان</span>
+        </h2>
 
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
-            <!-- Change Password -->
-            <div style="background: rgba(255,255,255,0.03); border-radius: 15px; padding: 2rem; border: 1px solid rgba(255,255,255,0.1);">
-              <h3 style="color: #fff; font-size: 1.3rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
-                <i class="fas fa-key" style="color: #0ea5e9;"></i>
-                تغيير كلمة المرور
-              </h3>
-              
-              <form id="changePasswordForm">
-                <input type="hidden" id="csrfToken2" value="<%= csrfToken %>">
-                
-                <div style="margin-bottom: 1.5rem;">
-                  <label style="color: rgba(255,255,255,0.9); font-size: 0.95rem; margin-bottom: 0.5rem; display: block; font-weight: 600;">كلمة المرور الحالية</label>
-                  <input type="password" id="currentPassword" 
-                    style="width: 100%; padding: 0.9rem 1rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: #fff; font-size: 1rem;"
-                    placeholder="أدخل كلمة المرور الحالية">
-                </div>
-                
-                <div style="margin-bottom: 1.5rem;">
-                  <label style="color: rgba(255,255,255,0.9); font-size: 0.95rem; margin-bottom: 0.5rem; display: block; font-weight: 600;">كلمة المرور الجديدة</label>
-                  <input type="password" id="newPassword" 
-                    style="width: 100%; padding: 0.9rem 1rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: #fff; font-size: 1rem;"
-                    placeholder="أدخل كلمة المرور الجديدة">
-                </div>
-                
-                <div style="margin-bottom: 1.5rem;">
-                  <label style="color: rgba(255,255,255,0.9); font-size: 0.95rem; margin-bottom: 0.5rem; display: block; font-weight: 600;">تأكيد كلمة المرور الجديدة</label>
-                  <input type="password" id="confirmNewPassword" 
-                    style="width: 100%; padding: 0.9rem 1rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: #fff; font-size: 1rem;"
-                    placeholder="أعد كتابة كلمة المرور الجديدة">
-                </div>
-                
-                <button type="submit" class="hm-btn-3d hm-btn-hero-primary" style="width: 100%; padding: 1rem; font-size: 1.1rem; font-weight: 700;">
-                  <i class="fas fa-sync-alt"></i> تغيير كلمة المرور
-                </button>
-              </form>
-            </div>
-
-            <!-- Two-Factor Authentication -->
-            <div style="background: rgba(255,255,255,0.03); border-radius: 15px; padding: 2rem; border: 1px solid rgba(255,255,255,0.1);">
-              <h3 style="color: #fff; font-size: 1.3rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
-                <i class="fas fa-mobile-alt" style="color: #0ea5e9;"></i>
-                المصادقة الثنائية
-              </h3>
-              
-              <div style="margin-bottom: 1.5rem;">
-                <label class="hm-switch" style="display: flex; align-items: center; gap: 1rem; cursor: pointer;">
-                  <input type="checkbox" id="twoFactorToggle" <%= currentUser.twoFactorEnabled ? 'checked' : '' %>>
-                  <span class="hm-slider" style="width: 60px; height: 30px; background: <%= currentUser.twoFactorEnabled ? '#0ea5e9' : 'rgba(255,255,255,0.2)' %>; border-radius: 15px; position: relative; display: inline-block;">
-                    <span style="position: absolute; top: 2px; left: 2px; width: 26px; height: 26px; background: white; border-radius: 50%; transition: 0.4s; <%= currentUser.twoFactorEnabled ? 'transform: translateX(30px);' : '' %>"></span>
-                  </span>
-                  <span style="color: #fff; font-size: 1.1rem;">تفعيل المصادقة الثنائية</span>
-                </label>
-              </div>
-              
-              <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem; margin-bottom: 1rem;">
-                عند التفعيل، سيُطلب منك رمز مكون من 6 أرقام من تطبيق Google Authenticator أو Microsoft Authenticator.
-              </p>
-            </div>
-
-            <!-- Device Binding -->
-            <div style="background: rgba(255,255,255,0.03); border-radius: 15px; padding: 2rem; border: 1px solid rgba(255,255,255,0.1);">
-              <h3 style="color: #fff; font-size: 1.3rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
-                <i class="fas fa-laptop" style="color: #0ea5e9;"></i>
-                ربط الأجهزة
-              </h3>
-              
-              <div style="margin-bottom: 1.5rem;">
-                <label class="hm-switch" style="display: flex; align-items: center; gap: 1rem; cursor: pointer;">
-                  <input type="checkbox" id="deviceBindingToggle" <%= !currentUser.allowMultipleSessions ? 'checked' : '' %>>
-                  <span class="hm-slider" style="width: 60px; height: 30px; background: <%= !currentUser.allowMultipleSessions ? '#0ea5e9' : 'rgba(255,255,255,0.2)' %>; border-radius: 15px; position: relative; display: inline-block;">
-                    <span style="position: absolute; top: 2px; left: 2px; width: 26px; height: 26px; background: white; border-radius: 50%; transition: 0.4s; <%= !currentUser.allowMultipleSessions ? 'transform: translateX(30px);' : '' %>"></span>
-                  </span>
-                  <span style="color: #fff; font-size: 1.1rem;">السماح بجهاز واحد فقط</span>
-                </label>
-              </div>
-              
-              <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem; margin-bottom: 1rem;">
-                عند التفعيل، لن تتمكن من تسجيل الدخول من أكثر من جهاز في نفس الوقت.
-              </p>
-            </div>
+        <form id="changePasswordForm" style="max-width: 500px;">
+          <input type="hidden" id="csrfToken2" value="<%= csrfToken %>">
+          
+          <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; color: #1e3a8a; font-weight: 600; margin-bottom: 0.5rem;">كلمة المرور الحالية</label>
+            <input type="password" id="currentPassword" placeholder="أدخل كلمة المرور الحالية" style="width: 100%; padding: 1rem; background: linear-gradient(135deg, rgba(248, 250, 252, 0.9) 0%, rgba(255, 255, 255, 0.95) 100%); border: 2px solid rgba(14, 165, 233, 0.2); border-radius: 15px; color: #1e3a8a; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(14, 165, 233, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -1px 0 rgba(0, 0, 0, 0.05); transform: perspective(50px) rotateX(2deg);">
           </div>
-        </div>
-      </div>
-
-      <!-- Devices Tab -->
-      <div id="devices-tab" class="hm-tab-content" style="display: none;">
-        <div style="background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border-radius: 20px; padding: 2.5rem; border: 1px solid rgba(255,255,255,0.1);">
-          <h2 style="color: #fff; font-size: 1.8rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 0.75rem;">
-            <i class="fas fa-laptop" style="color: #0ea5e9;"></i>
-            <span>الأجهزة المرتبطة</span>
-          </h2>
-
-          <div style="background: rgba(255,255,255,0.03); border-radius: 15px; padding: 2rem; border: 1px solid rgba(255,255,255,0.1);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-              <h3 style="color: #fff; font-size: 1.3rem; margin: 0;">قائمة الأجهزة</h3>
-              <span style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">
-                <%= (currentUser.boundDevices || []).length %> جهاز مرتبط
-              </span>
-            </div>
-
-            <div style="display: grid; gap: 1rem;">
-              <% if (currentUser.boundDevices && currentUser.boundDevices.length > 0) { %>
-                <% currentUser.boundDevices.forEach(function(device, index) { %>
-                  <div style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 1.5rem; border: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                      <h4 style="color: #fff; font-size: 1.1rem; margin: 0; display: flex; align-items: center; gap: 0.75rem;">
-                        <i class="fas fa-<%= device.browser && device.browser.includes('Mobile') ? 'mobile' : 'laptop' %>"></i>
-                        <%= device.browser ? device.browser.substring(0, 30) + '...' : 'جهاز غير معروف' %>
-                      </h4>
-                      <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem; margin: 0.5rem 0 0;">
-                        IP: <%= device.ip || 'غير معروف' %> • 
-                        أول استخدام: <%= new Date(device.firstUsedAt).toLocaleDateString('ar-SA') %> • 
-                        آخر استخدام: <%= new Date(device.lastUsedAt).toLocaleDateString('ar-SA') %>
-                      </p>
-                    </div>
-                    <div style="display: flex; gap: 0.5rem;">
-                      <% if (device.isActive) { %>
-                        <span style="background: rgba(40,167,69,0.2); color: #28a745; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; border: 1px solid rgba(40,167,69,0.3);">
-                          نشط
-                        </span>
-                      <% } else { %>
-                        <span style="background: rgba(220,53,69,0.2); color: #dc3545; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; border: 1px solid rgba(220,53,69,0.3);">
-                          غير نشط
-                        </span>
-                      <% } %>
-                      <button onclick="removeDevice('<%= device._id %>')" class="hm-btn-3d" style="background: rgba(220,53,69,0.8); padding: 0.5rem 1rem; font-size: 0.9rem;">
-                        <i class="fas fa-trash"></i> إزالة
-                      </button>
-                    </div>
-                  </div>
-                <% }); %>
-              <% } else { %>
-                <div style="text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);">
-                  <i class="fas fa-laptop" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-                  <h4 style="color: #fff; margin: 1rem 0 0.5rem;">لا توجد أجهزة مرتبطة</h4>
-                  <p>سيتم عرض الأجهزة التي سجلت الدخول إلى حسابك هنا</p>
-                </div>
-              <% } %>
-            </div>
-
-            <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
-              <button onclick="refreshDevices()" class="hm-btn-3d" style="background: rgba(255,255,255,0.1); padding: 1rem 2rem; font-size: 1.1rem;">
-                <i class="fas fa-sync"></i> تحديث القائمة
-              </button>
-              <button onclick="clearAllDevices()" class="hm-btn-3d" style="background: rgba(220,53,69,0.8); padding: 1rem 2rem; font-size: 1.1rem;">
-                <i class="fas fa-trash-alt"></i> مسح جميع الأجهزة
-              </button>
-            </div>
+          
+          <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; color: #1e3a8a; font-weight: 600; margin-bottom: 0.5rem;">كلمة المرور الجديدة</label>
+            <input type="password" id="newPassword" placeholder="أدخل كلمة المرور الجديدة" style="width: 100%; padding: 1rem; background: linear-gradient(135deg, rgba(248, 250, 252, 0.9) 0%, rgba(255, 255, 255, 0.95) 100%); border: 2px solid rgba(14, 165, 233, 0.2); border-radius: 15px; color: #1e3a8a; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(14, 165, 233, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -1px 0 rgba(0, 0, 0, 0.05); transform: perspective(50px) rotateX(2deg);">
           </div>
-        </div>
+          
+          <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; color: #1e3a8a; font-weight: 600; margin-bottom: 0.5rem;">تأكيد كلمة المرور الجديدة</label>
+            <input type="password" id="confirmNewPassword" placeholder="أعد كتابة كلمة المرور الجديدة" style="width: 100%; padding: 1rem; background: linear-gradient(135deg, rgba(248, 250, 252, 0.9) 0%, rgba(255, 255, 255, 0.95) 100%); border: 2px solid rgba(14, 165, 233, 0.2); border-radius: 15px; color: #1e3a8a; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(14, 165, 233, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -1px 0 rgba(0, 0, 0, 0.05); transform: perspective(50px) rotateX(2deg);">
+          </div>
+          
+          <button type="submit" class="hm-btn-3d" style="background: linear-gradient(135deg, #0ea5e9 0%, #1e3a8a 100%); color: #ffffff; width: 100%; padding: 1rem; font-size: 1.1rem; font-weight: 700; position: relative; overflow: hidden;">
+            <span style="position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 0.75rem;">
+              <i class="fas fa-sync-alt"></i> 
+              <span>تغيير كلمة المرور</span>
+            </span>
+            <div style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent); transition: left 0.5s ease;"></div>
+          </button>
+        </form>
       </div>
     </div>
   </section>
@@ -289,53 +720,80 @@
 
 <script>
 function showTab(tabName) {
-  // Hide all tabs
   document.querySelectorAll('.hm-tab-content').forEach(tab => {
     tab.style.display = 'none';
   });
   
-  // Remove active class from all buttons
   document.querySelectorAll('.hm-tab-btn').forEach(btn => {
-    btn.style.background = 'rgba(255,255,255,0.1)';
-    btn.style.borderColor = 'rgba(255,255,255,0.2)';
-    btn.style.color = 'rgba(255,255,255,0.7)';
+    btn.classList.remove('active');
   });
   
-  // Show selected tab
   document.getElementById(tabName + '-tab').style.display = 'block';
+  event.target.classList.add('active');
   
-  // Add active class to clicked button
-  event.target.style.background = 'rgba(14,165,233,0.2)';
-  event.target.style.borderColor = '#0ea5e9';
-  event.target.style.color = '#fff';
+  // Add ripple effect to clicked tab
+  const ripple = document.createElement('span');
+  ripple.style.position = 'absolute';
+  ripple.style.borderRadius = '50%';
+  ripple.style.background = 'rgba(255, 255, 255, 0.5)';
+  ripple.style.width = ripple.style.height = '40px';
+  ripple.style.left = '50%';
+  ripple.style.top = '50%';
+  ripple.style.transform = 'translate(-50%, -50%) scale(0)';
+  ripple.style.animation = 'rippleEffect 0.6s ease-out';
+  event.target.appendChild(ripple);
+  
+  setTimeout(() => {
+    ripple.remove();
+  }, 600);
 }
 
 function saveProfile() {
   const formData = {
     name: document.getElementById('name').value,
-    email: document.getElementById('email').value,
     phone: document.getElementById('phone').value,
-    securityLevel: document.getElementById('securityLevel').value,
     _csrf: document.getElementById('csrfToken').value
   };
   
+  // Show loading state
+  const saveBtn = event.target;
+  const originalText = saveBtn.innerHTML;
+  saveBtn.innerHTML = '<span style="position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 0.75rem;"><i class="fas fa-spinner fa-spin"></i> <span>جاري الحفظ...</span></span>';
+  saveBtn.disabled = true;
+  
   fetch('/client/profile/update', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(formData)
   })
   .then(response => response.json())
   .then(data => {
     if (data.success) {
-      alert('تم تحديث الملف الشخصي بنجاح!');
-      location.reload();
+      // Success animation
+      saveBtn.innerHTML = '<span style="position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 0.75rem;"><i class="fas fa-check"></i> <span>تم الحفظ!</span></span>';
+      saveBtn.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
+      
+      setTimeout(() => {
+        location.reload();
+      }, 1500);
     } else {
+      // Error state
+      saveBtn.innerHTML = '<span style="position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 0.75rem;"><i class="fas fa-exclamation-triangle"></i> <span>فشل!</span></span>';
+      saveBtn.style.background = 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)';
+      
+      setTimeout(() => {
+        saveBtn.innerHTML = originalText;
+        saveBtn.style.background = 'linear-gradient(135deg, #0ea5e9 0%, #1e3a8a 100%)';
+        saveBtn.disabled = false;
+      }, 2000);
+      
       alert('حدث خطأ: ' + data.message);
     }
   })
   .catch(error => {
+    saveBtn.innerHTML = originalText;
+    saveBtn.style.background = 'linear-gradient(135deg, #0ea5e9 0%, #1e3a8a 100%)';
+    saveBtn.disabled = false;
     alert('حدث خطأ في الاتصال');
   });
 }
@@ -350,123 +808,108 @@ document.getElementById('changePasswordForm').addEventListener('submit', functio
     _csrf: document.getElementById('csrfToken2').value
   };
   
+  // Validate passwords
+  if (formData.newPassword !== formData.confirmNewPassword) {
+    alert('كلم تتطابق كلمة المرور الجديدة مع تأكيدها');
+    return;
+  }
+  
+  if (formData.newPassword.length < 8) {
+    alert('كلمة المرور يجب أن تكون 8 أحرف على الأقل');
+    return;
+  }
+  
+  // Show loading state
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  const originalText = submitBtn.innerHTML;
+  submitBtn.innerHTML = '<span style="position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 0.75rem;"><i class="fas fa-spinner fa-spin"></i> <span>جاري التغيير...</span></span>';
+  submitBtn.disabled = true;
+  
   fetch('/client/profile/change-password', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(formData)
   })
   .then(response => response.json())
   .then(data => {
     if (data.success) {
-      alert('تم تغيير كلمة المرور بنجاح!');
+      // Success animation
+      submitBtn.innerHTML = '<span style="position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 0.75rem;"><i class="fas fa-check"></i> <span>تم التغيير!</span></span>';
+      submitBtn.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
+      
       document.getElementById('changePasswordForm').reset();
+      
+      setTimeout(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.style.background = 'linear-gradient(135deg, #0ea5e9 0%, #1e3a8a 100%)';
+        submitBtn.disabled = false;
+      }, 2000);
+      
+      alert('تم تغيير كلمة المرور بنجاح!');
     } else {
+      // Error state
+      submitBtn.innerHTML = '<span style="position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 0.75rem;"><i class="fas fa-exclamation-triangle"></i> <span>فشل!</span></span>';
+      submitBtn.style.background = 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)';
+      
+      setTimeout(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.style.background = 'linear-gradient(135deg, #0ea5e9 0%, #1e3a8a 100%)';
+        submitBtn.disabled = false;
+      }, 2000);
+      
       alert('حدث خطأ: ' + data.message);
     }
   })
   .catch(error => {
+    submitBtn.innerHTML = originalText;
+    submitBtn.style.background = 'linear-gradient(135deg, #0ea5e9 0%, #1e3a8a 100%)';
+    submitBtn.disabled = false;
     alert('حدث خطأ في الاتصال');
   });
 });
 
-// Two-factor toggle
-document.getElementById('twoFactorToggle').addEventListener('change', function() {
-  const formData = {
-    enabled: this.checked,
-    _csrf: document.getElementById('csrfToken').value
-  };
-  
-  fetch('/client/profile/toggle-2fa', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(formData)
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (!data.success) {
-      this.checked = !this.checked; // Revert the toggle
-      alert('حدث خطأ: ' + data.message);
-    }
+// Add ripple effect to all buttons
+document.querySelectorAll('.hm-btn-3d').forEach(button => {
+  button.addEventListener('click', function(e) {
+    const ripple = document.createElement('span');
+    ripple.style.position = 'absolute';
+    ripple.style.borderRadius = '50%';
+    ripple.style.background = 'rgba(255, 255, 255, 0.5)';
+    ripple.style.width = ripple.style.height = '40px';
+    ripple.style.left = e.offsetX - 20 + 'px';
+    ripple.style.top = e.offsetY - 20 + 'px';
+    ripple.style.transform = 'scale(0)';
+    ripple.style.animation = 'rippleEffect 0.6s ease-out';
+    this.appendChild(ripple);
+    
+    setTimeout(() => {
+      ripple.remove();
+    }, 600);
   });
 });
 
-// Device binding toggle
-document.getElementById('deviceBindingToggle').addEventListener('change', function() {
-  const formData = {
-    allowMultiple: !this.checked,
-    _csrf: document.getElementById('csrfToken').value
-  };
+// Add focus effects to form inputs
+document.querySelectorAll('input, select').forEach(input => {
+  input.addEventListener('focus', function() {
+    this.style.transform = 'perspective(50px) rotateX(0deg)';
+    this.style.boxShadow = '0 0 20px rgba(14, 165, 233, 0.3), 0 4px 15px rgba(14, 165, 233, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.9), inset 0 -1px 0 rgba(0, 0, 0, 0.02)';
+  });
   
-  fetch('/client/profile/toggle-device-binding', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(formData)
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (!data.success) {
-      this.checked = !this.checked; // Revert the toggle
-      alert('حدث خطأ: ' + data.message);
-    }
+  input.addEventListener('blur', function() {
+    this.style.transform = 'perspective(50px) rotateX(2deg)';
+    this.style.boxShadow = '0 2px 8px rgba(14, 165, 233, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -1px 0 rgba(0, 0, 0, 0.05)';
   });
 });
 
-function removeDevice(deviceId) {
-  if (confirm('هل أنت متأكد من إزالة هذا الجهاز؟')) {
-    const formData = {
-      deviceId: deviceId,
-      _csrf: document.getElementById('csrfToken').value
-    };
-    
-    fetch('/client/profile/remove-device', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData)
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        location.reload();
-      } else {
-        alert('حدث خطأ: ' + data.message);
-      }
-    });
+// Add CSS animation
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes rippleEffect {
+    to {
+      transform: scale(4);
+      opacity: 0;
+    }
   }
-}
-
-function refreshDevices() {
-  location.reload();
-}
-
-function clearAllDevices() {
-  if (confirm('هل أنت متأكد من مسح جميع الأجهزة؟ سيؤدي هذا إلى تسجيل الخروج من جميع الأجهزة الأخرى.')) {
-    const formData = {
-      _csrf: document.getElementById('csrfToken').value
-    };
-    
-    fetch('/client/profile/clear-all-devices', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData)
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        location.reload();
-      } else {
-        alert('حدث خطأ: ' + data.message);
-      }
-    });
-  }
-}
+`;
+document.head.appendChild(style);
 </script>

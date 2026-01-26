@@ -3,12 +3,12 @@
 /* ===== Admin Dashboard - Gold + White Luxury ===== */
 :root {
   /* Primary Colors - Navy Blue + Snow White */
-  --primary-navy: #001f3f;
-  --primary-navy-light: #003366;
-  --primary-navy-dark: #001429;
-  --accent-blue: #007bff;
-  --accent-blue-light: #3395ff;
-  --accent-blue-dark: #0056b3;
+  --primary-navy: #1e3a8a;
+  --primary-navy-light: #3b82f6;
+  --primary-navy-dark: #1e40af;
+  --accent-blue: #60a5fa;
+  --accent-blue-light: #dbeafe;
+  --accent-blue-dark: #2563eb;
   
   /* Snow White Colors */
   --snow-white: #ffffff;

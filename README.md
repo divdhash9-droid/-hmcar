@@ -41,7 +41,7 @@ npm start
 ```
 
 ### الروابط
-- **التطوير المحلي**: http://localhost:4001
+- **التطوير المحلي**: http://localhost:4000
 - **الإنتاج**: https://-hmcar.vercel.app
 
 ## 📱 حسابات الاختبار
@@ -179,7 +179,7 @@ npm start
 
 ### المتغيرات البيئية
 ```
-PORT=4001
+PORT=4000
 MONGO_URI=mongodb://localhost:27017/car-auction
 SESSION_SECRET=your-secret-key
 ```

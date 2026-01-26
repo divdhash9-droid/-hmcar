@@ -14,18 +14,27 @@ router.get('/dashboard', requireAuth, async (req, res) => {
     if (!user || user.role !== 'buyer') {
       return res.redirect('/auth/login');
     }
+
+    // تم إلغاء لوحة /client/dashboard لصالح صفحة /cars
+    return res.redirect('/cars');
     
-    res.render('client/dashboard', {
-      currentUser: user,
-      title: 'لوحة تحكم العميل',
-      hideNavbar: true,
-      hideFooter: true,
-      fullWidth: true
-    });
   } catch (error) {
     console.error('Error loading client dashboard:', error);
     res.redirect('/auth/login');
   }
+});
+
+// Notification settings (client)
+router.get('/notification-settings', requireAuth, (req, res) => {
+  res.render('client/notification-settings', {
+    title: 'إعدادات الإشعارات',
+    bodyClass: 'hm-client-dashboard'
+  });
+});
+
+// Backward compatibility: some templates/js may still link here
+router.get('/notifications', requireAuth, (req, res) => {
+  return res.redirect('/client/notification-settings');
 });
 
 // مسار حساب العميل (سيتم تضمينه من مسار منفصل)

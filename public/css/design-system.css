@@ -522,3 +522,94 @@
 .hm-hover-lift:hover { transform: translateY(-3px); }
 .hm-hover-scale:hover { transform: scale(1.05); }
 .hm-hover-rotate:hover { transform: rotate(5deg); }
+
+/* ============================================
+   FORM SELECT STYLING - تحسين تصميم القوائم المنسدلة
+   ============================================ */
+
+.hm-form-select {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border: 2px solid var(--hm-border-medium);
+  border-radius: var(--hm-radius-lg);
+  background: linear-gradient(135deg, var(--hm-white) 0%, var(--hm-snow-pearl) 100%);
+  color: var(--hm-text-primary);
+  font-size: 0.95rem;
+  font-weight: 500;
+  font-family: 'Cairo', sans-serif;
+  transition: all var(--hm-transition-normal);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23001f3f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: left 1rem center;
+  background-size: 1.25rem;
+  padding-left: 3rem;
+  box-shadow: var(--hm-shadow-sm);
+}
+
+.hm-form-select:hover {
+  border-color: var(--hm-accent-blue);
+  background: linear-gradient(135deg, var(--hm-snow-white) 0%, var(--hm-white) 100%);
+  box-shadow: var(--hm-shadow-md);
+  transform: translateY(-1px);
+}
+
+.hm-form-select:focus {
+  outline: none;
+  border-color: var(--hm-accent-blue);
+  background: var(--hm-white);
+  box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.1), var(--hm-shadow-lg);
+}
+
+/* Select Options Styling */
+.hm-form-select option {
+  background: var(--hm-white);
+  color: var(--hm-text-primary);
+  padding: 1rem;
+  font-weight: 500;
+  border: none;
+}
+
+.hm-form-select option:hover {
+  background: var(--hm-snow-pearl);
+  color: var(--hm-accent-blue);
+}
+
+.hm-form-select option:checked {
+  background: linear-gradient(135deg, var(--hm-accent-blue) 0%, var(--hm-accent-lightblue) 100%);
+  color: var(--hm-white);
+  font-weight: 600;
+}
+
+/* Dark theme for selects */
+.hm-form-select.dark {
+  background: linear-gradient(135deg, var(--hm-navy-primary) 0%, var(--hm-navy-light) 100%);
+  color: var(--hm-text-white);
+  border-color: var(--hm-navy-light);
+}
+
+.hm-form-select.dark:hover {
+  background: linear-gradient(135deg, var(--hm-navy-light) 0%, var(--hm-navy-lighter) 100%);
+  border-color: var(--hm-accent-blue);
+}
+
+.hm-form-select.dark option {
+  background: var(--hm-navy-primary);
+  color: var(--hm-text-white);
+}
+
+.hm-form-select.dark option:checked {
+  background: linear-gradient(135deg, var(--hm-accent-blue) 0%, var(--hm-accent-lightblue) 100%);
+  color: var(--hm-white);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hm-form-select {
+    padding: 0.875rem 1rem;
+    font-size: 0.9rem;
+    background-size: 1.125rem;
+    padding-left: 2.75rem;
+  }
+}

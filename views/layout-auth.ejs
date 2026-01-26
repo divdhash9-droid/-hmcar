@@ -1,0 +1,42 @@
+<!-- views/layout-auth.ejs -->
+<!--
+  تخطيط مخصص لصفحات المصادقة (تسجيل الدخول، إنشاء حساب)
+  - يحتوي فقط على الأنماط والسكربتات الضرورية لهذه الصفحات.
+  - يمنع تداخل الأنماط العامة مع تصميم صفحات الدخول الجديدة.
+-->
+<!DOCTYPE html>
+<% const _locale = (typeof locale !== 'undefined' && locale) ? String(locale) : 'ar'; %>
+<html lang="<%= _locale %>" dir="<%= _locale === 'ar' ? 'rtl' : 'ltr' %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= (typeof title !== 'undefined' && title) ? title : 'HM CAR' %></title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome (local) -->
+  <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/public/images/favicon.svg" />
+
+  <!-- PWA & Mobile -->
+  <meta name="theme-color" content="#07243b" />
+  <link rel="manifest" href="/manifest.json" />
+
+  <% const _bc = (typeof bodyClass !== 'undefined' && bodyClass) ? String(bodyClass) : ''; %>
+  <% if (_bc.includes('login-organized')) { %>
+    <link rel="stylesheet" href="/public/css/login-organized.css" />
+  <% } %>
+
+  <!-- Page-specific styles can also be included by the view -->
+</head>
+<body class="<%= (typeof bodyClass !== 'undefined' && bodyClass) ? bodyClass : '' %>">
+  <main id="main-content">
+    <%- body %>
+  </main>
+</body>
+</html>

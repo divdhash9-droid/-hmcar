@@ -1,15 +1,328 @@
 <!-- [[ARABIC_HEADER]] هذا الملف (views/errors/404.ejs) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. -->
 
-<div class="hm-dashboard">
-  <div class="hm-dashboard__container text-center" style="padding: 100px 0;">
-    <div class="hm-card mx-auto" style="max-width: 600px;">
-      <div class="hm-icon-container hm-icon-container-light mx-auto mb-4">
-        <i class="fas fa-exclamation-triangle hm-icon-3xl hm-icon-muted"></i>
-      </div>
-      <h1 class="hm-text-gold" style="font-size: 6rem; margin-bottom: 20px;">404</h1>
-      <h2 class="hm-text-blue" style="font-size: 2rem; margin-bottom: 20px;">الصفحة غير موجودة</h2>
-      <p class="mb-4" style="font-size: 1.2rem;">عذراً، الصفحة التي تبحث عنها غير موجودة أو تم نقلها.</p>
-      <a href="/" class="hm-btn hm-btn-primary">العودة للرئيسية</a>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.error-404-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 25%, #0ea5e9 50%, #1e3a8a 75%, #1e293b 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cairo', sans-serif;
+    position: relative;
+    overflow: hidden;
+}
+
+.error-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+.error-particles {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(2px 2px at 20px 30px, #0ea5e9, transparent),
+        radial-gradient(2px 2px at 40px 70px, #1e3a8a, transparent),
+        radial-gradient(1px 1px at 50px 50px, #f8fafc, transparent),
+        radial-gradient(1px 1px at 80px 10px, #ffffff, transparent),
+        radial-gradient(2px 2px at 130px 80px, #0ea5e9, transparent);
+    background-repeat: repeat;
+    background-size: 200px 200px;
+    animation: particlesFloat 20s linear infinite;
+}
+
+@keyframes particlesFloat {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(-200px, -200px); }
+}
+
+.error-grid {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: 
+        linear-gradient(90deg, rgba(248, 250, 252, 0.05) 1px, transparent 1px),
+        linear-gradient(rgba(14, 165, 233, 0.05) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: gridMove 10s linear infinite;
+}
+
+@keyframes gridMove {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50px, 50px); }
+}
+
+.error-light-beam {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(from 0deg, transparent, rgba(248, 250, 252, 0.1), rgba(14, 165, 233, 0.05), transparent);
+    animation: beamRotate 20s linear infinite;
+}
+
+@keyframes beamRotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.error-card {
+    background: linear-gradient(135deg, rgba(248, 250, 252, 0.95) 0%, rgba(255, 255, 255, 0.9) 50%, rgba(240, 249, 255, 0.95) 100%);
+    backdrop-filter: blur(20px);
+    border-radius: 30px;
+    padding: 4rem 3rem;
+    max-width: 600px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 
+        0 25px 50px rgba(14, 165, 233, 0.15),
+        0 15px 35px rgba(30, 58, 138, 0.1),
+        0 5px 15px rgba(0, 0, 0, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(248, 250, 252, 0.5);
+    transform: perspective(1000px) rotateY(0deg) rotateX(2deg);
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.error-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(248, 250, 252, 0.8), transparent);
+    animation: cardShimmer 3s ease-in-out infinite;
+}
+
+.error-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(from 0deg, transparent, rgba(14, 165, 233, 0.03), transparent);
+    animation: cardRotate 20s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes cardShimmer {
+    0%, 100% { opacity: 0.3; transform: translateX(-100%); }
+    50% { opacity: 0.8; transform: translateX(100%); }
+}
+
+@keyframes cardRotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.error-card:hover {
+    transform: perspective(1000px) rotateY(2deg) rotateX(0deg) translateY(-5px);
+    box-shadow: 
+        0 35px 70px rgba(14, 165, 233, 0.2),
+        0 20px 40px rgba(30, 58, 138, 0.15),
+        0 8px 20px rgba(0, 0, 0, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.03);
+}
+
+.error-icon-container {
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.error-icon {
+    font-size: 5rem;
+    background: linear-gradient(45deg, #0ea5e9, #1e3a8a, #64748b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: iconPulse 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 20px rgba(14, 165, 233, 0.5));
+}
+
+@keyframes iconPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+.error-code {
+    font-size: 8rem;
+    font-weight: 900;
+    background: linear-gradient(45deg, #1e3a8a, #0ea5e9, #64748b, #1e3a8a);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+    animation: gradientShift 3s ease-in-out infinite;
+    text-shadow: 0 0 30px rgba(14, 165, 233, 0.3);
+}
+
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.error-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #1e3a8a;
+    margin-bottom: 1rem;
+    background: linear-gradient(45deg, #1e3a8a, #0ea5e9, #64748b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 2px 10px rgba(14, 165, 233, 0.2);
+}
+
+.error-description {
+    font-size: 1.2rem;
+    color: rgba(30, 58, 138, 0.8);
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
+}
+
+.error-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.25rem 2.5rem;
+    background: linear-gradient(135deg, #0ea5e9 0%, #1e3a8a 50%, #0284c7 100%);
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    box-shadow: 
+        0 8px 25px rgba(14, 165, 233, 0.4),
+        0 4px 15px rgba(30, 58, 138, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+    border: 2px solid rgba(248, 250, 252, 0.3);
+    transform: perspective(100px) rotateX(10deg) translateY(0);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.error-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(248, 250, 252, 0.4), transparent);
+    transition: left 0.5s ease;
+}
+
+.error-btn::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 50%, rgba(0, 0, 0, 0.1) 100%);
+    border-radius: inherit;
+}
+
+.error-btn:hover::before {
+    left: 100%;
+}
+
+.error-btn:hover {
+    transform: perspective(100px) rotateX(0deg) translateY(-5px);
+    box-shadow: 
+        0 15px 35px rgba(14, 165, 233, 0.5),
+        0 8px 25px rgba(30, 58, 138, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+    border-color: rgba(248, 250, 252, 0.5);
+}
+
+.error-btn:active {
+    transform: perspective(100px) rotateX(5deg) translateY(-2px);
+    box-shadow: 
+        0 5px 15px rgba(14, 165, 233, 0.3),
+        0 2px 8px rgba(30, 58, 138, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.error-btn-icon {
+    transition: transform 0.3s ease;
+}
+
+.error-btn:hover .error-btn-icon {
+    transform: translateX(-5px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .error-card {
+        padding: 3rem 2rem;
+        margin: 1rem;
+    }
+    
+    .error-code {
+        font-size: 6rem;
+    }
+    
+    .error-title {
+        font-size: 2rem;
+    }
+    
+    .error-description {
+        font-size: 1.1rem;
+    }
+    
+    .error-btn {
+        padding: 1rem 2rem;
+        font-size: 1rem;
+    }
+}
+</style>
+
+<div class="error-404-container">
+    <div class="error-background">
+        <div class="error-particles"></div>
+        <div class="error-grid"></div>
+        <div class="error-light-beam"></div>
     </div>
-  </div>
+    
+    <div class="error-card">
+        <div class="error-icon-container">
+            <i class="fas fa-exclamation-triangle error-icon"></i>
+        </div>
+        
+        <h1 class="error-code">404</h1>
+        <h2 class="error-title">الصفحة غير موجودة</h2>
+        <p class="error-description">
+            عذراً، الصفحة التي تبحث عنها غير موجودة أو تم نقلها. 
+            يرجى التحقق من الرابط أو العودة إلى الصفحة الرئيسية.
+        </p>
+        
+        <a href="/" class="error-btn">
+            <i class="fas fa-home error-btn-icon"></i>
+            <span>العودة للرئيسية</span>
+        </a>
+    </div>
 </div>

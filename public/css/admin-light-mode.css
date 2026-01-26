@@ -1,0 +1,209 @@
+/*
+ * Snow-white admin palette overrides
+ * Ensures admin experiences use bright surfaces with deep navy accents
+ */
+
+.hm-admin-page,
+.hm-admin-page .hm-admin-layout,
+.hm-admin-page .hm-admin-main {
+  background: #f6f9ff;
+  color: #111c34;
+}
+
+.hm-admin-page .hm-admin-bg,
+.hm-admin-page .hm-admin-bg-gradient,
+.hm-admin-page .hm-admin-bg-glow {
+  display: none;
+}
+
+.hm-admin-page .hm-admin-content {
+  background: transparent;
+}
+
+.hm-admin-page .hm-admin-header {
+  background: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid rgba(17, 36, 70, 0.08);
+  box-shadow: 0 18px 35px rgba(8, 18, 40, 0.08);
+  color: #0f1f3a;
+}
+
+.hm-admin-page .hm-header-title h1 {
+  color: #111c34;
+}
+
+.hm-admin-page .hm-header-breadcrumb {
+  color: #5a6480;
+}
+
+.hm-admin-page .hm-header-breadcrumb a {
+  background: #0f2f5a;
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.4rem 1rem;
+}
+
+.hm-admin-page .hm-pill {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid #e1e7f3;
+  color: #0f1f3a;
+}
+
+.hm-admin-page .hm-pill i {
+  color: #1c4583;
+}
+
+.hm-admin-page .hm-admin-sidebar {
+  background: rgba(255, 255, 255, 0.96);
+  color: #111c34;
+  border-left: 1px solid rgba(15, 33, 63, 0.08);
+  box-shadow: -28px 0 60px rgba(7, 18, 44, 0.08);
+}
+
+.hm-admin-page .hm-sidebar-brand h1,
+.hm-admin-page .hm-sidebar-brand span {
+  color: #0b1f44;
+}
+
+.hm-admin-page .hm-nav-section {
+  border-color: rgba(17, 30, 56, 0.08);
+}
+
+.hm-admin-page .hm-nav-section-title {
+  color: #627496;
+}
+
+.hm-admin-page .hm-nav-item {
+  background: rgba(15, 33, 63, 0.04);
+  color: #0b1f44;
+  border: 1px solid transparent;
+}
+
+.hm-admin-page .hm-nav-item i,
+.hm-admin-page .hm-nav-item span,
+.hm-admin-page .hm-nav-item small {
+  color: inherit;
+}
+
+.hm-admin-page .hm-nav-item:hover {
+  border-color: rgba(15, 33, 63, 0.18);
+  box-shadow: 0 8px 18px rgba(10, 26, 54, 0.08);
+}
+
+.hm-admin-page .hm-nav-item.active {
+  background: linear-gradient(130deg, #0f2f5a, #1d4e8e);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 16px 26px rgba(13, 41, 89, 0.4);
+}
+
+.hm-admin-page .hm-sidebar-user-card {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid #e3e8f4;
+  color: #111c34;
+}
+
+.hm-admin-page .hm-sidebar-user small {
+  color: #5f6d85;
+}
+
+.hm-admin-page .hm-admin-card,
+.hm-admin-page .hm-stat-card,
+.hm-admin-page .hm-admin-table,
+.hm-admin-page .hm-admin-form-card,
+.hm-admin-page .hm-card-panel,
+.hm-admin-page .hm-quick-action-card,
+.hm-admin-page .hm-notification-card,
+.hm-admin-page .hm-team-card {
+  background: #fff;
+  border: 1px solid #e2e8f4;
+  box-shadow: 0 25px 65px rgba(12, 25, 52, 0.08);
+  color: #111c34;
+}
+
+.hm-admin-page .hm-admin-card .hm-card-title,
+.hm-admin-page .hm-card-title,
+.hm-admin-page .hm-stat-label {
+  color: #536186;
+}
+
+.hm-admin-page .hm-stat-value {
+  color: #0b1f44;
+}
+
+.hm-admin-page .hm-stat-icon {
+  background: radial-gradient(circle at top, #1b4b94, #0f2f5a);
+  color: #fff;
+}
+
+.hm-admin-page .hm-insights-card strong,
+.hm-admin-page .hm-insights-card h4 {
+  color: #0b1f44;
+}
+
+.hm-admin-page .hm-admin-table th {
+  background: #eff3fb;
+  color: #41506f;
+  border-bottom: 1px solid #dbe2f2;
+}
+
+.hm-admin-page .hm-admin-table td {
+  color: #263556;
+  border-bottom: 1px solid #edf1fb;
+}
+
+.hm-admin-page .hm-admin-table tbody tr:hover {
+  background: rgba(15, 33, 63, 0.04);
+}
+
+.hm-admin-page .hm-btn-admin,
+.hm-admin-page .hm-header-actions .hm-btn {
+  border-radius: 999px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.hm-admin-page .hm-btn-admin-primary,
+.hm-admin-page .hm-header-actions .hm-btn-primary {
+  background: linear-gradient(135deg, #0f2f5a, #1c4c90);
+  color: #fff;
+  box-shadow: 0 18px 30px rgba(15, 46, 101, 0.35);
+  border: none;
+}
+
+.hm-admin-page .hm-btn-admin-primary:hover,
+.hm-admin-page .hm-header-actions .hm-btn-primary:hover {
+  background: linear-gradient(135deg, #132f54, #245da4);
+}
+
+.hm-admin-page .hm-btn-admin-secondary,
+.hm-admin-page .hm-header-actions .hm-btn-outline {
+  background: rgba(15, 33, 63, 0.06);
+  color: #0f2f5a;
+  border: 1px solid rgba(15, 33, 63, 0.2);
+}
+
+.hm-admin-page .hm-btn-admin-secondary:hover,
+.hm-admin-page .hm-header-actions .hm-btn-outline:hover {
+  background: rgba(15, 33, 63, 0.14);
+}
+
+.hm-admin-page .hm-toast,
+.hm-admin-page .hm-alert-card {
+  background: #fff;
+  color: #0f1f3a;
+  border: 1px solid #e1e7f3;
+}
+
+.hm-admin-page .hm-progress-track {
+  background: rgba(15, 33, 63, 0.08);
+}
+
+.hm-admin-page .hm-progress-bar {
+  background: linear-gradient(135deg, #0f2f5a, #1d4e8e);
+}
+
+.hm-admin-page .hm-quick-action-card .hm-card-title,
+.hm-admin-page .hm-notification-card .hm-card-title,
+.hm-admin-page .hm-team-card .hm-card-title {
+  color: #0f1f3a;
+}

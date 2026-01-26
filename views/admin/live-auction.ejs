@@ -32,7 +32,7 @@
       <div class="mb-4">
         <label class="form-label">رابط المزاد المباشر</label>
         <input name="liveAuctionUrl" type="url" class="form-control" 
-               value="<%= setting ? setting.value : '' %>" 
+               value="<%= (typeof setting !== 'undefined' && setting) ? setting.value : '' %>" 
                placeholder="https://youtube.com/watch?v=..." />
         <div class="form-text">رابط البث المباشر أو صفحة المزاد الخارجية</div>
       </div>
@@ -40,14 +40,14 @@
       <div class="mb-4">
         <label class="form-label">رقم WhatsApp للعملاء</label>
         <input name="customerWhatsAppNumber" type="tel" class="form-control" 
-               value="<%= waSetting ? waSetting.value : '' %>" 
+               value="<%= (typeof waSetting !== 'undefined' && waSetting) ? waSetting.value : '' %>" 
                placeholder="+966500000000" />
         <div class="form-text">رقم WhatsApp للتواصل مع العملاء</div>
       </div>
       
       <div class="mb-4">
         <label class="form-label">بنرات العملاء</label>
-        <textarea name="customerBanners" class="form-control" rows="6"><%= banners %></textarea>
+        <textarea name="customerBanners" class="form-control" rows="6"><%= (typeof banners !== 'undefined' && banners) ? banners : '' %></textarea>
         <div class="form-text">بنرات تظهر للعملاء (تنسيق JSON)</div>
       </div>
       

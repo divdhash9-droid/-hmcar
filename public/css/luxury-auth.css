@@ -1,0 +1,1614 @@
+/* [[ARABIC_HEADER]] هذا الملف (public/css/luxury-auth.css) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. */
+
+/* استيراد الخطوط الحديثة */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap');
+
+/* المتغيرات الرئيسية للتصميم الفاخر */
+:root {
+  --snow-white: #ffffff;
+  --navy-blue: #0a192f;
+  --navy-light: #112240;
+  --navy-dark: #020817;
+  --accent-blue: #2366d1;
+  --accent-gold: #ffd700;
+  --text-primary: #0a192f;
+  --text-secondary: #64748b;
+  --text-light: #94a3b8;
+  --border-light: #e2e8f0;
+  --border-medium: #cbd5e1;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --shadow-3d: 0 8px 16px rgba(10, 25, 47, 0.3), 0 4px 8px rgba(10, 25, 47, 0.2);
+  --gradient-primary: linear-gradient(135deg, var(--navy-blue) 0%, var(--navy-light) 100%);
+  --gradient-secondary: linear-gradient(135deg, var(--snow-white) 0%, #f8fafc 100%);
+  --gradient-accent: linear-gradient(135deg, var(--accent-blue) 0%, #1e40af 100%);
+  --border-radius-sm: 8px;
+  --border-radius-md: 12px;
+  --border-radius-lg: 16px;
+  --border-radius-xl: 20px;
+  --border-radius-2xl: 24px;
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+}
+
+/* التصميم الأساسي */
+.hm-luxury-login {
+  font-family: 'Cairo', sans-serif;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%);
+}
+
+/* الخلفية المتحركة */
+.hm-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hm-gradient-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.3;
+  animation: floatOrbModern 25s ease-in-out infinite;
+}
+
+.hm-orb-1 {
+  width: 700px;
+  height: 700px;
+  background: radial-gradient(circle at 30% 30%, #2366d1 0%, #1e40af 40%, transparent 70%);
+  top: -250px;
+  right: -150px;
+  animation-delay: 0s;
+}
+
+.hm-orb-2 {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle at 70% 70%, #0a192f 0%, #112240 40%, transparent 70%);
+  bottom: -200px;
+  left: -150px;
+  animation-delay: 8s;
+}
+
+.hm-orb-3 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle at 50% 50%, #ffd700 0%, #ffed4e 30%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation-delay: 16s;
+}
+
+.hm-grid-pattern {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(10, 25, 47, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(10, 25, 47, 0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
+  animation: gridMove 20s linear infinite;
+}
+
+@keyframes floatOrbModern {
+  0%, 100% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+  20% {
+    transform: translate(40px, -40px) scale(1.15) rotate(90deg);
+  }
+  40% {
+    transform: translate(-30px, 30px) scale(0.85) rotate(180deg);
+  }
+  60% {
+    transform: translate(50px, 20px) scale(1.1) rotate(270deg);
+  }
+  80% {
+    transform: translate(-20px, -30px) scale(0.95) rotate(360deg);
+  }
+}
+
+@keyframes gridMove {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(60px, 60px);
+  }
+}
+
+/* الحاوية الرئيسية */
+.hm-container {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+  max-width: 1400px;
+  margin: 0 auto;
+  box-shadow: var(--shadow-2xl);
+}
+
+/* اللوحة اليسرى - العلامة التجارية */
+.hm-brand-panel {
+  background: linear-gradient(135deg, #0a192f 0%, #112240 40%, #1e3a8a 100%);
+  color: var(--snow-white);
+  padding: 3rem;
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.hm-brand-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(255, 215, 0, 0.05) 0%, transparent 50%),
+    url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.03"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.03"/><circle cx="50" cy="50" r="0.5" fill="white" opacity="0.02"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+  opacity: 0.4;
+  pointer-events: none;
+  animation: shimmer 8s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.hm-brand-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+
+/* الشريط العلوي */
+.hm-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3rem;
+  animation: slideDown 0.8s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hm-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--border-radius-xl);
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  transition: all var(--transition-normal);
+}
+
+.hm-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.hm-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hm-home-btn {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: var(--snow-white);
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--border-radius-lg);
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all var(--transition-normal);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  text-decoration: none;
+}
+
+.hm-home-btn:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.1) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  color: var(--snow-white);
+}
+
+.hm-lang-btn {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: var(--snow-white);
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--border-radius-lg);
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all var(--transition-normal);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.hm-lang-btn:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.1) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* قسم الشعار */
+.hm-logo-section {
+  text-align: center;
+  margin-bottom: 3rem;
+  animation: fadeInScale 1s ease-out 0.3s both;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.hm-logo-container {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.05) 100%);
+  -webkit-backdrop-filter: blur(25px);
+  backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: var(--border-radius-2xl);
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  display: inline-block;
+  box-shadow: 
+    0 25px 50px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transition: all var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+.hm-logo-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.8s ease;
+}
+
+.hm-logo-container:hover::before {
+  left: 100%;
+}
+
+.hm-logo-container:hover {
+  transform: translateY(-5px);
+  box-shadow: 
+    0 35px 70px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.hm-logo {
+  width: 140px;
+  height: auto;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3));
+  transition: transform var(--transition-normal);
+}
+
+.hm-logo-container:hover .hm-logo {
+  transform: scale(1.05);
+}
+
+.hm-brand-title {
+  font-size: 3.5rem;
+  font-weight: 900;
+  margin: 0 0 1rem 0;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hm-brand-subtitle {
+  font-size: 1.25rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.6;
+  margin: 0;
+  font-weight: 500;
+}
+
+.hm-english-text {
+  font-size: 0.9rem;
+  opacity: 0.7;
+  display: block;
+  margin-top: 0.5rem;
+  font-weight: 400;
+}
+
+/* قسم المميزات */
+.hm-features {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 3rem;
+}
+
+.hm-feature-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--border-radius-lg);
+  padding: 1.75rem;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  transition: all var(--transition-normal);
+  box-shadow: 
+    0 10px 25px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+  animation: slideInLeft 0.8s ease-out;
+  animation-fill-mode: both;
+}
+
+.hm-feature-card:nth-child(1) { animation-delay: 0.6s; }
+.hm-feature-card:nth-child(2) { animation-delay: 0.8s; }
+.hm-feature-card:nth-child(3) { animation-delay: 1s; }
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.hm-feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.6s ease;
+}
+
+.hm-feature-card:hover::before {
+  left: 100%;
+}
+
+.hm-feature-card:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.1) 100%);
+  transform: translateY(-3px) translateX(5px);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.hm-feature-icon {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #2366d1 0%, #1e40af 100%);
+  border-radius: var(--border-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: var(--snow-white);
+  box-shadow: 
+    0 8px 16px rgba(35, 102, 209, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all var(--transition-normal);
+  position: relative;
+  z-index: 1;
+}
+
+.hm-feature-card:hover .hm-feature-icon {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 
+    0 12px 24px rgba(35, 102, 209, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.hm-feature-content h3 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 0 0 0.5rem 0;
+  color: var(--snow-white);
+  letter-spacing: -0.01em;
+}
+
+.hm-feature-content p {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.75);
+  margin: 0;
+  font-weight: 500;
+}
+
+/* الإحصائيات */
+.hm-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.hm-stat-item {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.1);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--border-radius-lg);
+  padding: 1rem;
+  transition: all var(--transition-normal);
+}
+
+.hm-stat-item:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.hm-stat-number {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--accent-gold);
+  margin-bottom: 0.25rem;
+}
+
+.hm-stat-label {
+  display: block;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* اللوحة اليمنى - تسجيل الدخول */
+.hm-login-panel {
+  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%);
+  padding: 3rem;
+  display: flex;
+  align-items: center;
+  position: relative;
+  box-shadow: 
+    0 25px 50px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.hm-login-content {
+  width: 100%;
+  max-width: 450px;
+  margin: 0 auto;
+  animation: slideInRight 0.8s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* التبويبات */
+.hm-tabs {
+  display: flex;
+  background: linear-gradient(145deg, #f1f5f9 0%, #e2e8f0 100%);
+  border-radius: var(--border-radius-xl);
+  padding: 0.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.06),
+    0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.hm-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: var(--border-radius-lg);
+  text-decoration: none;
+  font-weight: 700;
+  color: var(--text-secondary);
+  transition: all var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+.hm-tab::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(35, 102, 209, 0.1), transparent);
+  transition: left 0.6s ease;
+}
+
+.hm-tab:hover::before {
+  left: 100%;
+}
+
+.hm-tab.active {
+  background: linear-gradient(135deg, #0a192f 0%, #112240 100%);
+  color: var(--snow-white);
+  box-shadow: 
+    0 8px 25px rgba(10, 25, 47, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.hm-tab:not(.active):hover {
+  background: rgba(10, 25, 47, 0.05);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+}
+
+/* العنوان */
+.hm-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.hm-title {
+  font-size: 2.75rem;
+  font-weight: 900;
+  color: var(--text-primary);
+  margin: 0 0 0.75rem 0;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #0a192f 0%, #2366d1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hm-subtitle {
+  font-size: 1.125rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+/* التنبيهات */
+.hm-alert {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: var(--border-radius-lg);
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+  position: relative;
+}
+
+.hm-alert-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+}
+
+.hm-alert-success {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #16a34a;
+}
+
+.hm-alert-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.7;
+  transition: opacity var(--transition-fast);
+}
+
+.hm-alert-close:hover {
+  opacity: 1;
+}
+
+/* النموذج */
+.hm-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.hm-input-group {
+  position: relative;
+  animation: fadeInUp 0.8s ease-out;
+  animation-fill-mode: both;
+}
+
+.hm-input-group:nth-child(1) { animation-delay: 0.2s; }
+.hm-input-group:nth-child(2) { animation-delay: 0.4s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hm-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.hm-input-icon {
+  position: absolute;
+  right: 1.25rem;
+  color: var(--text-light);
+  font-size: 1.25rem;
+  z-index: 1;
+  transition: all var(--transition-normal);
+}
+
+.hm-input {
+  width: 100%;
+  padding: 1.25rem 1.25rem 1.25rem 3.5rem;
+  border: 2px solid var(--border-light);
+  border-radius: var(--border-radius-lg);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  transition: all var(--transition-normal);
+  box-shadow: 
+    0 4px 6px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.hm-input:focus {
+  outline: none;
+  border-color: #2366d1;
+  box-shadow: 
+    0 0 0 4px rgba(35, 102, 209, 0.1),
+    0 8px 25px rgba(35, 102, 209, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transform: translateY(-2px);
+}
+
+.hm-input:focus + .hm-input-label,
+.hm-input:not(:placeholder-shown) + .hm-input-label {
+  top: -0.75rem;
+  right: 1rem;
+  font-size: 0.8rem;
+  color: #2366d1;
+  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  padding: 0.25rem 0.5rem;
+  font-weight: 700;
+}
+
+.hm-input-label {
+  position: absolute;
+  top: 50%;
+  right: 3.5rem;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  pointer-events: none;
+  transition: all var(--transition-normal);
+  background: transparent;
+}
+
+.hm-password-toggle {
+  position: absolute;
+  left: 1.25rem;
+  background: none;
+  border: none;
+  color: var(--text-light);
+  cursor: pointer;
+  font-size: 1.125rem;
+  z-index: 1;
+  transition: all var(--transition-normal);
+  padding: 0.5rem;
+}
+
+.hm-password-toggle:hover {
+  color: #2366d1;
+  transform: scale(1.1);
+}
+
+/* الخيارات */
+.hm-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  animation: fadeInUp 0.8s ease-out 0.6s both;
+}
+
+.hm-checkbox-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.hm-checkbox {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.hm-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.hm-checkbox-custom {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--border-medium);
+  border-radius: var(--border-radius-sm);
+  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  position: relative;
+  transition: all var(--transition-normal);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.hm-checkbox:checked + .hm-checkbox-label .hm-checkbox-custom {
+  background: linear-gradient(135deg, #0a192f 0%, #2366d1 100%);
+  border-color: #0a192f;
+  box-shadow: 0 4px 12px rgba(10, 25, 47, 0.2);
+}
+
+.hm-checkbox:checked + .hm-checkbox-label .hm-checkbox-custom::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--snow-white);
+  font-size: 0.875rem;
+  font-weight: 800;
+}
+
+.hm-link {
+  color: #2366d1;
+  text-decoration: none;
+  font-weight: 700;
+  transition: all var(--transition-normal);
+  position: relative;
+}
+
+.hm-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #0a192f 0%, #2366d1 100%);
+  transition: width var(--transition-normal);
+}
+
+.hm-link:hover {
+  color: #0a192f;
+}
+
+.hm-link:hover::after {
+  width: 100%;
+}
+
+/* الزر ثلاثي الأبعاد */
+.hm-btn {
+  background: linear-gradient(135deg, #0a192f 0%, #112240 50%, #2366d1 100%);
+  color: var(--snow-white);
+  border: none;
+  padding: 1.25rem 2rem;
+  border-radius: var(--border-radius-lg);
+  font-size: 1.125rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  transition: all var(--transition-fast);
+  position: relative;
+  transform-style: preserve-3d;
+  box-shadow: 
+    0 12px 24px rgba(10, 25, 47, 0.3),
+    0 6px 12px rgba(10, 25, 47, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  animation: fadeInUp 0.8s ease-out 0.8s both;
+  overflow: hidden;
+}
+
+.hm-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.8s ease;
+}
+
+.hm-btn:hover::before {
+  left: 100%;
+}
+
+.hm-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 
+    0 20px 40px rgba(10, 25, 47, 0.4),
+    0 10px 20px rgba(10, 25, 47, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.hm-btn:active {
+  transform: translateY(-1px);
+  box-shadow: 
+    0 8px 16px rgba(10, 25, 47, 0.3),
+    0 4px 8px rgba(10, 25, 47, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.hm-btn-3d::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #0a192f 0%, #112240 100%);
+  transform: translate3d(0, 6px, -6px);
+  z-index: -1;
+  filter: blur(12px);
+  opacity: 0.6;
+}
+
+/* التذييل */
+.hm-footer {
+  text-align: center;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-light);
+}
+
+.hm-no-account {
+  color: var(--text-secondary);
+  margin: 0 0 0.5rem 0;
+  font-size: 0.875rem;
+}
+
+.hm-register-link {
+  color: var(--accent-blue);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.875rem;
+  transition: color var(--transition-normal);
+}
+
+.hm-register-link:hover {
+  color: var(--navy-blue);
+}
+
+.hm-switch {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.hm-switch p {
+  color: var(--text-secondary);
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.hm-switch-link {
+  color: var(--accent-blue);
+  text-decoration: none;
+  font-weight: 700;
+  transition: color var(--transition-normal);
+}
+
+.hm-switch-link:hover {
+  color: var(--navy-blue);
+}
+
+/* دعم RTL */
+[dir="rtl"] .hm-input-icon {
+  right: auto;
+  left: 1rem;
+}
+
+[dir="rtl"] .hm-input {
+  padding: 1rem 3rem 1rem 1rem;
+}
+
+[dir="rtl"] .hm-input-label {
+  right: auto;
+  left: 3rem;
+}
+
+[dir="rtl"] .hm-password-toggle {
+  left: auto;
+  right: 1rem;
+}
+
+[dir="rtl"] .hm-input:focus + .hm-input-label,
+[dir="rtl"] .hm-input:not(:placeholder-shown) + .hm-input-label {
+  right: auto;
+  left: 0.75rem;
+}
+
+/* التصميم المتجاوب */
+@media (max-width: 1024px) {
+  .hm-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .hm-brand-panel {
+    min-height: 60vh;
+    padding: 2rem;
+  }
+  
+  .hm-login-panel {
+    padding: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .hm-brand-panel {
+    min-height: 0;
+    padding: 1.5rem;
+  }
+  
+  .hm-login-panel {
+    padding: 1.5rem;
+  }
+  
+  .hm-login-content {
+    max-width: 100%;
+  }
+  
+  .hm-title {
+    font-size: 2rem;
+  }
+  
+  .hm-brand-title {
+    font-size: 2.5rem;
+  }
+  
+  .hm-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .hm-features {
+    gap: 0.75rem;
+  }
+  
+  .hm-feature-card {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hm-top-bar {
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .hm-tabs {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .hm-tab {
+    padding: 1rem;
+  }
+  
+  .hm-options {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+}
+
+/* تأثيرات الحركة الإضافية */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.hm-brand-panel {
+  animation: slideInLeft 0.8s ease-out;
+}
+
+.hm-login-panel {
+  animation: slideInRight 0.8s ease-out;
+}
+
+/* تأثيرات التركيز المتقدمة */
+.hm-input:focus ~ .hm-input-icon {
+  color: var(--accent-blue);
+}
+
+/* تأثيرات التحميل */
+.hm-btn.loading {
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+.hm-btn.loading::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--snow-white);
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Cars Page Styles */
+.hm-cars-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%);
+}
+
+/* Header Section */
+.hm-page-header {
+  background: linear-gradient(135deg, #0a192f 0%, #112240 50%, #2366d1 100%);
+  color: white;
+  padding: 4rem 0 3rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hm-page-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.03"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.03"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+  opacity: 0.3;
+}
+
+.hm-header-content {
+  position: relative;
+  z-index: 1;
+}
+
+.hm-page-title {
+  font-size: 3rem;
+  font-weight: 900;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hm-page-title i {
+  color: #ffd700;
+}
+
+.hm-page-subtitle {
+  font-size: 1.25rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.hm-header-stats {
+  display: flex;
+  gap: 2rem;
+  justify-content: flex-end;
+}
+
+.hm-stat-card {
+  background: rgba(255, 255, 255, 0.1);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 1.5rem;
+  text-align: center;
+  min-width: 120px;
+}
+
+.hm-stat-number {
+  display: block;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #ffd700;
+  margin-bottom: 0.5rem;
+}
+
+.hm-stat-label {
+  font-size: 0.875rem;
+  opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Filters Section */
+.hm-filters-section {
+  background: white;
+  padding: 2rem 0;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.hm-filters {
+  display: flex;
+  gap: 1.5rem;
+  align-items: end;
+  flex-wrap: wrap;
+}
+
+.hm-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.hm-filter-group label {
+  font-weight: 600;
+  color: #0a192f;
+  font-size: 0.875rem;
+}
+
+.hm-filter-select {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 1rem;
+  background: white;
+  min-width: 150px;
+  transition: all 0.3s ease;
+}
+
+.hm-filter-select:focus {
+  outline: none;
+  border-color: #2366d1;
+  box-shadow: 0 0 0 3px rgba(35, 102, 209, 0.1);
+}
+
+.hm-filter-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 1rem;
+}
+
+.hm-btn-outline {
+  background: transparent;
+  border: 2px solid #0a192f;
+  color: #0a192f;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hm-btn-outline:hover {
+  background: #0a192f;
+  color: white;
+}
+
+.hm-btn-primary {
+  background: linear-gradient(135deg, #0a192f 0%, #2366d1 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hm-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(10, 25, 47, 0.3);
+}
+
+/* Content Section */
+.hm-cars-content {
+  padding: 3rem 0;
+}
+
+/* Loading State */
+.hm-loading {
+  text-align: center;
+  padding: 4rem 0;
+}
+
+.hm-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #e2e8f0;
+  border-top: 4px solid #2366d1;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+/* Empty State */
+.hm-empty-state {
+  text-align: center;
+  padding: 4rem 0;
+}
+
+.hm-empty-icon {
+  font-size: 4rem;
+  color: #cbd5e1;
+  margin-bottom: 2rem;
+}
+
+.hm-empty-state h3 {
+  font-size: 1.5rem;
+  color: #0a192f;
+  margin-bottom: 1rem;
+}
+
+.hm-empty-state p {
+  color: #64748b;
+  margin-bottom: 2rem;
+}
+
+/* Cars Grid */
+.hm-cars-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+/* Car Card */
+.hm-car-card {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.hm-car-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.hm-car-image {
+  position: relative;
+  height: 250px;
+  overflow: hidden;
+}
+
+.hm-car-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.hm-car-card:hover .hm-car-img {
+  transform: scale(1.05);
+}
+
+.hm-car-actions {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  opacity: 0;
+  transform: translateX(20px);
+  transition: all 0.3s ease;
+}
+
+.hm-car-card:hover .hm-car-actions {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.hm-action-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.hm-btn-favorite {
+  background: rgba(239, 68, 68, 0.9);
+  color: white;
+}
+
+.hm-btn-favorite:hover {
+  background: #dc2626;
+  transform: scale(1.1);
+}
+
+.hm-btn-favorite.favorited {
+  background: #dc2626;
+}
+
+.hm-btn-view {
+  background: rgba(35, 102, 209, 0.9);
+  color: white;
+}
+
+.hm-btn-view:hover {
+  background: #1e40af;
+  transform: scale(1.1);
+}
+
+.hm-btn-compare {
+  background: rgba(34, 197, 94, 0.9);
+  color: white;
+}
+
+.hm-btn-compare:hover {
+  background: #16a34a;
+  transform: scale(1.1);
+}
+
+.hm-car-badge {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: rgba(255, 215, 0, 0.9);
+  color: #0a192f;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.hm-car-details {
+  padding: 1.5rem;
+}
+
+.hm-car-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 1rem;
+}
+
+.hm-car-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0a192f;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.hm-car-price {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #2366d1;
+}
+
+.hm-car-specs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.hm-spec {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.hm-spec i {
+  color: #94a3b8;
+}
+
+.hm-car-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.hm-car-location,
+.hm-car-auction {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Pagination */
+.hm-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 3rem;
+}
+
+.hm-page-btn {
+  min-width: 40px;
+  height: 40px;
+  border: 2px solid #e2e8f0;
+  background: white;
+  color: #0a192f;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hm-page-btn:hover {
+  border-color: #2366d1;
+  color: #2366d1;
+}
+
+.hm-page-btn.active {
+  background: linear-gradient(135deg, #0a192f 0%, #2366d1 100%);
+  color: white;
+  border-color: #0a192f;
+}
+
+.hm-page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hm-page-title {
+    font-size: 2rem;
+  }
+  
+  .hm-header-stats {
+    justify-content: center;
+    margin-top: 2rem;
+  }
+  
+  .hm-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .hm-filter-actions {
+    margin-left: 0;
+    margin-top: 1rem;
+    justify-content: center;
+  }
+  
+  .hm-cars-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .hm-car-specs {
+    flex-wrap: wrap;
+  }
+}

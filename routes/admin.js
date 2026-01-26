@@ -72,6 +72,7 @@ const Brand = require('../models/Brand');
 const SpareBrand = require('../models/SpareBrand');
 // Firebase completely removed - using local storage only
 // const { bucket } = require('../config/firebase');
+const { saveMulterFileToUploads } = require('../utils/uploadStorage');
 const lotteAuctionSync = require('../services/lotteAuctionSync');
 
 // لوحة الإدارة (Admin Panel):
@@ -97,24 +98,10 @@ function toNumberOrNull(v) {
 const requireAdmin = [requireAuth, requireRole(['admin', 'super_admin', 'manager'])];
 const requireSuperAdmin = [requireAuth, requireRole('super_admin')];
 
-// دالة مساعدة لرفع الملفات إلى Firebase Storage
+// دالة مساعدة لرفع الملفات محلياً داخل uploads وإرجاع رابط قابل للعرض
 async function uploadToFirebase(file, folder = 'misc') {
-  if (!file) return null;
-  
-  const fileName = `${folder}/${Date.now()}_${file.originalname.replace(/\s+/g, '_')}`;
-  const blob = bucket.file(fileName);
-  
-  await blob.save(file.buffer, {
-    metadata: { contentType: file.mimetype },
-    public: true,
-    resumable: false
-  });
-
-  if (process.env.FIREBASE_STORAGE_EMULATOR_HOST) {
-    return `http://${process.env.FIREBASE_STORAGE_EMULATOR_HOST}/v0/b/${bucket.name}/o/${encodeURIComponent(fileName)}?alt=media`;
-  }
-  
-  return `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+  // تم الإبقاء على اسم الدالة لتجنب تعديل كبير: الآن تستخدم التخزين المحلي
+  return await saveMulterFileToUploads(file, folder);
 }
 
 // رفع صور قطع الغيار (حتى 5 صور)
@@ -170,7 +157,7 @@ router.get('/', requireAdmin, async (req, res) => {
 
     const usersList = await User.find({ role: { $in: ['admin', 'manager', 'super_admin'] } }).select('-password');
 
-    res.render('admin/dashboard', {
+    res.render('admin/unified-dashboard', {
       hideNavbar: true,
       hideSearch: true,
       fullWidth: true,
@@ -195,7 +182,7 @@ router.get('/', requireAdmin, async (req, res) => {
     });
   } catch (error) {
     console.error('❌ Error loading admin dashboard:', error);
-    res.render('admin/dashboard', {
+    res.render('admin/unified-dashboard', {
       hideNavbar: true,
       hideSearch: true,
       fullWidth: true,
@@ -307,11 +294,7 @@ router.post('/brands', requireAdmin, brandUpload.single('logo'), async (req, res
     let logoUrl = logoUrlBody;
 
     if (req.file) {
-      // Here you would handle file upload to a service like Cloudinary and get the URL
-      // For now, we'll just use a placeholder.
-      // logoUrl = await uploadToCloudinary(req.file.path);
-      // For demonstration, let's assume a path. In reality, you'd get a URL.
-      logoUrl = `/uploads/${req.file.filename}`; // This requires setting up a static path for uploads
+      logoUrl = await uploadToFirebase(req.file, 'brands');
     }
 
     if (!name) {
@@ -345,9 +328,7 @@ router.post('/brands/:id/edit', requireAdmin, brandUpload.single('logo'), async 
         }
         
         if (req.file) {
-            // Handle file upload
-            // logoUrl = await uploadToCloudinary(req.file.path);
-             logoUrl = `/uploads/${req.file.filename}`;
+          logoUrl = await uploadToFirebase(req.file, 'brands');
         }
 
         brand.name = name;
@@ -414,10 +395,11 @@ router.post('/spare-parts', requireAdmin, (req, res, next) => {
     next();
   });
 }, async (req, res) => {
-  const { name, partType, spareBrandId, carMake, carMakeLogoUrl, carModel, carYear, price, priceSar, priceUsd, description, inStock, stockQty } = req.body;
-  
-  const imagePromises = (req.files || []).map(file => uploadToFirebase(file, 'spare-parts'));
-  const images = await Promise.all(imagePromises);
+  try {
+    const { name, partType, spareBrandId, carMake, carMakeLogoUrl, carModel, carYear, price, priceSar, priceUsd, description, inStock, stockQty } = req.body;
+    
+    const imagePromises = (req.files || []).map(file => uploadToFirebase(file, 'spare-parts'));
+    const images = await Promise.all(imagePromises);
 
   const parsedPriceSar = toNumberOrNull(priceSar);
   const parsedPriceUsd = toNumberOrNull(priceUsd);
@@ -437,31 +419,37 @@ router.post('/spare-parts', requireAdmin, (req, res, next) => {
   const sbId = String(spareBrandId || '').trim();
   const spareBrand = sbId ? await SpareBrand.findById(sbId) : null;
 
-  await SparePart.create({
-    name,
-    partType,
-    spareBrand: spareBrand ? spareBrand._id : null,
-    carMake,
-    carMakeLogoUrl,
-    carModel,
-    carYear,
-    price: computedLegacyPrice,
-    priceSar: parsedPriceSar,
-    priceUsd: parsedPriceUsd,
-    description,
-    images,
-    stockQty: finalStockQty,
-    inStock: finalInStock
-  });
+    await SparePart.create({
+      name,
+      partType,
+      spareBrand: spareBrand ? spareBrand._id : null,
+      carMake,
+      carMakeLogoUrl,
+      carModel,
+      carYear,
+      price: computedLegacyPrice,
+      priceSar: parsedPriceSar,
+      priceUsd: parsedPriceUsd,
+      description,
+      images,
+      stockQty: finalStockQty,
+      inStock: finalInStock
+    });
 
   // Send notification to all buyers about new spare part
-  const NotificationService = require('../services/NotificationService');
-  const newSparePart = await SparePart.findOne({ name }).sort({ createdAt: -1 });
-  if (newSparePart) {
-    await NotificationService.sendNewItemNotification(newSparePart, 'spare_part');
-  }
+    const NotificationService = require('../services/NotificationService');
+    const newSparePart = await SparePart.findOne({ name }).sort({ createdAt: -1 });
+    if (newSparePart) {
+      await NotificationService.sendNewItemNotification(newSparePart, 'spare_part');
+    }
 
-  res.redirect('/admin/spare-parts');
+    if (req.session) req.session.flash = { type: 'success', message: 'تمت إضافة قطعة الغيار بنجاح.' };
+    return res.redirect('/admin/spare-parts');
+  } catch (error) {
+    console.error('❌ Error creating spare part:', error);
+    if (req.session) req.session.flash = { type: 'danger', message: 'حدث خطأ أثناء إضافة قطعة الغيار.' };
+    return res.redirect('/admin/spare-parts');
+  }
 });
 
 router.get('/spare-brands', requireAdmin, async (req, res) => {

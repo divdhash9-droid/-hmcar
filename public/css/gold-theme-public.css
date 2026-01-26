@@ -5,32 +5,32 @@
 /* Import dashboard luxury variables */
 :root {
   /* Modern Navy Blue Colors */
-  --hm-gold: #007bff;
-  --hm-gold-2: #0056b3;
-  --hm-gold-light: #3395ff;
-  --hm-gold-bright: #66b3ff;
-  --hm-gold-neon: #007bff;
-  --hm-gold-glow: rgba(0, 123, 255, 0.6);
+  --hm-gold: #1e3a8a;
+  --hm-gold-2: #1e40af;
+  --hm-gold-light: #dbeafe;
+  --hm-gold-bright: #60a5fa;
+  --hm-gold-neon: #3b82f6;
+  --hm-gold-glow: rgba(30, 58, 138, 0.6);
   
   /* Modern Glass Effects */
-  --hm-glass: rgba(0, 123, 255, 0.05);
-  --hm-glass-2: rgba(0, 123, 255, 0.08);
-  --hm-glass-3: rgba(0, 123, 255, 0.12);
-  --hm-border-gold: rgba(0, 123, 255, 0.6);
+  --hm-glass: rgba(30, 58, 138, 0.05);
+  --hm-glass-2: rgba(30, 58, 138, 0.08);
+  --hm-glass-3: rgba(30, 58, 138, 0.12);
+  --hm-border-gold: rgba(30, 58, 138, 0.6);
   
   /* Modern Navy Background */
-  --hm-black: #001f3f;
-  --hm-gray-dark: #00152a;
-  --hm-gray: #002040;
-  --hm-gray-light: #003060;
-  --hm-gray-lighter: #004080;
+  --hm-black: #ffffff;
+  --hm-gray-dark: #f8fafc;
+  --hm-gray: #f1f5f9;
+  --hm-gray-light: #e2e8f0;
+  --hm-gray-lighter: #cbd5e1;
   
   /* Strong Navy Shadows & Glows */
-  --hm-shadow: 0 32px 80px rgba(0, 31, 63, 0.8);
-  --hm-shadow-glass: 0 16px 48px rgba(0, 31, 63, 0.6);
-  --hm-glow-gold: 0 0 80px rgba(0, 123, 255, 0.5), 0 0 160px rgba(0, 123, 255, 0.3);
-  --hm-gold-pulse: 0 0 40px rgba(0, 123, 255, 0.6);
-  --hm-neon-glow: 0 0 60px rgba(0, 123, 255, 0.8), 0 0 120px rgba(0, 123, 255, 0.4);
+  --hm-shadow: 0 32px 80px rgba(30, 58, 138, 0.15);
+  --hm-shadow-glass: 0 16px 48px rgba(30, 58, 138, 0.1);
+  --hm-glow-gold: 0 0 80px rgba(30, 58, 138, 0.5), 0 0 160px rgba(30, 58, 138, 0.3);
+  --hm-gold-pulse: 0 0 40px rgba(30, 58, 138, 0.6);
+  --hm-neon-glow: 0 0 60px rgba(30, 58, 138, 0.8), 0 0 120px rgba(30, 58, 138, 0.4);
   
   /* Enhanced Blur Effects */
   --hm-blur: 32px;

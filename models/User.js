@@ -7,6 +7,8 @@ const bcrypt = require('bcrypt');
 const userSchema = new mongoose.Schema({
   // الاسم المعروض للمستخدم
   name: { type: String, trim: true, required: true },
+  // صورة الملف الشخصي (رابط محلي تحت /uploads أو رابط Cloudinary)
+  avatar: { type: String, default: '' },
   // مفتاح مبسط للاسم (يُستخدم لتسجيل دخول العميل بالاسم فقط)
   buyerNameKey: { type: String, unique: true, required: false, sparse: true },
   // رقم الهاتف (يُستخدم لحسابات الأدمن غالباً)

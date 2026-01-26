@@ -1,0 +1,115 @@
+<% layout('layout') -%>
+
+<%
+  const safeCounts = (typeof counts !== 'undefined' && counts) ? counts : {
+    availableCars: 0,
+    myCars: 0,
+    ordersAll: 0,
+    ordersPending: 0,
+    liveAuctions: 0
+  };
+%>
+
+<div class="hm-dashboard">
+  <div class="hm-dashboard__container">
+    <section class="hm-hero">
+      <div class="hm-hero__top">
+        <div class="hm-hero__brand">
+          <img class="hm-hero__logo" src="/public/images/logo.png" alt="HM CAR" />
+          <div class="hm-hero__titles">
+            <h1 class="hm-hero__title">لوحة العميل</h1>
+            <div class="hm-hero__subtitle">مرحباً <strong><%= currentUser && currentUser.name ? currentUser.name : '' %></strong></div>
+          </div>
+        </div>
+
+        <div class="hm-hero__actions">
+          <a class="hm-pill" href="/">
+            <i class="fas fa-home"></i>
+            <span>الرئيسية</span>
+          </a>
+          <a class="hm-pill" href="/auctions">
+            <i class="fas fa-gavel"></i>
+            <span>المزادات</span>
+          </a>
+          <a class="hm-pill" href="/orders">
+            <i class="fas fa-receipt"></i>
+            <span>الطلبات</span>
+          </a>
+          <a class="hm-pill" href="/client/profile">
+            <i class="fas fa-user-cog"></i>
+            <span>الملف الشخصي</span>
+          </a>
+          <a class="hm-pill hm-pill--danger" href="/auth/logout">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>خروج</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="hm-kpis">
+        <div class="hm-kpi">
+          <div class="hm-kpi__row">
+            <div>
+              <div class="hm-kpi__label">مزادات مباشرة</div>
+              <div class="hm-kpi__value"><%= safeCounts.liveAuctions %></div>
+            </div>
+            <div class="hm-kpi__icon"><i class="fas fa-broadcast-tower"></i></div>
+          </div>
+        </div>
+        <div class="hm-kpi">
+          <div class="hm-kpi__row">
+            <div>
+              <div class="hm-kpi__label">سيارات متاحة</div>
+              <div class="hm-kpi__value"><%= safeCounts.availableCars %></div>
+            </div>
+            <div class="hm-kpi__icon"><i class="fas fa-car"></i></div>
+          </div>
+        </div>
+        <div class="hm-kpi">
+          <div class="hm-kpi__row">
+            <div>
+              <div class="hm-kpi__label">طلباتي</div>
+              <div class="hm-kpi__value"><%= safeCounts.ordersAll %></div>
+            </div>
+            <div class="hm-kpi__icon"><i class="fas fa-shopping-bag"></i></div>
+          </div>
+        </div>
+        <div class="hm-kpi">
+          <div class="hm-kpi__row">
+            <div>
+              <div class="hm-kpi__label">طلبات قيد المعالجة</div>
+              <div class="hm-kpi__value"><%= safeCounts.ordersPending %></div>
+            </div>
+            <div class="hm-kpi__icon"><i class="fas fa-hourglass-half"></i></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="hm-section">
+      <h2 class="hm-section__title">اختصارات سريعة</h2>
+      <div class="hm-grid">
+        <a class="hm-card" href="/cars">
+          <div class="hm-card__icon"><i class="fas fa-car-side"></i></div>
+          <h3 class="hm-card__title">تصفح السيارات</h3>
+          <div class="hm-card__subtitle">ابحث عن السيارة المناسبة وابدأ المزايدة</div>
+        </a>
+        <a class="hm-card" href="/favorites">
+          <div class="hm-card__icon"><i class="fas fa-heart"></i></div>
+          <h3 class="hm-card__title">المفضلة</h3>
+          <div class="hm-card__subtitle">تابع السيارات التي قمت بحفظها</div>
+        </a>
+        <a class="hm-card" href="/messages">
+          <div class="hm-card__icon"><i class="fas fa-comments"></i></div>
+          <h3 class="hm-card__title">الرسائل</h3>
+          <div class="hm-card__subtitle">تواصل مع الدعم أو الإدارة</div>
+        </a>
+        <a class="hm-card" href="/client/notification-settings">
+          <div class="hm-card__icon"><i class="fas fa-bell"></i></div>
+          <h3 class="hm-card__title">إعدادات الإشعارات</h3>
+          <div class="hm-card__subtitle">تحكم في أنواع الإشعارات التي تصلك</div>
+        </a>
+      </div>
+    </section>
+  </div>
+</div>

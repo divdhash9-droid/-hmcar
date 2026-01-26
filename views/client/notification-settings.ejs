@@ -3,102 +3,102 @@
 <% layout('layout') -%>
 
 <div class="container mt-5">
-    <h2>Notification Preferences</h2>
-    <p>Manage how you receive notifications from CarAuction.</p>
+    <h2>إعدادات الإشعارات</h2>
+    <p class="text-muted">تحكم في أنواع الإشعارات التي تصلك ووسيلة الإرسال.</p>
     <hr>
 
     <form id="preferences-form">
         <div id="alert-container"></div>
 
-        <h4>Auction Notifications</h4>
-        <p class="text-muted">Choose which auction-related events you want to be notified about.</p>
+        <h4>إشعارات المزادات</h4>
+        <p class="text-muted">اختر الأحداث المتعلقة بالمزادات التي ترغب باستلام إشعار بها.</p>
         <div class="row">
             <div class="col-md-6">
                 <div class="form-check form-switch mb-3">
                     <input class="form-check-input" type="checkbox" id="outbid" name="outbid">
-                    <label class="form-check-label" for="outbid">When I'm outbid</label>
+                    <label class="form-check-label" for="outbid">عند المزايدة ضدي</label>
                 </div>
                 <div class="form-check form-switch mb-3">
                     <input class="form-check-input" type="checkbox" id="auctionEndingSoon" name="auctionEndingSoon">
-                    <label class="form-check-label" for="auctionEndingSoon">Watched auctions are ending soon</label>
+                    <label class="form-check-label" for="auctionEndingSoon">عند اقتراب نهاية مزاد أتابعه</label>
                 </div>
                 <div class="form-check form-switch mb-3">
                     <input class="form-check-input" type="checkbox" id="newBidOnWatched" name="newBidOnWatched">
-                    <label class="form-check-label" for="newBidOnWatched">New bids on my watched items</label>
+                    <label class="form-check-label" for="newBidOnWatched">مزايدات جديدة على العناصر التي أتابعها</label>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="form-check form-switch mb-3">
                     <input class="form-check-input" type="checkbox" id="auctionWon" name="auctionWon">
-                    <label class="form-check-label" for="auctionWon">When I win an auction</label>
+                    <label class="form-check-label" for="auctionWon">عند الفوز بمزاد</label>
                 </div>
                 <div class="form-check form-switch mb-3">
                     <input class="form-check-input" type="checkbox" id="auctionLost" name="auctionLost">
-                    <label class="form-check-label" for="auctionLost">When an auction I bid on is lost</label>
+                    <label class="form-check-label" for="auctionLost">عند خسارة مزاد شاركت به</label>
                 </div>
             </div>
         </div>
 
         <hr class="my-4">
 
-        <h4>Communication</h4>
+        <h4>التواصل</h4>
         <div class="form-check form-switch mb-3">
             <input class="form-check-input" type="checkbox" id="newMessage" name="newMessage">
-            <label class="form-check-label" for="newMessage">New messages in my inbox</label>
+            <label class="form-check-label" for="newMessage">رسائل جديدة</label>
         </div>
 
         <hr class="my-4">
 
-        <h4>Platform Updates</h4>
+        <h4>تحديثات المنصة</h4>
         <div class="form-check form-switch mb-3">
             <input class="form-check-input" type="checkbox" id="systemUpdates" name="systemUpdates">
-            <label class="form-check-label" for="systemUpdates">System updates and security announcements</label>
+            <label class="form-check-label" for="systemUpdates">تحديثات النظام والتنبيهات الأمنية</label>
         </div>
         <div class="form-check form-switch mb-3">
             <input class="form-check-input" type="checkbox" id="promotions" name="promotions">
-            <label class="form-check-label" for="promotions">Promotions, special offers, and new features</label>
+            <label class="form-check-label" for="promotions">العروض والميزات الجديدة</label>
         </div>
 
         <hr class="my-4">
 
-        <h4>Delivery Channels</h4>
-        <p class="text-muted">Choose how you want to receive these notifications. Note: Some critical notifications may still be sent via email.</p>
+        <h4>قنوات الإرسال</h4>
+        <p class="text-muted">اختر وسيلة استلام الإشعارات. قد تُرسل بعض الإشعارات المهمة عبر البريد مهما كانت الإعدادات.</p>
         
         <div class="row">
             <div class="col-md-6">
-                <h5><i class="fas fa-envelope me-2"></i>Email Notifications</h5>
+                <h5><i class="fas fa-envelope me-2"></i>البريد الإلكتروني</h5>
                 <div class="form-check">
                     <input class="form-check-input email-channel" type="checkbox" id="email-outbid" data-key="outbid">
-                    <label class="form-check-label" for="email-outbid">When I'm outbid</label>
+                    <label class="form-check-label" for="email-outbid">عند المزايدة ضدي</label>
                 </div>
                 <div class="form-check">
                     <input class="form-check-input email-channel" type="checkbox" id="email-auctionWon" data-key="auctionWon">
-                    <label class="form-check-label" for="email-auctionWon">When I win an auction</label>
+                    <label class="form-check-label" for="email-auctionWon">عند الفوز بمزاد</label>
                 </div>
                  <div class="form-check">
                     <input class="form-check-input email-channel" type="checkbox" id="email-promotions" data-key="promotions">
-                    <label class="form-check-label" for="email-promotions">Promotions & Offers</label>
+                    <label class="form-check-label" for="email-promotions">العروض</label>
                 </div>
             </div>
             <div class="col-md-6">
-                <h5><i class="fas fa-bell me-2"></i>Push Notifications (Web)</h5>
+                <h5><i class="fas fa-bell me-2"></i>إشعارات المتصفح</h5>
                 <div class="form-check">
                     <input class="form-check-input push-channel" type="checkbox" id="push-outbid" data-key="outbid">
-                    <label class="form-check-label" for="push-outbid">When I'm outbid</label>
+                    <label class="form-check-label" for="push-outbid">عند المزايدة ضدي</label>
                 </div>
                 <div class="form-check">
                     <input class="form-check-input push-channel" type="checkbox" id="push-newMessage" data-key="newMessage">
-                    <label class="form-check-label" for="push-newMessage">New messages</label>
+                    <label class="form-check-label" for="push-newMessage">رسائل جديدة</label>
                 </div>
                 <div class="form-check">
                     <input class="form-check-input push-channel" type="checkbox" id="push-auctionEndingSoon" data-key="auctionEndingSoon">
-                    <label class="form-check-label" for="push-auctionEndingSoon">Auctions ending soon</label>
+                    <label class="form-check-label" for="push-auctionEndingSoon">اقتراب نهاية المزاد</label>
                 </div>
             </div>
         </div>
 
         <div class="mt-5">
-            <button type="submit" class="btn btn-primary btn-gold">Save Preferences</button>
+            <button type="submit" class="btn btn-primary btn-gold">حفظ الإعدادات</button>
         </div>
     </form>
 </div>
@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const alertContainer = document.getElementById('alert-container');
 
     // Fetch and populate existing preferences
-    fetch('/api/notifications/preferences')
+    fetch('/notifications/preferences', { headers: { 'Accept': 'application/json' } })
         .then(res => res.json())
         .then(data => {
             if (data) {
@@ -169,25 +169,25 @@ document.addEventListener('DOMContentLoaded', function() {
         data.emailNotifications = emailNotifications;
         data.pushNotifications = pushNotifications;
 
-        fetch('/api/notifications/preferences', {
-            method: 'PUT',
+        fetch('/notifications/preferences', {
+            method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-Token': '<%= csrfToken %>'
+                'Accept': 'application/json'
             },
             body: JSON.stringify(data)
         })
         .then(res => res.json())
         .then(result => {
-            if (result) {
-                showAlert('Preferences saved successfully!', 'success');
+            if (result && !result.error) {
+                showAlert('تم حفظ الإعدادات بنجاح', 'success');
             } else {
-                showAlert('Failed to save preferences.', 'danger');
+                showAlert(result && result.error ? result.error : 'تعذر حفظ الإعدادات', 'danger');
             }
         })
         .catch(err => {
             console.error('Error saving preferences:', err);
-            showAlert('An error occurred. Please try again.', 'danger');
+            showAlert('حدث خطأ. حاول مرة أخرى.', 'danger');
         });
     });
 

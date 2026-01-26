@@ -2,6 +2,7 @@
 
 // ============================================
 // HM CAR Professional Homepage Scripts
+// Enhanced Button Functionality & Design Consistency
 // ============================================
 
 // Language Toggle
@@ -11,6 +12,15 @@ function toggleLanguage() {
   currentLanguage = currentLanguage === 'ar' ? 'en' : 'ar';
   updateLanguage();
   localStorage.setItem('preferredLanguage', currentLanguage);
+  
+  // Add visual feedback
+  const langBtn = document.querySelector('.hm-btn-lang');
+  if (langBtn) {
+    langBtn.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+      langBtn.style.transform = 'scale(1)';
+    }, 150);
+  }
 }
 
 function updateLanguage() {

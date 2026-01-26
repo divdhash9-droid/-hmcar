@@ -1,0 +1,143 @@
+<!-- [[ARABIC_HEADER]] هذا الملف (views/cars/list.ejs) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. -->
+
+<% var hideNavbar = (typeof currentUser !== 'undefined' && currentUser && currentUser.role === 'buyer'); %>
+<% layout('layout') -%>
+
+<div class="container" style="padding-top: 24px; padding-bottom: 48px; direction: rtl;">
+  <div class="hm-dashboard">
+    <div class="hm-dashboard__container">
+      <header class="hm-hero" aria-label="السيارات المتوفرة" style="min-height:auto; padding: 26px 18px;">
+        <div class="hm-hero__top">
+          <div class="hm-hero__brand">
+            <img class="hm-hero__logo" src="/public/images/navbar-logo.png" alt="HM CAR" loading="eager" decoding="async" onerror="this.onerror=null;this.src='/public/images/logo.png';" />
+            <div class="hm-hero__titles">
+              <h1 class="hm-hero__title">السيارات المتوفرة</h1>
+              <div class="hm-hero__subtitle">تصفح السيارات مع البحث والفلاتر</div>
+            </div>
+          </div>
+
+          <nav class="hm-hero__actions" aria-label="إجراءات">
+            <a class="hm-pill" href="/cars" aria-label="لوحة العميل">
+              <i class="fas fa-th-large"></i>
+              <span>لوحة العميل</span>
+            </a>
+            <a class="hm-pill" href="/spare-parts" aria-label="قطع الغيار">
+              <i class="fas fa-tools"></i>
+              <span>قطع الغيار</span>
+            </a>
+            <a class="hm-pill" href="/auctions/live" aria-label="المزاد المباشر">
+              <i class="fas fa-gavel"></i>
+              <span>المزاد المباشر</span>
+            </a>
+          </nav>
+        </div>
+      </header>
+
+      <section class="hm-section" aria-label="البحث والفلاتر" style="margin-top: 16px;">
+        <div class="hm-card" style="padding: 16px;">
+          <form method="get" action="/cars" class="row g-2 align-items-end">
+            <div class="col-12 col-lg-4">
+              <label class="form-label">بحث</label>
+              <input class="form-control" name="q" value="<%= (filters && filters.q) ? filters.q : '' %>" placeholder="ابحث بالعنوان أو الشركة أو الموديل" />
+            </div>
+
+            <div class="col-6 col-lg-2">
+              <label class="form-label">الشركة</label>
+              <input class="form-control" name="make" value="<%= (filters && filters.make) ? filters.make : '' %>" placeholder="Toyota" />
+            </div>
+
+            <div class="col-6 col-lg-2">
+              <label class="form-label">الموديل</label>
+              <input class="form-control" name="model" value="<%= (filters && filters.model) ? filters.model : '' %>" placeholder="Camry" />
+            </div>
+
+            <div class="col-6 col-lg-2">
+              <label class="form-label">السنة</label>
+              <input class="form-control" name="year" value="<%= (filters && filters.year) ? filters.year : '' %>" placeholder="2022" />
+            </div>
+
+            <div class="col-6 col-lg-2">
+              <button class="btn btn-primary w-100" type="submit">
+                <i class="fas fa-search"></i>
+                بحث
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section class="hm-section" aria-label="قائمة السيارات" style="margin-top: 12px;">
+        <% if (!cars || cars.length === 0) { %>
+          <div class="hm-card" style="padding: 26px; text-align:center;">
+            <div style="font-size: 2.5rem; opacity: 0.35; margin-bottom: 10px;"><i class="fas fa-car"></i></div>
+            <h3 style="margin:0 0 8px;">لا توجد سيارات مطابقة</h3>
+            <div class="text-muted">جرّب تغيير كلمات البحث أو الفلاتر.</div>
+          </div>
+        <% } else { %>
+          <div class="row g-3">
+            <% cars.forEach(car => { %>
+              <div class="col-12 col-md-6 col-lg-4">
+                <div class="hm-card" style="overflow:hidden;">
+                  <a href="/cars/<%= car._id %>" style="display:block; text-decoration:none; color:inherit;">
+                    <div style="width:100%; height: 210px; background:#0b1f3a; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+                      <% const img = (car.images && car.images.length) ? String(car.images[0]) : '/public/images/car-placeholder.png'; %>
+                      <img src="<%= img %>" alt="<%= car.title || 'Car' %>" style="width:100%; height:100%; object-fit:cover;" onerror="this.onerror=null;this.src='/public/images/car-placeholder.png';" />
+                    </div>
+
+                    <div style="padding: 14px 14px 16px;">
+                      <div style="display:flex; justify-content:space-between; gap:10px; align-items:flex-start;">
+                        <div>
+                          <div style="font-weight: 800; color:#0b1f3a;">
+                            <%= car.title || (car.make + ' ' + car.model) %>
+                          </div>
+                          <div class="text-muted" style="font-size: 0.95rem; margin-top: 4px;">
+                            <%= car.make || '' %> <%= car.model || '' %> <%= car.year ? ('- ' + car.year) : '' %>
+                          </div>
+                        </div>
+                        <span class="hm-badge"><i class="fas fa-eye" style="margin-left:6px;"></i>عرض</span>
+                      </div>
+
+                      <div style="margin-top: 10px; font-weight: 800; color: #133b6b;">
+                        <% if (car.priceSar) { %>
+                          <%= Number(car.priceSar).toLocaleString('en-US') %> SAR
+                        <% } else if (car.priceUsd) { %>
+                          <%= '$' + Number(car.priceUsd).toLocaleString('en-US') %>
+                        <% } else if (car.price) { %>
+                          <%= Number(car.price).toLocaleString('en-US') %>
+                        <% } else { %>
+                          السعر عند الطلب
+                        <% } %>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+
+          <% if (pagination && pagination.totalPages && pagination.totalPages > 1) { %>
+            <nav aria-label="pagination" style="margin-top: 18px;">
+              <ul class="pagination justify-content-center" style="direction: rtl;">
+                <% const qpBase = (k,v)=>{ const u = new URL('http://x'); if(filters){ Object.keys(filters).forEach(fk=>{ if(filters[fk]) u.searchParams.set(fk, filters[fk]); }); } if (v) u.searchParams.set(k,v); return '/cars' + u.search; }; %>
+
+                <li class="page-item <%= pagination.currentPage <= 1 ? 'disabled' : '' %>">
+                  <a class="page-link" href="<%= qpBase('page', String(pagination.currentPage - 1)) %>">السابق</a>
+                </li>
+
+                <% for (let i = 1; i <= pagination.totalPages; i++) { %>
+                  <li class="page-item <%= i === pagination.currentPage ? 'active' : '' %>">
+                    <a class="page-link" href="<%= qpBase('page', String(i)) %>"><%= i %></a>
+                  </li>
+                <% } %>
+
+                <li class="page-item <%= pagination.currentPage >= pagination.totalPages ? 'disabled' : '' %>">
+                  <a class="page-link" href="<%= qpBase('page', String(pagination.currentPage + 1)) %>">التالي</a>
+                </li>
+              </ul>
+            </nav>
+          <% } %>
+        <% } %>
+      </section>
+    </div>
+  </div>
+</div>

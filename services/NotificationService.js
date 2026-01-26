@@ -2,17 +2,21 @@
 
 /**
  * services/NotificationService.js
- * خدمة الإشعارات
- * 
+ * خدمة الإشعارات المتقدمة
+ *
  * الوصف:
  * - إرسال إشعارات للمستخدمين عند أحداث معينة
- * - دعم أنواع مختلفة: مزادات، طلبات، رسائل
+ * - دعم أنواع مختلفة: مزادات، طلبات، رسائل، نظامية
  * - تخزين الإشعارات في قاعدة البيانات
+ * - إشعارات مجدولة ومخصصة
+ * - إدارة قوالب الإشعارات
+ * - إشعارات جماعية متقدمة
  */
 const UserNotification = require('../models/UserNotification');
 const UserNotificationPreference = require('../models/UserNotificationPreference');
 const WebSocketService = require('./WebSocketService');
 const EmailService = require('./EmailService'); // Assuming you have an EmailService
+const mongoose = require('mongoose');
 
 class NotificationService {
 

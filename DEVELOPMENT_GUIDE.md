@@ -298,7 +298,7 @@ app.use(deprecationMiddleware(1, '2026-12-31'));
 - توثيق الأخطاء
 - Response schemas
 
-الوصول: `http://localhost:4001/api-docs`
+الوصول: `http://localhost:4000/api-docs`
 
 ---
 
@@ -391,10 +391,10 @@ npm run optimize:db
 ### Health Checks:
 ```bash
 # Public health
-curl http://localhost:4001/health
+curl http://localhost:4000/health
 
 # Detailed (requires auth)
-curl http://localhost:4001/health/detailed
+curl http://localhost:4000/health/detailed
 ```
 
 ---

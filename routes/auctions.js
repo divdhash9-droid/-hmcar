@@ -15,70 +15,109 @@ const Order = require('../models/Order');
 const User = require('../models/User');
 const Brand = require('../models/Brand');
 
+// Advanced Caching Services
+const { multiLevelGet, multiLevelSet, refreshAhead, warmCache } = require('../services/cache/strategies');
+const { setWithTags, invalidateByTag } = require('../services/cache/advanced');
+const { autoCacheMiddleware, cacheInvalidationMiddleware } = require('../middleware/autoCache');
+
 // الصفحة الرئيسية للمزادات
-router.get('/', async (req, res) => {
-  try {
-    // جلب المزادات النشطة
-    const auctions = await Auction.find({ status: 'running' })
-      .populate('car')
-      .sort({ createdAt: -1 })
-      .limit(20);
-    
-    // جلب سيارات المزاد
-    const cars = await Car.find({ listingType: 'auction', isSold: { $ne: true } })
-      .sort({ createdAt: -1 })
-      .limit(20);
-    
-    res.render('auctions/cars', { 
-      auctions, 
-      cars,
-      title: 'المزادات'
-    });
-  } catch (error) {
-    console.error('Error loading auctions:', error);
-    res.status(500).render('errors/500');
-  }
-});
+router.get('/',
+  // Apply advanced caching with multi-level strategy
+  autoCacheMiddleware({
+    ttl: 180, // 3 minutes for auction listings (shorter due to dynamic nature)
+    methods: ['GET'],
+    excludePaths: [],
+    cacheAuthenticated: false
+  }),
+  async (req, res) => {
+    try {
+      // Use refresh-ahead strategy for auction data
+      const [auctionsResult, carsResult] = await Promise.all([
+        refreshAhead('auctions:running', async () => {
+          return await Auction.find({ status: 'running' })
+            .populate('car')
+            .sort({ createdAt: -1 })
+            .limit(20);
+        }, 180),
+        refreshAhead('auctions:cars', async () => {
+          return await Car.find({ listingType: 'auction', isSold: { $ne: true } })
+            .sort({ createdAt: -1 })
+            .limit(20);
+        }, 180)
+      ]);
+
+      const auctions = auctionsResult.data || [];
+      const cars = carsResult.data || [];
+
+      res.render('auctions/cars', {
+        auctions,
+        cars,
+        title: 'المزادات'
+      });
+    } catch (error) {
+      console.error('Error loading auctions:', error);
+      res.status(500).render('errors/500');
+    }
+  });
 
 router.get('/live', async (req, res) => {
-  const [setting, endsAtSetting, snapshotSetting, whatsappSetting] = await Promise.all([
-    SiteSetting.findOne({ key: 'liveAuctionUrl' }),
-    SiteSetting.findOne({ key: 'externalAuctionEndsAt' }),
-    SiteSetting.findOne({ key: 'externalAuctionSnapshot' }),
-    SiteSetting.findOne({ key: 'customerWhatsAppNumber' })
-  ]);
+  try {
+    const [setting, endsAtSetting, snapshotSetting, whatsappSetting] = await Promise.all([
+      SiteSetting.findOne({ key: 'liveAuctionUrl' }),
+      SiteSetting.findOne({ key: 'externalAuctionEndsAt' }),
+      SiteSetting.findOne({ key: 'externalAuctionSnapshot' }),
+      SiteSetting.findOne({ key: 'customerWhatsAppNumber' })
+    ]);
 
-  const liveAuctionUrl = setting ? String(setting.value || '').trim() : '';
-  const endsAtRaw = endsAtSetting ? String(endsAtSetting.value || '').trim() : '';
-  const endsAt = endsAtRaw && !Number.isNaN(new Date(endsAtRaw).getTime()) ? new Date(endsAtRaw) : null;
-  const now = new Date();
-  const isEnded = endsAt ? now > endsAt : false;
+    const liveAuctionUrl = setting ? String(setting.value || '').trim() : '';
+    const endsAtRaw = endsAtSetting ? String(endsAtSetting.value || '').trim() : '';
+    const endsAt = endsAtRaw && !Number.isNaN(new Date(endsAtRaw).getTime()) ? new Date(endsAtRaw) : null;
+    const now = new Date();
+    const isEnded = endsAt ? now > endsAt : false;
 
-  let snapshot = { source: 'lotte', status: isEnded ? 'ended' : 'running', updatedAt: null, cars: [] };
-  if (snapshotSetting && snapshotSetting.value) {
-    try {
-      snapshot = JSON.parse(String(snapshotSetting.value));
-    } catch (e) {
-      snapshot = { source: 'lotte', status: isEnded ? 'ended' : 'running', updatedAt: null, cars: [] };
+    let snapshot = { source: 'lotte', status: isEnded ? 'ended' : 'running', updatedAt: null, cars: [] };
+    if (snapshotSetting && snapshotSetting.value) {
+      try {
+        snapshot = JSON.parse(String(snapshotSetting.value));
+      } catch (e) {
+        snapshot = { source: 'lotte', status: isEnded ? 'ended' : 'running', updatedAt: null, cars: [] };
+      }
     }
+
+    const raw = whatsappSetting ? String(whatsappSetting.value || '').trim() : '';
+    const waNumber = raw.replace(/[^0-9]/g, '');
+
+    const baseUrl = (process.env.BASE_URL && String(process.env.BASE_URL).trim())
+      ? String(process.env.BASE_URL).trim().replace(/\/$/, '')
+      : `${req.protocol}://${req.get('host')}`;
+    const pageUrl = `${baseUrl}/auctions/live`;
+
+    return res.render('auctions/live', {
+      liveAuctionUrl,
+      endsAt,
+      isEnded,
+      snapshot,
+      waNumber,
+      pageUrl
+    });
+  } catch (error) {
+    console.error('Error loading live auction:', error);
+
+    const baseUrl = (process.env.BASE_URL && String(process.env.BASE_URL).trim())
+      ? String(process.env.BASE_URL).trim().replace(/\/$/, '')
+      : `${req.protocol}://${req.get('host')}`;
+    const pageUrl = `${baseUrl}/auctions/live`;
+
+    return res.render('auctions/live', {
+      liveAuctionUrl: '',
+      endsAt: null,
+      isEnded: false,
+      snapshot: { source: 'lotte', status: 'unknown', updatedAt: null, cars: [] },
+      waNumber: '',
+      pageUrl,
+      errorMessage: 'تعذر تحميل بيانات المزاد حالياً. تم عرض الصفحة بدون بيانات.'
+    });
   }
-
-  const raw = whatsappSetting ? String(whatsappSetting.value || '').trim() : '';
-  const waNumber = raw.replace(/[^0-9]/g, '');
-
-  const baseUrl = (process.env.BASE_URL && String(process.env.BASE_URL).trim())
-    ? String(process.env.BASE_URL).trim().replace(/\/$/, '')
-    : `${req.protocol}://${req.get('host')}`;
-  const pageUrl = `${baseUrl}/auctions/live`;
-
-  res.render('auctions/live', {
-    liveAuctionUrl,
-    endsAt,
-    isEnded,
-    snapshot,
-    waNumber,
-    pageUrl
-  });
 });
 
 router.get('/cars', async (req, res) => {
@@ -269,10 +308,16 @@ router.post('/create/:carId', requireAuth, requireRole('admin'), async (req, res
 
 router.get('/:id', async (req, res) => {
   // عرض تفاصيل المزاد + أحدث المزايدات + بناء رابط واتساب للاستفسار
-  const auction = await Auction.findById(req.params.id).populate('car').populate('highestBidder');
+  // Optimized: Combine auction, bids, and settings queries
+  const [auction, bids, whatsappSetting] = await Promise.all([
+    Auction.findById(req.params.id).populate('car').populate('highestBidder'),
+    Bid.find({ auction: req.params.id }).populate('bidder').sort({ createdAt: -1 }),
+    SiteSetting.findOne({ key: 'customerWhatsAppNumber' })
+  ]);
+
   if (!auction) return res.status(404).send('Auction not found');
   if (auction.car && auction.car.isSold) return res.status(404).send('Auction not found');
-  const bids = await Bid.find({ auction: auction._id }).populate('bidder').sort({ createdAt: -1 });
+
   // تحديث الحالة بناءً على الوقت
   const now = new Date();
   if (now < auction.startsAt) auction.status = 'scheduled';
@@ -280,7 +325,6 @@ router.get('/:id', async (req, res) => {
   else auction.status = 'running';
   await auction.save();
 
-  const whatsappSetting = await SiteSetting.findOne({ key: 'customerWhatsAppNumber' });
   const raw = whatsappSetting ? String(whatsappSetting.value || '').trim() : '';
   const waNumber = raw.replace(/[^0-9]/g, '');
 

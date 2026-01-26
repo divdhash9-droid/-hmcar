@@ -1,5 +1,6 @@
 <!-- [[ARABIC_HEADER]] هذا الملف (views/cars/details.ejs) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. -->
 
+<% var hideNavbar = (typeof currentUser !== 'undefined' && currentUser && currentUser.role === 'buyer'); %>
 <% layout('layout') -%>
 
 <!-- HM Design System CSS -->

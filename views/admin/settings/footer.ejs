@@ -8,32 +8,45 @@
 
 <link rel="stylesheet" href="/css/admin-luxury.css">
 <link rel="stylesheet" href="/css/dashboard-luxury.css">
+<link rel="stylesheet" href="/css/admin-footer-settings.css">
 
-<div class="hm-admin-layout">
-  <div class="hm-dashboard__container">
-    <header class="hm-hero" aria-label="إعدادات الفوتر">
-      <div class="hm-hero__top">
-        <div class="hm-hero__brand">
-          <img class="hm-hero__logo" src="/public/images/navbar-logo.png" alt="HM CAR" loading="eager" decoding="async" onerror="this.onerror=null;this.src='/public/images/logo.png';" />
-          <div class="hm-hero__titles">
-            <h1 class="hm-hero__title">إعدادات الشريط السفلي</h1>
-            <div class="hm-hero__subtitle">معلومات الشركة + روابط + تواصل — تظهر للعميل مباشرة</div>
+<div class="footer-settings-page">
+  <div class="footer-settings__gradient" aria-hidden="true"></div>
+  <div class="footer-settings__grid">
+    <header class="footer-settings__hero" aria-label="إعدادات الشريط السفلي">
+      <div class="footer-settings__hero-content">
+        <div class="footer-settings__badge">منطقة الهوية البصرية</div>
+        <div class="footer-settings__title-block">
+          <img class="footer-settings__logo" src="/public/images/navbar-logo.png" alt="HM CAR" loading="eager" decoding="async" onerror="this.onerror=null;this.src='/public/images/logo.png';" />
+          <div>
+            <h1>لوحة إعدادات الفوتر</h1>
+            <p>حدّث معلومات العلامة وروابط العملاء بأسلوب حديث متناسق مع الواجهات الذهبية.</p>
           </div>
         </div>
-
-        <nav class="hm-hero__actions" aria-label="روابط">
-          <a class="hm-pill" href="/admin/settings" aria-label="الإعدادات"><i class="fas fa-cogs"></i><span>الإعدادات</span></a>
-          <a class="hm-pill" href="/admin" aria-label="لوحة الإدارة"><i class="fas fa-tachometer-alt"></i><span>لوحة الإدارة</span></a>
-          <a class="hm-pill hm-pill--danger" href="/auth/logout" aria-label="خروج"><i class="fas fa-sign-out-alt"></i><span>خروج</span></a>
-        </nav>
+        <div class="footer-settings__pills">
+          <a href="/admin/settings" class="footer-pill"><i class="fas fa-sliders"></i><span>الإعدادات العامة</span></a>
+          <a href="/admin" class="footer-pill"><i class="fas fa-gauge"></i><span>لوحة التحكم</span></a>
+          <a href="/auth/logout" class="footer-pill is-danger"><i class="fas fa-arrow-right-from-bracket"></i><span>تسجيل خروج</span></a>
+        </div>
       </div>
-
-      <section class="hm-kpis" aria-label="حالة">
-        <div class="hm-kpi"><div class="hm-kpi__row"><div><div class="hm-kpi__label">العنوان</div><div class="hm-kpi__value"><%= footer && footer.title ? 'OK' : '-' %></div></div><div class="hm-kpi__icon" aria-hidden="true"><i class="fas fa-heading"></i></div></div></div>
-        <div class="hm-kpi"><div class="hm-kpi__row"><div><div class="hm-kpi__label">البريد</div><div class="hm-kpi__value"><%= footer && footer.contactInfo && footer.contactInfo.email ? 'OK' : '-' %></div></div><div class="hm-kpi__icon" aria-hidden="true"><i class="fas fa-envelope"></i></div></div></div>
-        <div class="hm-kpi"><div class="hm-kpi__row"><div><div class="hm-kpi__label">الهاتف</div><div class="hm-kpi__value"><%= footer && footer.contactInfo && footer.contactInfo.phone ? 'OK' : '-' %></div></div><div class="hm-kpi__icon" aria-hidden="true"><i class="fas fa-phone"></i></div></div></div>
-        <div class="hm-kpi hm-kpi--security"><div class="hm-kpi__row"><div><div class="hm-kpi__label">الأمان</div><div class="hm-kpi__value">CSRF</div></div><div class="hm-kpi__icon" aria-hidden="true"><i class="fas fa-shield-alt"></i></div></div></div>
-      </section>
+      <div class="footer-settings__stats" aria-label="حالة الحقول">
+        <div class="footer-stat">
+          <span>عنوان الشركة</span>
+          <strong><%= footer && footer.title ? 'جاهز' : 'ناقص' %></strong>
+        </div>
+        <div class="footer-stat">
+          <span>بيانات التواصل</span>
+          <strong><%= footer && footer.contactInfo && footer.contactInfo.email && footer.contactInfo.phone ? 'مكتمل' : 'بحاجة تحديث' %></strong>
+        </div>
+        <div class="footer-stat">
+          <span>الروابط</span>
+          <strong><%= footer && footer.links && footer.links.length ? footer.links.length + ' رابط' : 'لا يوجد' %></strong>
+        </div>
+        <div class="footer-stat">
+          <span>الحماية</span>
+          <strong>CSRF مفعّل</strong>
+        </div>
+      </div>
     </header>
 
     <% if (flash && flash.message) { %>
@@ -45,11 +58,19 @@
       </div>
     <% } %>
 
-    <section class="hm-section" aria-label="تحديث الفوتر">
-      <h2 class="hm-section__title">تحديث الفوتر</h2>
-      <div class="hm-list">
-        <div class="hm-list__item">
-          <form class="w-100" method="POST" action="/admin/settings/footer">
+    <section class="footer-settings__form" aria-label="تحديث الفوتر">
+      <div class="footer-form-card">
+        <header>
+          <div>
+            <p>تحكم كامل في العناصر التي تظهر أسفل الموقع</p>
+            <h2>بيانات الفوتر</h2>
+          </div>
+          <div class="footer-form__meta">
+            <span><i class="fas fa-shield"></i> محمي بـ CSRF</span>
+            <span><i class="fas fa-clock"></i> يتم الحفظ فوراً</span>
+          </div>
+        </header>
+        <form class="footer-form" method="POST" action="/admin/settings/footer">
             <input type="hidden" name="_csrf" value="<%= csrfToken %>">
             <div class="row g-3">
               <div class="col-md-6">
@@ -106,11 +127,13 @@
                 <input class="form-control" name="tiktokUrl" placeholder="https://tiktok.com/@yourpage" value="<%= footer && footer.tiktokUrl ? footer.tiktokUrl : '' %>">
               </div>
               <div class="col-12">
-                <button class="hm-embed__close" type="submit">حفظ</button>
+                <button class="footer-form__submit" type="submit">
+                  <i class="fas fa-save"></i>
+                  <span>حفظ التغييرات</span>
+                </button>
               </div>
             </div>
           </form>
-        </div>
       </div>
     </section>
   </div>

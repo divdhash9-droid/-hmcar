@@ -1,0 +1,515 @@
+/* [[ARABIC_HEADER]] هذا الملف (public/css/luxury-theme.css) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. */
+
+/* ===== HM CAR LUXURY THEME ===== */
+/* تصميم فاخم و atraفه لمنصة مزادات السيارات */
+
+/* ===== CSS VARIABLES ===== */
+:root {
+  /* الألوان الفاخرة - الكحلي والأبيض الثلجي */
+  --luxury-primary: #1e3a8a;
+  --luxury-primary-dark: #1e40af;
+  --luxury-primary-light: #dbeafe;
+  --luxury-secondary: #ffffff;
+  --luxury-secondary-light: #f8fafc;
+  --luxury-accent: #3b82f6;
+  --luxury-gold: #60a5fa;
+  
+  /* ألوان النص */
+  --luxury-text-primary: #1e293b;
+  --luxury-text-secondary: #64748b;
+  --luxury-text-light: #ffffff;
+  --luxury-text-muted: #94a3b8;
+  
+  /* ألوان الخلفية */
+  --luxury-bg-primary: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  --luxury-bg-card: rgba(255, 255, 255, 0.95);
+  --luxury-bg-glass: rgba(255, 255, 255, 0.1);
+  --luxury-bg-gold: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+  
+  /* الظلال */
+  --luxury-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --luxury-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.15);
+  --luxury-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.25);
+  --luxury-shadow-gold: 0 4px 16px rgba(212, 175, 55, 0.4);
+  
+  /* الحواف */
+  --luxury-radius-sm: 8px;
+  --luxury-radius-md: 12px;
+  --luxury-radius-lg: 20px;
+  --luxury-radius-xl: 30px;
+  
+  /* الانتقالات */
+  --luxury-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --luxury-transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===== GLOBAL STYLES ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Playfair Display', 'Cormorant Garamond', serif;
+  background: var(--luxury-bg-primary);
+  color: var(--luxury-text-primary);
+  line-height: 1.6;
+  overflow-x: hidden;
+  transition: var(--luxury-transition);
+}
+
+/* ===== LUXURY COMPONENTS ===== */
+
+/* الأزرار الفاخرة */
+.luxury-btn {
+  background: var(--luxury-bg-gold);
+  color: var(--luxury-text-primary);
+  border: none;
+  border-radius: var(--luxury-radius-md);
+  padding: 12px 24px;
+  font-family: 'Playfair Display', serif;
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: var(--luxury-transition);
+  box-shadow: var(--luxury-shadow-gold);
+}
+
+.luxury-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: var(--luxury-transition-fast);
+}
+
+.luxury-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--luxury-shadow-lg);
+  background: linear-gradient(135deg, var(--luxury-primary-dark) 0%, var(--luxury-primary) 100%);
+}
+
+.luxury-btn:hover::before {
+  left: 0;
+}
+
+.luxury-btn:active {
+  transform: translateY(0);
+  box-shadow: var(--luxury-shadow-sm);
+}
+
+/* البطاقات الفاخرة */
+.luxury-card {
+  background: var(--luxury-bg-card);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: var(--luxury-radius-lg);
+  padding: 2rem;
+  box-shadow: var(--luxury-shadow-md);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden;
+  transition: var(--luxury-transition);
+}
+
+.luxury-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, 
+    rgba(212, 175, 55, 0.1) 0%, 
+    transparent 50%, 
+    rgba(212, 175, 55, 0.1) 100%);
+  pointer-events: none;
+}
+
+.luxury-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--luxury-shadow-lg);
+  border-color: var(--luxury-primary);
+}
+
+.luxury-card-header {
+  background: var(--luxury-bg-gold);
+  padding: 1.5rem 2rem;
+  margin: -2rem -2rem 2rem -2rem;
+  border-radius: var(--luxury-radius-lg) var(--luxury-radius-lg) 0 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.luxury-card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--luxury-text-primary);
+  margin: 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* حقول الإدخال الفاخرة */
+.luxury-input {
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid rgba(212, 175, 55, 0.3);
+  border-radius: var(--luxury-radius-md);
+  padding: 12px 16px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1rem;
+  color: var(--luxury-text-primary);
+  transition: var(--luxury-transition);
+  width: 100%;
+}
+
+.luxury-input:focus {
+  outline: none;
+  border-color: var(--luxury-primary);
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.3);
+  transform: translateY(-2px);
+}
+
+.luxury-input::placeholder {
+  color: var(--luxury-text-muted);
+  font-style: italic;
+}
+
+/* العناوين الفاخرة */
+.luxury-heading {
+  font-family: 'Playfair Display', serif;
+  font-weight: 800;
+  color: var(--luxury-text-primary);
+  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4);
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.luxury-heading::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 60px;
+  height: 2px;
+  background: var(--luxury-bg-gold);
+  border-radius: 1px;
+}
+
+/* الأيقونات الفاخرة */
+.luxury-icon {
+  color: var(--luxury-primary);
+  font-size: 1.2rem;
+  margin-right: 0.5rem;
+  transition: var(--luxury-transition);
+}
+
+.luxury-icon:hover {
+  color: var(--luxury-gold);
+  transform: scale(1.1);
+}
+
+/* الخلفية المتحركة */
+.luxury-bg-animated {
+  background: var(--luxury-bg-primary);
+  position: relative;
+  overflow: hidden;
+}
+
+.luxury-bg-animated::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 20% 20%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 60%, rgba(212, 175, 55, 0.05) 0%, transparent 50%);
+  animation: luxuryFloat 20s ease-in-out infinite;
+}
+
+@keyframes luxuryFloat {
+  0%, 100% { 
+    transform: translateY(0px) rotate(0deg); 
+  }
+  50% { 
+    transform: translateY(-20px) rotate(180deg); 
+  }
+}
+
+/* تأثيرات الجسيمات */
+.luxury-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.luxury-shimmer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
+  animation: luxuryShimmer 2s ease-in-out infinite;
+}
+
+@keyframes luxuryShimmer {
+  0% { left: -100%; }
+  50% { left: 100%; }
+  100% { left: 100%; }
+}
+
+/* ===== NAVIGATION ===== */
+.luxury-nav {
+  background: rgba(10, 22, 50, 0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  padding: 1rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  transition: var(--luxury-transition);
+}
+
+.luxury-nav-brand {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--luxury-gold);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.luxury-nav-brand:hover {
+  transform: scale(1.05);
+}
+
+.luxury-nav-link {
+  color: var(--luxury-text-light);
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--luxury-radius-sm);
+  transition: var(--luxury-transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.luxury-nav-link::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  transition: var(--luxury-transition-fast);
+}
+
+.luxury-nav-link:hover {
+  color: var(--luxury-gold);
+  background: rgba(212, 175, 55, 0.1);
+}
+
+.luxury-nav-link:hover::before {
+  left: 0;
+}
+
+/* ===== HERO SECTIONS ===== */
+.luxury-hero {
+  background: var(--luxury-bg-primary);
+  padding: 6rem 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 3rem;
+}
+
+.luxury-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.1) 0%, transparent 70%),
+    radial-gradient(circle at 20% 20%, rgba(255, 215, 0, 0.1) 0%, transparent 70%),
+    radial-gradient(circle at 80% 80%, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+  animation: luxuryParticles 30s ease-in-out infinite;
+}
+
+@keyframes luxuryParticles {
+  0%, 100% { 
+    transform: translateY(0px) rotate(0deg); 
+  }
+  33% { 
+    transform: translateY(-30px) rotate(120deg); 
+  }
+  66% { 
+    transform: translateY(-20px) rotate(240deg); 
+  }
+}
+
+.luxury-hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 4rem;
+  font-weight: 900;
+  color: var(--luxury-text-light);
+  text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
+  margin-bottom: 1rem;
+  animation: luxuryGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes luxuryGlow {
+  from { 
+    text-shadow: 0 4px 20px rgba(212, 175, 55, 0.5); 
+  }
+  to { 
+    text-shadow: 0 4px 30px rgba(212, 175, 55, 0.8); 
+  }
+}
+
+/* ===== CARDS GRID ===== */
+.luxury-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.luxury-grid-item {
+  background: var(--luxury-bg-card);
+  border-radius: var(--luxury-radius-lg);
+  overflow: hidden;
+  transition: var(--luxury-transition);
+  position: relative;
+}
+
+.luxury-grid-item:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: var(--luxury-shadow-lg);
+}
+
+.luxury-grid-item img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  transition: var(--luxury-transition);
+}
+
+.luxury-grid-item:hover img {
+  transform: scale(1.1);
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+  .luxury-heading {
+    font-size: 2.5rem;
+  }
+  
+  .luxury-hero {
+    padding: 4rem 0;
+  }
+  
+  .luxury-hero-title {
+    font-size: 3rem;
+  }
+  
+  .luxury-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1rem;
+  }
+  
+  .luxury-card {
+    padding: 1.5rem;
+  }
+  
+  .luxury-nav {
+    padding: 0.75rem 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .luxury-heading {
+    font-size: 2rem;
+  }
+  
+  .luxury-hero-title {
+    font-size: 2.5rem;
+  }
+  
+  .luxury-btn {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+  
+  .luxury-input {
+    padding: 10px 14px;
+  }
+}
+
+/* ===== ACCESSIBILITY ===== */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  .luxury-bg-animated::before,
+  .luxury-hero::before {
+    animation: none;
+  }
+}
+
+/* ===== SCROLLBAR STYLING ===== */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--luxury-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--luxury-primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--luxury-primary-dark);
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  .luxury-nav,
+  .luxury-bg-animated::before,
+  .luxury-hero::before {
+    display: none;
+  }
+  
+  body {
+    background: white !important;
+    color: black !important;
+  }
+}

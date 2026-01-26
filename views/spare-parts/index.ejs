@@ -18,66 +18,83 @@
     </header>
     
     <section class="hm-section">
-      <form method="get" class="mb-4">
-        <!-- فلاتر البحث (q/make/model) عبر QueryString -->
-        <div class="hm-card p-4">
-          <% if (isEmbed) { %>
-            <input type="hidden" name="embed" value="1" />
-          <% } %>
-          <div class="row g-4">
-            <div class="col-md-4">
-              <div class="hm-form-group">
-                <div class="hm-input-wrapper">
-                  <i class="hm-input-icon fas fa-search hm-icon hm-icon-sm hm-icon-muted"></i>
-                  <input name="q" 
-                         class="hm-input" 
-                         placeholder="اسم القطعة أو نوعها" 
-                         value="<%= filters.q %>" />
-                  <label for="q" class="hm-input-label">اسم القطعة أو نوعها</label>
-                </div>
+      <!-- البحث التلقائي بدون زر -->
+      <div class="hm-card p-4">
+        <% if (isEmbed) { %>
+          <input type="hidden" name="embed" value="1" />
+        <% } %>
+        <div class="row g-4">
+          <div class="col-md-4">
+            <div class="hm-form-group">
+              <div class="hm-input-wrapper">
+                <i class="hm-input-icon fas fa-search hm-icon hm-icon-sm hm-icon-muted"></i>
+                <input name="q" 
+                       class="hm-input" 
+                       id="searchInput"
+                       placeholder="اسم القطعة أو نوعها" 
+                       value="<%= filters.q %>" />
+                <label for="q" class="hm-input-label">اسم القطعة أو نوعها</label>
               </div>
             </div>
-            <div class="col-md-4">
-              <div class="hm-form-group">
-                <div class="hm-input-wrapper">
-                  <i class="hm-input-icon fas fa-building hm-icon hm-icon-sm hm-icon-muted"></i>
-                  <input name="make" 
-                         class="hm-input" 
-                         placeholder="Toyota" 
-                         value="<%= filters.make %>" />
-                  <label for="make" class="hm-input-label">الشركة</label>
-                </div>
+          </div>
+          <div class="col-md-4">
+            <div class="hm-form-group">
+              <div class="hm-input-wrapper">
+                <i class="hm-input-icon fas fa-building hm-icon hm-icon-sm hm-icon-muted"></i>
+                <input name="make" 
+                       class="hm-input" 
+                       id="makeInput"
+                       placeholder="Toyota" 
+                       value="<%= filters.make %>" />
+                <label for="make" class="hm-input-label">الشركة</label>
               </div>
             </div>
-            <div class="col-md-4">
-              <div class="hm-form-group">
-                <div class="hm-input-wrapper">
-                  <i class="hm-input-icon fas fa-car hm-icon hm-icon-sm hm-icon-muted"></i>
-                  <input name="model" 
-                         class="hm-input" 
-                         placeholder="Camry" 
-                         value="<%= filters.model %>" />
-                  <label for="model" class="hm-input-label">الموديل</label>
-                </div>
+          </div>
+          <div class="col-md-4">
+            <div class="hm-form-group">
+              <div class="hm-input-wrapper">
+                <i class="hm-input-icon fas fa-car hm-icon hm-icon-sm hm-icon-muted"></i>
+                <input name="model" 
+                       class="hm-input" 
+                       id="modelInput"
+                       placeholder="Camry" 
+                       value="<%= filters.model %>" />
+                <label for="model" class="hm-input-label">الموديل</label>
               </div>
-            </div>
-            <div class="col-12 d-flex gap-2 justify-content-end">
-              <button class="hm-btn hm-btn-primary">بحث</button>
-              <a class="hm-btn hm-btn-outline" href="/spare-parts<%= isEmbed ? '?embed=1' : '' %>">إزالة الفلاتر</a>
             </div>
           </div>
         </div>
-      </form>
+      </div>
       
       <div class="hm-grid hm-grid--responsive">
         <% if (!parts.length) { %>
           <div class="col-12">
-            <div class="hm-card text-center py-5">
-              <div class="hm-icon-container hm-icon-container-light mx-auto mb-3">
-                <i class="fas fa-box-open hm-icon-2xl hm-icon-muted"></i>
+            <div class="hm-no-results-card">
+              <div class="hm-no-results-animation">
+                <div class="hm-search-icon">
+                  <i class="fas fa-search"></i>
+                </div>
+                <div class="hm-particles">
+                  <span></span><span></span><span></span><span></span><span></span>
+                </div>
               </div>
-              <h5 class="mb-2 hm-text-blue">لا توجد نتائج</h5>
-              <div class="hm-text-muted">جرّب تغيير كلمات البحث أو إزالة الفلاتر.</div>
+              <h3 class="hm-no-results-title">لا توجد نتائج</h3>
+              <p class="hm-no-results-description">
+                لم نعثر على قطع غيار تطابق بحثك. جرب تغيير كلمات البحث أو استخدم مصطلحات مختلفة.
+              </p>
+              <div class="hm-suggestions">
+                <h4>اقتراحات:</h4>
+                <ul>
+                  <li>تحقق من إملاء الكلمات المفتاحية</li>
+                  <li>استخدم كلمات أكثر عمومية</li>
+                  <li>جرب البحث باسم الشركة فقط</li>
+                  <li>تحقق من توفر القطعة في المخزون</li>
+                </ul>
+              </div>
+              <button class="hm-btn hm-btn-primary hm-clear-search" onclick="clearSearch()">
+                <i class="fas fa-redo"></i>
+                <span>مسح البحث والبدء من جديد</span>
+              </button>
             </div>
           </div>
         <% } %>
@@ -138,6 +155,58 @@
 </div>
 
 <script>
+// Auto Search Functionality
+(function() {
+  let searchTimeout;
+  
+  function performSearch() {
+    const q = document.getElementById('searchInput').value;
+    const make = document.getElementById('makeInput').value;
+    const model = document.getElementById('modelInput').value;
+    const embed = '<%= isEmbed ? "1" : "" %>';
+    
+    const params = new URLSearchParams();
+    if (q) params.append('q', q);
+    if (make) params.append('make', make);
+    if (model) params.append('model', model);
+    if (embed) params.append('embed', embed);
+    
+    const url = '/spare-parts' + (params.toString() ? '?' + params.toString() : '');
+    window.location.href = url;
+  }
+  
+  function setupAutoSearch() {
+    const inputs = ['searchInput', 'makeInput', 'modelInput'];
+    
+    inputs.forEach(inputId => {
+      const input = document.getElementById(inputId);
+      if (input) {
+        input.addEventListener('input', function() {
+          clearTimeout(searchTimeout);
+          searchTimeout = setTimeout(performSearch, 800);
+        });
+      }
+    });
+  }
+  
+  function clearSearch() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('makeInput').value = '';
+    document.getElementById('modelInput').value = '';
+    performSearch();
+  }
+  
+  // Make clearSearch global
+  window.clearSearch = clearSearch;
+  
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupAutoSearch);
+  } else {
+    setupAutoSearch();
+  }
+})();
+
 // Currency Converter for Spare Parts
 (function() {
   const EXCHANGE_RATE = 3.75; // 1 USD = 3.75 SAR
@@ -189,3 +258,232 @@
   });
 })();
 </script>
+
+<style>
+/* Creative No Results Design */
+.hm-no-results-card {
+    background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 25%, #0ea5e9 50%, #1e3a8a 75%, #1e293b 100%);
+    border-radius: 25px;
+    padding: 4rem 3rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 25px 50px rgba(14, 165, 233, 0.15), 0 15px 35px rgba(30, 58, 138, 0.1);
+    border: 1px solid rgba(248, 250, 252, 0.5);
+    backdrop-filter: blur(20px);
+}
+
+.hm-no-results-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(248, 250, 252, 0.8), transparent);
+    animation: cardShimmer 3s ease-in-out infinite;
+}
+
+@keyframes cardShimmer {
+    0%, 100% { opacity: 0.3; transform: translateX(-100%); }
+    50% { opacity: 0.8; transform: translateX(100%); }
+}
+
+.hm-no-results-animation {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 2rem;
+}
+
+.hm-search-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #0ea5e9, #1e3a8a);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    box-shadow: 0 8px 25px rgba(14, 165, 233, 0.3), 0 4px 15px rgba(30, 58, 138, 0.2);
+    border: 3px solid rgba(248, 250, 252, 0.5);
+    position: relative;
+    animation: searchPulse 2s ease-in-out infinite;
+}
+
+.hm-search-icon i {
+    font-size: 2rem;
+    color: white;
+}
+
+@keyframes searchPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 8px 25px rgba(14, 165, 233, 0.3), 0 4px 15px rgba(30, 58, 138, 0.2); }
+    50% { transform: scale(1.05); box-shadow: 0 12px 35px rgba(14, 165, 233, 0.4), 0 6px 20px rgba(30, 58, 138, 0.3); }
+}
+
+.hm-particles {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120px;
+    height: 120px;
+}
+
+.hm-particles span {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: linear-gradient(135deg, #0ea5e9, #1e3a8a);
+    border-radius: 50%;
+    animation: float 3s ease-in-out infinite;
+}
+
+.hm-particles span:nth-child(1) { top: 0; left: 50%; animation-delay: 0s; }
+.hm-particles span:nth-child(2) { top: 25%; right: 0; animation-delay: 0.5s; }
+.hm-particles span:nth-child(3) { bottom: 0; left: 50%; animation-delay: 1s; }
+.hm-particles span:nth-child(4) { top: 25%; left: 0; animation-delay: 1.5s; }
+.hm-particles span:nth-child(5) { top: 50%; right: 10%; animation-delay: 2s; }
+
+@keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.7; }
+    50% { transform: translate(var(--x, 20px), var(--y, -20px)) scale(1.2); opacity: 1; }
+}
+
+.hm-no-results-title {
+    color: #1e3a8a;
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    background: linear-gradient(45deg, #1e3a8a, #0ea5e9, #64748b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 2px 10px rgba(14, 165, 233, 0.2);
+}
+
+.hm-no-results-description {
+    color: rgba(30, 58, 138, 0.8);
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.hm-suggestions {
+    background: linear-gradient(135deg, rgba(248, 250, 252, 0.9) 0%, rgba(255, 255, 255, 0.95) 100%);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(14, 165, 233, 0.2);
+    box-shadow: 0 4px 15px rgba(14, 165, 233, 0.1);
+    text-align: right;
+}
+
+.hm-suggestions h4 {
+    color: #1e3a8a;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.hm-suggestions h4::before {
+    content: '💡';
+    font-size: 1.5rem;
+}
+
+.hm-suggestions ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.hm-suggestions li {
+    color: rgba(30, 58, 138, 0.8);
+    margin-bottom: 0.5rem;
+    padding-right: 1.5rem;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.hm-suggestions li::before {
+    content: '→';
+    position: absolute;
+    right: 0;
+    color: #0ea5e9;
+    font-weight: bold;
+    transition: transform 0.3s ease;
+}
+
+.hm-suggestions li:hover {
+    color: #1e3a8a;
+    transform: translateX(5px);
+}
+
+.hm-suggestions li:hover::before {
+    transform: translateX(3px);
+}
+
+.hm-clear-search {
+    background: linear-gradient(135deg, #0ea5e9 0%, #1e3a8a 100%);
+    color: #ffffff;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 15px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(14, 165, 233, 0.3), 0 3px 10px rgba(30, 58, 138, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.hm-clear-search::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.hm-clear-search:hover::before {
+    left: 100%;
+}
+
+.hm-clear-search:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(14, 165, 233, 0.4), 0 4px 15px rgba(30, 58, 138, 0.3);
+}
+
+.hm-clear-search i {
+    margin-left: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .hm-no-results-card {
+        padding: 2rem 1.5rem;
+    }
+    
+    .hm-no-results-title {
+        font-size: 2rem;
+    }
+    
+    .hm-search-icon {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .hm-search-icon i {
+        font-size: 1.5rem;
+    }
+    
+    .hm-suggestions {
+        padding: 1.5rem;
+    }
+}
+</style>

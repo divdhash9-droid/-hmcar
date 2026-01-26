@@ -27,27 +27,65 @@ async function addIndexes() {
 
     // Indexes للسيارات (Cars)
     console.log('\n📊 إضافة Indexes للسيارات...');
-    await db.collection('cars').createIndex({ make: 1, model: 1 });
-    await db.collection('cars').createIndex({ price: 1 });
-    await db.collection('cars').createIndex({ priceSar: 1 });
-    await db.collection('cars').createIndex({ priceUsd: 1 });
-    await db.collection('cars').createIndex({ year: -1 });
-    await db.collection('cars').createIndex({ isActive: 1, isSold: 1 });
-    await db.collection('cars').createIndex({ condition: 1 });
-    await db.collection('cars').createIndex({ listingType: 1 });
-    await db.collection('cars').createIndex({ createdAt: -1 });
-    await db.collection('cars').createIndex({ mileage: 1 });
-    await db.collection('cars').createIndex({ seller: 1 });
+
+    // دالة مساعدة لإنشاء index مع التحقق من الوجود
+    const createIndexIfNotExists = async (collection, indexSpec, options = {}) => {
+      try {
+        const indexes = await collection.indexes();
+        const indexExists = indexes.some(idx => JSON.stringify(idx.key) === JSON.stringify(indexSpec));
+        if (!indexExists) {
+          await collection.createIndex(indexSpec, options);
+          console.log(`  ✅ تم إنشاء index: ${JSON.stringify(indexSpec)}`);
+        } else {
+          console.log(`  ⏭️  Index موجود بالفعل: ${JSON.stringify(indexSpec)}`);
+        }
+      } catch (error) {
+        if (error.code === 85) { // Index already exists with different options
+          console.log(`  ⏭️  Index موجود بإعدادات مختلفة: ${JSON.stringify(indexSpec)}`);
+        } else {
+          throw error;
+        }
+      }
+    };
+
+    await createIndexIfNotExists(db.collection('cars'), { make: 1, model: 1 });
+    await createIndexIfNotExists(db.collection('cars'), { price: 1 });
+    await createIndexIfNotExists(db.collection('cars'), { priceSar: 1 });
+    await createIndexIfNotExists(db.collection('cars'), { priceUsd: 1 });
+    await createIndexIfNotExists(db.collection('cars'), { year: -1 });
+    await createIndexIfNotExists(db.collection('cars'), { isActive: 1, isSold: 1 });
+    await createIndexIfNotExists(db.collection('cars'), { condition: 1 });
+    await createIndexIfNotExists(db.collection('cars'), { listingType: 1 });
+    await createIndexIfNotExists(db.collection('cars'), { createdAt: -1 });
+    await createIndexIfNotExists(db.collection('cars'), { mileage: 1 });
+    await createIndexIfNotExists(db.collection('cars'), { seller: 1 });
     // Compound indexes لتحسين الاستعلامات المعقدة
-    await db.collection('cars').createIndex({ isActive: 1, listingType: 1, createdAt: -1 });
-    await db.collection('cars').createIndex({ make: 1, year: -1, price: 1 });
-    // Text index للبحث
-    await db.collection('cars').createIndex({ 
-      title: 'text', 
-      make: 'text', 
-      model: 'text', 
-      description: 'text' 
-    });
+    await createIndexIfNotExists(db.collection('cars'), { isActive: 1, listingType: 1, createdAt: -1 });
+    await createIndexIfNotExists(db.collection('cars'), { make: 1, year: -1, price: 1 });
+
+    // التحقق من وجود text index وإنشاؤه إذا لم يكن موجوداً
+    try {
+      const indexes = await db.collection('cars').indexes();
+      const textIndexExists = indexes.some(idx => idx.key._fts === 'text');
+      if (!textIndexExists) {
+        await db.collection('cars').createIndex({
+          title: 'text',
+          make: 'text',
+          model: 'text',
+          description: 'text'
+        });
+        console.log('  ✅ تم إنشاء text index للبحث');
+      } else {
+        console.log('  ⏭️  Text index موجود بالفعل');
+      }
+    } catch (error) {
+      if (error.code === 85) {
+        console.log('  ⏭️  Text index موجود بإعدادات مختلفة');
+      } else {
+        console.log('  ⚠️  خطأ في إنشاء text index:', error.message);
+      }
+    }
+
     console.log('✅ تم إضافة Indexes للسيارات');
 
     // Indexes للمزادات (Auctions)

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="HM CAR">
+  <defs>
+    <linearGradient id="hm-navy" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a1f3a" />
+      <stop offset="100%" stop-color="#08152a" />
+    </linearGradient>
+    <linearGradient id="hm-ivory" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f2ede3" />
+      <stop offset="100%" stop-color="#e7dfd2" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="10" fill="url(#hm-navy)" />
+  <path d="M10 36c9-7 20-11 34-10 12 0 22 3 28 7" fill="none" stroke="url(#hm-ivory)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M12 37c6-4 15-7 26-7 14 0 22 3 28 7" fill="none" stroke="url(#hm-ivory)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="18" cy="41" r="3" fill="url(#hm-ivory)" />
+  <circle cx="46" cy="41" r="3" fill="url(#hm-ivory)" />
+  <text x="32" y="52" text-anchor="middle" font-size="11" font-family="'Playfair Display','Times New Roman',serif" fill="url(#hm-ivory)" font-weight="700">HM</text>
+</svg>

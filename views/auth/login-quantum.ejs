@@ -1,0 +1,988 @@
+<!-- [[ARABIC_HEADER]] هذا الملف (views/auth/login-quantum.ejs) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. -->
+
+<% layout('layout') -%>
+<% var hideNavbar = true; %>
+
+<div class="hm-quantum-login">
+  <!-- خلفية متحركة وأنيقة -->
+  <div class="hm-background">
+    <div class="hm-neural-network"></div>
+    <div class="hm-particles"></div>
+    <div class="hm-grid-lines"></div>
+    <div class="hm-light-beam"></div>
+    <div class="hm-wave-effect"></div>
+  </div>
+
+  <!-- الحاوية الرئيسية -->
+  <div class="hm-container">
+    <!-- اللوحة اليسرى - العلامة التجارية -->
+    <div class="hm-brand-panel">
+      <div class="hm-brand-content">
+        <!-- شريط العلوي -->
+        <div class="hm-top-bar">
+          <div class="hm-badge">
+            <i class="fas fa-rocket"></i>
+            <span>QUANTUM EDITION</span>
+          </div>
+          <div class="hm-top-actions">
+            <a href="/" class="hm-home-btn" title="العودة إلى الصفحة الرئيسية">
+              <i class="fas fa-home"></i>
+              <span>الرئيسية</span>
+            </a>
+            <button class="hm-lang-btn" onclick="toggleLanguage()">
+              <i class="fas fa-globe"></i>
+              <span id="currentLang">العربية</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- الشعار -->
+        <div class="hm-logo-section">
+          <div class="hm-logo-container">
+            <div class="hm-logo-ring"></div>
+            <div class="hm-logo-pulse"></div>
+            <img class="hm-logo" src="/public/images/logo-classic.svg" alt="HM CAR" loading="eager" decoding="async" onerror="this.onerror=null;this.src='/public/images/logo-signature.svg';" />
+          </div>
+          <h1 class="hm-brand-title" data-ar="HM CAR" data-en="HM CAR">HM CAR</h1>
+          <p class="hm-brand-subtitle" data-ar="منصة مزادات السيارات الفاخرة" data-en="Luxury Car Auction Platform">
+            منصة مزادات السيارات الفاخرة<br>
+            <span class="hm-english-text">Luxury Car Auction Platform</span>
+          </p>
+        </div>
+
+        <!-- المميزات -->
+        <div class="hm-features">
+          <div class="hm-feature-card">
+            <div class="hm-feature-icon">
+              <i class="fas fa-shield-alt"></i>
+            </div>
+            <div class="hm-feature-content">
+              <h3 data-ar="حماية كوانتوم" data-en="Quantum Protection">حماية كوانتوم</h3>
+              <p data-ar="تشفير AES-512" data-en="AES-512 Encryption">تشفير AES-512</p>
+            </div>
+          </div>
+          <div class="hm-feature-card">
+            <div class="hm-feature-icon">
+              <i class="fas fa-bolt"></i>
+            </div>
+            <div class="hm-feature-content">
+              <h3 data-ar="سرعة الضوء" data-en="Light Speed">سرعة الضوء</h3>
+              <p data-ar="استجابة 50ms" data-en="50ms Response">استجابة 50ms</p>
+            </div>
+          </div>
+          <div class="hm-feature-card">
+            <div class="hm-feature-icon">
+              <i class="fas fa-gem"></i>
+            </div>
+            <div class="hm-feature-content">
+              <h3 data-ar="تجربة مستقبلية" data-en="Future Experience">تجربة مستقبلية</h3>
+              <p data-ar="واجهة كوانتوم" data-en="Quantum Interface">واجهة كوانتوم</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- الإحصائيات -->
+        <div class="hm-stats">
+          <div class="hm-stat-item">
+            <span class="hm-stat-number">+5.2M</span>
+            <span class="hm-stat-label" data-ar="مستخدم" data-en="Users">مستخدم</span>
+          </div>
+          <div class="hm-stat-item">
+            <span class="hm-stat-number">99.99%</span>
+            <span class="hm-stat-label" data-ar="جاهزية" data-en="Uptime">جاهزية</span>
+          </div>
+          <div class="hm-stat-item">
+            <span class="hm-stat-number">24/7</span>
+            <span class="hm-stat-label" data-ar="دعم" data-en="Support">دعم</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- اللوحة اليمنى - نموذج تسجيل الدخول -->
+    <div class="hm-login-panel">
+      <div class="hm-login-content">
+        <!-- التبويبات -->
+        <div class="hm-tabs">
+          <button class="hm-tab hm-active" data-tab="login">
+            <i class="fas fa-sign-in-alt"></i>
+            <span data-ar="تسجيل الدخول" data-en="Login">تسجيل الدخول</span>
+          </button>
+          <button class="hm-tab" data-tab="register">
+            <i class="fas fa-user-plus"></i>
+            <span data-ar="حساب جديد" data-en="New Account">حساب جديد</span>
+          </button>
+        </div>
+
+        <!-- نموذج تسجيل الدخول -->
+        <div class="hm-form-container">
+          <div class="hm-form-header">
+            <h2 class="hm-title" data-ar="مرحباً بعودتك" data-en="Welcome Back">مرحباً بعودتك</h2>
+            <p class="hm-subtitle" data-ar="سجل دخولك للوصول إلى عالم السيارات الفاخرة" data-en="Login to access the world of luxury cars">
+              سجل دخولك للوصول إلى عالم السيارات الفاخرة
+            </p>
+          </div>
+
+          <form class="hm-login-form" action="/auth/login" method="POST">
+            <!-- البريد الإلكتروني -->
+            <div class="hm-input-group">
+              <label class="hm-input-label" data-ar="البريد الإلكتروني" data-en="Email Address">البريد الإلكتروني</label>
+              <div class="hm-input-wrapper">
+                <input type="email" name="email" class="hm-input" placeholder="example@email.com" required>
+                <span class="hm-input-icon">
+                  <i class="fas fa-envelope"></i>
+                </span>
+              </div>
+            </div>
+
+            <!-- كلمة المرور -->
+            <div class="hm-input-group">
+              <label class="hm-input-label" data-ar="كلمة المرور" data-en="Password">كلمة المرور</label>
+              <div class="hm-input-wrapper">
+                <input type="password" name="password" class="hm-input" placeholder="••••••••" required>
+                <span class="hm-input-icon">
+                  <i class="fas fa-lock"></i>
+                </span>
+                <button type="button" class="hm-password-toggle">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- الخيارات -->
+            <div class="hm-options">
+              <label class="hm-checkbox-label">
+                <input type="checkbox" class="hm-checkbox">
+                <span class="hm-checkbox-custom"></span>
+                <span data-ar="تذكرني" data-en="Remember me">تذكرني</span>
+              </label>
+              <a href="/auth/forgot-password" class="hm-link" data-ar="نسيت كلمة المرور؟" data-en="Forgot password?">نسيت كلمة المرور؟</a>
+            </div>
+
+            <!-- زر تسجيل الدخول -->
+            <button type="submit" class="hm-btn hm-btn-primary">
+              <span class="hm-btn-text" data-ar="تسجيل الدخول" data-en="Login">تسجيل الدخول</span>
+              <span class="hm-btn-icon">
+                <i class="fas fa-arrow-left"></i>
+              </span>
+            </button>
+          </form>
+
+          <!-- الفاصل -->
+          <div class="hm-divider">
+            <span data-ar="أو" data-en="OR">أو</span>
+          </div>
+
+          <!-- تسجيل الدخول الاجتماعي -->
+          <div class="hm-social-login">
+            <button class="hm-social-btn hm-google-btn">
+              <i class="fab fa-google"></i>
+              <span data-ar="جوجل" data-en="Google">جوجل</span>
+            </button>
+            <button class="hm-social-btn hm-facebook-btn">
+              <i class="fab fa-facebook-f"></i>
+              <span data-ar="فيسبوك" data-en="Facebook">فيسبوك</span>
+            </button>
+            <button class="hm-social-btn hm-apple-btn">
+              <i class="fab fa-apple"></i>
+              <span data-ar="آبل" data-en="Apple">آبل</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Quantum Login Styles - Navy Blue & Snow White Theme */
+.hm-quantum-login {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0a192f 0%, #112240 50%, #1e3a8a 100%);
+}
+
+/* Background Effects */
+.hm-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background: radial-gradient(ellipse at center, #1e3a8a 0%, #0a192f 50%, #000814 100%);
+}
+
+.hm-neural-network {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(30, 58, 138, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+  animation: neuralPulse 8s ease-in-out infinite;
+}
+
+@keyframes neuralPulse {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.1); }
+}
+
+.hm-particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(2px 2px at 20px 30px, #ffffff, transparent),
+    radial-gradient(2px 2px at 40px 70px, #ffffff, transparent),
+    radial-gradient(1px 1px at 50px 50px, #ffffff, transparent),
+    radial-gradient(1px 1px at 80px 10px, #ffffff, transparent),
+    radial-gradient(2px 2px at 130px 80px, #ffffff, transparent);
+  background-repeat: repeat;
+  background-size: 200px 200px;
+  animation: particlesFloat 20s linear infinite;
+}
+
+@keyframes particlesFloat {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(-200px, -200px); }
+}
+
+.hm-grid-lines {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: 
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 50px 50px;
+  animation: gridMove 10s linear infinite;
+}
+
+@keyframes gridMove {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(50px, 50px); }
+}
+
+.hm-light-beam {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(from 0deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+  animation: beamRotate 20s linear infinite;
+}
+
+@keyframes beamRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.hm-wave-effect {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 300px;
+  background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.02));
+  animation: waveMove 15s ease-in-out infinite;
+}
+
+@keyframes waveMove {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-50px); }
+}
+
+/* Container */
+.hm-container {
+  display: flex;
+  height: 100vh;
+  position: relative;
+}
+
+/* Brand Panel */
+.hm-brand-panel {
+  flex: 1;
+  background: linear-gradient(135deg, rgba(10, 25, 47, 0.95) 0%, rgba(17, 34, 64, 0.95) 100%);
+  backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hm-brand-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { transform: translateX(-100%); }
+  50% { transform: translateX(100%); }
+}
+
+.hm-brand-content {
+  max-width: 500px;
+  width: 100%;
+  z-index: 1;
+  position: relative;
+}
+
+/* Top Bar */
+.hm-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3rem;
+}
+
+.hm-badge {
+  background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
+  color: #0a192f;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
+}
+
+.hm-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hm-home-btn, .hm-lang-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  padding: 0.75rem 1rem;
+  border-radius: 25px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.hm-home-btn:hover, .hm-lang-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+/* Logo Section */
+.hm-logo-section {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.hm-logo-container {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 2rem;
+}
+
+.hm-logo-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 150px;
+  height: 150px;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #ffffff, #e2e8f0, #ffffff);
+  background-size: 300% 300%;
+  animation: ringRotate 3s linear infinite;
+  z-index: -1;
+}
+
+.hm-logo-pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 180px;
+  height: 180px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+  z-index: -2;
+}
+
+@keyframes ringRotate {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
+  50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.1; }
+}
+
+.hm-logo {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
+}
+
+.hm-brand-title {
+  font-size: 3rem;
+  font-weight: 900;
+  color: #ffffff;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+  background: linear-gradient(45deg, #ffffff, #e2e8f0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hm-brand-subtitle {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.hm-english-text {
+  color: #e2e8f0;
+  font-size: 0.9rem;
+}
+
+/* Features */
+.hm-features {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.hm-feature-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.hm-feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  transition: left 0.5s ease;
+}
+
+.hm-feature-card:hover::before {
+  left: 100%;
+}
+
+.hm-feature-card:hover {
+  transform: translateX(10px);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.15);
+}
+
+.hm-feature-icon {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0a192f;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.hm-feature-content h3 {
+  color: #ffffff;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.hm-feature-content p {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+}
+
+/* Stats */
+.hm-stats {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.hm-stat-item {
+  text-align: center;
+  flex: 1;
+}
+
+.hm-stat-number {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: #ffffff;
+  margin-bottom: 0.25rem;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.hm-stat-label {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Login Panel */
+.hm-login-panel {
+  flex: 1;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(226, 232, 240, 0.95) 100%);
+  backdrop-filter: blur(20px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+}
+
+.hm-login-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, transparent, rgba(10, 25, 47, 0.05), transparent);
+  animation: shimmer 3s ease-in-out infinite reverse;
+}
+
+.hm-login-content {
+  max-width: 450px;
+  width: 100%;
+  z-index: 1;
+  position: relative;
+}
+
+/* Tabs */
+.hm-tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  background: rgba(10, 25, 47, 0.05);
+  padding: 0.5rem;
+  border-radius: 15px;
+  border: 1px solid rgba(10, 25, 47, 0.1);
+}
+
+.hm-tab {
+  flex: 1;
+  padding: 1rem;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  color: rgba(10, 25, 47, 0.6);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.hm-tab:hover {
+  background: rgba(10, 25, 47, 0.1);
+  color: #0a192f;
+}
+
+.hm-tab.hm-active {
+  background: linear-gradient(135deg, #0a192f 0%, #1e3a8a 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(10, 25, 47, 0.3);
+}
+
+/* Form */
+.hm-form-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.hm-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #0a192f;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(45deg, #0a192f, #1e3a8a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hm-subtitle {
+  color: rgba(10, 25, 47, 0.6);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.hm-input-group {
+  margin-bottom: 1.5rem;
+}
+
+.hm-input-label {
+  display: block;
+  color: #0a192f;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.hm-input-wrapper {
+  position: relative;
+}
+
+.hm-input {
+  width: 100%;
+  padding: 1rem 3rem 1rem 1rem;
+  background: rgba(255, 255, 255, 0.8);
+  border: 2px solid rgba(10, 25, 47, 0.1);
+  border-radius: 15px;
+  color: #0a192f;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.hm-input::placeholder {
+  color: rgba(10, 25, 47, 0.4);
+}
+
+.hm-input:focus {
+  outline: none;
+  border-color: #0a192f;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 20px rgba(10, 25, 47, 0.2);
+}
+
+.hm-input-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(10, 25, 47, 0.4);
+  font-size: 1rem;
+}
+
+.hm-password-toggle {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: rgba(10, 25, 47, 0.4);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: color 0.3s ease;
+}
+
+.hm-password-toggle:hover {
+  color: #0a192f;
+}
+
+/* Options */
+.hm-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.hm-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #0a192f;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.hm-checkbox {
+  display: none;
+}
+
+.hm-checkbox-custom {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(10, 25, 47, 0.3);
+  border-radius: 5px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.hm-checkbox:checked + .hm-checkbox-custom {
+  background: linear-gradient(135deg, #0a192f 0%, #1e3a8a 100%);
+  border-color: #0a192f;
+}
+
+.hm-checkbox:checked + .hm-checkbox-custom::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.hm-link {
+  color: #0a192f;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+.hm-link:hover {
+  color: #1e3a8a;
+}
+
+/* Buttons */
+.hm-btn {
+  width: 100%;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 15px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.hm-btn-primary {
+  background: linear-gradient(135deg, #0a192f 0%, #1e3a8a 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(10, 25, 47, 0.3);
+}
+
+.hm-btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.hm-btn-primary:hover::before {
+  left: 100%;
+}
+
+.hm-btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(10, 25, 47, 0.4);
+}
+
+.hm-btn-icon {
+  transition: transform 0.3s ease;
+}
+
+.hm-btn-primary:hover .hm-btn-icon {
+  transform: translateX(-5px);
+}
+
+/* Divider */
+.hm-divider {
+  text-align: center;
+  margin: 2rem 0;
+  position: relative;
+}
+
+.hm-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(10, 25, 47, 0.1);
+}
+
+.hm-divider span {
+  background: rgba(255, 255, 255, 0.95);
+  color: rgba(10, 25, 47, 0.4);
+  padding: 0 1rem;
+  font-size: 0.9rem;
+}
+
+/* Social Login */
+.hm-social-login {
+  display: flex;
+  gap: 1rem;
+}
+
+.hm-social-btn {
+  flex: 1;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(10, 25, 47, 0.1);
+  border-radius: 10px;
+  color: rgba(10, 25, 47, 0.6);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.hm-social-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(10, 25, 47, 0.1);
+}
+
+.hm-google-btn:hover {
+  background: #4285f4;
+  color: #fff;
+  border-color: #4285f4;
+}
+
+.hm-facebook-btn:hover {
+  background: #1877f2;
+  color: #fff;
+  border-color: #1877f2;
+}
+
+.hm-apple-btn:hover {
+  background: #000;
+  color: #fff;
+  border-color: #000;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hm-container {
+    flex-direction: column;
+  }
+  
+  .hm-brand-panel {
+    padding: 2rem 1rem;
+    min-height: auto;
+  }
+  
+  .hm-login-panel {
+    padding: 2rem 1rem;
+  }
+  
+  .hm-brand-title {
+    font-size: 2rem;
+  }
+  
+  .hm-title {
+    font-size: 1.5rem;
+  }
+  
+  .hm-stats {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .hm-social-login {
+    flex-direction: column;
+  }
+}
+</style>
+
+<script>
+// Language Toggle
+function toggleLanguage() {
+  const elements = document.querySelectorAll('[data-ar][data-en]');
+  const currentLang = document.getElementById('currentLang');
+  
+  elements.forEach(element => {
+    if (currentLang.textContent === 'العربية') {
+      element.textContent = element.getAttribute('data-en');
+    } else {
+      element.textContent = element.getAttribute('data-ar');
+    }
+  });
+  
+  currentLang.textContent = currentLang.textContent === 'العربية' ? 'English' : 'العربية';
+}
+
+// Tab Switching
+document.querySelectorAll('.hm-tab').forEach(tab => {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.hm-tab').forEach(t => t.classList.remove('hm-active'));
+    this.classList.add('hm-active');
+  });
+});
+
+// Password Toggle
+document.querySelector('.hm-password-toggle')?.addEventListener('click', function() {
+  const input = this.parentElement.querySelector('.hm-input');
+  const icon = this.querySelector('i');
+  
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.classList.remove('fa-eye');
+    icon.classList.add('fa-eye-slash');
+  } else {
+    input.type = 'password';
+    icon.classList.remove('fa-eye-slash');
+    icon.classList.add('fa-eye');
+  }
+});
+
+// Form Validation
+document.querySelector('.hm-login-form')?.addEventListener('submit', function(e) {
+  const email = this.querySelector('input[name="email"]').value;
+  const password = this.querySelector('input[name="password"]').value;
+  
+  if (!email || !password) {
+    e.preventDefault();
+    alert('يرجى ملء جميع الحقول المطلوبة');
+  }
+});
+</script>

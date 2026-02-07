@@ -1,0 +1,1009 @@
+/* [[ARABIC_HEADER]] هذا الملف (public/css/unified-luxury.css) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. */
+
+/* ========== نظام التصميم الفاخر الموحد ========== */
+
+/* ======== متغيرات التصميم الأساسية ======== */
+:root {
+  /* Map legacy luxury "gold" variables to the navy/white theme tokens */
+  --primary-gold: var(--primary-color);
+  --primary-gold-light: var(--secondary-color);
+  --primary-gold-dark: var(--primary-color-light);
+  --accent-gold: var(--secondary-color);
+  --rose-gold: var(--gold-color);
+  --platinum: var(--gold-color);
+
+  /* RGB helpers (retain navy RGB for translucency) */
+  --accent-rgb: 11, 31, 58;
+  --accent-rgb-soft: 238, 243, 251;
+
+  /* Dark mode backgrounds (keep as-is but favor theme tokens when possible) */
+  --bg-dark: #000000;
+  --bg-secondary: #0D0D0D;
+  --bg-tertiary: #1A1A1A;
+  --bg-card: #0F0F0F;
+
+  /* Text colors (inherit light/dark variants from modern design tokens) */
+  --text-primary: var(--text-primary, #FFFFFF);
+  --text-secondary: var(--text-color-secondary, #E0E0E0);
+  --text-muted: #A0A0A0;
+  --text-gold: var(--primary-color);
+
+  /* Borders & shadows that previously used gold now use navy-based translucency */
+  --border-gold: rgba(var(--accent-rgb-soft), 0.22);
+  --border-gold-bright: rgba(var(--accent-rgb-soft), 0.35);
+  --shadow-gold: 0 10px 40px rgba(var(--accent-rgb), 0.18);
+  --shadow-gold-intense: 0 15px 60px rgba(var(--accent-rgb), 0.28);
+  --shadow-dark: 0 8px 32px rgba(0, 0, 0, 0.8);
+  --glow-gold: 0 0 20px rgba(var(--accent-rgb), 0.28), 0 0 40px rgba(var(--accent-rgb), 0.16);
+
+  /* Gradients: prefer central navy gradient already defined in modern-design.css */
+  --gradient-primary: var(--gold-gradient);
+  --gradient-gold-shine: var(--gold-gradient);
+  --gradient-bg: radial-gradient(ellipse at top, #1A1A1A 0%, #0D0D0D 50%, #000000 100%);
+  --gradient-card: linear-gradient(145deg, rgba(var(--accent-rgb), 0.14) 0%, rgba(var(--accent-rgb), 0.05) 100%);
+  --gradient-overlay: linear-gradient(180deg, rgba(var(--accent-rgb), 0.12) 0%, transparent 100%);
+  
+  /* الحركات والانتقالات */
+  --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  
+  /* الزوايا */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-full: 50%;
+}
+
+/* ======== Light Mode Variables ======== */
+[data-theme="light"] {
+  /* ألوان الخلفية الفاخرة - Light Mode */
+  --bg-dark: #FFFFFF;
+  --bg-secondary: #F8F9FA;
+  --bg-tertiary: #E9ECEF;
+  --bg-card: #FFFFFF;
+  
+  /* ألوان النصوص - Light Mode */
+  --text-primary: #212529;
+  --text-secondary: #495057;
+  --text-muted: #6C757D;
+  --text-gold: #0B1F3A;
+  
+  /* الظوال لل Light Mode */
+  --shadow-dark: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --shadow-gold: 0 10px 40px rgba(var(--accent-rgb), 0.18);
+  --shadow-gold-intense: 0 15px 60px rgba(var(--accent-rgb), 0.28);
+  --glow-gold: 0 0 20px rgba(var(--accent-rgb), 0.28), 0 0 40px rgba(var(--accent-rgb), 0.16);
+  
+  /* التدرجات لل Light Mode */
+  --gradient-bg: radial-gradient(ellipse at top, #F8F9FA 0%, #E9ECEF 50%, #FFFFFF 100%);
+  --gradient-card: linear-gradient(145deg, rgba(0, 0, 0, 0.02) 0%, rgba(0, 0, 0, 0.01) 100%);
+  --gradient-overlay: linear-gradient(180deg, rgba(var(--accent-rgb), 0.06) 0%, transparent 100%);
+  
+  /* الحدود لل Light Mode */
+  --border-gold: rgba(var(--accent-rgb), 0.22);
+  --border-gold-bright: rgba(var(--accent-rgb), 0.35);
+}
+
+/* ======== التصميم الأساسي ======== */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--gradient-bg);
+  background-attachment: fixed;
+  color: var(--text-primary);
+  font-family: 'Playfair Display', 'Tajawal', 'Roboto', serif;
+  line-height: 1.7;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(var(--accent-rgb), 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(var(--accent-rgb), 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(var(--accent-rgb), 0.05) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ======== البطاقات الفاخرة ======== */
+.luxury-card {
+  background: var(--gradient-card);
+  border: 2px solid var(--border-gold);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-gold), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  transition: var(--transition-smooth);
+  position: relative;
+  overflow: hidden;
+}
+
+.luxury-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--gradient-gold-shine);
+  background-size: 200% 100%;
+  animation: shimmerGold 3s linear infinite;
+}
+
+.luxury-card::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(var(--accent-rgb), 0.08) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+
+.luxury-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: var(--shadow-gold-intense), var(--glow-gold), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  border-color: var(--border-gold-bright);
+}
+
+.luxury-card:hover::after {
+  opacity: 1;
+}
+
+@keyframes shimmerGold {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ======== الأزرار الفاخرة ======== */
+.luxury-btn {
+  background: var(--gradient-primary);
+  border: 2px solid var(--primary-gold);
+  border-radius: var(--radius-full);
+  color: #000000;
+  font-weight: 700;
+  padding: 1rem 2rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: var(--transition-smooth);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  box-shadow: var(--shadow-gold), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.luxury-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+  transition: left 0.6s ease;
+}
+
+.luxury-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 2px;
+  background: var(--gradient-gold-shine);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.luxury-btn:hover::before {
+  left: 100%;
+}
+
+.luxury-btn:hover::after {
+  opacity: 1;
+}
+
+.luxury-btn:hover {
+  background: var(--gradient-gold-shine);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: var(--shadow-gold-intense), var(--glow-gold), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  color: #000000;
+  border-color: var(--primary-gold-light);
+}
+
+.luxury-btn-outline {
+  background: transparent;
+  color: var(--primary-gold);
+  border: 2px solid var(--primary-gold);
+}
+
+.luxury-btn-outline:hover {
+  background: var(--primary-gold);
+  color: var(--bg-dark);
+}
+
+.luxury-btn-secondary {
+  background: rgba(var(--accent-rgb), 0.1);
+  color: var(--text-primary);
+  border: 1px solid var(--border-gold);
+}
+
+.luxury-btn-secondary:hover {
+  background: rgba(var(--accent-rgb), 0.14);
+  border-color: var(--primary-gold);
+  color: var(--primary-gold);
+}
+
+/* ======== النماذج الفاخرة ======== */
+.luxury-input,
+.luxury-select {
+  background: rgba(var(--accent-rgb), 0.06);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  padding: 0.75rem 1rem;
+  transition: var(--transition-smooth);
+  width: 100%;
+  font-size: 0.9rem;
+}
+
+.luxury-input:focus,
+.luxury-select:focus {
+  background: rgba(var(--accent-rgb), 0.08);
+  border-color: var(--primary-gold);
+  box-shadow: 0 0 0 0.2rem rgba(var(--accent-rgb), 0.2);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.luxury-input::placeholder,
+.luxury-select::placeholder {
+  color: var(--text-muted);
+}
+
+/* ======== الجداول الفاخرة ======== */
+.luxury-table {
+  background: var(--gradient-card);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-gold);
+  width: 100%;
+}
+
+.luxury-table th {
+  background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.14), rgba(var(--accent-rgb), 0.08));
+  color: var(--primary-gold);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 1rem;
+  text-align: right;
+  border: none;
+}
+
+.luxury-table td {
+  padding: 1rem;
+  border-color: var(--border-gold);
+  color: var(--text-primary);
+  border: none;
+  border-bottom: 1px solid var(--border-gold);
+}
+
+.luxury-table tbody tr:hover {
+  background: rgba(var(--accent-rgb), 0.05);
+}
+
+.luxury-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ======== الإحصائيات الفاخرة ======== */
+.luxury-stat {
+  background: var(--gradient-card);
+  border: 2px solid var(--border-gold);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-gold), inset 0 1px 0 rgba(0, 123, 255, 0.1);
+  padding: 2.5rem;
+  text-align: center;
+  transition: var(--transition-smooth);
+  position: relative;
+  overflow: hidden;
+}
+
+.luxury-stat::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: var(--gradient-gold-shine);
+  background-size: 200% 100%;
+  animation: shimmerGold 3s linear infinite;
+}
+
+.luxury-stat::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(0, 123, 255, 0.15) 0%, transparent 70%);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+
+.luxury-stat:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: var(--shadow-gold-intense), var(--glow-gold), inset 0 1px 0 rgba(0, 123, 255, 0.15);
+  border-color: var(--border-gold-bright);
+}
+
+.luxury-stat:hover::after {
+  opacity: 1;
+}
+
+.luxury-stat-value {
+  font-size: 3.5rem;
+  font-weight: 900;
+  background: var(--gradient-gold-shine);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+  filter: drop-shadow(0 0 10px rgba(0, 123, 255, 0.5));
+  animation: pulseGlow 3s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { filter: drop-shadow(0 0 10px rgba(0, 123, 255, 0.5)); }
+  50% { filter: drop-shadow(0 0 20px rgba(0, 123, 255, 0.8)); }
+}
+
+.luxury-stat-label {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+}
+
+.luxury-stat-icon {
+  width: 80px;
+  height: 80px;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  color: #ffffff;
+  font-size: 2rem;
+  box-shadow: var(--shadow-gold), var(--glow-gold);
+  border: 3px solid rgba(0, 123, 255, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.luxury-stat-icon::before {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  background: conic-gradient(from 0deg, transparent, rgba(0, 123, 255, 0.3), transparent 30%);
+  animation: rotate 3s linear infinite;
+}
+
+@keyframes rotate {
+  100% { transform: rotate(360deg); }
+}
+
+/* ======== الشريط الجانبي ======== */
+.luxury-sidebar {
+  background: linear-gradient(180deg, #001f3f 0%, #00152a 100%);
+  border-left: 2px solid var(--border-gold);
+  width: 300px;
+  min-height: 100vh;
+  height: 100vh;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 1000;
+  transition: var(--transition-smooth);
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-shadow: -5px 0 30px rgba(0, 0, 0, 0.8), inset 1px 0 0 rgba(0, 123, 255, 0.1);
+}
+
+.luxury-sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 2px;
+  height: 100%;
+  background: var(--gradient-gold-shine);
+  background-size: 100% 200%;
+  animation: shimmerVertical 4s linear infinite;
+}
+
+@keyframes shimmerVertical {
+  0% { background-position: 0 -200%; }
+  100% { background-position: 0 200%; }
+}
+
+.luxury-sidebar-header {
+  padding: 2rem;
+  border-bottom: 2px solid var(--border-gold);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, rgba(0, 123, 255, 0.1) 0%, rgba(0, 123, 255, 0.05) 100%);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.luxury-sidebar-logo {
+  height: 50px;
+  filter: drop-shadow(0 0 15px rgba(0, 123, 255, 0.8)) drop-shadow(0 4px 8px rgba(0, 123, 255, 0.6));
+  transition: var(--transition-smooth);
+}
+
+.luxury-sidebar-logo:hover {
+  filter: drop-shadow(0 0 25px rgba(0, 123, 255, 1)) drop-shadow(0 4px 12px rgba(0, 123, 255, 0.8));
+  transform: scale(1.05);
+}
+
+.luxury-sidebar-nav {
+  padding: 1rem 0;
+}
+
+.luxury-nav-item {
+  display: flex;
+  align-items: center;
+  padding: 1.25rem 1.75rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: var(--transition-smooth);
+  border-right: 4px solid transparent;
+  position: relative;
+  margin: 0.5rem 1rem;
+  border-radius: var(--radius-lg);
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+.luxury-nav-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--gradient-gold-shine);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+
+.luxury-nav-item:hover {
+  color: #ffffff;
+  transform: translateX(-5px);
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+}
+
+.luxury-nav-item:hover::before {
+  opacity: 0.15;
+}
+
+.luxury-nav-item.active {
+  color: #ffffff;
+  background: var(--gradient-primary);
+  border-right-color: var(--primary-gold-light);
+  font-weight: 700;
+  box-shadow: var(--shadow-gold), var(--glow-gold);
+  transform: translateX(-5px);
+}
+
+.luxury-nav-item.active::after {
+  content: '';
+  position: absolute;
+  right: -1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  background: var(--primary-gold);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--primary-gold);
+}
+
+.luxury-nav-item i {
+  margin-left: 1rem;
+  width: 20px;
+  text-align: center;
+}
+
+/* ======== الهيدر الفاخر ======== */
+.luxury-header {
+  background: var(--gradient-primary);
+  padding: 2rem 2.5rem;
+  border-bottom: 3px solid var(--primary-gold-light);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 123, 255, 0.3);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden;
+}
+
+.luxury-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(0, 123, 255, 0.1), transparent);
+  animation: slideShine 3s ease-in-out infinite;
+}
+
+@keyframes slideShine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.luxury-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.luxury-header-title {
+  color: #ffffff;
+  font-size: 1.75rem;
+  font-weight: 900;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  position: relative;
+  z-index: 1;
+}
+
+.luxury-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* ======== التنبيهات ======== */
+.luxury-alert {
+  background: linear-gradient(135deg, rgba(0, 123, 255, 0.08) 0%, rgba(0, 123, 255, 0.03) 100%);
+  border: 2px solid var(--border-gold);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(0, 123, 255, 0.1);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.luxury-alert::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  background: var(--gradient-gold-shine);
+  background-size: 100% 200%;
+  animation: shimmerVertical 3s linear infinite;
+}
+
+.luxury-alert-success {
+  border-color: rgba(40, 167, 69, 0.3);
+  background: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+}
+
+.luxury-alert-danger {
+  border-color: rgba(220, 53, 69, 0.3);
+  background: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+}
+
+.luxury-alert-warning {
+  border-color: rgba(255, 193, 7, 0.3);
+  background: rgba(255, 193, 7, 0.1);
+  color: #ffc107;
+}
+
+.luxury-alert-info {
+  border-color: rgba(23, 162, 184, 0.3);
+  background: rgba(23, 162, 184, 0.1);
+  color: #17a2b8;
+}
+
+/* ======== الشارات ======== */
+.luxury-badge {
+  background: linear-gradient(135deg, rgba(0, 123, 255, 0.2) 0%, rgba(0, 123, 255, 0.1) 100%);
+  color: var(--primary-gold);
+  border: 2px solid var(--border-gold);
+  border-radius: var(--radius-full);
+  padding: 0.4rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3), inset 0 1px 0 rgba(0, 123, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.luxury-badge::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(0, 123, 255, 0.2), transparent);
+  transform: translateX(-100%);
+  animation: badgeShine 2s ease-in-out infinite;
+}
+
+@keyframes badgeShine {
+  0%, 100% { transform: translateX(-100%); }
+  50% { transform: translateX(100%); }
+}
+
+.luxury-badge-success {
+  background: linear-gradient(135deg, rgba(40, 167, 69, 0.25) 0%, rgba(40, 167, 69, 0.15) 100%);
+  color: #10b981;
+  border-color: rgba(40, 167, 69, 0.5);
+  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3), 0 0 15px rgba(40, 167, 69, 0.2);
+}
+
+.luxury-badge-danger {
+  background: linear-gradient(135deg, rgba(220, 53, 69, 0.25) 0%, rgba(220, 53, 69, 0.15) 100%);
+  color: #ef4444;
+  border-color: rgba(220, 53, 69, 0.5);
+  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3), 0 0 15px rgba(220, 53, 69, 0.2);
+}
+
+.luxury-badge-warning {
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.25) 0%, rgba(255, 193, 7, 0.15) 100%);
+  color: #fbbf24;
+  border-color: rgba(255, 193, 7, 0.5);
+  box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3), 0 0 15px rgba(255, 193, 7, 0.2);
+}
+
+/* ======== الروابط ======== */
+.luxury-link {
+  color: var(--primary-gold);
+  text-decoration: none;
+  transition: var(--transition-fast);
+}
+
+.luxury-link:hover {
+  color: var(--primary-gold-light);
+  text-decoration: underline;
+}
+
+/* ======== الحركات والرسوم المتحركة ======== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.luxury-fade-in-up {
+  animation: fadeInUp 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.luxury-fade-in-right {
+  animation: fadeInRight 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.luxury-fade-in-left {
+  animation: fadeInLeft 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.luxury-shimmer {
+  background: linear-gradient(90deg, var(--gradient-card) 0%, rgba(0, 123, 255, 0.05) 50%, var(--gradient-card) 100%);
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}
+
+.luxury-pulse {
+  animation: pulse 2s infinite;
+}
+
+/* ======== التصميم المتجاوب ======== */
+@media (max-width: 768px) {
+  .luxury-sidebar {
+    transform: translateX(100%);
+    width: 280px;
+  }
+  
+  .luxury-sidebar.active {
+    transform: translateX(0);
+  }
+  
+  .luxury-main-content {
+    margin-right: 0;
+  }
+  
+  .luxury-stat {
+    padding: 1.5rem;
+  }
+  
+  .luxury-stat-value {
+    font-size: 2.5rem;
+  }
+  
+  .luxury-stat-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+  }
+  
+  .luxury-card {
+    padding: 1.5rem;
+  }
+  
+  .luxury-header {
+    padding: 1.5rem;
+  }
+  
+  .luxury-header-content {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .luxury-header-actions {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .luxury-header-title {
+    font-size: 1.5rem;
+  }
+  
+  .luxury-btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .luxury-header-content {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .luxury-header-actions {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  .luxury-main-content {
+    margin-right: 0;
+    padding: 1rem;
+  }
+  
+  .luxury-card {
+    padding: 0.5rem;
+  }
+}
+
+@media print {
+  .luxury-sidebar,
+  .luxury-header {
+    display: none;
+  }
+  
+  .luxury-main-content {
+    margin-right: 0 !important;
+  }
+  
+  .luxury-card {
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+}
+
+/* ======== دعم RTL ======== */
+.luxury-sidebar {
+  right: 0;
+  left: auto;
+}
+
+.luxury-main-content {
+  margin-right: 280px;
+  margin-left: 0;
+}
+
+/* ======== تخطيط لوحة الأدمن ======== */
+body.admin-dashboard-luxury {
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+body.admin-dashboard-luxury .luxury-main-content {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  margin-right: 300px;
+  margin-left: 0;
+  position: relative;
+  z-index: 1;
+}
+
+body.admin-dashboard-luxury .luxury-header {
+  flex: 0 0 auto;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+body.admin-dashboard-luxury .luxury-dashboard-scroll {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 2rem;
+}
+
+body.admin-dashboard-luxury .luxury-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+body.admin-dashboard-luxury .luxury-chart-card {
+  height: 400px;
+  max-height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+body.admin-dashboard-luxury .luxury-chart-card h5 {
+  flex: 0 0 auto;
+}
+
+body.admin-dashboard-luxury .luxury-chart-card canvas {
+  display: block;
+  width: 100% !important;
+  height: 300px !important;
+  max-height: 300px;
+  flex: 1 1 auto;
+}
+
+@media (max-width: 768px) {
+  body.admin-dashboard-luxury .luxury-main-content {
+    margin-right: 0;
+    margin-left: 0;
+  }
+  
+  body.admin-dashboard-luxury .luxury-sidebar {
+    transform: translateX(100%);
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
+  }
+  
+  body.admin-dashboard-luxury .luxury-sidebar.active {
+    transform: translateX(0);
+  }
+}
+
+/* ======== overlay للشاشات الصغيرة ======== */
+body.sidebar-open::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
+
+@media (min-width: 769px) {
+  body.sidebar-open::before {
+    display: none;
+  }
+}
+
+/* ======== تحسينات الوصولية ======== */
+.luxury-btn:focus,
+.luxury-input:focus,
+.luxury-select:focus {
+  outline: 2px solid var(--primary-gold);
+  outline-offset: 2px;
+}
+
+.luxury-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

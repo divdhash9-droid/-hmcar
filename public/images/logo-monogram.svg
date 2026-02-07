@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-labelledby="title desc">
+  <title id="title">HM Monogram</title>
+  <desc id="desc">Minimal monogram of HM with a flowing arc accent.</desc>
+  <defs>
+    <linearGradient id="monoGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f8e3b3" />
+      <stop offset="50%" stop-color="#f1c76a" />
+      <stop offset="100%" stop-color="#c48a1e" />
+    </linearGradient>
+    <linearGradient id="monoDeep" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0e2745" />
+      <stop offset="100%" stop-color="#081428" />
+    </linearGradient>
+    <filter id="monoGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="b" />
+      <feColorMatrix in="b" type="matrix" values="0 0 0 0 0.95 0 0 0 0 0.8 0 0 0 0 0.45 0 0 0 0.35 0" />
+    </filter>
+  </defs>
+
+  <rect x="18" y="18" width="284" height="164" rx="26" fill="#0b1f3a" opacity="0.14" />
+  <rect x="26" y="26" width="268" height="148" rx="24" fill="url(#monoDeep)" />
+  <rect x="26" y="26" width="268" height="148" rx="24" fill="url(#monoGold)" opacity="0.06" />
+
+  <g transform="translate(54 42)">
+    <path d="M26 100V14h18l34 52 34-52h18v86h-18V52l-34 50h-0.5L44 52v48z" fill="#fefefe" />
+    <path d="M28 102V16h12l38 57 38-57h12v86h-12V46l-38 55-38-55v56z" fill="none" stroke="url(#monoGold)" stroke-width="4" />
+    <path d="M26 32c18-10 40-16 64-16 36 0 68 12 92 32" fill="none" stroke="url(#monoGold)" stroke-width="4" stroke-linecap="round" filter="url(#monoGlow)" opacity="0.8" />
+    <circle cx="42" cy="34" r="5" fill="url(#monoGold)" />
+    <circle cx="178" cy="54" r="5" fill="url(#monoGold)" />
+  </g>
+
+  <g fill="#fefefe" opacity="0.9" font-family="'Poppins','Segoe UI',sans-serif" font-size="13" font-weight="700" letter-spacing="0.16em">
+    <text x="90" y="176">HM CAR — PREMIUM</text>
+  </g>
+</svg>

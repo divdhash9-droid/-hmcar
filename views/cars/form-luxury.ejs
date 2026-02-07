@@ -1,0 +1,697 @@
+<!-- [[ARABIC_HEADER]] هذا الملف (views/cars/form-luxury.ejs) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. -->
+
+<!-- views/cars/form-luxury.ejs -->
+<% layout('layout') -%>
+<% const isEdit = typeof car !== 'undefined' && car && car._id; %>
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- HM Luxury Design System -->
+<link rel="stylesheet" href="/css/home-styles.css">
+<link rel="stylesheet" href="/css/admin-luxury.css">
+
+<style>
+.hm-car-form-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a1628 0%, #1e293b 50%, #334155 100%);
+  padding: 2rem 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.hm-car-form-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(14, 165, 233, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(245, 158, 11, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.hm-form-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.hm-form-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  animation: fadeInDown 1s ease-out;
+}
+
+.hm-form-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 1rem;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, #0ea5e9, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hm-form-subtitle {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 2rem;
+}
+
+.hm-form-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 3rem;
+  box-shadow: 
+    0 25px 50px rgba(0, 0, 0, 0.3),
+    0 0 40px rgba(14, 165, 233, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  animation: fadeInUp 1s ease-out;
+}
+
+.hm-form-section {
+  margin-bottom: 2.5rem;
+}
+
+.hm-section-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.hm-section-title i {
+  color: #0ea5e9;
+  font-size: 1.2rem;
+}
+
+.hm-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.hm-form-group {
+  position: relative;
+}
+
+.hm-form-label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 0.5rem;
+}
+
+.hm-form-input,
+.hm-form-select,
+.hm-form-textarea {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  color: #fff;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.hm-form-input::placeholder,
+.hm-form-select::placeholder,
+.hm-form-textarea::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.hm-form-input:focus,
+.hm-form-select:focus,
+.hm-form-textarea:focus {
+  outline: none;
+  border-color: #0ea5e9;
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 
+    0 0 20px rgba(14, 165, 233, 0.3),
+    0 0 40px rgba(14, 165, 233, 0.1);
+}
+
+.hm-form-input:hover,
+.hm-form-select:hover,
+.hm-form-textarea:hover {
+  border-color: rgba(14, 165, 233, 0.5);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.hm-form-textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.hm-image-upload-area {
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.02);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.hm-image-upload-area:hover {
+  border-color: #0ea5e9;
+  background: rgba(14, 165, 233, 0.05);
+}
+
+.hm-image-upload-area i {
+  font-size: 3rem;
+  color: #0ea5e9;
+  margin-bottom: 1rem;
+}
+
+.hm-image-upload-text {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.hm-image-upload-hint {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.9rem;
+}
+
+.hm-image-preview {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.hm-preview-item {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hm-preview-item img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+
+.hm-preview-remove {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: rgba(239, 68, 68, 0.9);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.hm-preview-remove:hover {
+  background: rgba(239, 68, 68, 1);
+  transform: scale(1.1);
+}
+
+.hm-form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hm-btn-submit {
+  padding: 1rem 3rem;
+  background: linear-gradient(135deg, #0ea5e9, #3b82f6);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 
+    0 8px 30px rgba(14, 165, 233, 0.4),
+    0 4px 15px rgba(0, 0, 0, 0.2),
+    inset 0 2px 0 rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.hm-btn-submit::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.2), 
+    transparent);
+  transition: left 0.6s ease;
+}
+
+.hm-btn-submit:hover::before {
+  left: 100%;
+}
+
+.hm-btn-submit:hover {
+  transform: translateY(-3px);
+  box-shadow: 
+    0 15px 40px rgba(14, 165, 233, 0.6),
+    0 8px 20px rgba(0, 0, 0, 0.3),
+    inset 0 2px 0 rgba(255, 255, 255, 0.3);
+}
+
+.hm-btn-submit:active {
+  transform: translateY(-1px);
+}
+
+.hm-btn-cancel {
+  padding: 1rem 3rem;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.hm-btn-cancel:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-3px);
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hm-form-wrapper {
+    padding: 0 1rem;
+  }
+  
+  .hm-form-card {
+    padding: 2rem 1.5rem;
+  }
+  
+  .hm-form-title {
+    font-size: 2rem;
+  }
+  
+  .hm-form-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .hm-form-actions {
+    flex-direction: column;
+  }
+  
+  .hm-btn-submit,
+  .hm-btn-cancel {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .hm-form-card {
+    padding: 1.5rem 1rem;
+  }
+  
+  .hm-form-title {
+    font-size: 1.8rem;
+  }
+  
+  .hm-image-preview {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+}
+</style>
+
+<div class="hm-car-form-container">
+  <div class="hm-form-wrapper">
+    <!-- Header -->
+    <div class="hm-form-header">
+      <h1 class="hm-form-title">
+        <i class="fas fa-car"></i>
+        <%= isEdit ? 'تعديل السيارة' : 'إضافة سيارة جديدة' %>
+      </h1>
+      <p class="hm-form-subtitle">
+        <%= isEdit ? 'قم بتحديث معلومات السيارة' : 'أضف سيارتك إلى مجموعتنا المميزة' %>
+      </p>
+    </div>
+
+    <!-- Form Card -->
+    <div class="hm-form-card">
+      <form method="post" enctype="multipart/form-data" action="<%= isEdit ? '/cars/' + car._id + '/edit' : '/cars/new' %>">
+        <!-- CSRF Token -->
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+
+        <!-- Basic Information Section -->
+        <div class="hm-form-section">
+          <h2 class="hm-section-title">
+            <i class="fas fa-info-circle"></i>
+            المعلومات الأساسية
+          </h2>
+          <div class="hm-form-grid">
+            <div class="hm-form-group">
+<label class="hm-form-label">اسم السيارة *</label>
+              <input type="text" 
+                     name="title" 
+                     class="hm-form-input" 
+                     placeholder="اكتب اسم السيارة" 
+                     required 
+                     value="<%= isEdit && car ? car.title : '' %>" />
+            </div>
+
+            <div class="hm-form-group">
+              <label class="hm-form-label">الشركة المصنعة *</label>
+              <input type="text" 
+                     name="make" 
+                     class="hm-form-input" 
+                     placeholder="مثال: Toyota, BMW, Mercedes" 
+                     required 
+                     value="<%= isEdit && car ? car.make : '' %>" />
+            </div>
+
+            <div class="hm-form-group">
+              <label class="hm-form-label">الموديل *</label>
+              <input type="text" 
+                     name="model" 
+                     class="hm-form-input" 
+                     placeholder="مثال: Camry, X5, C-Class" 
+                     required 
+                     value="<%= isEdit && car ? car.model : '' %>" />
+            </div>
+
+            <div class="hm-form-group">
+              <label class="hm-form-label">سنة الصنع *</label>
+              <input type="number" 
+                     name="year" 
+                     class="hm-form-input" 
+                     placeholder="مثال: 2024" 
+                     min="1900" 
+                     max="2025" 
+                     required 
+                     value="<%= isEdit && car ? car.year : '' %>" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Pricing Section -->
+        <div class="hm-form-section">
+          <h2 class="hm-section-title">
+            <i class="fas fa-dollar-sign"></i>
+            التسعير
+          </h2>
+          <div class="hm-form-grid">
+            <div class="hm-form-group">
+              <label class="hm-form-label">السعر بالريال السعودي *</label>
+              <input type="number" 
+                     name="priceSar" 
+                     class="hm-form-input" 
+                     placeholder="مثال: 150000" 
+                     step="0.01" 
+                     min="0" 
+                     required 
+                     value="<%= isEdit && car ? car.priceSar : '' %>" />
+            </div>
+
+            <div class="hm-form-group">
+              <label class="hm-form-label">السعر بالدولار الأمريكي</label>
+              <input type="number" 
+                     name="priceUsd" 
+                     class="hm-form-input" 
+                     placeholder="سيتم حسابه تلقائياً" 
+                     step="0.01" 
+                     min="0" 
+                     value="<%= isEdit && car ? car.priceUsd : '' %>" />
+            </div>
+
+            <div class="hm-form-group">
+              <label class="hm-form-label">الممشى (كم)</label>
+              <input type="number" 
+                     name="mileage" 
+                     class="hm-form-input" 
+                     placeholder="مثال: 50000" 
+                     min="0" 
+                     value="<%= isEdit && car ? car.mileage : '' %>" />
+            </div>
+
+            <div class="hm-form-group">
+              <label class="hm-form-label">حالة السيارة *</label>
+              <select name="condition" class="hm-form-select" required>
+                <option value="">اختر الحالة</option>
+                <option value="excellent" <%= (isEdit && car && car.condition === 'excellent') ? 'selected' : '' %>>ممتازة</option>
+                <option value="good" <%= (isEdit && car && car.condition === 'good') ? 'selected' : '' %>>جيدة</option>
+                <option value="fair" <%= (isEdit && car && car.condition === 'fair') ? 'selected' : '' %>>متوسطة</option>
+                <option value="needs work" <%= (isEdit && car && car.condition === 'needs work') ? 'selected' : '' %>>تحتاج صيانة</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category Section -->
+        <div class="hm-form-section">
+          <h2 class="hm-section-title">
+            <i class="fas fa-tags"></i>
+            الفئة والوصف
+          </h2>
+          <div class="hm-form-grid">
+            <div class="hm-form-group">
+              <label class="hm-form-label">فئة السيارة</label>
+              <select name="categoryId" class="hm-form-select">
+                <option value="">اختر الفئة</option>
+                <% (categories || []).forEach(cat => { %>
+                  <option value="<%= cat._id %>" <%= (isEdit && car && car.category && car.category._id.toString() === cat._id.toString()) ? 'selected' : '' %>><%= cat.name %></option>
+                <% }) %>
+              </select>
+            </div>
+
+            <div class="hm-form-group">
+              <label class="hm-form-label">رابط شعار الشركة (اختياري)</label>
+              <input type="url" 
+                     name="makeLogoUrl" 
+                     class="hm-form-input" 
+                     placeholder="https://example.com/logo.png" 
+                     value="<%= isEdit && car ? car.makeLogoUrl : '' %>" />
+            </div>
+          </div>
+
+          <div class="hm-form-group">
+            <label class="hm-form-label">وصف السيارة *</label>
+            <textarea name="description" 
+                      class="hm-form-textarea" 
+                      placeholder="صف سيارتك بالتفصيل... المميزات، الحالة، المواصفات، etc." 
+                      required><%= isEdit && car ? car.description : '' %></textarea>
+          </div>
+        </div>
+
+        <!-- Images Section -->
+        <div class="hm-form-section">
+          <h2 class="hm-section-title">
+            <i class="fas fa-images"></i>
+            صور السيارة
+          </h2>
+          
+          <div class="hm-image-upload-area" onclick="document.getElementById('imageInput').click()">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <div class="hm-image-upload-text">اضغط لرفع الصور أو اسحب وأفلت هنا</div>
+            <div class="hm-image-upload-hint">يمكنك رفع حتى 5 صور - JPG, PNG, WEBP (حجم أقصى 5MB للصورة)</div>
+            <input type="file" 
+                   id="imageInput"
+                   name="images" 
+                   multiple 
+                   accept="image/jpeg,image/png,image/webp" 
+                   style="display: none;" />
+          </div>
+
+          <div id="imagePreview" class="hm-image-preview"></div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="hm-form-actions">
+          <button type="submit" class="hm-btn-submit">
+            <i class="fas fa-save"></i>
+            <%= isEdit ? 'تحديث السيارة' : 'إضافة السيارة' %>
+          </button>
+          <a href="/cars" class="hm-btn-cancel">
+            <i class="fas fa-times"></i>
+            إلغاء
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+// Image Preview Functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const imageInput = document.getElementById('imageInput');
+  const previewContainer = document.getElementById('imagePreview');
+  const uploadArea = document.querySelector('.hm-image-upload-area');
+  
+  // Drag and Drop
+  uploadArea.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    this.style.borderColor = '#0ea5e9';
+    this.style.background = 'rgba(14, 165, 233, 0.1)';
+  });
+  
+  uploadArea.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    this.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+    this.style.background = 'rgba(255, 255, 255, 0.02)';
+  });
+  
+  uploadArea.addEventListener('drop', function(e) {
+    e.preventDefault();
+    this.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+    this.style.background = 'rgba(255, 255, 255, 0.02)';
+    
+    const files = Array.from(e.dataTransfer.files).filter(function(file) {
+      return file.type.startsWith('image/');
+    });
+    
+    if (files.length > 0) {
+      imageInput.files = e.dataTransfer.files;
+      handleImagePreview(files);
+    }
+  });
+  
+  // File Input Change
+  imageInput.addEventListener('change', function(e) {
+    const files = Array.from(e.target.files);
+    handleImagePreview(files);
+  });
+  
+  function handleImagePreview(files) {
+    previewContainer.innerHTML = '';
+    
+    if (files.length > 0) {
+      files.forEach(function(file, index) {
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          
+          reader.onload = function(e) {
+            const previewItem = document.createElement('div');
+            previewItem.className = 'hm-preview-item';
+            
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'hm-preview-remove';
+            removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+            removeBtn.onclick = function() {
+              previewItem.remove();
+              // Remove file from input
+              const dt = new DataTransfer();
+              const remainingFiles = Array.from(imageInput.files).filter(function(f, i) {
+                return i !== index;
+              });
+              remainingFiles.forEach(function(f) {
+                dt.items.add(f);
+              });
+              imageInput.files = dt.files;
+            };
+            
+            previewItem.appendChild(img);
+            previewItem.appendChild(removeBtn);
+            previewContainer.appendChild(previewItem);
+          };
+          
+          reader.readAsDataURL(file);
+        }
+      });
+      
+      if (files.length > 5) {
+        const warning = document.createElement('div');
+        warning.style.cssText = 'background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); color: #f59e0b; padding: 1rem; border-radius: 8px; margin-top: 1rem; text-align: center;';
+        warning.innerHTML = '<i class="fas fa-exclamation-triangle"></i> يمكنك رفع 5 صور كحد أقصى. سيتم تجاهل الصور الإضافية.';
+        previewContainer.appendChild(warning);
+      }
+    }
+  }
+
+  // Currency Converter
+  fetch('/api/exchange-rate/current')
+    .then(function(response) {
+      return response.json();
+    })
+    .then(function(data) {
+      const EXCHANGE_RATE = data.rate || 3.75;
+      
+      const priceSarInput = document.querySelector('input[name="priceSar"]');
+      const priceUsdInput = document.querySelector('input[name="priceUsd"]');
+      
+      priceSarInput.addEventListener('input', function() {
+        if (this.value && !priceUsdInput.value) {
+          const usdValue = (parseFloat(this.value) / EXCHANGE_RATE).toFixed(2);
+          priceUsdInput.value = usdValue;
+        }
+      });
+      
+      priceUsdInput.addEventListener('input', function() {
+        if (this.value && !priceSarInput.value) {
+          const sarValue = (parseFloat(this.value) * EXCHANGE_RATE).toFixed(2);
+          priceSarInput.value = sarValue;
+        }
+      });
+    })
+    .catch(function(err) {
+      console.error('Error fetching exchange rate:', err);
+    });
+});
+</script>

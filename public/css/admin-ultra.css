@@ -1,0 +1,302 @@
+/* [[ARABIC_HEADER]] هذا الملف (public/css/admin-ultra.css) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. */
+
+:root {
+  --adm-bg: radial-gradient(circle at 20% 20%, #12203a 0, #0b1224 30%, #050915 65%, #04060f 100%);
+  --adm-card: rgba(255,255,255,0.06);
+  --adm-border: rgba(255,255,255,0.08);
+  --adm-glow: 0 10px 40px rgba(0,0,0,0.35);
+  --adm-gold: var(--primary-color-light);
+  --adm-cyan: #1dd3b0;
+  --adm-blue: var(--primary-color-light);
+  --adm-rose: #f43f5e;
+  --adm-text: #e7edf5;
+  --adm-muted: #9fb2cc;
+  --adm-radius: 18px;
+}
+
+body.admin-ultra {
+  background: var(--adm-bg) fixed;
+  color: var(--adm-text);
+  min-height: 100vh;
+}
+
+/* Light variant for all admin pages: white canvas, gold buttons, dark text */
+body.admin-ultra-light {
+  background: var(--section-bg-color) !important;
+  color: var(--primary-color) !important;
+}
+
+.admin-ultra-light .hm-hero,
+.admin-ultra-light .admin-quick-links .aq-link,
+.admin-ultra-light .stat-tile,
+.admin-ultra-light .hm-card,
+.admin-ultra-light .hm-list__item {
+  background: #ffffff;
+  border-color: var(--border-color);
+  box-shadow: 0 12px 35px rgba(15,23,42,0.08);
+  color: var(--primary-color);
+}
+
+.admin-ultra-light .hm-hero__title,
+.admin-ultra-light .hm-hero__subtitle,
+.admin-ultra-light .stat-label,
+.admin-ultra-light .stat-value,
+.admin-ultra-light .stat-sub,
+.admin-ultra-light .hm-card__title,
+.admin-ultra-light .hm-card__subtitle,
+.admin-ultra-light .hm-card__value,
+.admin-ultra-light .hm-list__title,
+.admin-ultra-light .hm-list__sub,
+.admin-ultra-light a {
+  color: var(--primary-color);
+}
+
+.admin-ultra-light .hm-hero__meta .hm-hero__badge,
+.admin-ultra-light .hm-hero__meta .hm-hero__highlight {
+  background: var(--accent-color);
+  border-color: var(--border-color);
+  color: var(--primary-color);
+}
+
+.admin-ultra-light .btn,
+.admin-ultra-light .btn-primary,
+.admin-ultra-light .btn-outline-light,
+.admin-ultra-light .hero-cta .btn,
+.admin-ultra-light .admin-quick-links .aq-link {
+  background: var(--gold-gradient);
+  border: none;
+  color: #ffffff;
+}
+
+.admin-ultra-light .btn-outline-light:hover,
+.admin-ultra-light .btn-primary:hover,
+.admin-ultra-light .admin-quick-links .aq-link:hover {
+  box-shadow: 0 16px 40px rgba(11, 31, 58, 0.24);
+}
+
+.admin-ultra-light .admin-quick-links .aq-link i,
+.admin-ultra-light .admin-quick-links .aq-link span { color: #ffffff; }
+
+.admin-ultra-light .hm-card__icon { background: rgba(11, 31, 58, 0.10); color: var(--primary-color); }
+.admin-ultra-light .hm-card__value { color: var(--primary-color); }
+
+.admin-ultra-light .stat-tile { background: #ffffff; }
+.admin-ultra-light .stat-value { color: var(--primary-color); }
+
+.admin-ultra-light .hm-list__item { border-color: var(--border-color); }
+
+.admin-ultra .card,
+.admin-ultra .lux-card,
+.admin-ultra .hm-card {
+  background: var(--adm-card);
+  border: 1px solid var(--adm-border);
+  border-radius: var(--adm-radius);
+  box-shadow: var(--adm-glow);
+  backdrop-filter: blur(8px);
+  color: var(--adm-text);
+}
+
+.admin-ultra .btn,
+.admin-ultra .btn-primary,
+.admin-ultra .btn-outline-light {
+  border-radius: 12px;
+  border-width: 1.2px;
+}
+
+.admin-ultra .btn-primary { background: linear-gradient(120deg, var(--adm-blue), var(--adm-cyan)); border: none; }
+.admin-ultra .btn-outline-light { border-color: var(--adm-border); color: var(--adm-text); }
+.admin-ultra .btn-outline-light:hover { background: rgba(255,255,255,0.06); }
+
+.admin-ultra .stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.admin-ultra .stat-tile {
+  padding: 16px 18px;
+  border-radius: var(--adm-radius);
+  background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  border: 1px solid var(--adm-border);
+  box-shadow: var(--adm-glow);
+}
+
+.admin-ultra .stat-label { color: var(--adm-muted); font-size: 13px; }
+.admin-ultra .stat-value { font-size: 30px; font-weight: 800; letter-spacing: -0.5px; }
+.admin-ultra .stat-sub { color: var(--adm-muted); font-size: 12px; }
+
+.admin-ultra .nav-tabs .nav-link {
+  color: var(--adm-muted);
+  border: none;
+  padding: 10px 14px;
+  border-radius: 12px;
+}
+.admin-ultra .nav-tabs .nav-link.active { color: var(--adm-text); background: rgba(255,255,255,0.08); }
+
+.admin-ultra .table { color: var(--adm-text); }
+.admin-ultra .table thead { color: var(--adm-text); }
+.admin-ultra .table tbody tr { border-color: var(--adm-border); }
+.admin-ultra .table-striped>tbody>tr:nth-of-type(odd) { background-color: rgba(255,255,255,0.03); }
+
+.admin-ultra .navbar,
+.admin-ultra .navbar-luxury {
+  background: rgba(0,0,0,0.25) !important;
+  border-bottom: 1px solid var(--adm-border);
+  backdrop-filter: blur(10px);
+}
+
+.admin-ultra .sidebar-modern {
+  background: rgba(0,0,0,0.35);
+  border-right: 1px solid var(--adm-border);
+}
+
+.admin-ultra a { color: var(--adm-gold); }
+.admin-ultra a:hover { color: rgba(255,255,255,0.92); }
+
+@media (max-width: 768px) {
+  .admin-ultra .stat-value { font-size: 24px; }
+}
+
+/* Hero and quick links */
+.admin-ultra .hm-hero {
+  background: linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04)), var(--adm-card);
+  border: 1px solid var(--adm-border);
+  box-shadow: var(--adm-glow);
+  border-radius: calc(var(--adm-radius) * 1.2);
+  padding: 18px;
+}
+.admin-ultra .hm-hero--ultra { position: relative; overflow: hidden; }
+.admin-ultra .hm-hero__layout { display:flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+.admin-ultra .hm-hero__meta { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px; }
+.admin-ultra .hm-hero__badge,
+.admin-ultra .hm-hero__highlight {
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:8px 12px;
+  border-radius:999px;
+  border:1px solid var(--adm-border);
+  background: rgba(255,255,255,0.05);
+  color: var(--adm-text);
+  font-size: 13px;
+}
+.admin-ultra .hm-hero__badge { font-size: 12px; padding: 6px 10px; }
+.admin-ultra .hm-hero__badge { color: var(--adm-cyan); border-color: rgba(29,211,176,0.25); }
+.admin-ultra .hm-hero__badge i { color: var(--adm-cyan); }
+.admin-ultra .hm-hero__meta i { font-size: 14px; }
+
+.admin-ultra .hm-hero__title { color: var(--adm-text); }
+.admin-ultra .hm-hero__subtitle { color: var(--adm-muted); }
+
+.admin-ultra .hm-hero__top--compact { margin-top: 6px; }
+.admin-ultra .hm-hero__brand--small .hm-hero__logo { width: 72px; height: auto; }
+.admin-ultra .hm-hero__brand--small .hm-hero__title { font-size: 20px; }
+.admin-ultra .hm-hero__brand--small .hm-hero__subtitle { font-size: 13px; }
+
+.admin-ultra .hero-cta { gap: 8px; }
+.admin-ultra .hero-cta .btn { box-shadow: 0 8px 30px rgba(0,0,0,0.22); padding: 9px 12px; font-size: 13px; }
+.admin-ultra .hero-cta--vertical { flex-direction: column; align-items: flex-end; }
+
+.admin-ultra .hm-hero__highlight {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--adm-border);
+  color: var(--adm-gold);
+  border-radius: 999px;
+  padding: 8px 14px;
+}
+
+.admin-ultra .admin-quick-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  margin: 14px 0 8px;
+}
+
+.admin-ultra .admin-quick-links .aq-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(120deg, rgba(255,255,255,0.10), rgba(255,255,255,0.05));
+  border: 1px solid var(--adm-border);
+  padding: 12px 14px;
+  border-radius: var(--adm-radius);
+  color: var(--adm-text);
+  text-decoration: none;
+  box-shadow: var(--adm-glow);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.admin-ultra .admin-quick-links .aq-link i { color: var(--adm-gold); font-size: 16px; }
+.admin-ultra .admin-quick-links .aq-link span { font-weight: 700; letter-spacing: -0.2px; }
+
+.admin-ultra .admin-quick-links .aq-link:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255,255,255,0.18);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+}
+
+/* Grid and cards */
+.admin-ultra .hm-grid--modern {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.admin-ultra .hm-card {
+  position: relative;
+  overflow: hidden;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.admin-ultra .hm-card__icon {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.10);
+  color: rgba(255,255,255,0.90);
+  margin-bottom: 10px;
+}
+
+.admin-ultra .hm-card__title { font-weight: 800; color: var(--adm-text); letter-spacing: -0.3px; }
+.admin-ultra .hm-card__subtitle { color: var(--adm-muted); margin-bottom: 6px; }
+.admin-ultra .hm-card__value { font-size: 24px; font-weight: 800; color: var(--adm-gold); }
+.admin-ultra .hm-card__value { font-size: 20px; }
+
+.admin-ultra .hm-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255,255,255,0.18);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+}
+
+.admin-ultra .stat-grid { gap: 12px; }
+.admin-ultra .stat-grid--compact { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+.admin-ultra .stat-tile { padding: 14px 14px; }
+.admin-ultra .stat-tile--small { padding: 12px 12px; }
+.admin-ultra .stat-value { font-size: 22px; }
+.admin-ultra .stat-value.stat-value--small { font-size: 20px; }
+.admin-ultra .stat-label { font-size: 12px; }
+.admin-ultra .stat-sub { font-size: 11px; }
+
+/* Data cards */
+.admin-ultra .hm-card h3 { color: var(--adm-text); }
+.admin-ultra .hm-card__label { color: var(--adm-muted); letter-spacing: 0.5px; }
+.admin-ultra .hm-card__value { color: #fdfdfd; text-shadow: 0 8px 30px rgba(0,0,0,0.35); }
+
+.admin-ultra .hm-card hr { border-color: var(--adm-border); }
+
+.admin-ultra .hm-list__item {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--adm-border);
+}
+
+.admin-ultra .hm-list__title { color: var(--adm-text); }
+.admin-ultra .hm-list__sub { color: var(--adm-muted); }
+
+.admin-ultra .hm-label { color: var(--adm-muted); font-weight: 600; }
+.admin-ultra .hm-pill { background: rgba(255,255,255,0.10); color: var(--adm-text); }
+
+.admin-ultra .text-success { color: #5ef0c3 !important; }
+.admin-ultra .text-danger { color: #ff7b9c !important; }

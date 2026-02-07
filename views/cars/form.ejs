@@ -1,0 +1,318 @@
+<!-- [[ARABIC_HEADER]] هذا الملف (views/cars/form.ejs) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. -->
+
+<!-- views/cars/form.ejs -->
+<% layout('layout') -%>
+<% const isEdit = typeof car !== 'undefined' && car && car._id; %>
+
+<!-- HM Design System CSS -->
+<link rel="stylesheet" href="/css/design-system.css">
+<div class="hm-card">
+  <div class="p-4">
+    <h2 class="hm-section__title hm-text-blue mb-4"><%= isEdit ? 'تعديل سيارة' : 'إضافة سيارة جديدة' %></h2>
+    
+    <form method="post" enctype="multipart/form-data" action="<%= isEdit ? '/cars/' + car._id + '/edit' : '/cars/new' %>" class="auth-form">
+      <!-- حقل مخفي لحماية CSRF -->
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+      
+      <div class="row g-4">
+        <div class="col-md-6">
+          <div class="hm-form-group">
+            <div class="hm-input-wrapper">
+              <i class="hm-input-icon fas fa-car hm-icon hm-icon-sm hm-icon-muted"></i>
+              <input name="title" 
+                     class="hm-input" 
+                     placeholder="اسم السيارة" 
+                     required 
+                     value="<%= isEdit && car ? car.title : '' %>" />
+              <label for="title" class="hm-input-label">اسم السيارة</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-3">
+          <div class="hm-form-group">
+            <div class="hm-input-wrapper">
+              <i class="hm-input-icon fas fa-building hm-icon hm-icon-sm hm-icon-muted"></i>
+              <input name="make" 
+                     class="hm-input" 
+                     placeholder="الشركة" 
+                     value="<%= isEdit && car ? car.make : '' %>" />
+              <label for="make" class="hm-input-label">الشركة</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-3">
+          <div class="hm-form-group">
+            <div class="hm-input-wrapper">
+              <i class="hm-input-icon fas fa-car hm-icon hm-icon-sm hm-icon-muted"></i>
+              <input name="model" 
+                     class="hm-input" 
+                     placeholder="الموديل" 
+                     value="<%= isEdit && car ? car.model : '' %>" />
+              <label for="model" class="hm-input-label">الموديل</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="hm-form-group">
+            <div class="hm-input-wrapper">
+              <i class="hm-input-icon fas fa-image hm-icon hm-icon-sm hm-icon-muted"></i>
+              <input name="makeLogoUrl" 
+                     class="hm-input" 
+                     placeholder="https://..." 
+                     value="<%= isEdit && car ? car.makeLogoUrl : '' %>" />
+              <label for="makeLogoUrl" class="hm-input-label">شعار الشركة (رابط اختياري)</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-3">
+          <div class="hm-form-group">
+            <div class="hm-input-wrapper">
+              <i class="hm-input-icon fas fa-calendar hm-icon hm-icon-sm hm-icon-muted"></i>
+              <input name="year" 
+                     type="number" 
+                     class="hm-input" 
+                     placeholder="السنة" 
+                     value="<%= isEdit && car ? car.year : '' %>" />
+              <label for="year" class="hm-input-label">السنة</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-3">
+          <div class="hm-form-group">
+            <div class="hm-input-wrapper">
+              <i class="hm-input-icon fas fa-money-bill-wave hm-icon hm-icon-sm hm-icon-muted"></i>
+              <input name="priceSar" 
+                     type="number" 
+                     step="0.01" 
+                     class="hm-input" 
+                     placeholder="السعر (SAR)" 
+                     value="<%= isEdit && car ? car.priceSar : '' %>" />
+              <label for="priceSar" class="hm-input-label">السعر (SAR)</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-3">
+          <div class="hm-form-group">
+            <div class="hm-input-wrapper">
+              <i class="hm-input-icon fas fa-dollar-sign hm-icon hm-icon-sm hm-icon-muted"></i>
+              <input name="priceUsd" 
+                     type="number" 
+                     step="0.01" 
+                     class="hm-input" 
+                     placeholder="السعر (USD)" 
+                     value="<%= isEdit && car ? car.priceUsd : '' %>" />
+              <label for="priceUsd" class="hm-input-label">السعر (USD)</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-3">
+          <div class="hm-form-group">
+            <div class="hm-input-wrapper">
+              <i class="hm-input-icon fas fa-tag hm-icon hm-icon-sm hm-icon-muted"></i>
+              <input name="price" 
+                     type="number" 
+                     step="0.01" 
+                     class="hm-input" 
+                     placeholder="السعر (قديم/اختياري)" 
+                     value="<%= isEdit && car ? car.price : '' %>" />
+              <label for="price" class="hm-input-label">السعر (قديم/اختياري)</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="hm-form-group">
+            <div class="hm-input-wrapper">
+              <i class="hm-input-icon fas fa-tags hm-icon hm-icon-sm hm-icon-muted"></i>
+              <select name="categoryId" class="hm-input">
+                <option value="">بدون فئة</option>
+                <% (categories || []).forEach(cat => { %>
+                  <option value="<%= cat._id %>" <%= (isEdit && car && car.category && car.category._id.toString() === cat._id.toString()) ? 'selected' : '' %>><%= cat.name %></option>
+                <% }) %>
+              </select>
+              <label for="categoryId" class="hm-input-label">فئة السيارة</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-3">
+          <div class="hm-form-group">
+            <div class="hm-input-wrapper">
+              <i class="hm-input-icon fas fa-tachometer-alt hm-icon hm-icon-sm hm-icon-muted"></i>
+              <input name="mileage" 
+                     type="number" 
+                     class="hm-input" 
+                     placeholder="الممشى" 
+                     value="<%= isEdit && car ? car.mileage : '' %>" />
+              <label for="mileage" class="hm-input-label">الممشى</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-3">
+          <div class="hm-form-group">
+            <div class="hm-input-wrapper">
+              <i class="hm-input-icon fas fa-star hm-icon hm-icon-sm hm-icon-muted"></i>
+              <select name="condition" class="hm-input">
+                <option value="excellent" <%= (isEdit && car && car.condition === 'excellent') ? 'selected' : '' %>>ممتاز</option>
+                <option value="good" <%= (isEdit && car && car.condition === 'good') ? 'selected' : '' %>>جيد</option>
+                <option value="fair" <%= (isEdit && car && car.condition === 'fair') ? 'selected' : '' %>>متوسط</option>
+                <option value="needs work" <%= (isEdit && car && car.condition === 'needs work') ? 'selected' : '' %>>يحتاج صيانة</option>
+              </select>
+              <label for="condition" class="hm-input-label">الحالة</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-12">
+          <div class="hm-form-group">
+            <div class="hm-input-wrapper">
+              <i class="hm-input-icon fas fa-align-left hm-icon hm-icon-sm hm-icon-muted"></i>
+              <textarea name="description" 
+                      rows="4" 
+                      class="hm-input" 
+                      placeholder="الوصف"> <%= isEdit && car ? car.description : '' %></textarea>
+              <label for="description" class="hm-input-label">الوصف</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-12">
+          <div class="hm-form-group">
+            <label class="hm-input-label mb-2">صور السيارة (حتى 5 صور)</label>
+            <div class="hm-card hm-border">
+              <div class="p-3">
+                <input name="images" type="file" multiple class="hm-input" accept="image/jpeg,image/png,image/webp" />
+                <div class="hm-text-muted small mt-2">
+                  <i class="fas fa-info-circle me-1"></i>
+                  يمكنك اختيار حتى 5 صور من جهازك. الصيغ المسموحة: JPG, PNG, WEBP. الحد الأقصى للحجم: 5MB لكل صورة.
+                </div>
+                <div id="imagePreview" class="mt-3"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- زر الإرسال -->
+      <div class="mt-4">
+        <button type="submit" class="hm-btn hm-btn-primary">
+          <i class="fas fa-save hm-icon hm-icon-sm"></i>
+          <span><%= isEdit ? 'تحديث السيارة' : 'إضافة السيارة ومتابعة' %></span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+// Image Preview Functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const imageInput = document.querySelector('input[name="images"]');
+  const previewContainer = document.getElementById('imagePreview');
+  
+  if (imageInput && previewContainer) {
+    imageInput.addEventListener('change', function(e) {
+      previewContainer.innerHTML = '';
+      
+      const files = Array.from(e.target.files);
+      if (files.length > 0) {
+        const previewTitle = document.createElement('div');
+        previewTitle.className = 'mb-2';
+        previewTitle.innerHTML = '<strong>معاينة الصور:</strong>';
+        previewContainer.appendChild(previewTitle);
+        
+        const previewGrid = document.createElement('div');
+        previewGrid.className = 'row g-2';
+        
+        files.forEach((file, index) => {
+          if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+              const col = document.createElement('div');
+              col.className = 'col-md-3 col-6';
+              
+              const imgContainer = document.createElement('div');
+              imgContainer.className = 'position-relative';
+              
+              const img = document.createElement('img');
+              img.src = e.target.result;
+              img.className = 'img-fluid rounded';
+              img.style.maxHeight = '150px';
+              img.style.width = '100%';
+              img.style.objectFit = 'cover';
+              
+              const removeBtn = document.createElement('button');
+              removeBtn.type = 'button';
+              removeBtn.className = 'btn btn-danger btn-sm position-absolute top-0 end-0 m-1';
+              removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+              removeBtn.onclick = function() {
+                col.remove();
+                // Remove file from input
+                const dt = new DataTransfer();
+                const remainingFiles = Array.from(imageInput.files).filter((f, i) => i !== index);
+                remainingFiles.forEach(f => dt.items.add(f));
+                imageInput.files = dt.files;
+              };
+              
+              imgContainer.appendChild(img);
+              imgContainer.appendChild(removeBtn);
+              col.appendChild(imgContainer);
+              previewGrid.appendChild(col);
+            };
+            
+            reader.readAsDataURL(file);
+          }
+        });
+        
+        previewContainer.appendChild(previewGrid);
+        
+        if (files.length > 5) {
+          const warning = document.createElement('div');
+          warning.className = 'alert alert-warning mt-2';
+          warning.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>يمكنك رفع 5 صور كحد أقصى. سيتم تجاهل الصور الإضافية.';
+          previewContainer.appendChild(warning);
+        }
+      }
+    });
+  }
+});
+
+// Currency Converter for Car Form
+(function() {
+  // Get current exchange rate
+  fetch('/api/exchange-rate/current')
+    .then(response => response.json())
+    .then(data => {
+      const EXCHANGE_RATE = data.rate || 3.75;
+      
+      const priceSarInput = document.querySelector('input[name="priceSar"]');
+      const priceUsdInput = document.querySelector('input[name="priceUsd"]');
+      
+      // Convert SAR to USD
+      priceSarInput.addEventListener('input', function() {
+        if (this.value && !priceUsdInput.value) {
+          const usdValue = (parseFloat(this.value) / EXCHANGE_RATE).toFixed(2);
+          priceUsdInput.value = usdValue;
+        }
+      });
+      
+      // Convert USD to SAR
+      priceUsdInput.addEventListener('input', function() {
+        if (this.value && !priceSarInput.value) {
+          const sarValue = (parseFloat(this.value) * EXCHANGE_RATE).toFixed(2);
+          priceSarInput.value = sarValue;
+        }
+      });
+    })
+    .catch(err => console.error('Error fetching exchange rate:', err));
+})();
+</script>

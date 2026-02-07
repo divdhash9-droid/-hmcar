@@ -1,0 +1,1104 @@
+<% layout('layout') -%>
+
+<link rel="stylesheet" href="/css/luxury-auth.css" />
+
+<div class="hm-messages-page">
+  <!-- Header Section -->
+  <div class="hm-page-header">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-6">
+          <div class="hm-header-content">
+            <h1 class="hm-page-title">
+              <i class="fas fa-envelope"></i>
+              <span data-ar="الرسائل" data-en="Messages">الرسائل</span>
+            </h1>
+            <p class="hm-page-subtitle" data-ar="تواصل مع البائعين والمشترين" data-en="Communicate with sellers and buyers">
+              تواصل مع البائعين والمشترين
+            </p>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="hm-header-stats">
+            <div class="hm-stat-card">
+              <span class="hm-stat-number" id="totalMessages">0</span>
+              <span class="hm-stat-label" data-ar="رسالة" data-en="Messages">رسالة</span>
+            </div>
+            <div class="hm-stat-card">
+              <span class="hm-stat-number" id="unreadCount">0</span>
+              <span class="hm-stat-label" data-ar="غير مقروءة" data-en="Unread">غير مقروءة</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Messages Content -->
+  <div class="hm-messages-content">
+    <div class="container">
+      <div class="hm-messages-layout">
+        <!-- Conversations List -->
+        <div class="hm-conversations-list">
+          <div class="hm-conversations-header">
+            <h3 data-ar="المحادثات" data-en="Conversations">المحادثات</h3>
+            <button class="hm-btn hm-btn-primary" id="newMessageBtn">
+              <i class="fas fa-plus"></i>
+              <span data-ar="رسالة جديدة" data-en="New Message">رسالة جديدة</span>
+            </button>
+          </div>
+          
+          <!-- Search -->
+          <div class="hm-search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="البحث عن محادثة..." id="searchConversations">
+          </div>
+
+          <!-- Conversations -->
+          <div class="hm-conversations" id="conversationsList">
+            <!-- Conversations will be loaded here -->
+          </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="hm-chat-area">
+          <!-- Empty State -->
+          <div class="hm-empty-chat" id="emptyChat">
+            <div class="hm-empty-icon">
+              <i class="fas fa-comments"></i>
+            </div>
+            <h3 data-ar="اختر محادثة للبدء" data-en="Choose a conversation to start">اختر محادثة للبدء</h3>
+            <p data-ar="اختر محادثة من القائمة لعرض الرسائل" data-en="Select a conversation from the list to view messages">
+              اختر محادثة من القائمة لعرض الرسائل
+            </p>
+          </div>
+
+          <!-- Chat Content -->
+          <div class="hm-chat-content" id="chatContent" style="display: none;">
+            <!-- Chat Header -->
+            <div class="hm-chat-header">
+              <div class="hm-chat-user">
+                <img src="" alt="" class="hm-user-avatar" id="chatUserAvatar">
+                <div class="hm-user-info">
+                  <h4 id="chatUserName"></h4>
+                  <span id="chatUserStatus"></span>
+                </div>
+              </div>
+              <div class="hm-chat-actions">
+                <button class="hm-action-btn" id="deleteConversation">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Messages Area -->
+            <div class="hm-messages-area" id="messagesArea">
+              <!-- Messages will be loaded here -->
+            </div>
+
+            <!-- Message Input -->
+            <div class="hm-message-input">
+              <div class="hm-input-group">
+                <button class="hm-attach-btn" id="attachBtn">
+                  <i class="fas fa-paperclip"></i>
+                </button>
+                <input type="text" placeholder="اكتب رسالتك..." id="messageInput">
+                <button class="hm-send-btn" id="sendBtn">
+                  <i class="fas fa-paper-plane"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- New Message Modal -->
+<div class="hm-modal" id="newMessageModal">
+  <div class="hm-modal-content">
+    <div class="hm-modal-header">
+      <h3 data-ar="رسالة جديدة" data-en="New Message">رسالة جديدة</h3>
+      <button class="hm-modal-close" id="closeModal">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="hm-modal-body">
+      <div class="hm-form-group">
+        <label data-ar="المستلم" data-en="Recipient">المستلم</label>
+        <select class="hm-form-control" id="recipientSelect">
+          <option value="">اختر المستلم...</option>
+        </select>
+      </div>
+      <div class="hm-form-group">
+        <label data-ar="السيارة (اختياري)" data-en="Car (Optional)">السيارة (اختياري)</label>
+        <select class="hm-form-control" id="carSelect">
+          <option value="">اختر سيارة...</option>
+        </select>
+      </div>
+      <div class="hm-form-group">
+        <label data-ar="الرسالة" data-en="Message">الرسالة</label>
+        <textarea class="hm-form-control" id="newMessageText" rows="4" placeholder="اكتب رسالتك هنا..."></textarea>
+      </div>
+    </div>
+    <div class="hm-modal-footer">
+      <button class="hm-btn hm-btn-outline" id="cancelNewMessage">إلغاء</button>
+      <button class="hm-btn hm-btn-primary" id="sendNewMessage">إرسال</button>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Messages Page Styles */
+.hm-messages-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%);
+}
+
+/* Header Section */
+.hm-page-header {
+  background: linear-gradient(135deg, #0a192f 0%, #112240 50%, #2366d1 100%);
+  color: white;
+  padding: 4rem 0 3rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hm-page-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.03"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.03"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+  opacity: 0.3;
+}
+
+.hm-header-content {
+  position: relative;
+  z-index: 1;
+}
+
+.hm-page-title {
+  font-size: 3rem;
+  font-weight: 900;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hm-page-title i {
+  color: #ffd700;
+}
+
+.hm-page-subtitle {
+  font-size: 1.25rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.hm-header-stats {
+  display: flex;
+  gap: 2rem;
+  justify-content: flex-end;
+}
+
+.hm-stat-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 1.5rem;
+  text-align: center;
+  min-width: 120px;
+}
+
+.hm-stat-number {
+  display: block;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #ffd700;
+  margin-bottom: 0.5rem;
+}
+
+.hm-stat-label {
+  font-size: 0.875rem;
+  opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Messages Content */
+.hm-messages-content {
+  padding: 2rem 0;
+}
+
+.hm-messages-layout {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 2rem;
+  height: calc(100vh - 300px);
+}
+
+/* Conversations List */
+.hm-conversations-list {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.hm-conversations-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hm-conversations-header h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0a192f;
+  margin: 0;
+}
+
+.hm-btn-primary {
+  background: linear-gradient(135deg, #0a192f 0%, #2366d1 100%);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.hm-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(10, 25, 47, 0.3);
+}
+
+.hm-search-box {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  position: relative;
+}
+
+.hm-search-box i {
+  position: absolute;
+  right: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+}
+
+.hm-search-box input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+}
+
+.hm-search-box input:focus {
+  outline: none;
+  border-color: #2366d1;
+  box-shadow: 0 0 0 3px rgba(35, 102, 209, 0.1);
+}
+
+.hm-conversations {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.hm-conversation-item {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #f1f5f9;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.hm-conversation-item:hover {
+  background: #f8fafc;
+}
+
+.hm-conversation-item.active {
+  background: #e2e8f0;
+  border-right: 3px solid #2366d1;
+}
+
+.hm-conversation-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #e2e8f0;
+}
+
+.hm-conversation-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.hm-conversation-name {
+  font-weight: 600;
+  color: #0a192f;
+  margin: 0 0 0.25rem 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hm-conversation-message {
+  font-size: 0.875rem;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hm-conversation-meta {
+  text-align: left;
+}
+
+.hm-conversation-time {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin-bottom: 0.25rem;
+}
+
+.hm-unread-badge {
+  background: #2366d1;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Chat Area */
+.hm-chat-area {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.hm-empty-chat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+}
+
+.hm-empty-icon {
+  font-size: 4rem;
+  color: #cbd5e1;
+  margin-bottom: 2rem;
+}
+
+.hm-empty-chat h3 {
+  font-size: 1.5rem;
+  color: #0a192f;
+  margin-bottom: 1rem;
+}
+
+.hm-empty-chat p {
+  color: #64748b;
+  margin: 0;
+}
+
+.hm-chat-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.hm-chat-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hm-chat-user {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hm-user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #e2e8f0;
+}
+
+.hm-user-info h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #0a192f;
+  margin: 0 0 0.25rem 0;
+}
+
+.hm-user-info span {
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.hm-action-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: #f1f5f9;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hm-action-btn:hover {
+  background: #e2e8f0;
+  color: #0a192f;
+}
+
+.hm-messages-area {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+  background: #f8fafc;
+}
+
+.hm-message {
+  margin-bottom: 1rem;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.hm-message.sent {
+  flex-direction: row-reverse;
+}
+
+.hm-message-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #e2e8f0;
+  flex-shrink: 0;
+}
+
+.hm-message-content {
+  max-width: 70%;
+}
+
+.hm-message-bubble {
+  padding: 0.75rem 1rem;
+  border-radius: 18px;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+
+.hm-message.received .hm-message-bubble {
+  background: white;
+  color: #0a192f;
+  border-bottom-left-radius: 4px;
+}
+
+.hm-message.sent .hm-message-bubble {
+  background: linear-gradient(135deg, #0a192f 0%, #2366d1 100%);
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.hm-message-time {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin-top: 0.25rem;
+}
+
+.hm-message-input {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e2e8f0;
+  background: white;
+}
+
+.hm-input-group {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.hm-attach-btn,
+.hm-send-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hm-attach-btn {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.hm-attach-btn:hover {
+  background: #e2e8f0;
+  color: #0a192f;
+}
+
+.hm-send-btn {
+  background: linear-gradient(135deg, #0a192f 0%, #2366d1 100%);
+  color: white;
+}
+
+.hm-send-btn:hover {
+  transform: scale(1.05);
+}
+
+.hm-message-input input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+}
+
+.hm-message-input input:focus {
+  outline: none;
+  border-color: #2366d1;
+  box-shadow: 0 0 0 3px rgba(35, 102, 209, 0.1);
+}
+
+/* Modal */
+.hm-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.hm-modal.show {
+  display: flex;
+}
+
+.hm-modal-content {
+  background: white;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.hm-modal-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hm-modal-header h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0a192f;
+  margin: 0;
+}
+
+.hm-modal-close {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: #f1f5f9;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hm-modal-close:hover {
+  background: #e2e8f0;
+  color: #0a192f;
+}
+
+.hm-modal-body {
+  padding: 1.5rem;
+}
+
+.hm-form-group {
+  margin-bottom: 1.5rem;
+}
+
+.hm-form-group label {
+  display: block;
+  font-weight: 600;
+  color: #0a192f;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.hm-form-control {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+}
+
+.hm-form-control:focus {
+  outline: none;
+  border-color: #2366d1;
+  box-shadow: 0 0 0 3px rgba(35, 102, 209, 0.1);
+}
+
+.hm-modal-footer {
+  padding: 1.5rem;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.hm-btn-outline {
+  background: transparent;
+  border: 2px solid #0a192f;
+  color: #0a192f;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.hm-btn-outline:hover {
+  background: #0a192f;
+  color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hm-page-title {
+    font-size: 2rem;
+  }
+  
+  .hm-header-stats {
+    justify-content: center;
+    margin-top: 2rem;
+  }
+  
+  .hm-messages-layout {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+  
+  .hm-conversations-list {
+    height: 300px;
+  }
+  
+  .hm-message-content {
+    max-width: 85%;
+  }
+}
+</style>
+
+<script>
+// Messages Management
+class MessagesManager {
+  constructor() {
+    this.conversations = [];
+    this.currentConversation = null;
+    this.init();
+  }
+
+  async init() {
+    await this.loadConversations();
+    this.setupEventListeners();
+    this.updateStats();
+  }
+
+  async loadConversations() {
+    try {
+      const response = await fetch('/messages');
+      const data = await response.json();
+      
+      if (response.ok) {
+        this.conversations = data.conversations || [];
+        this.renderConversations();
+      } else {
+        throw new Error(data.error || 'Failed to load conversations');
+      }
+    } catch (error) {
+      console.error('Error loading conversations:', error);
+      this.showError('فشل في تحميل المحادثات');
+    }
+  }
+
+  renderConversations() {
+    const list = document.getElementById('conversationsList');
+    list.innerHTML = '';
+
+    if (this.conversations.length === 0) {
+      list.innerHTML = '<div class="hm-empty-conversations"><p>لا توجد محادثات</p></div>';
+      return;
+    }
+
+    this.conversations.forEach(conversation => {
+      const item = document.createElement('div');
+      item.className = 'hm-conversation-item';
+      item.setAttribute('data-conversation-id', conversation._id);
+      
+      const lastMessage = conversation.lastMessage || {};
+      const otherUser = conversation.otherUser || {};
+      
+      item.innerHTML = `
+        <img src="${otherUser.avatar || '/images/user-placeholder.jpg'}" alt="${otherUser.name}" class="hm-conversation-avatar">
+        <div class="hm-conversation-info">
+          <h4 class="hm-conversation-name">${otherUser.name || 'مستخدم مجهول'}</h4>
+          <p class="hm-conversation-message">${lastMessage.content || 'لا توجد رسائل'}</p>
+        </div>
+        <div class="hm-conversation-meta">
+          <div class="hm-conversation-time">${this.formatTime(lastMessage.createdAt)}</div>
+          ${conversation.unreadCount > 0 ? `<div class="hm-unread-badge">${conversation.unreadCount}</div>` : ''}
+        </div>
+      `;
+
+      item.addEventListener('click', () => this.openConversation(conversation));
+      list.appendChild(item);
+    });
+  }
+
+  async openConversation(conversation) {
+    this.currentConversation = conversation;
+    
+    // Update active state
+    document.querySelectorAll('.hm-conversation-item').forEach(item => {
+      item.classList.remove('active');
+    });
+    document.querySelector(`[data-conversation-id="${conversation._id}"]`).classList.add('active');
+
+    // Show chat content
+    document.getElementById('emptyChat').style.display = 'none';
+    document.getElementById('chatContent').style.display = 'flex';
+
+    // Update chat header
+    const otherUser = conversation.otherUser || {};
+    document.getElementById('chatUserAvatar').src = otherUser.avatar || '/images/user-placeholder.jpg';
+    document.getElementById('chatUserName').textContent = otherUser.name || 'مستخدم مجهول';
+    document.getElementById('chatUserStatus').textContent = 'متصل الآن';
+
+    // Load messages
+    await this.loadMessages(conversation._id);
+  }
+
+  async loadMessages(conversationId) {
+    try {
+      const response = await fetch(`/messages/${conversationId}`);
+      const data = await response.json();
+      
+      if (response.ok) {
+        this.renderMessages(data.messages || []);
+      } else {
+        throw new Error(data.error || 'Failed to load messages');
+      }
+    } catch (error) {
+      console.error('Error loading messages:', error);
+      this.showError('فشل في تحميل الرسائل');
+    }
+  }
+
+  renderMessages(messages) {
+    const messagesArea = document.getElementById('messagesArea');
+    messagesArea.innerHTML = '';
+
+    messages.forEach(message => {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `hm-message ${message.sender === this.currentUserId ? 'sent' : 'received'}`;
+      
+      const sender = message.sender === this.currentUserId ? 
+        this.currentConversation.otherUser : 
+        this.currentConversation.otherUser;
+
+      messageDiv.innerHTML = `
+        <img src="${sender.avatar || '/images/user-placeholder.jpg'}" alt="${sender.name}" class="hm-message-avatar">
+        <div class="hm-message-content">
+          <div class="hm-message-bubble">${message.content}</div>
+          <div class="hm-message-time">${this.formatTime(message.createdAt)}</div>
+        </div>
+      `;
+
+      messagesArea.appendChild(messageDiv);
+    });
+
+    // Scroll to bottom
+    messagesArea.scrollTop = messagesArea.scrollHeight;
+  }
+
+  setupEventListeners() {
+    // New message button
+    document.getElementById('newMessageBtn').addEventListener('click', () => {
+      this.showNewMessageModal();
+    });
+
+    // Modal controls
+    document.getElementById('closeModal').addEventListener('click', () => {
+      this.hideNewMessageModal();
+    });
+
+    document.getElementById('cancelNewMessage').addEventListener('click', () => {
+      this.hideNewMessageModal();
+    });
+
+    document.getElementById('sendNewMessage').addEventListener('click', () => {
+      this.sendNewMessage();
+    });
+
+    // Message input
+    document.getElementById('sendBtn').addEventListener('click', () => {
+      this.sendMessage();
+    });
+
+    document.getElementById('messageInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        this.sendMessage();
+      }
+    });
+
+    // Search
+    document.getElementById('searchConversations').addEventListener('input', (e) => {
+      this.searchConversations(e.target.value);
+    });
+
+    // Delete conversation
+    document.getElementById('deleteConversation').addEventListener('click', () => {
+      this.deleteConversation();
+    });
+  }
+
+  showNewMessageModal() {
+    document.getElementById('newMessageModal').classList.add('show');
+    this.loadRecipients();
+  }
+
+  hideNewMessageModal() {
+    document.getElementById('newMessageModal').classList.remove('show');
+  }
+
+  async loadRecipients() {
+    try {
+      const response = await fetch('/messages/recipients');
+      const data = await response.json();
+      
+      if (response.ok) {
+        const select = document.getElementById('recipientSelect');
+        select.innerHTML = '<option value="">اختر المستلم...</option>';
+        
+        data.recipients.forEach(recipient => {
+          const option = document.createElement('option');
+          option.value = recipient._id;
+          option.textContent = recipient.name;
+          select.appendChild(option);
+        });
+      }
+    } catch (error) {
+      console.error('Error loading recipients:', error);
+    }
+  }
+
+  async sendNewMessage() {
+    const recipientId = document.getElementById('recipientSelect').value;
+    const messageText = document.getElementById('newMessageText').value;
+
+    if (!recipientId || !messageText.trim()) {
+      this.showError('يرجى اختيار المستلم وكتابة الرسالة');
+      return;
+    }
+
+    try {
+      const response = await fetch('/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          recipient: recipientId,
+          content: messageText.trim()
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        this.hideNewMessageModal();
+        this.showSuccess('تم إرسال الرسالة بنجاح');
+        await this.loadConversations();
+      } else {
+        throw new Error(data.error);
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+      this.showError('فشل في إرسال الرسالة');
+    }
+  }
+
+  async sendMessage() {
+    const input = document.getElementById('messageInput');
+    const content = input.value.trim();
+
+    if (!content || !this.currentConversation) return;
+
+    try {
+      const response = await fetch(`/messages/${this.currentConversation._id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ content })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        input.value = '';
+        await this.loadMessages(this.currentConversation._id);
+        await this.loadConversations();
+      } else {
+        throw new Error(data.error);
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+      this.showError('فشل في إرسال الرسالة');
+    }
+  }
+
+  searchConversations(query) {
+    const items = document.querySelectorAll('.hm-conversation-item');
+    
+    items.forEach(item => {
+      const name = item.querySelector('.hm-conversation-name').textContent.toLowerCase();
+      const message = item.querySelector('.hm-conversation-message').textContent.toLowerCase();
+      
+      if (name.includes(query.toLowerCase()) || message.includes(query.toLowerCase())) {
+        item.style.display = 'flex';
+      } else {
+        item.style.display = 'none';
+      }
+    });
+  }
+
+  async deleteConversation() {
+    if (!this.currentConversation) return;
+
+    if (!confirm('هل أنت متأكد من حذف هذه المحادثة؟')) return;
+
+    try {
+      const response = await fetch(`/messages/${this.currentConversation._id}`, {
+        method: 'DELETE'
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        this.showSuccess('تم حذف المحادثة');
+        await this.loadConversations();
+        this.resetChatArea();
+      } else {
+        throw new Error(data.error);
+      }
+    } catch (error) {
+      console.error('Error deleting conversation:', error);
+      this.showError('فشل في حذف المحادثة');
+    }
+  }
+
+  resetChatArea() {
+    document.getElementById('emptyChat').style.display = 'flex';
+    document.getElementById('chatContent').style.display = 'none';
+    this.currentConversation = null;
+  }
+
+  updateStats() {
+    const totalMessages = this.conversations.reduce((sum, conv) => sum + (conv.messageCount || 0), 0);
+    const unreadCount = this.conversations.reduce((sum, conv) => sum + (conv.unreadCount || 0), 0);
+
+    document.getElementById('totalMessages').textContent = totalMessages;
+    document.getElementById('unreadCount').textContent = unreadCount;
+  }
+
+  formatTime(date) {
+    if (!date) return '';
+    
+    const now = new Date();
+    const messageDate = new Date(date);
+    const diffMs = now - messageDate;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'الآن';
+    if (diffMins < 60) return `منذ ${diffMins} دقيقة`;
+    if (diffHours < 24) return `منذ ${diffHours} ساعة`;
+    if (diffDays < 7) return `منذ ${diffDays} يوم`;
+    
+    return messageDate.toLocaleDateString('ar-SA');
+  }
+
+  showError(message) {
+    console.error(message);
+  }
+
+  showSuccess(message) {
+    console.log(message);
+  }
+}
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  new MessagesManager();
+});
+</script>

@@ -1,0 +1,273 @@
+![1769121168911](image/unified-dashboard/1769121168911.png)![1769121177113](image/unified-dashboard/1769121177113.png)![1769121210096](image/unified-dashboard/1769121210096.png)![1769121210172](image/unified-dashboard/1769121210172.png)![1769121223248](image/unified-dashboard/1769121223248.png)![1769121341624](image/unified-dashboard/1769121341624.png)<!-- [[ARABIC_HEADER]] هذا الملف (views/admin/unified-dashboard.ejs) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. -->
+
+<% layout('layout') -%>
+<% var hideNavbar = true; %>
+<% var hideSearch = true; %>
+<% var fullWidth = true; %>
+<% var bodyClass = 'hm-admin-page hm-dashboard'; %>
+
+<link rel="stylesheet" href="/css/admin-luxury.css">
+
+<%
+  const totalCars = Number(stats?.totalCars || 0);
+  const totalUsers = Number(stats?.totalUsers || 0);
+  const unseenCount = Number(stats?.unseenCount || 0);
+  const adminUsers = Array.isArray(users) ? users : [];
+  const notificationsList = Array.isArray(notifications) ? notifications.slice(0, 6) : [];
+  const quickActions = [
+    { icon: 'fa-car-side', label: 'إضافة سيارة', href: '/admin/cars?create=1', accent: 'primary' },
+    { icon: 'fa-gavel', label: 'إنشاء مزاد', href: '/admin/create-auction', accent: 'warning' },
+    { icon: 'fa-layer-group', label: 'إدارة الفئات', href: '/admin/categories', accent: 'info' },
+    { icon: 'fa-bell', label: 'الإشعارات', href: '/admin/notifications', accent: 'success' },
+    { icon: 'fa-shopping-cart', label: 'الطلبات', href: '/admin/orders', accent: 'danger' },
+    { icon: 'fa-user-shield', label: 'المشرفون', href: '/admin/users-management', accent: 'secondary' }
+  ];
+%>
+
+<div class="hm-admin-layout">
+  <div class="hm-admin-bg">
+    <div class="hm-admin-bg-gradient"></div>
+    <div class="hm-admin-bg-glow"></div>
+  </div>
+
+  <button class="hm-mobile-toggle" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <%- include('../partials/admin-sidebar') %>
+
+  <main class="hm-admin-main">
+    <header class="hm-admin-header">
+      <div class="hm-header-title">
+        <div>
+          <h1>لوحة التحكم الذهبية</h1>
+          <div class="hm-header-breadcrumb">
+            <a href="/">العودة للموقع</a>
+            <i class="fas fa-chevron-left"></i>
+            <span>الإدارة</span>
+          </div>
+        </div>
+      </div>
+      <div class="hm-header-actions">
+        <div class="hm-header-chip">
+          <i class="fas fa-sparkles"></i>
+          <span>مرحباً <%= currentUser?.name || 'مدير HM CAR' %></span>
+        </div>
+        <a href="/admin/settings" class="hm-btn-admin hm-btn-admin-primary">
+          <i class="fas fa-sliders"></i>
+          إعدادات سريعة
+        </a>
+      </div>
+<form action="/cars/new" method="POST" class="master-form">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        
+        <div class="master-form-grid">
+          <div class="master-form-group">
+            <label class="master-form-label">اسم السيارة *</label>
+            <input type="text" name="title" required class="master-form-input" placeholder="مثال: تويوتا كامري 2024">
+          </div>
+          <div class="master-form-group">
+            <label class="master-form-label">رابط المزاد الخارجي</label>
+            <input type="url" name="externalUrl" class="master-form-input" placeholder="https://example.com/auction">
+          </div>
+        </div>
+        <div class="hm-dashboard-hero__stats">
+          <div class="hm-dashboard-stat">
+            <span>المخزون النشط</span>
+            <strong><%= totalCars %></strong>
+            <small>سيارات ومزادات</small>
+          </div>
+          <div class="hm-dashboard-stat">
+            <span>المستخدمون</span>
+            <strong><%= totalUsers %></strong>
+            <small>عملاء ومشرفون</small>
+          </div>
+          <div class="hm-dashboard-stat">
+            <span>تنبيهات عاجلة</span>
+            <strong><%= unseenCount %></strong>
+            <small>إشعارات لم تتم قراءتها</small>
+          </div>
+        </div>
+      </section>
+
+      <div class="hm-dashboard-grid hm-dashboard-grid--quick">
+        <% quickActions.forEach(function(action) { %>
+          <a class="hm-dashboard-action hm-dashboard-action-<%= action.accent %>" href="<%= action.href %>">
+            <div class="hm-dashboard-action__icon">
+              <i class="fas <%= action.icon %>"></i>
+            </div>
+            <div class="hm-dashboard-action__content">
+              <span><%= action.label %></span>
+              <small>وصول فوري</small>
+            </div>
+            <i class="fas fa-arrow-left hm-dashboard-action__chevron"></i>
+          </a>
+        <% }) %>
+      </div>
+
+      <div class="hm-dashboard-panels">
+        <div class="hm-dashboard-card">
+          <div class="hm-card-header">
+            <h3 class="hm-card-title">
+              <i class="fas fa-bell"></i>
+              أحدث الإشعارات
+            </h3>
+            <a href="/admin/notifications" class="hm-card-link">عرض الكل</a>
+          </div>
+          <% if (notificationsList.length) { %>
+          <ul class="hm-notification-list">
+            <% notificationsList.forEach(function(note) { %>
+              <li class="hm-notification-item <%= note.status === 'new' ? 'is-new' : '' %>">
+                <div class="hm-notification-icon">
+                  <i class="fas <%= note.status === 'new' ? 'fa-circle-exclamation' : 'fa-clock' %>"></i>
+                </div>
+                <div class="hm-notification-body">
+                  <div class="hm-notification-title">
+                    <%= note.title || note.type || 'تنبيه إداري' %>
+                  </div>
+                  <p class="hm-notification-text">
+                    <%= note.message || note.content || 'تم استلام تحديث جديد في النظام.' %>
+                  </p>
+                  <div class="hm-notification-meta">
+                    <span><i class="fas fa-user"></i> <%= note.user?.name || 'مستخدم غير معرف' %></span>
+                    <span><i class="fas fa-clock"></i> <%= note.createdAt ? new Date(note.createdAt).toLocaleString('ar-SA') : '' %></span>
+                  </div>
+                </div>
+                <% if (note.status === 'new') { %>
+                  <form method="POST" action="/admin/notifications/<%= note._id %>/seen">
+                    <button class="hm-btn-admin hm-btn-admin-secondary" type="submit">تمت المعالجة</button>
+                  </form>
+                <% } %>
+              </li>
+            <% }) %>
+          </ul>
+          <% } else { %>
+            <div class="hm-empty-state">
+              <div class="hm-empty-icon"><i class="fas fa-bell-slash"></i></div>
+              <h3 class="hm-empty-title">لا توجد تنبيهات</h3>
+              <p class="hm-empty-text">كل شيء يعمل بسلاسة داخل المنصة.</p>
+            </div>
+          <% } %>
+        </div>
+
+        <div class="hm-dashboard-card hm-dashboard-card--team">
+          <div class="hm-card-header">
+            <h3 class="hm-card-title">
+              <i class="fas fa-user-shield"></i>
+              فريق الإدارة
+            </h3>
+            <a href="/admin/users-management" class="hm-card-link">تعديل الصلاحيات</a>
+          </div>
+          <% if (adminUsers.length) { %>
+          <ul class="hm-team-list">
+            <% adminUsers.slice(0,6).forEach(function(admin) { %>
+              <li class="hm-team-item">
+                <div class="hm-team-avatar"><%= admin.name ? admin.name.charAt(0).toUpperCase() : 'A' %></div>
+                <div class="hm-team-info">
+                  <strong><%= admin.name || 'مشرف' %></strong>
+                  <small><%= admin.role === 'super_admin' ? 'مدير عام' : admin.role === 'manager' ? 'مشرف' : 'مدير' %></small>
+                </div>
+                <div class="hm-team-meta">
+                  <span><i class="fas fa-phone"></i> <%= admin.phone || '---' %></span>
+                  <span><i class="fas fa-envelope"></i> <%= admin.email || '---' %></span>
+                </div>
+              </li>
+            <% }) %>
+          </ul>
+          <% } else { %>
+            <div class="hm-empty-state">
+              <div class="hm-empty-icon"><i class="fas fa-user-lock"></i></div>
+              <h3 class="hm-empty-title">لم يتم إضافة مشرفين</h3>
+              <p class="hm-empty-text">استخدم إدارة المشرفين لإضافة أعضاء الفريق.</p>
+            </div>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="hm-dashboard-grid hm-dashboard-grid--info">
+        <div class="hm-dashboard-card">
+          <div class="hm-card-header">
+            <h3 class="hm-card-title">
+              <i class="fas fa-chart-line"></i>
+              نظرة سريعة على الأداء
+            </h3>
+          </div>
+          <div class="hm-dashboard-insights">
+            <div>
+              <span>معدل نمو المستخدمين</span>
+              <strong>+14% هذا الشهر</strong>
+            </div>
+            <div>
+              <span>معدل سحب المزادات</span>
+              <strong>92% نجاح مزادات</strong>
+            </div>
+            <div>
+              <span>متوسط وقت الرد</span>
+              <strong>دقيقتان للدعم</strong>
+            </div>
+          </div>
+          <div class="hm-dashboard-chart-placeholder">
+            <i class="fas fa-wave-square"></i>
+            <p>اربط بياناتك مع Chart.js لعرض الرسوم التفاعلية.</p>
+          </div>
+        </div>
+
+        <div class="hm-dashboard-card">
+          <div class="hm-card-header">
+            <h3 class="hm-card-title">
+              <i class="fas fa-shield"></i>
+              مركز الحالة والتكاملات
+            </h3>
+          </div>
+          <ul class="hm-health-list">
+            <li>
+              <div>
+                <span>اتصال قاعدة البيانات</span>
+                <small>MongoDB Atlas</small>
+              </div>
+              <span class="hm-health-pill is-success">مستقر</span>
+            </li>
+            <li>
+              <div>
+                <span>خدمات الوسائط</span>
+                <small>Cloudinary + التخزين المحلي</small>
+              </div>
+              <span class="hm-health-pill is-success">نشط</span>
+            </li>
+            <li>
+              <div>
+                <span>التخزين المؤقت</span>
+                <small>Redis اختيارية</small>
+              </div>
+              <span class="hm-health-pill is-info">مراقبة</span>
+            </li>
+            <li>
+              <div>
+                <span>التحديثات الآلية</span>
+                <small>auto-deploy + health checks</small>
+              </div>
+              <span class="hm-health-pill is-warning">يتطلب مراجعة</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+function toggleSidebar() {
+  const sidebar = document.getElementById('adminSidebar');
+  sidebar.classList.toggle('open');
+}
+
+document.addEventListener('click', function(e) {
+  const sidebar = document.getElementById('adminSidebar');
+  const toggle = document.querySelector('.hm-mobile-toggle');
+  if (window.innerWidth <= 1024) {
+    if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+      sidebar.classList.remove('open');
+    }
+  }
+});
+</script>

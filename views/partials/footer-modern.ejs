@@ -1,0 +1,297 @@
+<!-- [[ARABIC_HEADER]] هذا الملف (views/partials/footer-modern.ejs) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. -->
+
+<footer class="main-footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section about">
+<h4><%= __('footer.aboutTitle') %></h4>
+                <p><%= __('footer.aboutText') %></p>
+                <% const social = (typeof siteSettings !== 'undefined' && siteSettings) ? siteSettings : {}; %>
+                <% const facebookUrl = (social && social.facebookUrl) ? social.facebookUrl : ''; %>
+                <% const twitterUrl = (social && social.twitterUrl) ? social.twitterUrl : ''; %>
+                <% const instagramUrl = (social && social.instagramUrl) ? social.instagramUrl : ''; %>
+                <% const youtubeUrl = (social && social.youtubeUrl) ? social.youtubeUrl : ''; %>
+                <% const tiktokUrl = (social && social.tiktokUrl) ? social.tiktokUrl : ''; %>
+                <% const whatsappNumber = (social && social.whatsappNumber) ? String(social.whatsappNumber) : ''; %>
+                <div class="social-links">
+                    <% if (facebookUrl) { %>
+                        <a href="<%= facebookUrl %>" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                            <img class="hm-social-icon-img" src="/images/icons/facebook.jpg" alt="" loading="lazy" decoding="async" onerror="this.style.display='none';if(this.nextElementSibling){this.nextElementSibling.style.display='inline-block';}" />
+                            <i class="fab fa-facebook-f" aria-hidden="true" style="display:none"></i>
+                        </a>
+                    <% } %>
+                    <% if (twitterUrl) { %>
+                        <a href="<%= twitterUrl %>" target="_blank" rel="noopener noreferrer" aria-label="X / Twitter">
+                            <img class="hm-social-icon-img" src="/images/icons/twitter.jpg" alt="" loading="lazy" decoding="async" onerror="this.style.display='none';if(this.nextElementSibling){this.nextElementSibling.style.display='inline-block';}" />
+                            <i class="fab fa-twitter" aria-hidden="true" style="display:none"></i>
+                        </a>
+                    <% } %>
+                    <% if (instagramUrl) { %>
+                        <a href="<%= instagramUrl %>" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                            <img class="hm-social-icon-img" src="/images/icons/instagram.jpg" alt="" loading="lazy" decoding="async" onerror="this.style.display='none';if(this.nextElementSibling){this.nextElementSibling.style.display='inline-block';}" />
+                            <i class="fab fa-instagram" aria-hidden="true" style="display:none"></i>
+                        </a>
+                    <% } %>
+                    <% if (youtubeUrl) { %>
+                        <a href="<%= youtubeUrl %>" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+                            <img class="hm-social-icon-img" src="/images/icons/youtube.jpg" alt="" loading="lazy" decoding="async" onerror="this.style.display='none';if(this.nextElementSibling){this.nextElementSibling.style.display='inline-block';}" />
+                            <i class="fab fa-youtube" aria-hidden="true" style="display:none"></i>
+                        </a>
+                    <% } %>
+                    <% if (tiktokUrl) { %>
+                        <a href="<%= tiktokUrl %>" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+                            <img class="hm-social-icon-img" src="/images/icons/tiktok.jpg" alt="" loading="lazy" decoding="async" onerror="this.style.display='none';if(this.nextElementSibling){this.nextElementSibling.style.display='inline-block';}" />
+                            <i class="fab fa-tiktok" aria-hidden="true" style="display:none"></i>
+                        </a>
+                    <% } %>
+                    <% if (whatsappNumber) { %>
+                        <a href="https://wa.me/<%= whatsappNumber %>" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+                            <img class="hm-social-icon-img" src="/images/icons/whatsapp.jpg" alt="" loading="lazy" decoding="async" onerror="this.style.display='none';if(this.nextElementSibling){this.nextElementSibling.style.display='inline-block';}" />
+                            <i class="fab fa-whatsapp" aria-hidden="true" style="display:none"></i>
+                        </a>
+                    <% } %>
+                </div>
+            </div>
+            <div class="footer-section links">
+                <h4>روابط سريعة</h4>
+                <ul>
+                    <li><a href="/auctions">المزادات</a></li>
+                    <li><a href="/cars">شراء سيارات</a></li>
+                    <li><a href="/sell">بيع سيارة</a></li>
+                    <li><a href="/spare-parts">قطع غيار</a></li>
+                    <li><a href="/support">الدعم الفني</a></li>
+                    <li><a href="/about">من نحن</a></li>
+                    <li><a href="/terms">الشروط والأحكام</a></li>
+                    <li><a href="/privacy">سياسة الخصوصية</a></li>
+                </ul>
+            </div>
+            <div class="footer-section contact">
+                <h4>تواصل معنا</h4>
+                <p><i class="fas fa-map-marker-alt"></i> شارع المزادات، مدينة السيارات، الرياض، المملكة العربية السعودية</p>
+                <p><i class="fas fa-phone"></i> +966 50 123 4567</p>
+                <p><i class="fas fa-phone-alt"></i> +966 11 234 5678</p>
+                <p><i class="fas fa-envelope"></i> info@hmcar.com</p>
+                <p><i class="fas fa-envelope-open-text"></i> support@hmcar.com</p>
+                <div class="contact-hours">
+                    <p><i class="fas fa-clock"></i> ساعات العمل: السبت - الخميس (8:00 ص - 8:00 م)</p>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="footer-bottom-content">
+                <p>&copy; <%= new Date().getFullYear() %> HM CAR | جميع الحقوق محفوظة</p>
+                <div class="footer-bottom-links">
+                    <a href="/terms">الشروط</a>
+                    <a href="/privacy">الخصوصية</a>
+                    <a href="/sitemap">خريطة الموقع</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<style>
+.main-footer {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    color: #ffffff;
+    padding: 3rem 0 1rem;
+    margin-top: 4rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.main-footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #0ea5e9, #1e3a8a, #0ea5e9);
+    animation: footerShimmer 3s ease-in-out infinite;
+}
+
+@keyframes footerShimmer {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.footer-section h4 {
+    color: #0ea5e9;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    position: relative;
+    padding-bottom: 0.5rem;
+}
+
+.footer-section h4::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 2px;
+    background: linear-gradient(90deg, #0ea5e9, #1e3a8a);
+}
+
+.footer-section p {
+    color: #94a3b8;
+    line-height: 1.6;
+    margin-bottom: 0.5rem;
+}
+
+.footer-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-section ul li {
+    margin-bottom: 0.5rem;
+}
+
+.footer-section ul li a {
+    color: #94a3b8;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.footer-section ul li a:hover {
+    color: #0ea5e9;
+    transform: translateX(5px);
+}
+
+.footer-section ul li a::before {
+    content: '←';
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.footer-section ul li a:hover::before {
+    opacity: 1;
+}
+
+.social-links {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.social-links a {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(30, 58, 138, 0.2) 100%);
+    border: 1px solid rgba(14, 165, 233, 0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0ea5e9;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.social-links a::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.social-links a:hover::before {
+    left: 100%;
+}
+
+.social-links a:hover {
+    background: linear-gradient(135deg, #0ea5e9 0%, #1e3a8a 100%);
+    color: #ffffff;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(14, 165, 233, 0.3);
+}
+
+.social-links a i {
+    font-size: 1.1rem;
+    z-index: 1;
+    position: relative;
+}
+
+.contact-hours {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(30, 58, 138, 0.2) 100%);
+    border-radius: 10px;
+    border: 1px solid rgba(14, 165, 233, 0.2);
+}
+
+.footer-bottom {
+    border-top: 1px solid rgba(148, 163, 184, 0.2);
+    padding-top: 1.5rem;
+    margin-top: 2rem;
+}
+
+.footer-bottom-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.footer-bottom p {
+    color: #94a3b8;
+    margin: 0;
+}
+
+.footer-bottom-links {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.footer-bottom-links a {
+    color: #94a3b8;
+    text-decoration: none;
+    transition: color 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.footer-bottom-links a:hover {
+    color: #0ea5e9;
+}
+
+@media (max-width: 768px) {
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .footer-bottom-content {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .social-links {
+        justify-content: center;
+    }
+    
+    .footer-section h4::after {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}
+</style>

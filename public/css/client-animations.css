@@ -1,0 +1,726 @@
+/* [[ARABIC_HEADER]] هذا الملف (public/css/client-animations.css) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. */
+
+/* Client Luxury Animations - HM CAR */
+/* حركات فاخرة للعميل */
+
+/* ===== Client Hero Animations ===== */
+.client-hero-container {
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+}
+
+.client-hero-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #1A1A1A 0%, #2D2D2D 50%, #1A1A1A 100%);
+  z-index: 1;
+}
+
+.client-hero-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+}
+
+.client-hero-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: rgba(255, 215, 0, 0.6);
+  border-radius: 50%;
+  animation: client-particle-float 10s infinite ease-in-out;
+}
+
+.client-hero-particle:nth-child(1) { left: 10%; animation-delay: 0s; }
+.client-hero-particle:nth-child(2) { left: 20%; animation-delay: 1s; }
+.client-hero-particle:nth-child(3) { left: 30%; animation-delay: 2s; }
+.client-hero-particle:nth-child(4) { left: 40%; animation-delay: 3s; }
+.client-hero-particle:nth-child(5) { left: 50%; animation-delay: 4s; }
+.client-hero-particle:nth-child(6) { left: 60%; animation-delay: 5s; }
+.client-hero-particle:nth-child(7) { left: 70%; animation-delay: 6s; }
+.client-hero-particle:nth-child(8) { left: 80%; animation-delay: 7s; }
+.client-hero-particle:nth-child(9) { left: 90%; animation-delay: 8s; }
+.client-hero-particle:nth-child(10) { left: 95%; animation-delay: 9s; }
+
+@keyframes client-particle-float {
+  0%, 100% {
+    transform: translateY(100vh) scale(0);
+    opacity: 0;
+  }
+  10% {
+    transform: translateY(80vh) scale(1);
+    opacity: 1;
+  }
+  90% {
+    transform: translateY(-10vh) scale(1);
+    opacity: 1;
+  }
+}
+
+/* ===== Client Car Animation ===== */
+.client-hero-car {
+  position: absolute;
+  bottom: -100px;
+  left: -200px;
+  width: 400px;
+  height: 200px;
+  z-index: 3;
+  animation: client-car-drive 8s ease-in-out infinite;
+}
+
+.client-hero-car img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 30px rgba(255, 215, 0, 0.3));
+}
+
+@keyframes client-car-drive {
+  0% {
+    transform: translateX(-200px) translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateX(100vw) translateY(-20px) rotate(-2deg);
+  }
+  50% {
+    transform: translateX(100vw) translateY(-40px) rotate(0deg);
+  }
+  75% {
+    transform: translateX(-200px) translateY(-20px) rotate(2deg);
+  }
+  100% {
+    transform: translateX(-200px) translateY(0) rotate(0deg);
+  }
+}
+
+/* ===== Client Logo Animation ===== */
+.client-hero-logo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 4;
+  opacity: 0;
+  animation: client-logo-appear 3s ease-in-out 2s forwards;
+}
+
+.client-hero-logo img {
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.8));
+}
+
+@keyframes client-logo-appear {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0) rotate(0deg);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translate(-50%, -50%) scale(0.5) rotate(180deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) rotate(360deg);
+  }
+}
+
+/* ===== Client Text Animations ===== */
+.client-hero-title {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  opacity: 0;
+  animation: client-title-appear 2s ease-out 3s forwards;
+}
+
+.client-hero-subtitle {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  opacity: 0;
+  animation: client-subtitle-appear 2s ease-out 3.5s forwards;
+}
+
+.client-hero-buttons {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  opacity: 0;
+  animation: client-buttons-appear 2s ease-out 4s forwards;
+}
+
+@keyframes client-title-appear {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) translateY(0);
+  }
+}
+
+@keyframes client-subtitle-appear {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) translateY(0);
+  }
+}
+
+@keyframes client-buttons-appear {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) translateY(0);
+  }
+}
+
+/* ===== Client Shimmer Effects ===== */
+.client-shimmer-text {
+  position: relative;
+  overflow: hidden;
+}
+
+.client-shimmer-text::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.3), transparent);
+  animation: client-shimmer 3s infinite;
+}
+
+@keyframes client-shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* ===== Client Glow Effects ===== */
+.client-glow-element {
+  position: relative;
+}
+
+.client-glow-element::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.3) 0%, transparent 70%);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.client-glow-element:hover::before {
+  opacity: 1;
+}
+
+/* ===== Client Floating Elements ===== */
+.client-floating-element {
+  position: absolute;
+  animation: client-float 6s ease-in-out infinite;
+}
+
+.client-floating-element:nth-child(odd) {
+  animation-delay: 3s;
+}
+
+@keyframes client-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+/* ===== Client Pulse Effects ===== */
+.client-pulse-element {
+  position: relative;
+}
+
+.client-pulse-element::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  border: 2px solid rgba(255, 215, 0, 0.5);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: client-pulse 2s ease-in-out infinite;
+}
+
+@keyframes client-pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0;
+  }
+}
+
+/* ===== Client Rotate Effects ===== */
+.client-rotate-element {
+  animation: client-rotate 10s linear infinite;
+}
+
+@keyframes client-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===== Client Bounce Effects ===== */
+.client-bounce-element {
+  animation: client-bounce 2s ease-in-out infinite;
+}
+
+@keyframes client-bounce {
+  0%, 20%, 53%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40%, 43% {
+    transform: translateY(-20px);
+  }
+  70% {
+    transform: translateY(-10px);
+  }
+  90% {
+    transform: translateY(-5px);
+  }
+}
+
+/* ===== Client Slide Effects ===== */
+.client-slide-in-left {
+  opacity: 0;
+  animation: client-slide-left 1s ease-out forwards;
+}
+
+.client-slide-in-right {
+  opacity: 0;
+  animation: client-slide-right 1s ease-out forwards;
+}
+
+.client-slide-in-up {
+  opacity: 0;
+  animation: client-slide-up 1s ease-out forwards;
+}
+
+.client-slide-in-down {
+  opacity: 0;
+  animation: client-slide-down 1s ease-out forwards;
+}
+
+@keyframes client-slide-left {
+  0% {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes client-slide-right {
+  0% {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes client-slide-up {
+  0% {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes client-slide-down {
+  0% {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== Client Scale Effects ===== */
+.client-scale-in {
+  opacity: 0;
+  animation: client-scale-in 0.5s ease-out forwards;
+}
+
+.client-scale-out {
+  opacity: 1;
+  animation: client-scale-out 0.5s ease-out forwards;
+}
+
+@keyframes client-scale-in {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes client-scale-out {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0);
+  }
+}
+
+/* ===== Client Fade Effects ===== */
+.client-fade-in {
+  opacity: 0;
+  animation: client-fade-in 1s ease-out forwards;
+}
+
+.client-fade-out {
+  opacity: 1;
+  animation: client-fade-out 1s ease-out forwards;
+}
+
+@keyframes client-fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes client-fade-out {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ===== Client Stagger Animations ===== */
+.client-stagger-item {
+  opacity: 0;
+  animation: client-stagger-fade-up 0.6s ease-out forwards;
+}
+
+.client-stagger-item:nth-child(1) { animation-delay: 0.1s; }
+.client-stagger-item:nth-child(2) { animation-delay: 0.2s; }
+.client-stagger-item:nth-child(3) { animation-delay: 0.3s; }
+.client-stagger-item:nth-child(4) { animation-delay: 0.4s; }
+.client-stagger-item:nth-child(5) { animation-delay: 0.5s; }
+.client-stagger-item:nth-child(6) { animation-delay: 0.6s; }
+.client-stagger-item:nth-child(7) { animation-delay: 0.7s; }
+.client-stagger-item:nth-child(8) { animation-delay: 0.8s; }
+
+@keyframes client-stagger-fade-up {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== Client Typewriter Effect ===== */
+.client-typewriter {
+  overflow: hidden;
+  border-right: 2px solid var(--client-gold);
+  white-space: nowrap;
+  animation: client-typewriter 3s steps(40, end), client-blink-caret 0.75s step-end infinite;
+}
+
+@keyframes client-typewriter {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes client-blink-caret {
+  from, to {
+    border-color: transparent;
+  }
+  50% {
+    border-color: var(--client-gold);
+  }
+}
+
+/* ===== Client Wave Effect ===== */
+.client-wave {
+  position: relative;
+  overflow: hidden;
+}
+
+.client-wave::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.2), transparent);
+  animation: client-wave 2s ease-in-out infinite;
+}
+
+@keyframes client-wave {
+  0% {
+    left: -100%;
+  }
+  50% {
+    left: 100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* ===== Client Morphing Effect ===== */
+.client-morph {
+  animation: client-morph 4s ease-in-out infinite;
+}
+
+@keyframes client-morph {
+  0%, 100% {
+    border-radius: 12px;
+    transform: scale(1);
+  }
+  25% {
+    border-radius: 50%;
+    transform: scale(1.1);
+  }
+  50% {
+    border-radius: 12px;
+    transform: scale(1);
+  }
+  75% {
+    border-radius: 50%;
+    transform: scale(0.9);
+  }
+}
+
+/* ===== Client Glitch Effect ===== */
+.client-glitch {
+  position: relative;
+  animation: client-glitch 2s ease-in-out infinite;
+}
+
+.client-glitch::before,
+.client-glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+}
+
+.client-glitch::before {
+  color: var(--client-gold);
+  animation: client-glitch-1 0.5s ease-in-out infinite alternate;
+}
+
+.client-glitch::after {
+  color: var(--client-silver);
+  animation: client-glitch-2 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes client-glitch {
+  0%, 100% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(-2px, 2px);
+  }
+  40% {
+    transform: translate(-2px, -2px);
+  }
+  60% {
+    transform: translate(2px, 2px);
+  }
+  80% {
+    transform: translate(2px, -2px);
+  }
+}
+
+@keyframes client-glitch-1 {
+  0% {
+    clip-path: inset(0 0 0 0);
+    opacity: 0;
+  }
+  20% {
+    clip-path: inset(20% 0 30% 0);
+    opacity: 0.5;
+  }
+  40% {
+    clip-path: inset(50% 0 20% 0);
+    opacity: 0.8;
+  }
+  60% {
+    clip-path: inset(10% 0 60% 0);
+    opacity: 0.5;
+  }
+  80% {
+    clip-path: inset(80% 0 5% 0);
+    opacity: 0.3;
+  }
+}
+
+@keyframes client-glitch-2 {
+  0% {
+    clip-path: inset(0 0 0 0);
+    opacity: 0;
+  }
+  20% {
+    clip-path: inset(60% 0 20% 0);
+    opacity: 0.3;
+  }
+  40% {
+    clip-path: inset(20% 0 50% 0);
+    opacity: 0.6;
+  }
+  60% {
+    clip-path: inset(30% 0 40% 0);
+    opacity: 0.4;
+  }
+  80% {
+    clip-path: inset(5% 0 80% 0);
+    opacity: 0.2;
+  }
+}
+
+/* ===== Client Responsive Animations ===== */
+@media (max-width: 768px) {
+  .client-hero-car {
+    width: 300px;
+    height: 150px;
+  }
+  
+  .client-hero-logo img {
+    width: 150px;
+    height: 150px;
+  }
+  
+  .client-hero-title {
+    top: 25%;
+  }
+  
+  .client-hero-subtitle {
+    top: 35%;
+  }
+  
+  .client-hero-buttons {
+    top: 45%;
+  }
+  
+  @keyframes client-car-drive {
+    0% {
+      transform: translateX(-150px) translateY(0) rotate(0deg);
+    }
+    25% {
+      transform: translateX(100vw) translateY(-15px) rotate(-2deg);
+    }
+    50% {
+      transform: translateX(100vw) translateY(-30px) rotate(0deg);
+    }
+    75% {
+      transform: translateX(-150px) translateY(-15px) rotate(2deg);
+    }
+    100% {
+      transform: translateX(-150px) translateY(0) rotate(0deg);
+    }
+  }
+}
+
+/* ===== Client Performance Optimizations ===== */
+.client-gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.client-will-change {
+  will-change: transform, opacity;
+}
+
+/* ===== Client Reduced Motion Support ===== */
+@media (prefers-reduced-motion: reduce) {
+  .client-hero-car,
+  .client-hero-logo,
+  .client-hero-title,
+  .client-hero-subtitle,
+  .client-hero-buttons,
+  .client-floating-element,
+  .client-rotate-element,
+  .client-bounce-element,
+  .client-pulse-element,
+  .client-morph {
+    animation: none;
+  }
+  
+  .client-shimmer-text::before,
+  .client-wave::before {
+    animation: none;
+  }
+}

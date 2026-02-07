@@ -1,0 +1,129 @@
+<!-- [[ARABIC_HEADER]] هذا الملف (views/partials/chat-sidebar.ejs) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. -->
+
+<div class="chat-sidebar">
+  <div class="chat-header">
+    <h5><i class="fas fa-comments"></i> المحادثات</h5>
+    <span class="unread-badge" id="unreadCount">0</span>
+  </div>
+  
+  <div class="chat-search">
+    <input type="text" class="form-control" placeholder="البحث في المحادثات..." id="chatSearch">
+  </div>
+  
+  <div class="conversations-list" id="conversationsList">
+    <!-- Conversations will be loaded here -->
+  </div>
+</div>
+
+<style>
+.chat-sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 350px;
+  height: 100vh;
+  background: var(--background-color);
+  border-right: 1px solid var(--border-color);
+  display: none;
+  flex-direction: column;
+  z-index: 1000;
+}
+
+.chat-sidebar.active {
+  display: flex;
+}
+
+.chat-sidebar .chat-header {
+  padding: 15px;
+  background: var(--primary-color);
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chat-sidebar .chat-header h5 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.chat-sidebar .unread-badge {
+  background: var(--danger-color);
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  display: none;
+}
+
+.chat-sidebar .chat-search {
+  padding: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.chat-sidebar .conversations-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.chat-sidebar .conversation-item {
+  padding: 15px;
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.chat-sidebar .conversation-item:hover {
+  background: var(--accent-color);
+}
+
+.chat-sidebar .conversation-item.active {
+  background: var(--section-bg-color);
+}
+
+.chat-sidebar .conversation-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--primary-color-light);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 10px;
+  font-weight: bold;
+}
+
+.chat-sidebar .conversation-info {
+  flex: 1;
+}
+
+.chat-sidebar .conversation-name {
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: var(--primary-color);
+}
+
+.chat-sidebar .conversation-last-message {
+  font-size: 14px;
+  color: var(--text-color-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chat-sidebar .conversation-time {
+  font-size: 12px;
+  color: var(--text-color-secondary);
+}
+
+.chat-sidebar .conversation-unread {
+  width: 8px;
+  height: 8px;
+  background: var(--danger-color);
+  border-radius: 50%;
+  margin-right: 5px;
+}
+</style>

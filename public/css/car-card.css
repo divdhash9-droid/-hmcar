@@ -1,0 +1,284 @@
+/* [[ARABIC_HEADER]] هذا الملف (public/css/car-card.css) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. */
+
+/* 
+ * Car Card Component - Using Design System
+ * مكون بطاقة السيارة - باستخدام نظام التصميم الموحد
+ */
+
+.hm-card {
+  background: var(--hm-white);
+  border: 2px solid var(--hm-border-light);
+  border-radius: var(--hm-radius-xl);
+  padding: var(--hm-space-lg);
+  box-shadow: var(--hm-shadow-md);
+  transition: all var(--hm-transition-bounce);
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+  display: block;
+}
+
+.hm-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity var(--hm-transition-normal);
+}
+
+.hm-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--hm-gold-primary);
+  box-shadow: var(--hm-shadow-gold-hover);
+}
+
+.hm-card:hover::before {
+  opacity: 1;
+}
+
+.hm-card-elevated {
+  box-shadow: var(--hm-shadow-lg);
+}
+
+.hm-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.hm-card-image-container {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  border-radius: var(--hm-radius-lg);
+  margin-bottom: var(--hm-space-md);
+  background: var(--hm-gray-100);
+}
+
+.hm-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--hm-transition-normal);
+}
+
+.hm-card-link:hover .hm-card-image {
+  transform: scale(1.05);
+}
+
+.hm-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--hm-text-muted);
+  text-align: center;
+  gap: var(--hm-space-sm);
+}
+
+.hm-card-overlay {
+  position: absolute;
+  top: var(--hm-space-sm);
+  right: var(--hm-space-sm);
+  z-index: 2;
+}
+
+.hm-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--hm-radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.hm-badge-success {
+  background: var(--hm-success);
+  color: var(--hm-white);
+}
+
+.hm-badge-danger {
+  background: var(--hm-danger);
+  color: var(--hm-white);
+}
+
+.hm-badge-warning {
+  background: var(--hm-warning);
+  color: var(--hm-white);
+}
+
+.hm-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hm-space-sm);
+}
+
+.hm-card-title-make {
+  display: flex;
+  align-items: center;
+  gap: var(--hm-space-sm);
+}
+
+.hm-make-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  border-radius: var(--hm-radius-sm);
+  border: 1px solid var(--hm-border-medium);
+}
+
+.hm-card-title {
+  color: var(--hm-text-primary);
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.hm-card-model {
+  color: var(--hm-text-secondary);
+  font-size: 0.95rem;
+  margin: 0;
+  font-weight: 500;
+}
+
+.hm-card-specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--hm-space-lg);
+  margin: var(--hm-space-sm) 0;
+}
+
+.hm-spec-item {
+  display: flex;
+  align-items: center;
+  gap: var(--hm-space-xs);
+  color: var(--hm-text-muted);
+  font-size: 0.875rem;
+}
+
+.hm-card-price {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--hm-gold-primary);
+  margin: var(--hm-space-md) 0 0 0;
+  padding-top: var(--hm-space-md);
+  border-top: 2px solid var(--hm-border-light);
+}
+
+.hm-card-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--hm-space-sm);
+  margin-top: var(--hm-space-md);
+  padding-top: var(--hm-space-md);
+  border-top: 2px solid var(--hm-border-light);
+}
+
+.hm-card-actions .hm-btn {
+  flex: 1;
+}
+
+.hm-btn-icon {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border-radius: 50%;
+  justify-content: center;
+}
+
+.hm-btn-icon:hover {
+  transform: scale(1.1) rotate(360deg);
+}
+
+.hm-icon-danger {
+  color: var(--hm-danger) !important;
+}
+
+.hm-icon-success {
+  color: var(--hm-success) !important;
+}
+
+/* Responsive Design - التصميم المتجاوب */
+@media (max-width: 768px) {
+  .hm-card {
+    padding: var(--hm-space-md);
+  }
+  
+  .hm-card-specs {
+    gap: var(--hm-space-md);
+  }
+  
+  .hm-card-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .hm-card-actions .hm-btn {
+    flex: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .hm-card-image-container {
+    height: 150px;
+  }
+  
+  .hm-card-title {
+    font-size: 1.1rem;
+  }
+  
+  .hm-card-price {
+    font-size: 1.1rem;
+  }
+}
+
+/* Animation Effects - تأثيرات الحركة */
+.hm-card {
+  animation: slideInUp 0.4s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Hover Effects - تأثيرات التحويم */
+.hm-card-link:hover .hm-card-title {
+  color: var(--hm-gold-primary);
+}
+
+.hm-card-link:hover .hm-card-price {
+  color: var(--hm-gold-dark);
+}
+
+/* Focus States - حالات التركيز */
+.hm-card:focus-within {
+  outline: 2px solid var(--hm-gold-primary);
+  outline-offset: 2px;
+}
+
+/* Accessibility - إمكانية الوصول */
+@media (prefers-reduced-motion: reduce) {
+  .hm-card,
+  .hm-card-image {
+    transition: none;
+  }
+  
+  .hm-card {
+    animation: none;
+  }
+}

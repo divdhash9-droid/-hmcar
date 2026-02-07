@@ -1,0 +1,700 @@
+<!-- [[ARABIC_HEADER]] هذا الملف (views/partials/car-card-luxury.ejs) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. -->
+<!-- بطاقة سيارة فاخرة مع صور محسّنة وتأثيرات تفاعلية -->
+
+<div class="luxury-card-container" data-car-id="<%= car._id %>">
+    <div class="luxury-card">
+        <!-- رأس البطاقة مع الصورة المحسّنة -->
+        <div class="luxury-card-header">
+            <a href="/cars/<%= car._id %>" class="luxury-image-link">
+                <div class="luxury-image-wrapper">
+                    <% if (car.images && car.images.length > 0) { %>
+                        <% if (car.processedImages && car.processedImages[0] && car.processedImages[0].thumbnail) { %>
+                            <!-- استخدام الصورة المصغرة المحسّنة -->
+                            <img src="<%= car.processedImages[0].thumbnail %>" 
+                                 alt="<%= car.title %>" 
+                                 class="luxury-main-image"
+                                 loading="lazy"
+                                 onerror="this.src='<%= car.images[0] %>'">
+                        <% } else { %>
+                            <!-- الصورة الأصلية كنسخة احتياطية -->
+                            <img src="<%= car.images[0] %>" 
+                                 alt="<%= car.title %>" 
+                                 class="luxury-main-image"
+                                 loading="lazy">
+                        <% } %>
+                        
+                        <!-- معرض الصور المصغرة -->
+                        <% if (car.images.length > 1) { %>
+                            <div class="luxury-thumbnails">
+                                <% car.images.slice(1, 4).forEach((image, index) => { %>
+                                    <div class="luxury-thumbnail">
+                                        <% if (car.processedImages && car.processedImages[index + 1] && car.processedImages[index + 1].icon) { %>
+                                            <img src="<%= car.processedImages[index + 1].icon %>" 
+                                                 alt="صورة <%= index + 2 %>"
+                                                 loading="lazy">
+                                        <% } else { %>
+                                            <img src="<%= image %>" 
+                                                 alt="صورة <%= index + 2 %>"
+                                                 loading="lazy">
+                                        <% } %>
+                                    </div>
+                                <% }); %>
+                                <% if (car.images.length > 4) { %>
+                                    <div class="luxury-thumbnail more-images">
+                                        +<%= car.images.length - 4 %>
+                                    </div>
+                                <% } %>
+                            </div>
+                        <% } %>
+                    <% } else { %>
+                        <!-- صورة نائبة فاخرة -->
+                        <div class="luxury-placeholder">
+                            <div class="luxury-placeholder-content">
+                                <i class="fas fa-car luxury-placeholder-icon"></i>
+                                <h4>سيارة فاخرة</h4>
+                                <p>لا توجد صور متاحة</p>
+                            </div>
+                        </div>
+                    <% } %>
+                    
+                    <!-- شارات الحالة -->
+                    <div class="luxury-badges">
+                        <% if (car.isSold) { %>
+                            <span class="luxury-badge luxury-badge-sold">
+                                <i class="fas fa-check-circle"></i>
+                                تم البيع
+                            </span>
+                        <% } else if (car.listingType === 'auction') { %>
+                            <span class="luxury-badge luxury-badge-auction">
+                                <i class="fas fa-gavel"></i>
+                                مزاد
+                            </span>
+                        <% } else if (car.isActive) { %>
+                            <span class="luxury-badge luxury-badge-available">
+                                <i class="fas fa-check"></i>
+                                متوفر
+                            </span>
+                        <% } %>
+                        
+                        <% if (car.condition === 'excellent') { %>
+                            <span class="luxury-badge luxury-badge-condition">
+                                <i class="fas fa-star"></i>
+                                ممتازة
+                            </span>
+                        <% } %>
+                    </div>
+                    
+                    <!-- تأثيرات التفاعل -->
+                    <div class="luxury-overlay">
+                        <div class="luxury-overlay-content">
+                            <button class="luxury-overlay-btn">
+                                <i class="fas fa-search-plus"></i>
+                                عرض سريع
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <!-- محتوى البطاقة -->
+        <div class="luxury-card-body">
+            <!-- العنوان والشعار -->
+            <div class="luxury-title-section">
+                <div class="luxury-brand">
+                    <% if (car.makeLogoUrl) { %>
+                        <img src="<%= car.makeLogoUrl %>" 
+                             alt="<%= car.make %>" 
+                             class="luxury-brand-logo"
+                             loading="lazy">
+                    <% } else { %>
+                        <div class="luxury-brand-placeholder">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                    <% } %>
+                </div>
+                <div class="luxury-title-info">
+                    <h3 class="luxury-title">
+                        <a href="/cars/<%= car._id %>"><%= car.title %></a>
+                    </h3>
+                    <p class="luxury-subtitle">
+                        <%= car.make %> <%= car.model %> <%= car.year %>
+                    </p>
+                </div>
+            </div>
+            
+            <!-- المواصفات -->
+            <div class="luxury-specs">
+                <div class="luxury-spec-item">
+                    <div class="luxury-spec-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="luxury-spec-info">
+                        <span class="luxury-spec-label">سنة الصنع</span>
+                        <span class="luxury-spec-value"><%= car.year || 'N/A' %></span>
+                    </div>
+                </div>
+                
+                <div class="luxury-spec-item">
+                    <div class="luxury-spec-icon">
+                        <i class="fas fa-tachometer-alt"></i>
+                    </div>
+                    <div class="luxury-spec-info">
+                        <span class="luxury-spec-label">المسافة</span>
+                        <span class="luxury-spec-value">
+                            <%= car.mileage ? car.mileage.toLocaleString() + ' كم' : 'N/A' %>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="luxury-spec-item">
+                    <div class="luxury-spec-icon">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <div class="luxury-spec-info">
+                        <span class="luxury-spec-label">الحالة</span>
+                        <span class="luxury-spec-value">
+                            <% 
+                            const conditionMap = {
+                                'excellent': 'ممتازة',
+                                'good': 'جيدة',
+                                'fair': 'متوسطة',
+                                'poor': 'سيئة'
+                            };
+                            %>
+                            <%= conditionMap[car.condition] || car.condition || 'N/A' %>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- السعر -->
+            <div class="luxury-price-section">
+                <div class="luxury-price-main">
+                    <% if (car.priceSar) { %>
+                        <span class="luxury-price-amount"><%= car.priceSar.toLocaleString() %></span>
+                        <span class="luxury-price-currency">ريال سعودي</span>
+                    <% } else if (car.price) { %>
+                        <span class="luxury-price-amount"><%= car.price.toLocaleString() %></span>
+                        <span class="luxury-price-currency">ريال</span>
+                    <% } else { %>
+                        <span class="luxury-price-contact">السعر عند الطلب</span>
+                    <% } %>
+                </div>
+                
+                <% if (car.priceUsd) { %>
+                    <div class="luxury-price-secondary">
+                        ≈ <%= car.priceUsd.toLocaleString() %> USD
+                    </div>
+                <% } %>
+            </div>
+        </div>
+        
+        <!-- أزرار الإجراءات -->
+        <div class="luxury-card-footer">
+            <a href="/cars/<%= car._id %>" class="luxury-btn luxury-btn-primary">
+                <i class="fas fa-eye"></i>
+                <span>التفاصيل</span>
+            </a>
+            
+            <% if (currentUser && (currentUser.role === 'buyer' || currentUser.role === 'user')) { %>
+                <button class="luxury-btn luxury-btn-favorite" 
+                        data-car-id="<%= car._id %>" 
+                        onclick="toggleLuxuryFavorite(this)">
+                    <i class="far fa-heart"></i>
+                </button>
+            <% } %>
+            
+            <% if (currentUser && currentUser.role === 'admin') { %>
+                <a href="/cars/<%= car._id %>/edit" class="luxury-btn luxury-btn-edit">
+                    <i class="fas fa-edit"></i>
+                </a>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleLuxuryFavorite(button) {
+    const carId = button.getAttribute('data-car-id');
+    const icon = button.querySelector('i');
+    const isActive = button.classList.contains('active');
+    
+    // تبديل الحالة المرئية
+    if (isActive) {
+        button.classList.remove('active');
+        icon.className = 'far fa-heart';
+    } else {
+        button.classList.add('active');
+        icon.className = 'fas fa-heart';
+        
+        // تأثير نابض
+        button.style.transform = 'scale(1.2)';
+        setTimeout(() => {
+            button.style.transform = 'scale(1)';
+        }, 200);
+    }
+    
+    // إرسال طلب إلى الخادم
+    fetch('/api/favorites/toggle', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+        },
+        body: JSON.stringify({ carId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Favorite updated successfully');
+        }
+    })
+    .catch(error => {
+        console.error('Error updating favorite:', error);
+    });
+}
+
+// تأثيرات حركية عند التمرير
+document.addEventListener('DOMContentLoaded', function() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('luxury-card-visible');
+            }
+        });
+    }, {
+        threshold: 0.1
+    });
+    
+    document.querySelectorAll('.luxury-card-container').forEach(card => {
+        observer.observe(card);
+    });
+});
+</script>
+
+<style>
+.luxury-card-container {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.luxury-card-container.luxury-card-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.luxury-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.luxury-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    border-color: rgba(212, 175, 55, 0.4);
+}
+
+.luxury-card-header {
+    position: relative;
+    overflow: hidden;
+}
+
+.luxury-image-link {
+    display: block;
+    text-decoration: none;
+}
+
+.luxury-image-wrapper {
+    position: relative;
+    height: 280px;
+    overflow: hidden;
+}
+
+.luxury-main-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.luxury-card:hover .luxury-main-image {
+    transform: scale(1.1);
+}
+
+.luxury-thumbnails {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    display: flex;
+    gap: 5px;
+}
+
+.luxury-thumbnail {
+    width: 40px;
+    height: 30px;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(5px);
+}
+
+.luxury-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.luxury-thumbnail.more-images {
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.luxury-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #d4af37 0%, #f4e4bc 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.luxury-placeholder-content {
+    text-align: center;
+    color: white;
+}
+
+.luxury-placeholder-icon {
+    font-size: 48px;
+    margin-bottom: 10px;
+}
+
+.luxury-badges {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.luxury-badge {
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.luxury-badge-sold {
+    background: rgba(220, 53, 69, 0.9);
+}
+
+.luxury-badge-auction {
+    background: rgba(255, 193, 7, 0.9);
+}
+
+.luxury-badge-available {
+    background: rgba(40, 167, 69, 0.9);
+}
+
+.luxury-badge-condition {
+    background: rgba(212, 175, 55, 0.9);
+}
+
+.luxury-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.luxury-image-wrapper:hover .luxury-overlay {
+    opacity: 1;
+}
+
+.luxury-overlay-btn {
+    background: rgba(212, 175, 55, 0.9);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.luxury-overlay-btn:hover {
+    background: rgba(212, 175, 55, 1);
+    transform: scale(1.05);
+}
+
+.luxury-card-body {
+    padding: 25px;
+}
+
+.luxury-title-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.luxury-brand {
+    flex-shrink: 0;
+}
+
+.luxury-brand-logo {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    border-radius: 10px;
+    background: white;
+    padding: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.luxury-brand-placeholder {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #d4af37 0%, #f4e4bc 100%);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+}
+
+.luxury-title-info {
+    flex: 1;
+}
+
+.luxury-title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.luxury-title a {
+    color: #333;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.luxury-title a:hover {
+    color: #d4af37;
+}
+
+.luxury-subtitle {
+    margin: 5px 0 0 0;
+    color: #666;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.luxury-specs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.luxury-spec-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.luxury-spec-icon {
+    width: 35px;
+    height: 35px;
+    background: linear-gradient(135deg, #d4af37 0%, #f4e4bc 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.luxury-spec-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.luxury-spec-label {
+    font-size: 11px;
+    color: #999;
+    font-weight: 500;
+}
+
+.luxury-spec-value {
+    font-size: 13px;
+    color: #333;
+    font-weight: 600;
+}
+
+.luxury-price-section {
+    padding: 20px 0;
+    border-top: 1px solid #eee;
+}
+
+.luxury-price-main {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 5px;
+}
+
+.luxury-price-amount {
+    font-size: 24px;
+    font-weight: 700;
+    color: #d4af37;
+}
+
+.luxury-price-currency {
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+}
+
+.luxury-price-contact {
+    font-size: 18px;
+    color: #666;
+    font-weight: 600;
+}
+
+.luxury-price-secondary {
+    font-size: 12px;
+    color: #999;
+}
+
+.luxury-card-footer {
+    padding: 20px 25px;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.luxury-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    flex: 1;
+    justify-content: center;
+}
+
+.luxury-btn-primary {
+    background: linear-gradient(135deg, #d4af37 0%, #f4e4bc 100%);
+    color: white;
+}
+
+.luxury-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(212, 175, 55, 0.4);
+}
+
+.luxury-btn-favorite {
+    width: 45px;
+    height: 45px;
+    padding: 0;
+    background: white;
+    color: #999;
+    border: 2px solid #eee;
+    flex: none;
+}
+
+.luxury-btn-favorite:hover,
+.luxury-btn-favorite.active {
+    background: #ff4757;
+    color: white;
+    border-color: #ff4757;
+}
+
+.luxury-btn-edit {
+    width: 45px;
+    height: 45px;
+    padding: 0;
+    background: white;
+    color: #666;
+    border: 2px solid #eee;
+    flex: none;
+}
+
+.luxury-btn-edit:hover {
+    background: #666;
+    color: white;
+    border-color: #666;
+}
+
+/* تأثيرات الاستجابة */
+@media (max-width: 768px) {
+    .luxury-card {
+        border-radius: 15px;
+    }
+    
+    .luxury-image-wrapper {
+        height: 200px;
+    }
+    
+    .luxury-card-body {
+        padding: 20px;
+    }
+    
+    .luxury-title {
+        font-size: 18px;
+    }
+    
+    .luxury-specs {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .luxury-price-amount {
+        font-size: 20px;
+    }
+    
+    .luxury-card-footer {
+        padding: 15px 20px;
+    }
+    
+    .luxury-btn {
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+}
+</style>

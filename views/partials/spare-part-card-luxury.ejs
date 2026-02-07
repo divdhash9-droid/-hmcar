@@ -1,0 +1,734 @@
+<!-- [[ARABIC_HEADER]] هذا الملف (views/partials/spare-part-card-luxury.ejs) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. -->
+<!-- بطاقة قطعة غيار فاخرة مع صور محسّنة وتأثيرات تفاعلية -->
+
+<div class="luxury-part-card-container" data-part-id="<%= part._id %>">
+    <div class="luxury-part-card">
+        <!-- رأس البطاقة مع الصورة المحسّنة -->
+        <div class="luxury-part-header">
+            <a href="/spare-parts/<%= part._id %>" class="luxury-part-image-link">
+                <div class="luxury-part-image-wrapper">
+                    <% if (part.images && part.images.length > 0) { %>
+                        <img src="<%= part.images[0] %>" 
+                             alt="<%= part.name %>" 
+                             class="luxury-part-main-image"
+                             loading="lazy">
+                        
+                        <!-- شعار المخزون -->
+                        <% if (part.inStock && part.stockQty > 0) { %>
+                            <div class="luxury-part-stock-badge">
+                                <i class="fas fa-check-circle"></i>
+                                متوفر
+                            </div>
+                        <% } else { %>
+                            <div class="luxury-part-out-of-stock">
+                                <i class="fas fa-times-circle"></i>
+                                نفد المخزون
+                            </div>
+                        <% } %>
+                    <% } else { %>
+                        <!-- صورة نائبة فاخرة -->
+                        <div class="luxury-part-placeholder">
+                            <div class="luxury-part-placeholder-content">
+                                <i class="fas fa-cogs luxury-part-placeholder-icon"></i>
+                                <h4>قطعة غيار</h4>
+                                <p><%= part.name %></p>
+                            </div>
+                        </div>
+                    <% } %>
+                    
+                    <!-- تأثيرات التفاعل -->
+                    <div class="luxury-part-overlay">
+                        <div class="luxury-part-overlay-content">
+                            <button class="luxury-part-overlay-btn">
+                                <i class="fas fa-search-plus"></i>
+                                عرض سريع
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <!-- محتوى البطاقة -->
+        <div class="luxury-part-body">
+            <!-- العنوان والنوع -->
+            <div class="luxury-part-title-section">
+                <div class="luxury-part-type-icon">
+                    <% 
+                    const typeIcons = {
+                        'engine': 'fa-cogs',
+                        'transmission': 'fa-cog',
+                        'brakes': 'fa-compact-disc',
+                        'suspension': 'fa-wrench',
+                        'electrical': 'fa-bolt',
+                        'interior': 'fa-chair',
+                        'exterior': 'fa-car-side',
+                        'other': 'fa-tools'
+                    };
+                    const icon = typeIcons[part.partType] || 'fa-tools';
+                    %>
+                    <i class="fas <%= icon %>"></i>
+                </div>
+                <div class="luxury-part-title-info">
+                    <h3 class="luxury-part-title">
+                        <a href="/spare-parts/<%= part._id %>"><%= part.name %></a>
+                    </h3>
+                    <p class="luxury-part-type">
+                        <% 
+                        const typeNames = {
+                            'engine': 'محرك',
+                            'transmission': 'ناقل حركة',
+                            'brakes': 'فرامل',
+                            'suspension': 'تعليق',
+                            'electrical': 'كهرباء',
+                            'interior': 'داخلية',
+                            'exterior': 'خارجية',
+                            'other': 'أخرى'
+                        };
+                        %>
+                        <%= typeNames[part.partType] || part.partType || 'قطعة غيار' %>
+                    </p>
+                </div>
+            </div>
+            
+            <!-- معلومات السيارة المتوافقة -->
+            <% if (part.carMake || part.carModel) { %>
+                <div class="luxury-part-compatibility">
+                    <div class="luxury-part-compatibility-header">
+                        <i class="fas fa-car"></i>
+                        <span>متوافق مع</span>
+                    </div>
+                    <div class="luxury-part-compatibility-info">
+                        <% if (part.carMake) { %>
+                            <span class="luxury-part-make"><%= part.carMake %></span>
+                        <% } %>
+                        <% if (part.carModel) { %>
+                            <span class="luxury-part-model"><%= part.carModel %></span>
+                        <% } %>
+                        <% if (part.carYear) { %>
+                            <span class="luxury-part-year"><%= part.carYear %></span>
+                        <% } %>
+                    </div>
+                </div>
+            <% } %>
+            
+            <!-- العلامة التجارية -->
+            <% if (part.spareBrand) { %>
+                <div class="luxury-part-brand">
+                    <div class="luxury-part-brand-label">العلامة التجارية</div>
+                    <div class="luxury-part-brand-name">
+                        <% if (part.spareBrand.logo) { %>
+                            <img src="<%= part.spareBrand.logo %>" 
+                                 alt="<%= part.spareBrand.name %>" 
+                                 class="luxury-part-brand-logo"
+                                 loading="lazy">
+                        <% } %>
+                        <%= part.spareBrand.name %>
+                    </div>
+                </div>
+            <% } %>
+            
+            <!-- السعر -->
+            <div class="luxury-part-price-section">
+                <div class="luxury-part-price-main">
+                    <% if (part.priceSar) { %>
+                        <span class="luxury-part-price-amount"><%= part.priceSar.toLocaleString() %></span>
+                        <span class="luxury-part-price-currency">ريال سعودي</span>
+                    <% } else if (part.price) { %>
+                        <span class="luxury-part-price-amount"><%= part.price.toLocaleString() %></span>
+                        <span class="luxury-part-price-currency">ريال</span>
+                    <% } else { %>
+                        <span class="luxury-part-price-contact">السعر عند الطلب</span>
+                    <% } %>
+                </div>
+                
+                <% if (part.priceUsd) { %>
+                    <div class="luxury-part-price-secondary">
+                        ≈ <%= part.priceUsd.toLocaleString() %> USD
+                    </div>
+                <% } %>
+            </div>
+            
+            <!-- معلومات المخزون -->
+            <% if (part.inStock && part.stockQty > 0) { %>
+                <div class="luxury-part-stock-info">
+                    <i class="fas fa-box"></i>
+                    <span>الكمية المتاحة: <%= part.stockQty %></span>
+                </div>
+            <% } %>
+        </div>
+        
+        <!-- أزرار الإجراءات -->
+        <div class="luxury-part-footer">
+            <a href="/spare-parts/<%= part._id %>" class="luxury-part-btn luxury-part-btn-primary">
+                <i class="fas fa-eye"></i>
+                <span>التفاصيل</span>
+            </a>
+            
+            <% if (currentUser && (currentUser.role === 'buyer' || currentUser.role === 'user')) { %>
+                <% if (part.inStock && part.stockQty > 0) { %>
+                    <button class="luxury-part-btn luxury-part-btn-cart" 
+                            data-part-id="<%= part._id %>" 
+                            onclick="addToCartLuxury(this)">
+                        <i class="fas fa-shopping-cart"></i>
+                    </button>
+                <% } else { %>
+                    <button class="luxury-part-btn luxury-part-btn-disabled" disabled>
+                        <i class="fas fa-times"></i>
+                    </button>
+                <% } %>
+            <% } %>
+            
+            <% if (currentUser && currentUser.role === 'admin') { %>
+                <a href="/admin/spare-parts/<%= part._id %>/edit" class="luxury-part-btn luxury-part-btn-edit">
+                    <i class="fas fa-edit"></i>
+                </a>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<script>
+function addToCartLuxury(button) {
+    const partId = button.getAttribute('data-part-id');
+    const icon = button.querySelector('i');
+    
+    // تأثير إضافة للسلة
+    button.classList.add('adding');
+    icon.className = 'fas fa-spinner fa-spin';
+    
+    // إرسال طلب إلى الخادم
+    fetch('/spare-parts/cart/add', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+        },
+        body: JSON.stringify({ partId, quantity: 1 })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            button.classList.remove('adding');
+            button.classList.add('added');
+            icon.className = 'fas fa-check';
+            
+            // تحديث عداد السلة
+            updateCartCounter(data.cartCount);
+            
+            // إعادة تعيين بعد ثانيتين
+            setTimeout(() => {
+                button.classList.remove('added');
+                icon.className = 'fas fa-shopping-cart';
+            }, 2000);
+        } else {
+            throw new Error(data.message || 'Failed to add to cart');
+        }
+    })
+    .catch(error => {
+        console.error('Error adding to cart:', error);
+        button.classList.remove('adding');
+        icon.className = 'fas fa-shopping-cart';
+        
+        // إشعار خطأ
+        showNotification('حدث خطأ أثناء إضافة المنتج للسلة', 'error');
+    });
+}
+
+function updateCartCounter(count) {
+    const counter = document.querySelector('.cart-counter');
+    if (counter) {
+        counter.textContent = count;
+        counter.classList.add('updated');
+        setTimeout(() => counter.classList.remove('updated'), 500);
+    }
+}
+
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `luxury-notification luxury-notification-${type}`;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 100);
+    
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+// تأثيرات حركية عند التمرير
+document.addEventListener('DOMContentLoaded', function() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('luxury-part-card-visible');
+            }
+        });
+    }, {
+        threshold: 0.1
+    });
+    
+    document.querySelectorAll('.luxury-part-card-container').forEach(card => {
+        observer.observe(card);
+    });
+});
+</script>
+
+<style>
+.luxury-part-card-container {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.luxury-part-card-container.luxury-part-card-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.luxury-part-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(212, 175, 55, 0.15);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.luxury-part-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12);
+    border-color: rgba(212, 175, 55, 0.3);
+}
+
+.luxury-part-header {
+    position: relative;
+    overflow: hidden;
+}
+
+.luxury-part-image-link {
+    display: block;
+    text-decoration: none;
+}
+
+.luxury-part-image-wrapper {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+}
+
+.luxury-part-main-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.luxury-part-card:hover .luxury-part-main-image {
+    transform: scale(1.1);
+}
+
+.luxury-part-stock-badge,
+.luxury-part-out-of-stock {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.luxury-part-stock-badge {
+    background: rgba(40, 167, 69, 0.9);
+    color: white;
+}
+
+.luxury-part-out-of-stock {
+    background: rgba(220, 53, 69, 0.9);
+    color: white;
+}
+
+.luxury-part-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.luxury-part-placeholder-content {
+    text-align: center;
+    color: white;
+}
+
+.luxury-part-placeholder-icon {
+    font-size: 36px;
+    margin-bottom: 8px;
+}
+
+.luxury-part-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.luxury-part-image-wrapper:hover .luxury-part-overlay {
+    opacity: 1;
+}
+
+.luxury-part-overlay-btn {
+    background: rgba(212, 175, 55, 0.9);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.luxury-part-overlay-btn:hover {
+    background: rgba(212, 175, 55, 1);
+    transform: scale(1.05);
+}
+
+.luxury-part-body {
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.luxury-part-title-section {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.luxury-part-type-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.luxury-part-title-info {
+    flex: 1;
+}
+
+.luxury-part-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.luxury-part-title a {
+    color: #333;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.luxury-part-title a:hover {
+    color: #667eea;
+}
+
+.luxury-part-type {
+    margin: 4px 0 0 0;
+    color: #666;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.luxury-part-compatibility {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 15px;
+}
+
+.luxury-part-compatibility-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 6px;
+}
+
+.luxury-part-compatibility-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.luxury-part-make,
+.luxury-part-model,
+.luxury-part-year {
+    background: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #333;
+    border: 1px solid #eee;
+}
+
+.luxury-part-brand {
+    margin-bottom: 15px;
+}
+
+.luxury-part-brand-label {
+    font-size: 11px;
+    color: #666;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.luxury-part-brand-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+}
+
+.luxury-part-brand-logo {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+.luxury-part-price-section {
+    margin-top: auto;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.luxury-part-price-main {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+
+.luxury-part-price-amount {
+    font-size: 20px;
+    font-weight: 700;
+    color: #d4af37;
+}
+
+.luxury-part-price-currency {
+    font-size: 12px;
+    color: #666;
+    font-weight: 500;
+}
+
+.luxury-part-price-contact {
+    font-size: 16px;
+    color: #666;
+    font-weight: 600;
+}
+
+.luxury-part-price-secondary {
+    font-size: 11px;
+    color: #999;
+}
+
+.luxury-part-stock-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: #666;
+    margin-top: 8px;
+}
+
+.luxury-part-footer {
+    padding: 15px 20px;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.luxury-part-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 13px;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    flex: 1;
+    justify-content: center;
+}
+
+.luxury-part-btn-primary {
+    background: linear-gradient(135deg, #d4af37 0%, #f4e4bc 100%);
+    color: white;
+}
+
+.luxury-part-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(212, 175, 55, 0.4);
+}
+
+.luxury-part-btn-cart {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    background: white;
+    color: #666;
+    border: 2px solid #eee;
+    flex: none;
+}
+
+.luxury-part-btn-cart:hover {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+.luxury-part-btn-cart.adding {
+    background: #ffc107;
+    color: white;
+    border-color: #ffc107;
+}
+
+.luxury-part-btn-cart.added {
+    background: #28a745;
+    color: white;
+    border-color: #28a745;
+}
+
+.luxury-part-btn-disabled {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    background: #e9ecef;
+    color: #adb5bd;
+    border: 2px solid #dee2e6;
+    flex: none;
+    cursor: not-allowed;
+}
+
+.luxury-part-btn-edit {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    background: white;
+    color: #666;
+    border: 2px solid #eee;
+    flex: none;
+}
+
+.luxury-part-btn-edit:hover {
+    background: #666;
+    color: white;
+    border-color: #666;
+}
+
+.luxury-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    z-index: 9999;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+}
+
+.luxury-notification.show {
+    transform: translateX(0);
+}
+
+.luxury-notification-error {
+    background: #dc3545;
+    color: white;
+}
+
+.luxury-notification-success {
+    background: #28a745;
+    color: white;
+}
+
+.cart-counter {
+    transition: all 0.3s ease;
+}
+
+.cart-counter.updated {
+    transform: scale(1.2);
+    color: #d4af37;
+}
+
+/* تأثيرات الاستجابة */
+@media (max-width: 768px) {
+    .luxury-part-card {
+        border-radius: 12px;
+    }
+    
+    .luxury-part-image-wrapper {
+        height: 160px;
+    }
+    
+    .luxury-part-body {
+        padding: 15px;
+    }
+    
+    .luxury-part-title {
+        font-size: 15px;
+    }
+    
+    .luxury-part-price-amount {
+        font-size: 18px;
+    }
+    
+    .luxury-part-footer {
+        padding: 12px 15px;
+    }
+    
+    .luxury-part-btn {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+}
+</style>

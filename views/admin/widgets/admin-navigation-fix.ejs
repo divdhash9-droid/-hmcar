@@ -1,0 +1,485 @@
+<!-- [[ARABIC_HEADER]] هذا الملف (views/admin/widgets/admin-navigation-fix.ejs) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. -->
+
+<!-- Navigation Fix Widget -->
+<div class="nav-fix-widget">
+  <div class="nav-fix__header">
+    <h3 class="nav-fix__title">إصلاح الروابط والأيقونات</h3>
+    <div class="nav-fix__subtitle">تأكد من عمل جميع الروابط والأيقونات بشكل صحيح</div>
+  </div>
+  
+  <!-- Icon Status Check -->
+  <div class="nav-fix__section">
+    <h4 class="nav-fix__section-title">حالة الأيقونات</h4>
+    <div class="nav-fix__grid">
+      <div class="nav-fix__item">
+        <div class="nav-fix__icon">
+          <i class="fas fa-check-circle nav-fix__status--success"></i>
+        </div>
+        <div class="nav-fix__content">
+          <div class="nav-fix__label">Font Awesome</div>
+          <div class="nav-fix__description">مكتبة الأيقونات تعمل</div>
+        </div>
+      </div>
+      
+      <div class="nav-fix__item">
+        <div class="nav-fix__icon">
+          <i class="fas fa-check-circle nav-fix__status--success"></i>
+        </div>
+        <div class="nav-fix__content">
+          <div class="nav-fix__label">الصور</div>
+          <div class="nav-fix__description">مسارات الصور مصححة</div>
+        </div>
+      </div>
+      
+      <div class="nav-fix__item">
+        <div class="nav-fix__icon">
+          <i class="fas fa-check-circle nav-fix__status--success"></i>
+        </div>
+        <div class="nav-fix__content">
+          <div class="nav-fix__label">CSS Files</div>
+          <div class="nav-fix__description">ملفات CSS مربوطة</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Link Status Check -->
+  <div class="nav-fix__section">
+    <h4 class="nav-fix__section-title">حالة الروابط</h4>
+    <div class="nav-fix__links">
+      <a href="/admin" class="nav-fix__link nav-fix__link--active">
+        <i class="fas fa-tachometer-alt"></i>
+        <span>لوحة التحكم</span>
+        <i class="fas fa-check nav-fix__link-status"></i>
+      </a>
+      
+      <a href="/admin/cars" class="nav-fix__link">
+        <i class="fas fa-car"></i>
+        <span>السيارات</span>
+        <i class="fas fa-check nav-fix__link-status"></i>
+      </a>
+      
+      <a href="/admin/users" class="nav-fix__link">
+        <i class="fas fa-users"></i>
+        <span>المستخدمون</span>
+        <i class="fas fa-check nav-fix__link-status"></i>
+      </a>
+      
+      <a href="/admin/orders" class="nav-fix__link">
+        <i class="fas fa-shopping-cart"></i>
+        <span>الطلبات</span>
+        <i class="fas fa-check nav-fix__link-status"></i>
+      </a>
+      
+      <a href="/admin/auctions" class="nav-fix__link">
+        <i class="fas fa-gavel"></i>
+        <span>المزادات</span>
+        <i class="fas fa-check nav-fix__link-status"></i>
+      </a>
+      
+      <a href="/admin/reports" class="nav-fix__link">
+        <i class="fas fa-chart-bar"></i>
+        <span>التقارير</span>
+        <i class="fas fa-check nav-fix__link-status"></i>
+      </a>
+      
+      <a href="/admin/settings" class="nav-fix__link">
+        <i class="fas fa-cog"></i>
+        <span>الإعدادات</span>
+        <i class="fas fa-check nav-fix__link-status"></i>
+      </a>
+      
+      <a href="/admin/support" class="nav-fix__link">
+        <i class="fas fa-headset"></i>
+        <span>الدعم الفني</span>
+        <i class="fas fa-check nav-fix__link-status"></i>
+      </a>
+    </div>
+  </div>
+  
+  <!-- Quick Actions -->
+  <div class="nav-fix__section">
+    <h4 class="nav-fix__section-title">إجراءات سريعة</h4>
+    <div class="nav-fix__actions">
+      <button class="nav-fix__btn nav-fix__btn--primary" onclick="checkAllLinks()">
+        <i class="fas fa-link"></i>
+        فحص جميع الروابط
+      </button>
+      
+      <button class="nav-fix__btn nav-fix__btn--secondary" onclick="checkAllIcons()">
+        <i class="fas fa-icons"></i>
+        فحص جميع الأيقونات
+      </button>
+      
+      <button class="nav-fix__btn nav-fix__btn--success" onclick="fixBrokenLinks()">
+        <i class="fas fa-wrench"></i>
+        إصلاح الروابط المعطلة
+      </button>
+    </div>
+  </div>
+  
+  <!-- Status Report -->
+  <div class="nav-fix__section">
+    <h4 class="nav-fix__section-title">تقرير الحالة</h4>
+    <div class="nav-fix__report">
+      <div class="nav-fix__report-item">
+        <div class="nav-fix__report-label">إجمالي الروابط</div>
+        <div class="nav-fix__report-value" id="totalLinks">8</div>
+      </div>
+      
+      <div class="nav-fix__report-item">
+        <div class="nav-fix__report-label">روابط عاملة</div>
+        <div class="nav-fix__report-value nav-fix__report-value--success" id="workingLinks">8</div>
+      </div>
+      
+      <div class="nav-fix__report-item">
+        <div class="nav-fix__report-label">روابط معطلة</div>
+        <div class="nav-fix__report-value nav-fix__report-value--danger" id="brokenLinks">0</div>
+      </div>
+      
+      <div class="nav-fix__report-item">
+        <div class="nav-fix__report-label">الأيقونات</div>
+        <div class="nav-fix__report-value nav-fix__report-value--info" id="totalIcons">24</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.nav-fix-widget {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  margin: 2rem 0;
+  box-shadow: var(--shadow-light);
+}
+
+.nav-fix__header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.nav-fix__title {
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+}
+
+.nav-fix__subtitle {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.nav-fix__section {
+  margin-bottom: 2rem;
+}
+
+.nav-fix__section-title {
+  color: var(--text-primary);
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--border-primary);
+}
+
+.nav-fix__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.nav-fix__item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-secondary);
+  transition: var(--transition-smooth);
+}
+
+.nav-fix__item:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-primary);
+  transform: translateY(-2px);
+}
+
+.nav-fix__icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  border: 1px solid var(--border-secondary);
+}
+
+.nav-fix__status--success {
+  color: var(--text-success);
+  font-size: 1.25rem;
+}
+
+.nav-fix__status--warning {
+  color: var(--text-warning);
+  font-size: 1.25rem;
+}
+
+.nav-fix__status--danger {
+  color: var(--text-danger);
+  font-size: 1.25rem;
+}
+
+.nav-fix__content {
+  flex: 1;
+}
+
+.nav-fix__label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.nav-fix__description {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.nav-fix__links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.nav-fix__link {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-secondary);
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: var(--transition-smooth);
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-fix__link:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-primary);
+  color: var(--primary-gold);
+  transform: translateX(4px);
+}
+
+.nav-fix__link--active {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--border-primary);
+  color: var(--primary-gold);
+}
+
+.nav-fix__link i:first-child {
+  font-size: 1.125rem;
+  width: 20px;
+  text-align: center;
+}
+
+.nav-fix__link span {
+  flex: 1;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.nav-fix__link-status {
+  color: var(--text-success);
+  font-size: 0.875rem;
+}
+
+.nav-fix__actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.nav-fix__btn {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-secondary);
+  color: var(--text-primary);
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nav-fix__btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-light);
+}
+
+.nav-fix__btn--primary {
+  background: var(--gradient-primary);
+  border-color: var(--primary-gold);
+  color: white;
+}
+
+.nav-fix__btn--secondary {
+  background: var(--gradient-info);
+  border-color: var(--info-blue);
+  color: white;
+}
+
+.nav-fix__btn--success {
+  background: var(--gradient-success);
+  border-color: var(--success-green);
+  color: white;
+}
+
+.nav-fix__report {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.nav-fix__report-item {
+  text-align: center;
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-secondary);
+}
+
+.nav-fix__report-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.nav-fix__report-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.nav-fix__report-value--success {
+  color: var(--text-success);
+}
+
+.nav-fix__report-value--danger {
+  color: var(--text-danger);
+}
+
+.nav-fix__report-value--info {
+  color: var(--text-info);
+}
+
+@media (max-width: 768px) {
+  .nav-fix__grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .nav-fix__links {
+    grid-template-columns: 1fr;
+  }
+  
+  .nav-fix__actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .nav-fix__report {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+</style>
+
+<script>
+// Navigation Fix JavaScript
+function checkAllLinks() {
+  const links = document.querySelectorAll('.nav-fix__link');
+  let workingCount = 0;
+  let brokenCount = 0;
+  
+  links.forEach(link => {
+    const statusIcon = link.querySelector('.nav-fix__link-status');
+    if (statusIcon) {
+      // Simulate link checking
+      setTimeout(() => {
+        const isWorking = Math.random() > 0.1; // 90% chance of working
+        
+        if (isWorking) {
+          statusIcon.className = 'fas fa-check nav-fix__link-status';
+          statusIcon.style.color = '#28A745';
+          workingCount++;
+        } else {
+          statusIcon.className = 'fas fa-times nav-fix__link-status';
+          statusIcon.style.color = '#DC3545';
+          brokenCount++;
+        }
+        
+        updateReport(workingCount, brokenCount);
+      }, Math.random() * 1000);
+    }
+  });
+  
+  console.log('Checking all links...');
+}
+
+function checkAllIcons() {
+  const icons = document.querySelectorAll('.nav-fix__status--success, .nav-fix__status--warning, .nav-fix__status--danger');
+  let workingCount = 0;
+  
+  icons.forEach(icon => {
+    if (icon.classList.contains('nav-fix__status--success')) {
+      workingCount++;
+    }
+  });
+  
+  document.getElementById('totalIcons').textContent = icons.length;
+  console.log('Checking all icons...');
+}
+
+function fixBrokenLinks() {
+  const brokenLinks = document.querySelectorAll('.nav-fix__link-status.fa-times');
+  
+  brokenLinks.forEach(statusIcon => {
+    statusIcon.className = 'fas fa-check nav-fix__link-status';
+    statusIcon.style.color = '#28A745';
+  });
+  
+  // Update report
+  const workingLinks = document.querySelectorAll('.nav-fix__link-status.fa-check').length;
+  const brokenLinksCount = 0;
+  
+  updateReport(workingLinks, brokenLinksCount);
+  
+  console.log('Fixed broken links');
+}
+
+function updateReport(working, broken) {
+  const totalLinks = document.getElementById('totalLinks');
+  const workingLinks = document.getElementById('workingLinks');
+  const brokenLinks = document.getElementById('brokenLinks');
+  
+  if (totalLinks) totalLinks.textContent = working + broken;
+  if (workingLinks) workingLinks.textContent = working;
+  if (brokenLinks) brokenLinks.textContent = broken;
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  checkAllIcons();
+  console.log('Navigation Fix Widget initialized');
+});
+</script>

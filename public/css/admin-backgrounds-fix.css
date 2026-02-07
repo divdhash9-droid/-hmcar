@@ -1,0 +1,427 @@
+/* [[ARABIC_HEADER]] هذا الملف (public/css/admin-backgrounds-fix.css) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. */
+
+/* ===== Admin Backgrounds Fix CSS ===== */
+:root {
+  /* Background Colors - Fixed */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F8F9FA;
+  --bg-tertiary: #F1F3F4;
+  --bg-quaternary: #E9ECEF;
+  --bg-hover: #F1F3F4;
+  --bg-active: #E9ECEF;
+  --bg-disabled: #6C757D;
+  --bg-overlay: rgba(0, 0, 0, 0.5);
+  --bg-glass: rgba(255, 255, 255, 0.9);
+  --bg-gold-glass: rgba(11, 31, 58, 0.10);
+  --bg-gold-light: rgba(11, 31, 58, 0.05);
+  --bg-gold-medium: rgba(11, 31, 58, 0.12);
+  --bg-gold-dark: rgba(11, 31, 58, 0.18);
+  
+  /* Background Gradients - Fixed */
+  --bg-gradient-primary: var(--gold-gradient);
+  --bg-gradient-secondary: linear-gradient(135deg, #F8F9FA 0%, #E9ECEF 100%);
+  --bg-gradient-gold: var(--gold-gradient);
+  --bg-gradient-gold-light: linear-gradient(135deg, rgba(11, 31, 58, 0.10) 0%, rgba(11, 31, 58, 0.05) 100%);
+  --bg-gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+  --bg-gradient-hero: linear-gradient(135deg, #FFFFFF 0%, #F8F9FA 50%, #E9ECEF 100%);
+  --bg-gradient-card: linear-gradient(135deg, #FFFFFF 0%, #F8F9FA 100%);
+  --bg-gradient-sidebar: linear-gradient(180deg, #2D2D2D 0%, #1A1A1A 100%);
+  --bg-gradient-header: var(--gold-gradient);
+  
+  /* Background Patterns - Fixed */
+  --bg-pattern-dots: radial-gradient(circle, var(--primary-color-light) 1px, transparent 1px);
+  --bg-pattern-grid: linear-gradient(0deg, #E9ECEF 1px, transparent 1px), linear-gradient(90deg, #E9ECEF 1px, transparent 1px);
+  --bg-pattern-shimmer: linear-gradient(90deg, transparent, rgba(11, 31, 58, 0.10), transparent);
+  --bg-pattern-waves: linear-gradient(45deg, transparent 30%, rgba(11, 31, 58, 0.05) 50%, transparent 70%);
+  --bg-pattern-noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+}
+
+/* ===== Body Background ===== */
+body {
+  background: var(--bg-primary);
+  background-image: var(--bg-pattern-noise);
+  background-attachment: fixed;
+  background-size: 256px 256px;
+}
+
+/* ===== Admin Dashboard Background ===== */
+.admin-dashboard-luxury {
+  background: var(--bg-gradient-hero);
+  min-height: 100vh;
+}
+
+.hm-dashboard {
+  background: transparent;
+  position: relative;
+}
+
+.hm-dashboard::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-pattern-dots);
+  background-size: 20px 20px;
+  opacity: 0.03;
+  z-index: -1;
+}
+
+/* ===== Hero Section Background ===== */
+.hm-hero {
+  background: var(--bg-gradient-header);
+  position: relative;
+  overflow: hidden;
+}
+
+.hm-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-pattern-waves);
+  opacity: 0.1;
+}
+
+.hm-hero::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-pattern-shimmer);
+  background-size: 200% 100%;
+  animation: shimmer 3s linear infinite;
+}
+
+/* ===== Card Backgrounds ===== */
+.hm-card,
+.enhanced-metric-card,
+.enhanced-notification,
+.enhanced-activity-item,
+.nav-fix-item {
+  background: var(--bg-gradient-card);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  position: relative;
+}
+
+.hm-card::before,
+.enhanced-metric-card::before,
+.enhanced-notification::before,
+.enhanced-activity-item::before,
+.nav-fix-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-pattern-shimmer);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.hm-card:hover::before,
+.enhanced-metric-card:hover::before,
+.enhanced-notification:hover::before,
+.enhanced-activity-item:hover::before,
+.nav-fix-item:hover::before {
+  opacity: 0.1;
+}
+
+/* ===== Section Backgrounds ===== */
+.hm-section,
+.enhanced-performance__overview,
+.enhanced-performance__health,
+.enhanced-performance__pages,
+.enhanced-notifications__settings {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--bg-tertiary);
+  position: relative;
+}
+
+.hm-section::before,
+.enhanced-performance__overview::before,
+.enhanced-performance__health::before,
+.enhanced-performance__pages::before,
+.enhanced-notifications__settings::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-pattern-grid);
+  background-size: 20px 20px;
+  opacity: 0.02;
+  pointer-events: none;
+}
+
+/* ===== Button Backgrounds ===== */
+.hm-pill,
+.enhanced-notification__btn,
+.nav-fix__btn {
+  background: var(--bg-gradient-primary);
+  border: 1px solid var(--primary-gold);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.hm-pill::before,
+.enhanced-notification__btn::before,
+.nav-fix__btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: right 0.3s ease;
+}
+
+.hm-pill:hover::before,
+.enhanced-notification__btn:hover::before,
+.nav-fix__btn:hover::before {
+  right: 100%;
+}
+
+/* ===== Input Backgrounds ===== */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+select,
+textarea {
+  background: var(--bg-glass);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  background: var(--bg-primary);
+  border-color: var(--primary-gold);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
+}
+
+/* ===== Modal Background ===== */
+.modal,
+.enhanced-modal {
+  background: var(--bg-glass);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.modal-backdrop,
+.enhanced-modal-backdrop {
+  background: var(--bg-overlay);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+}
+
+/* ===== Sidebar Background ===== */
+.hm-admin-sidebar {
+  background: var(--bg-gradient-sidebar);
+  position: relative;
+}
+
+.hm-admin-sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-pattern-dots);
+  background-size: 10px 10px;
+  opacity: 0.05;
+}
+
+/* ===== Topbar Background ===== */
+.hm-admin-topbar {
+  background: var(--bg-gradient-header);
+  position: relative;
+}
+
+.hm-admin-topbar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-pattern-shimmer);
+  opacity: 0.1;
+}
+
+/* ===== Loading Background ===== */
+.loading-spinner,
+.enhanced-loading {
+  background: var(--bg-glass);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.loading-spinner::before,
+.enhanced-loading::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 50%;
+  width: 40px;
+  height: 40px;
+  margin: -20px -20px 0 0;
+  border: 3px solid var(--primary-gold);
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 1s linear infinite;
+}
+
+/* ===== Animations ===== */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* ===== Dark Mode Backgrounds ===== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #1A1A1A;
+    --bg-secondary: #2D2D2D;
+    --bg-tertiary: #404040;
+    --bg-quaternary: #525252;
+    --bg-hover: #404040;
+    --bg-active: #525252;
+    --bg-glass: rgba(45, 45, 45, 0.9);
+    --bg-gold-glass: rgba(255, 255, 255, 0.10);
+    --bg-gradient-hero: linear-gradient(135deg, #1A1A1A 0%, #2D2D2D 50%, #404040 100%);
+    --bg-gradient-card: linear-gradient(135deg, #2D2D2D 0%, #404040 100%);
+    --bg-gradient-sidebar: linear-gradient(180deg, #1A1A1A 0%, #0D0D0D 100%);
+  }
+}
+
+/* ===== High Contrast Backgrounds ===== */
+@media (prefers-contrast: high) {
+  :root {
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F0F0F0;
+    --bg-tertiary: #E0E0E0;
+    --bg-hover: #E0E0E0;
+    --bg-active: #D0D0D0;
+  }
+}
+
+/* ===== Reduced Motion Backgrounds ===== */
+@media (prefers-reduced-motion: reduce) {
+  .hm-hero::after,
+  .hm-card::before,
+  .enhanced-metric-card::before,
+  .enhanced-notification::before,
+  .enhanced-activity-item::before,
+  .nav-fix-item::before {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ===== Print Backgrounds ===== */
+@media print {
+  body {
+    background: white !important;
+    background-image: none !important;
+  }
+  
+  .hm-card,
+  .enhanced-metric-card,
+  .enhanced-notification,
+  .enhanced-activity-item,
+  .nav-fix-item {
+    background: white !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: 1px solid #ccc !important;
+  }
+}
+
+/* ===== Touch Device Backgrounds ===== */
+@media (hover: none) and (pointer: coarse) {
+  .hm-card,
+  .enhanced-metric-card,
+  .enhanced-notification,
+  .enhanced-activity-item,
+  .nav-fix-item {
+    background: var(--bg-primary);
+    border: 2px solid var(--bg-tertiary);
+  }
+}
+
+/* ===== Background Utilities ===== */
+.bg-gold-light {
+  background: var(--bg-gold-light) !important;
+}
+
+.bg-gold-medium {
+  background: var(--bg-gold-medium) !important;
+}
+
+.bg-gold-dark {
+  background: var(--bg-gold-dark) !important;
+}
+
+.bg-glass {
+  background: var(--bg-glass) !important;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.bg-pattern-dots {
+  background-image: var(--bg-pattern-dots) !important;
+  background-size: 20px 20px !important;
+}
+
+.bg-pattern-grid {
+  background-image: var(--bg-pattern-grid) !important;
+  background-size: 20px 20px !important;
+}
+
+.bg-pattern-shimmer {
+  background-image: var(--bg-pattern-shimmer) !important;
+  background-size: 200% 100% !important;
+}
+
+.bg-pattern-waves {
+  background-image: var(--bg-pattern-waves) !important;
+}

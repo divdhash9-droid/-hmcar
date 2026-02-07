@@ -1,0 +1,99 @@
+<!-- [[ARABIC_HEADER]] هذا الملف (views/spare-parts/cart.ejs) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. -->
+
+<% var hideNavbar = (typeof currentUser !== 'undefined' && currentUser && currentUser.role === 'buyer'); %>
+<% layout('layout') -%>
+
+<div class="hm-dashboard">
+  <div class="hm-dashboard__container">
+    <header class="hm-hero" aria-label="سلة قطع الغيار" style="min-height:auto; padding: 26px 18px;">
+      <div class="hm-hero__top">
+        <div class="hm-hero__brand">
+          <img class="hm-hero__logo" src="/public/images/navbar-logo.png" alt="HM CAR" loading="eager" decoding="async" onerror="this.onerror=null;this.src='/public/images/logo.png';" />
+          <div class="hm-hero__titles">
+            <h1 class="hm-hero__title"><i class="fas fa-shopping-cart" style="margin-left:10px;"></i>سلة قطع الغيار</h1>
+            <div class="hm-hero__subtitle">أضف القطع ثم أرسل الطلب للإدارة عبر واتساب.</div>
+          </div>
+        </div>
+        <nav class="hm-hero__actions" aria-label="إجراءات">
+          <a class="hm-pill" href="/spare-parts" aria-label="متابعة التسوق"><i class="fas fa-tools"></i><span>متابعة التسوق</span></a>
+          <a class="hm-pill" href="/spare-parts/brands" aria-label="كل الشركات"><i class="fas fa-building"></i><span>الشركات</span></a>
+        </nav>
+      </div>
+    </header>
+
+    <section class="hm-section" aria-label="محتوى السلة" style="margin-top: 16px;">
+      <% if (!items || !items.length) { %>
+        <div class="hm-card" style="padding: 26px; text-align:center;">
+          <div style="font-size: 2.5rem; opacity: 0.35; margin-bottom: 10px;"><i class="fas fa-shopping-basket"></i></div>
+          <h3 style="margin:0 0 8px;">السلة فارغة</h3>
+          <div class="text-muted">قم بإضافة قطع من صفحة قطع الغيار.</div>
+        </div>
+      <% } else { %>
+        <div class="hm-card" style="padding: 16px; margin-bottom: 12px;">
+          <div class="table-responsive">
+            <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>القطعة</th>
+              <th class="text-center">الكمية</th>
+              <th>الحالة</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% items.forEach(it => { %>
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <% if (it.part.images && it.part.images[0]) { %>
+                      <img src="<%= it.part.images[0] %>" alt="" width="56" height="56" class="hm-spare-thumb hm-spare-thumb--cover" loading="lazy" decoding="async" />
+                    <% } else { %>
+                      <img src="/public/images/spare-parts.png" alt="" width="56" height="56" class="hm-spare-thumb hm-spare-thumb--contain" loading="lazy" decoding="async" />
+                    <% } %>
+                    <div>
+                      <div class="fw-semibold"><a class="text-decoration-none" href="/spare-parts/part/<%= it.part._id %>"><%= it.part.name %></a></div>
+                      <div class="small text-muted"><%= [it.part.carMake, it.part.carModel, it.part.carYear].filter(Boolean).join(' - ') || '' %></div>
+                    </div>
+                  </div>
+                </td>
+                <td class="text-center hm-spare-qty-cell">
+                  <form method="post" action="/spare-parts/cart/update/<%= it.part._id %>" class="d-flex gap-2 justify-content-center">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                    <input name="qty" type="number" min="1" class="form-control hm-spare-qty" value="<%= it.qty %>" />
+                    <button class="btn btn-outline-primary" type="submit">تحديث</button>
+                  </form>
+                </td>
+                <td>
+                  <span class="badge <%= it.part.inStock ? 'bg-success' : 'bg-secondary' %>"><%= it.part.inStock ? 'متوفر' : 'غير متوفر' %></span>
+                </td>
+                <td class="text-end hm-spare-remove-cell">
+                  <form method="post" action="/spare-parts/cart/remove/<%= it.part._id %>" onsubmit="return confirm('حذف القطعة من السلة؟');">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                    <button class="btn btn-outline-danger" type="submit">حذف</button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+          </div>
+
+          <div class="d-flex flex-column flex-md-row justify-content-end gap-2" style="margin-top: 10px;">
+            <form method="post" action="/spare-parts/cart/checkout">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+              <button class="btn btn-primary">إتمام الطلب</button>
+            </form>
+            <form method="post" action="/spare-parts/cart/checkout?autoWhatsApp=1">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+              <button class="btn btn-success">إتمام الطلب وإرسال واتساب</button>
+            </form>
+          </div>
+        </div>
+
+        <div class="alert alert-info mb-0">
+          سيتم إنشاء طلب من محتوى السلة. بعد فتح صفحة الطلب يمكنك إرساله عبر واتساب للإدارة.
+        </div>
+      <% } %>
+    </section>
+  </div>
+</div>

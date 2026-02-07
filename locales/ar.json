@@ -1,0 +1,150 @@
+{
+  "navigation": {
+    "home": "الرئيسية",
+    "auctions": "المزادات",
+    "cars": "السيارات",
+    "about": "من نحن",
+    "contact": "اتصل بنا",
+    "notifications": "الإشعارات",
+    "dashboard": "لوحة التحكم",
+    "profile": "الملف الشخصي",
+    "login": "تسجيل الدخول",
+    "logout": "تسجيل الخروج",
+    "register": "إنشاء حساب"
+  },
+  "about": {
+    "title": "من نحن",
+    "subtitle": "تعرف على قصتنا ورؤيتنا",
+    "our_story": "قصتنا",
+    "secure_transactions": "معاملات آمنة",
+    "secure_desc": "نضمن لك أعلى مستويات الأمان في جميع معاملاتك",
+    "global_reach": "وصول عالمي",
+    "global_desc": "نصل إلى جميع أنحاء العالم بخدماتنا المميزة",
+    "support": "دعم على مدار الساعة",
+    "support_desc": "فريق الدعم متاح لمساعدتك في أي وقت",
+    "quality": "جودة عالية",
+    "quality_desc": "نقدم لك أفضل السيارات المفحوصة والموثوقة"
+  },
+  "contact": {
+    "title": "اتصل بنا",
+    "subtitle": "نحن هنا لمساعدتك",
+    "send_message": "أرسل رسالة",
+    "name": "الاسم",
+    "email": "البريد الإلكتروني",
+    "phone": "رقم الهاتف",
+    "subject": "الموضوع",
+    "message": "الرسالة",
+    "submit": "إرسال",
+    "success": "تم إرسال رسالتك بنجاح",
+    "info_title": "معلومات التواصل",
+    "address": "العنوان",
+    "working_hours": "ساعات العمل"
+  },
+  "accessibility": {
+    "skipToContent": "تخطي إلى المحتوى"
+  },
+  "ui": {
+    "switch_to_english": "التبديل إلى الإنجليزية",
+    "switch_to_arabic": "التبديل إلى العربية"
+  },
+  "footer": {
+    "aboutTitle": "حول HM CAR",
+    "aboutText": "أفضل مكان للعثور على سيارتك أحلامك من خلال مزاداتنا الحصرية.",
+    "quickLinksTitle": "روابط سريعة",
+    "contactTitle": "اتصل بنا",
+    "followUs": "تابعنا",
+    "rightsReserved": "جميع الحقوق محفوظة",
+    "luxuryDescription": "المنصة الرائدة لمزادات السيارات الفاخرة وقطع الغيار الأصلية. نحن نجمع بين الشغف والجودة.",
+    "links": {
+      "buyCars": "شراء سيارات",
+      "sellCar": "بيع سيارة",
+      "support": "الدعم الفني",
+      "spareParts": "قطع الغيار",
+      "liveAuction": "المزاد المباشر"
+    },
+    "contact": {
+      "address": "شارع المزادات، مدينة السيارات",
+      "phone": "+966 50 123 4567",
+      "email": "info@hmcar.com"
+    }
+  },
+  "common": {
+    "or": "أو",
+    "details": "عرض التفاصيل"
+  },
+  "home": {
+    "creative": {
+      "searchTitle": "ابحث عن سيارتك",
+      "searchPlaceholder": "اسم السيارة",
+      "brand": "الماركة",
+      "minPrice": "السعر من",
+      "maxPrice": "السعر إلى",
+      "searchButton": "بحث",
+      "featuredTitle": "سيارات مميزة",
+      "noCarsTitle": "لا توجد سيارات حالياً",
+      "noCarsSubtitle": "سيتم إضافة سيارات جديدة قريباً",
+      "cta": {
+        "exploreAuctions": "استكشف المزادات",
+        "browseCars": "تصفح السيارات",
+        "register": "إنشاء حساب",
+        "login": "تسجيل الدخول"
+      },
+      "stats": {
+        "cars": "سيارة فاخرة",
+        "activeAuctions": "مزاد نشط",
+        "users": "مستخدم",
+        "completedAuctions": "مزاد مكتمل"
+      },
+      "car": {
+        "year": "السنة",
+        "price": "السعر"
+      }
+    }
+  },
+  "auth": {
+    "brand": "CarAuction",
+    "rememberMe": "تذكرني",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "continueWithGoogle": "المتابعة باستخدام Google",
+    "continueWithFacebook": "المتابعة باستخدام Facebook",
+    "noAccount": "ليس لديك حساب؟",
+    "signUpNow": "سجّل الآن",
+    "haveAccount": "لديك حساب بالفعل؟",
+    "login": "تسجيل الدخول",
+    "createAccount": "إنشاء حساب",
+    "loginAsAdmin": "تسجيل الدخول كمسؤول",
+    "loginAsCustomer": "تسجيل الدخول كعميل",
+    "copyright": "جميع الحقوق محفوظة.",
+    "fields": {
+      "username": "اسم المستخدم",
+      "email": "البريد الإلكتروني",
+      "password": "كلمة المرور",
+      "fullName": "الاسم الكامل",
+      "confirmPassword": "تأكيد كلمة المرور"
+    },
+    "loginPage": {
+      "sideTitle": "اعثر على\nسيارة أحلامك",
+      "sideDescription": "المنصة الأكثر تميزاً لبيع وشراء سيارات الرفاهية والنادرة. انضم إلينا لاكتشاف المزادات وتقديم العروض والفوز.",
+      "features": {
+        "liveAuctions": "مزادات مباشرة",
+        "verifiedSellers": "بائعون موثوقون",
+        "globalBidding": "مزايدة عالمية"
+      },
+      "title": "مرحباً بعودتك",
+      "subtitle": "سجّل الدخول لمتابعة رحلتك معنا.",
+      "button": "تسجيل الدخول"
+    },
+    "registerPage": {
+      "sideTitle": "انضم إلى مجتمع المزادات المميز",
+      "sideDescription": "أنشئ حساباً لبدء المزايدة والشراء والبيع لأفضل السيارات المتاحة.",
+      "title": "إنشاء حساب",
+      "subtitle": "ابدأ خلال خطوات بسيطة.",
+      "placeholders": {
+        "fullName": "اكتب اسمك الكامل",
+        "email": "you@example.com",
+        "password": "أنشئ كلمة مرور قوية",
+        "confirmPassword": "أكد كلمة المرور"
+      }
+    }
+  }
+}

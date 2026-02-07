@@ -1,0 +1,552 @@
+/* [[ARABIC_HEADER]] هذا الملف (public/css/admin-enhancements.css) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. */
+
+/* ===== Admin Dashboard Enhancements ===== */
+:root {
+  /* Enhanced Colors */
+  --primary-gold: var(--primary-color-light);
+  --primary-gold-light: var(--accent-color);
+  --primary-gold-dark: var(--primary-color);
+  --success-green: #28A745;
+  --danger-red: #DC3545;
+  --info-blue: #17A2B8;
+  --warning-orange: #FFC107;
+  
+  /* Enhanced Backgrounds */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F8F9FA;
+  --bg-tertiary: #F1F3F4;
+  --bg-card: #FFFFFF;
+  --bg-hover: #F8F9FA;
+  --bg-success: rgba(40, 167, 69, 0.1);
+  --bg-danger: rgba(220, 53, 69, 0.1);
+  --bg-info: rgba(23, 162, 184, 0.1);
+  --bg-warning: rgba(255, 193, 7, 0.1);
+  
+  /* Enhanced Text */
+  --text-primary: #212529;
+  --text-secondary: #6C757D;
+  --text-muted: #ADB5BD;
+  --text-success: #28A745;
+  --text-danger: #DC3545;
+  --text-info: #17A2B8;
+  --text-warning: #FFC107;
+  
+  /* Enhanced Borders */
+  --border-primary: var(--border-color);
+  --border-secondary: #DEE2E6;
+  --border-card: #E9ECEF;
+  --border-success: #28A745;
+  --border-danger: #DC3545;
+  --border-info: #17A2B8;
+  --border-warning: #FFC107;
+  
+  /* Enhanced Shadows */
+  --shadow-gold: 0 4px 20px rgba(11, 31, 58, 0.14);
+  --shadow-gold-intense: 0 8px 40px rgba(11, 31, 58, 0.22);
+  --shadow-success: 0 4px 20px rgba(40, 167, 69, 0.15);
+  --shadow-danger: 0 4px 20px rgba(220, 53, 69, 0.15);
+  --shadow-info: 0 4px 20px rgba(23, 162, 184, 0.15);
+  --shadow-warning: 0 4px 20px rgba(255, 193, 7, 0.15);
+  --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.08);
+  --shadow-medium: 0 4px 20px rgba(0, 0, 0, 0.12);
+  
+  /* Enhanced Gradients */
+  --gradient-primary: var(--gold-gradient);
+  --gradient-success: linear-gradient(135deg, #28A745 0%, #1E7E34 100%);
+  --gradient-danger: linear-gradient(135deg, #DC3545 0%, #BB2D3B 100%);
+  --gradient-info: linear-gradient(135deg, #17A2B8 0%, #138496 100%);
+  --gradient-warning: linear-gradient(135deg, #FFC107 0%, #E0A800 100%);
+  --gradient-card: linear-gradient(145deg, #FFFFFF 0%, #F8F9FA 100%);
+  --gradient-hero: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color-light) 50%, #FFFFFF 100%);
+  
+  /* Enhanced Transitions */
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: all 0.2s ease;
+  --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  
+  /* Enhanced Border Radius */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --radius-full: 50%;
+}
+
+/* ===== Enhanced Animations ===== */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pulseGold {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+/* ===== Enhanced Dashboard Components ===== */
+.hm-dashboard {
+  animation: slideInUp 0.6s ease-out;
+}
+
+/* ===== Enhanced Hero Section ===== */
+.hm-hero {
+  position: relative;
+  overflow: hidden;
+}
+
+.hm-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+  animation: shimmer 3s infinite;
+  pointer-events: none;
+}
+
+.hm-hero__logo {
+  transition: var(--transition-smooth);
+}
+
+.hm-hero__logo:hover {
+  transform: scale(1.1) rotate(5deg);
+  filter: drop-shadow(0 0 20px var(--primary-gold));
+}
+
+/* ===== Enhanced Pills ===== */
+.hm-pill {
+  position: relative;
+  overflow: hidden;
+}
+
+.hm-pill::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: var(--transition-smooth);
+}
+
+.hm-pill:hover::before {
+  right: 100%;
+}
+
+.hm-pill i {
+  transition: var(--transition-bounce);
+}
+
+.hm-pill:hover i {
+  transform: scale(1.2);
+}
+
+/* ===== Enhanced KPI Cards ===== */
+.hm-kpi {
+  position: relative;
+  overflow: hidden;
+}
+
+.hm-kpi::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.07) 0%, transparent 70%);
+  animation: pulseGold 2s infinite;
+  pointer-events: none;
+}
+
+.hm-kpi__value {
+  transition: var(--transition-smooth);
+}
+
+.hm-kpi:hover .hm-kpi__value {
+  transform: scale(1.05);
+  color: var(--primary-gold);
+}
+
+.hm-kpi__icon {
+  transition: var(--transition-bounce);
+}
+
+.hm-kpi:hover .hm-kpi__icon {
+  transform: scale(1.1) rotate(10deg);
+}
+
+/* ===== Enhanced Cards ===== */
+.hm-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.hm-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--gradient-primary);
+  transform: scaleX(0);
+  transition: var(--transition-smooth);
+}
+
+.hm-card:hover::before {
+  transform: scaleX(1);
+}
+
+/* ===== Enhanced List Items ===== */
+.hm-list__item {
+  position: relative;
+  overflow: hidden;
+}
+
+.hm-list__item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.04), transparent);
+  transition: var(--transition-smooth);
+}
+
+.hm-list__item:hover::before {
+  right: 100%;
+}
+
+/* ===== Enhanced Tables ===== */
+.hm-table {
+  position: relative;
+}
+
+.hm-table::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--gradient-primary);
+  opacity: 0;
+  transition: var(--transition-smooth);
+}
+
+.hm-table:hover::before {
+  opacity: 1;
+}
+
+.hm-table th {
+  position: relative;
+}
+
+.hm-table th::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 0;
+  height: 2px;
+  background: var(--primary-gold);
+  transition: var(--transition-smooth);
+}
+
+.hm-table:hover th::after {
+  width: 100%;
+}
+
+/* ===== Enhanced Status Badges ===== */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  position: relative;
+  overflow: hidden;
+}
+
+.status-badge::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: var(--transition-smooth);
+}
+
+.status-badge:hover::before {
+  right: 100%;
+}
+
+.status-badge--success {
+  background: var(--bg-success);
+  color: var(--text-success);
+  border: 1px solid var(--border-success);
+}
+
+.status-badge--danger {
+  background: var(--bg-danger);
+  color: var(--text-danger);
+  border: 1px solid var(--border-danger);
+}
+
+.status-badge--warning {
+  background: var(--bg-warning);
+  color: var(--text-warning);
+  border: 1px solid var(--border-warning);
+}
+
+.status-badge--info {
+  background: var(--bg-info);
+  color: var(--text-info);
+  border: 1px solid var(--border-info);
+}
+
+/* ===== Enhanced Buttons ===== */
+.btn-enhanced {
+  position: relative;
+  overflow: hidden;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.btn-enhanced::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: var(--transition-smooth);
+}
+
+.btn-enhanced:hover::before {
+  right: 100%;
+}
+
+.btn-enhanced:active {
+  transform: scale(0.95);
+}
+
+/* ===== Enhanced Search Box ===== */
+.search-enhanced {
+  position: relative;
+  background: var(--bg-card);
+  border: 2px solid var(--border-secondary);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.5rem;
+  transition: var(--transition-smooth);
+}
+
+.search-enhanced:focus-within {
+  border-color: var(--primary-gold);
+  box-shadow: var(--shadow-gold);
+}
+
+.search-enhanced input {
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 1rem;
+  width: 100%;
+}
+
+.search-enhanced input::placeholder {
+  color: var(--text-muted);
+}
+
+/* ===== Enhanced Loading States ===== */
+.loading-enhanced {
+  position: relative;
+  pointer-events: none;
+}
+
+.loading-enhanced::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px -10px 0 0;
+  border: 2px solid var(--primary-gold);
+  border-radius: var(--radius-full);
+  border-top-color: transparent;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===== Enhanced Tooltips ===== */
+.tooltip-enhanced {
+  position: relative;
+}
+
+.tooltip-enhanced::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 125%;
+  right: 50%;
+  transform: translateX(50%);
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: var(--transition-fast);
+  z-index: 1000;
+}
+
+.tooltip-enhanced:hover::before {
+  opacity: 1;
+  bottom: 110%;
+}
+
+/* ===== Enhanced Progress Bars ===== */
+.progress-enhanced {
+  width: 100%;
+  height: 8px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-enhanced__bar {
+  height: 100%;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-full);
+  transition: var(--transition-smooth);
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-enhanced__bar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+/* ===== Enhanced Responsive Design ===== */
+@media (max-width: 768px) {
+  .hm-hero__top {
+    animation: slideInRight 0.6s ease-out;
+  }
+  
+  .hm-kpis {
+    animation: slideInUp 0.8s ease-out;
+  }
+  
+  .hm-grid {
+    animation: slideInUp 1s ease-out;
+  }
+}
+
+/* ===== Enhanced Dark Mode Support ===== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #1A1A1A;
+    --bg-secondary: #2D2D2D;
+    --bg-tertiary: #404040;
+    --bg-card: #2D2D2D;
+    --bg-hover: #404040;
+    --text-primary: #FFFFFF;
+    --text-secondary: #B8B8B8;
+    --text-muted: #888888;
+    --border-primary: rgba(255, 255, 255, 0.14);
+    --border-secondary: #404040;
+    --border-card: #404040;
+  }
+}
+
+/* ===== Enhanced Accessibility ===== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Enhanced Focus States */
+.focus-enhanced:focus {
+  outline: 2px solid var(--primary-gold);
+  outline-offset: 2px;
+}
+
+/* Enhanced Print Styles */
+@media print {
+  .hm-dashboard {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .hm-hero,
+  .hm-kpi,
+  .hm-card {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+  }
+}

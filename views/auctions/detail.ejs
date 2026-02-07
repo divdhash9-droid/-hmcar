@@ -1,0 +1,210 @@
+<!-- [[ARABIC_HEADER]] هذا الملف (views/auctions/detail.ejs) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. -->
+
+<!-- views/auctions/detail.ejs -->
+ <% layout('layout') -%>
+ <!-- صفحة المزاد: إذا كانت creating=true نعرض نموذج إنشاء مزاد للسيارة، وإلا نعرض تفاصيل المزاد والمزايدات -->
+ <% if (creating) { %>
+   <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2 mb-3">
+     <div>
+       <h3 class="mb-1">إنشاء مزاد</h3>
+       <div class="text-muted">السيارة: <span class="fw-semibold"><%= car.title %></span></div>
+     </div>
+     <a class="btn btn-outline-secondary" href="/cars">العودة للسيارات</a>
+   </div>
+
+   <div class="card border-0 shadow-sm">
+     <div class="card-body">
+       <form method="post">
+        <!-- حماية CSRF للطلبات POST -->
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+         <div class="row g-3">
+           <div class="col-md-4">
+            <!-- السعر الابتدائي للمزايدة -->
+             <label class="form-label">السعر الابتدائي</label>
+             <input name="startingPrice" type="number" class="form-control" required />
+           </div>
+           <div class="col-md-4">
+            <!-- وقت بداية المزاد (بتنسيق datetime-local) -->
+             <label class="form-label">وقت البداية</label>
+             <input name="startsAt" type="datetime-local" class="form-control" required />
+           </div>
+           <div class="col-md-4">
+            <!-- وقت نهاية المزاد -->
+             <label class="form-label">وقت النهاية</label>
+             <input name="endsAt" type="datetime-local" class="form-control" required />
+           </div>
+           <div class="col-12">
+             <button class="btn btn-primary">إنشاء المزاد</button>
+           </div>
+         </div>
+       </form>
+     </div>
+   </div>
+ <% } else { %>
+  <!-- وضع العرض: تفاصيل السيارة + حالة المزاد + (للأدمن) إضافة مزايدات وإنشاء طلب + قائمة أحدث المزايدات -->
+   <div class="row g-3">
+     <div class="col-lg-7">
+       <div class="card border-0 shadow-sm overflow-hidden">
+         <% if (car.images && car.images.length) { %>
+          <!-- صورة الغلاف: أول صورة إن وجدت -->
+           <img src="<%= car.images[0] %>" class="img-fluid" style="max-height: 420px; width: 100%; object-fit: cover;" alt="صورة سيارة" loading="lazy" decoding="async" />
+         <% } else { %>
+           <div class="bg-body-tertiary d-flex align-items-center justify-content-center" style="height: 320px;">
+             <span class="text-muted">لا توجد صورة</span>
+           </div>
+         <% } %>
+         <div class="card-body">
+           <h3 class="mb-1"><%= car.title %></h3>
+           <div class="text-muted mb-3"><%= car.make %> - <%= car.model %> - <%= car.year %> | ممشى: <%= car.mileage %></div>
+           <div class="text-muted mb-3">
+            <!-- عرض السعر: نفضل priceSar/priceUsd إن كانت متوفرة، وإلا نرجع للحقل القديم price -->
+             <% const sar = (car.priceSar !== undefined && car.priceSar !== null) ? car.priceSar : null; %>
+             <% const usd = (car.priceUsd !== undefined && car.priceUsd !== null) ? car.priceUsd : null; %>
+             <% if (sar !== null || usd !== null) { %>
+               <%= sar !== null ? sar.toLocaleString('en-US') + ' SAR' : '' %>
+               <%= (sar !== null && usd !== null) ? ' | ' : '' %>
+               <%= usd !== null ? usd.toLocaleString('en-US') + ' USD' : '' %>
+             <% } else { %>
+               <%= car.price ? car.price.toLocaleString('en-US') : '' %>
+             <% } %>
+           </div>
+           <% if (car.description) { %>
+             <div class="mb-0"><%= car.description %></div>
+           <% } else { %>
+             <div class="text-muted">لا يوجد وصف.</div>
+           <% } %>
+         </div>
+       </div>
+     </div>
+
+     <div class="col-lg-5">
+       <div class="card border-0 shadow-sm">
+         <div class="card-body">
+           <div class="d-flex align-items-center justify-content-between mb-2">
+             <div class="fw-semibold">حالة المزاد</div>
+            <!-- لون الشارة يتغير حسب حالة المزاد -->
+             <span class="badge bg-<%= auction.status === 'running' ? 'success' : auction.status === 'scheduled' ? 'secondary' : 'danger' %>">
+               <%= auction.status %>
+             </span>
+           </div>
+           <div class="d-flex align-items-center justify-content-between mb-2">
+             <div class="text-muted">السعر الحالي</div>
+            <!-- currentPrice يتم تحديثه أيضاً عبر socket في المزاد المباشر -->
+             <div id="currentPrice" class="fw-semibold"><%= Number(auction.currentPrice).toLocaleString('en-US') %> <%= auction.currency || 'SAR' %></div>
+           </div>
+           <div class="d-flex align-items-center justify-content-between mb-3">
+             <div class="text-muted">ينتهي خلال</div>
+            <!-- عنصر العد التنازلي: سكربت countdown.js يقرأ data-ends -->
+             <div class="fw-semibold"><span id="countdown" data-ends="<%= auction.endsAt.toISOString() %>"></span></div>
+           </div>
+
+           <%# --- START: Bidding/Action Block --- %>
+           <div class="bidding-action-block">
+ 
+             <%# 1. Handle non-auction car (e.g., direct sale) %>
+             <% if ((car.listingType || 'store') === 'store') { %>
+               <% if (currentUser && currentUser.role === 'buyer') { %>
+                 <form method="post" action="/cars/buy/<%= car._id %>" class="mb-3">
+                   <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                   <button class="btn btn-success w-100" type="submit">شراء عبر واتساب</button>
+                 </form>
+               <% } else if (!currentUser) { %>
+                 <div class="alert alert-info">الرجاء <a href="/auth/login">تسجيل الدخول</a> لتتمكن من الشراء.</div>
+               <% } %>
+             <% } %>
+ 
+             <%# 2. Handle auction car %>
+             <% if ((car.listingType || 'store') === 'auction') { %>
+ 
+               <%# If auction is RUNNING %>
+               <% if (auction.status === 'running') { %>
+                 
+                 <%# Admin View %>
+                 <% if (currentUser && currentUser.role === 'admin') { %>
+                   <form method="post" action="/auctions/<%= auction._id %>/order" class="mb-3">
+                     <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                     <label class="form-label">إنشاء طلب للعميل (سيارة مزاد)</label>
+                     <div class="input-group">
+                       <input name="buyerName" type="text" class="form-control" placeholder="اسم العميل" required />
+                       <button class="btn btn-success" type="submit">إنشاء فاتورة</button>
+                     </div>
+                     <div class="form-text">سيتم إنشاء طلب من نوع auctionWin وتحويلك مباشرة لصفحة الفاتورة.</div>
+                   </form>
+ 
+                   <form method="post" action="/bids/<%= auction._id %>" class="row g-2">
+                     <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                     <div class="col-12">
+                       <input name="bidderName" type="text" class="form-control" placeholder="اسم المزايد (اختياري للعرض)" />
+                     </div>
+                     <div class="col-8">
+                       <input name="amount" type="number" class="form-control" placeholder="أدخل مبلغ المزايدة" required />
+                     </div>
+                     <div class="col-4">
+                       <button class="btn btn-primary w-100">إضافة مزايدة</button>
+                     </div>
+                   </form>
+                   <div class="text-muted small mt-2">العملة: <%= auction.currency || 'SAR' %></div>
+                 
+                 <%# Buyer View %>
+                 <% } else if (currentUser && currentUser.role === 'buyer') { %>
+                   <form method="post" action="/bids/<%= auction._id %>" class="row g-2">
+                     <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                     <div class="col-8">
+                       <input name="amount" type="number" class="form-control" placeholder="أدخل مبلغ المزايدة" required min="<%= Number(auction.currentPrice) + 1 %>" />
+                     </div>
+                     <div class="col-4">
+                       <button class="btn btn-primary w-100">مزايدة</button>
+                     </div>
+                   </form>
+                   <div class="form-text mt-2">مزايدتك يجب أن تكون أعلى من السعر الحالي.</div>
+ 
+                 <%# Guest View %>
+                 <% } else { %>
+                   <div class="alert alert-info">الرجاء <a href="/auth/login">تسجيل الدخول</a> للمشاركة في المزاد.</div>
+                 <% } %>
+ 
+               <%# If auction is NOT running %>
+               <% } else { %>
+                 <div class="alert alert-secondary">المزاد ليس فعالاً حالياً. لا يمكن تقديم مزايدات.</div>
+               <% } %>
+             
+             <% } %>
+           </div>
+           <%# --- END: Bidding/Action Block --- %>
+
+         </div>
+       </div>
+
+       <div class="d-flex align-items-center justify-content-between mt-4 mb-2">
+         <h5 class="mb-0">أحدث المزايدات</h5>
+         <small class="text-muted"><%= (bids || []).length %> مزايدة</small>
+       </div>
+       <% if (!bids || bids.length === 0) { %>
+        <!-- لا توجد مزايدات بعد -->
+         <div class="card border-0 shadow-sm">
+           <div class="card-body text-muted">لا توجد مزايدات حتى الآن.</div>
+         </div>
+       <% } else { %>
+        <!-- قائمة آخر المزايدات -->
+         <ul id="bidsList" class="list-group shadow-sm">
+           <% bids.forEach(b => { %>
+             <li class="list-group-item d-flex justify-content-between">
+               <span><%= b.displayName || b.bidder.name %></span>
+               <strong><%= Number(b.amount).toLocaleString('en-US') %> <%= auction.currency || 'SAR' %></strong>
+             </li>
+           <% }) %>
+         </ul>
+       <% } %>
+     </div>
+   </div>
+
+  <!-- سكربت العد التنازلي -->
+   <script src="/public/js/countdown.js"></script>
+ <% } %>
+  <!-- socket.io + سكربت تحديث المزاد لحظياً (السعر/المزايدات) -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    // يقرأه /public/js/auction-live.js لمعرفة أي مزاد يتابع
+    window.__auctionId = '<%= String(auction._id) %>';
+  </script>
+  <script src="/public/js/auction-live.js"></script>

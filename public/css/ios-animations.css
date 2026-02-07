@@ -1,0 +1,463 @@
+/* [[ARABIC_HEADER]] هذا الملف (public/css/ios-animations.css) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. */
+
+/* iOS Advanced Animations - HM CAR */
+/* حركات وتأثيرات متقدمة مستوحاة من iOS */
+
+/* ===== iOS Spring Animations ===== */
+.ios-spring {
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.ios-spring-gentle {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.ios-spring-bounce {
+  transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* ===== iOS Micro-interactions ===== */
+.ios-press {
+  transition: all 0.1s ease-out;
+}
+
+.ios-press:active {
+  transform: scale(0.95);
+  opacity: 0.8;
+}
+
+.ios-press-scale:active {
+  transform: scale(0.92);
+}
+
+.ios-press-bright:active {
+  filter: brightness(1.2);
+}
+
+/* ===== iOS Hover Effects ===== */
+.ios-hover-lift {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.ios-hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.ios-hover-glow:hover {
+  box-shadow: 0 0 20px rgba(0, 122, 255, 0.4);
+}
+
+.ios-hover-rotate:hover {
+  transform: rotate(5deg) scale(1.05);
+}
+
+/* ===== iOS Icon Animations ===== */
+.ios-icon-spin {
+  animation: ios-icon-spin 2s linear infinite;
+}
+
+@keyframes ios-icon-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.ios-icon-pulse {
+  animation: ios-icon-pulse 2s ease-in-out infinite;
+}
+
+@keyframes ios-icon-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+.ios-icon-bounce {
+  animation: ios-icon-bounce 1s ease-in-out infinite;
+}
+
+@keyframes ios-icon-bounce {
+  0%, 20%, 53%, 80%, 100% { transform: translateY(0); }
+  40%, 43% { transform: translateY(-8px); }
+  70% { transform: translateY(-4px); }
+  90% { transform: translateY(-2px); }
+}
+
+.ios-icon-shake {
+  animation: ios-icon-shake 0.5s ease-in-out;
+}
+
+@keyframes ios-icon-shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+  20%, 40%, 60%, 80% { transform: translateX(2px); }
+}
+
+/* ===== iOS Loading Animations ===== */
+.ios-loading-spinner {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(0, 122, 255, 0.2);
+  border-radius: 50%;
+  border-top-color: var(--ios-blue);
+  animation: ios-loading-spin 1s linear infinite;
+}
+
+.ios-loading-dots {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.ios-loading-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ios-blue);
+  animation: ios-loading-dots 1.4s ease-in-out infinite both;
+}
+
+.ios-loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+.ios-loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes ios-loading-dots {
+  0%, 80%, 100% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes ios-loading-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ===== iOS Slide Animations ===== */
+.ios-slide-up {
+  animation: ios-slide-up 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes ios-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ios-slide-down {
+  animation: ios-slide-down 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes ios-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ios-slide-left {
+  animation: ios-slide-left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes ios-slide-left {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.ios-slide-right {
+  animation: ios-slide-right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes ios-slide-right {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ===== iOS Fade Animations ===== */
+.ios-fade-in {
+  animation: ios-fade-in 0.3s ease-out;
+}
+
+@keyframes ios-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.ios-fade-out {
+  animation: ios-fade-out 0.3s ease-out;
+}
+
+@keyframes ios-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.ios-fade-in-up {
+  animation: ios-fade-in-up 0.5s ease-out;
+}
+
+@keyframes ios-fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== iOS Scale Animations ===== */
+.ios-scale-in {
+  animation: ios-scale-in 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes ios-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.ios-scale-out {
+  animation: ios-scale-out 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes ios-scale-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+/* ===== iOS Notification Animations ===== */
+.ios-notification-slide {
+  animation: ios-notification-slide 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes ios-notification-slide {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.ios-notification-bounce {
+  animation: ios-notification-bounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes ios-notification-bounce {
+  0% {
+    transform: translateX(100%) scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: translateX(-10px) scale(1.05);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* ===== iOS Page Transitions ===== */
+.ios-page-transition {
+  animation: ios-page-transition 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes ios-page-transition {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ===== iOS Modal Animations ===== */
+.ios-modal-backdrop {
+  animation: ios-modal-backdrop 0.3s ease-out;
+}
+
+@keyframes ios-modal-backdrop {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.ios-modal-content {
+  animation: ios-modal-content 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes ios-modal-content {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ===== iOS Tab Bar Animations ===== */
+.ios-tab-item {
+  transition: all 0.2s ease-out;
+}
+
+.ios-tab-item:active {
+  transform: scale(0.95);
+}
+
+.ios-tab-indicator {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* ===== iOS Switch Animations ===== */
+.ios-switch {
+  transition: all 0.2s ease-out;
+}
+
+.ios-switch-handle {
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* ===== iOS Progress Animations ===== */
+.ios-progress-bar {
+  position: relative;
+  overflow: hidden;
+}
+
+.ios-progress-fill {
+  transition: width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.ios-progress-shimmer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  animation: ios-progress-shimmer 2s infinite;
+}
+
+@keyframes ios-progress-shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* ===== iOS Stagger Animations ===== */
+.ios-stagger-item {
+  opacity: 0;
+  animation: ios-stagger-fade-up 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.ios-stagger-item:nth-child(1) { animation-delay: 0.1s; }
+.ios-stagger-item:nth-child(2) { animation-delay: 0.2s; }
+.ios-stagger-item:nth-child(3) { animation-delay: 0.3s; }
+.ios-stagger-item:nth-child(4) { animation-delay: 0.4s; }
+.ios-stagger-item:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes ios-stagger-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== iOS Gesture Animations ===== */
+.ios-swipe-hint {
+  animation: ios-swipe-hint 2s ease-in-out infinite;
+}
+
+@keyframes ios-swipe-hint {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-10px); }
+}
+
+.ios-pull-to-refresh {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* ===== iOS Responsive Animations ===== */
+@media (prefers-reduced-motion: reduce) {
+  .ios-spring,
+  .ios-spring-gentle,
+  .ios-spring-bounce,
+  .ios-hover-lift,
+  .ios-icon-spin,
+  .ios-icon-pulse,
+  .ios-icon-bounce,
+  .ios-loading-spinner,
+  .ios-slide-up,
+  .ios-slide-down,
+  .ios-slide-left,
+  .ios-slide-right,
+  .ios-fade-in,
+  .ios-fade-out,
+  .ios-fade-in-up,
+  .ios-scale-in,
+  .ios-scale-out {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* ===== iOS Performance Optimizations ===== */
+.ios-gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.ios-will-change {
+  will-change: transform, opacity;
+}

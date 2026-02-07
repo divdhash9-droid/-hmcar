@@ -1,0 +1,736 @@
+/* [[ARABIC_HEADER]] هذا الملف (public/css/ios-light-theme.css) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. */
+
+/* iOS Light Theme - HM CAR */
+/* نظام ألوان iOS الأبيض الثلجي والكحلي الفاخر */
+
+:root {
+  /* iOS Light Theme Colors */
+  --ios-light-primary: #007AFF;
+  --ios-light-primary-dark: #0056CC;
+  --ios-light-primary-light: #5AC8FA;
+  
+  /* iOS Light Gray Scale */
+  --ios-light-background: #FFFFFF;
+  --ios-light-surface: #F2F2F7;
+  --ios-light-surface-variant: #E5E5EA;
+  --ios-light-surface-container: #FFFFFF;
+  --ios-light-surface-container-high: #F2F2F7;
+  --ios-light-surface-container-highest: #FFFFFF;
+  
+  /* iOS Light Text Colors */
+  --ios-light-on-primary: #FFFFFF;
+  --ios-light-on-surface: #000000;
+  --ios-light-on-surface-variant: #3C3C43;
+  --ios-light-on-background: #000000;
+  --ios-light-outline: #C6C6C8;
+  --ios-light-outline-variant: #D1D1D6;
+  
+  /* iOS Light Shadow Colors */
+  --ios-light-shadow: rgba(0, 0, 0, 0.1);
+  --ios-light-shadow-dark: rgba(0, 0, 0, 0.2);
+  --ios-light-shadow-light: rgba(0, 0, 0, 0.05);
+  
+  /* iOS Light Accent Colors */
+  --ios-light-success: #34C759;
+  --ios-light-warning: #FF9500;
+  --ios-light-error: #FF3B30;
+  --ios-light-info: #5AC8FA;
+  
+  /* HM CAR Luxury Colors */
+  --hm-luxury-gold: #FFD700;
+  --hm-luxury-gold-dark: #B8860B;
+  --hm-luxury-gold-light: #FFF8DC;
+  --hm-luxury-silver: #C0C0C0;
+  --hm-luxury-platinum: #E5E4E2;
+  --hm-luxury-charcoal: #36454F;
+  --hm-luxury-graphite: #282828;
+  --hm-luxury-pearl: #F8F6F0;
+  
+  /* Glassmorphism Light */
+  --glass-light-bg: rgba(255, 255, 255, 0.7);
+  --glass-light-border: rgba(255, 255, 255, 0.3);
+  --glass-light-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  
+  /* Gradient Definitions */
+  --gradient-light-primary: linear-gradient(135deg, #007AFF 0%, #5AC8FA 100%);
+  --gradient-light-gold: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  --gradient-light-silver: linear-gradient(135deg, #C0C0C0 0%, #E5E4E2 100%);
+  --gradient-light-charcoal: linear-gradient(135deg, #36454F 0%, #282828 100%);
+}
+
+/* ===== iOS Light Theme Typography ===== */
+.ios-light-text {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--ios-light-on-surface);
+}
+
+.ios-light-title-large {
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 41px;
+  letter-spacing: 0.374px;
+  color: var(--ios-light-on-surface);
+}
+
+.ios-light-title-1 {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 34px;
+  letter-spacing: 0.364px;
+  color: var(--ios-light-on-surface);
+}
+
+.ios-light-title-2 {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 28px;
+  letter-spacing: 0.352px;
+  color: var(--ios-light-on-surface);
+}
+
+.ios-light-title-3 {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 25px;
+  letter-spacing: 0.38px;
+  color: var(--ios-light-on-surface);
+}
+
+.ios-light-headline {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 22px;
+  letter-spacing: -0.408px;
+  color: var(--ios-light-on-surface);
+}
+
+.ios-light-body {
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 22px;
+  letter-spacing: -0.408px;
+  color: var(--ios-light-on-surface);
+}
+
+.ios-light-body-secondary {
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 22px;
+  letter-spacing: -0.408px;
+  color: var(--ios-light-on-surface-variant);
+}
+
+.ios-light-callout {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 21px;
+  letter-spacing: -0.32px;
+  color: var(--ios-light-on-surface);
+}
+
+.ios-light-subhead {
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 20px;
+  letter-spacing: -0.24px;
+  color: var(--ios-light-on-surface-variant);
+}
+
+.ios-light-footnote {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 18px;
+  letter-spacing: -0.078px;
+  color: var(--ios-light-on-surface-variant);
+}
+
+.ios-light-caption-1 {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  letter-spacing: 0px;
+  color: var(--ios-light-on-surface-variant);
+}
+
+.ios-light-caption-2 {
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 13px;
+  letter-spacing: 0.07px;
+  color: var(--ios-light-on-surface-variant);
+}
+
+/* ===== iOS Light Theme Buttons ===== */
+.ios-light-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 22px;
+  letter-spacing: -0.408px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  color: var(--ios-light-on-primary);
+}
+
+.ios-light-btn:active {
+  transform: scale(0.96);
+}
+
+.ios-light-btn:focus {
+  outline: none;
+}
+
+/* iOS Light Primary Button */
+.ios-light-btn-primary {
+  background: var(--gradient-light-primary);
+  color: var(--ios-light-on-primary);
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+}
+
+.ios-light-btn-primary:hover {
+  background: var(--ios-light-primary-dark);
+  box-shadow: 0 6px 20px rgba(0, 122, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+.ios-light-btn-primary:active {
+  background: var(--ios-light-primary-dark);
+  transform: translateY(0) scale(0.96);
+}
+
+/* iOS Light Secondary Button */
+.ios-light-btn-secondary {
+  background: var(--ios-light-surface-container);
+  color: var(--ios-light-primary);
+  border: 1px solid var(--ios-light-outline);
+}
+
+.ios-light-btn-secondary:hover {
+  background: var(--ios-light-surface-container-high);
+  border-color: var(--ios-light-primary);
+  transform: translateY(-1px);
+}
+
+.ios-light-btn-secondary:active {
+  background: var(--ios-light-surface);
+  transform: translateY(0) scale(0.96);
+}
+
+/* iOS Light Tertiary Button */
+.ios-light-btn-tertiary {
+  background: transparent;
+  color: var(--ios-light-primary);
+  padding: 12px 16px;
+}
+
+.ios-light-btn-tertiary:hover {
+  background: var(--ios-light-surface-container);
+  transform: translateY(-1px);
+}
+
+.ios-light-btn-tertiary:active {
+  background: var(--ios-light-surface-variant);
+  transform: translateY(0) scale(0.96);
+}
+
+/* iOS Light Luxury Gold Button */
+.ios-light-btn-gold {
+  background: var(--gradient-light-gold);
+  color: var(--ios-light-on-surface);
+  box-shadow: 0 4px 20px rgba(255, 215, 0, 0.4);
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.ios-light-btn-gold:hover {
+  background: linear-gradient(135deg, var(--hm-luxury-gold-light) 0%, var(--hm-luxury-gold) 100%);
+  box-shadow: 0 6px 30px rgba(255, 215, 0, 0.6);
+  transform: translateY(-2px);
+}
+
+.ios-light-btn-gold:active {
+  background: linear-gradient(135deg, var(--hm-luxury-gold-dark) 0%, var(--hm-luxury-gold) 100%);
+  transform: translateY(0) scale(0.96);
+}
+
+/* iOS Light Luxury Silver Button */
+.ios-light-btn-silver {
+  background: var(--gradient-light-silver);
+  color: var(--ios-light-on-surface);
+  box-shadow: 0 4px 20px rgba(192, 192, 192, 0.3);
+  font-weight: 600;
+}
+
+.ios-light-btn-silver:hover {
+  background: linear-gradient(135deg, var(--hm-luxury-platinum) 0%, var(--hm-luxury-silver) 100%);
+  box-shadow: 0 6px 30px rgba(192, 192, 192, 0.5);
+  transform: translateY(-2px);
+}
+
+/* iOS Light Luxury Charcoal Button */
+.ios-light-btn-charcoal {
+  background: var(--gradient-light-charcoal);
+  color: var(--ios-light-on-primary);
+  box-shadow: 0 4px 20px rgba(54, 69, 79, 0.4);
+  font-weight: 600;
+}
+
+.ios-light-btn-charcoal:hover {
+  background: linear-gradient(135deg, var(--hm-luxury-graphite) 0%, var(--hm-luxury-charcoal) 100%);
+  box-shadow: 0 6px 30px rgba(54, 69, 79, 0.6);
+  transform: translateY(-2px);
+}
+
+/* iOS Light Glass Button */
+.ios-light-btn-glass {
+  background: var(--glass-light-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-light-border);
+  color: var(--ios-light-on-surface);
+  box-shadow: var(--glass-light-shadow);
+}
+
+.ios-light-btn-glass:hover {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.25);
+  transform: translateY(-2px);
+}
+
+/* iOS Light Button Sizes */
+.ios-light-btn-small {
+  padding: 8px 16px;
+  font-size: 15px;
+  line-height: 20px;
+  border-radius: 8px;
+}
+
+.ios-light-btn-large {
+  padding: 16px 32px;
+  font-size: 19px;
+  line-height: 24px;
+  border-radius: 16px;
+}
+
+.ios-light-btn-icon {
+  padding: 12px;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+}
+
+.ios-light-btn-icon-small {
+  padding: 8px;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 16px;
+}
+
+/* ===== iOS Light Theme Cards ===== */
+.ios-light-card {
+  background: var(--ios-light-surface-container);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 20px var(--ios-light-shadow);
+  border: 1px solid var(--ios-light-outline);
+  transition: all 0.3s ease;
+}
+
+.ios-light-card:hover {
+  box-shadow: 0 8px 30px var(--ios-light-shadow-dark);
+  transform: translateY(-4px);
+  border-color: var(--ios-light-outline-variant);
+}
+
+.ios-light-card-glass {
+  background: var(--glass-light-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-light-border);
+  box-shadow: var(--glass-light-shadow);
+}
+
+/* iOS Light Luxury Card */
+.ios-light-card-luxury {
+  background: var(--ios-light-surface-container);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 8px 32px var(--ios-light-shadow);
+  border: 1px solid var(--hm-luxury-platinum);
+  position: relative;
+  overflow: hidden;
+}
+
+.ios-light-card-luxury::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--gradient-light-gold);
+}
+
+.ios-light-card-luxury:hover {
+  box-shadow: 0 12px 40px var(--ios-light-shadow-dark);
+  transform: translateY(-6px);
+}
+
+/* ===== iOS Light Theme Input Fields ===== */
+.ios-light-input {
+  width: 100%;
+  padding: 16px;
+  border: 1px solid var(--ios-light-outline);
+  border-radius: 12px;
+  background: var(--ios-light-surface-container);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  font-size: 17px;
+  line-height: 22px;
+  color: var(--ios-light-on-surface);
+  transition: all 0.2s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.ios-light-input:focus {
+  outline: none;
+  border-color: var(--ios-light-primary);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+  background: var(--ios-light-surface);
+}
+
+.ios-light-input::placeholder {
+  color: var(--ios-light-on-surface-variant);
+}
+
+/* ===== iOS Light Theme Navigation ===== */
+.ios-light-navbar {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid var(--ios-light-outline);
+}
+
+.ios-light-tab-bar {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-top: 1px solid var(--ios-light-outline);
+}
+
+/* ===== iOS Light Theme Icons ===== */
+.ios-light-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  font-style: normal;
+  font-variant: normal;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  transition: all 0.2s ease;
+  color: var(--ios-light-on-surface-variant);
+}
+
+.ios-light-icon-large {
+  width: 32px;
+  height: 32px;
+  font-size: 20px;
+}
+
+.ios-light-icon-small {
+  width: 18px;
+  height: 18px;
+  font-size: 14px;
+}
+
+/* iOS Light Icon Colors */
+.ios-light-icon-primary { color: var(--ios-light-primary); }
+.ios-light-icon-secondary { color: var(--ios-light-on-surface-variant); }
+.ios-light-icon-success { color: var(--ios-light-success); }
+.ios-light-icon-warning { color: var(--ios-light-warning); }
+.ios-light-icon-error { color: var(--ios-light-error); }
+.ios-light-icon-info { color: var(--ios-light-info); }
+.ios-light-icon-gold { color: var(--hm-luxury-gold); }
+.ios-light-icon-silver { color: var(--hm-luxury-silver); }
+.ios-light-icon-charcoal { color: var(--hm-luxury-charcoal); }
+
+/* ===== iOS Light Theme Badges ===== */
+.ios-light-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ios-light-badge-primary {
+  background: var(--ios-light-primary);
+  color: var(--ios-light-on-primary);
+}
+
+.ios-light-badge-success {
+  background: var(--ios-light-success);
+  color: var(--ios-light-on-primary);
+}
+
+.ios-light-badge-warning {
+  background: var(--ios-light-warning);
+  color: var(--ios-light-on-primary);
+}
+
+.ios-light-badge-error {
+  background: var(--ios-light-error);
+  color: var(--ios-light-on-primary);
+}
+
+.ios-light-badge-gold {
+  background: var(--hm-luxury-gold);
+  color: var(--ios-light-on-surface);
+}
+
+.ios-light-badge-silver {
+  background: var(--hm-luxury-silver);
+  color: var(--ios-light-on-surface);
+}
+
+/* ===== iOS Light Theme Switch ===== */
+.ios-light-switch {
+  position: relative;
+  width: 51px;
+  height: 31px;
+  background: var(--ios-light-surface-variant);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.ios-light-switch.active {
+  background: var(--ios-light-primary);
+}
+
+.ios-light-switch-handle {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 27px;
+  height: 27px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px var(--ios-light-shadow);
+  transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.ios-light-switch.active .ios-light-switch-handle {
+  transform: translateX(20px);
+}
+
+/* ===== iOS Light Theme List ===== */
+.ios-light-list {
+  background: var(--ios-light-surface-container);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--ios-light-outline);
+}
+
+.ios-light-list-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--ios-light-outline);
+  text-decoration: none;
+  color: var(--ios-light-on-surface);
+  transition: background-color 0.2s ease;
+}
+
+.ios-light-list-item:last-child {
+  border-bottom: none;
+}
+
+.ios-light-list-item:hover {
+  background: var(--ios-light-surface-container-high);
+}
+
+.ios-light-list-item:active {
+  background: var(--ios-light-surface-variant);
+}
+
+/* ===== iOS Light Theme Animations ===== */
+@keyframes ios-light-bounce {
+  0%, 20%, 53%, 80%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  40%, 43% {
+    transform: translate3d(0, -8px, 0);
+  }
+  70% {
+    transform: translate3d(0, -4px, 0);
+  }
+  90% {
+    transform: translate3d(0, -2px, 0);
+  }
+}
+
+@keyframes ios-light-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 122, 255, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(0, 122, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 122, 255, 0);
+  }
+}
+
+@keyframes ios-light-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ios-light-animate-bounce {
+  animation: ios-light-bounce 1s ease-in-out;
+}
+
+.ios-light-animate-pulse {
+  animation: ios-light-pulse 2s infinite;
+}
+
+.ios-light-animate-fade-in {
+  animation: ios-light-fade-in 0.5s ease-out;
+}
+
+/* ===== iOS Light Theme Responsive ===== */
+@media (max-width: 768px) {
+  .ios-light-btn {
+    padding: 14px 20px;
+    font-size: 16px;
+  }
+  
+  .ios-light-btn-small {
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+  
+  .ios-light-btn-large {
+    padding: 18px 24px;
+    font-size: 18px;
+  }
+  
+  .ios-light-card {
+    padding: 16px;
+    border-radius: 12px;
+  }
+  
+  .ios-light-card-luxury {
+    padding: 20px;
+    border-radius: 16px;
+  }
+  
+  .ios-light-input {
+    padding: 14px;
+    font-size: 16px;
+  }
+}
+
+/* ===== iOS Light Theme Dark Mode Support ===== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ios-light-background: #000000;
+    --ios-light-surface: #1C1C1E;
+    --ios-light-surface-variant: #2C2C2E;
+    --ios-light-surface-container: #2C2C2E;
+    --ios-light-surface-container-high: #3A3A3C;
+    --ios-light-surface-container-highest: #1C1C1E;
+    --ios-light-on-primary: #FFFFFF;
+    --ios-light-on-surface: #FFFFFF;
+    --ios-light-on-surface-variant: #EBEBF5;
+    --ios-light-on-background: #FFFFFF;
+    --ios-light-outline: #38383A;
+    --ios-light-outline-variant: #48484A;
+    --ios-light-shadow: rgba(0, 0, 0, 0.3);
+    --ios-light-shadow-dark: rgba(0, 0, 0, 0.5);
+    --ios-light-shadow-light: rgba(0, 0, 0, 0.1);
+  }
+  
+  .ios-light-navbar,
+  .ios-light-tab-bar {
+    background: rgba(28, 28, 30, 0.95);
+    border-color: var(--ios-light-outline);
+  }
+  
+  .ios-light-card {
+    background: var(--ios-light-surface);
+    border-color: var(--ios-light-outline);
+  }
+  
+  .ios-light-input {
+    background: var(--ios-light-surface-variant);
+    border-color: var(--ios-light-outline);
+    color: var(--ios-light-on-surface);
+  }
+  
+  .ios-light-list {
+    background: var(--ios-light-surface);
+    border-color: var(--ios-light-outline);
+  }
+  
+  .ios-light-list-item {
+    border-color: var(--ios-light-outline);
+  }
+}
+
+/* ===== iOS Light Theme Loading States ===== */
+.ios-light-loading {
+  position: relative;
+  color: transparent !important;
+  pointer-events: none;
+}
+
+.ios-light-loading::after {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 50%;
+  left: 50%;
+  margin-left: -10px;
+  margin-top: -10px;
+  border: 2px solid var(--ios-light-outline);
+  border-radius: 50%;
+  border-top-color: var(--ios-light-primary);
+  animation: ios-light-spin 1s linear infinite;
+}
+
+@keyframes ios-light-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

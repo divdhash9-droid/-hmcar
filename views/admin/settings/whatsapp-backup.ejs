@@ -1,0 +1,79 @@
+<!-- [[ARABIC_HEADER]] هذا الملف (views/admin/settings/whatsapp.ejs) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. -->
+
+<% layout('layout') -%>
+<% var hideNavbar = true; %>
+<% var hideSearch = true; %>
+<% var fullWidth = true; %>
+<% var bodyClass = 'hm-admin-page'; %>
+
+<link rel="stylesheet" href="/css/admin-luxury.css">
+<link rel="stylesheet" href="/css/dashboard-luxury.css">
+
+<div class="hm-admin-layout">
+  <div class="hm-dashboard__container">
+    <header class="hm-hero" aria-label="إعدادات الواتساب">
+      <div class="hm-hero__top">
+        <div class="hm-hero__brand">
+          <img class="hm-hero__logo" src="/public/images/navbar-logo.png" alt="HM CAR" loading="eager" decoding="async" onerror="this.onerror=null;this.src='/public/images/logo.png';" />
+          <div class="hm-hero__titles">
+            <h1 class="hm-hero__title">إعدادات WhatsApp</h1>
+            <div class="hm-hero__subtitle">رقم + رسالة ترحيب + تفعيل/تعطيل</div>
+          </div>
+        </div>
+
+        <nav class="hm-hero__actions" aria-label="روابط">
+          <a class="hm-pill" href="/admin/settings" aria-label="الإعدادات"><i class="fas fa-cogs"></i><span>الإعدادات</span></a>
+          <a class="hm-pill" href="/admin" aria-label="لوحة الإدارة"><i class="fas fa-tachometer-alt"></i><span>لوحة الإدارة</span></a>
+          <a class="hm-pill hm-pill--danger" href="/auth/logout" aria-label="خروج"><i class="fas fa-sign-out-alt"></i><span>خروج</span></a>
+        </nav>
+      </div>
+
+      <section class="hm-kpis" aria-label="حالة">
+        <div class="hm-kpi"><div class="hm-kpi__row"><div><div class="hm-kpi__label">الحالة</div><div class="hm-kpi__value"><%= (settings && settings.whatsapp && settings.whatsapp.enabled) ? 'ON' : 'OFF' %></div></div><div class="hm-kpi__icon" aria-hidden="true"><i class="fab fa-whatsapp"></i></div></div></div>
+        <div class="hm-kpi"><div class="hm-kpi__row"><div><div class="hm-kpi__label">الرقم</div><div class="hm-kpi__value"><%= (settings && settings.whatsapp && settings.whatsapp.phoneNumber) ? settings.whatsapp.phoneNumber : '-' %></div></div><div class="hm-kpi__icon" aria-hidden="true"><i class="fas fa-phone"></i></div></div></div>
+        <div class="hm-kpi hm-kpi--security"><div class="hm-kpi__row"><div><div class="hm-kpi__label">الأمان</div><div class="hm-kpi__value">CSRF</div></div><div class="hm-kpi__icon" aria-hidden="true"><i class="fas fa-shield-alt"></i></div></div></div>
+        <div class="hm-kpi"><div class="hm-kpi__row"><div><div class="hm-kpi__label">التحديث</div><div class="hm-kpi__value">LIVE</div></div><div class="hm-kpi__icon" aria-hidden="true"><i class="fas fa-bolt"></i></div></div></div>
+      </section>
+    </header>
+
+    <% if (flash && flash.message) { %>
+      <div class="mt-3">
+        <div class="alert alert-<%= flash.type || 'info' %> alert-dismissible fade show" role="alert">
+          <%= flash.message %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      </div>
+    <% } %>
+
+    <section class="hm-section" aria-label="تحديث الواتساب">
+      <h2 class="hm-section__title">تحديث الإعدادات</h2>
+      <div class="hm-list">
+        <div class="hm-list__item">
+          <form class="w-100" method="POST" action="/admin/settings/whatsapp">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label text-light">رقم الواتساب</label>
+                <input class="form-control" name="phoneNumber" value="<%= (settings && settings.whatsapp && settings.whatsapp.phoneNumber) ? settings.whatsapp.phoneNumber : '' %>" placeholder="مثال: +9665xxxxxxxx" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label text-light">تفعيل</label>
+                <select class="form-select" name="enabled">
+                  <option value="true" <%= (settings && settings.whatsapp && settings.whatsapp.enabled) ? 'selected' : '' %>>مفعل</option>
+                  <option value="false" <%= (settings && settings.whatsapp && !settings.whatsapp.enabled) ? 'selected' : '' %>>غير مفعل</option>
+                </select>
+              </div>
+              <div class="col-12">
+                <label class="form-label text-light">رسالة الترحيب</label>
+                <textarea class="form-control" name="message" rows="3" placeholder="اكتب رسالة الترحيب"><%= (settings && settings.whatsapp && settings.whatsapp.message) ? settings.whatsapp.message : '' %></textarea>
+              </div>
+              <div class="col-12">
+                <button class="hm-embed__close" type="submit">حفظ</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

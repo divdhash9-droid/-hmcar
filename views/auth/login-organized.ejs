@@ -1,0 +1,460 @@
+<!-- [[ARABIC_HEADER]] هذا الملف (views/auth/login-organized.ejs) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. -->
+
+<% layout('layout-auth') -%>
+<% var hideNavbar = true; %>
+<%
+  // Preserve any server-provided bodyClass (for layout decisions) while ensuring login-organized is present.
+  var bodyClass = (typeof bodyClass !== 'undefined' && bodyClass) ? String(bodyClass) : '';
+  if (!bodyClass.includes('login-organized')) bodyClass = (bodyClass ? (bodyClass + ' login-organized') : 'login-organized');
+%>
+
+<style>
+  /* Force-hide legacy auth layouts that may be injected by other templates/styles */
+  .hm-login2, .hm-login-neo, .hm-login-v4, .hm-login-v5, .hm-login-page, .hm-login2__shell, .hm-login2__card {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
+  }
+  /* Ensure our container displays correctly even if other CSS is strong */
+  .login-container{display:flex !important;flex-direction:row !important;min-height:100vh !important;width:100% !important}
+  .login-brand, .login-form-section{display:flex !important}
+</style>
+
+<div class="login-container">
+  <!-- Left Side - Brand Section -->
+  <div class="login-brand login-card" id="brandCard">
+    <a href="/" class="home-link" title="العودة للصفحة الرئيسية">
+      <i class="fas fa-arrow-left"></i>
+    </a>
+    <div class="brand-content">
+      <!-- Logo -->
+      <div class="brand-logo">
+        <img src="/public/images/navbar-logo.png" alt="HM CAR" class="logo-img"
+             onerror="this.onerror=null;this.src='/public/images/logo.png';" />
+      </div>
+
+      <!-- Company Info -->
+      <div class="brand-info">
+        <h1 class="brand-title" data-ar="HM CAR" data-en="HM CAR">HM CAR</h1>
+        <p class="brand-subtitle" data-ar="تصدير السيارات وقطع الغيار من كوريا" data-en="Exporting Cars & Parts from Korea">تصدير السيارات وقطع الغيار من كوريا</p>
+      </div>
+
+      <!-- Features -->
+      <div class="brand-features">
+        <div class="feature-item">
+          <i class="fas fa-gavel"></i>
+          <span data-ar="مزادات حية" data-en="Live Auctions">مزادات حية</span>
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-shield-halved"></i>
+          <span data-ar="آمن وموثوق" data-en="Secure & Trusted">آمن وموثوق</span>
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-plane"></i>
+          <span data-ar="تصدير عالمي" data-en="Global Export">تصدير عالمي</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Side - Login Form -->
+  <div class="login-form-section login-card" id="formCard">
+    <div class="form-container">
+      <!-- Language Switcher -->
+      <div class="lang-switcher">
+        <button class="lang-btn" onclick="toggleLanguage()">
+          <i class="fas fa-globe"></i>
+          <span id="currentLang" data-ar="العربية" data-en="English">العربية</span>
+        </button>
+      </div>
+
+      <!-- Role Tabs + Form Header -->
+      <div class="role-tabs">
+        <button type="button" class="role-tab <%= !isAdminLogin ? 'is-active' : '' %>" id="tab-buyer" onclick="switchRole('buyer')" data-ar="دخول العملاء" data-en="Client Login">دخول العملاء</button>
+        <button type="button" class="role-tab <%= isAdminLogin ? 'is-active' : '' %>" id="tab-admin" onclick="switchRole('admin')" data-ar="دخول الأدمن" data-en="Admin Login">دخول الأدمن</button>
+      </div>
+      <div class="form-header">
+        <h2 class="form-title" data-ar="مرحباً بعودتك" data-en="Welcome Back">مرحباً بعودتك</h2>
+        <p class="form-subtitle" data-ar="سجل دخولك للمتابعة" data-en="Sign in to continue">سجل دخولك للمتابعة</p>
+      </div>
+
+      <!-- Role hint card (small creative touch) -->
+      <div class="role-hint" id="roleHint" aria-live="polite">
+        <i class="fas fa-circle-info" aria-hidden="true"></i>
+        <span id="roleHintText"
+              data-ar-buyer="دخول العميل: اكتب اسمك (اسمين على الأقل)"
+              data-en-buyer="Client login: enter your full name (2+ words)"
+              data-ar-admin="دخول الأدمن: بريد إلكتروني وكلمة مرور"
+              data-en-admin="Admin login: email and password">
+          دخول العميل: اكتب اسمك (اسمين على الأقل)
+        </span>
+      </div>
+
+      <!-- Alerts -->
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert--error">
+          <i class="fas fa-exclamation-circle"></i>
+          <span data-ar-error="<%= error %>" data-en-error="<%= error %>"><%= error %></span>
+          <button type="button" class="alert-close" onclick="this.parentElement.remove()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      <% } %>
+      <% if (typeof success !== 'undefined' && success) { %>
+        <div class="alert alert--success">
+          <i class="fas fa-check-circle"></i>
+          <span data-ar-success="<%= success %>" data-en-success="<%= success %>"><%= success %></span>
+          <button type="button" class="alert-close" onclick="this.parentElement.remove()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      <% } %>
+
+      <!-- Login Form -->
+      <form method="POST" action="/auth/login" class="login-form">
+        <input type="hidden" id="loginRole" name="loginRole" value="<%= isAdminLogin ? 'admin' : 'buyer' %>">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+        <!-- Username/Email Field -->
+        <div class="form-group">
+          <div class="input-wrapper">
+            <i class="input-icon fas fa-user"></i>
+            <input type="text"
+                   id="identifier"
+                   name="<%= isAdminLogin ? 'email' : 'name' %>"
+                   class="input-field"
+                   autocomplete="<%= isAdminLogin ? 'email' : 'username' %>"
+                   data-ar="<%= isAdminLogin ? 'البريد الإلكتروني' : 'اسم المستخدم' %>"
+                   data-en="<%= isAdminLogin ? 'Email address' : 'Username' %>"
+                   placeholder="<%= isAdminLogin ? 'البريد الإلكتروني' : 'اسم المستخدم' %>"
+                   required>
+            <label for="identifier" class="input-label" id="identifierLabel" data-ar="<%= isAdminLogin ? 'البريد الإلكتروني' : 'اسم المستخدم' %>" data-en="<%= isAdminLogin ? 'Email address' : 'Username' %>">
+              <%= isAdminLogin ? 'البريد الإلكتروني' : 'اسم المستخدم' %>
+            </label>
+          </div>
+        </div>
+
+        <!-- Password Field -->
+        <div class="form-group" id="passwordGroup">
+          <div class="input-wrapper">
+            <i class="input-icon fas fa-lock"></i>
+            <input type="password"
+                   id="password"
+                   name="password"
+                   class="input-field"
+                   autocomplete="current-password"
+                   data-ar="كلمة المرور"
+                   data-en="Password"
+                   placeholder="كلمة المرور">
+            <button type="button" class="input-toggle" onclick="togglePassword('password')">
+              <i class="fas fa-eye"></i>
+            </button>
+            <label for="password" class="input-label" data-ar="كلمة المرور" data-en="Password">كلمة المرور</label>
+          </div>
+        </div>
+
+        <!-- Form Options -->
+        <div class="form-options">
+          <div class="checkbox-wrapper">
+            <input type="checkbox" id="remember" name="remember" class="checkbox-input">
+            <label for="remember" class="checkbox-label">
+              <span class="checkbox-mark"></span>
+              <span data-ar="تذكرني" data-en="Remember me">تذكرني</span>
+            </label>
+          </div>
+          <a href="/auth/forgot-password" class="forgot-link" id="forgotLink" data-ar="نسيت كلمة المرور؟" data-en="Forgot password?">نسيت كلمة المرور؟</a>
+        </div>
+
+        <!-- Login Button -->
+        <button type="submit" class="btn btn--primary btn--full">
+          <i class="fas fa-sign-in-alt"></i>
+          تسجيل الدخول
+        </button>
+      </form>
+
+      <!-- Register Link -->
+      <div class="form-footer">
+        <p>ليس لديك حساب؟ <a href="/auth/register" class="register-link">إنشاء حساب جديد</a></p>
+      </div>
+
+      <!-- Admin/Customer Switch (progressive enhancement: client-side tabs already exist) -->
+      <div class="form-switch" aria-hidden="true">
+        <% if (!isAdminLogin) { %>
+          <p data-ar="تسجيل دخول كـ مدير" data-en="Login as Admin">تسجيل دخول كـ <a href="/auth/login?admin=true" class="switch-link">مدير</a></p>
+        <% } else { %>
+          <p data-ar="تسجيل دخول كـ عميل" data-en="Login as Client">تسجيل دخول كـ <a href="/auth/login" class="switch-link">عميل</a></p>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Language Toggle
+  let currentLanguage = 'ar';
+
+  const REMEMBER_PREFIX = 'hmcar.remember';
+
+  function rememberKey(role) {
+    return `${REMEMBER_PREFIX}.${role}.identifier`;
+  }
+
+  function safeGetRemembered(role) {
+    try {
+      const v = localStorage.getItem(rememberKey(role));
+      return (typeof v === 'string' && v.trim()) ? v.trim() : '';
+    } catch (_) {
+      return '';
+    }
+  }
+
+  function safeSetRemembered(role, value) {
+    try {
+      const cleaned = String(value || '').trim();
+      if (!cleaned) {
+        localStorage.removeItem(rememberKey(role));
+        return;
+      }
+      localStorage.setItem(rememberKey(role), cleaned);
+    } catch (_) {
+      // ignore storage errors
+    }
+  }
+
+  function safeClearRemembered(role) {
+    try { localStorage.removeItem(rememberKey(role)); } catch (_) {}
+  }
+
+  function toggleLanguage() {
+    currentLanguage = currentLanguage === 'ar' ? 'en' : 'ar';
+    updateLanguage();
+    localStorage.setItem('preferredLanguage', currentLanguage);
+  }
+
+  function updateLanguage() {
+    const elements = document.querySelectorAll('[data-ar][data-en]');
+    const langBtn = document.getElementById('currentLang');
+
+    elements.forEach(element => {
+      const text = element.getAttribute(`data-${currentLanguage}`);
+      if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+        element.placeholder = text;
+      } else {
+        element.textContent = text;
+      }
+    });
+
+    langBtn.textContent = currentLanguage === 'ar' ? 'English' : 'العربية';
+
+    // Update text direction
+    document.documentElement.dir = currentLanguage === 'ar' ? 'rtl' : 'ltr';
+    document.documentElement.lang = currentLanguage;
+
+    // Refresh role-dependent hint text on language switch
+    const roleInput = document.getElementById('loginRole');
+    const role = (roleInput && roleInput.value === 'admin') ? 'admin' : 'buyer';
+    const hint = document.getElementById('roleHintText');
+    if (hint) {
+      const ar = role === 'admin' ? hint.getAttribute('data-ar-admin') : hint.getAttribute('data-ar-buyer');
+      const en = role === 'admin' ? hint.getAttribute('data-en-admin') : hint.getAttribute('data-en-buyer');
+      hint.textContent = (currentLanguage === 'ar') ? ar : en;
+    }
+  }
+
+  // Role switch (client-side)
+  function switchRole(role) {
+    const isAdmin = role === 'admin';
+    // set hidden field
+    const roleInput = document.getElementById('loginRole');
+    if (roleInput) roleInput.value = isAdmin ? 'admin' : 'buyer';
+
+    // update tabs UI
+    const tabBuyer = document.getElementById('tab-buyer');
+    const tabAdmin = document.getElementById('tab-admin');
+    if (tabBuyer && tabAdmin) {
+      tabBuyer.classList.toggle('is-active', !isAdmin);
+      tabAdmin.classList.toggle('is-active', isAdmin);
+    }
+
+    // update identifier field name, placeholder and label
+    const identifier = document.getElementById('identifier');
+    const label = document.getElementById('identifierLabel');
+    if (identifier && label) {
+      identifier.name = isAdmin ? 'email' : 'name';
+      identifier.autocomplete = isAdmin ? 'email' : 'username';
+      const ar = isAdmin ? 'البريد الإلكتروني' : 'اسم المستخدم';
+      const en = isAdmin ? 'Email address' : 'Username';
+      identifier.dataset.ar = ar;
+      identifier.dataset.en = en;
+      label.dataset.ar = ar;
+      label.dataset.en = en;
+      const text = currentLanguage === 'ar' ? ar : en;
+      identifier.placeholder = text;
+      label.textContent = text;
+    }
+
+    // Buyer login is name-only; admin requires password.
+    const pwdGroup = document.getElementById('passwordGroup');
+    const pwdInput = document.getElementById('password');
+    const forgotLink = document.getElementById('forgotLink');
+    if (pwdGroup && pwdInput) {
+      if (isAdmin) {
+        pwdGroup.style.display = '';
+        pwdInput.required = true;
+        if (forgotLink) forgotLink.style.visibility = 'visible';
+      } else {
+        pwdGroup.style.display = 'none';
+        pwdInput.required = false;
+        pwdInput.value = '';
+        if (forgotLink) forgotLink.style.visibility = 'hidden';
+      }
+    }
+
+    // Update hint card text
+    const hint = document.getElementById('roleHintText');
+    if (hint) {
+      const ar = isAdmin ? hint.getAttribute('data-ar-admin') : hint.getAttribute('data-ar-buyer');
+      const en = isAdmin ? hint.getAttribute('data-en-admin') : hint.getAttribute('data-en-buyer');
+      hint.textContent = (currentLanguage === 'ar') ? ar : en;
+    }
+
+    // Apply remembered identifier per role
+    applyRememberForRole(isAdmin ? 'admin' : 'buyer');
+  }
+
+  function applyRememberForRole(role) {
+    const remember = document.getElementById('remember');
+    const identifier = document.getElementById('identifier');
+    if (!remember || !identifier) return;
+
+    const remembered = safeGetRemembered(role);
+    if (remembered) {
+      remember.checked = true;
+      identifier.value = remembered;
+      // ensure focus style is consistent
+      const w = identifier.parentElement;
+      if (w) w.classList.add('focused');
+    } else {
+      remember.checked = false;
+    }
+  }
+
+  // Password Toggle
+  function togglePassword(inputId) {
+    const input = document.getElementById(inputId);
+    const toggle = input.nextElementSibling;
+    const icon = toggle.querySelector('i');
+
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.classList.remove('fa-eye');
+      icon.classList.add('fa-eye-slash');
+    } else {
+      input.type = 'password';
+      icon.classList.remove('fa-eye-slash');
+      icon.classList.add('fa-eye');
+    }
+  }
+
+  // Initialize language
+  document.addEventListener('DOMContentLoaded', function() {
+    const savedLang = localStorage.getItem('preferredLanguage');
+    if (savedLang && savedLang !== currentLanguage) {
+      currentLanguage = savedLang;
+      updateLanguage();
+    }
+
+    // Add input focus animations
+    document.querySelectorAll('.input-field').forEach(input => {
+      input.addEventListener('focus', function() {
+        this.parentElement.classList.add('focused');
+      });
+
+      input.addEventListener('blur', function() {
+        if (!this.value) {
+          this.parentElement.classList.remove('focused');
+        }
+      });
+    });
+
+    // Form submission feedback
+    const form = document.querySelector('.login-form');
+    if (form) {
+      form.addEventListener('submit', function() {
+        const submitBtn = this.querySelector('.btn--primary');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري تسجيل الدخول...';
+      });
+    }
+
+    // Initialize role tabs according to server-rendered state
+    (function initRole() {
+      const roleInput = document.getElementById('loginRole');
+      const initialRole = roleInput && roleInput.value ? roleInput.value : 'buyer';
+      switchRole(initialRole === 'admin' ? 'admin' : 'buyer');
+    })();
+
+    // Remember-me behavior: store identifier only (never password)
+    (function initRemember() {
+      const roleInput = document.getElementById('loginRole');
+      const role = (roleInput && roleInput.value === 'admin') ? 'admin' : 'buyer';
+      applyRememberForRole(role);
+
+      const form = document.querySelector('.login-form');
+      const remember = document.getElementById('remember');
+      const identifier = document.getElementById('identifier');
+      if (!form || !remember || !identifier) return;
+
+      form.addEventListener('submit', function() {
+        const currentRole = (document.getElementById('loginRole') && document.getElementById('loginRole').value === 'admin') ? 'admin' : 'buyer';
+        if (remember.checked) {
+          safeSetRemembered(currentRole, identifier.value);
+        } else {
+          safeClearRemembered(currentRole);
+        }
+      });
+
+      // If user unchecks remember, clear immediately.
+      remember.addEventListener('change', function() {
+        const currentRole = (document.getElementById('loginRole') && document.getElementById('loginRole').value === 'admin') ? 'admin' : 'buyer';
+        if (!this.checked) safeClearRemembered(currentRole);
+      });
+    })();
+
+    // Subtle tilt effect for the two cards (desktop only)
+    (function initTilt() {
+      const container = document.querySelector('.login-container');
+      if (!container) return;
+      const isFinePointer = window.matchMedia && window.matchMedia('(pointer: fine)').matches;
+      const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!isFinePointer || reduceMotion) return;
+
+      let raf = 0;
+      let lastX = 0;
+      let lastY = 0;
+
+      function apply() {
+        raf = 0;
+        container.style.setProperty('--hm-tilt-x', `${lastY}deg`);
+        container.style.setProperty('--hm-tilt-y', `${lastX}deg`);
+        container.classList.add('is-tilting');
+      }
+
+      container.addEventListener('mousemove', (e) => {
+        const r = container.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width;
+        const py = (e.clientY - r.top) / r.height;
+        lastX = (px - 0.5) * 6;   // rotateY
+        lastY = (0.5 - py) * 6;   // rotateX
+        if (!raf) raf = requestAnimationFrame(apply);
+      });
+
+      container.addEventListener('mouseleave', () => {
+        container.classList.remove('is-tilting');
+        container.style.setProperty('--hm-tilt-x', '0deg');
+        container.style.setProperty('--hm-tilt-y', '0deg');
+      });
+    })();
+  });
+</script>

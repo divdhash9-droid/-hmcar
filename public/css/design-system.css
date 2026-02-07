@@ -1,0 +1,615 @@
+/* [[ARABIC_HEADER]] هذا الملف (public/css/design-system.css) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. */
+
+/* 
+ * HM CAR AUCTION - Design System
+ * نظام التصميم الموحد - ألوان وأيقونات متناسقة
+ */
+
+/* ============================================
+   COLOR PALETTE - نظام الألوان الموحد
+   ============================================ */
+
+:root {
+  /* Navy Blue Colors - الألوان الزرقاء البحرية */
+  --hm-navy-primary: #001f3f;
+  --hm-navy-light: #003366;
+  --hm-navy-lighter: #004080;
+  --hm-navy-muted: rgba(0, 31, 63, 0.72);
+  
+  /* Snow White Colors - الألوان البيضاء الثلجية */
+  --hm-snow-white: #ffffff;
+  --hm-snow-offwhite: #f8f9fa;
+  --hm-snow-cream: #fdfdfd;
+  --hm-snow-pearl: #f5f7fa;
+  
+  /* Accent Colors */
+  --hm-accent-blue: #007bff;
+  --hm-accent-lightblue: #3395ff;
+  --hm-accent-darkblue: #0056b3;
+  
+  /* Neutral Colors - الألوان المحايدة */
+  --hm-white: #ffffff;
+  --hm-gray-50: #f8f9fa;
+  --hm-gray-100: #f1f3f5;
+  --hm-gray-200: #e9ecef;
+  --hm-gray-300: #dee2e6;
+  --hm-gray-400: #ced4da;
+  --hm-gray-500: #adb5bd;
+  --hm-gray-600: #6c757d;
+  --hm-gray-700: #495057;
+  --hm-gray-800: #343a40;
+  --hm-gray-900: #212529;
+  
+  /* Semantic Colors - الألوان الدلالية */
+  --hm-success: #10b981;
+  --hm-success-light: #34d399;
+  --hm-danger: #ef4444;
+  --hm-danger-light: #f87171;
+  --hm-warning: #f59e0b;
+  --hm-warning-light: #fbbf24;
+  --hm-info: #3b82f6;
+  --hm-info-light: #60a5fa;
+  
+  /* Background Colors - ألوان الخلفيات */
+  --hm-bg-primary: var(--hm-snow-white);
+  --hm-bg-secondary: var(--hm-snow-pearl);
+  --hm-bg-tertiary: linear-gradient(135deg, var(--hm-snow-pearl) 0%, var(--hm-snow-white) 100%);
+  --hm-bg-dark: var(--hm-navy-primary);
+  --hm-bg-accent: linear-gradient(135deg, var(--hm-navy-primary) 0%, var(--hm-navy-light) 100%);
+  
+  /* Text Colors - ألوان النصوص */
+  --hm-text-primary: var(--hm-navy-primary);
+  --hm-text-secondary: var(--hm-navy-light);
+  --hm-text-muted: #6c757d;
+  --hm-text-light: #adb5bd;
+  --hm-text-white: var(--hm-snow-white);
+  --hm-text-accent: var(--hm-accent-blue);
+  
+  /* Border Colors - ألوان الحدود */
+  --hm-border-light: rgba(11, 31, 58, 0.08);
+  --hm-border-medium: rgba(11, 31, 58, 0.12);
+  --hm-border-dark: rgba(11, 31, 58, 0.20);
+  --hm-border-gold: var(--hm-accent-blue);
+  
+  /* Gold colors mapped to Navy/Blue theme */
+  --hm-gold-primary: var(--hm-accent-blue);
+  --hm-gold-light: var(--hm-accent-lightblue);
+  --hm-gold-dark: var(--hm-accent-darkblue);
+  --hm-gold-lighter: rgba(0, 123, 255, 0.1);
+  
+  /* Blue primary for dark areas */
+  --hm-blue-primary: var(--hm-navy-primary);
+  --hm-ink: var(--hm-navy-primary);
+  --hm-muted: var(--hm-text-muted);
+  
+  /* Background variants */
+  --hm-bg-gold: linear-gradient(135deg, var(--hm-accent-blue) 0%, var(--hm-accent-lightblue) 100%);
+  
+  /* Shadow Gold mapped to Navy */
+  --hm-shadow-gold: 0 4px 16px rgba(0, 123, 255, 0.2);
+  --hm-shadow-gold-hover: 0 8px 24px rgba(0, 123, 255, 0.3);
+  
+  /* Shadow System - نظام الظلال */
+  --hm-shadow-xs: 0 1px 3px rgba(0, 31, 63, 0.08);
+  --hm-shadow-sm: 0 2px 8px rgba(0, 31, 63, 0.10);
+  --hm-shadow-md: 0 4px 16px rgba(0, 31, 63, 0.12);
+  --hm-shadow-lg: 0 8px 24px rgba(0, 31, 63, 0.14);
+  --hm-shadow-xl: 0 12px 40px rgba(0, 31, 63, 0.16);
+  --hm-shadow-navy: 0 8px 24px rgba(0, 31, 63, 0.2);
+  --hm-shadow-navy-hover: 0 12px 40px rgba(0, 31, 63, 0.3);
+  
+  /* Spacing System - نظام المسافات */
+  --hm-space-xs: 0.25rem;
+  --hm-space-sm: 0.5rem;
+  --hm-space-md: 1rem;
+  --hm-space-lg: 1.5rem;
+  --hm-space-xl: 2rem;
+  --hm-space-2xl: 3rem;
+  --hm-space-3xl: 4rem;
+  
+  /* Border Radius - انحناء الحواف */
+  --hm-radius-sm: 8px;
+  --hm-radius-md: 12px;
+  --hm-radius-lg: 16px;
+  --hm-radius-xl: 20px;
+  --hm-radius-2xl: 24px;
+  --hm-radius-full: 9999px;
+  
+  /* Transitions - التحولات */
+  --hm-transition-fast: 0.15s ease;
+  --hm-transition-normal: 0.3s ease;
+  --hm-transition-slow: 0.5s ease;
+  --hm-transition-bounce: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  
+  /* Z-index System - نظام الطبقات */
+  --hm-z-base: 1;
+  --hm-z-dropdown: 100;
+  --hm-z-sticky: 200;
+  --hm-z-modal: 1000;
+  --hm-z-toast: 2000;
+  --hm-z-tooltip: 3000;
+}
+
+/* ============================================
+   ICON SYSTEM - نظام الأيقونات الموحد
+   ============================================ */
+
+/* Base Icon Styles - الأنماط الأساسية للأيقونات */
+.hm-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-style: normal;
+  line-height: 1;
+  transition: all var(--hm-transition-normal);
+}
+
+/* Icon Sizes - أحجام الأيقونات */
+.hm-icon-xs { font-size: 0.75rem; width: 16px; height: 16px; }
+.hm-icon-sm { font-size: 0.875rem; width: 20px; height: 20px; }
+.hm-icon-md { font-size: 1rem; width: 24px; height: 24px; }
+.hm-icon-lg { font-size: 1.25rem; width: 32px; height: 32px; }
+.hm-icon-xl { font-size: 1.5rem; width: 40px; height: 40px; }
+.hm-icon-2xl { font-size: 2rem; width: 48px; height: 48px; }
+.hm-icon-3xl { font-size: 3rem; width: 72px; height: 72px; }
+
+/* Icon Colors - ألوان الأيقونات */
+.hm-icon-gold { color: var(--hm-gold-primary); }
+.hm-icon-blue { color: var(--hm-blue-primary); }
+.hm-icon-white { color: var(--hm-white); }
+.hm-icon-success { color: var(--hm-success); }
+.hm-icon-danger { color: var(--hm-danger); }
+.hm-icon-warning { color: var(--hm-warning); }
+.hm-icon-info { color: var(--hm-info); }
+.hm-icon-muted { color: var(--hm-text-muted); }
+
+/* Icon with Gradient - أيقونات بتدرج */
+.hm-icon-gradient-gold {
+  background: linear-gradient(135deg, var(--hm-gold-primary), var(--hm-gold-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Icon Containers - حاويات الأيقونات */
+.hm-icon-container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--hm-radius-md);
+  transition: all var(--hm-transition-bounce);
+  position: relative;
+  overflow: hidden;
+}
+
+.hm-icon-container-sm { width: 40px; height: 40px; }
+.hm-icon-container-md { width: 56px; height: 56px; }
+.hm-icon-container-lg { width: 72px; height: 72px; }
+
+/* Icon Container Variants - أنواع حاويات الأيقونات */
+.hm-icon-container-gold {
+  background: linear-gradient(135deg, var(--hm-gold-primary), var(--hm-gold-light));
+  border: 2px solid var(--hm-gold-primary);
+  color: var(--hm-blue-primary);
+  box-shadow: var(--hm-shadow-gold);
+}
+
+.hm-icon-container-gold::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+  transform: rotate(45deg);
+  transition: left 0.6s ease;
+}
+
+.hm-icon-container-gold:hover {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: var(--hm-shadow-gold-hover);
+}
+
+.hm-icon-container-gold:hover::before {
+  left: 100%;
+}
+
+.hm-icon-container-outline {
+  background: transparent;
+  border: 2px solid var(--hm-gold-primary);
+  color: var(--hm-gold-primary);
+}
+
+.hm-icon-container-outline:hover {
+  background: var(--hm-gold-primary);
+  color: var(--hm-white);
+  transform: scale(1.05);
+}
+
+.hm-icon-container-light {
+  background: var(--hm-gray-100);
+  border: 2px solid var(--hm-border-medium);
+  color: var(--hm-text-primary);
+}
+
+.hm-icon-container-light:hover {
+  background: var(--hm-white);
+  border-color: var(--hm-gold-primary);
+  color: var(--hm-gold-primary);
+}
+
+/* ============================================
+   BUTTON SYSTEM - نظام الأزرار الموحد
+   ============================================ */
+
+.hm-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--hm-space-sm);
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--hm-radius-lg);
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all var(--hm-transition-bounce);
+  position: relative;
+  overflow: hidden;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.hm-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+  z-index: 0;
+}
+
+.hm-btn > * {
+  position: relative;
+  z-index: 1;
+}
+
+.hm-btn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* Button Variants - أنواع الأزرار */
+.hm-btn-primary {
+  background: linear-gradient(135deg, var(--hm-accent-blue) 0%, var(--hm-accent-lightblue) 100%);
+  border-color: var(--hm-accent-blue);
+  color: var(--hm-snow-white);
+  box-shadow: var(--hm-shadow-navy);
+}
+
+.hm-btn-primary:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: var(--hm-shadow-navy-hover);
+}
+
+.hm-btn-outline {
+  background: transparent;
+  border-color: var(--hm-navy-primary);
+  color: var(--hm-navy-primary);
+}
+
+.hm-btn-outline:hover {
+  background: var(--hm-navy-primary);
+  color: var(--hm-snow-white);
+  transform: translateY(-3px);
+  box-shadow: var(--hm-shadow-navy);
+}
+
+.hm-btn-secondary {
+  background: var(--hm-snow-pearl);
+  border-color: var(--hm-border-medium);
+  color: var(--hm-navy-primary);
+}
+
+.hm-btn-secondary:hover {
+  background: var(--hm-snow-white);
+  border-color: var(--hm-accent-blue);
+  color: var(--hm-accent-blue);
+  transform: translateY(-2px);
+}
+
+.hm-btn-dark {
+  background: var(--hm-navy-primary);
+  border-color: var(--hm-navy-primary);
+  color: var(--hm-snow-white);
+  box-shadow: var(--hm-shadow-md);
+}
+
+.hm-btn-dark:hover {
+  background: var(--hm-navy-light);
+  transform: translateY(-3px);
+  box-shadow: var(--hm-shadow-lg);
+}
+
+/* Button Sizes - أحجام الأزرار */
+.hm-btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+.hm-btn-lg {
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+}
+
+.hm-btn-xl {
+  padding: 1.25rem 2.5rem;
+  font-size: 1.25rem;
+}
+
+/* Icon Button - زر الأيقونة */
+.hm-btn-icon {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+.hm-btn-icon:hover {
+  transform: scale(1.1) rotate(360deg);
+}
+
+/* ============================================
+   CARD SYSTEM - نظام البطاقات الموحد
+   ============================================ */
+
+.hm-card {
+  background: var(--hm-snow-white);
+  border: 2px solid var(--hm-border-light);
+  border-radius: var(--hm-radius-xl);
+  padding: var(--hm-space-lg);
+  box-shadow: var(--hm-shadow-md);
+  transition: all var(--hm-transition-bounce);
+  position: relative;
+  overflow: hidden;
+}
+
+.hm-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(0, 123, 255, 0.05) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity var(--hm-transition-normal);
+}
+
+.hm-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--hm-accent-blue);
+  box-shadow: var(--hm-shadow-navy-hover);
+}
+
+.hm-card:hover::before {
+  opacity: 1;
+}
+
+/* Card Variants - أنواع البطاقات */
+.hm-card-outlined {
+  border-width: 2px;
+}
+
+.hm-card-elevated {
+  box-shadow: var(--hm-shadow-xl);
+}
+
+.hm-card-gold {
+  background: linear-gradient(135deg, rgba(0, 123, 255, 0.1) 0%, rgba(51, 149, 255, 0.05) 100%);
+  border-color: var(--hm-accent-blue);
+}
+
+/* ============================================
+   CHIP/BADGE SYSTEM - نظام الشارات
+   ============================================ */
+
+.hm-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--hm-space-sm);
+  padding: 0.5rem 1rem;
+  border-radius: var(--hm-radius-full);
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all var(--hm-transition-normal);
+  border: 2px solid transparent;
+}
+
+.hm-chip-gold {
+  background: rgba(0, 123, 255, 0.1);
+  border-color: var(--hm-accent-blue);
+  color: var(--hm-accent-darkblue);
+}
+
+.hm-chip-gold:hover {
+  background: var(--hm-accent-blue);
+  color: var(--hm-white);
+  transform: translateY(-2px);
+}
+
+.hm-chip-light {
+  background: var(--hm-gray-100);
+  border-color: var(--hm-border-medium);
+  color: var(--hm-text-primary);
+}
+
+.hm-chip-light:hover {
+  border-color: var(--hm-accent-blue);
+  color: var(--hm-accent-blue);
+}
+
+/* ============================================
+   ANIMATION UTILITIES - أدوات الحركة
+   ============================================ */
+
+@keyframes hmPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.9; }
+}
+
+@keyframes hmGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.7); }
+  50% { box-shadow: 0 0 0 10px rgba(0, 123, 255, 0); }
+}
+
+@keyframes hmFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes hmShine {
+  from { left: -100%; }
+  to { left: 100%; }
+}
+
+.hm-animate-pulse { animation: hmPulse 2s ease-in-out infinite; }
+.hm-animate-glow { animation: hmGlow 2s ease-in-out infinite; }
+.hm-animate-float { animation: hmFloat 3s ease-in-out infinite; }
+
+/* ============================================
+   UTILITY CLASSES - فئات مساعدة
+   ============================================ */
+
+/* Text Colors */
+.hm-text-gold { color: var(--hm-gold-primary) !important; }
+.hm-text-blue { color: var(--hm-blue-primary) !important; }
+.hm-text-white { color: var(--hm-white) !important; }
+.hm-text-muted { color: var(--hm-text-muted) !important; }
+
+/* Background Colors */
+.hm-bg-gold { background: var(--hm-gold-primary) !important; }
+.hm-bg-gold-light { background: var(--hm-gold-lighter) !important; }
+.hm-bg-blue { background: var(--hm-blue-primary) !important; }
+.hm-bg-white { background: var(--hm-white) !important; }
+.hm-bg-gray { background: var(--hm-gray-100) !important; }
+
+/* Shadows */
+.hm-shadow-sm { box-shadow: var(--hm-shadow-sm) !important; }
+.hm-shadow-md { box-shadow: var(--hm-shadow-md) !important; }
+.hm-shadow-lg { box-shadow: var(--hm-shadow-lg) !important; }
+.hm-shadow-gold { box-shadow: var(--hm-shadow-gold) !important; }
+
+/* Borders */
+.hm-border { border: 2px solid var(--hm-border-medium) !important; }
+.hm-border-gold { border-color: var(--hm-gold-primary) !important; }
+.hm-border-none { border: none !important; }
+
+/* Border Radius */
+.hm-rounded-sm { border-radius: var(--hm-radius-sm) !important; }
+.hm-rounded-md { border-radius: var(--hm-radius-md) !important; }
+.hm-rounded-lg { border-radius: var(--hm-radius-lg) !important; }
+.hm-rounded-xl { border-radius: var(--hm-radius-xl) !important; }
+.hm-rounded-full { border-radius: var(--hm-radius-full) !important; }
+
+/* Hover Effects */
+.hm-hover-lift:hover { transform: translateY(-3px); }
+.hm-hover-scale:hover { transform: scale(1.05); }
+.hm-hover-rotate:hover { transform: rotate(5deg); }
+
+/* ============================================
+   FORM SELECT STYLING - تحسين تصميم القوائم المنسدلة
+   ============================================ */
+
+.hm-form-select {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border: 2px solid var(--hm-border-medium);
+  border-radius: var(--hm-radius-lg);
+  background: linear-gradient(135deg, var(--hm-white) 0%, var(--hm-snow-pearl) 100%);
+  color: var(--hm-text-primary);
+  font-size: 0.95rem;
+  font-weight: 500;
+  font-family: 'Cairo', sans-serif;
+  transition: all var(--hm-transition-normal);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23001f3f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: left 1rem center;
+  background-size: 1.25rem;
+  padding-left: 3rem;
+  box-shadow: var(--hm-shadow-sm);
+}
+
+.hm-form-select:hover {
+  border-color: var(--hm-accent-blue);
+  background: linear-gradient(135deg, var(--hm-snow-white) 0%, var(--hm-white) 100%);
+  box-shadow: var(--hm-shadow-md);
+  transform: translateY(-1px);
+}
+
+.hm-form-select:focus {
+  outline: none;
+  border-color: var(--hm-accent-blue);
+  background: var(--hm-white);
+  box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.1), var(--hm-shadow-lg);
+}
+
+/* Select Options Styling */
+.hm-form-select option {
+  background: var(--hm-white);
+  color: var(--hm-text-primary);
+  padding: 1rem;
+  font-weight: 500;
+  border: none;
+}
+
+.hm-form-select option:hover {
+  background: var(--hm-snow-pearl);
+  color: var(--hm-accent-blue);
+}
+
+.hm-form-select option:checked {
+  background: linear-gradient(135deg, var(--hm-accent-blue) 0%, var(--hm-accent-lightblue) 100%);
+  color: var(--hm-white);
+  font-weight: 600;
+}
+
+/* Dark theme for selects */
+.hm-form-select.dark {
+  background: linear-gradient(135deg, var(--hm-navy-primary) 0%, var(--hm-navy-light) 100%);
+  color: var(--hm-text-white);
+  border-color: var(--hm-navy-light);
+}
+
+.hm-form-select.dark:hover {
+  background: linear-gradient(135deg, var(--hm-navy-light) 0%, var(--hm-navy-lighter) 100%);
+  border-color: var(--hm-accent-blue);
+}
+
+.hm-form-select.dark option {
+  background: var(--hm-navy-primary);
+  color: var(--hm-text-white);
+}
+
+.hm-form-select.dark option:checked {
+  background: linear-gradient(135deg, var(--hm-accent-blue) 0%, var(--hm-accent-lightblue) 100%);
+  color: var(--hm-white);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hm-form-select {
+    padding: 0.875rem 1rem;
+    font-size: 0.9rem;
+    background-size: 1.125rem;
+    padding-left: 2.75rem;
+  }
+}

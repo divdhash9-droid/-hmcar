@@ -1,0 +1,148 @@
+/* [[ARABIC_HEADER]] هذا الملف (public/css/error-page.css) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. */
+
+/* Error Page Styles */
+.error-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background:
+    radial-gradient(1000px 500px at 15% 10%, rgba(19, 59, 107, 0.10), transparent 60%),
+    radial-gradient(800px 500px at 85% 20%, rgba(11, 31, 58, 0.06), transparent 55%),
+    var(--section-bg-color);
+  color: var(--dark-text-color);
+  font-family: 'Montserrat', sans-serif;
+  direction: rtl;
+  padding: 2rem;
+}
+
+.error-content {
+  background: var(--background-color);
+  border: 1px solid var(--border-color);
+  padding: 3rem;
+  border-radius: var(--border-radius);
+  max-width: 600px;
+  margin: 2rem;
+  text-align: center;
+  box-shadow: var(--gold-shadow);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.error-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.error-title {
+  color: var(--primary-color);
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+  font-family: 'Playfair Display', serif;
+}
+
+.error-details {
+  background: var(--section-bg-color);
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  margin: 2rem 0;
+  text-align: left;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  border: 1px solid var(--border-color);
+}
+
+.error-details h3 {
+  color: var(--primary-color);
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.error-details pre {
+  color: var(--dark-text-color);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.error-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+
+.error-btn {
+  background: var(--gold-gradient);
+  color: #fff;
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 25px;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  font-family: 'Montserrat', sans-serif;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.error-btn:hover {
+  filter: brightness(1.03);
+  transform: translateY(-2px);
+  box-shadow: var(--gold-shadow);
+}
+
+.error-btn-secondary {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--primary-color);
+}
+
+.error-btn-secondary:hover {
+  background: var(--accent-color);
+  color: var(--primary-color);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .error-content {
+    padding: 2rem;
+    margin: 1rem;
+  }
+  
+  .error-title {
+    font-size: 1.5rem;
+  }
+  
+  .error-icon {
+    font-size: 3rem;
+  }
+  
+  .error-details {
+    font-size: 0.8rem;
+    padding: 1rem;
+  }
+  
+  .error-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .error-btn {
+    width: 100%;
+    max-width: 250px;
+    justify-content: center;
+  }
+}

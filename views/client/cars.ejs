@@ -1,0 +1,1008 @@
+<% layout('layout') -%>
+
+<% var bodyClass = (typeof bodyClass !== 'undefined' && bodyClass) ? bodyClass : 'hm-catalog-page hm-cars-available-page'; %>
+
+<div class="hm-dashboard">
+  <div class="hm-dashboard__container">
+    <header class="hm-hero" aria-label="السيارات المتاحة" style="min-height:auto; padding: 26px 18px;">
+      <div class="hm-hero__top">
+        <div class="hm-hero__brand">
+          <img class="hm-hero__logo" src="/public/images/navbar-logo.png" alt="HM CAR" loading="eager" decoding="async" onerror="this.onerror=null;this.src='/public/images/logo.png';" />
+          <div class="hm-hero__titles">
+            <h1 class="hm-hero__title"><i class="fas fa-car" style="margin-left:10px;"></i><span data-ar="السيارات المتاحة" data-en="Available Cars">السيارات المتاحة</span></h1>
+            <div class="hm-hero__subtitle" data-ar="استكشف السيارات المتاحة مع فلاتر سريعة" data-en="Browse available cars with quick filters">استكشف السيارات المتاحة مع فلاتر سريعة</div>
+          </div>
+        </div>
+        <nav class="hm-hero__actions" aria-label="إجراءات">
+          <a class="hm-pill" href="/cars" aria-label="السيارات المتوفرة"><i class="fas fa-list"></i><span>السيارات المتوفرة</span></a>
+          <a class="hm-pill" href="/auctions/live" aria-label="المزاد المباشر"><i class="fas fa-gavel"></i><span>المزاد المباشر</span></a>
+          <a class="hm-pill" href="/spare-parts" aria-label="قطع الغيار"><i class="fas fa-tools"></i><span>قطع الغيار</span></a>
+          <div class="hm-pill" role="status" aria-label="إحصائيات" style="cursor:default;">
+            <i class="fas fa-chart-bar"></i>
+            <span>الإجمالي: <strong id="totalCars">0</strong></span>
+            <span style="opacity:.85;">| مزاد نشط: <strong id="activeAuctions">0</strong></span>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <section class="hm-section" aria-label="الفلاتر" style="margin-top: 16px;">
+      <div class="hm-card" style="padding: 16px;">
+        <div class="row g-2 align-items-end">
+          <div class="col-12 col-md-6 col-lg-3">
+            <label class="form-label" data-ar="العلامة التجارية" data-en="Make">العلامة التجارية</label>
+            <select class="form-select" id="makeFilter">
+              <option value="">جميع العلامات</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-6 col-lg-3">
+            <label class="form-label" data-ar="الموديل" data-en="Model">الموديل</label>
+            <select class="form-select" id="modelFilter">
+              <option value="">جميع الموديلات</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-6 col-lg-2">
+            <label class="form-label" data-ar="الفئة" data-en="Category">الفئة</label>
+            <select class="form-select" id="categoryFilter">
+              <option value="">جميع الفئات</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-6 col-lg-2">
+            <label class="form-label" data-ar="السعر" data-en="Price">السعر</label>
+            <select class="form-select" id="priceFilter">
+              <option value="">جميع الأسعار</option>
+              <option value="0-50000">أقل من 50,000</option>
+              <option value="50000-100000">50,000 - 100,000</option>
+              <option value="100000-200000">100,000 - 200,000</option>
+              <option value="200000+">أكثر من 200,000</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-6 col-lg-2">
+            <label class="form-label" data-ar="السنة" data-en="Year">السنة</label>
+            <select class="form-select" id="yearFilter">
+              <option value="">جميع السنوات</option>
+            </select>
+          </div>
+
+          <div class="col-12 d-flex gap-2 justify-content-end" style="margin-top: 6px;">
+            <button class="btn btn-outline-secondary" type="button" id="clearFilters"><i class="fas fa-times"></i><span style="margin-right:8px;" data-ar="مسح الفلاتر" data-en="Clear Filters">مسح الفلاتر</span></button>
+            <button class="btn btn-primary" type="button" id="searchBtn"><i class="fas fa-search"></i><span style="margin-right:8px;" data-ar="بحث" data-en="Search">بحث</span></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cars Grid -->
+    <section class="hm-section" aria-label="قائمة السيارات" style="margin-top: 12px;">
+      <!-- Loading State -->
+      <div class="hm-loading" id="loadingState" style="display: none;">
+        <div class="hm-spinner"></div>
+        <p data-ar="جاري التحميل..." data-en="Loading...">جاري التحميل...</p>
+      </div>
+
+      <!-- Empty State -->
+      <div class="hm-empty-state" id="emptyState" style="display: none;">
+        <div class="hm-empty-icon">
+          <i class="fas fa-car"></i>
+        </div>
+        <h3 data-ar="لا توجد سيارات متاحة" data-en="No cars available">لا توجد سيارات متاحة</h3>
+        <p data-ar="لم يتم العثور على سيارات تطابق معايير البحث" data-en="No cars found matching your search criteria">
+          لم يتم العثور على سيارات تطابق معايير البحث
+        </p>
+        <button class="hm-btn hm-btn-primary" id="resetSearch">
+          <i class="fas fa-redo"></i>
+          <span data-ar="إعادة تعيين البحث" data-en="Reset Search">إعادة تعيين البحث</span>
+        </button>
+      </div>
+
+      <!-- Cars Grid -->
+      <div class="hm-cars-grid" id="carsGrid">
+        <!-- Cars will be loaded here dynamically -->
+      </div>
+
+      <!-- Pagination -->
+      <div class="hm-pagination" id="pagination">
+        <!-- Pagination will be loaded here -->
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- Car Card Template -->
+<template id="carCardTemplate">
+  <div class="hm-car-card">
+    <div class="hm-car-image">
+      <img src="" alt="" class="hm-car-img">
+      <div class="hm-car-actions">
+        <button class="hm-action-btn hm-btn-favorite" data-car-id="">
+          <i class="fas fa-heart"></i>
+        </button>
+        <button class="hm-action-btn hm-btn-view" data-car-id="">
+          <i class="fas fa-eye"></i>
+        </button>
+        <button class="hm-action-btn hm-btn-compare" data-car-id="">
+          <i class="fas fa-balance-scale"></i>
+        </button>
+      </div>
+      <div class="hm-car-badge">
+        <span class="hm-badge-text"></span>
+      </div>
+    </div>
+    <div class="hm-car-details">
+      <div class="hm-car-header">
+        <h3 class="hm-car-title"></h3>
+        <div class="hm-car-price"></div>
+      </div>
+      <div class="hm-car-specs">
+        <div class="hm-spec">
+          <i class="fas fa-calendar"></i>
+          <span class="hm-year"></span>
+        </div>
+        <div class="hm-spec">
+          <i class="fas fa-tachometer-alt"></i>
+          <span class="hm-mileage"></span>
+        </div>
+        <div class="hm-spec">
+          <i class="fas fa-gas-pump"></i>
+          <span class="hm-fuel"></span>
+        </div>
+      </div>
+      <div class="hm-car-footer">
+        <div class="hm-car-location">
+          <i class="fas fa-map-marker-alt"></i>
+          <span class="hm-location"></span>
+        </div>
+        <div class="hm-car-auction">
+          <i class="fas fa-gavel"></i>
+          <span class="hm-auction-status"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style>
+/* Cars Page Styles */
+.hm-cars-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%);
+}
+
+/* Header Section */
+.hm-page-header {
+  background: linear-gradient(135deg, #0a192f 0%, #112240 50%, #2366d1 100%);
+  color: white;
+  padding: 4rem 0 3rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hm-page-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.03"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.03"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+  opacity: 0.3;
+}
+
+.hm-header-content {
+  position: relative;
+  z-index: 1;
+}
+
+.hm-page-title {
+  font-size: 3rem;
+  font-weight: 900;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hm-page-title i {
+  color: #ffd700;
+}
+
+.hm-page-subtitle {
+  font-size: 1.25rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.hm-header-stats {
+  display: flex;
+  gap: 2rem;
+  justify-content: flex-end;
+}
+
+.hm-stat-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 1.5rem;
+  text-align: center;
+  min-width: 120px;
+}
+
+.hm-stat-number {
+  display: block;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #ffd700;
+  margin-bottom: 0.5rem;
+}
+
+.hm-stat-label {
+  font-size: 0.875rem;
+  opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Filters Section */
+.hm-filters-section {
+  background: white;
+  padding: 2rem 0;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.hm-filters {
+  display: flex;
+  gap: 1.5rem;
+  align-items: end;
+  flex-wrap: wrap;
+}
+
+.hm-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.hm-filter-group label {
+  font-weight: 600;
+  color: #0a192f;
+  font-size: 0.875rem;
+}
+
+.hm-filter-select {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 1rem;
+  background: white;
+  min-width: 150px;
+  transition: all 0.3s ease;
+}
+
+.hm-filter-select:focus {
+  outline: none;
+  border-color: #2366d1;
+  box-shadow: 0 0 0 3px rgba(35, 102, 209, 0.1);
+}
+
+.hm-filter-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 1rem;
+}
+
+.hm-btn-outline {
+  background: transparent;
+  border: 2px solid #0a192f;
+  color: #0a192f;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hm-btn-outline:hover {
+  background: #0a192f;
+  color: white;
+}
+
+.hm-btn-primary {
+  background: linear-gradient(135deg, #0a192f 0%, #2366d1 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hm-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(10, 25, 47, 0.3);
+}
+
+/* Content Section */
+.hm-cars-content {
+  padding: 3rem 0;
+}
+
+/* Loading State */
+.hm-loading {
+  text-align: center;
+  padding: 4rem 0;
+}
+
+.hm-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #e2e8f0;
+  border-top: 4px solid #2366d1;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Empty State */
+.hm-empty-state {
+  text-align: center;
+  padding: 4rem 0;
+}
+
+.hm-empty-icon {
+  font-size: 4rem;
+  color: #cbd5e1;
+  margin-bottom: 2rem;
+}
+
+.hm-empty-state h3 {
+  font-size: 1.5rem;
+  color: #0a192f;
+  margin-bottom: 1rem;
+}
+
+.hm-empty-state p {
+  color: #64748b;
+  margin-bottom: 2rem;
+}
+
+/* Cars Grid */
+.hm-cars-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+/* Car Card */
+.hm-car-card {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.hm-car-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.hm-car-image {
+  position: relative;
+  height: 250px;
+  overflow: hidden;
+}
+
+.hm-car-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.hm-car-card:hover .hm-car-img {
+  transform: scale(1.05);
+}
+
+.hm-car-actions {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  opacity: 0;
+  transform: translateX(20px);
+  transition: all 0.3s ease;
+}
+
+.hm-car-card:hover .hm-car-actions {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.hm-action-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.hm-btn-favorite {
+  background: rgba(239, 68, 68, 0.9);
+  color: white;
+}
+
+.hm-btn-favorite:hover {
+  background: #dc2626;
+  transform: scale(1.1);
+}
+
+.hm-btn-favorite.favorited {
+  background: #dc2626;
+}
+
+.hm-btn-view {
+  background: rgba(35, 102, 209, 0.9);
+  color: white;
+}
+
+.hm-btn-view:hover {
+  background: #1e40af;
+  transform: scale(1.1);
+}
+
+.hm-btn-compare {
+  background: rgba(34, 197, 94, 0.9);
+  color: white;
+}
+
+.hm-btn-compare:hover {
+  background: #16a34a;
+  transform: scale(1.1);
+}
+
+.hm-car-badge {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: rgba(255, 215, 0, 0.9);
+  color: #0a192f;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.hm-car-details {
+  padding: 1.5rem;
+}
+
+.hm-car-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 1rem;
+}
+
+.hm-car-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0a192f;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.hm-car-price {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #2366d1;
+}
+
+.hm-car-specs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.hm-spec {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.hm-spec i {
+  color: #94a3b8;
+}
+
+.hm-car-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.hm-car-location,
+.hm-car-auction {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Pagination */
+.hm-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 3rem;
+}
+
+.hm-page-btn {
+  min-width: 40px;
+  height: 40px;
+  border: 2px solid #e2e8f0;
+  background: white;
+  color: #0a192f;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hm-page-btn:hover {
+  border-color: #2366d1;
+  color: #2366d1;
+}
+
+.hm-page-btn.active {
+  background: linear-gradient(135deg, #0a192f 0%, #2366d1 100%);
+  color: white;
+  border-color: #0a192f;
+}
+
+.hm-page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hm-page-title {
+    font-size: 2rem;
+  }
+  
+  .hm-header-stats {
+    justify-content: center;
+    margin-top: 2rem;
+  }
+  
+  .hm-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .hm-filter-actions {
+    margin-left: 0;
+    margin-top: 1rem;
+    justify-content: center;
+  }
+  
+  .hm-cars-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .hm-car-specs {
+    flex-wrap: wrap;
+  }
+}
+</style>
+
+<script>
+// Cars Management
+class CarsManager {
+  constructor() {
+    this.cars = [];
+    this.filters = {
+      make: '',
+      model: '',
+      category: '',
+      price: '',
+      year: ''
+    };
+    this.pagination = {
+      page: 1,
+      limit: 12,
+      total: 0,
+      pages: 0
+    };
+    this.init();
+  }
+
+  async init() {
+    await this.loadFilterOptions();
+    await this.loadCars();
+    this.setupEventListeners();
+    this.updateStats();
+  }
+
+  async loadFilterOptions() {
+    try {
+      // Load makes
+      const makesResponse = await fetch('/api/cars/makes');
+      const makesData = await makesResponse.json();
+      if (makesResponse.ok) {
+        const makeSelect = document.getElementById('makeFilter');
+        makesData.makes.forEach(make => {
+          const option = document.createElement('option');
+          option.value = make._id;
+          option.textContent = make.name;
+          makeSelect.appendChild(option);
+        });
+      }
+
+      // Load categories
+      const categoriesResponse = await fetch('/api/cars/categories');
+      const categoriesData = await categoriesResponse.json();
+      if (categoriesResponse.ok) {
+        const categorySelect = document.getElementById('categoryFilter');
+        categoriesData.categories.forEach(category => {
+          const option = document.createElement('option');
+          option.value = category._id;
+          option.textContent = category.name;
+          categorySelect.appendChild(option);
+        });
+      }
+
+      // Load years
+      const yearSelect = document.getElementById('yearFilter');
+      const currentYear = new Date().getFullYear();
+      for (let year = currentYear; year >= currentYear - 20; year--) {
+        const option = document.createElement('option');
+        option.value = year;
+        option.textContent = year;
+        yearSelect.appendChild(option);
+      }
+    } catch (error) {
+      console.error('Error loading filter options:', error);
+    }
+  }
+
+  async loadCars() {
+    try {
+      this.showLoading(true);
+      
+      const params = new URLSearchParams({
+        page: this.pagination.page,
+        limit: this.pagination.limit,
+        ...this.filters
+      });
+
+      const response = await fetch(`/api/cars?${params}`);
+      const data = await response.json();
+      
+      if (response.ok) {
+        this.cars = data.cars || [];
+        this.pagination = data.pagination || this.pagination;
+        this.renderCars();
+        this.renderPagination();
+      } else {
+        throw new Error(data.error || 'Failed to load cars');
+      }
+    } catch (error) {
+      console.error('Error loading cars:', error);
+      this.showError('فشل في تحميل السيارات');
+    } finally {
+      this.showLoading(false);
+    }
+  }
+
+  renderCars() {
+    const grid = document.getElementById('carsGrid');
+    const emptyState = document.getElementById('emptyState');
+
+    if (this.cars.length === 0) {
+      grid.style.display = 'none';
+      emptyState.style.display = 'block';
+      return;
+    }
+
+    grid.style.display = 'grid';
+    emptyState.style.display = 'none';
+
+    const template = document.getElementById('carCardTemplate');
+    grid.innerHTML = '';
+
+    this.cars.forEach(car => {
+      const card = template.content.cloneNode(true);
+      
+      // Set car data
+      const img = card.querySelector('.hm-car-img');
+      img.src = car.images && car.images.length > 0 ? car.images[0] : '/images/car-placeholder.jpg';
+      img.alt = `${car.make?.name || ''} ${car.model?.name || ''}`;
+
+      card.querySelector('.hm-car-title').textContent = `${car.make?.name || ''} ${car.model?.name || ''}`;
+      card.querySelector('.hm-car-price').textContent = this.formatPrice(car.price);
+      
+      // Set specs
+      card.querySelector('.hm-year').textContent = car.year || 'N/A';
+      card.querySelector('.hm-mileage').textContent = this.formatMileage(car.mileage);
+      card.querySelector('.hm-fuel').textContent = car.fuelType || 'N/A';
+      
+      // Set location and auction status
+      card.querySelector('.hm-location').textContent = car.location || 'غير محدد';
+      card.querySelector('.hm-auction-status').textContent = car.auctionStatus || 'متاح';
+
+      // Set action buttons
+      const favoriteBtn = card.querySelector('.hm-btn-favorite');
+      const viewBtn = card.querySelector('.hm-btn-view');
+      const compareBtn = card.querySelector('.hm-btn-compare');
+
+      favoriteBtn.setAttribute('data-car-id', car._id);
+      viewBtn.setAttribute('data-car-id', car._id);
+      compareBtn.setAttribute('data-car-id', car._id);
+
+      // Check if favorited
+      if (car.isFavorite) {
+        favoriteBtn.classList.add('favorited');
+      }
+
+      // Set badge
+      const badge = card.querySelector('.hm-badge-text');
+      if (car.category) {
+        badge.textContent = car.category.name;
+      }
+
+      grid.appendChild(card);
+    });
+
+    this.setupCardEventListeners();
+  }
+
+  renderPagination() {
+    const pagination = document.getElementById('pagination');
+    pagination.innerHTML = '';
+
+    if (this.pagination.pages <= 1) return;
+
+    // Previous button
+    const prevBtn = document.createElement('button');
+    prevBtn.className = 'hm-page-btn';
+    prevBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+    prevBtn.disabled = this.pagination.page === 1;
+    prevBtn.addEventListener('click', () => this.goToPage(this.pagination.page - 1));
+    pagination.appendChild(prevBtn);
+
+    // Page numbers
+    for (let i = 1; i <= this.pagination.pages; i++) {
+      if (i === 1 || i === this.pagination.pages || (i >= this.pagination.page - 2 && i <= this.pagination.page + 2)) {
+        const pageBtn = document.createElement('button');
+        pageBtn.className = `hm-page-btn ${i === this.pagination.page ? 'active' : ''}`;
+        pageBtn.textContent = i;
+        pageBtn.addEventListener('click', () => this.goToPage(i));
+        pagination.appendChild(pageBtn);
+      } else if (i === this.pagination.page - 3 || i === this.pagination.page + 3) {
+        const dots = document.createElement('span');
+        dots.textContent = '...';
+        dots.style.padding = '0 0.5rem';
+        pagination.appendChild(dots);
+      }
+    }
+
+    // Next button
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'hm-page-btn';
+    nextBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+    nextBtn.disabled = this.pagination.page === this.pagination.pages;
+    nextBtn.addEventListener('click', () => this.goToPage(this.pagination.page + 1));
+    pagination.appendChild(nextBtn);
+  }
+
+  setupEventListeners() {
+    // Filter changes
+    document.getElementById('makeFilter').addEventListener('change', (e) => {
+      this.filters.make = e.target.value;
+      this.loadModels(e.target.value);
+    });
+
+    document.getElementById('modelFilter').addEventListener('change', (e) => {
+      this.filters.model = e.target.value;
+    });
+
+    document.getElementById('categoryFilter').addEventListener('change', (e) => {
+      this.filters.category = e.target.value;
+    });
+
+    document.getElementById('priceFilter').addEventListener('change', (e) => {
+      this.filters.price = e.target.value;
+    });
+
+    document.getElementById('yearFilter').addEventListener('change', (e) => {
+      this.filters.year = e.target.value;
+    });
+
+    // Search button
+    document.getElementById('searchBtn').addEventListener('click', () => {
+      this.pagination.page = 1;
+      this.loadCars();
+    });
+
+    // Clear filters
+    document.getElementById('clearFilters').addEventListener('click', () => {
+      this.clearFilters();
+    });
+
+    // Reset search
+    document.getElementById('resetSearch').addEventListener('click', () => {
+      this.clearFilters();
+    });
+  }
+
+  setupCardEventListeners() {
+    // Favorite buttons
+    document.querySelectorAll('.hm-btn-favorite').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const carId = e.currentTarget.getAttribute('data-car-id');
+        await this.toggleFavorite(carId, e.currentTarget);
+      });
+    });
+
+    // View buttons
+    document.querySelectorAll('.hm-btn-view').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const carId = e.currentTarget.getAttribute('data-car-id');
+        window.location.href = `/cars/${carId}`;
+      });
+    });
+
+    // Compare buttons
+    document.querySelectorAll('.hm-btn-compare').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const carId = e.currentTarget.getAttribute('data-car-id');
+        this.addToComparison(carId);
+      });
+    });
+  }
+
+  async loadModels(makeId) {
+    const modelSelect = document.getElementById('modelFilter');
+    modelSelect.innerHTML = '<option value="">جميع الموديلات</option>';
+
+    if (!makeId) return;
+
+    try {
+      const response = await fetch(`/api/cars/models?make=${makeId}`);
+      const data = await response.json();
+      
+      if (response.ok) {
+        data.models.forEach(model => {
+          const option = document.createElement('option');
+          option.value = model._id;
+          option.textContent = model.name;
+          modelSelect.appendChild(option);
+        });
+      }
+    } catch (error) {
+      console.error('Error loading models:', error);
+    }
+  }
+
+  async toggleFavorite(carId, button) {
+    try {
+      const isFavorited = button.classList.contains('favorited');
+      const url = isFavorited ? `/favorites/remove/${carId}` : `/favorites/add/${carId}`;
+      const method = isFavorited ? 'DELETE' : 'POST';
+
+      const response = await fetch(url, { method });
+      const data = await response.json();
+
+      if (response.ok) {
+        button.classList.toggle('favorited');
+        this.showSuccess(isFavorited ? 'تمت إزالة السيارة من المفضلة' : 'تمت إضافة السيارة للمفضلة');
+      } else {
+        throw new Error(data.error);
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      this.showError('فشل في تحديث المفضلة');
+    }
+  }
+
+  addToComparison(carId) {
+    window.location.href = `/comparisons?add=${carId}`;
+  }
+
+  goToPage(page) {
+    this.pagination.page = page;
+    this.loadCars();
+  }
+
+  clearFilters() {
+    this.filters = {
+      make: '',
+      model: '',
+      category: '',
+      price: '',
+      year: ''
+    };
+    
+    document.getElementById('makeFilter').value = '';
+    document.getElementById('modelFilter').value = '';
+    document.getElementById('categoryFilter').value = '';
+    document.getElementById('priceFilter').value = '';
+    document.getElementById('yearFilter').value = '';
+    
+    this.pagination.page = 1;
+    this.loadCars();
+  }
+
+  updateStats() {
+    document.getElementById('totalCars').textContent = this.pagination.total || 0;
+    document.getElementById('activeAuctions').textContent = this.cars.filter(car => car.auctionStatus === 'active').length;
+  }
+
+  formatPrice(price) {
+    return new Intl.NumberFormat('ar-SA', {
+      style: 'currency',
+      currency: 'SAR',
+      minimumFractionDigits: 0
+    }).format(price || 0);
+  }
+
+  formatMileage(mileage) {
+    if (!mileage) return 'N/A';
+    return `${mileage.toLocaleString('ar-SA')} كم`;
+  }
+
+  showLoading(show) {
+    document.getElementById('loadingState').style.display = show ? 'block' : 'none';
+  }
+
+  showError(message) {
+    console.error(message);
+  }
+
+  showSuccess(message) {
+    console.log(message);
+  }
+}
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  new CarsManager();
+});
+</script>

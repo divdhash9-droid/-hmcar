@@ -1,0 +1,255 @@
+<!-- [[ARABIC_HEADER]] هذا الملف (views/admin/settings/footer.ejs) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. -->
+
+<% layout('layout') -%>
+  <% var hideNavbar=true; %>
+    <% var hideSearch=true; %>
+      <% var fullWidth=true; %>
+        <% var bodyClass='hm-admin-page' ; %>
+
+<link rel="stylesheet" href="/css/admin-luxury.css">
+
+          <div class="hm-admin-layout">
+            <!-- Animated Background -->
+            <div class="hm-admin-bg">
+              <div class="hm-admin-bg-gradient"></div>
+              <div class="hm-admin-bg-glow"></div>
+            </div>
+
+            <!-- Mobile Toggle -->
+            <button class="hm-mobile-toggle" onclick="toggleSidebar()">
+              <i class="fas fa-bars"></i>
+            </button>
+
+            <!-- Sidebar -->
+            <%- include('../../partials/admin-sidebar') %>
+
+              <!-- Main Content -->
+              <main class="hm-admin-main">
+                <!-- Header -->
+                <header class="hm-admin-header">
+                  <div class="hm-header-title">
+                    <h1>إعدادات الشريط السفلي</h1>
+                    <div class="hm-header-breadcrumb">
+                      <a href="/admin">لوحة التحكم</a>
+                      <i class="fas fa-chevron-left"></i>
+                      <a href="/admin/settings">الإعدادات</a>
+                      <i class="fas fa-chevron-left"></i>
+                      <span>الشريط السفلي</span>
+                    </div>
+                  </div>
+                </header>
+
+                <!-- Content -->
+                <div class="hm-admin-content">
+                  <!-- Flash Messages -->
+                  <% if (flash && flash.message) { %>
+                    <div class="hm-admin-alert hm-admin-alert-<%= flash.type || 'info' %>">
+                      <i
+                        class="fas <%= flash.type === 'success' ? 'fa-check-circle' : flash.type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle' %>"></i>
+                      <span>
+                        <%= flash.message %>
+                      </span>
+                    </div>
+                    <% } %>
+
+                      <!-- Stats -->
+                      <div class="hm-stats-grid">
+                        <div class="hm-stat-card">
+                          <div class="hm-stat-icon">
+                            <i class="fas fa-heading"></i>
+                          </div>
+                          <div class="hm-stat-info">
+                            <div class="hm-stat-label">العنوان</div>
+                            <div class="hm-stat-value">
+                              <%= footer && footer.title ? 'OK' : '-' %>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="hm-stat-card">
+                          <div class="hm-stat-icon success">
+                            <i class="fas fa-envelope"></i>
+                          </div>
+                          <div class="hm-stat-info">
+                            <div class="hm-stat-label">البريد</div>
+                            <div class="hm-stat-value">
+                              <%= footer && footer.contactInfo && footer.contactInfo.email ? 'OK' : '-' %>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="hm-stat-card">
+                          <div class="hm-stat-icon warning">
+                            <i class="fas fa-phone"></i>
+                          </div>
+                          <div class="hm-stat-info">
+                            <div class="hm-stat-label">الهاتف</div>
+                            <div class="hm-stat-value">
+                              <%= footer && footer.contactInfo && footer.contactInfo.phone ? 'OK' : '-' %>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <form method="POST" action="/admin/settings/footer" class="hm-admin-form">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                          <!-- Basic Info -->
+                          <div class="hm-admin-card">
+                            <div class="hm-card-header">
+                              <h2 class="hm-card-title">
+                                <i class="fas fa-info-circle"></i>
+                                المعلومات الأساسية
+                              </h2>
+                            </div>
+                            <div class="hm-card-body">
+                              <div class="hm-admin-form-group">
+                                <label class="hm-admin-label">العنوان الرئيسي</label>
+                                <input type="text" name="title" class="hm-admin-input"
+                                  value="<%= footer && footer.title ? footer.title : '' %>">
+                              </div>
+
+                              <div class="hm-admin-form-group">
+                                <label class="hm-admin-label">الوصف</label>
+                                <textarea name="description" class="hm-admin-input"
+                                  rows="4"><%= footer && footer.description ? footer.description : '' %></textarea>
+                              </div>
+
+                              <div class="hm-admin-form-group">
+                                <label class="hm-admin-label">الروابط السريعة (JSON)</label>
+                                <textarea name="links" class="hm-admin-input" rows="4"
+                                  style="font-family: monospace; direction: ltr;"><%= footer && footer.links ? JSON.stringify(footer.links, null, 2) : '[]' %></textarea>
+                                <small
+                                  style="color: var(--hm-gray); display: block; margin-top: 0.5rem; direction: ltr;">Ex:
+                                  [{"name":"Cars","url":"/cars"}]</small>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Contact Info -->
+                          <div class="hm-admin-card">
+                            <div class="hm-card-header">
+                              <h2 class="hm-card-title">
+                                <i class="fas fa-address-book"></i>
+                                معلومات التواصل
+                              </h2>
+                            </div>
+                            <div class="hm-card-body">
+                              <div class="hm-admin-form-group">
+                                <label class="hm-admin-label">البريد الإلكتروني</label>
+                                <div class="hm-input-icon-wrapper">
+                                  <i class="fas fa-envelope hm-input-icon"></i>
+                                  <input type="email" name="email" class="hm-admin-input has-icon"
+                                    value="<%= footer && footer.contactInfo && footer.contactInfo.email ? footer.contactInfo.email : '' %>">
+                                </div>
+                              </div>
+
+                              <div class="hm-admin-form-group">
+                                <label class="hm-admin-label">رقم الهاتف</label>
+                                <div class="hm-input-icon-wrapper">
+                                  <i class="fas fa-phone hm-input-icon"></i>
+                                  <input type="text" name="phone" class="hm-admin-input has-icon"
+                                    value="<%= footer && footer.contactInfo && footer.contactInfo.phone ? footer.contactInfo.phone : '' %>">
+                                </div>
+                              </div>
+
+                              <div class="hm-admin-form-group">
+                                <label class="hm-admin-label">العنوان</label>
+                                <div class="hm-input-icon-wrapper">
+                                  <i class="fas fa-map-marker-alt hm-input-icon"></i>
+                                  <input type="text" name="address" class="hm-admin-input has-icon"
+                                    value="<%= footer && footer.contactInfo && footer.contactInfo.address ? footer.contactInfo.address : '' %>">
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Social Media -->
+                        <div class="hm-admin-card mt-4">
+                          <div class="hm-card-header">
+                            <h2 class="hm-card-title">
+                              <i class="fas fa-share-alt"></i>
+                              روابط التواصل الاجتماعي
+                            </h2>
+                          </div>
+                          <div class="hm-card-body">
+                            <div
+                              style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                              <div class="hm-admin-form-group">
+                                <label class="hm-admin-label"><i
+                                    class="fab fa-facebook text-primary me-2"></i>فيسبوك</label>
+                                <input type="url" name="facebookUrl" class="hm-admin-input"
+                                  placeholder="https://facebook.com/..."
+                                  value="<%= footer && footer.facebookUrl ? footer.facebookUrl : '' %>">
+                              </div>
+
+                              <div class="hm-admin-form-group">
+                                <label class="hm-admin-label"><i class="fab fa-twitter text-info me-2"></i>تويتر
+                                  (X)</label>
+                                <input type="url" name="twitterUrl" class="hm-admin-input"
+                                  placeholder="https://twitter.com/..."
+                                  value="<%= footer && footer.twitterUrl ? footer.twitterUrl : '' %>">
+                              </div>
+
+                              <div class="hm-admin-form-group">
+                                <label class="hm-admin-label"><i
+                                    class="fab fa-instagram text-danger me-2"></i>انستقرام</label>
+                                <input type="url" name="instagramUrl" class="hm-admin-input"
+                                  placeholder="https://instagram.com/..."
+                                  value="<%= footer && footer.instagramUrl ? footer.instagramUrl : '' %>">
+                              </div>
+
+                              <div class="hm-admin-form-group">
+                                <label class="hm-admin-label"><i class="fab fa-whatsapp text-success me-2"></i>واتساب
+                                  (رقم دولي بدون +)</label>
+                                <input type="text" name="whatsappNumber" class="hm-admin-input" placeholder="9665..."
+                                  value="<%= footer && footer.whatsappNumber ? footer.whatsappNumber : '' %>">
+                              </div>
+
+                              <div class="hm-admin-form-group">
+                                <label class="hm-admin-label"><i
+                                    class="fab fa-youtube text-danger me-2"></i>يوتيوب</label>
+                                <input type="url" name="youtubeUrl" class="hm-admin-input"
+                                  placeholder="https://youtube.com/..."
+                                  value="<%= footer && footer.youtubeUrl ? footer.youtubeUrl : '' %>">
+                              </div>
+
+                              <div class="hm-admin-form-group">
+                                <label class="hm-admin-label"><i class="fab fa-tiktok me-2"></i>تيك توك</label>
+                                <input type="url" name="tiktokUrl" class="hm-admin-input"
+                                  placeholder="https://tiktok.com/..."
+                                  value="<%= footer && footer.tiktokUrl ? footer.tiktokUrl : '' %>">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="hm-form-actions mt-4">
+                          <button type="submit" class="hm-btn-admin hm-btn-admin-primary">
+                            <i class="fas fa-save"></i>
+                            حفظ الإعدادات
+                          </button>
+                        </div>
+
+                      </form>
+                </div>
+              </main>
+          </div>
+
+          <script>
+            function toggleSidebar() {
+              const sidebar = document.getElementById('adminSidebar');
+              sidebar.classList.toggle('open');
+            }
+
+            document.addEventListener('click', function (e) {
+              const sidebar = document.getElementById('adminSidebar');
+              const toggle = document.querySelector('.hm-mobile-toggle');
+
+              if (window.innerWidth <= 1024) {
+                if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+                  sidebar.classList.remove('open');
+                }
+              }
+            });
+          </script>

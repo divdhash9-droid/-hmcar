@@ -1,0 +1,260 @@
+/* [[ARABIC_HEADER]] هذا الملف (public/css/theme-enhancements.css) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. */
+
+/* ======== Theme Toggle Styles - Gold Enhanced ======== */
+.theme-toggle {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 9999;
+  background: linear-gradient(135deg, #D4AF37 0%, #B8860B 25%, #E6C88C 75%, #D4AF37 100%);
+  border: 2px solid #D4AF37;
+  border-radius: 50%;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 
+    0 8px 25px rgba(212,175,55,0.4),
+    inset 0 2px 0 rgba(212,175,55,0.3);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  backdrop-filter: blur(16px) saturate(1.2);
+  overflow: hidden;
+}
+
+.theme-toggle::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, transparent, rgba(212,175,55,0.4), transparent);
+  background-size: 200% 100%;
+  background-position: -200% 0;
+  animation: shimmerGold 3s linear infinite;
+  pointer-events: none;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 
+    0 12px 35px rgba(212,175,55,0.6),
+    0 0 80px rgba(212,175,55,0.3),
+    inset 0 3px 0 rgba(212,175,55,0.4);
+  border-color: #E6C88C;
+}
+
+.theme-toggle i {
+  font-size: 20px;
+  color: #ffffff;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.theme-toggle:hover i {
+  transform: rotate(180deg);
+}
+
+/* ======== Smooth Theme Transition ======== */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+/* ======== Enhanced Animations - Gold Edition ======== */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes pulse-gold {
+  0%, 100% { 
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+    transform: scale(1);
+  }
+  50% { 
+    box-shadow: 0 0 40px rgba(212, 175, 55, 0.8), 0 0 60px rgba(212, 175, 55, 0.4);
+    transform: scale(1.02);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+@keyframes shimmerGold {
+  to { background-position: 200% 0; }
+}
+
+@keyframes slide-in-right {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slide-in-left {
+  from { transform: translateX(-100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fade-in-up {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes bounce-in {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.05); }
+  70% { transform: scale(0.9); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { 
+    box-shadow: 0 0 25px rgba(212, 175, 55, 0.4);
+    border-color: #D4AF37;
+  }
+  50% { 
+    box-shadow: 0 0 50px rgba(212, 175, 55, 0.8), 0 0 100px rgba(212, 175, 55, 0.3);
+    border-color: #E6C88C;
+  }
+}
+
+/* ======== Interactive Elements - Gold Enhanced ======== */
+.interactive-card {
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 2px solid transparent;
+  background: linear-gradient(135deg, rgba(212,175,55,0.1) 0%, rgba(212,175,55,0.05) 100%);
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.interactive-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, transparent, rgba(212,175,55,0.3), transparent);
+  background-size: 200% 100%;
+  background-position: -200% 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  animation: shimmerGold 4s linear infinite;
+  pointer-events: none;
+}
+
+.interactive-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  border-color: #D4AF37;
+  box-shadow: 
+    0 20px 40px rgba(212,175,55,0.3),
+    0 0 80px rgba(212,175,55,0.2),
+    inset 0 2px 0 rgba(212,175,55,0.2);
+}
+
+.interactive-card:hover::before {
+  opacity: 1;
+}
+
+.interactive-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #D4AF37 0%, #B8860B 25%, #E6C88C 75%, #D4AF37 100%);
+  border: 2px solid #D4AF37;
+  border-radius: 12px;
+  color: #ffffff;
+  font-weight: 600;
+  padding: 12px 24px;
+  cursor: pointer;
+}
+
+.interactive-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4), transparent);
+  transition: left 0.5s;
+}
+
+.interactive-button:hover::before {
+  left: 100%;
+}
+
+.interactive-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 12px 25px rgba(212,175,55,0.4),
+    0 0 50px rgba(212,175,55,0.2),
+    inset 0 2px 0 rgba(212,175,55,0.3);
+  border-color: #E6C88C;
+}
+
+/* ======== Loading Animations - Gold Enhanced ======== */
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(212,175,55,0.2);
+  border-top: 4px solid #D4AF37;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  box-shadow: 0 0 20px rgba(212,175,55,0.3);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-skeleton {
+  background: linear-gradient(90deg, 
+    rgba(212,175,55,0.1) 25%, 
+    rgba(212,175,55,0.2) 50%, 
+    rgba(212,175,55,0.1) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+/* ======== Mobile Responsive Enhancements ======== */
+@media (max-width: 768px) {
+  .theme-toggle {
+    top: 10px;
+    left: 10px;
+    padding: 8px;
+  }
+  
+  .theme-toggle i {
+    font-size: 16px;
+  }
+  
+  .interactive-card:hover {
+    transform: translateY(-5px) scale(1.01);
+  }
+  
+  .interactive-button:hover {
+    transform: translateY(-1px);
+  }
+}
+
+/* ======== Performance Optimizations ======== */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.will-change-transform {
+  will-change: transform;
+}
+
+/* ======== Reduced Motion Support ======== */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,179 @@
+/* Clean Login Styles - HM CAR */
+.hm-login-3d {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 25%, #0a192f 75%, #172a45 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.hm-login-3d__container {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 3rem;
+  max-width: 1200px;
+  width: 100%;
+}
+
+.hm-login-3d__brand-card {
+  background: linear-gradient(135deg, #0a192f 0%, #172a45 50%, #1e3a8a 100%);
+  border-radius: 25px;
+  padding: 3rem 2.5rem;
+  text-align: center;
+  color: #ffffff;
+  max-width: 450px;
+  box-shadow: 0 25px 50px rgba(10, 25, 47, 0.3);
+}
+
+.hm-login-3d__brand-title {
+  font-size: 2.5rem;
+  font-weight: 900;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #ffffff 0%, #fbbf24 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hm-login-3d__brand-subtitle {
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 2.5rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.hm-login-3d__chips {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.hm-login-3d__chip {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.hm-login-3d__chip i {
+  font-size: 1.2rem;
+  color: #fbbf24;
+}
+
+.hm-login-3d__login-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 25px;
+  padding: 3rem 3.5rem;
+  max-width: 550px;
+  box-shadow: 0 25px 50px rgba(10, 25, 47, 0.15);
+}
+
+.hm-login-3d__title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #0a192f;
+  margin-bottom: 0.8rem;
+}
+
+.hm-login-3d__subtitle {
+  color: #172a45;
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+
+.hm-login-3d__role-toggle {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  background: rgba(10, 25, 47, 0.05);
+  padding: 0.5rem;
+  border-radius: 15px;
+}
+
+.hm-login-3d__role-btn {
+  flex: 1;
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  color: #172a45;
+}
+
+.hm-login-3d__role-btn.active {
+  background: linear-gradient(135deg, #0a192f 0%, #2563eb 100%);
+  color: #ffffff;
+}
+
+.hm-login-3d__form-group {
+  margin-bottom: 2rem;
+}
+
+.hm-login-3d__form-label {
+  display: block;
+  color: #0a192f;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+}
+
+.hm-login-3d__form-input {
+  width: 100%;
+  padding: 1.2rem 1.5rem;
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid rgba(10, 25, 47, 0.1);
+  border-radius: 18px;
+  color: #0a192f;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.hm-login-3d__form-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 20px rgba(37, 99, 235, 0.3);
+}
+
+.hm-login-3d__btn {
+  width: 100%;
+  padding: 1.3rem 2rem;
+  background: linear-gradient(135deg, #0a192f 0%, #1e3a8a 50%, #2563eb 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 18px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.hm-login-3d__btn:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(10, 25, 47, 0.5);
+}
+
+.hm-login-3d__switch {
+  text-align: center;
+  margin-top: 2.5rem;
+  color: #172a45;
+}
+
+.hm-login-3d__switch a {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+@media (max-width: 1024px) {
+  .hm-login-3d__container {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    max-width: 600px;
+  }
+}

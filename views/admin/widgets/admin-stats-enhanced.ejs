@@ -1,0 +1,464 @@
+<!-- [[ARABIC_HEADER]] هذا الملف (views/admin/widgets/admin-stats-enhanced.ejs) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. -->
+
+<!-- Enhanced Stats Widget -->
+<div class="enhanced-stats-widget">
+  <div class="enhanced-stats__header">
+    <h3 class="enhanced-stats__title">الإحصائيات المحسّنة</h3>
+    <div class="enhanced-stats__period">
+      <select class="enhanced-stats__select">
+        <option value="today">اليوم</option>
+        <option value="week" selected>هذا الأسبوع</option>
+        <option value="month">هذا الشهر</option>
+        <option value="year">هذه السنة</option>
+      </select>
+    </div>
+  </div>
+  
+  <div class="enhanced-stats__grid">
+    <!-- Cars Stats -->
+    <div class="enhanced-stat-card">
+      <div class="enhanced-stat__icon enhanced-stat__icon--gold">
+        <i class="fas fa-car"></i>
+      </div>
+      <div class="enhanced-stat__content">
+        <div class="enhanced-stat__value"><%= Number(stats?.totalCars || 0) %></div>
+        <div class="enhanced-stat__label">إجمالي السيارات</div>
+        <div class="enhanced-stat__change enhanced-stat__change--positive">
+          <i class="fas fa-arrow-up"></i>
+          <span>+12.5%</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Users Stats -->
+    <div class="enhanced-stat-card">
+      <div class="enhanced-stat__icon enhanced-stat__icon--blue">
+        <i class="fas fa-users"></i>
+      </div>
+      <div class="enhanced-stat__content">
+        <div class="enhanced-stat__value"><%= Number(stats?.totalUsers || 0) %></div>
+        <div class="enhanced-stat__label">إجمالي المستخدمين</div>
+        <div class="enhanced-stat__change enhanced-stat__change--positive">
+          <i class="fas fa-arrow-up"></i>
+          <span>+8.3%</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Revenue Stats -->
+    <div class="enhanced-stat-card">
+      <div class="enhanced-stat__icon enhanced-stat__icon--green">
+        <i class="fas fa-chart-line"></i>
+      </div>
+      <div class="enhanced-stat__content">
+        <div class="enhanced-stat__value"><%= Number(stats?.revenue || 0).toLocaleString() %></div>
+        <div class="enhanced-stat__label">الإيرادات</div>
+        <div class="enhanced-stat__change enhanced-stat__change--positive">
+          <i class="fas fa-arrow-up"></i>
+          <span>+23.7%</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Orders Stats -->
+    <div class="enhanced-stat-card">
+      <div class="enhanced-stat__icon enhanced-stat__icon--purple">
+        <i class="fas fa-shopping-cart"></i>
+      </div>
+      <div class="enhanced-stat__content">
+        <div class="enhanced-stat__value"><%= Number(stats?.totalOrders || 0) %></div>
+        <div class="enhanced-stat__label">إجمالي الطلبات</div>
+        <div class="enhanced-stat__change enhanced-stat__change--negative">
+          <i class="fas fa-arrow-down"></i>
+          <span>-3.2%</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Notifications Stats -->
+    <div class="enhanced-stat-card">
+      <div class="enhanced-stat__icon enhanced-stat__icon--orange">
+        <i class="fas fa-bell"></i>
+      </div>
+      <div class="enhanced-stat__content">
+        <div class="enhanced-stat__value"><%= Number(stats?.unseenCount || 0) %></div>
+        <div class="enhanced-stat__label">الإشعارات الجديدة</div>
+        <div class="enhanced-stat__change enhanced-stat__change--neutral">
+          <i class="fas fa-minus"></i>
+          <span>0%</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Active Sessions -->
+    <div class="enhanced-stat-card">
+      <div class="enhanced-stat__icon enhanced-stat__icon--red">
+        <i class="fas fa-signal"></i>
+      </div>
+      <div class="enhanced-stat__content">
+        <div class="enhanced-stat__value">127</div>
+        <div class="enhanced-stat__label">الجلسات النشطة</div>
+        <div class="enhanced-stat__change enhanced-stat__change--positive">
+          <i class="fas fa-arrow-up"></i>
+          <span>+15.8%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Chart Section -->
+  <div class="enhanced-stats__chart">
+    <div class="enhanced-chart__header">
+      <h4 class="enhanced-chart__title">نمو الإحصائيات</h4>
+      <div class="enhanced-chart__legend">
+        <div class="enhanced-legend__item">
+          <div class="enhanced-legend__color enhanced-legend__color--gold"></div>
+          <span>السيارات</span>
+        </div>
+        <div class="enhanced-legend__item">
+          <div class="enhanced-legend__color enhanced-legend__color--blue"></div>
+          <span>المستخدمون</span>
+        </div>
+        <div class="enhanced-legend__item">
+          <div class="enhanced-legend__color enhanced-legend__color--green"></div>
+          <span>الإيرادات</span>
+        </div>
+      </div>
+    </div>
+    <div class="enhanced-chart__container">
+      <canvas id="enhancedStatsChart" width="400" height="200"></canvas>
+    </div>
+  </div>
+</div>
+
+<style>
+.enhanced-stats-widget {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  margin: 2rem 0;
+  box-shadow: var(--shadow-light);
+}
+
+.enhanced-stats__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border-primary);
+}
+
+.enhanced-stats__title {
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.enhanced-stats__select {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-secondary);
+  color: var(--text-primary);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.enhanced-stats__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.enhanced-stat-card {
+  background: var(--gradient-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: var(--transition-smooth);
+  position: relative;
+  overflow: hidden;
+}
+
+.enhanced-stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-medium);
+  border-color: var(--border-primary);
+}
+
+.enhanced-stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--gradient-primary);
+  transform: scaleY(0);
+  transition: var(--transition-smooth);
+}
+
+.enhanced-stat-card:hover::before {
+  transform: scaleY(1);
+}
+
+.enhanced-stat__icon {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+  box-shadow: var(--shadow-light);
+}
+
+.enhanced-stat__icon--gold {
+  background: var(--gradient-primary);
+}
+
+.enhanced-stat__icon--blue {
+  background: var(--gradient-info);
+}
+
+.enhanced-stat__icon--green {
+  background: var(--gradient-success);
+}
+
+.enhanced-stat__icon--purple {
+  background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
+}
+
+.enhanced-stat__icon--orange {
+  background: var(--gradient-warning);
+}
+
+.enhanced-stat__icon--red {
+  background: var(--gradient-danger);
+}
+
+.enhanced-stat__content {
+  flex: 1;
+}
+
+.enhanced-stat__value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.enhanced-stat__label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.enhanced-stat__change {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.enhanced-stat__change--positive {
+  color: var(--text-success);
+}
+
+.enhanced-stat__change--negative {
+  color: var(--text-danger);
+}
+
+.enhanced-stat__change--neutral {
+  color: var(--text-muted);
+}
+
+.enhanced-stats__chart {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+}
+
+.enhanced-chart__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.enhanced-chart__title {
+  color: var(--text-primary);
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.enhanced-chart__legend {
+  display: flex;
+  gap: 1rem;
+}
+
+.enhanced-legend__item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.enhanced-legend__color {
+  width: 12px;
+  height: 12px;
+  border-radius: var(--radius-sm);
+}
+
+.enhanced-legend__color--gold {
+  background: var(--primary-gold);
+}
+
+.enhanced-legend__color--blue {
+  background: var(--info-blue);
+}
+
+.enhanced-legend__color--green {
+  background: var(--success-green);
+}
+
+.enhanced-chart__container {
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-primary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-card);
+}
+
+@media (max-width: 768px) {
+  .enhanced-stats__header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  .enhanced-stats__grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .enhanced-chart__header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  .enhanced-chart__legend {
+    flex-wrap: wrap;
+  }
+}
+</style>
+
+<script>
+// Simple chart implementation
+const canvas = document.getElementById('enhancedStatsChart');
+if (canvas) {
+  const ctx = canvas.getContext('2d');
+
+  function getThemeVar(name, fallback) {
+    try {
+      const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+      return value || fallback;
+    } catch (e) {
+      return fallback;
+    }
+  }
+
+  const themePrimary = getThemeVar('--primary-color', '#0f172a');
+  
+  // Sample data
+  const data = {
+    labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'],
+    datasets: [
+      {
+        label: 'السيارات',
+        data: [12, 19, 15, 25, 22, 30],
+        borderColor: themePrimary,
+        backgroundColor: 'rgba(255, 255, 255, 0.08)',
+        tension: 0.4
+      },
+      {
+        label: 'المستخدمون',
+        data: [8, 12, 10, 18, 16, 24],
+        borderColor: '#17A2B8',
+        backgroundColor: 'rgba(23, 162, 184, 0.1)',
+        tension: 0.4
+      },
+      {
+        label: 'الإيرادات',
+        data: [15, 25, 20, 35, 30, 45],
+        borderColor: '#28A745',
+        backgroundColor: 'rgba(40, 167, 69, 0.1)',
+        tension: 0.4
+      }
+    ]
+  };
+  
+  // Draw simple line chart
+  const width = canvas.width;
+  const height = canvas.height;
+  const padding = 40;
+  
+  ctx.clearRect(0, 0, width, height);
+  
+  // Draw grid lines
+  ctx.strokeStyle = '#E9ECEF';
+  ctx.lineWidth = 1;
+  
+  for (let i = 0; i <= 5; i++) {
+    const y = padding + (height - 2 * padding) * (i / 5);
+    ctx.beginPath();
+    ctx.moveTo(padding, y);
+    ctx.lineTo(width - padding, y);
+    ctx.stroke();
+  }
+  
+  // Draw data lines
+  data.datasets.forEach((dataset, datasetIndex) => {
+    ctx.strokeStyle = dataset.borderColor;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    
+    dataset.data.forEach((value, index) => {
+      const x = padding + (width - 2 * padding) * (index / (data.labels.length - 1));
+      const y = height - padding - (value / 50) * (height - 2 * padding);
+      
+      if (index === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
+    });
+    
+    ctx.stroke();
+    
+    // Draw points
+    dataset.data.forEach((value, index) => {
+      const x = padding + (width - 2 * padding) * (index / (data.labels.length - 1));
+      const y = height - padding - (value / 50) * (height - 2 * padding);
+      
+      ctx.fillStyle = dataset.borderColor;
+      ctx.beginPath();
+      ctx.arc(x, y, 4, 0, 2 * Math.PI);
+      ctx.fill();
+    });
+  });
+}
+</script>

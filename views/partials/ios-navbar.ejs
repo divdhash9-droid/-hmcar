@@ -1,0 +1,119 @@
+<!-- [[ARABIC_HEADER]] هذا الملف (views/partials/ios-navbar.ejs) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. -->
+
+<!-- iOS Navigation Bar -->
+<nav class="ios-navbar ios-text">
+  <div class="ios-navbar-content">
+    <div class="ios-navbar-left">
+      <% if (typeof backButton !== 'undefined' && backButton) { %>
+        <button class="ios-btn ios-btn-tertiary ios-btn-icon ios-haptic" onclick="history.back()">
+          <i class="fas fa-chevron-left ios-icon"></i>
+        </button>
+      <% } else if (typeof menuButton !== 'undefined' && menuButton) { %>
+        <button class="ios-btn ios-btn-tertiary ios-btn-icon ios-haptic" onclick="toggleSidebar()">
+          <i class="fas fa-bars ios-icon"></i>
+        </button>
+      <% } %>
+    </div>
+    
+    <div class="ios-navbar-title">
+      <%= typeof title !== 'undefined' ? title : 'HM CAR' %>
+    </div>
+    
+    <div class="ios-navbar-right">
+      <% if (typeof searchButton !== 'undefined' && searchButton) { %>
+        <button class="ios-btn ios-btn-tertiary ios-btn-icon ios-haptic" onclick="toggleSearch()">
+          <i class="fas fa-search ios-icon"></i>
+        </button>
+      <% } %>
+      
+      <% if (typeof notifications !== 'undefined' && notifications) { %>
+        <button class="ios-btn ios-btn-tertiary ios-btn-icon ios-haptic ios-ripple-container" onclick="toggleNotifications()">
+          <i class="fas fa-bell ios-icon"></i>
+          <% if (notificationCount > 0) { %>
+            <span class="ios-badge"><%= notificationCount %></span>
+          <% } %>
+        </button>
+      <% } %>
+      
+      <% if (typeof userButton !== 'undefined' && userButton) { %>
+        <button class="ios-btn ios-btn-tertiary ios-btn-icon ios-haptic" onclick="toggleUserMenu()">
+          <i class="fas fa-user ios-icon"></i>
+        </button>
+      <% } %>
+    </div>
+  </div>
+</nav>
+
+<!-- iOS Search Bar (Hidden by default) -->
+<div class="ios-search-bar ios-search-container" style="display: none;" id="iosSearchBar">
+  <i class="fas fa-search ios-search-icon"></i>
+  <input type="text" class="ios-search-input" placeholder="Search..." id="iosSearchInput">
+  <button class="ios-search-clear" id="iosSearchClear" onclick="clearSearch()">
+    <i class="fas fa-times"></i>
+  </button>
+</div>
+
+<style>
+.ios-search-container {
+  position: fixed;
+  top: 88px;
+  left: 16px;
+  right: 16px;
+  z-index: 999;
+  animation: ios-slide-down 0.3s ease-out;
+}
+
+@media (max-width: 768px) {
+  .ios-search-container {
+    top: 64px;
+    left: 8px;
+    right: 8px;
+  }
+}
+</style>
+
+<script>
+// Search functionality
+function toggleSearch() {
+  const searchBar = document.getElementById('iosSearchBar');
+  const searchInput = document.getElementById('iosSearchInput');
+  
+  if (searchBar.style.display === 'none') {
+    searchBar.style.display = 'flex';
+    searchInput.focus();
+  } else {
+    searchBar.style.display = 'none';
+    searchInput.value = '';
+    document.getElementById('iosSearchClear').classList.remove('visible');
+  }
+}
+
+function clearSearch() {
+  const searchInput = document.getElementById('iosSearchInput');
+  const searchClear = document.getElementById('iosSearchClear');
+  
+  searchInput.value = '';
+  searchClear.classList.remove('visible');
+  searchInput.focus();
+}
+
+// Show clear button when typing
+document.getElementById('iosSearchInput').addEventListener('input', function() {
+  const searchClear = document.getElementById('iosSearchClear');
+  if (this.value.length > 0) {
+    searchClear.classList.add('visible');
+  } else {
+    searchClear.classList.remove('visible');
+  }
+});
+
+// Close search on escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    const searchBar = document.getElementById('iosSearchBar');
+    if (searchBar.style.display !== 'none') {
+      toggleSearch();
+    }
+  }
+});
+</script>

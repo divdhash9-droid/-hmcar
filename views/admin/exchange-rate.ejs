@@ -1,0 +1,174 @@
+<!-- [[ARABIC_HEADER]] هذا الملف (views/admin/exchange-rate.ejs) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. -->
+
+<% layout('layout') -%>
+<% var hideNavbar = true; %>
+<% var hideSearch = true; %>
+<% var fullWidth = true; %>
+<% var bodyClass = 'hm-admin-page'; %>
+
+<link rel="stylesheet" href="/css/admin-luxury.css">
+
+<div class="hm-admin-layout">
+  <!-- Animated Background -->
+  <div class="hm-admin-bg">
+    <div class="hm-admin-bg-gradient"></div>
+    <div class="hm-admin-bg-glow"></div>
+  </div>
+
+  <!-- Mobile Toggle -->
+  <button class="hm-mobile-toggle" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Sidebar -->
+  <%- include('../partials/admin-sidebar') %>
+
+  <!-- Main Content -->
+  <main class="hm-admin-main">
+    <!-- Header -->
+    <header class="hm-admin-header">
+      <div class="hm-header-title">
+        <h1>إدارة سعر الصرف</h1>
+        <div class="hm-header-breadcrumb">
+          <a href="/admin">لوحة التحكم</a>
+          <i class="fas fa-chevron-left"></i>
+          <a href="/admin/settings">الإعدادات</a>
+          <i class="fas fa-chevron-left"></i>
+          <span>سعر الصرف</span>
+        </div>
+      </div>
+      <div class="hm-header-actions">
+        <a href="/admin/settings" class="hm-btn-admin hm-btn-admin-secondary">
+          <i class="fas fa-cog"></i>
+          الإعدادات
+        </a>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <div class="hm-admin-content">
+      <!-- Flash Messages -->
+      <% if (flash && flash.message) { %>
+      <div class="hm-admin-alert hm-admin-alert-<%= flash.type || 'info' %>">
+        <i class="fas <%= flash.type === 'success' ? 'fa-check-circle' : flash.type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle' %>"></i>
+        <span><%= flash.message %></span>
+      </div>
+      <% } %>
+
+      <!-- Stats -->
+      <div class="hm-stats-grid">
+        <div class="hm-stat-card">
+          <div class="hm-stat-icon" style="background: linear-gradient(135deg, #22c55e, #16a34a);">
+            <i class="fas fa-dollar-sign" style="color: white;"></i>
+          </div>
+          <div class="hm-stat-info">
+            <div class="hm-stat-label">USD -> SAR</div>
+            <div class="hm-stat-value"><%= (exchangeRate && exchangeRate.usdToSar) ? Number(exchangeRate.usdToSar).toFixed(4) : '3.7500' %></div>
+          </div>
+        </div>
+        <div class="hm-stat-card">
+          <div class="hm-stat-icon warning">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div class="hm-stat-info">
+            <div class="hm-stat-label">آخر تحديث</div>
+            <div class="hm-stat-value"><%= (exchangeRate && exchangeRate.lastUpdated) ? new Date(exchangeRate.lastUpdated).toLocaleDateString('ar-SA') : '-' %></div>
+          </div>
+        </div>
+        <div class="hm-stat-card">
+          <div class="hm-stat-icon success">
+            <i class="fas fa-sticky-note"></i>
+          </div>
+          <div class="hm-stat-info">
+            <div class="hm-stat-label">الملاحظات</div>
+            <div class="hm-stat-value"><%= (exchangeRate && exchangeRate.notes) ? 'موجود' : '-' %></div>
+          </div>
+        </div>
+        <div class="hm-stat-card">
+          <div class="hm-stat-icon">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <div class="hm-stat-info">
+            <div class="hm-stat-label">الحماية</div>
+            <div class="hm-stat-value">CSRF</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Update Form -->
+      <div class="hm-admin-card">
+        <div class="hm-card-header">
+          <h2 class="hm-card-title">
+            <i class="fas fa-edit"></i>
+            تحديث سعر الصرف
+          </h2>
+        </div>
+        <div class="hm-card-body">
+          <form method="POST" action="/admin/exchange-rate">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            
+            <div style="display: grid; grid-template-columns: 1fr 2fr auto; gap: 1rem; align-items: end;">
+              <div class="hm-admin-form-group" style="margin-bottom: 0;">
+                <label class="hm-admin-label">USD إلى SAR</label>
+                <input type="number" step="0.0001" name="usdToSar" class="hm-admin-input" value="<%= (exchangeRate && exchangeRate.usdToSar) ? exchangeRate.usdToSar : 3.75 %>" required>
+              </div>
+              
+              <div class="hm-admin-form-group" style="margin-bottom: 0;">
+                <label class="hm-admin-label">ملاحظات (اختياري)</label>
+                <input type="text" name="notes" class="hm-admin-input" value="<%= (exchangeRate && exchangeRate.notes) ? exchangeRate.notes : '' %>" placeholder="سبب التحديث أو ملاحظة">
+              </div>
+              
+              <button type="submit" class="hm-btn-admin hm-btn-admin-primary">
+                <i class="fas fa-save"></i>
+                حفظ
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Info Card -->
+      <div class="hm-admin-card">
+        <div class="hm-card-header">
+          <h2 class="hm-card-title">
+            <i class="fas fa-info-circle"></i>
+            معلومات مهمة
+          </h2>
+        </div>
+        <div class="hm-card-body">
+          <div style="color: var(--hm-silver); line-height: 1.8;">
+            <p><i class="fas fa-check-circle" style="color: var(--hm-success); margin-left: 0.5rem;"></i> سعر الصرف يُستخدم لتحويل أسعار السيارات من الدولار إلى الريال السعودي.</p>
+            <p><i class="fas fa-check-circle" style="color: var(--hm-success); margin-left: 0.5rem;"></i> أي تغيير في السعر سينعكس فوراً على جميع الأسعار المعروضة.</p>
+            <p><i class="fas fa-exclamation-triangle" style="color: var(--hm-warning); margin-left: 0.5rem;"></i> تأكد من إدخال سعر صرف صحيح ومحدث.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<style>
+@media (max-width: 768px) {
+  div[style*="grid-template-columns: 1fr 2fr auto"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+</style>
+
+<script>
+function toggleSidebar() {
+  const sidebar = document.getElementById('adminSidebar');
+  sidebar.classList.toggle('open');
+}
+
+document.addEventListener('click', function(e) {
+  const sidebar = document.getElementById('adminSidebar');
+  const toggle = document.querySelector('.hm-mobile-toggle');
+  
+  if (window.innerWidth <= 1024) {
+    if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+      sidebar.classList.remove('open');
+    }
+  }
+});
+</script>

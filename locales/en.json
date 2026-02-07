@@ -1,0 +1,150 @@
+{
+  "navigation": {
+    "home": "Home",
+    "auctions": "Auctions",
+    "cars": "Cars",
+    "about": "About",
+    "contact": "Contact",
+    "notifications": "Notifications",
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register"
+  },
+  "about": {
+    "title": "About Us",
+    "subtitle": "Learn about our story and vision",
+    "our_story": "Our Story",
+    "secure_transactions": "Secure Transactions",
+    "secure_desc": "We ensure the highest levels of security in all your transactions",
+    "global_reach": "Global Reach",
+    "global_desc": "We reach all parts of the world with our premium services",
+    "support": "24/7 Support",
+    "support_desc": "Our support team is available to help you anytime",
+    "quality": "High Quality",
+    "quality_desc": "We offer you the best inspected and certified vehicles"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "We are here to help you",
+    "send_message": "Send a Message",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "subject": "Subject",
+    "message": "Message",
+    "submit": "Submit",
+    "success": "Your message has been sent successfully",
+    "info_title": "Contact Information",
+    "address": "Address",
+    "working_hours": "Working Hours"
+  },
+  "accessibility": {
+    "skipToContent": "Skip to content"
+  },
+  "ui": {
+    "switch_to_english": "Switch to English",
+    "switch_to_arabic": "Switch to Arabic"
+  },
+  "footer": {
+    "aboutTitle": "About HM CAR",
+    "aboutText": "The best place to find your dream car through our exclusive auctions.",
+    "quickLinksTitle": "Quick Links",
+    "contactTitle": "Contact Us",
+    "followUs": "Follow Us",
+    "rightsReserved": "All rights reserved",
+    "luxuryDescription": "A leading platform for luxury car auctions and genuine spare parts. We bring passion and quality together.",
+    "links": {
+      "buyCars": "Buy Cars",
+      "sellCar": "Sell a Car",
+      "support": "Support",
+      "spareParts": "Spare Parts",
+      "liveAuction": "Live Auction"
+    },
+    "contact": {
+      "address": "Auction Street, Car City",
+      "phone": "+966 50 123 4567",
+      "email": "info@hmcar.com"
+    }
+  },
+  "common": {
+    "or": "OR",
+    "details": "View Details"
+  },
+  "home": {
+    "creative": {
+      "searchTitle": "Search for your car",
+      "searchPlaceholder": "Car name",
+      "brand": "Brand",
+      "minPrice": "Min price",
+      "maxPrice": "Max price",
+      "searchButton": "Search",
+      "featuredTitle": "Featured cars",
+      "noCarsTitle": "No cars available",
+      "noCarsSubtitle": "New cars will be added soon",
+      "cta": {
+        "exploreAuctions": "Explore Auctions",
+        "browseCars": "Browse Cars",
+        "register": "Create Account",
+        "login": "Login"
+      },
+      "stats": {
+        "cars": "Luxury cars",
+        "activeAuctions": "Active auctions",
+        "users": "Users",
+        "completedAuctions": "Completed auctions"
+      },
+      "car": {
+        "year": "Year",
+        "price": "Price"
+      }
+    }
+  },
+  "auth": {
+    "brand": "CarAuction",
+    "rememberMe": "Remember Me",
+    "forgotPassword": "Forgot Password?",
+    "continueWithGoogle": "Continue with Google",
+    "continueWithFacebook": "Continue with Facebook",
+    "noAccount": "Don't have an account?",
+    "signUpNow": "Sign Up Now",
+    "haveAccount": "Already have an account?",
+    "login": "Login",
+    "createAccount": "Create Account",
+    "loginAsAdmin": "Login as Admin",
+    "loginAsCustomer": "Login as Customer",
+    "copyright": "All Rights Reserved.",
+    "fields": {
+      "username": "Username",
+      "email": "Email",
+      "password": "Password",
+      "fullName": "Full Name",
+      "confirmPassword": "Confirm Password"
+    },
+    "loginPage": {
+      "sideTitle": "Find Your\nDream Car",
+      "sideDescription": "The world's most exclusive marketplace for luxury and exotic cars. Join us to discover, bid, and win.",
+      "features": {
+        "liveAuctions": "Live Auctions",
+        "verifiedSellers": "Verified Sellers",
+        "globalBidding": "Global Bidding"
+      },
+      "title": "Welcome Back",
+      "subtitle": "Login to continue your journey with us.",
+      "button": "Login"
+    },
+    "registerPage": {
+      "sideTitle": "Join the Elite Auction Community",
+      "sideDescription": "Create an account to start bidding, buying, and selling the finest cars available.",
+      "title": "Create an Account",
+      "subtitle": "Get started in just a few steps.",
+      "placeholders": {
+        "fullName": "Enter your full name",
+        "email": "you@example.com",
+        "password": "Create a strong password",
+        "confirmPassword": "Confirm your password"
+      }
+    }
+  }
+}

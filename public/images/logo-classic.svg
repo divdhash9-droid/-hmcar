@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 320" role="img" aria-labelledby="title desc">
+  <title id="title">HM CAR Classic</title>
+  <desc id="desc">Minimal navy-and-ivory wordmark with flowing car silhouette.</desc>
+  <defs>
+    <linearGradient id="navy" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a1f3a" />
+      <stop offset="100%" stop-color="#08152a" />
+    </linearGradient>
+    <linearGradient id="ivory" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f2ede3" />
+      <stop offset="100%" stop-color="#e7dfd2" />
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="700" height="320" rx="28" fill="url(#navy)" />
+
+  <!-- Car silhouette -->
+  <path d="M110 194c58-46 134-70 220-68 75 1 137 20 180 48 12 8 9 26-6 24-41-5-72-40-173-40-86 0-136 19-179 38-10 4-21-6-12-17z" fill="none" stroke="url(#ivory)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M118 196c42-30 103-52 180-52 96 0 156 23 194 49" fill="none" stroke="url(#ivory)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- Wordmark -->
+  <g fill="url(#ivory)" font-family="'Times New Roman','Playfair Display','Cormorant Garamond',serif" text-rendering="optimizeLegibility">
+    <text x="150" y="245" font-size="96" font-weight="700" letter-spacing="6">HM CAR</text>
+  </g>
+</svg>

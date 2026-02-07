@@ -1,0 +1,50 @@
+name: Scheduled Deployment
+
+on:
+  schedule:
+    # Deploy every day at 2 AM UTC (5 AM Saudi Arabia)
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  check-and-deploy:
+    name: Check for changes and deploy
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 2
+
+    - name: Check for changes
+      id: changes
+      run: |
+        # Check if there are new commits in the last 24 hours
+        COMMITS=$(git log --since="24 hours ago" --oneline | wc -l)
+        echo "commits=$COMMITS" >> $GITHUB_OUTPUT
+        
+        if [ $COMMITS -gt 0 ]; then
+          echo "🔄 Found $COMMITS new commits in the last 24 hours"
+          echo "should_deploy=true" >> $GITHUB_OUTPUT
+        else
+          echo "✅ No new commits, skipping deployment"
+          echo "should_deploy=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Trigger deployment
+      if: steps.changes.outputs.should_deploy == 'true'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          await github.rest.actions.createWorkflowDispatch({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            workflow_id: 'deploy.yml',
+            ref: 'main'
+          })
+
+    - name: Send notification
+      if: steps.changes.outputs.should_deploy == 'true'
+      run: |
+        echo "📦 Triggered automated deployment"

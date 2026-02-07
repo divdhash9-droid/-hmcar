@@ -1,0 +1,103 @@
+<!-- [[ARABIC_HEADER]] هذا الملف (views/cars/list.ejs) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. -->
+
+<% layout('layout') -%>
+
+<!-- HM Design System CSS -->
+<link rel="stylesheet" href="/css/design-system.css">
+
+<div class="hm-dashboard">
+  <div class="hm-dashboard__container">
+    <header class="hm-hero hm-bg-gold" aria-label="قائمة السيارات">
+      <div class="hm-hero__top">
+        <div class="hm-hero__brand">
+          <div class="hm-hero__titles">
+            <h1 class="hm-hero__title hm-text-white">السيارات المتاحة</h1>
+            <div class="hm-hero__subtitle hm-text-white">استكشف مجموعتنا المميزة من السيارات</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="row mt-4">
+      <!-- Filters Sidebar -->
+      <div class="col-md-3">
+        <div class="hm-card mb-4">
+          <h4 class="hm-text-blue mb-3">تصفية البحث</h4>
+          <form action="/cars/list" method="GET">
+            <div class="mb-3">
+              <label class="form-label">بحث</label>
+              <input type="text" name="q" class="form-control" value="<%= filters.q %>" placeholder="اسم السيارة...">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">الشركة</label>
+              <input type="text" name="make" class="form-control" value="<%= filters.make %>" placeholder="مثال: Toyota">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">الموديل</label>
+              <input type="text" name="model" class="form-control" value="<%= filters.model %>" placeholder="مثال: Camry">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">السعر (ريال)</label>
+              <div class="d-flex gap-2">
+                <input type="number" name="minPrice" class="form-control" placeholder="من" value="<%= filters.minPrice %>">
+                <input type="number" name="maxPrice" class="form-control" placeholder="إلى" value="<%= filters.maxPrice %>">
+              </div>
+            </div>
+            <button type="submit" class="hm-btn hm-btn-primary w-100">بحث</button>
+            <a href="/cars/list" class="hm-btn hm-btn-outline w-100 mt-2 text-center">إلغاء الفلاتر</a>
+          </form>
+        </div>
+      </div>
+
+      <!-- Cars Grid -->
+      <div class="col-md-9">
+        <% if (cars && cars.length > 0) { %>
+          <div class="row">
+            <% cars.forEach(car => { %>
+              <div class="col-md-4 mb-4">
+                <div class="hm-card h-100">
+                  <div class="car-image-container mb-3" style="height: 200px; overflow: hidden; border-radius: var(--hm-radius-md);">
+                    <img src="<%= (car.images && car.images.length > 0) ? car.images[0] : '/images/placeholder.png' %>" alt="<%= car.title %>" style="width: 100%; height: 100%; object-fit: cover;">
+                  </div>
+                  <h5 class="hm-text-blue mb-2"><%= car.title %></h5>
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge bg-light text-dark border"><%= car.make %></span>
+                    <span class="hm-text-gold fw-bold">
+                      <%= car.priceSar ? car.priceSar.toLocaleString() + ' ريال' : (car.price ? car.price.toLocaleString() + ' ريال' : 'غير محدد') %>
+                    </span>
+                  </div>
+                  <div class="car-meta mb-3 small text-muted">
+                    <span><i class="fas fa-calendar me-1"></i> <%= car.year %></span>
+                    <span class="mx-2">|</span>
+                    <span><i class="fas fa-tachometer-alt me-1"></i> <%= car.mileage ? car.mileage.toLocaleString() : 'N/A' %></span>
+                  </div>
+                  <a href="/cars/<%= car._id %>" class="hm-btn hm-btn-outline w-100">التفاصيل</a>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+
+<!-- Pagination -->
+          <% if (pagination.totalPages > 1) { %>
+            <nav aria-label="Page navigation" class="mt-4">
+              <ul class="pagination justify-content-center">
+                <% for(let i = 1; i <= pagination.totalPages; i++) { %>
+                  <li class="page-item <%= pagination.currentPage === i ? 'active' : '' %>">
+                    <a class="page-link" href="/cars/list?page=<%= i %>&q=<%= filters.q %>&make=<%= filters.make %>"><%= i %></a>
+                  </li>
+                <% } %>
+              </ul>
+            </nav>
+          <% } %>
+
+        <% } else { %>
+          <div class="hm-card text-center py-5">
+            <i class="fas fa-car fa-3x hm-text-muted mb-3"></i>
+            <h3>لا توجد سيارات متاحة</h3>
+            <p>جرب تغيير خيارات البحث أو عد لاحقاً.</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>

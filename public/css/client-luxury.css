@@ -1,0 +1,759 @@
+/* [[ARABIC_HEADER]] هذا الملف (public/css/client-luxury.css) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. */
+
+/* Client Luxury Design System - HM CAR */
+/* نظام تصميم فاخر للعميل */
+
+/* ===== Client Color System ===== */
+:root {
+  /* Client Luxury Colors */
+  --client-primary: #1A1A1A;
+  --client-primary-light: #2D2D2D;
+  --client-primary-dark: #0A0A0A;
+  
+  /* Client Gold Accents */
+  --client-gold: #FFD700;
+  --client-gold-light: #FFF8DC;
+  --client-gold-dark: #B8860B;
+  --client-gold-shimmer: linear-gradient(45deg, #FFD700, #FFA500, #FFD700);
+  
+  /* Client Silver Accents */
+  --client-silver: #C0C0C0;
+  --client-silver-light: #E8E8E8;
+  --client-silver-dark: #A8A8A8;
+  --client-silver-shimmer: linear-gradient(45deg, #C0C0C0, #E5E5E5, #C0C0C0);
+  
+  /* Client Platinum Accents */
+  --client-platinum: #E5E4E2;
+  --client-platinum-light: #F8F6F0;
+  --client-platinum-dark: #D1D1D1;
+  --client-platinum-shimmer: linear-gradient(45deg, #E5E4E2, #FFFFFF, #E5E4E2);
+  
+  /* Client Text Colors */
+  --client-text-primary: #FFFFFF;
+  --client-text-secondary: #B8B8B8;
+  --client-text-tertiary: #888888;
+  --client-text-quaternary: #666666;
+  
+  /* Client Background Colors */
+  --client-bg-primary: #FFFFFF;
+  --client-bg-secondary: #F8F9FA;
+  --client-bg-tertiary: #F1F3F4;
+  --client-bg-quaternary: #FAFBFC;
+  
+  /* Client Border Colors */
+  --client-border: #E0E0E0;
+  --client-border-light: #F0F0F0;
+  --client-border-dark: #D0D0D0;
+  
+  /* Client Shadow Colors */
+  --client-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --client-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --client-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
+  --client-shadow-xl: 0 12px 36px rgba(0, 0, 0, 0.25);
+  
+  /* Client Luxury Gradients */
+  --client-gradient-gold: linear-gradient(135deg, var(--client-gold) 0%, var(--client-gold-light) 50%, var(--client-gold) 100%);
+  --client-gradient-silver: linear-gradient(135deg, var(--client-silver) 0%, var(--client-silver-light) 50%, var(--client-silver) 100%);
+  --client-gradient-platinum: linear-gradient(135deg, var(--client-platinum) 0%, var(--client-platinum-light) 50%, var(--client-platinum) 100%);
+  --client-gradient-charcoal: linear-gradient(135deg, var(--client-primary-dark) 0%, var(--client-primary) 50%, var(--client-primary-light) 100%);
+  --client-gradient-midnight: linear-gradient(135deg, #0F1419 0%, #1A1A2E 50%, #2D3748 100%);
+  
+  /* Client Glassmorphism */
+  --client-glass-bg: rgba(255, 255, 255, 0.1);
+  --client-glass-border: rgba(255, 255, 255, 0.2);
+  --client-glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* ===== Client Typography ===== */
+.client-text {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--client-text-primary);
+}
+
+.client-title-hero {
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  background: var(--client-gradient-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.client-title-large {
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--client-text-primary);
+}
+
+.client-title-medium {
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--client-text-primary);
+}
+
+.client-title-small {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--client-text-primary);
+}
+
+.client-subtitle {
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--client-text-secondary);
+  margin-bottom: 8px;
+}
+
+.client-body {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--client-text-secondary);
+}
+
+.client-caption {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--client-text-tertiary);
+}
+
+.client-small {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--client-text-quaternary);
+}
+
+/* ===== Client Buttons ===== */
+.client-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.client-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.client-btn:hover::before {
+  left: 100%;
+}
+
+.client-btn:active {
+  transform: scale(0.98);
+}
+
+.client-btn:focus {
+  outline: none;
+}
+
+/* Client Primary Button */
+.client-btn-primary {
+  background: var(--client-gradient-gold);
+  color: var(--client-text-primary);
+  box-shadow: var(--client-shadow);
+  border: 1px solid var(--client-gold-dark);
+}
+
+.client-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--client-shadow-lg);
+  border-color: var(--client-gold-dark);
+}
+
+.client-btn-primary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Client Secondary Button */
+.client-btn-secondary {
+  background: var(--client-gradient-silver);
+  color: var(--client-text-primary);
+  box-shadow: var(--client-shadow);
+  border: 1px solid var(--client-silver-dark);
+}
+
+.client-btn-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--client-lg);
+  border-color: var(--client-silver-dark);
+}
+
+.client-btn-secondary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Client Tertiary Button */
+.client-btn-tertiary {
+  background: var(--client-bg-primary);
+  color: var(--client-primary);
+  border: 1px solid var(--client-border);
+}
+
+.client-btn-tertiary:hover {
+  background: var(--client-bg-secondary);
+  transform: translateY(-1px);
+  border-color: var(--client-border-dark);
+}
+
+.client-btn-tertiary:active {
+  background: var(--client-bg-tertiary);
+  transform: translateY(0) scale(0.98);
+}
+
+/* Client Luxury Buttons */
+.client-btn-luxury {
+  background: var(--client-gradient-gold);
+  color: var(--client-text-primary);
+  box-shadow: var(--client-shadow-lg);
+  border: 2px solid var(--client-gold-dark);
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.client-btn-luxury::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.client-btn-luxury:hover::before {
+  left: 100%;
+}
+
+.client-btn-luxury:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--client-shadow-xl);
+  border-color: var(--client-gold-dark);
+}
+
+.client-btn-luxury:active {
+  transform: translateY(0) scale(0.96);
+}
+
+.client-btn-luxury::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.4) 0%, transparent 70%);
+  transform: translate(-50%, -50%);
+  transition: all 0.3s ease;
+  opacity: 0;
+}
+
+.client-btn-luxury:hover::after {
+  width: 60px;
+  height: 60px;
+  opacity: 1;
+}
+
+/* Client Button Sizes */
+.client-btn-sm {
+  padding: 8px 16px;
+  font-size: 14px;
+  border-radius: 8px;
+}
+
+.client-btn-lg {
+  padding: 16px 32px;
+  font-size: 18px;
+  border-radius: 16px;
+}
+
+.client-btn-xl {
+  padding: 20px 40px;
+  font-size: 20px;
+  border-radius: 20px;
+}
+
+.client-btn-icon {
+  padding: 12px;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+}
+
+.client-btn-icon-sm {
+  padding: 8px;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 14px;
+}
+
+/* ===== Client Cards ===== */
+.client-card {
+  background: var(--client-bg-primary);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: var(--client-shadow);
+  border: 1px solid var(--client-border);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  overflow: hidden;
+}
+
+.client-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--client-gradient-gold);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.client-card:hover::before {
+  opacity: 1;
+}
+
+.client-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--client-shadow-lg);
+  border-color: var(--client-border-dark);
+}
+
+.client-card-luxury {
+  background: var(--client-bg-primary);
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: var(--client-shadow-lg);
+  border: 2px solid var(--client-gold-dark);
+  position: relative;
+  overflow: hidden;
+}
+
+.client-card-luxury::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: var(--client-gradient-gold);
+  opacity: 0.8;
+}
+
+.client-card-luxury:hover {
+  transform: translateY(-12px);
+  box-shadow: var(--client-shadow-xl);
+  border-color: var(--client-gold-dark);
+}
+
+.client-card-glass {
+  background: var(--client-glass-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--client-glass-border);
+  box-shadow: var(--client-glass-shadow);
+}
+
+.client-card-glass:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: var(--client-glass-shadow);
+}
+
+/* ===== Client Input Fields ===== */
+.client-input {
+  width: 100%;
+  padding: 16px;
+  border: 1px solid var(--client-border);
+  border-radius: 12px;
+  background: var(--client-bg-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--client-text-primary);
+  transition: all 0.3s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.client-input:focus {
+  outline: none;
+  border-color: var(--client-gold);
+  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+  background: var(--client-bg-primary);
+}
+
+.client-input::placeholder {
+  color: var(--client-text-tertiary);
+}
+
+/* ===== Client Badges ===== */
+.client-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.2s ease;
+}
+
+.client-badge-gold {
+  background: var(--client-gradient-gold);
+  color: var(--client-text-primary);
+  box-shadow: var(--client-shadow);
+}
+
+.client-badge-silver {
+  background: var(--client-gradient-silver);
+  color: var(--client-text-primary);
+  box-shadow: var(--client-shadow);
+}
+
+.client-badge-platinum {
+  background: var(--client-gradient-platinum);
+  color: var(--client-text-primary);
+  box-shadow: var(--client-shadow);
+}
+
+/* ===== Client Loading States ===== */
+.client-loading {
+  position: relative;
+  color: transparent !important;
+  pointer-events: none;
+}
+
+.client-loading::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 50%;
+  left: 50%;
+  margin-left: -10px;
+  margin-top: -10px;
+  border: 2px solid var(--client-border);
+  border-radius: 50%;
+  border-top-color: var(--client-gold);
+  animation: client-spin 1s linear infinite;
+}
+
+@keyframes client-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ===== Client Animations ===== */
+@keyframes client-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes client-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes client-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes client-shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes client-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.5));
+  }
+}
+
+@keyframes client-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes client-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* Client Animation Classes */
+.client-animate-fade-in {
+  opacity: 0;
+  animation: client-fade-in 0.6s ease-out forwards;
+}
+
+.client-animate-slide-up {
+  opacity: 0;
+  animation: client-slide-up 0.6s ease-out forwards;
+}
+
+.client-animate-scale-in {
+  opacity: 0;
+  animation: client-scale-in 0.4s ease-out forwards;
+}
+
+.client-animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  background-size: 200% 100%;
+  animation: client-shimmer 2s infinite;
+}
+
+.client-animate-glow {
+  animation: client-glow 2s ease-in-out infinite alternate;
+}
+
+.client-animate-float {
+  animation: client-float 3s ease-in-out infinite;
+}
+
+.client-animate-pulse {
+  animation: client-pulse 2s ease-in-out infinite;
+}
+
+/* ===== Client Hover Effects ===== */
+.client-hover-lift:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--client-shadow-lg);
+}
+
+.client-hover-scale:hover {
+  transform: scale(1.05);
+  box-shadow: var(--client-shadow-lg);
+}
+
+.client-hover-rotate:hover {
+  transform: rotate(5deg);
+  box-shadow: var(--client-shadow-lg);
+}
+
+.client-hover-glow:hover {
+  filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.4));
+}
+
+/* ===== Client Special Effects ===== */
+.client-text-shimmer {
+  background: linear-gradient(90deg, var(--client-text-primary) 0%, var(--client-text-secondary) 50%, var(--client-text-primary) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  background-size: 200% auto;
+  animation: client-shimmer 3s linear infinite;
+}
+
+.client-border-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.client-border-shimmer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--client-gradient-gold);
+  animation: client-shimmer 3s linear infinite;
+}
+
+.client-icon-neon {
+  text-shadow: 
+    0 0 10px rgba(255, 215, 0, 0.8),
+    0 0 20px rgba(255, 215, 0, 0.6),
+    0 0 30px rgba(255, 0, 0, 0.4);
+}
+
+.client-icon-neon:hover {
+  text-shadow: 
+    0 0 20px rgba(255, 215, 0, 1),
+    0 0 30px rgba(255, 215, 0, 0.8),
+    0 0 40px rgba(255, 215, 0, 0.6);
+}
+
+/* ===== Client Responsive ===== */
+@media (max-width: 768px) {
+  .client-title-hero {
+    font-size: 36px;
+  }
+  
+  .client-title-large {
+    font-size: 28px;
+  }
+  
+  .client-title-medium {
+    font-size: 24px;
+  }
+  
+  .client-title-small {
+    font-size: 20px;
+  }
+  
+  .client-btn {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+  
+  .client-btn-sm {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+  
+  .client-btn-lg {
+    padding: 14px 24px;
+    font-size: 16px;
+  }
+  
+  .client-btn-xl {
+    padding: 16px 32px;
+    font-size: 18px;
+  }
+  
+  .client-card {
+    padding: 20px;
+    border-radius: 12px;
+  }
+  
+  .client-card-luxury {
+    padding: 24px;
+    border-radius: 16px;
+  }
+  
+  .client-input {
+    padding: 14px;
+    font-size: 14px;
+  }
+}
+
+/* ===== Client Dark Mode Support ===== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --client-primary: #FFFFFF;
+    --client-primary-light: #F2F2F7;
+    --client-primary-dark: #FFFFFF;
+    
+    --client-text-primary: #FFFFFF;
+    --client-text-secondary: #C7C7CC;
+    --client-text-tertiary: #98989D;
+    --client-text-quaternary: #B8B8B8;
+    
+    --client-bg-primary: #1C1C1E;
+    --client-bg-secondary: #2C2C2E;
+    --client-bg-tertiary: #3A3A3C;
+    --client-bg-quaternary: #1C1C1E;
+    
+    --client-border: #38383A;
+    --client-border-light: #48484A;
+    --client-border-dark: #282828;
+    
+    --client-shadow: rgba(0, 0, 0, 0.3);
+    --client-shadow-lg: rgba(0, 0, 0, 0.4);
+    --client-shadow-xl: rgba(0, 0, 0, 0.5);
+    
+    --client-glass-bg: rgba(255, 255, 255, 0.05);
+    --client-glass-border: rgba(255, 255, 255, 0.1);
+    --client-glass-shadow: rgba(0, 0, 0, 0.2);
+  }
+  
+  .client-card {
+    background: var(--client-bg-primary);
+    border-color: var(--client-border);
+  }
+  
+  .client-input {
+    background: var(--client-bg-secondary);
+    border-color: var(--client-border);
+    color: var(--client-text-primary);
+  }
+  
+  .client-input:focus {
+    border-color: var(--client-gold);
+    background: var(--client-bg-primary);
+  }
+  
+  .client-btn-tertiary {
+    background: var(--client-bg-secondary);
+    color: var(--client-primary);
+    border-color: var(--client-border);
+  }
+  
+  .client-btn-tertiary:hover {
+    background: var(--client-bg-tertiary);
+    border-color: var(--client-border-dark);
+  }
+}

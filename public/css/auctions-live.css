@@ -1,0 +1,318 @@
+/* [[ARABIC_HEADER]] هذا الملف (public/css/auctions-live.css) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. */
+
+/* 
+ * Live Auctions Page - Using Design System
+ * صفحة المزادات المباشرة - باستخدام نظام التصميم الموحد
+ */
+
+.hm-auction-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--hm-space-xl) var(--hm-space-md);
+}
+
+.hm-auction-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hm-space-lg);
+  margin-bottom: var(--hm-space-xl);
+  padding: var(--hm-space-lg);
+  background: var(--hm-bg-tertiary);
+  border-radius: var(--hm-radius-2xl);
+  border: 2px solid var(--hm-border-medium);
+}
+
+.hm-auction-title-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hm-space-md);
+}
+
+.hm-auction-title-section h3 {
+  color: var(--hm-text-primary);
+  font-size: 1.8rem;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--hm-space-md);
+}
+
+.hm-auction-description {
+  color: var(--hm-text-muted);
+  font-size: 1rem;
+}
+
+.hm-auction-actions {
+  display: flex;
+  gap: var(--hm-space-md);
+  flex-wrap: wrap;
+}
+
+.hm-auction-url-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hm-space-sm);
+  margin-bottom: var(--hm-space-md);
+}
+
+.hm-link-gold {
+  color: var(--hm-gold-primary);
+  text-decoration: none;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: var(--hm-space-xs);
+}
+
+.hm-link-gold:hover {
+  color: var(--hm-gold-dark);
+  text-decoration: underline;
+}
+
+.hm-card-content-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--hm-space-md);
+  padding: var(--hm-space-2xl) var(--hm-space-xl);
+  text-align: center;
+}
+
+.hm-card-content-center h5 {
+  color: var(--hm-text-primary);
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+.hm-card-gold {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(245, 216, 118, 0.05) 100%);
+  border-color: var(--hm-gold-primary);
+}
+
+.hm-card-light {
+  background: var(--hm-gray-50);
+  border-color: var(--hm-border-light);
+}
+
+.hm-card-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: var(--hm-radius-lg) var(--hm-radius-lg) 0 0;
+}
+
+.hm-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  align-items: center;
+  gap: var(--hm-space-sm);
+  margin-bottom: var(--hm-space-md);
+}
+
+.hm-card-header h6 {
+  color: var(--hm-text-primary);
+  font-size: 1.1rem;
+  margin: 0;
+  flex: 1;
+}
+
+.hm-text-sm {
+  font-size: 0.875rem;
+}
+
+.hm-alert {
+  padding: var(--hm-space-md);
+  border-radius: var(--hm-radius-md);
+  border: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  gap: var(--hm-space-sm);
+}
+
+.hm-alert-warning {
+  background: var(--hm-warning-light);
+  border-color: var(--hm-warning);
+  color: var(--hm-warning);
+}
+
+.hm-auction-cars-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--hm-space-xl);
+}
+
+.hm-card-actions {
+  display: flex;
+  gap: var(--hm-space-sm);
+  flex-wrap: wrap;
+  margin-top: var(--hm-space-md);
+  padding-top: var(--hm-space-md);
+  border-top: 2px solid var(--hm-border-light);
+}
+
+.hm-btn-success {
+  background: var(--hm-success);
+  color: var(--hm-white);
+  border-color: var(--hm-success);
+}
+
+.hm-btn-success:hover {
+  background: var(--hm-success-light);
+  color: var(--hm-white);
+  transform: translateY(-2px);
+}
+
+.hm-btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+.hm-animate-spin {
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive Design - التصميم المتجاوب */
+@media (max-width: 1024px) {
+  .hm-auction-header {
+    padding: var(--hm-space-md);
+  }
+  
+  .hm-auction-actions {
+    flex-direction: column;
+  }
+  
+  .hm-auction-cars-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--hm-space-lg);
+  }
+}
+
+@media (max-width: 768px) {
+  .hm-auction-container {
+    padding: var(--hm-space-lg) var(--hm-space-md);
+  }
+  
+  .hm-auction-header {
+    gap: var(--hm-space-md);
+    margin-bottom: var(--hm-space-lg);
+  }
+  
+  .hm-auction-title-section h3 {
+    font-size: 1.5rem;
+  }
+  
+  .hm-card-image {
+    height: 180px;
+  }
+  
+  .hm-card-content-center {
+    padding: var(--hm-space-xl) var(--hm-space-lg);
+  }
+}
+
+@media (max-width: 480px) {
+  .hm-auction-container {
+    padding: var(--hm-space-md);
+  }
+  
+  .hm-auction-title-section h3 {
+    font-size: 1.3rem;
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .hm-auction-actions {
+    flex-direction: column;
+  }
+  
+  .hm-card-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--hm-space-sm);
+  }
+  
+  .hm-card-header h6 {
+    text-align: center;
+  }
+  
+  .hm-card-header span {
+    text-align: center;
+  }
+}
+
+/* Animation Effects - تأثيرات الحركة */
+.hm-card {
+  animation: slideInUp 0.4s ease-out;
+}
+
+.hm-card:nth-child(1) { animation-delay: 0.1s; }
+.hm-card:nth-child(2) { animation-delay: 0.2s; }
+.hm-card:nth-child(3) { animation-delay: 0.3s; }
+.hm-card:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Hover Effects - تأثيرات التحويم */
+.hm-card:hover {
+  transform: translateY(-5px) scale(1.02);
+}
+
+.hm-card-image:hover {
+  transform: scale(1.05);
+}
+
+/* Focus States - حالات التركيز */
+.hm-card:focus-within {
+  outline: 2px solid var(--hm-gold-primary);
+  outline-offset: 2px;
+}
+
+.hm-link-gold:focus {
+  outline: 2px solid var(--hm-gold-primary);
+  outline-offset: 2px;
+  border-radius: var(--hm-radius-sm);
+}
+
+/* Accessibility - إمكانية الوصول */
+@media (prefers-reduced-motion: reduce) {
+  .hm-card,
+  .hm-card-image {
+    transition: none;
+    animation: none;
+  }
+  
+  .hm-animate-spin {
+    animation: none;
+  }
+}
+
+/* High Contrast Mode - وضع التباين العالي */
+@media (prefers-contrast: high) {
+  .hm-card {
+    border-width: 3px;
+  }
+  
+  .hm-btn {
+    border-width: 2px;
+  }
+}

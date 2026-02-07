@@ -1,0 +1,392 @@
+<!-- [[ARABIC_HEADER]] هذا الملف (views/admin/brands.ejs) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. -->
+
+<% layout('layout') -%>
+  <% var hideNavbar=true; %>
+    <% var hideSearch=true; %>
+      <% var fullWidth=true; %>
+        <% var bodyClass='hm-admin-page' ; %>
+
+          <link rel="stylesheet" href="/css/admin-luxury.css">
+
+          <div class="hm-admin-layout">
+            <!-- Animated Background -->
+            <div class="hm-admin-bg">
+              <div class="hm-admin-bg-gradient"></div>
+              <div class="hm-admin-bg-glow"></div>
+            </div>
+
+            <!-- Mobile Toggle -->
+            <button class="hm-mobile-toggle" onclick="toggleSidebar()">
+              <i class="fas fa-bars"></i>
+            </button>
+
+            <!-- Sidebar -->
+            <%- include('../partials/admin-sidebar') %>
+
+              <!-- Main Content -->
+              <main class="hm-admin-main">
+                <!-- Header -->
+                <header class="hm-admin-header">
+                  <div class="hm-header-title">
+                    <h1>إدارة الماركات</h1>
+                    <div class="hm-header-breadcrumb">
+                      <a href="/admin">لوحة التحكم</a>
+                      <i class="fas fa-chevron-left"></i>
+                      <span>الماركات</span>
+                    </div>
+                  </div>
+                  <div class="hm-header-actions">
+                    <button class="hm-btn-admin hm-btn-admin-primary" onclick="openBrandModal()">
+                      <i class="fas fa-plus"></i>
+                      إضافة ماركة
+                    </button>
+                  </div>
+                </header>
+
+                <!-- Content -->
+                <div class="hm-admin-content">
+                  <!-- Flash Messages -->
+                  <% if (flash && flash.message) { %>
+                    <div class="hm-admin-alert hm-admin-alert-<%= flash.type || 'info' %>">
+                      <i
+                        class="fas <%= flash.type === 'success' ? 'fa-check-circle' : flash.type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle' %>"></i>
+                      <span>
+                        <%= flash.message %>
+                      </span>
+                    </div>
+                    <% } %>
+
+                      <!-- Stats -->
+                      <div class="hm-stats-grid">
+                        <div class="hm-stat-card">
+                          <div class="hm-stat-icon">
+                            <i class="fas fa-copyright"></i>
+                          </div>
+                          <div class="hm-stat-info">
+                            <div class="hm-stat-label">إجمالي الماركات</div>
+                            <div class="hm-stat-value">
+                              <%= brands ? brands.length : 0 %>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Brands List -->
+                      <div class="hm-admin-card">
+                        <div class="hm-card-header">
+                          <h2 class="hm-card-title">
+                            <i class="fas fa-copyright"></i>
+                            قائمة الماركات
+                          </h2>
+                          <span class="hm-admin-badge hm-admin-badge-primary">
+                            <%= brands ? brands.length : 0 %> ماركة
+                          </span>
+                        </div>
+                        <div class="hm-card-body" style="padding: 0;">
+                          <% if (brands && brands.length> 0) { %>
+                            <table class="hm-admin-table">
+                              <thead>
+                                <tr>
+                                  <th>الشعار</th>
+                                  <th>اسم الماركة</th>
+                                  <th>إجراءات</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <% brands.forEach(function(brand) { %>
+                                  <tr>
+                                    <td>
+                                      <% if (brand.logoUrl) { %>
+                                        <img src="<%= brand.logoUrl %>" alt="<%= brand.name %>"
+                                          style="width: 50px; height: 35px; object-fit: contain; background: white; border-radius: 6px; padding: 4px;">
+                                        <% } else { %>
+                                          <div
+                                            style="width: 50px; height: 35px; background: var(--hm-glass-bg); border-radius: 6px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-image" style="color: var(--hm-gray);"></i>
+                                          </div>
+                                          <% } %>
+                                    </td>
+                                    <td style="color: var(--hm-white); font-weight: 600;">
+                                      <%= brand.name %>
+                                        <div style="font-size: 0.7em; margin-top: 4px; display: flex; gap: 4px;">
+                                          <% if (brand.forCars) { %>
+                                            <span
+                                              style="background: rgba(59, 130, 246, 0.2); color: #60a5fa; padding: 2px 6px; border-radius: 4px;">سيارات</span>
+                                            <% } %>
+                                              <% if (brand.forSpareParts) { %>
+                                                <span
+                                                  style="background: rgba(16, 185, 129, 0.2); color: #34d399; padding: 2px 6px; border-radius: 4px;">قطع
+                                                  غيار</span>
+                                                <% } %>
+                                        </div>
+                                    </td>
+                                    <td>
+                                      <div style="display: flex; gap: 0.5rem;">
+                                        <button class="hm-btn-admin hm-btn-admin-primary hm-btn-admin-sm"
+                                          data-brand-id="<%= brand._id %>" data-brand-name="<%= brand.name %>"
+                                          data-brand-logo="<%= brand.logoUrl || '' %>"
+                                          data-for-cars="<%= brand.forCars %>"
+                                          data-for-parts="<%= brand.forSpareParts %>"
+                                          onclick="openBrandModalFromBtn(this)" title="تعديل">
+                                          <i class="fas fa-edit"></i>
+                                        </button>
+                                        <form method="POST" action="/admin/brands/<%= brand._id %>/delete"
+                                          style="display: inline;"
+                                          onsubmit="return confirm('هل أنت متأكد من حذف هذه الماركة؟');">
+                                          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                          <button type="submit" class="hm-btn-admin hm-btn-admin-danger hm-btn-admin-sm"
+                                            title="حذف">
+                                            <i class="fas fa-trash"></i>
+                                          </button>
+                                        </form>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                  <% }); %>
+                              </tbody>
+                            </table>
+                            <% } else { %>
+                              <div class="hm-empty-state">
+                                <div class="hm-empty-icon">
+                                  <i class="fas fa-copyright"></i>
+                                </div>
+                                <h3 class="hm-empty-title">لا توجد ماركات</h3>
+                                <p class="hm-empty-text">أضف ماركات السيارات لتظهر هنا</p>
+                                <button class="hm-btn-admin hm-btn-admin-primary" onclick="openBrandModal()"
+                                  style="margin-top: 1rem;">
+                                  <i class="fas fa-plus"></i>
+                                  إضافة ماركة
+                                </button>
+                              </div>
+                              <% } %>
+                        </div>
+                      </div>
+                </div>
+              </main>
+          </div>
+
+          <!-- Add/Edit Brand Modal -->
+          <div class="hm-modal-overlay" id="brandModalOverlay" onclick="closeBrandModal(event)">
+            <div class="hm-modal" onclick="event.stopPropagation()">
+              <div class="hm-modal-header">
+                <h3 class="hm-modal-title" id="brandModalTitle">إضافة ماركة جديدة</h3>
+                <button class="hm-modal-close" onclick="closeBrandModal()">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+              <form id="brandForm" method="POST" action="/admin/brands" enctype="multipart/form-data">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <div class="hm-modal-body">
+                  <div class="hm-admin-form-group">
+                    <label class="hm-admin-label">اسم الماركة</label>
+                    <input type="text" name="name" id="brandName" class="hm-admin-input" placeholder="مثال: تويوتا"
+                      required>
+                  </div>
+                  <div class="hm-admin-form-group">
+                    <label class="hm-admin-label">رابط الشعار (URL)</label>
+                    <input type="url" name="logoUrl" id="brandLogoUrl" class="hm-admin-input"
+                      placeholder="https://example.com/logo.png">
+                  </div>
+                  <div class="hm-admin-form-group">
+                    <label class="hm-admin-label">أو رفع ملف الشعار</label>
+                    <input type="file" name="logo" class="hm-admin-input" accept="image/*">
+                  </div>
+
+                  <div class="hm-admin-form-group">
+                    <label class="hm-admin-label">نوع الماركة</label>
+                    <div style="display: flex; gap: 20px; margin-top: 10px;">
+                      <label
+                        style="display: flex; align-items: center; gap: 8px; color: var(--hm-white); cursor: pointer;">
+                        <input type="checkbox" name="forCars" id="brandForCars" style="width: 18px; height: 18px;"
+                          checked>
+                        <span>سيارات</span>
+                      </label>
+                      <label
+                        style="display: flex; align-items: center; gap: 8px; color: var(--hm-white); cursor: pointer;">
+                        <input type="checkbox" name="forSpareParts" id="brandForSpareParts"
+                          style="width: 18px; height: 18px;">
+                        <span>قطع غيار</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div class="hm-modal-footer">
+                  <button type="button" class="hm-btn-admin hm-btn-admin-secondary" onclick="closeBrandModal()">
+                    إلغاء
+                  </button>
+                  <button type="submit" class="hm-btn-admin hm-btn-admin-primary">
+                    <i class="fas fa-save"></i>
+                    حفظ
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <style>
+            /* Modal Styles */
+            .hm-modal-overlay {
+              position: fixed;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              background: rgba(0, 0, 0, 0.7);
+              backdrop-filter: blur(8px);
+              display: none;
+              align-items: center;
+              justify-content: center;
+              z-index: 1000;
+              padding: 1rem;
+            }
+
+            .hm-modal-overlay.show {
+              display: flex;
+            }
+
+            .hm-modal {
+              width: 100%;
+              max-width: 500px;
+              background: var(--hm-royal-navy);
+              border: 1px solid var(--hm-glass-border);
+              border-radius: 20px;
+              overflow: hidden;
+              box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+              animation: modalAppear 0.3s ease;
+            }
+
+            @keyframes modalAppear {
+              from {
+                transform: scale(0.9);
+                opacity: 0;
+              }
+
+              to {
+                transform: scale(1);
+                opacity: 1;
+              }
+            }
+
+            .hm-modal-header {
+              padding: 1.25rem 1.5rem;
+              border-bottom: 1px solid var(--hm-glass-border);
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+            }
+
+            .hm-modal-title {
+              font-size: 1.2rem;
+              font-weight: 700;
+              color: var(--hm-white);
+              margin: 0;
+            }
+
+            .hm-modal-close {
+              width: 36px;
+              height: 36px;
+              background: var(--hm-glass-bg);
+              border: none;
+              border-radius: 10px;
+              color: var(--hm-silver);
+              cursor: pointer;
+              transition: all 0.2s;
+            }
+
+            .hm-modal-close:hover {
+              background: rgba(239, 68, 68, 0.2);
+              color: #fca5a5;
+            }
+
+            .hm-modal-body {
+              padding: 1.5rem;
+            }
+
+            .hm-modal-footer {
+              padding: 1rem 1.5rem;
+              border-top: 1px solid var(--hm-glass-border);
+              display: flex;
+              gap: 1rem;
+              justify-content: flex-end;
+            }
+          </style>
+
+          <script>
+            function toggleSidebar() {
+              const sidebar = document.getElementById('adminSidebar');
+              sidebar.classList.toggle('open');
+            }
+
+            document.addEventListener('click', function (e) {
+              const sidebar = document.getElementById('adminSidebar');
+              const toggle = document.querySelector('.hm-mobile-toggle');
+
+              if (window.innerWidth <= 1024) {
+                if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+                  sidebar.classList.remove('open');
+                }
+              }
+            });
+
+            let editingBrandId = null;
+
+            function openBrandModalFromBtn(btn) {
+              const brand = {
+                _id: btn.dataset.brandId,
+                name: btn.dataset.brandName,
+                logoUrl: btn.dataset.brandLogo,
+                forCars: btn.dataset.forCars === 'true',
+                forSpareParts: btn.dataset.forParts === 'true'
+              };
+              openBrandModal(brand);
+              console.log('Opening modal for brand:', brand);
+            }
+
+            function openBrandModal(brand) {
+              const overlay = document.getElementById('brandModalOverlay');
+              const form = document.getElementById('brandForm');
+              const title = document.getElementById('brandModalTitle');
+              const nameInput = document.getElementById('brandName');
+
+              const forCarsInput = document.getElementById('brandForCars');
+              const forPartsInput = document.getElementById('brandForSpareParts');
+
+              form.reset();
+
+              if (brand) {
+                const b = typeof brand === 'string' ? JSON.parse(brand) : brand;
+                title.textContent = 'تعديل ماركة';
+                form.action = '/admin/brands/' + b._id + '/edit';
+                nameInput.value = b.name || '';
+
+                // Set checkboxes
+                forCarsInput.checked = !!b.forCars;
+                forPartsInput.checked = !!b.forSpareParts;
+
+                editingBrandId = b._id;
+              } else {
+                title.textContent = 'إضافة ماركة جديدة';
+                form.action = '/admin/brands';
+                editingBrandId = null;
+                nameInput.value = '';
+
+                // Defaults for new
+                forCarsInput.checked = true;
+                forPartsInput.checked = false;
+              }
+
+              overlay.classList.add('show');
+            }
+
+            function closeBrandModal(e) {
+              if (e && e.target !== e.currentTarget) return;
+              document.getElementById('brandModalOverlay').classList.remove('show');
+            }
+
+            // Close on Escape
+            document.addEventListener('keydown', function (e) {
+              if (e.key === 'Escape') {
+                closeBrandModal();
+              }
+            });
+          </script>

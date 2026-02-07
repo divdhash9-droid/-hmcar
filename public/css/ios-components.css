@@ -1,0 +1,634 @@
+/* [[ARABIC_HEADER]] هذا الملف (public/css/ios-components.css) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. */
+
+/* iOS Components - HM CAR */
+/* مكونات iOS متقدمة للمشروع */
+
+/* ===== iOS Navigation Bar ===== */
+.ios-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 88px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid var(--ios-separator);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  padding: 8px 16px;
+}
+
+.ios-navbar-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 44px;
+}
+
+.ios-navbar-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ios-label);
+  text-align: center;
+  flex: 1;
+}
+
+.ios-navbar-left,
+.ios-navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 60px;
+}
+
+.ios-navbar-right {
+  justify-content: flex-end;
+}
+
+/* ===== iOS Tab Bar ===== */
+.ios-tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 83px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-top: 1px solid var(--ios-separator);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-around;
+  padding-top: 8px;
+  padding-bottom: 34px;
+}
+
+.ios-tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px;
+  min-width: 60px;
+  text-decoration: none;
+  color: var(--ios-gray);
+  transition: all 0.2s ease;
+}
+
+.ios-tab-item.active {
+  color: var(--ios-blue);
+}
+
+.ios-tab-item:hover {
+  color: var(--ios-blue);
+}
+
+.ios-tab-icon {
+  width: 24px;
+  height: 24px;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ios-tab-label {
+  font-size: 10px;
+  font-weight: 500;
+  text-align: center;
+  line-height: 12px;
+}
+
+/* ===== iOS Search Bar ===== */
+.ios-search-bar {
+  position: relative;
+  background: var(--ios-gray-6);
+  border-radius: 10px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+}
+
+.ios-search-icon {
+  color: var(--ios-gray);
+  font-size: 16px;
+}
+
+.ios-search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 17px;
+  color: var(--ios-label);
+  outline: none;
+}
+
+.ios-search-input::placeholder {
+  color: var(--ios-tertiary-label);
+}
+
+.ios-search-clear {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--ios-gray);
+  color: white;
+  border: none;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.ios-search-clear.visible {
+  opacity: 1;
+}
+
+/* ===== iOS List ===== */
+.ios-list {
+  background: var(--ios-system-background);
+  border-radius: 16px;
+  overflow: hidden;
+  margin: 16px;
+}
+
+.ios-list-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--ios-separator);
+  text-decoration: none;
+  color: var(--ios-label);
+  transition: background-color 0.2s ease;
+  position: relative;
+}
+
+.ios-list-item:last-child {
+  border-bottom: none;
+}
+
+.ios-list-item:hover {
+  background: var(--ios-gray-6);
+}
+
+.ios-list-item:active {
+  background: var(--ios-gray-5);
+}
+
+.ios-list-item-leading {
+  margin-right: 16px;
+}
+
+.ios-list-item-content {
+  flex: 1;
+}
+
+.ios-list-item-title {
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--ios-label);
+  margin-bottom: 2px;
+}
+
+.ios-list-item-subtitle {
+  font-size: 15px;
+  color: var(--ios-secondary-label);
+}
+
+.ios-list-item-trailing {
+  margin-left: 16px;
+  color: var(--ios-tertiary-label);
+}
+
+/* ===== iOS Card ===== */
+.ios-card {
+  background: var(--ios-system-background);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  margin: 16px;
+}
+
+.ios-card-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--ios-separator);
+}
+
+.ios-card-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ios-label);
+  margin-bottom: 4px;
+}
+
+.ios-card-subtitle {
+  font-size: 15px;
+  color: var(--ios-secondary-label);
+}
+
+.ios-card-content {
+  padding: 16px;
+}
+
+.ios-card-footer {
+  padding: 16px;
+  border-top: 1px solid var(--ios-separator);
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* ===== iOS Alert ===== */
+.ios-alert {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--ios-system-background);
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  z-index: 2000;
+  min-width: 270px;
+  max-width: 90%;
+}
+
+.ios-alert-header {
+  padding: 20px 20px 12px;
+  text-align: center;
+}
+
+.ios-alert-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ios-label);
+  margin-bottom: 8px;
+}
+
+.ios-alert-message {
+  font-size: 13px;
+  color: var(--ios-secondary-label);
+  line-height: 18px;
+}
+
+.ios-alert-actions {
+  display: flex;
+  border-top: 1px solid var(--ios-separator);
+}
+
+.ios-alert-button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  background: transparent;
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--ios-blue);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.ios-alert-button:not(:last-child) {
+  border-right: 1px solid var(--ios-separator);
+}
+
+.ios-alert-button:hover {
+  background: var(--ios-gray-6);
+}
+
+.ios-alert-button.destructive {
+  color: var(--ios-red);
+}
+
+/* ===== iOS Switch ===== */
+.ios-switch {
+  position: relative;
+  width: 51px;
+  height: 31px;
+  background: var(--ios-gray);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.ios-switch.active {
+  background: var(--ios-green);
+}
+
+.ios-switch-handle {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 27px;
+  height: 27px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.ios-switch.active .ios-switch-handle {
+  transform: translateX(20px);
+}
+
+/* ===== iOS Slider ===== */
+.ios-slider {
+  position: relative;
+  width: 100%;
+  height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.ios-slider-track {
+  flex: 1;
+  height: 2px;
+  background: var(--ios-gray-4);
+  border-radius: 1px;
+  position: relative;
+}
+
+.ios-slider-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: var(--ios-blue);
+  border-radius: 1px;
+  transition: width 0.2s ease;
+}
+
+.ios-slider-thumb {
+  position: absolute;
+  top: 50%;
+  width: 28px;
+  height: 28px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.ios-slider-thumb:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+/* ===== iOS Badge ===== */
+.ios-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 6px;
+  background: var(--ios-red);
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 9px;
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  z-index: 1;
+}
+
+.ios-badge.large {
+  min-width: 24px;
+  height: 24px;
+  font-size: 14px;
+  border-radius: 12px;
+  top: -6px;
+  right: -6px;
+}
+
+/* ===== iOS Progress View ===== */
+.ios-progress {
+  height: 4px;
+  background: var(--ios-gray-4);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.ios-progress-fill {
+  height: 100%;
+  background: var(--ios-blue);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.ios-progress.large {
+  height: 8px;
+  border-radius: 4px;
+}
+
+.ios-progress.large .ios-progress-fill {
+  border-radius: 4px;
+}
+
+/* ===== iOS Activity Indicator ===== */
+.ios-activity-indicator {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--ios-gray-3);
+  border-top-color: var(--ios-blue);
+  border-radius: 50%;
+  animation: ios-activity-spin 1s linear infinite;
+}
+
+.ios-activity-indicator.large {
+  width: 24px;
+  height: 24px;
+  border-width: 3px;
+}
+
+@keyframes ios-activity-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ===== iOS Segmented Control ===== */
+.ios-segmented {
+  display: flex;
+  background: var(--ios-gray-6);
+  border-radius: 9px;
+  padding: 2px;
+}
+
+.ios-segmented-item {
+  flex: 1;
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ios-secondary-label);
+  cursor: pointer;
+  border-radius: 7px;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.ios-segmented-item.active {
+  background: var(--ios-system-background);
+  color: var(--ios-label);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== iOS Stepper ===== */
+.ios-stepper {
+  display: flex;
+  align-items: center;
+  background: var(--ios-gray-6);
+  border-radius: 9px;
+  overflow: hidden;
+}
+
+.ios-stepper-button {
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: transparent;
+  color: var(--ios-blue);
+  font-size: 24px;
+  font-weight: 300;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.ios-stepper-button:hover {
+  background: var(--ios-gray-5);
+}
+
+.ios-stepper-button:active {
+  background: var(--ios-gray-4);
+}
+
+.ios-stepper-value {
+  flex: 1;
+  text-align: center;
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--ios-label);
+  min-width: 60px;
+}
+
+/* ===== iOS Toggle Button ===== */
+.ios-toggle {
+  display: flex;
+  background: var(--ios-gray-6);
+  border-radius: 9px;
+  overflow: hidden;
+}
+
+.ios-toggle-option {
+  flex: 1;
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ios-secondary-label);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.ios-toggle-option.active {
+  background: var(--ios-system-background);
+  color: var(--ios-label);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== iOS Dark Mode ===== */
+@media (prefers-color-scheme: dark) {
+  .ios-navbar,
+  .ios-tab-bar {
+    background: rgba(28, 28, 30, 0.95);
+    border-color: var(--ios-separator-dark);
+  }
+  
+  .ios-list {
+    background: var(--ios-secondary-background-dark);
+  }
+  
+  .ios-list-item {
+    border-color: var(--ios-separator-dark);
+  }
+  
+  .ios-card {
+    background: var(--ios-secondary-background-dark);
+  }
+  
+  .ios-alert {
+    background: var(--ios-secondary-background-dark);
+  }
+  
+  .ios-segmented,
+  .ios-stepper,
+  .ios-toggle {
+    background: var(--ios-tertiary-background-dark);
+  }
+  
+  .ios-segmented-item.active,
+  .ios-toggle-option.active {
+    background: var(--ios-secondary-background-dark);
+  }
+}
+
+/* ===== iOS Responsive ===== */
+@media (max-width: 768px) {
+  .ios-navbar {
+    height: 64px;
+    padding: 4px 8px;
+  }
+  
+  .ios-navbar-content {
+    height: 36px;
+  }
+  
+  .ios-navbar-title {
+    font-size: 16px;
+  }
+  
+  .ios-tab-bar {
+    height: 65px;
+    padding-bottom: 20px;
+  }
+  
+  .ios-tab-label {
+    font-size: 9px;
+  }
+  
+  .ios-list {
+    margin: 8px;
+    border-radius: 12px;
+  }
+  
+  .ios-list-item {
+    padding: 10px 12px;
+  }
+  
+  .ios-card {
+    margin: 8px;
+    border-radius: 12px;
+  }
+  
+  .ios-card-header,
+  .ios-card-content,
+  .ios-card-footer {
+    padding: 12px;
+  }
+}

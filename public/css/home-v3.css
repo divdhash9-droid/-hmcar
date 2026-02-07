@@ -1,0 +1,442 @@
+/* [[ARABIC_HEADER]] هذا الملف (public/css/home-v3.css) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. */
+
+/* 
+ * Home Page V3 - Using Design System
+ * يستخدم نظام التصميم الموحد
+ */
+
+.hm-home {
+  min-height: 100vh;
+  padding: var(--hm-space-lg) var(--hm-space-md) var(--hm-space-2xl);
+  background: var(--hm-bg-tertiary);
+  color: var(--hm-text-primary);
+  position: relative;
+  overflow-x: hidden;
+}
+
+.hm-home::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 400px;
+  background: radial-gradient(circle at 30% 20%, rgba(0, 123, 255, 0.08) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hm-home__top {
+  max-width: 1200px;
+  margin: 0 auto var(--hm-space-lg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--hm-space-md);
+  position: relative;
+  z-index: var(--hm-z-sticky);
+  padding: var(--hm-space-sm);
+}
+
+.hm-home__brand {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.hm-home__logo {
+  width: min(200px, 54vw);
+  height: 56px;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 4px 12px rgba(0, 123, 255, 0.3));
+  transition: all var(--hm-transition-normal);
+}
+
+.hm-home__logo:hover {
+  filter: drop-shadow(0 6px 16px rgba(0, 123, 255, 0.5));
+  transform: scale(1.05);
+}
+
+.hm-home__topRight {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.hm-home__langBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--hm-space-xs);
+  min-width: 70px;
+  height: 44px;
+  padding: 0 var(--hm-space-md);
+  border-radius: var(--hm-radius-md);
+  background: rgba(0, 123, 255, 0.08);
+  border: 2px solid var(--hm-gold-primary);
+  color: var(--hm-gold-primary);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: all var(--hm-transition-bounce);
+  box-shadow: var(--hm-shadow-sm);
+}
+
+.hm-home__langBtn i,
+.hm-home__langBtn .icon-fallback {
+  font-size: 1rem;
+  transition: transform var(--hm-transition-normal);
+}
+
+.hm-home__langBtn:hover {
+  background: var(--hm-gold-primary);
+  color: var(--hm-blue-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--hm-shadow-gold);
+}
+
+.hm-home__langBtn:hover i,
+.hm-home__langBtn:hover .icon-fallback {
+  transform: rotate(360deg);
+}
+
+.hm-home__login {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--hm-space-md);
+  padding: 0.7rem 1.2rem;
+  border-radius: var(--hm-radius-lg);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--hm-blue-primary);
+  background: var(--hm-bg-gold);
+  border: 2px solid var(--hm-gold-primary);
+  box-shadow: var(--hm-shadow-md);
+  transition: all var(--hm-transition-bounce);
+  position: relative;
+  overflow: hidden;
+}
+
+.hm-home__login::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+
+.hm-home__login i,
+.hm-home__login .icon-fallback {
+  font-size: 1.1rem;
+  transition: all var(--hm-transition-normal);
+  z-index: 1;
+  position: relative;
+}
+
+.hm-home__login:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: var(--hm-shadow-gold-hover);
+}
+
+.hm-home__login:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.hm-home__login:hover i,
+.hm-home__login:hover .icon-fallback {
+  transform: scale(1.2) rotate(10deg);
+}
+
+.hm-home__hero {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--hm-space-xl);
+  border-radius: var(--hm-radius-2xl);
+  background: var(--hm-bg-primary);
+  border: 2px solid var(--hm-border-medium);
+  box-shadow: var(--hm-shadow-lg);
+}
+
+.hm-home__heroText {
+  text-align: center;
+  margin-bottom: 1.1rem;
+}
+
+.hm-home__title {
+  margin: 0;
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: var(--hm-ink);
+  font-size: clamp(1.8rem, 3.4vw, 2.4rem);
+  text-shadow: 0 12px 28px rgba(11, 31, 58, 0.10);
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: var(--hm-text-primary);
+  margin: 0 0 1rem 0;
+  text-shadow: 0 4px 20px rgba(0, 123, 255, 0.5);
+  animation: glowText 2s ease-in-out infinite alternate;
+}
+
+@keyframes glowText {
+  from { text-shadow: 0 4px 20px rgba(0, 123, 255, 0.5); }
+  to { text-shadow: 0 4px 30px rgba(0, 123, 255, 0.8); }
+}
+
+.hm-home__subtitle {
+  margin: 0.5rem auto 0;
+  max-width: 760px;
+  color: var(--hm-muted);
+  font-weight: 700;
+  line-height: 1.7;
+  font-size: 1.2rem;
+  color: var(--hm-text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.hm-home__subtitle span {
+  opacity: 0.92;
+}
+
+.hm-home__cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--hm-space-lg);
+  margin-top: var(--hm-space-lg);
+}
+
+.hm-homeCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hm-space-md);
+  padding: var(--hm-space-xl);
+  border-radius: var(--hm-radius-xl);
+  background: var(--hm-white);
+  border: 2px solid transparent;
+  text-decoration: none;
+  color: var(--hm-text-primary);
+  box-shadow: var(--hm-shadow-md);
+  transition: all var(--hm-transition-bounce);
+  position: relative;
+  overflow: hidden;
+}
+
+.hm-homeCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(0, 123, 255, 0.05) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity var(--hm-transition-normal);
+}
+
+.hm-homeCard:hover {
+  transform: translateY(-5px) scale(1.02);
+  background: var(--hm-white);
+  border-color: var(--hm-gold-primary);
+  box-shadow: var(--hm-shadow-gold-hover);
+}
+
+.hm-homeCard:hover::before {
+  opacity: 1;
+}
+
+.hm-homeCard__icon {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--hm-radius-lg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--hm-bg-gold);
+  border: 2px solid var(--hm-gold-primary);
+  box-shadow: var(--hm-shadow-gold);
+  transition: all var(--hm-transition-bounce);
+  position: relative;
+  overflow: hidden;
+}
+
+.hm-homeCard__icon::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.4), transparent);
+  transform: rotate(45deg);
+  transition: left 0.6s ease;
+}
+
+.hm-homeCard:hover .hm-homeCard__icon {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: var(--hm-shadow-gold-hover);
+}
+
+.hm-homeCard:hover .hm-homeCard__icon::before {
+  left: 100%;
+}
+
+.hm-homeCard__icon i,
+.hm-homeCard__icon .icon-fallback {
+  color: var(--hm-blue-primary);
+  font-size: 1.5rem;
+  z-index: 1;
+  position: relative;
+  transition: transform var(--hm-transition-normal);
+}
+
+.hm-homeCard:hover .hm-homeCard__icon i,
+.hm-homeCard:hover .hm-homeCard__icon .icon-fallback {
+  transform: scale(1.2);
+}
+
+.hm-homeCard__title {
+  font-weight: 900;
+  color: var(--hm-ink);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--hm-text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.hm-homeCard__text {
+  color: var(--hm-muted);
+  font-weight: 650;
+  line-height: 1.55;
+  font-size: 0.95rem;
+  font-size: 1rem;
+  color: var(--hm-text-secondary);
+  margin: 0;
+}
+
+.hm-home__chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--hm-space-md);
+  margin-top: var(--hm-space-lg);
+}
+
+.hm-homeChip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--hm-space-md);
+  padding: var(--hm-space-md) var(--hm-space-lg);
+  border-radius: var(--hm-radius-full);
+  background: var(--hm-white);
+  border: 2px solid var(--hm-border-medium);
+  color: var(--hm-text-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all var(--hm-transition-bounce);
+  box-shadow: var(--hm-shadow-sm);
+}
+
+.hm-homeChip:hover {
+  transform: translateY(-2px);
+  border-color: var(--hm-gold-primary);
+  box-shadow: var(--hm-shadow-gold);
+}
+
+.hm-homeChip i,
+.hm-homeChip .icon-fallback {
+  color: var(--hm-gold-primary);
+  font-size: 1.1rem;
+  transition: transform var(--hm-transition-normal);
+}
+
+.hm-homeChip:hover i,
+.hm-homeChip:hover .icon-fallback {
+  transform: scale(1.2) rotate(10deg);
+}
+
+/* Responsive Design - التصميم المتجاوب */
+@media (max-width: 1024px) {
+  .hm-home__title {
+    font-size: 2.5rem;
+  }
+  
+  .hm-home__cards {
+    grid-template-columns: 1fr;
+    gap: var(--hm-space-md);
+  }
+}
+
+@media (max-width: 768px) {
+  .hm-home {
+    padding: var(--hm-space-md);
+  }
+  
+  .hm-home__top {
+    flex-direction: column;
+    gap: var(--hm-space-md);
+  }
+  
+  .hm-home__title {
+    font-size: 2rem;
+  }
+  
+  .hm-home__subtitle {
+    font-size: 1rem;
+  }
+  
+  .hm-home__hero {
+    padding: var(--hm-space-lg);
+  }
+}
+
+@media (max-width: 480px) {
+  .hm-home__title {
+    font-size: 1.8rem;
+  }
+  
+  .hm-home__chips {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+/* Animation Effects - تأثيرات الحركة */
+.hm-homeCard {
+  animation: slideInUp 0.4s ease-out;
+}
+
+.hm-homeCard:nth-child(1) { animation-delay: 0.1s; }
+.hm-homeCard:nth-child(2) { animation-delay: 0.2s; }
+.hm-homeCard:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 992px) {
+  .hm-home__cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .hm-home__login span {
+    display: none;
+  }
+}

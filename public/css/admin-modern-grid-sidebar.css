@@ -1,0 +1,259 @@
+/* [[ARABIC_HEADER]] هذا الملف (public/css/admin-modern-grid-sidebar.css) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. */
+
+/* ===== Modern Grid Admin Sidebar - Gold + White ===== */
+:root {
+  /* Primary Colors - Gold + White Luxury */
+  --primary-gold: var(--primary-color-light);
+  --primary-gold-light: var(--accent-color);
+  --primary-gold-dark: var(--primary-color);
+  
+  /* Background Colors - White Theme */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F8F9FA;
+  --bg-tertiary: #F1F3F4;
+  --bg-card: #FFFFFF;
+  --bg-hover: #F8F9FA;
+  
+  /* Text Colors */
+  --text-primary: #212529;
+  --text-secondary: #6C757D;
+  --text-muted: #ADB5BD;
+  
+  /* Border Colors */
+  --border-primary: var(--border-color);
+  --border-secondary: #DEE2E6;
+  --border-card: #E9ECEF;
+  
+  /* Shadow Colors */
+  --shadow-gold: 0 4px 20px rgba(11, 31, 58, 0.14);
+  --shadow-gold-intense: 0 8px 40px rgba(11, 31, 58, 0.22);
+  --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.08);
+  --shadow-medium: 0 4px 20px rgba(0, 0, 0, 0.12);
+  
+  /* Gradients */
+  --gradient-primary: var(--gold-gradient);
+  --gradient-gold-shine: var(--gold-gradient);
+  --gradient-card: linear-gradient(145deg, #FFFFFF 0%, #F8F9FA 100%);
+  
+  /* Transitions */
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: all 0.2s ease;
+  
+  /* Border Radius */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+}
+
+/* ===== Admin Shell ===== */
+.hm-admin-shell {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg-primary);
+}
+
+.hm-admin-sidebar {
+  width: 280px;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border-secondary);
+  padding: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-light);
+}
+
+.hm-admin-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-primary);
+}
+
+/* ===== Sidebar Brand ===== */
+.hm-admin-sidebar__brand {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-secondary);
+  background: var(--gradient-primary);
+}
+
+.hm-admin-sidebar__brand-link {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  text-decoration: none;
+  color: var(--bg-primary);
+}
+
+.hm-admin-sidebar__logo {
+  width: 40px;
+  height: 40px;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+}
+
+.hm-admin-sidebar__brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.hm-admin-sidebar__brand-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.hm-admin-sidebar__brand-subtitle {
+  font-size: 0.75rem;
+  opacity: 0.9;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ===== Sidebar Navigation ===== */
+.hm-admin-sidebar__nav {
+  padding: 1rem 0;
+}
+
+.hm-admin-link {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: var(--transition-smooth);
+  border-right: 3px solid transparent;
+  position: relative;
+}
+
+.hm-admin-link:hover {
+  background: var(--bg-hover);
+  color: var(--primary-gold);
+  border-right-color: var(--primary-gold);
+}
+
+.hm-admin-link.is-active {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--primary-gold);
+  border-right-color: var(--primary-gold);
+  font-weight: 600;
+}
+
+.hm-admin-link i {
+  width: 20px;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.hm-admin-link span {
+  flex: 1;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+/* ===== Admin Topbar ===== */
+.hm-admin-topbar {
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-secondary);
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: var(--shadow-light);
+}
+
+.hm-admin-toggle {
+  background: var(--gradient-primary);
+  border: none;
+  color: var(--bg-primary);
+  padding: 0.75rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  font-size: 1rem;
+}
+
+.hm-admin-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-gold);
+}
+
+.hm-admin-topbar__meta {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-right: auto;
+}
+
+.hm-admin-topbar__link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-primary);
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  transition: var(--transition-smooth);
+  position: relative;
+}
+
+.hm-admin-topbar__link:hover {
+  background: var(--bg-hover);
+  color: var(--primary-gold);
+}
+
+.hm-admin-badge {
+  background: var(--gradient-primary);
+  color: var(--bg-primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* ===== Admin Content ===== */
+.hm-admin-content {
+  flex: 1;
+  padding: 0;
+  overflow-y: auto;
+  background: var(--bg-primary);
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 768px) {
+  .hm-admin-sidebar {
+    position: fixed;
+    left: -280px;
+    z-index: 1000;
+    transition: var(--transition-smooth);
+  }
+  
+  .hm-admin-sidebar.is-open {
+    left: 0;
+  }
+  
+  .hm-admin-main {
+    margin-left: 0;
+  }
+  
+  .hm-admin-topbar {
+    padding: 1rem;
+  }
+  
+  .hm-admin-topbar__meta {
+    gap: 1rem;
+  }
+  
+  .hm-admin-topbar__link span {
+    display: none;
+  }
+}

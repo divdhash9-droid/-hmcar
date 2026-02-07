@@ -1,0 +1,427 @@
+/* [[ARABIC_HEADER]] هذا الملف (public/css/admin-gold-white.css) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. */
+
+/* ===== Admin Dashboard - Gold + White Luxury ===== */
+:root {
+  /* Primary Colors - Navy Blue + Snow White */
+  --primary-navy: #1e3a8a;
+  --primary-navy-light: #3b82f6;
+  --primary-navy-dark: #1e40af;
+  --accent-blue: #60a5fa;
+  --accent-blue-light: #dbeafe;
+  --accent-blue-dark: #2563eb;
+  
+  /* Snow White Colors */
+  --snow-white: #ffffff;
+  --snow-offwhite: #f8f9fa;
+  --snow-pearl: #f5f7fa;
+  --snow-cream: #fdfdfd;
+  
+  /* Background Colors - Snow White Theme */
+  --bg-primary: var(--snow-white);
+  --bg-secondary: var(--snow-pearl);
+  --bg-tertiary: var(--snow-offwhite);
+  --bg-card: var(--snow-white);
+  --bg-hover: var(--snow-offwhite);
+  
+  /* Text Colors */
+  --text-primary: var(--primary-navy);
+  --text-secondary: var(--primary-navy-light);
+  --text-muted: #6c757d;
+  
+  /* Border Colors */
+  --border-primary: rgba(0, 31, 63, 0.12);
+  --border-secondary: #dee2e6;
+  --border-card: #e9ecef;
+  
+  /* Shadow Colors */
+  --shadow-navy: 0 4px 20px rgba(0, 31, 63, 0.14);
+  --shadow-navy-intense: 0 8px 40px rgba(0, 31, 63, 0.22);
+  --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.08);
+  --shadow-medium: 0 4px 20px rgba(0, 0, 0, 0.12);
+  
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-blue-light) 100%);
+  --gradient-navy: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-navy-light) 100%);
+  --gradient-card: linear-gradient(145deg, var(--snow-white) 0%, var(--snow-pearl) 100%);
+  --gradient-hero: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-navy-light) 50%, var(--snow-white) 100%);
+  
+  /* Transitions */
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: all 0.2s ease;
+  
+  /* Border Radius */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+}
+
+/* ===== Override Existing Dashboard Styles ===== */
+.hm-dashboard {
+  background: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+/* ===== Hero Section ===== */
+.hm-hero {
+  background: var(--gradient-navy) !important;
+  border-radius: var(--radius-lg) !important;
+  margin: 2rem !important;
+  padding: 2rem !important;
+  box-shadow: var(--shadow-navy) !important;
+  border: 1px solid var(--border-primary) !important;
+}
+
+.hm-hero__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.hm-hero__brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hm-hero__logo {
+  width: 50px;
+  height: 50px;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+}
+
+.hm-hero__title {
+  color: var(--text-primary) !important;
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+}
+
+.hm-hero__subtitle {
+  color: var(--text-secondary) !important;
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* ===== Hero Actions ===== */
+.hm-hero__actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.hm-pill {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  color: var(--bg-primary) !important;
+  padding: 0.75rem 1.5rem !important;
+  border-radius: var(--radius-md) !important;
+  text-decoration: none !important;
+  font-weight: 600 !important;
+  transition: var(--transition-smooth) !important;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.hm-pill:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: var(--shadow-navy) !important;
+}
+
+.hm-pill--danger {
+  background: rgba(220, 53, 69, 0.2) !important;
+  border-color: rgba(220, 53, 69, 0.3) !important;
+  color: #dc3545 !important;
+}
+
+.hm-pill--danger:hover {
+  background: rgba(220, 53, 69, 0.3) !important;
+  box-shadow: 0 4px 20px rgba(220, 53, 69, 0.3) !important;
+}
+
+/* ===== KPIs Section ===== */
+.hm-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.hm-kpi {
+  background: var(--gradient-card) !important;
+  border: 1px solid var(--border-card) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: 1.5rem !important;
+  box-shadow: var(--shadow-light) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.hm-kpi::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--gradient-primary);
+}
+
+.hm-kpi__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hm-kpi__label {
+  color: var(--text-secondary) !important;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.hm-kpi__value {
+  color: var(--text-primary) !important;
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.hm-kpi__icon {
+  width: 50px;
+  height: 50px;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--bg-primary);
+  font-size: 1.25rem;
+  box-shadow: var(--shadow-light);
+}
+
+/* ===== Sections ===== */
+.hm-section {
+  margin: 2rem 0;
+}
+
+.hm-section__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border-primary);
+}
+
+.hm-section__title {
+  color: var(--text-primary) !important;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.hm-section__action {
+  background: var(--gradient-primary) !important;
+  color: var(--bg-primary) !important;
+  padding: 0.75rem 1.5rem !important;
+  border-radius: var(--radius-md) !important;
+  text-decoration: none !important;
+  font-weight: 600 !important;
+  transition: var(--transition-smooth) !important;
+}
+
+.hm-section__action:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: var(--shadow-navy) !important;
+}
+
+/* ===== Grid ===== */
+.hm-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+/* ===== Cards ===== */
+.hm-card {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-card) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: 1.5rem !important;
+  box-shadow: var(--shadow-light) !important;
+  transition: var(--transition-smooth) !important;
+}
+
+.hm-card:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: var(--shadow-medium) !important;
+  border-color: var(--border-primary) !important;
+}
+
+/* ===== Lists ===== */
+.hm-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.hm-list__item {
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--border-secondary) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 1rem !important;
+  margin-bottom: 0.75rem !important;
+  transition: var(--transition-smooth) !important;
+}
+
+.hm-list__item:hover {
+  background: var(--bg-hover) !important;
+  border-color: var(--border-primary) !important;
+}
+
+.hm-list__title {
+  color: var(--text-primary) !important;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+}
+
+.hm-list__meta {
+  color: var(--text-secondary) !important;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+/* ===== Tables ===== */
+.hm-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card) !important;
+  border-radius: var(--radius-lg) !important;
+  overflow: hidden;
+  box-shadow: var(--shadow-light) !important;
+}
+
+.hm-table th {
+  background: var(--bg-secondary) !important;
+  color: var(--text-secondary) !important;
+  font-weight: 600;
+  text-align: right;
+  padding: 1rem;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid var(--border-primary) !important;
+}
+
+.hm-table td {
+  padding: 1rem;
+  border-top: 1px solid var(--border-secondary) !important;
+  color: var(--text-primary) !important;
+}
+
+.hm-table tr:hover {
+  background: var(--bg-hover) !important;
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 768px) {
+  .hm-hero__top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .hm-hero__actions {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .hm-kpis {
+    grid-template-columns: 1fr;
+  }
+  
+  .hm-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .hm-section__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+}
+
+/* ===== Admin Sidebar Override ===== */
+.hm-admin-sidebar {
+  background: var(--bg-card) !important;
+  border-right: 1px solid var(--border-secondary) !important;
+}
+
+.hm-admin-sidebar__brand {
+  background: var(--gradient-primary) !important;
+}
+
+.hm-admin-link {
+  color: var(--text-primary) !important;
+}
+
+.hm-admin-link:hover {
+  background: var(--bg-hover) !important;
+  color: var(--primary-gold) !important;
+  border-right-color: var(--primary-gold) !important;
+}
+
+.hm-admin-link.is-active {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: var(--primary-gold) !important;
+  border-right-color: var(--primary-gold) !important;
+}
+
+.hm-admin-topbar {
+  background: var(--bg-card) !important;
+  border-bottom: 1px solid var(--border-secondary) !important;
+}
+
+.hm-admin-topbar__link {
+  color: var(--text-primary) !important;
+}
+
+.hm-admin-topbar__link:hover {
+  background: var(--bg-hover) !important;
+  color: var(--primary-gold) !important;
+}
+
+/* ===== Flash Messages ===== */
+.alert {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-primary) !important;
+  color: var(--text-primary) !important;
+  border-radius: var(--radius-md) !important;
+}
+
+.alert-success {
+  background: rgba(25, 135, 84, 0.1) !important;
+  border-color: #198754 !important;
+  color: #198754 !important;
+}
+
+.alert-danger {
+  background: rgba(220, 53, 69, 0.1) !important;
+  border-color: #dc3545 !important;
+  color: #dc3545 !important;
+}
+
+.alert-info {
+  background: rgba(13, 202, 240, 0.1) !important;
+  border-color: #0dcaf0 !important;
+  color: #0dcaf0 !important;
+}

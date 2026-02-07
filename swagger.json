@@ -1,0 +1,30 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "HM Car Auction API",
+    "version": "2.0.0",
+    "description": "توثيق المسارات الأساسية لنظام مزاد السيارات"
+  },
+  "servers": [
+    { "url": "http://localhost:4000/api/v2" }
+  ],
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "summary": "تسجيل الدخول",
+        "responses": {
+          "200": { "description": "نجاح" },
+          "400": { "description": "بيانات غير صحيحة" }
+        }
+      }
+    },
+    "/auth/logout": {
+      "get": {
+        "summary": "تسجيل الخروج",
+        "responses": {
+          "200": { "description": "تم" }
+        }
+      }
+    }
+  }
+}

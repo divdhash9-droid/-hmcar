@@ -1,0 +1,186 @@
+/* [[ARABIC_HEADER]] هذا الملف (public/css/footer-modern.css) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. */
+
+/* Modern Footer Styles */
+.main-footer {
+  background:
+    radial-gradient(900px 420px at 20% 0%, rgba(0, 123, 255, 0.12) 0%, transparent 60%),
+    radial-gradient(900px 420px at 85% 10%, rgba(35, 96, 190, 0.16) 0%, transparent 55%),
+    linear-gradient(135deg, #001f3f 0%, #003366 55%, #001f3f 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  padding: 3rem 0 1rem;
+  margin-top: 4rem;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.main-footer::before {
+  content: '';
+  display: block;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0, 123, 255, 0.75), transparent);
+  opacity: 0.9;
+}
+
+.main-footer .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 3rem;
+  margin-bottom: 2rem;
+}
+
+.footer-section h4 {
+  color: #ffffff;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+.footer-section.about p {
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.70);
+  margin-bottom: 1.5rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+}
+
+.social-links {
+  display: flex;
+  gap: 1rem;
+}
+
+.social-links a {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.social-links a .hm-social-icon-img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  display: block;
+}
+
+.social-links a:hover {
+  background: rgba(0, 123, 255, 0.92);
+  color: #ffffff;
+  transform: translateY(-3px);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.22);
+}
+
+.footer-section.links ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-section.links ul li {
+  margin-bottom: 0.8rem;
+}
+
+.footer-section.links ul li a {
+  color: rgba(255, 255, 255, 0.70);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.9rem;
+  position: relative;
+  padding-right: 0;
+}
+
+.footer-section.links ul li a::before {
+  content: '←';
+  margin-left: 0.5rem;
+  color: rgba(0, 123, 255, 0.92);
+  transition: transform 0.3s ease;
+}
+
+.footer-section.links ul li a:hover {
+  color: #ffffff;
+  padding-right: 5px;
+}
+
+.footer-section.contact p {
+  margin-bottom: 0.8rem;
+  color: rgba(255, 255, 255, 0.70);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.footer-section.contact p i {
+  color: rgba(0, 123, 255, 0.92);
+  width: 16px;
+  text-align: center;
+}
+
+.footer-bottom {
+  text-align: center;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(238, 243, 251, 0.66);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.85rem;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.04), rgba(0, 123, 255, 0.06), rgba(255, 255, 255, 0.04));
+  border-radius: 14px;
+  margin-top: 1.75rem;
+  padding-bottom: 1.25rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .footer-content {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    text-align: center;
+  }
+  
+  .social-links {
+    justify-content: center;
+  }
+  
+  .footer-section.contact p {
+    justify-content: center;
+  }
+  
+  .footer-section.links ul li a::before {
+    content: '↓';
+    margin-left: 0;
+    margin-right: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-footer {
+    padding: 2rem 0 1rem;
+  }
+  
+  .footer-content {
+    gap: 1.5rem;
+  }
+  
+  .footer-section h4 {
+    font-size: 1.1rem;
+  }
+  
+  .social-links a {
+    width: 35px;
+    height: 35px;
+  }
+}

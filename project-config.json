@@ -1,0 +1,50 @@
+{
+  "name": "HM CAR Auction",
+  "version": "2.0.0",
+  "description": "منصة متكاملة لمزادات السيارات",
+  "modules": {
+    "admin": {
+      "enabled": true,
+      "version": "1.0.0"
+    },
+    "client": {
+      "enabled": true,
+      "version": "1.0.0"
+    },
+    "api": {
+      "enabled": true,
+      "version": "1.0.0"
+    },
+    "database": {
+      "enabled": true,
+      "version": "1.0.0"
+    }
+  },
+  "features": {
+    "auctions": {
+      "enabled": true,
+      "status": "stable"
+    },
+    "users": {
+      "enabled": true,
+      "status": "stable"
+    },
+    "payments": {
+      "enabled": false,
+      "status": "development"
+    },
+    "analytics": {
+      "enabled": true,
+      "status": "beta"
+    }
+  },
+  "deployment": {
+    "environments": [
+      "development",
+      "staging",
+      "production"
+    ],
+    "current": "development",
+    "autoDeploy": false
+  }
+}

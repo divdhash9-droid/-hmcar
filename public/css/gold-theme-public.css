@@ -1,0 +1,368 @@
+/* [[ARABIC_HEADER]] هذا الملف (public/css/gold-theme-public.css) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. */
+
+/* ======== Modern Navy & Snow White Theme for Public Pages ======== */
+
+/* Import dashboard luxury variables */
+:root {
+  /* Modern Navy Blue Colors */
+  --hm-gold: #1e3a8a;
+  --hm-gold-2: #1e40af;
+  --hm-gold-light: #dbeafe;
+  --hm-gold-bright: #60a5fa;
+  --hm-gold-neon: #3b82f6;
+  --hm-gold-glow: rgba(30, 58, 138, 0.6);
+  
+  /* Modern Glass Effects */
+  --hm-glass: rgba(30, 58, 138, 0.05);
+  --hm-glass-2: rgba(30, 58, 138, 0.08);
+  --hm-glass-3: rgba(30, 58, 138, 0.12);
+  --hm-border-gold: rgba(30, 58, 138, 0.6);
+  
+  /* Modern Navy Background */
+  --hm-black: #ffffff;
+  --hm-gray-dark: #f8fafc;
+  --hm-gray: #f1f5f9;
+  --hm-gray-light: #e2e8f0;
+  --hm-gray-lighter: #cbd5e1;
+  
+  /* Strong Navy Shadows & Glows */
+  --hm-shadow: 0 32px 80px rgba(30, 58, 138, 0.15);
+  --hm-shadow-glass: 0 16px 48px rgba(30, 58, 138, 0.1);
+  --hm-glow-gold: 0 0 80px rgba(30, 58, 138, 0.5), 0 0 160px rgba(30, 58, 138, 0.3);
+  --hm-gold-pulse: 0 0 40px rgba(30, 58, 138, 0.6);
+  --hm-neon-glow: 0 0 60px rgba(30, 58, 138, 0.8), 0 0 120px rgba(30, 58, 138, 0.4);
+  
+  /* Enhanced Blur Effects */
+  --hm-blur: 32px;
+  --hm-blur-heavy: 64px;
+  
+  /* Radius */
+  --hm-radius-xl: 34px;
+  --hm-radius-lg: 26px;
+  --hm-radius-md: 20px;
+  --hm-radius-sm: 16px;
+  
+  /* Modern Navy Effects */
+  --hm-gradient-gold: linear-gradient(135deg, #007bff 0%, #0056b3 20%, #3395ff 50%, #0056b3 80%, #007bff 100%);
+  --hm-gradient-neon: linear-gradient(135deg, #66b3ff 0%, #3395ff 50%, #007bff 100%);
+  --hm-shimmer-gold: linear-gradient(90deg, transparent, rgba(0, 123, 255, 0.6), transparent);
+  --hm-gradient-bg: linear-gradient(180deg, #001f3f 0%, #002040 50%, #003060 100%);
+}
+
+/* ======== Modern Black Background ======== */
+body {
+  background: var(--hm-gradient-bg);
+  color: #ffffff;
+}
+
+/* ======== Enhanced Hero Sections ======== */
+.hero-luxury, .premium-hero {
+  background: var(--hm-gradient-bg);
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--hm-radius-xl);
+  border: 3px solid var(--hm-gold);
+  box-shadow: 
+    0 32px 80px rgba(0, 31, 63, 0.8),
+    0 16px 32px rgba(0, 31, 63, 0.6),
+    inset 0 4px 0 rgba(0, 123, 255, 0.2),
+    0 0 120px rgba(0, 123, 255, 0.4);
+  -webkit-backdrop-filter: blur(var(--hm-blur-heavy)) saturate(1.3);
+  backdrop-filter: blur(var(--hm-blur-heavy)) saturate(1.3);
+}
+
+.hero-luxury::before, .premium-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--hm-shimmer-gold);
+  background-size: 200% 100%;
+  background-position: -200% 0;
+  opacity: 0.4;
+  animation: shimmerGold 3s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ======== Enhanced Cards ======== */
+.card-luxury, .car-card, .stat-card-3d {
+  border-radius: var(--hm-radius-lg);
+  border: 3px solid var(--hm-gold);
+  background:
+    var(--hm-gradient-neon),
+    rgba(0, 123, 255, 0.05);
+  box-shadow: 
+    0 25px 60px rgba(0, 31, 63, 0.7),
+    0 10px 25px rgba(0, 31, 63, 0.5),
+    inset 0 4px 0 rgba(0, 123, 255, 0.2),
+    inset 0 -8px 0 rgba(0, 31, 63, 0.3);
+  overflow: hidden;
+  position: relative;
+  transition: all 0.3s ease;
+  -webkit-backdrop-filter: blur(var(--hm-blur)) saturate(1.3);
+  backdrop-filter: blur(var(--hm-blur)) saturate(1.3);
+}
+
+.card-luxury::before, .car-card::before, .stat-card-3d::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--hm-shimmer-gold);
+  background-size: 200% 100%;
+  background-position: -200% 0;
+  opacity: 0.4;
+  animation: shimmerGold 3.5s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.card-luxury:hover, .car-card:hover, .stat-card-3d:hover {
+  transform: translateY(-8px) scale(1.02);
+  border-color: var(--hm-gold-bright);
+  box-shadow: 
+    0 35px 80px rgba(0, 31, 63, 0.8),
+    0 0 120px rgba(0, 123, 255, 0.6);
+}
+
+/* ======== Enhanced Buttons ======== */
+.btn-primary-luxury, .btn-outline-luxury, .btn-luxury {
+  background: var(--hm-gradient-gold);
+  border: 3px solid var(--hm-gold);
+  border-radius: var(--hm-radius-md);
+  color: #ffffff;
+  font-weight: 700;
+  padding: 14px 24px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 20px 40px rgba(0, 31, 63, 0.6),
+    0 0 80px rgba(0, 123, 255, 0.4),
+    inset 0 4px 0 rgba(0, 123, 255, 0.3),
+    inset 0 -6px 0 rgba(0, 31, 63, 0.3);
+}
+
+.btn-primary-luxury::before, .btn-outline-luxury::before, .btn-luxury::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--hm-shimmer-gold);
+  background-size: 200% 100%;
+  background-position: -200% 0;
+  opacity: 0.4;
+  animation: shimmerGold 3s linear infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.btn-primary-luxury:hover, .btn-outline-luxury:hover, .btn-luxury:hover {
+  transform: translateY(-4px) scale(1.02);
+  background: var(--hm-gradient-neon);
+  border-color: var(--hm-gold-bright);
+  box-shadow:
+    0 25px 50px rgba(0, 31, 63, 0.7),
+    0 0 120px rgba(0, 123, 255, 0.6),
+    var(--hm-gold-pulse);
+}
+
+.btn-outline-luxury {
+  background: transparent;
+  color: var(--hm-gold);
+}
+
+.btn-outline-luxury:hover {
+  background: var(--hm-gradient-gold);
+  color: #ffffff;
+}
+
+/* ======== Enhanced Navigation ======== */
+.navbar-luxury, .navbar {
+  background: 
+    var(--hm-gradient-neon),
+    rgba(0, 123, 255, 0.05);
+  border-bottom: 3px solid var(--hm-gold);
+  -webkit-backdrop-filter: blur(var(--hm-blur)) saturate(1.3);
+  backdrop-filter: blur(var(--hm-blur)) saturate(1.3);
+  box-shadow: 
+    0 12px 30px rgba(0, 31, 63, 0.6),
+    0 0 60px rgba(0, 123, 255, 0.3);
+}
+
+.navbar-brand, .navbar-brand:hover {
+  color: var(--hm-gold) !important;
+  font-weight: 800;
+  text-shadow: 0 0 30px rgba(0, 123, 255, 0.8);
+}
+
+.nav-link, .nav-link:hover {
+  color: #ffffff !important;
+  font-weight: 700;
+  position: relative;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 3px;
+  background: var(--hm-gold);
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+  width: 80%;
+}
+
+/* ======== Enhanced Forms ======== */
+.form-control-luxury, .form-control {
+  background: rgba(0, 123, 255, 0.05);
+  border: 3px solid rgba(0, 123, 255, 0.6);
+  border-radius: var(--hm-radius-md);
+  color: #ffffff;
+  transition: all 0.3s ease;
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  backdrop-filter: blur(20px) saturate(1.3);
+}
+
+.form-control-luxury:focus, .form-control:focus {
+  border-color: var(--hm-gold);
+  box-shadow: 
+    0 0 40px rgba(0, 123, 255, 0.5),
+    inset 0 3px 0 rgba(0, 123, 255, 0.2);
+  background: rgba(0, 123, 255, 0.08);
+}
+
+/* ======== Enhanced Stats ======== */
+.stat-luxury, .stats-luxury {
+  background: 
+    var(--hm-gradient-neon),
+    rgba(0, 123, 255, 0.05);
+  border: 3px solid var(--hm-gold);
+  border-radius: var(--hm-radius-lg);
+  padding: 24px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 
+    0 25px 60px rgba(0, 31, 63, 0.7),
+    0 10px 25px rgba(0, 31, 63, 0.5),
+    inset 0 4px 0 rgba(0, 123, 255, 0.2);
+}
+
+.stat-luxury::before, .stats-luxury::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--hm-shimmer-gold);
+  background-size: 200% 100%;
+  background-position: -200% 0;
+  opacity: 0.4;
+  animation: shimmerGold 4s linear infinite;
+  pointer-events: none;
+}
+
+.stat-number-3d, .stat-number {
+  font-size: 2.8rem;
+  font-weight: 900;
+  color: var(--hm-gold);
+  text-shadow: 0 0 30px rgba(0, 123, 255, 0.8);
+}
+
+.stat-label-3d, .stat-label {
+  color: #ffffff;
+  font-weight: 700;
+  margin-top: 10px;
+}
+
+/* ======== Modern Animations ======== */
+@keyframes shimmerGold {
+  to { background-position: 200% 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes pulse-gold {
+  0%, 100% { 
+    box-shadow: 0 0 30px rgba(0, 123, 255, 0.8);
+    transform: scale(1);
+  }
+  50% { 
+    box-shadow: 0 0 60px rgba(0, 123, 255, 1), 0 0 100px rgba(0, 123, 255, 0.5);
+    transform: scale(1.03);
+  }
+}
+
+/* ======== Modern Glass Orbs ======== */
+.glass-orb {
+  position: absolute;
+  border-radius: 50%;
+  background: 
+    radial-gradient(circle at 30% 30%, rgba(0, 123, 255, 0.9), transparent 70%),
+    rgba(0, 123, 255, 0.08);
+  border: 3px solid rgba(0, 123, 255, 0.8);
+  box-shadow: 
+    0 0 80px rgba(0, 123, 255, 0.6),
+    inset 0 0 30px rgba(0, 123, 255, 0.3);
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
+}
+
+.orb-1 { width: 220px; height: 220px; top: 10%; left: 10%; animation: float 7s ease-in-out infinite; }
+.orb-2 { width: 170px; height: 170px; top: 60%; right: 15%; animation: float 9s ease-in-out infinite reverse; }
+.orb-3 { width: 120px; height: 120px; bottom: 20%; left: 70%; animation: float 8s ease-in-out infinite; }
+
+/* ======== Modern Gold Particles ======== */
+.gold-particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.gold-particles::before {
+  content: '';
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: #007bff;
+  border-radius: 50%;
+  box-shadow: 
+    25px 35px 0 #007bff,
+    45px 75px 0 #0056b3,
+    65px 45px 0 #007bff,
+    85px 95px 0 #66b3ff,
+    105px 25px 0 #007bff,
+    125px 65px 0 #0056b3,
+    145px 85px 0 #007bff,
+    165px 35px 0 #66b3ff,
+    185px 75px 0 #007bff,
+    205px 55px 0 #0056b3;
+  animation: float 18s linear infinite;
+}
+
+/* ======== Modern Responsive ======== */
+@media (max-width: 768px) {
+  .hero-luxury, .premium-hero {
+    border-radius: var(--hm-radius-lg);
+    padding: 24px;
+  }
+  
+  .card-luxury, .car-card, .stat-card-3d {
+    margin-bottom: 24px;
+  }
+  
+  .btn-primary-luxury, .btn-outline-luxury, .btn-luxury {
+    padding: 12px 20px;
+    font-size: 0.9rem;
+  }
+}

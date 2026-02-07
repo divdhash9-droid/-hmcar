@@ -1,0 +1,57 @@
+<!-- [[ARABIC_HEADER]] هذا الملف (views/admin/live-auction.ejs) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. -->
+
+<% layout('layout') -%>
+<link rel="stylesheet" href="/public/css/admin-unified.css" />
+<% var hideNavbar = true; %>
+<% var hideSearch = true; %>
+<% var fullWidth = true; %>
+<% var bodyClass = 'admin-unified-bg' %>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h3 class="mb-1">إعداد رابط المزاد المباشر</h3>
+    <div class="text-muted">ضع رابط البث/المزاد الخارجي ليظهر للمستخدمين في صفحة المزاد المباشر.</div>
+  </div>
+  <a href="/admin" class="back-btn">
+    <i class="fas fa-arrow-right me-2"></i>العودة للوحة التحكم
+  </a>
+</div>
+
+<div class="live-auction-card">
+  <div class="live-auction-header">
+    <h5 class="mb-0">
+      <i class="fas fa-gavel me-2"></i>
+      إعدادات المزاد المباشر
+    </h5>
+  </div>
+  
+  <div class="p-4">
+    <form method="post" action="/admin/live-auction">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+      
+      <div class="mb-4">
+        <label class="form-label">رابط المزاد المباشر</label>
+        <input name="liveAuctionUrl" type="url" class="form-control" 
+               value="<%= (typeof setting !== 'undefined' && setting) ? setting.value : '' %>" 
+               placeholder="https://youtube.com/watch?v=..." />
+        <div class="form-text">رابط البث المباشر أو صفحة المزاد الخارجية</div>
+      </div>
+      
+      <div class="mb-4">
+        <label class="form-label">رقم WhatsApp للعملاء</label>
+        <input name="customerWhatsAppNumber" type="tel" class="form-control" 
+               value="<%= (typeof waSetting !== 'undefined' && waSetting) ? waSetting.value : '' %>" 
+               placeholder="+966500000000" />
+        <div class="form-text">رقم WhatsApp للتواصل مع العملاء</div>
+      </div>
+      
+      <div class="mb-4">
+        <label class="form-label">بنرات العملاء</label>
+        <textarea name="customerBanners" class="form-control" rows="6"><%= (typeof banners !== 'undefined' && banners) ? banners : '' %></textarea>
+        <div class="form-text">بنرات تظهر للعملاء (تنسيق JSON)</div>
+      </div>
+      
+      <button class="btn btn-primary">حفظ الإعدادات</button>
+    </form>
+  </div>
+</div>

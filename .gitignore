@@ -1,0 +1,49 @@
+﻿# Node
+node_modules/
+
+# Environment files (DO NOT COMMIT)
+.env
+.env.*
+!.env.example
+config/.env
+
+# Vercel
+.vercel/
+
+# Logs
+*.log
+logs/
+
+# Local reports / exports
+docs/*.pdf
+
+# Runtime uploads / generated assets
+uploads/
+
+# Sensitive keys
+config/serviceAccountKey.json
+firebase-service-account.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Database
+database-data/
+*.wt
+local-db.json
+
+# IDE
+.vscode/
+.idea/
+
+# Qodo
+.qodo/
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Backup files
+*.bak
+_head_*

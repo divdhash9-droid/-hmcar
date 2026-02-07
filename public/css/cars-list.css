@@ -1,0 +1,326 @@
+/* [[ARABIC_HEADER]] هذا الملف (public/css/cars-list.css) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. */
+
+/* 
+ * Cars List Page - Using Design System
+ * صفحة عرض السيارات - باستخدام نظام التصميم الموحد
+ */
+
+.hm-page-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--hm-space-xl) var(--hm-space-md);
+}
+
+.hm-page-header {
+  text-align: center;
+  margin-bottom: var(--hm-space-2xl);
+  padding: var(--hm-space-lg);
+  background: var(--hm-bg-tertiary);
+  border-radius: var(--hm-radius-2xl);
+  border: 2px solid var(--hm-border-medium);
+}
+
+.hm-page-header h1 {
+  color: var(--hm-text-primary);
+  font-size: 2rem;
+  margin-bottom: var(--hm-space-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--hm-space-md);
+}
+
+.hm-page-header p {
+  color: var(--hm-text-muted);
+  font-size: 1.1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.hm-cars-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: var(--hm-space-xl);
+  align-items: start;
+}
+
+.hm-filters-sidebar {
+  background: var(--hm-white);
+  border-radius: var(--hm-radius-xl);
+  padding: var(--hm-space-lg);
+  border: 2px solid var(--hm-border-medium);
+  box-shadow: var(--hm-shadow-md);
+  position: sticky;
+  top: var(--hm-space-lg);
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+}
+
+.hm-filters-sidebar h3 {
+  color: var(--hm-gold-primary);
+  margin-bottom: var(--hm-space-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--hm-space-sm);
+  font-size: 1.2rem;
+}
+
+.hm-filter-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hm-space-lg);
+}
+
+.hm-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hm-space-sm);
+}
+
+.hm-form-group label {
+  color: var(--hm-text-primary);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: var(--hm-space-xs);
+  font-size: 0.95rem;
+}
+
+.hm-form-control {
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--hm-border-medium);
+  border-radius: var(--hm-radius-md);
+  background: var(--hm-white);
+  color: var(--hm-text-primary);
+  font-size: 0.95rem;
+  transition: all var(--hm-transition-normal);
+}
+
+.hm-form-control:focus {
+  outline: none;
+  border-color: var(--hm-gold-primary);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+}
+
+.hm-price-range {
+  display: flex;
+  gap: var(--hm-space-sm);
+}
+
+.hm-price-range .hm-form-control {
+  flex: 1;
+}
+
+.hm-btn-block {
+  width: 100%;
+}
+
+.hm-cars-grid-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hm-space-xl);
+}
+
+.hm-car-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--hm-space-xl);
+}
+
+.hm-empty-state {
+  text-align: center;
+  padding: var(--hm-space-3xl) var(--hm-space-xl);
+  background: var(--hm-bg-secondary);
+  border-radius: var(--hm-radius-2xl);
+  border: 2px dashed var(--hm-border-medium);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--hm-space-lg);
+}
+
+.hm-empty-state h4 {
+  color: var(--hm-text-primary);
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.hm-empty-state p {
+  color: var(--hm-text-muted);
+  font-size: 1rem;
+  max-width: 400px;
+  margin: 0;
+}
+
+.hm-pagination-container {
+  text-align: center;
+  margin-top: var(--hm-space-xl);
+}
+
+.hm-pagination {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--hm-space-sm);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.hm-page-item {
+  display: flex;
+}
+
+.hm-page-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-radius: var(--hm-radius-md);
+  text-decoration: none;
+  color: var(--hm-text-primary);
+  border: 2px solid var(--hm-border-medium);
+  transition: all var(--hm-transition-normal);
+  gap: var(--hm-space-xs);
+}
+
+.hm-page-link:hover {
+  background: var(--hm-gold-primary);
+  color: var(--hm-white);
+  border-color: var(--hm-gold-primary);
+}
+
+.hm-page-item.hm-active .hm-page-link {
+  background: var(--hm-gold-primary);
+  color: var(--hm-white);
+  border-color: var(--hm-gold-primary);
+  font-weight: 700;
+}
+
+/* Responsive Design - التصميم المتجاوب */
+@media (max-width: 1024px) {
+  .hm-cars-layout {
+    grid-template-columns: 250px 1fr;
+    gap: var(--hm-space-lg);
+  }
+}
+
+@media (max-width: 768px) {
+  .hm-cars-layout {
+    grid-template-columns: 1fr;
+  }
+  
+  .hm-filters-sidebar {
+    position: static;
+    max-height: none;
+  }
+  
+  .hm-page-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .hm-car-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: var(--hm-space-lg);
+  }
+  
+  .hm-price-range {
+    flex-direction: column;
+    gap: var(--hm-space-sm);
+  }
+}
+
+@media (max-width: 480px) {
+  .hm-page-container {
+    padding: var(--hm-space-md);
+  }
+  
+  .hm-page-header {
+    padding: var(--hm-space-md);
+  }
+  
+  .hm-car-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .hm-pagination {
+    flex-wrap: wrap;
+  }
+}
+
+/* Animation Effects - تأثيرات الحركة */
+.hm-page-header {
+  animation: slideInDown 0.6s ease-out;
+}
+
+.hm-car-grid > * {
+  animation: fadeInUp 0.6s ease-out;
+  animation-fill-mode: both;
+}
+
+.hm-car-grid > *:nth-child(1) { animation-delay: 0.1s; }
+.hm-car-grid > *:nth-child(2) { animation-delay: 0.2s; }
+.hm-car-grid > *:nth-child(3) { animation-delay: 0.3s; }
+.hm-car-grid > *:nth-child(4) { animation-delay: 0.4s; }
+.hm-car-grid > *:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes slideInDown {
+  from {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Hover Effects - تأثيرات التحويم */
+.hm-form-control:hover {
+  border-color: var(--hm-gold-primary);
+}
+
+.hm-filters-sidebar {
+  transition: all var(--hm-transition-normal);
+}
+
+.hm-filters-sidebar:hover {
+  border-color: var(--hm-gold-primary);
+  box-shadow: var(--hm-shadow-lg);
+}
+
+/* Focus States - حالات التركيز */
+.hm-form-control:focus-visible {
+  outline: 2px solid var(--hm-gold-primary);
+  outline-offset: 2px;
+}
+
+/* Accessibility - إمكانية الوصول */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High Contrast Mode - وضع التباين العالي */
+@media (prefers-contrast: high) {
+  .hm-form-control {
+    border-width: 3px;
+  }
+  
+  .hm-page-link {
+    border-width: 3px;
+  }
+}

@@ -1,0 +1,636 @@
+/* [[ARABIC_HEADER]] هذا الملف (public/css/modern-auth.css) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. */
+
+/* public/css/modern-auth.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+.modern-auth {
+    --primary-font: 'Poppins', sans-serif;
+    /* Scoped to auth pages only to avoid overriding site-wide theme vars */
+    --primary-color: #0b1f3a;
+    --secondary-color: #07162a;
+    --accent-color: #0b1f3a;
+    --gold-color: #ffffff;
+    --text-color: #ffffff;
+    --light-text-color: rgba(255, 255, 255, 0.78);
+    --background-color: #ffffff;
+    --form-bg-color: #ffffff;
+    --border-color: #dfe4ea;
+    --border-radius: 12px;
+    --box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    font-family: var(--primary-font);
+    background-color: var(--background-color);
+}
+
+.auth-wrapper {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+}
+
+.auth-left {
+    flex: 1;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.auth-left-inner {
+    z-index: 2;
+    max-width: 450px;
+    text-align: left;
+}
+
+/* RTL support for Arabic auth pages */
+[dir="rtl"] .auth-left-inner {
+    text-align: right;
+}
+
+[dir="rtl"] .logo-container {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .logo-icon {
+    margin-right: 0;
+    margin-left: 1rem;
+}
+
+[dir="rtl"] .features {
+    justify-content: flex-end;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 3rem;
+}
+
+.logo-icon {
+    font-size: 3rem;
+    color: var(--gold-color);
+    margin-right: 1rem;
+    animation: car-drive 5s ease-in-out infinite;
+}
+
+.logo-text {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 1px;
+}
+
+.auth-left h2 {
+    font-size: 3.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    color: #fff;
+}
+
+.auth-left p {
+    font-size: 1.1rem;
+    color: var(--light-text-color);
+    line-height: 1.6;
+    margin-bottom: 3rem;
+}
+
+.features {
+    display: flex;
+    gap: 2rem;
+}
+
+.feature {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-color);
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.8rem 1.2rem;
+    border-radius: var(--border-radius);
+    transition: transform 0.3s ease;
+}
+
+.feature:hover {
+    transform: translateY(-5px);
+}
+
+.feature i {
+    color: var(--gold-color);
+    font-size: 1.5rem;
+}
+
+.auth-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background-color: var(--form-bg-color);
+}
+
+.auth-form-container {
+    width: 100%;
+    max-width: 400px;
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.auth-header h2 {
+    font-size: 2.2rem;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.auth-header p {
+    color: #6c757d;
+    font-size: 1rem;
+}
+
+.auth-form .form-floating label {
+    color: #6c757d;
+}
+
+.auth-form .form-control {
+    height: 58px;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.auth-form .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(11, 31, 58, 0.12);
+}
+
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+}
+
+.form-check-label, .forgot-password-link {
+    color: #6c757d;
+}
+
+.forgot-password-link {
+    text-decoration: none;
+    font-weight: 500;
+    color: var(--secondary-color);
+}
+
+.forgot-password-link:hover {
+    color: var(--accent-color);
+}
+
+.btn-gold {
+    background-color: #ffffff;
+    border-color: rgba(11, 31, 58, 0.18);
+    color: var(--primary-color);
+    font-weight: 600;
+    padding: 0.9rem;
+    border-radius: var(--border-radius);
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 18px rgba(11, 31, 58, 0.12);
+}
+
+.btn-gold:hover {
+    background-color: #f6f8fc;
+    border-color: rgba(11, 31, 58, 0.25);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(11, 31, 58, 0.18);
+}
+
+/* ===== Login V2 (premium) ===== */
+.hm-login-v2.modern-auth {
+    background:
+        radial-gradient(1200px 800px at 20% 20%, rgba(35, 96, 190, 0.28) 0%, transparent 60%),
+        radial-gradient(900px 700px at 85% 30%, rgba(14, 170, 160, 0.18) 0%, transparent 55%),
+        linear-gradient(135deg, #061325 0%, #0b2450 55%, #07162a 100%);
+}
+
+/* Video background layer (Login V2 - premium only) */
+.hm-login-v2:not(.hm-login-v2--light) .hm-login2__bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.hm-login-v2:not(.hm-login-v2--light) .hm-login2__bgVideo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transform: scale(1.03);
+}
+
+.hm-login-v2:not(.hm-login-v2--light) .hm-login2__bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(1200px 800px at 20% 20%, rgba(35, 96, 190, 0.32) 0%, transparent 60%),
+        radial-gradient(900px 700px at 85% 30%, rgba(14, 170, 160, 0.22) 0%, transparent 55%),
+        linear-gradient(135deg, rgba(6, 19, 37, 0.76) 0%, rgba(11, 36, 80, 0.78) 55%, rgba(7, 22, 42, 0.84) 100%);
+}
+
+.hm-login-v2 .hm-login2__shell {
+    position: relative;
+    z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hm-login-v2:not(.hm-login-v2--light) .hm-login2__bg {
+        display: none;
+    }
+}
+
+/* ===== Login V2 (light) ===== */
+.hm-login-v2.hm-login-v2--light.modern-auth {
+    background: #ffffff;
+}
+
+.hm-login-v2.hm-login-v2--light .hm-login2__brand {
+    background: #ffffff;
+    border: 1px solid rgba(11, 31, 58, 0.10);
+    box-shadow: 0 22px 60px rgba(11, 31, 58, 0.14);
+    color: rgba(11, 31, 58, 0.92);
+}
+
+.hm-login-v2.hm-login-v2--light .hm-login2__name {
+    color: #0b1f3a;
+    text-shadow: 0 12px 28px rgba(11, 31, 58, 0.10);
+}
+
+.hm-login-v2.hm-login-v2--light .hm-login2__desc {
+    color: rgba(11, 31, 58, 0.74);
+    text-shadow: none;
+}
+
+.hm-login-v2.hm-login-v2--light .hm-chip {
+    background: rgba(255, 255, 255, 0.86);
+    border: 1px solid rgba(11, 31, 58, 0.12);
+    color: rgba(11, 31, 58, 0.90);
+}
+
+.hm-login-v2.hm-login-v2--light .hm-chip i {
+    color: rgba(11, 31, 58, 0.90);
+}
+
+.hm-login-v2.hm-login-v2--light .hm-login2__card {
+    box-shadow: 0 22px 60px rgba(11, 31, 58, 0.14);
+}
+
+.hm-login-v2 .hm-login2 {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    position: relative;
+}
+
+.hm-login-v2 .hm-login2__shell {
+    width: min(1100px, 100%);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    align-items: stretch;
+    justify-items: center;
+}
+
+.hm-login-v2:not(.hm-login-v2--light) .hm-login2__brand {
+    border-radius: 22px;
+    padding: 1.75rem;
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06)),
+        radial-gradient(800px 400px at 30% 20%, rgba(255, 198, 90, 0.18) 0%, transparent 60%),
+        radial-gradient(800px 400px at 85% 15%, rgba(35, 96, 190, 0.22) 0%, transparent 55%);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.35);
+    color: rgba(238, 243, 251, 0.96);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    -webkit-backdrop-filter: blur(18px) saturate(120%);
+    backdrop-filter: blur(18px) saturate(120%);
+}
+
+.hm-login-v2 .hm-login2__logoWrap {
+    width: fit-content;
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 18px;
+    padding: 0.85rem 1rem;
+    border: 1px solid rgba(11, 31, 58, 0.10);
+    box-shadow: 0 16px 34px rgba(0, 0, 0, 0.22);
+    margin-bottom: 1rem;
+}
+
+.hm-login-v2 .hm-login2__logo {
+    width: min(320px, 60vw);
+    height: auto;
+    display: block;
+}
+
+.hm-login-v2 .hm-login2__name {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: #ffffff;
+    font-size: clamp(1.4rem, 3vw, 2.2rem);
+    text-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+}
+
+.hm-login-v2 .hm-login2__desc {
+    font-weight: 600;
+    line-height: 1.65;
+    color: rgba(238, 243, 251, 0.92);
+    font-size: 1rem;
+    margin-top: 0.35rem;
+    text-shadow: 0 10px 22px rgba(0, 0, 0, 0.32);
+}
+
+.hm-login-v2 .hm-login2__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    margin-top: 1.25rem;
+}
+
+.hm-login-v2 .hm-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.55rem 0.8rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: rgba(238, 243, 251, 0.92);
+    font-weight: 700;
+    font-size: 0.92rem;
+}
+
+.hm-login-v2 .hm-chip i {
+    color: rgba(0, 123, 255, 0.96);
+}
+
+.hm-login-v2:not(.hm-login-v2--light) .hm-login2__card {
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.35);
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    -webkit-backdrop-filter: blur(18px) saturate(120%);
+    backdrop-filter: blur(18px) saturate(120%);
+    width: min(560px, 100%);
+}
+
+.hm-login-v2 .hm-login2__brandInline {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 0.85rem;
+}
+
+[dir="rtl"] .hm-login-v2 .hm-login2__brandInline {
+    text-align: center;
+}
+
+.hm-login-v2 .hm-login2__brandInline .hm-login2__tag {
+    margin-top: 0.15rem;
+}
+
+.hm-login-v2 .hm-login2__brandInline .hm-login2__name {
+    margin-top: 0.1rem;
+}
+
+.hm-login-v2 .hm-login2__brandInline .hm-login2__chips {
+    justify-content: center;
+}
+
+.hm-login-v2:not(.hm-login-v2--light) .hm-login2__title {
+    margin: 0;
+    color: rgba(238, 243, 251, 0.96);
+    font-weight: 900;
+    font-size: 1.9rem;
+}
+
+.hm-login-v2:not(.hm-login-v2--light) .hm-login2__subtitle {
+    margin: 0.35rem 0 1.25rem;
+    color: rgba(238, 243, 251, 0.80);
+    font-weight: 700;
+}
+
+.hm-login-v2 .hm-login2__role {
+    display: flex;
+    gap: 0.6rem;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.hm-login-v2 .hm-link.hm-link--pill {
+    padding: 0.55rem 0.85rem;
+    border-radius: 999px;
+}
+
+.hm-login-v2:not(.hm-login-v2--light) .hm-link.hm-link--active {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.22);
+}
+
+.hm-login-v2:not(.hm-login-v2--light) .hm-login2__role .hm-link,
+.hm-login-v2:not(.hm-login-v2--light) .hm-login2__role .hm-link i {
+    color: rgba(238, 243, 251, 0.92);
+}
+
+.hm-login-v2:not(.hm-login-v2--light) .hm-login2__note {
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    padding: 0.75rem 0.9rem;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.10);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: rgba(238, 243, 251, 0.86);
+    font-weight: 700;
+}
+
+.hm-login-v2 .hm-login2__note i {
+    color: rgba(0, 123, 255, 0.96);
+}
+
+.hm-login-v2:not(.hm-login-v2--light) .auth-form .form-label,
+.hm-login-v2:not(.hm-login-v2--light) .form-check-label,
+.hm-login-v2:not(.hm-login-v2--light) .auth-form .form-text {
+    color: rgba(238, 243, 251, 0.86);
+}
+
+.hm-login-v2:not(.hm-login-v2--light) .auth-form .form-control {
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.10);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: rgba(238, 243, 251, 0.96);
+}
+
+.hm-login-v2:not(.hm-login-v2--light) .auth-form .form-control::placeholder {
+    color: rgba(238, 243, 251, 0.62);
+}
+
+.hm-login-v2:not(.hm-login-v2--light) .auth-form .form-control:focus {
+    border-color: rgba(255, 255, 255, 0.30);
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.10);
+}
+
+.hm-login-v2:not(.hm-login-v2--light) .hm-login2__footer .hm-link {
+    color: rgba(238, 243, 251, 0.86);
+}
+
+.hm-login-v2.hm-login-v2--light .hm-login2__bg {
+    display: none;
+}
+
+.hm-login-v2 .btn-gold {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+}
+
+.hm-login-v2 .hm-login2__switch {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+}
+
+.hm-login-v2 .hm-link {
+    text-decoration: none;
+    color: rgba(11, 31, 58, 0.85);
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.6rem 0.8rem;
+    border-radius: 12px;
+    background: rgba(11, 31, 58, 0.06);
+    border: 1px solid rgba(11, 31, 58, 0.12);
+}
+
+.hm-login-v2 .hm-link:hover {
+    background: rgba(11, 31, 58, 0.10);
+}
+
+.hm-login-v2 .hm-login2__footer {
+    margin-top: 1.25rem;
+    text-align: center;
+    color: rgba(11, 31, 58, 0.55);
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 992px) {
+    .hm-login-v2 .hm-login2__shell {
+        grid-template-columns: 1fr;
+    }
+    .hm-login-v2 .hm-login2__brand {
+        order: 2;
+    }
+    .hm-login-v2 .hm-login2__card {
+        order: 1;
+    }
+}
+
+.social-login-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 2rem 0;
+    color: #adb5bd;
+}
+
+.social-login-divider::before,
+.social-login-divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.social-login-divider:not(:empty)::before {
+    margin-right: .25em;
+}
+
+.social-login-divider:not(:empty)::after {
+    margin-left: .25em;
+}
+
+.social-login-buttons .btn {
+    font-weight: 500;
+    padding: 0.8rem;
+    border-radius: var(--border-radius);
+    border-color: var(--border-color);
+}
+
+.social-login-buttons .btn i {
+    font-size: 1.2rem;
+}
+
+.auth-switch {
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 0.9rem;
+}
+
+.auth-switch a {
+    color: var(--accent-color);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.auth-footer {
+    position: absolute;
+    bottom: 1rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+@keyframes car-drive {
+    0% { transform: translateX(-150px); opacity: 0; }
+    10% { transform: translateX(0); opacity: 1; }
+    40% { transform: translateX(0); opacity: 1; }
+    50% { transform: translateX(150px); opacity: 0; }
+    100% { transform: translateX(-150px); opacity: 0; }
+}
+
+@media (max-width: 992px) {
+    .auth-left {
+        display: none;
+    }
+    .auth-right {
+        flex: 1;
+        width: 100%;
+    }
+    .auth-form-container {
+        padding: 1rem;
+    }
+}
+

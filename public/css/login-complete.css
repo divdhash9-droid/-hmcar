@@ -1,0 +1,501 @@
+/* Complete Login Styles - HM CAR */
+:root {
+  --navy-primary: #0a192f;
+  --navy-secondary: #172a45;
+  --navy-accent: #1e3a8a;
+  --navy-light: #2563eb;
+  --snow-white: #ffffff;
+  --snow-light: #f8fafc;
+  --gold-accent: #fbbf24;
+  --ios-ice: #f5f7fb;
+  --ios-glass: rgba(255, 255, 255, 0.78);
+  --ios-border: rgba(10, 25, 47, 0.12);
+  --ios-shadow: 0 20px 45px rgba(7, 18, 34, 0.18);
+  --ios-shadow-soft: 0 8px 20px rgba(10, 25, 47, 0.12);
+  --ios-gradient: linear-gradient(135deg, #091a31 0%, #0f2a4d 55%, #1f3f74 100%);
+  --ios-ice-gradient: linear-gradient(145deg, #ffffff 0%, #f2f6fb 50%, #e9eef5 100%);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Tajawal', 'Poppins', sans-serif;
+  line-height: 1.6;
+  background: #edf2f7;
+}
+
+.hm-login-3d {
+  min-height: 100vh;
+  background: radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.15) 0%, transparent 45%),
+    radial-gradient(circle at 90% 10%, rgba(10, 25, 47, 0.35) 0%, transparent 55%),
+    linear-gradient(160deg, #0a162b 0%, #112647 45%, #f2f6fb 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hm-login-3d::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.25) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(37, 99, 235, 0.2) 0%, transparent 55%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08), transparent 35%, rgba(255, 255, 255, 0.12));
+  animation: premiumFloating 20s ease-in-out infinite;
+}
+
+@keyframes premiumFloating {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(-10px, -10px) rotate(1deg); }
+  66% { transform: translate(10px, -5px) rotate(-1deg); }
+}
+
+.hm-login-3d__container {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 3rem;
+  max-width: 1200px;
+  width: 100%;
+  z-index: 1;
+  position: relative;
+  align-items: center;
+  min-height: 600px;
+}
+
+.hm-login-ios .hm-login-3d__container {
+  gap: 3.5rem;
+}
+
+.hm-login-3d__brand-card {
+  background: var(--ios-gradient);
+  border-radius: 30px;
+  padding: 3.5rem 3rem;
+  text-align: center;
+  color: var(--snow-white);
+  max-width: 450px;
+  width: 100%;
+  box-shadow: 0 28px 60px rgba(6, 14, 28, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  position: relative;
+  overflow: hidden;
+}
+
+.hm-login-ios .hm-login-3d__brand-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.18) 0%, transparent 40%, rgba(255, 255, 255, 0.05) 100%);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.hm-login-3d__logo {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  filter: drop-shadow(0 16px 28px rgba(0, 0, 0, 0.35));
+  transition: transform 0.3s ease;
+}
+
+.hm-login-3d__logo:hover {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.hm-login-3d__brand-title {
+  font-size: 2.8rem;
+  font-weight: 900;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #ffffff 0%, #e6efff 45%, #ffdca5 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hm-login-3d__brand-subtitle {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  margin-bottom: 2.5rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.hm-login-3d__chips {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.hm-login-3d__chip {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 18px;
+  padding: 1rem 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #ffffff;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.hm-login-3d__chip:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.hm-login-3d__chip i {
+  font-size: 1.15rem;
+  color: #ffdca5;
+  background: rgba(255, 255, 255, 0.12);
+  padding: 0.45rem;
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+.hm-login-3d__social-section {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hm-login-3d__social-title {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.hm-login-3d__social-links {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.hm-login-3d__social-link {
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+.hm-login-3d__social-link:hover {
+  background: #f7d38a;
+  border-color: #f7d38a;
+  transform: translateY(-3px);
+  box-shadow: 0 12px 24px rgba(247, 211, 138, 0.35);
+}
+
+.hm-login-3d__login-card {
+  background: var(--ios-glass);
+  border-radius: 32px;
+  padding: 3.25rem 3.5rem;
+  box-shadow: var(--ios-shadow);
+  border: 1px solid var(--ios-border);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  position: relative;
+  transform-style: preserve-3d;
+  transform: perspective(1200px) translateZ(0);
+  transition: transform 0.45s ease, box-shadow 0.45s ease;
+}
+
+.hm-login-3d__login-card:hover {
+  transform: perspective(1200px) translateZ(12px);
+  box-shadow: 0 30px 60px rgba(6, 16, 32, 0.25);
+}
+
+.hm-login-ios .hm-login-3d__login-card::before {
+  content: '';
+  position: absolute;
+  inset: 14px;
+  border-radius: 24px;
+  border: 1px solid rgba(10, 25, 47, 0.08);
+  pointer-events: none;
+}
+
+.hm-login-3d__title {
+  font-size: 2.25rem;
+  font-weight: 900;
+  color: #0b1b33;
+  margin-bottom: 0.8rem;
+  text-align: center;
+}
+
+.hm-login-3d__subtitle {
+  color: #344563;
+  font-size: 1.05rem;
+  font-weight: 500;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.hm-login-3d__role-toggle {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  background: rgba(10, 25, 47, 0.06);
+  padding: 0.55rem;
+  border-radius: 18px;
+  border: 1px solid rgba(10, 25, 47, 0.12);
+}
+
+.hm-login-3d__role-btn {
+  flex: 1;
+  padding: 0.85rem 1.5rem;
+  border: none;
+  border-radius: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: transparent;
+  color: #3d526f;
+  font-size: 0.95rem;
+}
+
+.hm-login-3d__role-btn.active {
+  background: linear-gradient(135deg, #0a1b34 0%, #1c3d72 100%);
+  color: var(--snow-white);
+  box-shadow: 0 8px 20px rgba(10, 25, 47, 0.25);
+}
+
+.hm-login-3d__role-btn:hover:not(.active) {
+  background: rgba(10, 25, 47, 0.12);
+  color: #0a1b34;
+}
+
+.hm-login-3d__form-group {
+  margin-bottom: 1.75rem;
+}
+
+.hm-login-3d__form-label {
+  display: block;
+  color: #0b1b33;
+  font-weight: 700;
+  margin-bottom: 0.8rem;
+  font-size: 0.95rem;
+}
+
+.hm-login-3d__form-input {
+  width: 100%;
+  padding: 1.15rem 1.45rem;
+  background: var(--ios-ice-gradient);
+  border: 1px solid var(--ios-border);
+  border-radius: 20px;
+  color: #0b1b33;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: var(--ios-shadow-soft);
+}
+
+.hm-login-3d__form-input::placeholder {
+  color: #64748b;
+}
+
+.hm-login-3d__form-input:focus {
+  outline: none;
+  border-color: #1f3f74;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(31, 63, 116, 0.15), 0 16px 35px rgba(10, 25, 47, 0.2);
+}
+
+.hm-login-3d__checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 2.25rem;
+}
+
+.hm-login-3d__checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: #1f3f74;
+}
+
+.hm-login-3d__btn {
+  width: 100%;
+  padding: 1.2rem 2rem;
+  background: linear-gradient(135deg, #0b1b33 0%, #142a4d 45%, #1f3f74 100%);
+  color: var(--snow-white);
+  border: none;
+  border-radius: 20px;
+  font-weight: 800;
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  box-shadow: 0 18px 32px rgba(10, 25, 47, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.hm-login-3d__btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transform: translateX(-120%);
+  transition: transform 0.5s ease;
+}
+
+.hm-login-3d__btn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(10, 25, 47, 0.45);
+}
+
+.hm-login-3d__btn:hover::after {
+  transform: translateX(120%);
+}
+
+.hm-login-3d__btn:active {
+  transform: translateY(2px) scale(0.99);
+  box-shadow: 0 10px 22px rgba(10, 25, 47, 0.35), inset 0 4px 10px rgba(8, 18, 36, 0.5);
+}
+
+.hm-login-3d__btn.is-clicked {
+  animation: loginPulse 0.6s ease;
+}
+
+@keyframes loginPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5);
+  }
+  100% {
+    box-shadow: 0 0 0 18px rgba(59, 130, 246, 0);
+  }
+}
+
+.hm-login-3d__switch {
+  text-align: center;
+  margin-top: 2.5rem;
+  color: #3b4c67;
+}
+
+.hm-login-3d__switch a {
+  color: #1f3f74;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.hm-login-3d__switch a:hover {
+  color: #0b1b33;
+  text-shadow: 0 0 12px rgba(31, 63, 116, 0.35);
+}
+
+.hm-login-3d__footer {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.hm-login-3d__footer a {
+  color: #3b4c67;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.hm-login-3d__footer a:hover {
+  color: #1f3f74;
+}
+
+.alert {
+  border-radius: 15px;
+  border: none;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.5rem;
+}
+
+.alert-danger {
+  background: linear-gradient(135deg, #ffdad6, #f06b6b);
+  color: #8f1d1d;
+}
+
+.alert-success {
+  background: linear-gradient(135deg, #d4fbe7, #71d9a2);
+  color: #0f5a33;
+}
+
+@media (max-width: 1024px) {
+  .hm-login-3d__container {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    max-width: 600px;
+  }
+  
+  .hm-login-3d__brand-card,
+  .hm-login-3d__login-card {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .hm-login-3d {
+    padding: 1rem;
+  }
+  
+  .hm-login-3d__container {
+    gap: 2rem;
+  }
+  
+  .hm-login-3d__brand-card,
+  .hm-login-3d__login-card {
+    padding: 2.5rem 2rem;
+  }
+  
+  .hm-login-3d__brand-title {
+    font-size: 2rem;
+  }
+  
+  .hm-login-3d__title {
+    font-size: 1.8rem;
+  }
+  
+  .hm-login-3d__form-input {
+    padding: 1rem 1.25rem;
+  }
+  
+  .hm-login-3d__btn {
+    padding: 1.05rem 1.5rem;
+    font-size: 1rem;
+  }
+}
+
+.hm-login-ios .hm-login-3d__brand,
+.hm-login-ios .hm-login-3d__login-section {
+  transform: translateZ(0);
+}
+
+.hm-login-ios .hm-login-3d__role-btn i,
+.hm-login-ios .hm-login-3d__form-label i,
+.hm-login-ios .hm-login-3d__btn i {
+  font-size: 1.05rem;
+}
+
+.hm-login-ios .hm-login-3d__role-btn i {
+  color: inherit;
+}

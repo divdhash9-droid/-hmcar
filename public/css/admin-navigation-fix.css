@@ -1,0 +1,312 @@
+/* [[ARABIC_HEADER]] هذا الملف (public/css/admin-navigation-fix.css) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. */
+
+/* ===== Admin Navigation Fix CSS ===== */
+:root {
+  /* Navigation Fix Colors */
+  --nav-fix-primary: var(--primary-color-light);
+  --nav-fix-success: #28A745;
+  --nav-fix-warning: #FFC107;
+  --nav-fix-danger: #DC3545;
+  --nav-fix-info: #17A2B8;
+  --nav-fix-bg: #FFFFFF;
+  --nav-fix-bg-secondary: #F8F9FA;
+  --nav-fix-bg-hover: #F1F3F4;
+  --nav-fix-text: #212529;
+  --nav-fix-text-secondary: #6C757D;
+  --nav-fix-border: #DEE2E6;
+  --nav-fix-border-primary: var(--border-color);
+  --nav-fix-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  --nav-fix-shadow-hover: 0 4px 20px rgba(0, 0, 0, 0.12);
+  --nav-fix-shadow-gold: 0 4px 20px rgba(11, 31, 58, 0.14);
+}
+
+/* ===== Icon Fix ===== */
+.nav-fix-icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-fix-icon::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--nav-fix-primary);
+  border-radius: 50%;
+  opacity: 0;
+  transition: all 0.3s ease;
+  transform: scale(0.8);
+}
+
+.nav-fix-icon:hover::before {
+  opacity: 0.1;
+  transform: scale(1.2);
+}
+
+/* ===== Link Fix ===== */
+.nav-fix-link {
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-fix-link::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
+  transition: all 0.3s ease;
+}
+
+.nav-fix-link:hover::before {
+  right: 100%;
+}
+
+.nav-fix-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 0;
+  height: 2px;
+  background: var(--nav-fix-primary);
+  transition: all 0.3s ease;
+}
+
+.nav-fix-link:hover::after {
+  width: 100%;
+}
+
+/* ===== Button Fix ===== */
+.nav-fix-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-fix-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: all 0.3s ease;
+}
+
+.nav-fix-btn:hover::before {
+  right: 100%;
+}
+
+.nav-fix-btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  transform: translate(50%, 50%);
+}
+
+.nav-fix-btn:hover::after {
+  width: 100%;
+  height: 100%;
+}
+
+/* ===== Status Indicators ===== */
+.nav-fix-status {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 0.75rem;
+}
+
+.nav-fix-status--success {
+  background: var(--nav-fix-success);
+  color: white;
+  animation: pulse-success 2s infinite;
+}
+
+.nav-fix-status--warning {
+  background: var(--nav-fix-warning);
+  color: white;
+  animation: pulse-warning 2s infinite;
+}
+
+.nav-fix-status--danger {
+  background: var(--nav-fix-danger);
+  color: white;
+  animation: pulse-danger 2s infinite;
+}
+
+/* ===== Loading States ===== */
+.nav-fix-loading {
+  position: relative;
+  pointer-events: none;
+}
+
+.nav-fix-loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 50%;
+  width: 16px;
+  height: 16px;
+  margin: -8px -8px 0 0;
+  border: 2px solid var(--nav-fix-primary);
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 1s linear infinite;
+}
+
+/* ===== Animations ===== */
+@keyframes pulse-success {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+  }
+}
+
+@keyframes pulse-warning {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(255, 193, 7, 0);
+  }
+}
+
+@keyframes pulse-danger {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===== Responsive Fixes ===== */
+@media (max-width: 768px) {
+  .nav-fix-link {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+    padding: 1.25rem;
+  }
+  
+  .nav-fix-link i:first-child {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .nav-fix-link span {
+    font-size: 1rem;
+  }
+  
+  .nav-fix-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 1rem;
+  }
+}
+
+/* ===== Print Styles ===== */
+@media print {
+  .nav-fix-widget {
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+  }
+  
+  .nav-fix-btn {
+    background: white !important;
+    color: black !important;
+    border: 1px solid #ccc !important;
+  }
+}
+
+/* ===== Accessibility ===== */
+@media (prefers-reduced-motion: reduce) {
+  .nav-fix-link::before,
+  .nav-fix-link::after,
+  .nav-fix-btn::before,
+  .nav-fix-btn::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  .nav-fix-status--success,
+  .nav-fix-status--warning,
+  .nav-fix-status--danger {
+    animation: none !important;
+  }
+}
+
+/* ===== Focus States ===== */
+.nav-fix-link:focus,
+.nav-fix-btn:focus {
+  outline: 2px solid var(--nav-fix-primary);
+  outline-offset: 2px;
+}
+
+/* ===== Dark Mode Support ===== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --nav-fix-bg: #1A1A1A;
+    --nav-fix-bg-secondary: #2D2D2D;
+    --nav-fix-bg-hover: #404040;
+    --nav-fix-text: #FFFFFF;
+    --nav-fix-text-secondary: #B8B8B8;
+    --nav-fix-border: #404040;
+  }
+}
+
+/* ===== High Contrast Mode ===== */
+@media (prefers-contrast: high) {
+  .nav-fix-link {
+    border-width: 2px;
+  }
+  
+  .nav-fix-btn {
+    border-width: 2px;
+  }
+  
+  .nav-fix-status {
+    border: 2px solid currentColor;
+  }
+}
+
+/* ===== Touch Device Optimizations ===== */
+@media (hover: none) and (pointer: coarse) {
+  .nav-fix-link {
+    padding: 1.25rem;
+  }
+  
+  .nav-fix-btn {
+    padding: 1rem;
+    min-height: 48px;
+    min-width: 48px;
+  }
+}

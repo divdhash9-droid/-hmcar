@@ -1,0 +1,798 @@
+<!-- [[ARABIC_HEADER]] هذا الملف (views/admin/auth-control.ejs) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. -->
+
+<% layout('layout') -%>
+<% var hideNavbar = true; %>
+<% var hideSearch = true; %>
+<% var fullWidth = true; %>
+<% var bodyClass = 'hm-admin-page'; %>
+
+<link rel="stylesheet" href="/css/admin-luxury.css">
+<link rel="stylesheet" href="/css/ios-design-system.css">
+<link rel="stylesheet" href="/css/ios-components.css">
+
+<div class="hm-admin-layout">
+  <!-- Animated Background -->
+  <div class="hm-admin-bg">
+    <div class="hm-admin-bg-gradient"></div>
+    <div class="hm-admin-bg-glow"></div>
+  </div>
+
+  <!-- Mobile Toggle -->
+  <button class="hm-mobile-toggle" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Sidebar -->
+  <%- include('../partials/admin-sidebar') %>
+
+  <!-- Main Content -->
+  <main class="hm-admin-main">
+    <!-- iOS Navigation Bar -->
+    <nav class="ios-navbar ios-text">
+      <div class="ios-navbar-content">
+        <div class="ios-navbar-left">
+          <button class="ios-btn ios-btn-tertiary ios-btn-icon ios-haptic" onclick="history.back()">
+            <i class="fas fa-chevron-left ios-icon"></i>
+          </button>
+        </div>
+        
+        <div class="ios-navbar-title">
+          التحكم في المصادقة
+        </div>
+        
+        <div class="ios-navbar-right">
+          <button class="ios-btn ios-btn-tertiary ios-btn-icon ios-haptic" onclick="refreshStatus()">
+            <i class="fas fa-sync ios-icon"></i>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Content -->
+    <div class="hm-admin-content" style="padding-top: 88px;">
+      <!-- Status Card -->
+      <div class="ios-card ios-animate-fade-in">
+        <div class="ios-card-header">
+          <h2 class="ios-headline ios-text">حالة المصادقة الحالية</h2>
+        </div>
+        <div class="ios-card-content">
+          <div class="ios-status-grid">
+            <div class="ios-status-item">
+              <div class="ios-status-icon" id="authStatusIcon">
+                <i class="fas fa-shield-alt ios-icon-large"></i>
+              </div>
+              <div class="ios-status-info">
+                <h3 class="ios-subhead ios-text">نظام المصادقة</h3>
+                <p class="ios-footnote ios-text" id="authStatusText">جاري التحميل...</p>
+              </div>
+              <div class="ios-status-toggle">
+                <label class="ios-switch" id="authSwitch">
+                  <input type="checkbox" id="authToggle" onchange="toggleAuthentication()">
+                  <span class="ios-switch-handle"></span>
+                </label>
+              </div>
+            </div>
+            
+            <div class="ios-status-item">
+              <div class="ios-status-icon" id="devStatusIcon">
+                <i class="fas fa-code ios-icon-large"></i>
+              </div>
+              <div class="ios-status-info">
+                <h3 class="ios-subhead ios-text">وضع التطوير</h3>
+                <p class="ios-footnote ios-text" id="devStatusText">جاري التحميل...</p>
+              </div>
+              <div class="ios-status-toggle">
+                <label class="ios-switch" id="devSwitch">
+                  <input type="checkbox" id="devToggle" onchange="toggleDevMode()">
+                  <span class="ios-switch-handle"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="ios-card ios-animate-fade-in" style="animation-delay: 0.1s;">
+        <div class="ios-card-header">
+          <h2 class="ios-headline ios-text">إجراءات سريعة</h2>
+        </div>
+        <div class="ios-card-content">
+          <div class="ios-quick-actions">
+            <button class="ios-btn ios-btn-primary ios-haptic" onclick="enableTestMode()">
+              <i class="fas fa-flask ios-icon"></i>
+              تفعيل وضع الاختبار
+            </button>
+            <button class="ios-btn ios-btn-secondary ios-haptic" onclick="enableProductionMode()">
+              <i class="fas fa-server ios-icon"></i>
+              تفعيل وضع الإنتاج
+            </button>
+            <button class="ios-btn ios-btn-tertiary ios-haptic" onclick="resetSettings()">
+              <i class="fas fa-undo ios-icon"></i>
+              إعادة تعيين
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Development Users -->
+      <div class="ios-card ios-animate-fade-in" style="animation-delay: 0.2s;">
+        <div class="ios-card-header">
+          <h2 class="ios-headline ios-text">مستخدمو التطوير</h2>
+        </div>
+        <div class="ios-card-content">
+          <div class="ios-dev-users-section">
+            <div class="ios-add-dev-user">
+              <div class="ios-input-group">
+                <input type="email" class="ios-input" id="devUserEmail" placeholder="أضف بريداً إلكترونياً...">
+                <button class="ios-btn ios-btn-primary ios-haptic" onclick="addDevUser()">
+                  <i class="fas fa-plus ios-icon"></i>
+                  إضافة
+                </button>
+              </div>
+            </div>
+            
+            <div class="ios-dev-users-list" id="devUsersList">
+              <div class="ios-loading-spinner"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Advanced Settings -->
+      <div class="ios-card ios-animate-fade-in" style="animation-delay: 0.3s;">
+        <div class="ios-card-header">
+          <h2 class="ios-headline ios-text">إعدادات متقدمة</h2>
+        </div>
+        <div class="ios-card-content">
+          <div class="ios-advanced-settings">
+            <div class="ios-setting-item">
+              <div class="ios-setting-info">
+                <h3 class="ios-subhead ios-text">تسجيل الدخول المتعدد</h3>
+                <p class="ios-footnote ios-text">السماح بتسجيل الدخول من عدة أجهزة</p>
+              </div>
+              <label class="ios-switch">
+                <input type="checkbox" id="multipleLoginsToggle" onchange="updateSetting('allowMultipleLogins', this.checked)">
+                <span class="ios-switch-handle"></span>
+              </label>
+            </div>
+            
+            <div class="ios-setting-item">
+              <div class="ios-setting-info">
+                <h3 class="ios-subhead ios-text">دخول بدون كلمة مرور</h3>
+                <p class="ios-footnote ios-text">السماح بتسجيل الدخول بدون كلمة مرور</p>
+              </div>
+              <label class="ios-switch">
+                <input type="checkbox" id="passwordlessToggle" onchange="updateSetting('allowPasswordlessLogin', this.checked)">
+                <span class="ios-switch-handle"></span>
+              </label>
+            </div>
+            
+            <div class="ios-setting-item">
+              <div class="ios-setting-info">
+                <h3 class="ios-subhead ios-text">التحقق من البريد الإلكتروني</h3>
+                <p class="ios-footnote ios-text">إلزام التحقق من البريد الإلكتروني</p>
+              </div>
+              <label class="ios-switch">
+                <input type="checkbox" id="emailVerifyToggle" onchange="updateSetting('requireEmailVerification', this.checked)">
+                <span class="ios-switch-handle"></span>
+              </label>
+            </div>
+            
+            <div class="ios-setting-item">
+              <div class="ios-setting-info">
+                <h3 class="ios-subhead ios-text">التحقق من الجهاز</h3>
+                <p class="ios-footnote ios-text">إلزام التحقق من بصمة الجهاز</p>
+              </div>
+              <label class="ios-switch">
+                <input type="checkbox" id="deviceVerifyToggle" onchange="updateSetting('requireDeviceVerification', this.checked)">
+                <span class="ios-switch-handle"></span>
+              </label>
+            </div>
+            
+            <div class="ios-setting-item">
+              <div class="ios-setting-info">
+                <h3 class="ios-subhead ios-text">مدة تذكرني</h3>
+                <p class="ios-footnote ios-text">عدد الأيام لحفظ جلسة العميل</p>
+              </div>
+              <input
+                type="number"
+                id="rememberMeDaysInput"
+                class="ios-input"
+                min="1"
+                max="365"
+                value="30"
+                onchange="updateSetting('rememberMeDays', parseInt(this.value, 10) || 30)"
+                style="max-width: 120px;"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Change Log -->
+      <div class="ios-card ios-animate-fade-in" style="animation-delay: 0.4s;">
+        <div class="ios-card-header">
+          <h2 class="ios-headline ios-text">سجل التغييرات</h2>
+        </div>
+        <div class="ios-card-content">
+          <div class="ios-change-log" id="changeLog">
+            <div class="ios-loading-spinner"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<style>
+.ios-status-grid {
+  display: grid;
+  gap: 20px;
+}
+
+.ios-status-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: var(--ios-gray-6);
+  border-radius: 12px;
+}
+
+.ios-status-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ios-blue);
+  color: white;
+}
+
+.ios-status-icon.active {
+  background: var(--ios-green);
+}
+
+.ios-status-icon.inactive {
+  background: var(--ios-gray);
+}
+
+.ios-status-info {
+  flex: 1;
+}
+
+.ios-status-toggle {
+  margin-left: auto;
+}
+
+.ios-quick-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ios-dev-users-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ios-input-group {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.ios-input-group .ios-input {
+  flex: 1;
+}
+
+.ios-dev-users-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ios-dev-user-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  background: var(--ios-gray-6);
+  border-radius: 8px;
+}
+
+.ios-dev-user-email {
+  flex: 1;
+  font-size: 15px;
+  color: var(--ios-label);
+}
+
+.ios-dev-user-remove {
+  background: none;
+  border: none;
+  color: var(--ios-red);
+  cursor: pointer;
+  padding: 4px;
+}
+
+.ios-advanced-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.ios-setting-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--ios-separator);
+}
+
+.ios-setting-item:last-child {
+  border-bottom: none;
+}
+
+.ios-setting-info h3 {
+  margin-bottom: 4px;
+}
+
+.ios-change-log {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.ios-change-log-item {
+  display: flex;
+  align-items: start;
+  gap: 12px;
+  padding: 12px;
+  border-bottom: 1px solid var(--ios-separator);
+}
+
+.ios-change-log-item:last-child {
+  border-bottom: none;
+}
+
+.ios-change-log-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ios-blue);
+  color: white;
+  font-size: 14px;
+}
+
+.ios-change-log-content {
+  flex: 1;
+}
+
+.ios-change-log-field {
+  font-weight: 600;
+  color: var(--ios-label);
+  margin-bottom: 4px;
+}
+
+.ios-change-log-details {
+  font-size: 13px;
+  color: var(--ios-secondary-label);
+  margin-bottom: 2px;
+}
+
+.ios-change-log-time {
+  font-size: 12px;
+  color: var(--ios-tertiary-label);
+}
+
+.ios-loading-spinner {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+@media (max-width: 768px) {
+  .ios-quick-actions {
+    flex-direction: column;
+  }
+  
+  .ios-input-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .ios-status-item {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+  
+  .ios-setting-item {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+}
+</style>
+
+<script>
+let authStatus = {};
+
+// تحميل الحالة الأولية
+async function loadStatus() {
+  try {
+    const response = await fetch('/admin/auth-control/status');
+    const data = await response.json();
+    
+    if (data.success) {
+      authStatus = data.status;
+      updateUI();
+    }
+  } catch (error) {
+    console.error('Error loading status:', error);
+    showiOSNotification('خطأ في تحميل الحالة', 'error');
+  }
+}
+
+// تحديث الواجهة
+function updateUI() {
+  // تحديث حالة المصادقة
+  const authToggle = document.getElementById('authToggle');
+  const authStatusIcon = document.getElementById('authStatusIcon');
+  const authStatusText = document.getElementById('authStatusText');
+  
+  authToggle.checked = authStatus.authenticationEnabled;
+  
+  if (authStatus.authenticationEnabled) {
+    authStatusIcon.className = 'ios-status-icon active';
+    authStatusIcon.innerHTML = '<i class="fas fa-shield-alt ios-icon-large"></i>';
+    authStatusText.textContent = 'مفعل';
+  } else {
+    authStatusIcon.className = 'ios-status-icon inactive';
+    authStatusIcon.innerHTML = '<i class="fas fa-shield-alt ios-icon-large"></i>';
+    authStatusText.textContent = 'معطل';
+  }
+  
+  // تحديث وضع التطوير
+  const devToggle = document.getElementById('devToggle');
+  const devStatusIcon = document.getElementById('devStatusIcon');
+  const devStatusText = document.getElementById('devStatusText');
+  
+  devToggle.checked = authStatus.developmentMode;
+  
+  if (authStatus.developmentMode) {
+    devStatusIcon.className = 'ios-status-icon active';
+    devStatusIcon.innerHTML = '<i class="fas fa-code ios-icon-large"></i>';
+    devStatusText.textContent = 'مفعل';
+  } else {
+    devStatusIcon.className = 'ios-status-icon inactive';
+    devStatusIcon.innerHTML = '<i class="fas fa-code ios-icon-large"></i>';
+    devStatusText.textContent = 'معطل';
+  }
+  
+  // تحميل الإعدادات المتقدمة
+  loadAdvancedSettings();
+  
+  // تحميل مستخدمي التطوير
+  loadDevUsers();
+  
+  // تحميل سجل التغييرات
+  loadChangeLog();
+}
+
+// تبديل المصادقة
+async function toggleAuthentication() {
+  try {
+    const response = await fetch('/admin/auth-control/toggle-auth', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      showiOSNotification(data.message, 'success');
+      await loadStatus();
+    } else {
+      showiOSNotification(data.error, 'error');
+      document.getElementById('authToggle').checked = !document.getElementById('authToggle').checked;
+    }
+  } catch (error) {
+    console.error('Error toggling authentication:', error);
+    showiOSNotification('خطأ في تبديل المصادقة', 'error');
+    document.getElementById('authToggle').checked = !document.getElementById('authToggle').checked;
+  }
+}
+
+// تبديل وضع التطوير
+async function toggleDevMode() {
+  try {
+    const response = await fetch('/admin/auth-control/toggle-dev-mode', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      showiOSNotification(data.message, 'success');
+      await loadStatus();
+    } else {
+      showiOSNotification(data.error, 'error');
+      document.getElementById('devToggle').checked = !document.getElementById('devToggle').checked;
+    }
+  } catch (error) {
+    console.error('Error toggling dev mode:', error);
+    showiOSNotification('خطأ في تبديل وضع التطوير', 'error');
+    document.getElementById('devToggle').checked = !document.getElementById('devToggle').checked;
+  }
+}
+
+// تحديث إعداد
+async function updateSetting(field, value) {
+  try {
+    const response = await fetch('/admin/auth-control/settings', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ field, value })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      showiOSNotification(data.message, 'success');
+    } else {
+      showiOSNotification(data.error, 'error');
+    }
+  } catch (error) {
+    console.error('Error updating setting:', error);
+    showiOSNotification('خطأ في تحديث الإعداد', 'error');
+  }
+}
+
+// تحميل الإعدادات المتقدمة
+async function loadAdvancedSettings() {
+  try {
+    const response = await fetch('/admin/auth-control/settings');
+    const data = await response.json();
+    
+    if (data.success) {
+      const settings = data.settings;
+      
+      document.getElementById('multipleLoginsToggle').checked = settings.allowMultipleLogins;
+      document.getElementById('passwordlessToggle').checked = settings.allowPasswordlessLogin;
+      document.getElementById('emailVerifyToggle').checked = settings.requireEmailVerification;
+      document.getElementById('deviceVerifyToggle').checked = settings.requireDeviceVerification;
+      const rememberInput = document.getElementById('rememberMeDaysInput');
+      if (rememberInput) {
+        rememberInput.value = settings.rememberMeDays || 30;
+      }
+    }
+  } catch (error) {
+    console.error('Error loading advanced settings:', error);
+  }
+}
+
+// تحميل مستخدمي التطوير
+async function loadDevUsers() {
+  try {
+    const response = await fetch('/admin/auth-control/settings');
+    const data = await response.json();
+    
+    if (data.success) {
+      const devUsersList = document.getElementById('devUsersList');
+      const users = data.settings.developmentUsers || [];
+      
+      if (users.length === 0) {
+        devUsersList.innerHTML = '<p class="ios-footnote ios-text" style="text-align: center; padding: 20px;">لا يوجد مستخدمو تطوير</p>';
+      } else {
+        devUsersList.innerHTML = users.map(user => `
+          <div class="ios-dev-user-item">
+            <span class="ios-dev-user-email">${user}</span>
+            <button class="ios-dev-user-remove" onclick="removeDevUser('${user}')">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        `).join('');
+      }
+    }
+  } catch (error) {
+    console.error('Error loading dev users:', error);
+  }
+}
+
+// إضافة مستخدم تطوير
+async function addDevUser() {
+  const email = document.getElementById('devUserEmail').value.trim();
+  
+  if (!email) {
+    showiOSNotification('البريد الإلكتروني مطلوب', 'error');
+    return;
+  }
+  
+  try {
+    const response = await fetch('/admin/auth-control/add-dev-user', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      showiOSNotification(data.message, 'success');
+      document.getElementById('devUserEmail').value = '';
+      await loadDevUsers();
+    } else {
+      showiOSNotification(data.error, 'error');
+    }
+  } catch (error) {
+    console.error('Error adding dev user:', error);
+    showiOSNotification('خطأ في إضافة مستخدم التطوير', 'error');
+  }
+}
+
+// إزالة مستخدم تطوير
+async function removeDevUser(email) {
+  if (!confirm(`هل أنت متأكد من إزالة ${email} من وضع التطوير؟`)) {
+    return;
+  }
+  
+  try {
+    const response = await fetch('/admin/auth-control/remove-dev-user', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      showiOSNotification(data.message, 'success');
+      await loadDevUsers();
+    } else {
+      showiOSNotification(data.error, 'error');
+    }
+  } catch (error) {
+    console.error('Error removing dev user:', error);
+    showiOSNotification('خطأ في إزالة مستخدم التطوير', 'error');
+  }
+}
+
+// تحميل سجل التغييرات
+async function loadChangeLog() {
+  try {
+    const response = await fetch('/admin/auth-control/change-log');
+    const data = await response.json();
+    
+    if (data.success) {
+      const changeLog = document.getElementById('changeLog');
+      const logs = data.changeLog || [];
+      
+      if (logs.length === 0) {
+        changeLog.innerHTML = '<p class="ios-footnote ios-text" style="text-align: center; padding: 20px;">لا يوجد تغييرات</p>';
+      } else {
+        changeLog.innerHTML = logs.map(log => `
+          <div class="ios-change-log-item">
+            <div class="ios-change-log-icon">
+              <i class="fas fa-edit"></i>
+            </div>
+            <div class="ios-change-log-content">
+              <div class="ios-change-log-field">${log.field}</div>
+              <div class="ios-change-log-details">
+                بواسطة: ${log.changedBy} | 
+                من: ${JSON.stringify(log.oldValue)} | 
+                إلى: ${JSON.stringify(log.newValue)}
+              </div>
+              <div class="ios-change-log-time">
+                ${new Date(log.timestamp).toLocaleString('ar-SA')}
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+  } catch (error) {
+    console.error('Error loading change log:', error);
+  }
+}
+
+// تفعيل وضع الاختبار
+async function enableTestMode() {
+  try {
+    // إيقاف المصادقة
+    await fetch('/admin/auth-control/toggle-auth', { method: 'POST' });
+    
+    // تفعيل وضع التطوير
+    await fetch('/admin/auth-control/toggle-dev-mode', { method: 'POST' });
+    
+    // إضافة مستخدم الاختبار
+    await fetch('/admin/auth-control/add-dev-user', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'test@hmcar.com' })
+    });
+    
+    showiOSNotification('تم تفعيل وضع الاختبار بنجاح', 'success');
+    await loadStatus();
+  } catch (error) {
+    console.error('Error enabling test mode:', error);
+    showiOSNotification('خطأ في تفعيل وضع الاختبار', 'error');
+  }
+}
+
+// تفعيل وضع الإنتاج
+async function enableProductionMode() {
+  try {
+    // إيقاف وضع التطوير
+    await fetch('/admin/auth-control/toggle-dev-mode', { method: 'POST' });
+    
+    // تفعيل المصادقة
+    await fetch('/admin/auth-control/toggle-auth', { method: 'POST' });
+    
+    showiOSNotification('تم تفعيل وضع الإنتاج بنجاح', 'success');
+    await loadStatus();
+  } catch (error) {
+    console.error('Error enabling production mode:', error);
+    showiOSNotification('خطأ في تفعيل وضع الإنتاج', 'error');
+  }
+}
+
+// إعادة تعيين الإعدادات
+async function resetSettings() {
+  if (!confirm('هل أنت متأكد من إعادة تعيين جميع الإعدادات؟')) {
+    return;
+  }
+  
+  try {
+    const response = await fetch('/admin/auth-control/reset', {
+      method: 'POST'
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      showiOSNotification(data.message, 'success');
+      await loadStatus();
+    } else {
+      showiOSNotification(data.error, 'error');
+    }
+  } catch (error) {
+    console.error('Error resetting settings:', error);
+    showiOSNotification('خطأ في إعادة تعيين الإعدادات', 'error');
+  }
+}
+
+// تحديث الحالة
+async function refreshStatus() {
+  showiOSNotification('جاري تحديث الحالة...', 'info');
+  await loadStatus();
+  showiOSNotification('تم تحديث الحالة', 'success');
+}
+
+// تحميل الصفحة
+document.addEventListener('DOMContentLoaded', function() {
+  loadStatus();
+});
+
+// دالة Sidebar
+function toggleSidebar() {
+  const sidebar = document.getElementById('adminSidebar');
+  sidebar.classList.toggle('open');
+}
+</script>

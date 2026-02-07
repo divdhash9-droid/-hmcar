@@ -1,0 +1,75 @@
+/* [[ARABIC_HEADER]] هذا الملف (public/css/ios-ripple.css) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. */
+
+/* iOS Ripple Effect - HM CAR */
+/* تأثيرات Ripple متقدمة مستوحاة من iOS */
+
+/* ===== Ripple Effect Base ===== */
+.ios-ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  transform: scale(0);
+  animation: ios-ripple-animation 0.6s ease-out;
+  pointer-events: none;
+}
+
+@keyframes ios-ripple-animation {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* ===== Ripple Container ===== */
+.ios-ripple-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.ios-ripple-container .ios-ripple {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* ===== Colored Ripples ===== */
+.ios-ripple-primary .ios-ripple {
+  background: rgba(0, 122, 255, 0.3);
+}
+
+.ios-ripple-success .ios-ripple {
+  background: rgba(52, 199, 89, 0.3);
+}
+
+.ios-ripple-warning .ios-ripple {
+  background: rgba(255, 149, 0, 0.3);
+}
+
+.ios-ripple-danger .ios-ripple {
+  background: rgba(255, 59, 48, 0.3);
+}
+
+.ios-ripple-gold .ios-ripple {
+  background: rgba(255, 215, 0, 0.4);
+}
+
+/* ===== Dark Mode Ripples ===== */
+@media (prefers-color-scheme: dark) {
+  .ios-ripple {
+    background: rgba(255, 255, 255, 0.2);
+  }
+  
+  .ios-ripple-primary .ios-ripple {
+    background: rgba(10, 132, 255, 0.3);
+  }
+  
+  .ios-ripple-success .ios-ripple {
+    background: rgba(48, 209, 88, 0.3);
+  }
+  
+  .ios-ripple-warning .ios-ripple {
+    background: rgba(255, 159, 10, 0.3);
+  }
+  
+  .ios-ripple-danger .ios-ripple {
+    background: rgba(255, 69, 58, 0.3);
+  }
+}

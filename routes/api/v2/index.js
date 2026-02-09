@@ -26,6 +26,8 @@ router.get('/', (req, res) => {
     version: '2.0.0',
     description: 'Advanced RESTful API for car auction management system',
     endpoints: {
+      auth: '/auth',
+      users: '/users',
       notifications: '/notifications',
       analytics: '/analytics'
     },
@@ -40,7 +42,7 @@ router.get('/health', async (req, res) => {
   try {
     const mongoose = require('mongoose');
     const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
-    
+
     const health = {
       status: 'healthy',
       timestamp: new Date().toISOString(),
@@ -53,7 +55,7 @@ router.get('/health', async (req, res) => {
       version: process.version,
       environment: process.env.NODE_ENV || 'development'
     };
-    
+
     res.status(200).json(health);
   } catch (error) {
     res.status(503).json({
@@ -65,13 +67,22 @@ router.get('/health', async (req, res) => {
 });
 
 // API routes
+router.use('/auth', require('./auth'));
+router.use('/users', require('./users'));
+router.use('/cars', require('./cars'));
+router.use('/auctions', require('./auctions'));
+router.use('/parts', require('./parts'));
+router.use('/dashboard', require('./dashboard'));
+router.use('/orders', require('./orders'));
 router.use('/notifications', require('./notifications'));
 router.use('/analytics', require('./analytics'));
+router.use('/upload', require('./upload.js'));
+router.use('/settings', require('./settings'));
 
 // Error handling middleware
 router.use((error, req, res, next) => {
   console.error('API Error:', error);
-  
+
   if (error.name === 'ValidationError') {
     return res.status(400).json({
       error: 'Validation Error',
@@ -79,21 +90,21 @@ router.use((error, req, res, next) => {
       details: error.errors
     });
   }
-  
+
   if (error.name === 'CastError') {
     return res.status(400).json({
       error: 'Invalid ID',
       message: 'The provided ID is not valid'
     });
   }
-  
+
   if (error.code === 11000) {
     return res.status(409).json({
       error: 'Duplicate Entry',
       message: 'A record with this value already exists'
     });
   }
-  
+
   res.status(error.status || 500).json({
     error: error.name || 'Internal Server Error',
     message: error.message || 'Something went wrong',
@@ -110,8 +121,10 @@ router.use('*', (req, res) => {
     availableEndpoints: [
       'GET /',
       'GET /health',
+      'GET /auth',
+      'GET /users',
       'GET /notifications',
-        'GET /analytics'
+      'GET /analytics'
     ]
   });
 });

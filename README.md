@@ -1,197 +1,196 @@
-> [[ARABIC_HEADER]] هذا الملف (README.md) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+# 🚗 HM CAR - منصة مزادات السيارات الفاخرة
 
-# HM CAR Auction - منصة مزادات السيارات الفاخرة
+<div align="center">
 
-منصة متكاملة متخصصة في بيع وشراء السيارات وقطع الغيار عبر نظام المزادات العلنية. تتميز بواجهة فاخرة باللون الذهبي والأسود مع تجربة مستخدم سلسة باللغة العربية.
+![HM CAR Logo](public/images/logo.png)
 
-## 🎯 نظرة عامة
+**منصة متكاملة لمزادات وبيع السيارات الفاخرة**
 
-**HM CAR** هو تطبيق ويب متقدم يجمع بين:
-- **مزادات السيارات**: منصة لبيع وشراء السيارات الجديدة والمستعملة
-- **قطع الغيار**: سوق متخصص لقطع غيار السيارات
-- **نظام المزايدات**: نظام مزادات مباشر بالوقت الحقيقي
-- **لوحة تحكم**: إدارة كاملة للمستخدمين والمزادات
-- **تطبيق ويب (PWA)**: يعمل على جميع الأجهزة
+[![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-16+-black.svg)](https://nextjs.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-7+-green.svg)](https://mongodb.com/)
+[![License](https://img.shields.io/badge/License-Private-red.svg)]()
 
-## 🚀 بدء التشغيل
+[العربية](#العربية) | [English](#english)
 
-### المتطلبات
-- Node.js v20+ (موصى به v24.12.0+)
-- MongoDB 8.2+ (محلي أو Atlas)
-- npm أو yarn
-- Git
+</div>
 
-### التثبيت والتشغيل
+---
+
+## العربية
+
+### 📋 نظرة عامة
+
+**HM CAR** هي منصة متطورة لمزادات وبيع السيارات الفاخرة، مبنية بأحدث التقنيات لتوفير تجربة مستخدم استثنائية.
+
+### ⚡ المميزات الرئيسية
+
+- 🏎️ **معرض السيارات** - عرض السيارات مع صور عالية الجودة ومواصفات تفصيلية
+- 🔨 **نظام المزادات** - مزادات حية مع تحديثات فورية
+- ❤️ **المفضلات** - حفظ السيارات المفضلة
+- ⚖️ **مقارنة السيارات** - مقارنة مواصفات عدة سيارات
+- 💬 **نظام الرسائل** - تواصل مباشر بين المستخدمين
+- 🔧 **قطع الغيار** - متجر قطع الغيار الأصلية
+- 👤 **لوحة تحكم العملاء** - إدارة الحساب والطلبات
+- 🔐 **لوحة تحكم الإدارة** - إدارة كاملة للمنصة
+
+### 🛠️ التقنيات المستخدمة
+
+| التقنية | الوصف |
+|---------|-------|
+| **Backend** | Node.js + Express.js |
+| **Frontend** | Next.js 16 + React 19 |
+| **Database** | MongoDB |
+| **Styling** | Tailwind CSS v4 |
+| **Animations** | Framer Motion |
+| **Auth** | JWT + Sessions |
+
+### 🚀 البدء السريع
+
 ```bash
-# استنساخ المشروع
-git clone <repository-url>
-cd car-auction
-
-# تثبيت الاعتماديات
+# 1. تثبيت التبعيات
 npm install
+cd client-app && npm install
 
-# إعداد متغيرات البيئة
+# 2. إعداد متغيرات البيئة
 cp .env.example .env
 
-# تشغيل الخادم للتطوير
+# 3. تشغيل قاعدة البيانات
+./start-database.bat  # Windows
+# أو
+mongod --dbpath ./database-data  # Linux/Mac
+
+# 4. تشغيل السيرفر
 npm run dev
 
-# أو للإنتاج
-npm start
+# 5. تشغيل الواجهة الأمامية (في terminal آخر)
+cd client-app && npm run dev
 ```
 
-### الروابط
-- **التطوير المحلي**: http://localhost:4000
-- **الإنتاج**: https://-hmcar.vercel.app
+### 📁 هيكل المشروع
 
-## 📱 حسابات الاختبار
-
-### الأدمن
-
-- **البريد**: admin@localhost.com
-- **كلمة المرور**: Admin@123
-
-### العميل
-
-- **اسم المستخدم**: 500000002
-- **كلمة المرور**: Buyer@123
-
-## 🎨 نظام التصميم
-
-### الألوان الرئيسية
-
-- **الذهبي الفاخر**: #d4af37
-- **الأسود الفاخر**: #0a0a0a
-- **الأبيض النقي**: #ffffff
-- **الزجاجي**: rgba(255, 255, 255, 0.1)
-
-### الخطوط
-
-- **Playfair Display**: للعناوين الرئيسية
-- **Montserrat**: للنصوص العادية
-- **Cormorant Garamond**: للعناوين الفرعية
-
-### التأثيرات
-
-- **ثلاثي الأبعاد**: تحويلات 3D
-- **زجاجي**: Glassmorphism
-- **ذهبي متوهج**: Shimmer effects
-- **حركات سلسة**: Smooth animations
-
-## 📁 الهيكل المنظم
-
-### الملفات الأساسية
-
-```text
-├── server.js              # الخادم الرئيسي
-├── layout.ejs             # التخطيط العام
-├── index.ejs              # الصفحة الرئيسية
-└── unified-luxury.css     # الأنماط الموحدة
+```
+car-auction/
+├── client-app/          # Next.js Frontend
+│   ├── src/
+│   │   ├── app/         # صفحات التطبيق
+│   │   ├── components/  # المكونات
+│   │   ├── hooks/       # React Hooks
+│   │   └── lib/         # المكتبات والأدوات
+│   └── public/          # الملفات الثابتة
+├── modules/             # وحدات Backend المنظمة
+├── routes/              # مسارات API
+│   └── api/v2/          # API الإصدار 2
+├── models/              # نماذج MongoDB
+├── middleware/          # وسطاء Express
+├── services/            # خدمات الأعمال
+├── config/              # إعدادات التطبيق
+└── server.js            # نقطة الدخول
 ```
 
-### المجلدات المنظمة
+### 🔗 الروابط
 
-```text
-├── config/        # الإعدادات
-├── models/        # نماذج البيانات
-├── routes/        # المسارات
-├── middleware/    # البرمجيات الوسيطة
-├── services/      # الخدمات
-├── views/         # القوالب
-└── public/        # الملفات العامة
-```
+| الخدمة | الرابط |
+|--------|--------|
+| **Frontend** | http://localhost:3001 |
+| **Backend API** | http://localhost:4001 |
+| **API Docs** | http://localhost:4001/api/v2/docs |
 
-## 🔧 التطوير
+---
 
-### إضافة صفحة جديدة
-1. إنشاء ملف EJS في `views/`
-2. إضافة المسار في `routes/`
-3. إضافة النموذج في `models/` (إذا لزم)
+## English
 
-### تعديل التصميم
-- تعديل `unified-luxury.css` للأنماط العامة
-- تعديل `layout.ejs` للتخطيط العام
-- تعديل الصفحة الفردية لتخصيصات محددة
+### 📋 Overview
 
-### قواعد البرمجة
-- استخدام EJS للقوالب
-- Bootstrap 5 للتصميم الأساسي
-- Font Awesome 6 للأيقونات
-- CSS Variables للتصميم الموحد
+**HM CAR** is a sophisticated luxury car auction and sales platform, built with cutting-edge technologies to provide an exceptional user experience.
 
-## 🎯 المميزات
+### ⚡ Key Features
 
-### الصفحة الرئيسية
-- شعار ثلاثي الأبعاد
-- عنوان متحرك
-- كرات زجاجية ذهبية
-- أزرار تفاعلية 3D
+- 🏎️ **Car Showroom** - Display cars with HD images and detailed specs
+- 🔨 **Auction System** - Live auctions with real-time updates
+- ❤️ **Favorites** - Save favorite cars
+- ⚖️ **Car Comparison** - Compare multiple car specifications
+- 💬 **Messaging System** - Direct communication between users
+- 🔧 **Spare Parts** - Original spare parts store
+- 👤 **Client Dashboard** - Account and orders management
+- 🔐 **Admin Dashboard** - Complete platform management
 
-### لوحة الأدمن
-- إدارة السيارات
-- إدارة المستخدمين
-- إدارة المزادات
-- إحصائيات فاخرة
+### 🛠️ Tech Stack
 
-### صفحة العميل
-- تصفح السيارات
-- قطع الغيار
-- المزادات المباشرة
-- المشتريات
+| Technology | Description |
+|------------|-------------|
+| **Backend** | Node.js + Express.js |
+| **Frontend** | Next.js 16 + React 19 |
+| **Database** | MongoDB |
+| **Styling** | Tailwind CSS v4 |
+| **Animations** | Framer Motion |
+| **Auth** | JWT + Sessions |
 
-## 📊 الإحصائيات
+### 🚀 Quick Start
 
-### الأداء
-- **وقت التحميل**: <2 ثانية
-- **حجم الصفحة**: <1MB
-- **دعم المتصفحات**: 95%+
-
-### المحتوى
-- **500+** سيارة
-- **1000+** قطعة غيار
-- **24/7** خدمة عملاء
-
-## 🔒 الأمان
-
-### المصادقة
-- جلسات آمنة
-- تشفير كلمات المرور
-- CSRF protection
-- XSS protection
-
-### البيانات
-- MongoDB آمن
-- تحقق من المدخلات
-- تنظيف البيانات
-- نسخ احتياطي
-
-## 🚀 النشر
-
-### البيئة المحلية
 ```bash
+# 1. Install dependencies
+npm install
+cd client-app && npm install
+
+# 2. Setup environment variables
+cp .env.example .env
+
+# 3. Start database
+./start-database.bat  # Windows
+# or
+mongod --dbpath ./database-data  # Linux/Mac
+
+# 4. Start backend server
 npm run dev
+
+# 5. Start frontend (in another terminal)
+cd client-app && npm run dev
 ```
 
-### البيئة الإنتاجية
-```bash
-npm start
+### 📁 Project Structure
+
+```
+car-auction/
+├── client-app/          # Next.js Frontend
+│   ├── src/
+│   │   ├── app/         # App pages
+│   │   ├── components/  # Components
+│   │   ├── hooks/       # React Hooks
+│   │   └── lib/         # Libraries & utilities
+│   └── public/          # Static files
+├── modules/             # Organized Backend modules
+├── routes/              # API routes
+│   └── api/v2/          # API Version 2
+├── models/              # MongoDB models
+├── middleware/          # Express middleware
+├── services/            # Business services
+├── config/              # App configuration
+└── server.js            # Entry point
 ```
 
-### المتغيرات البيئية
-```
-PORT=4000
-MONGO_URI=mongodb://localhost:27017/car-auction
-SESSION_SECRET=your-secret-key
-```
+### 🔗 Links
 
-## 📞 الدعم
+| Service | URL |
+|---------|-----|
+| **Frontend** | http://localhost:3001 |
+| **Backend API** | http://localhost:4001 |
+| **API Docs** | http://localhost:4001/api/v2/docs |
 
-### التوثيق
-- `PROJECT_STRUCTURE.md` - هيكل الملفات
-- `README.md` - هذا الملف
-- تعليقات الكود - تفاصيل التنفيذ
+---
 
-### المساعدة
-- مراجعة الكود
-- اختبار الوظائف
-- تحسين الأداء
+## 📄 License
+
+This project is private and proprietary. All rights reserved.
+
+## 👥 Team
+
+Developed by **HM CAR Team**
+
+---
+
+<div align="center">
+
+**© 2026 HM CAR. All Rights Reserved.**
+
+</div>

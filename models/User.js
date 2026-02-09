@@ -1,6 +1,6 @@
 // [[ARABIC_HEADER]] هذا الملف (models/User.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
 
-﻿// models/User.js
+// models/User.js
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
@@ -32,8 +32,10 @@ const userSchema = new mongoose.Schema({
       'manage_cars',         // إدارة السيارات
       'manage_parts',        // إدارة قطع الغيار
       'manage_auctions',     // إدارة المزادات
+      'manage_concierge',    // إدارة طلبات الكونسيرج
       'view_analytics',      // عرض التحليلات
-      'manage_content'       // إدارة المحتوى
+      'manage_content',      // إدارة المحتوى
+      'super_admin'          // صلاحيات كاملة
     ]
   }],
   // معرف المشرف الذي أنشأ هذا المستخدم (للتتبع)
@@ -53,7 +55,7 @@ const userSchema = new mongoose.Schema({
   twoFactorSecret: { type: String, default: '' },
   twoFactorBackupCodes: [{ type: String }],
   twoFactorEnabledAt: { type: Date, default: null },
-  
+
   // Device Binding and Security
   deviceId: { type: String, default: '' },
   deviceInfo: {
@@ -70,13 +72,26 @@ const userSchema = new mongoose.Schema({
     ip: String,
     firstUsedAt: { type: Date, default: Date.now },
     lastUsedAt: { type: Date, default: Date.now },
-    isActive: { type: Boolean, default: true }
+    isActive: { type: Boolean, default: true },
+    isTrusted: { type: Boolean, default: false } // Admin approval status
   }],
+  isDeviceLocked: { type: Boolean, default: true }, // If true, new devices require admin approval or are blocked logic
   securityLevel: { type: String, enum: ['basic', 'standard', 'enhanced'], default: 'standard' },
-  allowMultipleSessions: { type: Boolean, default: false }
+  allowMultipleSessions: { type: Boolean, default: false },
+
+  // IP Tracking
+  registrationIP: { type: String, default: '' },     // IP عند التسجيل
+  lastLoginIP: { type: String, default: '' },        // آخر IP تسجيل دخول
+
+  // How the account was created
+  createdVia: {
+    type: String,
+    enum: ['manual', 'auto-registration', 'admin-created', 'api'],
+    default: 'manual'
+  }
 }, { timestamps: true });
 
-userSchema.pre('save', async function(next) {
+userSchema.pre('save', async function (next) {
   // تشفير كلمة المرور عند الإنشاء/التعديل فقط (إذا كانت password تم تعديلها)
   if (!this.isModified('password') || !this.password) return next();
   const salt = await bcrypt.genSalt(10);
@@ -84,19 +99,19 @@ userSchema.pre('save', async function(next) {
   next();
 });
 
-userSchema.methods.comparePassword = function(candidate) {
+userSchema.methods.comparePassword = function (candidate) {
   // مقارنة كلمة مرور المستخدم المدخلة مع الـ hash المخزن
   if (!this.password) return Promise.resolve(false);
   return bcrypt.compare(candidate, this.password);
 };
 
 // التحقق من قفل الحساب
-userSchema.virtual('isLocked').get(function() {
+userSchema.virtual('isLocked').get(function () {
   return !!(this.lockUntil && this.lockUntil > Date.now());
 });
 
 // زيادة محاولات الدخول الفاشلة
-userSchema.methods.incLoginAttempts = function() {
+userSchema.methods.incLoginAttempts = function () {
   // إذا كان هناك قفل سابق وانتهى، نعيد تعيين المحاولات
   if (this.lockUntil && this.lockUntil < Date.now()) {
     return this.updateOne({
@@ -104,20 +119,20 @@ userSchema.methods.incLoginAttempts = function() {
       $unset: { lockUntil: 1 }
     });
   }
-  
+
   const updates = { $inc: { loginAttempts: 1 } };
-  
+
   // قفل الحساب بعد 5 محاولات فاشلة لمدة 30 دقيقة
   const maxAttempts = 5;
   if (this.loginAttempts + 1 >= maxAttempts && !this.isLocked) {
     updates.$set = { lockUntil: Date.now() + 30 * 60 * 1000 }; // 30 دقيقة
   }
-  
+
   return this.updateOne(updates);
 };
 
 // إعادة تعيين محاولات الدخول عند النجاح
-userSchema.methods.resetLoginAttempts = function() {
+userSchema.methods.resetLoginAttempts = function () {
   return this.updateOne({
     $set: { loginAttempts: 0 },
     $unset: { lockUntil: 1 }

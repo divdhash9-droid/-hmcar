@@ -1,104 +1,160 @@
 // [[ARABIC_HEADER]] هذا الملف (config/database.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
 
-/**
- * config/database.js
- * تهيئة قاعدة بيانات MongoDB Atlas
- * 
- * الوصف:
- * - هذا الملف يهتم بتهيئة الاتصال بقاعدة بيانات MongoDB Atlas
- * - يتضمن إعدادات الاتصال ووظائف إدارة الاتصال
- */
-
-const mongoose = require('mongoose');
 const fs = require('fs');
 const path = require('path');
+const mongoose = require('mongoose');
 
-let mongoMemoryServer;
+const LOCAL_DB_PATH = path.join(__dirname, '..', 'local-db.json');
+const DEFAULT_LOCAL_URI = 'mongodb://127.0.0.1:27017/car-auction';
 
-function isValidMongoUri(uri) {
-  return typeof uri === 'string' && /^mongodb(\+srv)?:\/\//i.test(uri.trim());
-}
+let memoryServerPromise;
 
 function isOfflineUri(uri) {
-  if (typeof uri !== 'string') return false;
-  const v = uri.trim().toLowerCase();
+  const v = String(uri || '').trim().toLowerCase();
   return v.startsWith('offline://') || v === 'localdb' || v === 'local-db';
 }
 
 function isMemoryMongoUri(uri) {
-  return typeof uri === 'string' && uri.trim().toLowerCase().startsWith('memory://');
+  const v = String(uri || '').trim().toLowerCase();
+  return v.startsWith('memory://');
+}
+
+function isValidMongoUri(uri) {
+  const v = String(uri || '').trim().toLowerCase();
+  return v.startsWith('mongodb://') || v.startsWith('mongodb+srv://');
 }
 
 function loadLocalDbJson() {
-  const localDbPath = path.join(process.cwd(), 'local-db.json');
-  const raw = fs.readFileSync(localDbPath, 'utf8');
-  return JSON.parse(raw);
+  try {
+    if (fs.existsSync(LOCAL_DB_PATH)) {
+      const raw = fs.readFileSync(LOCAL_DB_PATH, 'utf8');
+      const parsed = JSON.parse(raw || '{}');
+      return parsed && typeof parsed === 'object' ? parsed : {};
+    }
+  } catch (e) {
+    console.warn('⚠️ Failed to read local-db.json:', e.message);
+  }
+
+  // Default shape: keep common collections present
+  return {
+    users: [],
+    cars: [],
+    brands: [],
+    auctions: [],
+    bids: [],
+    spareParts: [],
+    settings: [],
+  };
+}
+
+function saveLocalDbJson(db) {
+  try {
+    fs.writeFileSync(LOCAL_DB_PATH, JSON.stringify(db, null, 2), 'utf8');
+  } catch (e) {
+    console.warn('⚠️ Failed to write local-db.json:', e.message);
+  }
+}
+
+function matchesQuery(doc, query) {
+  if (!query || typeof query !== 'object') return true;
+  const keys = Object.keys(query);
+  return keys.every((k) => {
+    // Minimal matcher: equality only
+    return doc && Object.prototype.hasOwnProperty.call(doc, k) && doc[k] === query[k];
+  });
+}
+
+function createCollectionOps(db, collectionKey) {
+  if (!db[collectionKey]) db[collectionKey] = [];
+
+  return {
+    find: async (query = {}) => {
+      const arr = Array.isArray(db[collectionKey]) ? db[collectionKey] : [];
+      return arr.filter((d) => matchesQuery(d, query));
+    },
+    findOne: async (query = {}) => {
+      const arr = Array.isArray(db[collectionKey]) ? db[collectionKey] : [];
+      return arr.find((d) => matchesQuery(d, query)) || null;
+    },
+    create: async (data) => {
+      const doc = {
+        ...data,
+        _id: (data && data._id) ? String(data._id) : String(Date.now()),
+        createdAt: (data && data.createdAt) ? data.createdAt : new Date(),
+      };
+      db[collectionKey].push(doc);
+      saveLocalDbJson(db);
+      return doc;
+    },
+  };
+}
+
+function createLocalDbOperations(db) {
+  // Map model names used by the app to JSON keys
+  return {
+    User: createCollectionOps(db, 'users'),
+    Car: createCollectionOps(db, 'cars'),
+    Brand: createCollectionOps(db, 'brands'),
+    Auction: createCollectionOps(db, 'auctions'),
+    Bid: createCollectionOps(db, 'bids'),
+    SparePart: createCollectionOps(db, 'spareParts'),
+    Settings: createCollectionOps(db, 'settings'),
+  };
 }
 
 async function ensureMemoryMongoStarted() {
-  if (mongoMemoryServer) return mongoMemoryServer;
-
-  // Lazy require so production installs (without devDependencies) don't break.
-  // eslint-disable-next-line global-require
-  const { MongoMemoryServer } = require('mongodb-memory-server');
-  mongoMemoryServer = await MongoMemoryServer.create({
-    instance: { dbName: 'car-auction' }
-  });
-  return mongoMemoryServer;
-}
-
-function matchesFilter(doc, filter) {
-  if (!filter || typeof filter !== 'object') return true;
-  for (const [key, expected] of Object.entries(filter)) {
-    if (expected && typeof expected === 'object') {
-      // Minimal local-db matching: unsupported operators are treated as non-match.
-      return false;
-    }
-    if (doc?.[key] !== expected) return false;
+  if (!memoryServerPromise) {
+    const { MongoMemoryServer } = require('mongodb-memory-server');
+    memoryServerPromise = MongoMemoryServer.create({
+      instance: { dbName: 'car-auction' },
+    });
   }
-  return true;
+  return memoryServerPromise;
 }
 
-function createCollectionOps(items) {
-  const arr = Array.isArray(items) ? items : [];
-  return {
-    find: async (filter = {}) => arr.filter((d) => matchesFilter(d, filter)),
-    findById: async (id) => arr.find((d) => String(d?._id ?? d?.id) === String(id)) || null,
-    countDocuments: async (filter = {}) => arr.filter((d) => matchesFilter(d, filter)).length,
-  };
+function bindMongooseEventsOnce() {
+  if (mongoose.connection.__hmEventsBound) return;
+  mongoose.connection.__hmEventsBound = true;
+
+  mongoose.connection.on('connected', () => {
+    console.log('MongoDB connection established');
+  });
+
+  mongoose.connection.on('error', (err) => {
+    console.error('MongoDB connection error:', err);
+  });
+
+  mongoose.connection.on('disconnected', () => {
+    console.log('MongoDB connection disconnected');
+  });
+
+  process.on('SIGINT', async () => {
+    try {
+      await mongoose.connection.close();
+    } finally {
+      console.log('MongoDB connection closed through app termination');
+      process.exit(0);
+    }
+  });
 }
 
-function createLocalDbOperations(dbJson) {
-  return {
-    Car: createCollectionOps(dbJson?.cars),
-    Brand: createCollectionOps(dbJson?.brands),
-    Auction: createCollectionOps(dbJson?.auctions),
-    Bid: createCollectionOps(dbJson?.bids),
-    User: createCollectionOps(dbJson?.users),
-    Notification: createCollectionOps(dbJson?.notifications),
-  };
-}
+async function connectDB() {
+  const envUri = process.env.MONGO_URI || process.env.MONGODB_URI;
+  const isProduction = process.env.NODE_ENV === 'production';
+  const isVercel = !!process.env.VERCEL || !!process.env.NOW_REGION;
 
-// تهيئة الاتصال بقاعدة البيانات
-const connectDB = async () => {
   try {
-    // استخدام متغير البيئة MONGO_URI للاتصال بـ MongoDB Atlas
-    const defaultLocalUri = 'mongodb://127.0.0.1:27017/car-auction';
-    const envUri = process.env.MONGO_URI || process.env.MONGODB_URI;
-    const isProduction = process.env.NODE_ENV === 'production';
-    const isVercel = !!process.env.VERCEL || !!process.env.NOW_REGION;
-
     // Explicit local JSON DB mode
     if (envUri && isOfflineUri(envUri)) {
       const dbJson = loadLocalDbJson();
       return {
         type: 'local',
         connection: null,
-        operations: createLocalDbOperations(dbJson)
+        operations: createLocalDbOperations(dbJson),
       };
     }
 
-    // In-process MongoDB for local development
+    // In-process MongoDB for local development/testing
     if (envUri && isMemoryMongoUri(envUri)) {
       const ms = await ensureMemoryMongoStarted();
       const memUri = ms.getUri();
@@ -108,6 +164,7 @@ const connectDB = async () => {
         maxPoolSize: 10,
         socketTimeoutMS: 45000,
       });
+      bindMongooseEventsOnce();
       console.log('✅ Database Connected (in-memory MongoDB)');
       return conn;
     }
@@ -116,77 +173,44 @@ const connectDB = async () => {
       throw new Error('MONGO_URI (or MONGODB_URI) is required in production/serverless environments');
     }
 
-    let mongoUri = envUri || defaultLocalUri;
+    let mongoUri = envUri || DEFAULT_LOCAL_URI;
     if (envUri && !isValidMongoUri(envUri)) {
       const msg = 'Invalid MONGO_URI scheme, expected mongodb:// or mongodb+srv://';
-      if (isProduction) {
-        throw new Error(msg);
-      }
+      if (isProduction) throw new Error(msg);
       console.warn(`⚠️ ${msg}. Falling back to local MongoDB URI.`);
-      mongoUri = defaultLocalUri;
+      mongoUri = DEFAULT_LOCAL_URI;
     }
 
-    // خيارات الاتصال الموصى بها من MongoDB
     const options = {
-      // Driver options: do not include deprecated flags (useNewUrlParser/useUnifiedTopology).
-      serverSelectionTimeoutMS: isProduction ? 30000 : 2000, // faster dev fallback
-      bufferCommands: false, // Disable mongoose buffering
-      maxPoolSize: 10, // Maintain up to 10 socket connections
-      socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+      serverSelectionTimeoutMS: isProduction ? 30000 : 2000,
+      bufferCommands: false,
+      maxPoolSize: 10,
+      socketTimeoutMS: 45000,
     };
 
     const conn = await mongoose.connect(mongoUri, options);
-
+    bindMongooseEventsOnce();
     console.log(`✅ Database Connected: ${conn.connection.host}`);
-
-    // إعداد أحداث الاتصال
-    mongoose.connection.on('connected', () => {
-      console.log('MongoDB connection established');
-    });
-
-    mongoose.connection.on('error', (err) => {
-      console.error('MongoDB connection error:', err);
-    });
-
-    mongoose.connection.on('disconnected', () => {
-      console.log('MongoDB connection disconnected');
-    });
-
-    // التعامل مع إغلاق العملية
-    process.on('SIGINT', async () => {
-      await mongoose.connection.close();
-      console.log('MongoDB connection closed through app termination');
-      process.exit(0);
-    });
-
     return conn;
   } catch (error) {
     const isDev = process.env.NODE_ENV !== 'production';
     if (isDev) console.warn('⚠️ Database connection failed:', error.message);
     else console.error('❌ Database connection failed:', error.message);
-
-    // IMPORTANT: Do NOT silently fall back to in-memory/local JSON DB here.
-    // Those modes cause data loss across restarts and break "persist my data" expectations.
-    // If the user wants offline/in-memory, they must explicitly set MONGO_URI to offline:// or memory://.
     throw error;
   }
-};
+}
 
-// دالة للحصول على حالة الاتصال
-const getConnectionStatus = () => {
-  return mongoose.connection.readyState;
-};
+const getConnectionStatus = () => mongoose.connection.readyState;
 
-// خرائط حالة الاتصال
 const connectionStates = {
   0: 'Disconnected',
   1: 'Connected',
   2: 'Connecting',
-  3: 'Disconnecting'
+  3: 'Disconnecting',
 };
 
 module.exports = {
   connectDB,
   getConnectionStatus,
-  connectionStates
+  connectionStates,
 };

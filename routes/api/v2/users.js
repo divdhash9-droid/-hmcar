@@ -2,9 +2,9 @@
 
 const express = require('express');
 const router = express.Router();
-const User = require('../../models/User');
-const AuditLog = require('../../models/AuditLog');
-const { requireAuthAPI, requirePermissionAPI } = require('../../middleware/auth');
+const User = require('../../../models/User');
+const AuditLog = require('../../../models/AuditLog');
+const { requireAuthAPI, requirePermissionAPI } = require('../../../middleware/auth');
 
 // Get all users (admin only)
 router.get('/', requireAuthAPI, requirePermissionAPI('manage_users'), async (req, res) => {
@@ -24,7 +24,7 @@ router.get('/', requireAuthAPI, requirePermissionAPI('manage_users'), async (req
     const filter = {};
     if (role) filter.role = role;
     if (status) filter.status = status;
-    
+
     if (search) {
       filter.$or = [
         { name: { $regex: search, $options: 'i' } },
@@ -79,7 +79,7 @@ router.get('/', requireAuthAPI, requirePermissionAPI('manage_users'), async (req
 router.get('/profile', requireAuthAPI, async (req, res) => {
   try {
     const user = await User.findById(req.user.userId).select('-password');
-    
+
     if (!user) {
       return res.status(404).json({
         error: 'User Not Found',
@@ -105,7 +105,7 @@ router.put('/profile', requireAuthAPI, async (req, res) => {
   try {
     const allowedFields = ['name', 'email', 'phone'];
     const updates = {};
-    
+
     // Only allow updating specific fields
     Object.keys(req.body).forEach(key => {
       if (allowedFields.includes(key)) {
@@ -114,7 +114,7 @@ router.put('/profile', requireAuthAPI, async (req, res) => {
     });
 
     const user = await User.findById(req.user.userId);
-    
+
     if (!user) {
       return res.status(404).json({
         error: 'User Not Found',
@@ -131,7 +131,7 @@ router.put('/profile', requireAuthAPI, async (req, res) => {
           ...(updates.phone ? [{ phone: updates.phone }] : [])
         ]
       });
-      
+
       if (existingUser) {
         return res.status(409).json({
           error: 'Conflict',
@@ -178,7 +178,7 @@ router.put('/profile', requireAuthAPI, async (req, res) => {
 router.get('/:id', requireAuthAPI, requirePermissionAPI('manage_users'), async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select('-password');
-    
+
     if (!user) {
       return res.status(404).json({
         error: 'User Not Found',
@@ -280,7 +280,7 @@ router.post('/', requireAuthAPI, requirePermissionAPI('manage_users'), async (re
 router.put('/:id', requireAuthAPI, requirePermissionAPI('manage_users'), async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
-    
+
     if (!user) {
       return res.status(404).json({
         error: 'User Not Found',
@@ -297,7 +297,7 @@ router.put('/:id', requireAuthAPI, requirePermissionAPI('manage_users'), async (
     }
 
     const oldData = { ...user.toObject() };
-    const allowedUpdates = ['name', 'email', 'phone', 'role', 'status', 'permissions'];
+    const allowedUpdates = ['name', 'email', 'phone', 'role', 'status', 'permissions', 'boundDevices', 'isDeviceLocked'];
     const updates = {};
 
     Object.keys(req.body).forEach(key => {
@@ -315,7 +315,7 @@ router.put('/:id', requireAuthAPI, requirePermissionAPI('manage_users'), async (
           ...(updates.phone ? [{ phone: updates.phone }] : [])
         ]
       });
-      
+
       if (existingUser) {
         return res.status(409).json({
           error: 'Conflict',
@@ -361,7 +361,7 @@ router.put('/:id', requireAuthAPI, requirePermissionAPI('manage_users'), async (
 router.delete('/:id', requireAuthAPI, requirePermissionAPI('manage_users'), async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
-    
+
     if (!user) {
       return res.status(404).json({
         error: 'User Not Found',
@@ -477,7 +477,7 @@ router.post('/:id/suspend', requireAuthAPI, requirePermissionAPI('manage_users')
   try {
     const { reason } = req.body;
     const user = await User.findById(req.params.id);
-    
+
     if (!user) {
       return res.status(404).json({
         error: 'User Not Found',

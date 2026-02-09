@@ -1,49 +1,53 @@
-﻿# Node
+﻿# Dependencies
 node_modules/
+.pnp/
+.pnp.js
 
-# Environment files (DO NOT COMMIT)
+# Build outputs
+.next/
+out/
+build/
+dist/
+
+# Environment files
 .env
-.env.*
-!.env.example
-config/.env
+.env.local
+.env.production
+.env*.local
 
-# Vercel
-.vercel/
-
-# Logs
+# Database
+database-data/
 *.log
-logs/
 
-# Local reports / exports
-docs/*.pdf
-
-# Runtime uploads / generated assets
-uploads/
-
-# Sensitive keys
-config/serviceAccountKey.json
-firebase-service-account.json
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Database
-database-data/
-*.wt
-local-db.json
+# Uploads
+uploads/*
+!uploads/.gitkeep
 
-# IDE
-.vscode/
-.idea/
+# Logs
+logs/
+*.log
+npm-debug.log*
 
-# Qodo
-.qodo/
-
-# Test coverage
+# Coverage
 coverage/
 .nyc_output/
 
-# Backup files
-*.bak
-_head_*
+# Testing
+test-results/
+
+# Vercel
+.vercel/
+
+# Misc
+*.pem
+.qodo/

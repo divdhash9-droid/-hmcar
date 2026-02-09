@@ -84,7 +84,7 @@ const security = {
   cors: {
     origin: process.env.NODE_ENV === 'production' 
       ? ['https://hmcar.vercel.app'] 
-      : ['http://localhost:4002', 'http://localhost:3000'],
+      : ['http://localhost:4002', 'http://localhost:3000', 'http://localhost:3001'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']

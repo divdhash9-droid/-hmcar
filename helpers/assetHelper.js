@@ -1,31 +1,89 @@
-'use strict';
+// [[ARABIC_HEADER]] هذا الملف (helpers/assetHelper.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+//
+// مساعد تحميل الموارد الموحد
+// يضمن تحميل الموارد بشكل موحد في جميع البيئات
 
-// Minimal asset helper used by config/serverConfig.js and server.js.
-// The project currently relies on this for cache/static settings.
+const path = require('path');
 
-function parseBool(value, fallback = false) {
-  if (value === undefined || value === null || value === '') return fallback;
-  const v = String(value).trim().toLowerCase();
-  return v === '1' || v === 'true' || v === 'yes' || v === 'on';
+class AssetHelper {
+  constructor() {
+    this.isProduction = process.env.NODE_ENV === 'production';
+    this.basePath = this.isProduction ? '' : '';
+    this.assetVersion = Date.now(); // للتحكم في التخزين المؤقت
+  }
+
+  /**
+   * الحصول على مسار CSS الموحد
+   */
+  getCssPath(filename) {
+    const versionedPath = `${this.basePath}/public/css/${filename}?v=${this.assetVersion}`;
+    return versionedPath;
+  }
+
+  /**
+   * الحصول على مسار JS الموحد
+   */
+  getJsPath(filename) {
+    const versionedPath = `${this.basePath}/public/js/${filename}?v=${this.assetVersion}`;
+    return versionedPath;
+  }
+
+  /**
+   * الحصول على مسار الصور الموحد
+   */
+  getImagePath(filename) {
+    return `${this.basePath}/public/images/${filename}`;
+  }
+
+  /**
+   * الحصول على مسار الملفات المرفوعة
+   */
+  getUploadPath(filename) {
+    // للملفات المرفوعة، نستخدم مسار مطلق
+    if (filename.startsWith('http')) {
+      return filename; // رابط خارجي
+    }
+    return `${this.basePath}/uploads/${filename}`;
+  }
+
+  /**
+   * إنشاء علامات ربط CSS متعددة
+   */
+  generateCssTags(filenames) {
+    return filenames
+      .map((filename) => `<link rel="stylesheet" href="${this.getCssPath(filename)}">`)
+      .join('\n');
+  }
+
+  /**
+   * إنشاء علامات ربط JS متعددة
+   */
+  generateJsTags(filenames) {
+    return filenames
+      .map((filename) => `<script src="${this.getJsPath(filename)}"></script>`)
+      .join('\n');
+  }
+
+  /**
+   * الحصول على إعدادات التخزين المؤقت المناسبة
+   */
+  getCacheSettings() {
+    return {
+      maxAge: this.isProduction ? '1d' : '0',
+      etag: true,
+      lastModified: true,
+      immutable: this.isProduction,
+    };
+  }
+
+  /**
+   * التحقق من صحة مسار الملف
+   */
+  isValidAssetPath(filepath) {
+    const allowedPaths = ['/public/', '/uploads/', '/css/', '/js/', '/images/', '/vendor/'];
+    return allowedPaths.some((allowed) => filepath.startsWith(allowed));
+  }
 }
 
-function getCacheSettings() {
-  const isDevelopment = process.env.NODE_ENV === 'development';
-
-  // Allow override via env when deploying behind CDNs.
-  // Defaults are conservative in production and disabled in development.
-  const maxAgeSeconds = Number.parseInt(process.env.STATIC_MAX_AGE_SECONDS || '', 10);
-  const maxAge = Number.isFinite(maxAgeSeconds) && maxAgeSeconds >= 0
-    ? `${maxAgeSeconds}s`
-    : (isDevelopment ? 0 : '1h');
-
-  const etag = parseBool(process.env.STATIC_ETAG, true);
-  const lastModified = parseBool(process.env.STATIC_LAST_MODIFIED, true);
-  const immutable = parseBool(process.env.STATIC_IMMUTABLE, !isDevelopment);
-
-  return { maxAge, etag, lastModified, immutable };
-}
-
-module.exports = {
-  getCacheSettings,
-};
+// تصدير نسخة واحدة (Singleton)
+module.exports = new AssetHelper();

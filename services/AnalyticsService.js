@@ -18,6 +18,7 @@ class AnalyticsService {
       totalAuctions,
       runningAuctions,
       scheduledAuctions,
+      totalOrders,
       totalBids,
       bidsLast24h,
       avgBid
@@ -28,6 +29,7 @@ class AnalyticsService {
       Auction.countDocuments(),
       Auction.countDocuments({ status: 'running' }),
       Auction.countDocuments({ status: 'scheduled' }),
+      Order.countDocuments(),
       Bid.countDocuments(),
       Bid.countDocuments({ createdAt: { $gte: last24 } }),
       // average bid amount
@@ -45,7 +47,7 @@ class AnalyticsService {
       Order.countDocuments({ createdAt: { $gte: last7 } }),
       (async () => {
         const r = await Order.aggregate([
-          { $match: { createdAt: { $gte: last7 }, status: { $in: ['confirmed','shipped','completed'] } } },
+          { $match: { createdAt: { $gte: last7 }, status: { $in: ['confirmed', 'shipped', 'completed'] } } },
           { $group: { _id: null, total: { $sum: '$totalAmount' } } }
         ]);
         return (r[0] && r[0].total) ? Number(r[0].total) : 0;
@@ -59,6 +61,7 @@ class AnalyticsService {
       totalAuctions,
       runningAuctions,
       scheduledAuctions,
+      totalOrders,
       totalBids,
       bidsLast24h,
       avgBid,

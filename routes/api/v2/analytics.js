@@ -3,11 +3,10 @@
 const express = require('express');
 const router = express.Router();
 const AnalyticsService = require('../../../services/AnalyticsService');
-const { requireAuth } = require('../../../middleware/auth');
-const { requireRole } = require('../../../middleware/roles');
+const { requireAuthAPI, requireAdmin } = require('../../../middleware/auth');
 
 // GET /api/v2/analytics - ملخص إحصائي (admin فقط)
-router.get('/', requireAuth, requireRole('admin'), async (req, res) => {
+router.get('/', requireAuthAPI, requireAdmin, async (req, res) => {
   try {
     const stats = await AnalyticsService.getSummary();
     res.json({ success: true, stats });

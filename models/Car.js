@@ -1,6 +1,6 @@
 // [[ARABIC_HEADER]] هذا الملف (models/Car.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
 
-﻿﻿// models/Car.js
+// models/Car.js
 const mongoose = require('mongoose');
 
 const carSchema = new mongoose.Schema({
@@ -17,12 +17,15 @@ const carSchema = new mongoose.Schema({
   model: String,
   year: Number,
   // تصنيف/فئة السيارة
-  category: { type: mongoose.Schema.Types.ObjectId, ref: 'VehicleCategory' },
+  category: { type: String, default: 'sedan' }, // Changed to String for flexibility
   // السعر (price قديم) + سعر بالريال/الدولار
   price: Number,
   priceSar: Number,
   priceUsd: Number,
   mileage: Number,
+  fuelType: { type: String, default: 'Petrol' },
+  transmission: { type: String, default: 'Automatic' },
+  color: String,
   // الحالة العامة
   condition: { type: String, enum: ['excellent', 'good', 'fair', 'needs work'], default: 'good' },
   description: String,

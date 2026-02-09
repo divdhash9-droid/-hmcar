@@ -41,19 +41,19 @@ class App {
     // الوسطاء الأساسية
     this.app.use(express.json({ limit: '10mb' }));
     this.app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-    
+
     // إعدادات الأمان
     this.setupSecurity();
-    
+
     // إعدادات الجلسات
     this.setupSessions();
-    
+
     // الملفات الثابتة
     this.setupStaticFiles();
-    
+
     // محرك القوالب
     this.setupViewEngine();
-    
+
     // الوسطاء المخصصة
     this.setupCustomMiddleware();
   }
@@ -64,17 +64,17 @@ class App {
   setupSecurity() {
     const helmet = require('helmet');
     const cors = require('cors');
-    
+
     // Helmet
     this.app.use(helmet(config.security.helmet));
-    
+
     // CORS
     this.app.use(cors(config.security.cors));
-    
+
     // Rate Limiting
     const rateLimit = require('express-rate-limit');
     this.app.use(rateLimit(config.security.rateLimit));
-    
+
     logger.info('تم إعداد إعدادات الأمان');
   }
 
@@ -84,20 +84,20 @@ class App {
   setupSessions() {
     const session = require('express-session');
     const flash = require('connect-flash');
-    
+
     // الجلسات
     this.app.use(session(config.server.session));
-    
+
     // Flash Messages
     this.app.use(flash());
-    
+
     // تمرير الرسائل لجميع القوالب
     this.app.use((req, res, next) => {
       res.locals.flash = req.session.flash || null;
       res.locals.csrfToken = req.session.csrfToken || '';
       next();
     });
-    
+
     logger.info('تم إعداد الجلسات والرسائل');
   }
 
@@ -106,7 +106,7 @@ class App {
    */
   setupStaticFiles() {
     const staticConfig = config.server.static;
-    
+
     this.app.use('/public', express.static(path.join(__dirname, '..', 'public'), staticConfig));
     this.app.use('/css', express.static(path.join(__dirname, '..', 'public/css'), staticConfig));
     this.app.use('/js', express.static(path.join(__dirname, '..', 'public/js'), staticConfig));
@@ -115,21 +115,21 @@ class App {
       ...staticConfig,
       maxAge: '7d'
     }));
-    
+
     // PWA Assets
     this.app.get('/manifest.json', (req, res) => {
       res.sendFile(path.join(__dirname, '..', 'public', 'manifest.json'));
     });
-    
+
     this.app.get('/sw.js', (req, res) => {
       res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
       res.sendFile(path.join(__dirname, '..', 'public', 'sw.js'));
     });
-    
+
     this.app.get('/favicon.ico', (req, res) => {
       res.sendFile(path.join(__dirname, '..', 'public', 'images', 'favicon.ico'));
     });
-    
+
     logger.info('تم إعداد الملفات الثابتة');
   }
 
@@ -138,11 +138,11 @@ class App {
    */
   setupViewEngine() {
     const ejs = require('ejs');
-    
+
     // إعدادات EJS
     this.app.set('view engine', 'ejs');
     this.app.set('views', path.join(__dirname, '..', 'views'));
-    
+
     // CSRF Protection
     this.app.use((req, res, next) => {
       if (!req.session.csrfToken) {
@@ -150,7 +150,7 @@ class App {
       }
       next();
     });
-    
+
     logger.info('تم إعداد محرك القوالب');
   }
 
@@ -159,13 +159,13 @@ class App {
    */
   setupCustomMiddleware() {
     const { requireDeviceAuth, logApiRequest } = require('./auth/middleware');
-    
+
     // تسجيل طلبات API
     this.app.use('/api', logApiRequest);
-    
+
     // معلومات الجهاز
     this.app.use(requireDeviceAuth);
-    
+
     // متغيرات عامة للقوالب
     this.app.use((req, res, next) => {
       res.locals.currentUser = req.session.user || null;
@@ -175,7 +175,7 @@ class App {
       res.locals.fullWidth = false;
       next();
     });
-    
+
     logger.info('تم إعداد الوسطاء المخصصة');
   }
 
@@ -193,19 +193,19 @@ class App {
 
     // مسارات المصادقة
     this.setupAuthRoutes();
-    
+
     // مسارات الأدمن
     this.setupAdminRoutes();
-    
+
     // مسارات العملاء
     this.setupClientRoutes();
-    
+
     // مسارات API
     this.setupApiRoutes();
-    
+
     // مسارات إضافية
     this.setupAdditionalRoutes();
-    
+
     logger.info('تم إعداد المسارات');
   }
 
@@ -223,7 +223,7 @@ class App {
   setupAdminRoutes() {
     const adminRoutes = require('../routes/admin');
     const clientRoutes = require('../routes/admin-clients');
-    
+
     this.app.use('/admin', adminRoutes);
     this.app.use('/admin/clients', clientRoutes);
   }
@@ -241,13 +241,53 @@ class App {
    */
   setupApiRoutes() {
     try {
+      // مسارات API v1 (القديمة)
       const analyticsRoutes = require('../routes/api/analytics');
       const notificationsRoutes = require('../routes/api/notifications');
-      
+
       this.app.use('/api/analytics', analyticsRoutes);
       this.app.use('/api/notifications', notificationsRoutes);
     } catch (error) {
-      logger.warn('بعض مسارات API غير موجودة، سيتم تخطيها');
+      logger.warn('بعض مسارات API v1 غير موجودة، سيتم تخطيها');
+    }
+
+    // مسارات API v2 (الجديدة - للواجهة الأمامية Next.js)
+    try {
+      const authRoutes = require('../routes/api/v2/auth');
+      const carsRoutes = require('../routes/api/v2/cars');
+      const auctionsRoutes = require('../routes/api/v2/auctions');
+      const ordersRoutes = require('../routes/api/v2/orders');
+      const dashboardRoutes = require('../routes/api/v2/dashboard');
+      const analyticsV2Routes = require('../routes/api/v2/analytics');
+      const partsRoutes = require('../routes/api/v2/parts');
+      const settingsRoutes = require('../routes/api/v2/settings');
+      const usersRoutes = require('../routes/api/v2/users');
+      const favoritesRoutes = require('../routes/api/v2/favorites');
+      const bidsRoutes = require('../routes/api/v2/bids');
+      const reviewsRoutes = require('../routes/api/v2/reviews');
+      const messagesRoutes = require('../routes/api/v2/messages');
+      const comparisonsRoutes = require('../routes/api/v2/comparisons');
+      const contactRoutes = require('../routes/api/v2/contact');
+
+      this.app.use('/api/v2/auth', authRoutes);
+      this.app.use('/api/v2/cars', carsRoutes);
+      this.app.use('/api/v2/auctions', auctionsRoutes);
+      this.app.use('/api/v2/orders', ordersRoutes);
+      this.app.use('/api/v2/dashboard', dashboardRoutes);
+      this.app.use('/api/v2/analytics', analyticsV2Routes);
+      this.app.use('/api/v2/parts', partsRoutes);
+      this.app.use('/api/v2/settings', settingsRoutes);
+      this.app.use('/api/v2/users', usersRoutes);
+      this.app.use('/api/v2/favorites', favoritesRoutes);
+      this.app.use('/api/v2/bids', bidsRoutes);
+      this.app.use('/api/v2/reviews', reviewsRoutes);
+      this.app.use('/api/v2/messages', messagesRoutes);
+      this.app.use('/api/v2/comparisons', comparisonsRoutes);
+      this.app.use('/api/v2/contact', contactRoutes);
+
+      logger.info('تم تحميل مسارات API v2 بنجاح');
+    } catch (error) {
+      logger.error('خطأ في تحميل مسارات API v2:', error.message);
     }
   }
 
@@ -275,11 +315,11 @@ class App {
         req.session.returnTo = '/client/dashboard';
         return res.redirect('/auth/login');
       }
-      
+
       if (req.session.user.role === 'buyer') {
         return res.redirect('/cars');
       }
-      
+
       res.render('client/dashboard', {
         title: 'لوحة التحكم - HM CAR'
       });
@@ -295,8 +335,8 @@ class App {
       if (req.path.startsWith('/api')) {
         return res.status(404).json({ error: 'المورد غير موجود' });
       }
-      
-      res.status(404).render('errors/404', { 
+
+      res.status(404).render('errors/404', {
         layout: 'layout',
         title: 'صفحة غير موجودة - HM CAR'
       });
@@ -305,32 +345,32 @@ class App {
     // معالج الأخطاء العامة
     this.app.use((err, req, res, next) => {
       logger.error('خطأ غير معالج', err);
-      
+
       // خطأ CSRF
       if (err && err.code === 'EBADCSRFTOKEN') {
         const wantsJson = req.path.startsWith('/api');
-        
+
         if (wantsJson) {
           return res.status(403).json({ error: 'رمز CSRF غير صالح' });
         }
-        
+
         req.flash('error', 'انتهت صلاحية الجلسة أو رمز الحماية غير صحيح');
         return res.redirect('/auth/login');
       }
-      
+
       // خطأ API
       if (req.path.startsWith('/api')) {
         return res.status(500).json({ error: 'حدث خطأ في الخادم' });
       }
-      
+
       // خطأ صفحة
-      res.status(500).render('errors/500', { 
+      res.status(500).render('errors/500', {
         layout: 'layout',
         title: 'خطأ في الخادم - HM CAR',
         error: err
       });
     });
-    
+
     logger.info('تم إعداد معالجة الأخطاء');
   }
 
@@ -341,7 +381,7 @@ class App {
     try {
       // الاتصال بقاعدة البيانات
       await database.connect();
-      
+
       // بدء الخادم
       const server = this.app.listen(config.server.port, config.server.host, () => {
         logger.info(`🚀 الخادم يعمل على ${config.server.host}:${config.server.port}`);
@@ -352,7 +392,7 @@ class App {
       // معالجة إغلاق التطبيق
       process.on('SIGTERM', () => this.shutdown(server));
       process.on('SIGINT', () => this.shutdown(server));
-      
+
       return server;
     } catch (error) {
       logger.error('فشل في بدء التطبيق', error);
@@ -365,16 +405,16 @@ class App {
    */
   async shutdown(server) {
     logger.info('جاري إيقاف التطبيق...');
-    
+
     try {
       // إغلاق الخادم
       server.close(() => {
         logger.info('تم إغلاق الخادم');
       });
-      
+
       // قطع الاتصال بقاعدة البيانات
       await database.disconnect();
-      
+
       logger.info('تم إيقاف التطبيق بنجاح');
       process.exit(0);
     } catch (error) {

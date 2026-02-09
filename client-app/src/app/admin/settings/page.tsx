@@ -1,0 +1,510 @@
+'use client';
+
+import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import {
+    ArrowLeft,
+    Save,
+    User,
+    Mail,
+    Phone,
+    Lock,
+    Shield,
+    Globe,
+    MessageCircle,
+    Instagram,
+    Youtube,
+    Facebook,
+    Linkedin,
+    Send,
+    Camera,
+    MapPin,
+    Clock,
+    Link as LinkIcon,
+    CheckCircle
+} from "lucide-react";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { useLanguage } from "@/lib/LanguageContext";
+import { useAuth } from "@/lib/AuthContext";
+import { api } from "@/lib/api";
+import { useRouter } from "next/navigation";
+
+export default function AdminSettings() {
+    const { isRTL } = useLanguage();
+    const { user } = useAuth();
+    const router = useRouter();
+    const [activeTab, setActiveTab] = useState<'profile' | 'social' | 'contact'>('profile');
+    const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState({ type: '', text: '' });
+
+    // Profile data
+    const [profileData, setProfileData] = useState({
+        name: '',
+        email: '',
+        phone: '',
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+    });
+
+    // Social links
+    const [socialLinks, setSocialLinks] = useState({
+        whatsapp: '',
+        instagram: '',
+        twitter: '',
+        facebook: '',
+        youtube: '',
+        tiktok: '',
+        snapchat: '',
+        telegram: '',
+        linkedin: ''
+    });
+
+    // Contact info
+    const [contactInfo, setContactInfo] = useState({
+        phone: '',
+        email: '',
+        address: '',
+        workingHours: ''
+    });
+
+    useEffect(() => {
+        loadSettings();
+        if (user) {
+            setProfileData(prev => ({
+                ...prev,
+                name: user.name || '',
+                email: user.email || '',
+                phone: ''
+            }));
+        }
+    }, [user]);
+
+    const loadSettings = async () => {
+        try {
+            const response = await api.settings.get();
+            if (response.success) {
+                setSocialLinks(response.data.socialLinks || {});
+                setContactInfo(response.data.contactInfo || {});
+            }
+        } catch (error) {
+            console.error('Failed to load settings', error);
+        }
+    };
+
+    const handleSaveProfile = async () => {
+        setLoading(true);
+        setMessage({ type: '', text: '' });
+
+        try {
+            // Validate password change
+            if (profileData.newPassword) {
+                if (profileData.newPassword !== profileData.confirmPassword) {
+                    setMessage({ type: 'error', text: isRTL ? 'كلمات المرور غير متطابقة' : 'Passwords do not match' });
+                    return;
+                }
+                if (!profileData.currentPassword) {
+                    setMessage({ type: 'error', text: isRTL ? 'يجب إدخال كلمة المرور الحالية' : 'Current password required' });
+                    return;
+                }
+            }
+
+            await api.users.updateProfile({
+                name: profileData.name,
+                email: profileData.email,
+                phone: profileData.phone
+            });
+
+            setMessage({ type: 'success', text: isRTL ? 'تم حفظ البيانات بنجاح' : 'Profile saved successfully' });
+        } catch (error: any) {
+            setMessage({ type: 'error', text: error.message || 'Error saving profile' });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSaveSocialLinks = async () => {
+        setLoading(true);
+        setMessage({ type: '', text: '' });
+
+        try {
+            await api.settings.updateSocialLinks({ socialLinks });
+            setMessage({ type: 'success', text: isRTL ? 'تم حفظ روابط التواصل' : 'Social links saved' });
+        } catch (error: any) {
+            setMessage({ type: 'error', text: error.message || 'Error saving' });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSaveContactInfo = async () => {
+        setLoading(true);
+        setMessage({ type: '', text: '' });
+
+        try {
+            await api.settings.updateContactInfo({ contactInfo });
+            setMessage({ type: 'success', text: isRTL ? 'تم حفظ معلومات الاتصال' : 'Contact info saved' });
+        } catch (error: any) {
+            setMessage({ type: 'error', text: error.message || 'Error saving' });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const tabs = [
+        { id: 'profile', label: isRTL ? 'الملف الشخصي' : 'Profile', icon: User },
+        { id: 'social', label: isRTL ? 'التواصل الاجتماعي' : 'Social Links', icon: Globe },
+        { id: 'contact', label: isRTL ? 'معلومات الاتصال' : 'Contact Info', icon: Phone }
+    ];
+
+    const socialFields = [
+        { key: 'whatsapp', label: 'WhatsApp', icon: MessageCircle, placeholder: '+966XXXXXXXXX', color: 'text-green-500' },
+        { key: 'instagram', label: 'Instagram', icon: Instagram, placeholder: 'https://instagram.com/...', color: 'text-pink-500' },
+        { key: 'twitter', label: 'X (Twitter)', icon: Globe, placeholder: 'https://x.com/...', color: 'text-white' },
+        { key: 'facebook', label: 'Facebook', icon: Facebook, placeholder: 'https://facebook.com/...', color: 'text-blue-500' },
+        { key: 'youtube', label: 'YouTube', icon: Youtube, placeholder: 'https://youtube.com/...', color: 'text-red-500' },
+        { key: 'tiktok', label: 'TikTok', icon: Camera, placeholder: 'https://tiktok.com/@...', color: 'text-white' },
+        { key: 'snapchat', label: 'Snapchat', icon: Camera, placeholder: 'snapchat_username', color: 'text-yellow-400' },
+        { key: 'telegram', label: 'Telegram', icon: Send, placeholder: 'https://t.me/...', color: 'text-blue-400' },
+        { key: 'linkedin', label: 'LinkedIn', icon: Linkedin, placeholder: 'https://linkedin.com/...', color: 'text-blue-600' }
+    ];
+
+    return (
+        <div className={cn("min-h-screen bg-black text-white", isRTL && "rtl")}>
+            {/* Background */}
+            <div className="fixed inset-0 pointer-events-none">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-cinematic-neon-red/10 via-black to-black" />
+                <div className="absolute inset-0 bg-[linear-gradient(rgba(255,0,60,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,0,60,0.02)_1px,transparent_1px)] bg-[size:60px_60px]" />
+            </div>
+
+            <div className="relative z-10 p-8">
+                {/* Header with Back Button */}
+                <div className="max-w-5xl mx-auto">
+                    <div className="flex items-center gap-6 mb-12">
+                        <Link href="/admin/dashboard">
+                            <motion.button
+                                whileHover={{ scale: 1.05, x: isRTL ? 5 : -5 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-cinematic-neon-red/30 transition-all group"
+                            >
+                                <ArrowLeft className={cn("w-5 h-5 text-white/60 group-hover:text-cinematic-neon-red", isRTL && "rotate-180")} />
+                            </motion.button>
+                        </Link>
+                        <div>
+                            <div className="flex items-center gap-3 mb-2">
+                                <div className="h-[2px] w-8 bg-cinematic-neon-red shadow-[0_0_10px_rgba(255,0,60,1)]" />
+                                <span className="text-[9px] font-black uppercase tracking-[0.5em] text-cinematic-neon-red">
+                                    {isRTL ? 'لوحة التحكم' : 'Admin Panel'}
+                                </span>
+                            </div>
+                            <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic">
+                                {isRTL ? 'الإعدادات' : 'SETTINGS'}
+                            </h1>
+                        </div>
+                    </div>
+
+                    {/* Message */}
+                    {message.text && (
+                        <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className={cn(
+                                "mb-8 p-4 rounded-xl border text-center",
+                                message.type === 'success'
+                                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+                                    : "bg-cinematic-neon-red/10 border-cinematic-neon-red/30 text-cinematic-neon-red"
+                            )}
+                        >
+                            <span className="text-sm font-bold">{message.text}</span>
+                        </motion.div>
+                    )}
+
+                    {/* Tabs */}
+                    <div className="flex gap-2 mb-8 p-2 bg-white/5 rounded-2xl border border-white/5">
+                        {tabs.map((tab) => (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id as any)}
+                                className={cn(
+                                    "flex-1 flex items-center justify-center gap-3 py-4 rounded-xl font-bold text-sm uppercase tracking-wider transition-all",
+                                    activeTab === tab.id
+                                        ? "bg-cinematic-neon-red text-white shadow-lg"
+                                        : "text-white/40 hover:text-white hover:bg-white/5"
+                                )}
+                            >
+                                <tab.icon className="w-4 h-4" />
+                                {tab.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Profile Tab */}
+                    {activeTab === 'profile' && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="space-y-8"
+                        >
+                            {/* Profile Card */}
+                            <div className="p-8 bg-white/[0.02] border border-white/5 rounded-3xl">
+                                <h2 className="text-lg font-black uppercase tracking-wider mb-6 flex items-center gap-3">
+                                    <User className="w-5 h-5 text-cinematic-neon-red" />
+                                    {isRTL ? 'البيانات الشخصية' : 'Personal Information'}
+                                </h2>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">
+                                            {isRTL ? 'الاسم' : 'Name'}
+                                        </label>
+                                        <div className="relative">
+                                            <User className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-4" : "left-4")} />
+                                            <input
+                                                type="text"
+                                                value={profileData.name}
+                                                onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
+                                                className={cn("w-full bg-white/5 border border-white/10 rounded-xl py-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">
+                                            {isRTL ? 'البريد الإلكتروني' : 'Email'}
+                                        </label>
+                                        <div className="relative">
+                                            <Mail className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-4" : "left-4")} />
+                                            <input
+                                                type="email"
+                                                value={profileData.email}
+                                                onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
+                                                className={cn("w-full bg-white/5 border border-white/10 rounded-xl py-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">
+                                            {isRTL ? 'الهاتف' : 'Phone'}
+                                        </label>
+                                        <div className="relative">
+                                            <Phone className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-4" : "left-4")} />
+                                            <input
+                                                type="tel"
+                                                value={profileData.phone}
+                                                onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
+                                                className={cn("w-full bg-white/5 border border-white/10 rounded-xl py-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Password Card */}
+                            <div className="p-8 bg-white/[0.02] border border-white/5 rounded-3xl">
+                                <h2 className="text-lg font-black uppercase tracking-wider mb-6 flex items-center gap-3">
+                                    <Shield className="w-5 h-5 text-cinematic-neon-red" />
+                                    {isRTL ? 'تغيير كلمة المرور' : 'Change Password'}
+                                </h2>
+
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div>
+                                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">
+                                            {isRTL ? 'كلمة المرور الحالية' : 'Current Password'}
+                                        </label>
+                                        <div className="relative">
+                                            <Lock className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-4" : "left-4")} />
+                                            <input
+                                                type="password"
+                                                value={profileData.currentPassword}
+                                                onChange={(e) => setProfileData({ ...profileData, currentPassword: e.target.value })}
+                                                className={cn("w-full bg-white/5 border border-white/10 rounded-xl py-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">
+                                            {isRTL ? 'كلمة المرور الجديدة' : 'New Password'}
+                                        </label>
+                                        <div className="relative">
+                                            <Lock className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-4" : "left-4")} />
+                                            <input
+                                                type="password"
+                                                value={profileData.newPassword}
+                                                onChange={(e) => setProfileData({ ...profileData, newPassword: e.target.value })}
+                                                className={cn("w-full bg-white/5 border border-white/10 rounded-xl py-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">
+                                            {isRTL ? 'تأكيد كلمة المرور' : 'Confirm Password'}
+                                        </label>
+                                        <div className="relative">
+                                            <Lock className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-4" : "left-4")} />
+                                            <input
+                                                type="password"
+                                                value={profileData.confirmPassword}
+                                                onChange={(e) => setProfileData({ ...profileData, confirmPassword: e.target.value })}
+                                                className={cn("w-full bg-white/5 border border-white/10 rounded-xl py-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <motion.button
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={handleSaveProfile}
+                                disabled={loading}
+                                className="w-full py-5 bg-cinematic-neon-red text-white font-black uppercase tracking-wider rounded-xl shadow-[0_0_30px_rgba(255,0,60,0.3)] hover:shadow-[0_0_50px_rgba(255,0,60,0.5)] transition-all flex items-center justify-center gap-3"
+                            >
+                                <Save className="w-5 h-5" />
+                                {loading ? (isRTL ? 'جاري الحفظ...' : 'Saving...') : (isRTL ? 'حفظ البيانات' : 'Save Profile')}
+                            </motion.button>
+                        </motion.div>
+                    )}
+
+                    {/* Social Links Tab */}
+                    {activeTab === 'social' && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="space-y-6"
+                        >
+                            <div className="p-8 bg-white/[0.02] border border-white/5 rounded-3xl">
+                                <h2 className="text-lg font-black uppercase tracking-wider mb-6 flex items-center gap-3">
+                                    <Globe className="w-5 h-5 text-cinematic-neon-red" />
+                                    {isRTL ? 'روابط التواصل الاجتماعي' : 'Social Media Links'}
+                                </h2>
+                                <p className="text-sm text-white/40 mb-8">
+                                    {isRTL
+                                        ? 'أضف روابط حساباتك على مواقع التواصل الاجتماعي لتظهر في الموقع'
+                                        : 'Add your social media links to display them on the website'}
+                                </p>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {socialFields.map((field) => (
+                                        <div key={field.key}>
+                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 flex items-center gap-2">
+                                                <field.icon className={cn("w-4 h-4", field.color)} />
+                                                {field.label}
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={(socialLinks as any)[field.key]}
+                                                onChange={(e) => setSocialLinks({ ...socialLinks, [field.key]: e.target.value })}
+                                                placeholder={field.placeholder}
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40 placeholder:text-white/20"
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <motion.button
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={handleSaveSocialLinks}
+                                disabled={loading}
+                                className="w-full py-5 bg-cinematic-neon-red text-white font-black uppercase tracking-wider rounded-xl shadow-[0_0_30px_rgba(255,0,60,0.3)] hover:shadow-[0_0_50px_rgba(255,0,60,0.5)] transition-all flex items-center justify-center gap-3"
+                            >
+                                <Save className="w-5 h-5" />
+                                {loading ? (isRTL ? 'جاري الحفظ...' : 'Saving...') : (isRTL ? 'حفظ الروابط' : 'Save Links')}
+                            </motion.button>
+                        </motion.div>
+                    )}
+
+                    {/* Contact Info Tab */}
+                    {activeTab === 'contact' && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="space-y-6"
+                        >
+                            <div className="p-8 bg-white/[0.02] border border-white/5 rounded-3xl">
+                                <h2 className="text-lg font-black uppercase tracking-wider mb-6 flex items-center gap-3">
+                                    <Phone className="w-5 h-5 text-cinematic-neon-red" />
+                                    {isRTL ? 'معلومات الاتصال' : 'Contact Information'}
+                                </h2>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 flex items-center gap-2">
+                                            <Phone className="w-4 h-4" />
+                                            {isRTL ? 'رقم الهاتف' : 'Phone Number'}
+                                        </label>
+                                        <input
+                                            type="tel"
+                                            value={contactInfo.phone}
+                                            onChange={(e) => setContactInfo({ ...contactInfo, phone: e.target.value })}
+                                            placeholder="+966XXXXXXXXX"
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 flex items-center gap-2">
+                                            <Mail className="w-4 h-4" />
+                                            {isRTL ? 'البريد الإلكتروني' : 'Email'}
+                                        </label>
+                                        <input
+                                            type="email"
+                                            value={contactInfo.email}
+                                            onChange={(e) => setContactInfo({ ...contactInfo, email: e.target.value })}
+                                            placeholder="info@hmcar.com"
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40"
+                                        />
+                                    </div>
+
+                                    <div className="md:col-span-2">
+                                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 flex items-center gap-2">
+                                            <MapPin className="w-4 h-4" />
+                                            {isRTL ? 'العنوان' : 'Address'}
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={contactInfo.address}
+                                            onChange={(e) => setContactInfo({ ...contactInfo, address: e.target.value })}
+                                            placeholder={isRTL ? "المملكة العربية السعودية، الرياض" : "Riyadh, Saudi Arabia"}
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40"
+                                        />
+                                    </div>
+
+                                    <div className="md:col-span-2">
+                                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 flex items-center gap-2">
+                                            <Clock className="w-4 h-4" />
+                                            {isRTL ? 'ساعات العمل' : 'Working Hours'}
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={contactInfo.workingHours}
+                                            onChange={(e) => setContactInfo({ ...contactInfo, workingHours: e.target.value })}
+                                            placeholder={isRTL ? "السبت - الخميس: 9 صباحاً - 9 مساءً" : "Sat - Thu: 9AM - 9PM"}
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <motion.button
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={handleSaveContactInfo}
+                                disabled={loading}
+                                className="w-full py-5 bg-cinematic-neon-red text-white font-black uppercase tracking-wider rounded-xl shadow-[0_0_30px_rgba(255,0,60,0.3)] hover:shadow-[0_0_50px_rgba(255,0,60,0.5)] transition-all flex items-center justify-center gap-3"
+                            >
+                                <Save className="w-5 h-5" />
+                                {loading ? (isRTL ? 'جاري الحفظ...' : 'Saving...') : (isRTL ? 'حفظ المعلومات' : 'Save Info')}
+                            </motion.button>
+                        </motion.div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+}

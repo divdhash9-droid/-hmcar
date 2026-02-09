@@ -1,0 +1,231 @@
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4001';
+
+export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
+    const url = `${API_BASE_URL}${endpoint}`;
+
+    const defaultOptions: RequestInit = {
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        ...options,
+    };
+
+    // If using JWT from local storage
+    if (typeof window !== 'undefined') {
+        const token = localStorage.getItem('hm_token');
+        if (token) {
+            (defaultOptions.headers as any)['Authorization'] = `Bearer ${token}`;
+        }
+    }
+
+    const response = await fetch(url, defaultOptions);
+
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `API request failed: ${response.status}`);
+    }
+
+    return response.json();
+}
+
+export const api = {
+    auth: {
+        login: (credentials: any) => fetchAPI('/api/v2/auth/login', {
+            method: 'POST',
+            body: JSON.stringify(credentials),
+        }),
+        // التسجيل/الدخول التلقائي للعملاء
+        autoLogin: (data: { name: string; password: string; deviceId?: string }) =>
+            fetchAPI('/api/v2/auth/auto-login', {
+                method: 'POST',
+                body: JSON.stringify(data),
+            }),
+        register: (data: any) => fetchAPI('/api/v2/auth/register', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        }),
+        verify: () => fetchAPI('/api/v2/auth/verify'),
+        logout: () => fetchAPI('/api/v2/auth/logout', {
+            method: 'POST',
+        }),
+    },
+    users: {
+        getProfile: () => fetchAPI('/api/v2/users/profile'),
+        updateProfile: (data: any) => fetchAPI('/api/v2/users/profile', {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        }),
+    },
+    cars: {
+        list: (params: any = {}) => {
+            const query = new URLSearchParams(params).toString();
+            return fetchAPI(`/api/v2/cars?${query}`);
+        },
+        getById: (id: string) => fetchAPI(`/api/v2/cars/${id}`),
+        create: (data: any) => fetchAPI('/api/v2/cars', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        }),
+        update: (id: string, data: any) => fetchAPI(`/api/v2/cars/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        }),
+        delete: (id: string) => fetchAPI(`/api/v2/cars/${id}`, {
+            method: 'DELETE'
+        }),
+        getStyles: () => fetchAPI('/api/cars/makes'),
+    },
+    auctions: {
+        list: (params: any = {}) => {
+            const query = new URLSearchParams(params).toString();
+            return fetchAPI(`/api/v2/auctions?${query}`);
+        },
+        getById: (id: string) => fetchAPI(`/api/v2/auctions/${id}`),
+        placeBid: (id: string, amount: number) => fetchAPI(`/api/v2/auctions/${id}/bid`, {
+            method: 'POST',
+            body: JSON.stringify({ amount }),
+        }),
+        create: (data: any) => fetchAPI('/api/v2/auctions', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        }),
+        delete: (id: string) => fetchAPI(`/api/v2/auctions/${id}`, {
+            method: 'DELETE',
+        }),
+    },
+    parts: {
+        list: (params: any = {}) => {
+            const query = new URLSearchParams(params).toString();
+            return fetchAPI(`/api/v2/parts?${query}`);
+        },
+        create: (data: any) => fetchAPI('/api/v2/parts', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        }),
+        update: (id: string, data: any) => fetchAPI(`/api/v2/parts/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        }),
+        delete: (id: string) => fetchAPI(`/api/v2/parts/${id}`, {
+            method: 'DELETE',
+        }),
+    },
+    analytics: {
+        getSummary: () => fetchAPI('/api/v2/analytics'),
+    },
+    dashboard: {
+        getClientData: () => fetchAPI('/api/v2/dashboard/client'),
+        getAdminData: () => fetchAPI('/api/v2/dashboard/admin'),
+    },
+    orders: {
+        list: (params: any = {}) => {
+            const query = new URLSearchParams(params).toString();
+            return fetchAPI(`/api/v2/orders?${query}`);
+        },
+        getById: (id: string) => fetchAPI(`/api/v2/orders/${id}`),
+    },
+    upload: {
+        image: (formData: FormData) => fetchAPI('/api/v2/upload', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                // Content-Type must be undefined to let browser set boundary
+            },
+            body: formData,
+        }),
+    },
+    settings: {
+        getPublic: () => fetchAPI('/api/v2/settings/public'),
+        get: () => fetchAPI('/api/v2/settings'),
+        updateSocialLinks: (data: any) => fetchAPI('/api/v2/settings/social-links', {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        }),
+        updateContactInfo: (data: any) => fetchAPI('/api/v2/settings/contact-info', {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        }),
+        updateSiteInfo: (data: any) => fetchAPI('/api/v2/settings/site-info', {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        }),
+    },
+    favorites: {
+        list: () => fetchAPI('/api/v2/favorites'),
+        check: (carId: string) => fetchAPI(`/api/v2/favorites/check/${carId}`),
+        add: (carId: string) => fetchAPI('/api/v2/favorites', {
+            method: 'POST',
+            body: JSON.stringify({ carId }),
+        }),
+        remove: (carId: string) => fetchAPI(`/api/v2/favorites/${carId}`, {
+            method: 'DELETE',
+        }),
+        clear: () => fetchAPI('/api/v2/favorites', {
+            method: 'DELETE',
+        }),
+    },
+    bids: {
+        myBids: () => fetchAPI('/api/v2/bids/my'),
+        auctionBids: (auctionId: string, limit?: number) =>
+            fetchAPI(`/api/v2/bids/auction/${auctionId}?limit=${limit || 20}`),
+        place: (auctionId: string, amount: number) => fetchAPI('/api/v2/bids', {
+            method: 'POST',
+            body: JSON.stringify({ auctionId, amount }),
+        }),
+        highest: (auctionId: string) => fetchAPI(`/api/v2/bids/highest/${auctionId}`),
+    },
+    reviews: {
+        list: (params: any = {}) => {
+            const query = new URLSearchParams(params).toString();
+            return fetchAPI(`/api/v2/reviews?${query}`);
+        },
+        carReviews: (carId: string) => fetchAPI(`/api/v2/reviews/car/${carId}`),
+        add: (carId: string, rating: number, comment?: string) => fetchAPI('/api/v2/reviews', {
+            method: 'POST',
+            body: JSON.stringify({ carId, rating, comment }),
+        }),
+        delete: (id: string) => fetchAPI(`/api/v2/reviews/${id}`, {
+            method: 'DELETE',
+        }),
+    },
+    messages: {
+        conversations: () => fetchAPI('/api/v2/messages/conversations'),
+        conversation: (userId: string, page?: number) =>
+            fetchAPI(`/api/v2/messages/conversation/${userId}?page=${page || 1}`),
+        send: (receiverId: string, content: string) => fetchAPI('/api/v2/messages', {
+            method: 'POST',
+            body: JSON.stringify({ receiverId, content }),
+        }),
+        markRead: (messageId: string) => fetchAPI(`/api/v2/messages/${messageId}/read`, {
+            method: 'PATCH',
+        }),
+        unreadCount: () => fetchAPI('/api/v2/messages/unread-count'),
+    },
+    comparisons: {
+        get: () => fetchAPI('/api/v2/comparisons'),
+        add: (carId: string) => fetchAPI('/api/v2/comparisons/add', {
+            method: 'POST',
+            body: JSON.stringify({ carId }),
+        }),
+        remove: (carId: string) => fetchAPI(`/api/v2/comparisons/remove/${carId}`, {
+            method: 'DELETE',
+        }),
+        clear: () => fetchAPI('/api/v2/comparisons/clear', {
+            method: 'DELETE',
+        }),
+        compare: (carIds: string[]) => fetchAPI('/api/v2/comparisons/compare', {
+            method: 'POST',
+            body: JSON.stringify({ carIds }),
+        }),
+    },
+    contact: {
+        send: (data: { name: string; email: string; phone?: string; subject?: string; message: string }) =>
+            fetchAPI('/api/v2/contact', {
+                method: 'POST',
+                body: JSON.stringify(data),
+            }),
+    },
+};

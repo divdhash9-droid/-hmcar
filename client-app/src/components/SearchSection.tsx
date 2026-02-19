@@ -58,8 +58,8 @@ export default function SearchSection() {
                         </select>
                     </div>
 
-                    {/* Price Range */}
-                    <div className="flex-1 relative group">
+                    {/* Price Range (hidden) */}
+                    <div className="flex-1 relative group hidden">
                         <Banknote className={cn(
                             "absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-luxury-gold transition-all duration-500",
                             isRTL ? "right-8" : "left-8"
@@ -90,21 +90,8 @@ export default function SearchSection() {
                 </form>
             </div>
 
-            {/* Matrix Quick Filters */}
-            <div className="flex flex-wrap items-center justify-center gap-6 mt-10">
-                <div className="flex items-center gap-3 px-4 py-2 bg-white/5 border border-white/10 rounded-full">
-                    <ShieldCheck className="w-3 h-3 text-luxury-gold" />
-                    <span className="text-[9px] uppercase tracking-[0.4em] text-white/40 font-black">
-                        SECURE TERMINAL ACCESS
-                    </span>
-                </div>
-                <div className="h-[1px] w-12 bg-white/10 hidden sm:block" />
-                <div className="flex gap-6">
-                    {['McLaren', 'RollsRoyce', 'Lamborghini'].map((b) => (
-                        <span key={b} className="text-[9px] uppercase tracking-[0.3em] font-black text-white/20 hover:text-luxury-gold cursor-pointer transition-all duration-500">#{b}</span>
-                    ))}
-                </div>
-            </div>
+            {/* Matrix Quick Filters (hidden) */}
+            <div className="hidden" />
         </motion.div>
     );
 }

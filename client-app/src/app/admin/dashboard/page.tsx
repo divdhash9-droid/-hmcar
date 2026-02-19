@@ -23,7 +23,10 @@ import {
     Clock,
     Menu,
     X,
-    FileText
+    FileText,
+    Share2,
+    MessageCircle,
+    Tag
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -31,6 +34,8 @@ import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/LanguageContext";
 import { usePathname, useRouter } from "next/navigation";
 import { api } from "@/lib/api";
+import DashboardBackdrop from "@/components/DashboardBackdrop";
+import ParticleBackground from "@/components/ParticleBackground";
 
 export default function AdminDashboard() {
     const { t, lang, isRTL, toggleLanguage } = useLanguage();
@@ -60,6 +65,7 @@ export default function AdminDashboard() {
 
     const [stats, setStats] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const loadStats = async () => {
@@ -70,11 +76,22 @@ export default function AdminDashboard() {
                 }
             } catch (err) {
                 console.error("Failed to load stats", err);
+                setError(isRTL ? "تعذر تحميل الإحصائيات" : "Failed to load statistics");
             } finally {
                 setLoading(false);
             }
         };
         loadStats();
+    }, []);
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const token = localStorage.getItem('hm_token');
+            const role = localStorage.getItem('hm_user_role');
+            if (!token || !role) {
+                router.push('/login');
+            }
+        }
     }, []);
 
     const adminStats = [
@@ -100,8 +117,10 @@ export default function AdminDashboard() {
         { id: 'inventory', icon: Car, label: isRTL ? 'المخزون' : 'INVENTORY', href: '/admin/cars' },
         { id: 'parts', icon: Layers, label: isRTL ? 'قطع الغيار' : 'PARTS', href: '/admin/parts' },
         { id: 'auctions', icon: Gavel, label: isRTL ? 'المزادات' : 'AUCTIONS', href: '/admin/auctions' },
+        { id: 'brands', icon: Tag, label: t('brands'), href: '/admin/brands' },
         { id: 'users', icon: Users, label: isRTL ? 'المستخدمون' : 'DIRECTORY', href: '/admin/users' },
         { id: 'security', icon: Lock, label: isRTL ? 'الأمان' : 'SECURITY', href: '/admin/notifications' },
+        { id: 'social', icon: Share2, label: t('social'), href: '/admin/social' },
     ];
 
     if (!mounted) return null;
@@ -109,11 +128,8 @@ export default function AdminDashboard() {
     return (
         <div className="relative min-h-screen bg-black text-white font-sans overflow-hidden selection:bg-cinematic-neon-red selection:text-white">
 
-            {/* Background HUD Grid */}
-            <div className="fixed inset-0 z-0 pointer-events-none opacity-20">
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(255,0,60,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,0,60,0.03)_1px,transparent_1px)] bg-[size:50px:50px] sm:bg-[size:100px:100px]" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border border-cinematic-neon-red/5 rounded-full animate-spin-slow" />
-            </div>
+            <DashboardBackdrop />
+            <ParticleBackground />
 
             {/* --- ADMIN SIDEBAR --- */}
             <aside className={cn(
@@ -133,12 +149,12 @@ export default function AdminDashboard() {
                             <button
                                 onClick={() => setIsSidebarOpen(false)}
                                 className={cn(
-                                    "flex flex-col items-center gap-2 group transition-all w-full py-4 rounded-2xl relative",
+                                    "flex flex-col items-center gap-3 group transition-all w-full py-4 rounded-2xl relative",
                                     pathname === item.href ? "text-cinematic-neon-red bg-white/5 shadow-inner" : "text-white/20 hover:text-white hover:bg-white/[0.02]"
                                 )}
                             >
-                                <item.icon className={cn("w-7 h-7 shrink-0 transition-transform group-hover:scale-110", pathname === item.href && "drop-shadow-[0_0_15px_rgba(255,0,60,1)]")} />
-                                <span className="text-[7px] font-black uppercase tracking-[0.3em]">{item.label}</span>
+                                <item.icon className={cn("w-8 h-8 lg:w-9 lg:h-9 shrink-0 transition-transform group-hover:scale-110", pathname === item.href && "drop-shadow-[0_0_15px_rgba(255,0,60,1)]")} />
+                                <span className="text-[9px] lg:text-[10px] font-black uppercase tracking-[0.25em] lg:tracking-[0.3em]">{item.label}</span>
                                 {pathname === item.href && <motion.div layoutId="activeInd" className="absolute left-0 top-0 bottom-0 w-[2px] bg-cinematic-neon-red" />}
                             </button>
                         </Link>
@@ -149,9 +165,9 @@ export default function AdminDashboard() {
                     <button onClick={toggleLanguage} className="text-white/20 hover:text-white transition-colors p-2 uppercase text-[10px] font-black border border-white/5 bg-white/5 rounded-lg active:scale-95">
                         {lang}
                     </button>
-                    <button onClick={handleLogout} className="flex flex-col items-center gap-2 text-white/20 hover:text-cinematic-neon-blue transition-all active:scale-90">
-                        <LogOut className="w-6 h-6 shrink-0" />
-                        <span className="text-[7px] font-black uppercase tracking-[0.2em]">{isRTL ? "خروج" : "EXIT"}</span>
+                    <button onClick={handleLogout} className="btn-glow-red flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 text-white/80 hover:text-white transition-all">
+                        <LogOut className="w-5 h-5 text-cinematic-neon-red" />
+                        <span className="text-[10px] font-black uppercase tracking-widest">{isRTL ? "تسجيل الخروج" : "LOG OUT"}</span>
                     </button>
                 </div>
             </aside>
@@ -176,74 +192,86 @@ export default function AdminDashboard() {
                 {/* Header HUD */}
                 <header className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-10 mb-20 border-b border-white/5 pb-16">
                     <div className="space-y-6 w-full lg:w-auto">
-                        <div className="flex items-center gap-4">
-                            <ShieldCheck className="w-6 h-6 text-cinematic-neon-red" />
-                            <span className="text-[10px] font-black uppercase tracking-[0.6em] text-white/40 italic">System Protocol: Active / Level 10 Root</span>
-                        </div>
-                        <h1 className="text-5xl sm:text-6xl md:text-8xl font-black tracking-tighter uppercase italic leading-[0.8] mb-4">
-                            {isRTL ? "لوحة" : "GOLDEN"} <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/20">{isRTL ? "التحكم الذهبية" : "CONTROL"}</span>
+                        
+                        <h1 className="text-5xl sm:text-6xl md:text-8xl font-black tracking-tighter uppercase leading-[0.8] mb-4 text-center text-glow-white">
+                            {isRTL ? (
+                                <span className="inline-block mx-auto px-8 py-4 rounded-2xl border border-white/10 bg-white/[0.06] text-white font-black tracking-[0.1em] not-italic text-center ring-1 ring-white/10 hover:ring-cinematic-neon-red/40 transition-all hover:scale-[1.02] shadow-[0_0_25px_rgba(255,0,60,0.25)] bg-gradient-to-r from-white/[0.06] via-white/[0.02] to-white/[0.06] backdrop-blur-sm">
+                                    لوحة التحكم
+                                </span>
+                            ) : (
+                                <>GOLDEN <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/20">CONTROL</span></>
+                            )}
                         </h1>
                         <div className="flex items-center gap-6 text-[10px] text-white/40 font-bold uppercase tracking-[0.4em]">
-                            <Link href="/" className="hover:text-white transition-all flex items-center gap-3 group">
+                            <Link href="/" className="hover:text-white transition-all flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-cinematic-neon-red/40 rounded-xl">
                                 <ChevronLeft className={cn("w-4 h-4 transition-transform group-hover:-translate-x-1", isRTL && "rotate-180 group-hover:translate-x-1")} /> {isRTL ? "المنصة الرئيسية" : "MAIN TERMINAL"}
                             </Link>
                             <div className="w-[1px] h-4 bg-white/10" />
                             <span className="text-cinematic-neon-red/80 tracking-widest">{isRTL ? "بروتوكول الإدارة" : "SECURE ADMIN PROTOCOL"}</span>
                         </div>
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row items-center gap-6 w-full lg:w-auto">
-                        <div className="relative group w-full sm:w-auto">
+                        {error && (
+                            <div className="mt-6 p-4 rounded-xl border border-cinematic-neon-red/30 bg-cinematic-neon-red/10 text-white/80 text-[10px] font-black uppercase tracking-widest">
+                                {error}
+                            </div>
+                        )}
+                        <div className="relative group w-full mt-6">
                             <Search className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-6" : "left-6")} />
                             <input
                                 type="text"
                                 placeholder={isRTL ? "بحث في السجلات..." : "SEARCH RECORDS..."}
                                 className={cn(
-                                    "bg-white/[0.03] border border-white/10 rounded-full py-5 text-[10px] font-black tracking-[0.2em] text-white/60 focus:outline-none focus:border-cinematic-neon-red/40 transition-all w-full sm:w-80",
+                                    "bg-white/[0.03] border border-white/10 rounded-full py-5 text-[10px] font-black tracking-[0.2em] text-white/60 focus:outline-none focus:border-cinematic-neon-red/40 transition-all w-full focus-visible:ring-2 focus-visible:ring-cinematic-neon-red/30",
                                     isRTL ? "pr-14 pl-8 text-right" : "pl-14 pr-8 text-left"
                                 )}
                             />
                         </div>
-                        <div className="flex items-center gap-5 bg-white/[0.02] p-2 pr-6 border border-white/5 rounded-full backdrop-blur-3xl w-full sm:w-auto justify-between sm:justify-start">
-                            <div className="text-right">
-                                <div className="text-[9px] font-black text-white/30 uppercase tracking-widest">Master Admin</div>
-                                <div className="text-[11px] font-black text-white tracking-[0.1em] italic">AD-9920-LUX</div>
-                            </div>
-                            <div className="w-14 h-14 rounded-full bg-cinematic-neon-red/10 flex items-center justify-center border border-cinematic-neon-red/20 shadow-[0_0_20px_rgba(255,0,60,0.1)]">
-                                <Database className="w-7 h-7 text-cinematic-neon-red" />
-                            </div>
-                        </div>
                     </div>
+
                 </header>
 
-                {/* Dashboard Stats */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-16">
-                    {adminStats.map((stat, i) => (
-                        <motion.div
-                            key={i}
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: i * 0.1 }}
-                            className="glass-card p-10 md:p-12 bg-white/[0.01] border-white/5 relative group cursor-default overflow-hidden"
-                        >
-                            <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:scale-110 transition-transform duration-1000 grayscale group-hover:grayscale-0">
-                                <stat.icon className="w-24 h-24" />
-                            </div>
-                            <div className="relative z-10 space-y-6">
-                                <div className={cn("p-5 rounded-2xl bg-white/5 w-fit shadow-xl transition-all", stat.color, stat.shadow)}>
-                                    <stat.icon className="w-7 h-7" />
-                                </div>
-                                <div className="space-y-2">
-                                    <div className="text-6xl font-black tracking-tighter text-white drop-shadow-2xl">{stat.val}</div>
-                                    <div className="flex flex-col gap-1">
-                                        <span className="text-[11px] font-black text-white uppercase italic tracking-[0.1em]">{stat.label}</span>
-                                        <span className="text-[8px] text-white/20 uppercase tracking-[0.3em] font-bold">{stat.sub}</span>
+                    {loading ? (
+                        Array.from({ length: 4 }).map((_, i) => (
+                            <div key={i} className="glass-card p-10 md:p-12 bg-white/[0.02] border-white/5 relative overflow-hidden">
+                                <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-white/[0.01]" />
+                                <div className="relative z-10 space-y-6">
+                                    <div className="p-5 rounded-2xl bg-white/5 w-16 h-16 shadow-xl animate-pulse" />
+                                    <div className="space-y-2">
+                                        <div className="h-10 bg-white/10 rounded-md animate-pulse" />
+                                        <div className="h-3 bg-white/5 rounded-md animate-pulse w-3/4" />
+                                        <div className="h-2 bg-white/5 rounded-md animate-pulse w-1/2" />
                                     </div>
                                 </div>
                             </div>
-                            <div className={cn("absolute bottom-0 left-0 h-[3px] w-0 bg-white group-hover:w-full transition-all duration-700", stat.color.replace('text-', 'bg-'))} />
-                        </motion.div>
-                    ))}
+                        ))
+                    ) : (
+                        adminStats.map((stat, i) => (
+                            <motion.div
+                                key={i}
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: i * 0.1 }}
+                                className="glass-card p-10 md:p-12 bg-white/[0.01] border-white/5 relative group cursor-default overflow-hidden"
+                            >
+                                <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:scale-110 transition-transform duration-1000 grayscale group-hover:grayscale-0">
+                                    <stat.icon className="w-24 h-24" />
+                                </div>
+                                <div className="relative z-10 space-y-6">
+                                    <div className={cn("p-5 rounded-2xl bg-white/5 w-fit shadow-xl transition-all", stat.color, stat.shadow)}>
+                                        <stat.icon className="w-7 h-7" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <div className="text-6xl font-black tracking-tighter text-white drop-shadow-2xl">{stat.val}</div>
+                                        <div className="flex flex-col gap-1">
+                                            <span className="text-[11px] font-black text-white uppercase italic tracking-[0.1em]">{stat.label}</span>
+                                            <span className="text-[8px] text-white/20 uppercase tracking-[0.3em] font-bold">{stat.sub}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className={cn("absolute bottom-0 left-0 h-[3px] w-0 bg-white group-hover:w-full transition-all duration-700", stat.color.replace('text-', 'bg-'))} />
+                            </motion.div>
+                        ))
+                    )}
                 </div>
 
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-10 lg:gap-12">
@@ -278,84 +306,15 @@ export default function AdminDashboard() {
                             </div>
                         </div>
 
-                        {/* System Logs */}
-                        <div className="glass-card p-10 md:p-14 bg-white/[0.01] border-white/5">
-                            <div className="flex flex-col sm:flex-row items-center justify-between mb-12 gap-6">
-                                <h2 className="text-[11px] font-black uppercase tracking-[0.6em] text-white flex items-center gap-5">
-                                    <Bell className="w-6 h-6 text-cinematic-neon-yellow" /> {t('notifications')}
-                                </h2>
-                                <Link href="/admin/notifications" className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 hover:text-cinematic-neon-red transition-all border-b border-white/0 hover:border-cinematic-neon-red/20 pb-2 uppercase italic tracking-[0.2em]">{isRTL ? "عرض جميع السجلات" : "AUDIT ENTIRE MAINFRAME"}</Link>
-                            </div>
-
-                            <div className="space-y-4">
-                                {[
-                                    { type: 'alert', title: isRTL ? 'محاولة وصول غير مصرح بها' : 'UNAUTHORIZED ACCESS ATTEMPT', user: 'IP: 192.168.1.5', time: isRTL ? 'منذ دقيقة' : '1M AGO', icon: AlertCircle, color: 'text-cinematic-neon-red', bg: 'bg-cinematic-neon-red/10' },
-                                    { type: 'info', title: isRTL ? 'طلب كونسيرج جديد' : 'NEW CONCIERGE REQUEST', user: 'CLIENT: ABDULLAH', time: isRTL ? 'منذ 5 دقيقة' : '5M AGO', icon: FileText, color: 'text-cinematic-neon-blue', bg: 'bg-cinematic-neon-blue/10' },
-                                    { type: 'success', title: isRTL ? 'تصفية مزاد: Ferrari Daytona' : 'SETTLED: FERRARI DAYTONA SP3', user: 'BUYER: FAHAD_H', time: isRTL ? 'منذ 15 دقيقة' : '15M AGO', icon: CheckCircle2, color: 'text-cinematic-neon-blue', bg: 'bg-cinematic-neon-blue/10' },
-                                    { type: 'info', title: isRTL ? 'تحديث قاعدة بيانات القطع' : 'SYNCED: COMPONENT DATABASE', user: 'STAFF: AD_SARAH', time: isRTL ? 'منذ ساعة' : '1H AGO', icon: Clock, color: 'text-white/40', bg: 'bg-white/5' },
-                                ].map((note, i) => (
-                                    <Link href="/admin/notifications" key={i}>
-                                        <div className="flex flex-col md:flex-row items-center gap-8 p-8 border-b border-white/5 hover:bg-white/[0.03] transition-all group cursor-pointer mb-2 rounded-2xl">
-                                            <div className={cn("w-16 h-16 rounded-[1.2rem] flex items-center justify-center shrink-0 transition-all group-hover:scale-110 group-hover:-rotate-6", note.bg, note.color)}>
-                                                <note.icon className="w-8 h-8" />
-                                            </div>
-                                            <div className="flex-grow space-y-2 text-center md:text-left">
-                                                <div className="text-[13px] font-black uppercase tracking-widest italic">{note.title}</div>
-                                                <div className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">{note.user}</div>
-                                            </div>
-                                            <div className="text-[10px] font-black text-cinematic-neon-red/40 uppercase tracking-[0.5em] shrink-0">{note.time}</div>
-                                        </div>
-                                    </Link>
-                                ))}
-                            </div>
-                        </div>
+                        
                     </div>
 
                     {/* Admin Sidebar Widgets */}
                     <div className="space-y-12">
 
-                        {/* Server Status Center */}
-                        <div className="glass-card p-12 bg-white/[0.01] border-white/5 space-y-10 relative overflow-hidden group">
-                            <div className="absolute top-0 left-0 w-2 h-full bg-cinematic-neon-blue transition-all group-hover:w-4" />
-                            <h2 className="text-[11px] font-black uppercase tracking-[0.6em] text-white flex items-center gap-5 pl-4">
-                                <Database className="w-6 h-6 text-cinematic-neon-blue" /> {t('serverStatus')}
-                            </h2>
-                            <div className="space-y-6">
-                                {[
-                                    { label: 'Database Sync', status: 'Optimal', pulse: 'bg-cinematic-neon-blue' },
-                                    { label: 'Asset Storage', status: 'Active', pulse: 'bg-cinematic-neon-blue' },
-                                    { label: 'Payments Core', status: 'Verified', pulse: 'bg-cinematic-neon-blue' },
-                                    { label: 'Automated Logs', status: 'Pending', pulse: 'bg-cinematic-neon-yellow' },
-                                ].map((stat, i) => (
-                                    <div key={i} className="flex justify-between items-center bg-white/[0.02] p-5 rounded-2xl border border-white/5 group-hover:border-white/10 transition-all">
-                                        <div className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30">{stat.label}</div>
-                                        <div className="flex items-center gap-3">
-                                            <span className="text-[9px] font-black text-white uppercase tracking-widest">{stat.status}</span>
-                                            <div className={cn("w-2 h-2 rounded-full animate-pulse", stat.pulse, "shadow-[0_0_10px_rgba(0,240,255,0.5)]")} />
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+                        
 
-                        {/* Security Shield Access */}
-                        <div className="glass-card p-12 bg-gradient-to-tr from-cinematic-neon-red/15 to-transparent border border-cinematic-neon-red/20 relative group overflow-hidden">
-                            <Lock className="absolute -bottom-6 -right-6 w-32 h-32 text-cinematic-neon-red opacity-10 group-hover:scale-125 group-hover:rotate-12 transition-all duration-1000" />
-                            <div className="relative z-10 space-y-8">
-                                <div className="flex items-center gap-4">
-                                    <ShieldCheck className="w-6 h-6 text-cinematic-neon-red animate-pulse" />
-                                    <div className="text-[12px] font-black uppercase tracking-[0.6em] text-white italic">CYBER SECURITY</div>
-                                </div>
-                                <p className="text-[11px] text-white/40 leading-relaxed uppercase font-bold tracking-[0.2em]">
-                                    {isRTL ? "جميع قنوات الاتصال والبيانات الإدارية تخضع للتشفير العسكري AES-512 لضمان السيطرة التامة." : "All administrative channels & transaction data are locked under AES-512 military-grade encryption."}
-                                </p>
-                                <Link href="/admin/settings" className="block">
-                                    <button className="w-full py-6 text-[10px] font-black uppercase tracking-[0.6em] bg-white text-black rounded-2xl hover:bg-cinematic-neon-red hover:text-white transition-all shadow-2xl">
-                                        {isRTL ? "تدقيق السجلات الأمنية" : "AUDIT VAULT LOGS"}
-                                    </button>
-                                </Link>
-                            </div>
-                        </div>
+                        
 
                         {/* Load & Performance Monitor */}
                         <div className="glass-card p-12 bg-white/[0.01] border-white/5 space-y-8">
@@ -394,18 +353,7 @@ export default function AdminDashboard() {
                     </div>
                 </div>
 
-                {/* Console Bottom HUD Lines */}
-                <footer className="mt-48 pt-16 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-12 opacity-30 text-[9px] font-black uppercase tracking-[0.8em]">
-                    <div className="flex flex-wrap gap-12 justify-center">
-                        <div>Uptime: 2,481.42H</div>
-                        <div>Node Process: #HM-CORE-AUX-1</div>
-                        <div>Memory Load: <span className="text-cinematic-neon-red">22%</span></div>
-                    </div>
-                    <div className="flex gap-12">
-                        <span className="text-white">Admin Hub v2.4</span>
-                        <span className="text-cinematic-neon-red">Restricted Zone</span>
-                    </div>
-                </footer>
+                
 
             </main>
 

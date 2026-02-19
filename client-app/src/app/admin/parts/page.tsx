@@ -136,10 +136,7 @@ export default function AdminPartsPage() {
             <main className="relative z-10 pt-32 pb-24 px-6 max-w-7xl mx-auto">
 
                 <header className="mb-16">
-                    <Link href="/admin/dashboard" className="inline-flex items-center gap-2 mb-6 text-white/40 hover:text-white transition-colors group">
-                        <ChevronLeft className={cn("w-4 h-4 transition-transform group-hover:-translate-x-1", isRTL && "rotate-180 group-hover:translate-x-1")} />
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em]">{isRTL ? 'العودة للرئيسية' : 'BACK TO DASHBOARD'}</span>
-                    </Link>
+                    
 
                     <div className="flex items-center gap-4 mb-6">
                         <div className="h-[2px] w-12 bg-cinematic-neon-blue shadow-[0_0_10px_rgba(0,240,255,1)]" />
@@ -158,7 +155,7 @@ export default function AdminPartsPage() {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => { resetForm(); setShowModal(true); }}
-                            className="px-8 py-4 bg-cinematic-neon-blue text-black rounded-xl text-[11px] font-black uppercase tracking-[0.3em] shadow-[0_0_30px_rgba(0,240,255,0.3)] flex items-center gap-3"
+                            className="btn-glow px-8 py-4 bg-cinematic-neon-blue text-black rounded-xl text-[11px] font-black uppercase tracking-[0.3em] shadow-[0_0_30px_rgba(0,240,255,0.3)] flex items-center gap-3"
                         >
                             <Plus className="w-5 h-5" />
                             {isRTL ? 'إضافة قطعة' : 'ADD PART'}
@@ -183,13 +180,19 @@ export default function AdminPartsPage() {
                                 key={cat}
                                 onClick={() => setFilter(cat)}
                                 className={cn(
-                                    "px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-[0.3em] transition-all",
+                                    "px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-[0.3em] transition-colors select-none",
                                     filter === cat
-                                        ? "bg-cinematic-neon-blue text-black shadow-[0_0_20px_rgba(0,240,255,0.3)]"
-                                        : "bg-white/[0.02] text-white/60 hover:bg-white/[0.05] border border-white/5"
+                                        ? "relative bg-cinematic-neon-blue text-white shadow-[0_0_35px_rgba(0,240,255,0.45)] ring-2 ring-cinematic-neon-blue after:content-[''] after:absolute after:-inset-1 after:rounded-xl after:bg-cinematic-neon-blue/25 after:blur-md after:-z-10"
+                                        : "bg-white/[0.14] text-white hover:bg-white/[0.18] ring-1 ring-white/10"
                                 )}
+                                aria-pressed={filter === cat}
                             >
-                                {cat}
+                                <span className="inline-flex items-center gap-2 justify-center">
+                                    {filter === cat && <span className="w-2 h-2 rounded-full bg-white" />}
+                                    <span>{isRTL
+                                        ? (cat === 'all' ? 'الكل' : cat === 'Engine' ? 'المحرك' : cat === 'Brakes' ? 'الفرامل' : 'المرشحات')
+                                        : cat}</span>
+                                </span>
                             </button>
                         ))}
                     </div>
@@ -342,15 +345,20 @@ export default function AdminPartsPage() {
 
                                     <div>
                                         <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/60 mb-2">
-                                            {isRTL ? 'الماركة' : 'BRAND/MAKE'}
+                                            {isRTL ? 'الماركة' : 'BRAND'}
                                         </label>
-                                        <input
-                                            type="text"
-                                            required
+                                        <select
                                             value={formData.brand}
                                             onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
                                             className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 px-4 text-sm font-bold text-white focus:outline-none focus:border-cinematic-neon-blue/40"
-                                        />
+                                        >
+                                            {(() => {
+                                                let list: any[] = [];
+                                                try { list = JSON.parse(localStorage.getItem('hm_brands_cache') || '[]'); } catch {}
+                                                const partBrands = list.filter((b: any) => b.category === 'parts' || b.category === 'both');
+                                                return partBrands.length ? partBrands.map((b: any) => <option key={b.id} value={b.name}>{b.name}</option>) : [<option key="manual" value={formData.brand || ''}>{formData.brand || (isRTL ? 'اكتب الماركة' : 'Type brand')}</option>];
+                                            })()}
+                                        </select>
                                     </div>
 
                                     <div>

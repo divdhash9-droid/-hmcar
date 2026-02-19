@@ -7,13 +7,14 @@ import { useLanguage } from '@/lib/LanguageContext';
  * Provides locale information and translation function
  */
 export function useLocale() {
-    const { t, isRTL, language } = useLanguage();
+    const { t, isRTL, lang } = useLanguage();
 
     return {
         t,
         isRTL,
-        locale: language,
-        language
+        locale: lang,
+        language: lang,
+        lang
     };
 }
 

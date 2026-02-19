@@ -1,7 +1,7 @@
 'use client';
 
-import { motion } from "framer-motion";
-import { UserPlus, User, Mail, Lock, ArrowRight, ChevronLeft, Globe, ShieldCheck } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { UserPlus, User, Mail, Lock, ArrowRight, ChevronLeft, ChevronRight, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/LanguageContext";
@@ -11,10 +11,7 @@ import { api } from "@/lib/api";
 export default function Register() {
     const { t, isRTL, lang, toggleLanguage } = useLanguage();
     const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        password: '',
-        confirmPassword: ''
+        name: '', email: '', password: '', confirmPassword: ''
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -22,32 +19,22 @@ export default function Register() {
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
-
         if (formData.password !== formData.confirmPassword) {
             setError(isRTL ? 'كلمات المرور غير متطابقة' : 'Passwords do not match');
             return;
         }
-
         if (formData.name.trim().split(/\s+/).length < 2) {
             setError(isRTL ? 'يجب إدخال الاسم كاملاً (اسمين على الأقل)' : 'Full name must contain at least two names');
             return;
         }
-
         setLoading(true);
-
         try {
             const response = await api.auth.register({
-                name: formData.name,
-                email: formData.email,
-                password: formData.password
+                name: formData.name, email: formData.email, password: formData.password
             });
-
             if (response.success) {
-                // Save token
                 localStorage.setItem('hm_token', response.token);
                 localStorage.setItem('hm_user', JSON.stringify(response.user));
-
-                // Redirect
                 window.location.href = "/dashboard";
             }
         } catch (err: any) {
@@ -57,169 +44,172 @@ export default function Register() {
     };
 
     return (
-        <div className="relative min-h-screen bg-black text-white font-sans overflow-hidden flex items-center justify-center p-6">
+        <div className={`relative min-h-screen bg-black text-white flex items-center justify-center p-6 overflow-hidden ${isRTL ? 'font-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
 
-            {/* Cinematic Background Atmosphere */}
-            <div className="bg-grid-overlay opacity-20" />
-            <div className="fixed inset-0 pointer-events-none z-0">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-cinematic-neon-blue/5 via-black to-black opacity-40" />
-
-                {/* Floating Light Orbs */}
-                <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-cinematic-neon-blue/5 blur-[180px] rounded-full animate-float-slow" />
-                <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-luxury-gold/5 blur-[150px] rounded-full" />
-
-                {/* Noise Grain */}
-                <div className="absolute inset-0 opacity-[0.03] animate-grain"
-                    style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")` }}
-                />
+            {/* ── VIDEO BACKGROUND ── */}
+            <div className="video-bg-wrapper">
+                <video
+                    autoPlay loop muted playsInline
+                    className="video-bg"
+                    style={{ filter: 'brightness(0.3) contrast(1.2) saturate(1.1)' }}
+                >
+                    <source src="/videos/video_2026-02-07_22-24-58.mp4" type="video/mp4" />
+                </video>
+                <div className="video-overlay-dark" />
+                <div className="video-grain" />
             </div>
 
-            {/* --- TOP HUD BAR --- */}
-            <div className="fixed top-0 left-0 right-0 p-8 flex justify-between items-center z-50">
-                <Link href="/" className="flex items-center gap-3 group">
-                    <ChevronLeft className={cn("w-5 h-5 text-white/20 group-hover:text-white transition-all", isRTL && "rotate-180")} />
-                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 group-hover:text-white">{t('home')}</span>
-                </Link>
-                <button onClick={toggleLanguage} className="p-3 rounded-full bg-white/5 border border-white/10 hover:border-white/40 transition-all text-[10px] font-black">
-                    {lang}
-                </button>
+            {/* ── AMBIENT ── */}
+            <div className="fixed inset-0 pointer-events-none z-[1]">
+                <div className="orb orb-blue w-[600px] h-[600px] top-[-200px] right-[-200px] animate-breathe" />
+                <div className="orb orb-gold w-[400px] h-[400px] bottom-[-100px] left-[-100px] animate-breathe delay-1000" />
             </div>
 
-            {/* --- REGISTER CARD --- */}
+            {/* ── BACK BUTTON ── */}
             <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="relative z-10 w-full max-w-xl"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+                className="fixed top-8 left-8 z-50"
             >
-                <div className="glass-card p-10 md:p-14 bg-white/[0.02] border-white/5 backdrop-blur-3xl rounded-[3rem] shadow-2xl space-y-12">
+                <Link href="/" className="group flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.3em] text-white/25 hover:text-white/70 transition-all duration-500">
+                    <div className="w-11 h-11 border border-white/10 rounded-xl flex items-center justify-center group-hover:border-white/25 group-hover:bg-white/5 transition-all backdrop-blur-md">
+                        {isRTL ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+                    </div>
+                    <span className="hidden sm:block">{isRTL ? "الرئيسية" : "HOME"}</span>
+                </Link>
+            </motion.div>
 
-                    {/* Logo/Title */}
-                    <div className="text-center space-y-4">
-                        <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-cinematic-neon-blue/10 border border-cinematic-neon-blue/20 mb-4">
-                            <UserPlus className="w-3.5 h-3.5 text-cinematic-neon-blue" />
-                            <span className="text-[8px] font-black uppercase tracking-[0.4em] text-cinematic-neon-blue">New Membership Protocol</span>
-                        </div>
-                        <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic">{t('registerTitle')}</h1>
-                        <p className="text-[10px] text-white/40 uppercase tracking-[0.3em] font-bold">{t('registerSubtitle')}</p>
+            {/* ── REGISTER CARD ── */}
+            <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+                className="relative z-10 w-full max-w-lg"
+            >
+                <div className="obsidian-card p-8 sm:p-10 md:p-12">
+
+                    {/* Header */}
+                    <div className="text-center space-y-5 mb-10">
+                        <motion.div
+                            animate={{ opacity: [0.4, 0.8, 0.4] }}
+                            transition={{ duration: 3, repeat: Infinity }}
+                            className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/[0.03] border border-white/8"
+                        >
+                            <UserPlus className="w-3 h-3 text-accent-blue" />
+                            <span className="text-[8px] font-bold uppercase tracking-[0.4em] text-white/30">
+                                {isRTL ? "حساب جديد" : "NEW ACCOUNT"}
+                            </span>
+                        </motion.div>
+                        <h1 className="text-4xl sm:text-5xl font-black tracking-[-0.04em] uppercase leading-[0.9]">
+                            {isRTL ? "إنشاء" : "CREATE"}
+                            <br />
+                            <span className="gradient-text-platinum">{isRTL ? "حساب" : "ACCOUNT"}</span>
+                        </h1>
                     </div>
 
-                    {/* Error Message */}
-                    {error && (
-                        <div className="p-4 bg-cinematic-neon-red/10 border border-cinematic-neon-red/20 rounded-xl text-center">
-                            <span className="text-[10px] font-black text-cinematic-neon-red uppercase tracking-widest">{error}</span>
-                        </div>
-                    )}
+                    {/* Error */}
+                    <AnimatePresence>
+                        {error && (
+                            <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="px-4 py-3 bg-accent-red/10 border border-accent-red/20 rounded-xl text-center mb-6"
+                            >
+                                <span className="text-[10px] font-bold text-accent-red uppercase tracking-widest">{error}</span>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
 
                     {/* Form */}
-                    <form onSubmit={handleRegister} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-2 col-span-1 md:col-span-2">
-                            <label className="text-[9px] font-black text-white/30 uppercase tracking-[0.4em] ml-4">{t('fullName')}</label>
+                    <form onSubmit={handleRegister} className="space-y-5">
+                        <div className="space-y-2">
+                            <label className="text-[9px] font-bold text-white/20 uppercase tracking-[0.3em] px-1">{isRTL ? "الاسم الكامل" : "FULL NAME"}</label>
                             <div className="relative group">
-                                <User className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-white transition-colors", isRTL ? "right-5" : "left-5")} />
+                                <User className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/10 group-focus-within:text-white/40 transition-colors", isRTL ? "right-4" : "left-4")} />
                                 <input
-                                    type="text"
-                                    required
-                                    value={formData.name}
+                                    type="text" required value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    placeholder={isRTL ? "اكتب اسمك بالكامل" : "John Doe"}
-                                    className={cn(
-                                        "w-full bg-white/5 border border-white/5 rounded-2xl py-5 text-sm text-white focus:outline-none focus:ring-1 focus:border-cinematic-neon-blue/40 focus:ring-cinematic-neon-blue/20 transition-all placeholder:text-white/10",
-                                        isRTL ? "pr-14 pl-6" : "pl-14 pr-6"
-                                    )}
+                                    placeholder={isRTL ? "اسمك الكامل" : "John Doe"}
+                                    className={cn("w-full glass-input", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
                                     disabled={loading}
                                 />
                             </div>
                         </div>
 
-                        <div className="space-y-2 col-span-1 md:col-span-2">
-                            <label className="text-[9px] font-black text-white/30 uppercase tracking-[0.4em] ml-4">{t('email')}</label>
+                        <div className="space-y-2">
+                            <label className="text-[9px] font-bold text-white/20 uppercase tracking-[0.3em] px-1">{isRTL ? "البريد الإلكتروني" : "EMAIL"}</label>
                             <div className="relative group">
-                                <Mail className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-white transition-colors", isRTL ? "right-5" : "left-5")} />
+                                <Mail className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/10 group-focus-within:text-white/40 transition-colors", isRTL ? "right-4" : "left-4")} />
                                 <input
-                                    type="email"
-                                    required
-                                    value={formData.email}
+                                    type="email" required value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                     placeholder="you@example.com"
-                                    className={cn(
-                                        "w-full bg-white/5 border border-white/5 rounded-2xl py-5 text-sm text-white focus:outline-none focus:ring-1 focus:border-cinematic-neon-blue/40 focus:ring-cinematic-neon-blue/20 transition-all placeholder:text-white/10",
-                                        isRTL ? "pr-14 pl-6" : "pl-14 pr-6"
-                                    )}
+                                    className={cn("w-full glass-input", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
                                     disabled={loading}
                                 />
                             </div>
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-[9px] font-black text-white/30 uppercase tracking-[0.4em] ml-4">{t('password')}</label>
-                            <div className="relative group">
-                                <Lock className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-white transition-colors", isRTL ? "right-5" : "left-5")} />
-                                <input
-                                    type="password"
-                                    required
-                                    minLength={6}
-                                    value={formData.password}
-                                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                    placeholder="••••••••"
-                                    className={cn(
-                                        "w-full bg-white/5 border border-white/5 rounded-2xl py-5 text-sm text-white focus:outline-none focus:ring-1 focus:border-cinematic-neon-blue/40 focus:ring-cinematic-neon-blue/20 transition-all placeholder:text-white/10",
-                                        isRTL ? "pr-14 pl-6" : "pl-14 pr-6"
-                                    )}
-                                    disabled={loading}
-                                />
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <label className="text-[9px] font-bold text-white/20 uppercase tracking-[0.3em] px-1">{isRTL ? "كلمة المرور" : "PASSWORD"}</label>
+                                <div className="relative group">
+                                    <Lock className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/10 group-focus-within:text-white/40 transition-colors", isRTL ? "right-4" : "left-4")} />
+                                    <input
+                                        type="password" required minLength={6} value={formData.password}
+                                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                        placeholder="••••••••"
+                                        className={cn("w-full glass-input", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
+                                        disabled={loading}
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[9px] font-bold text-white/20 uppercase tracking-[0.3em] px-1">{isRTL ? "تأكيد" : "CONFIRM"}</label>
+                                <div className="relative group">
+                                    <Lock className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/10 group-focus-within:text-white/40 transition-colors", isRTL ? "right-4" : "left-4")} />
+                                    <input
+                                        type="password" required minLength={6} value={formData.confirmPassword}
+                                        onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                                        placeholder="••••••••"
+                                        className={cn("w-full glass-input", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
+                                        disabled={loading}
+                                    />
+                                </div>
                             </div>
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-[9px] font-black text-white/30 uppercase tracking-[0.4em] ml-4">{isRTL ? "تأكيد كلمة المرور" : "CONFIRM"}</label>
-                            <div className="relative group">
-                                <Lock className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-white transition-colors", isRTL ? "right-5" : "left-5")} />
-                                <input
-                                    type="password"
-                                    required
-                                    minLength={6}
-                                    value={formData.confirmPassword}
-                                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                                    placeholder="••••••••"
-                                    className={cn(
-                                        "w-full bg-white/5 border border-white/5 rounded-2xl py-5 text-sm text-white focus:outline-none focus:ring-1 focus:border-cinematic-neon-blue/40 focus:ring-cinematic-neon-blue/20 transition-all placeholder:text-white/10",
-                                        isRTL ? "pr-14 pl-6" : "pl-14 pr-6"
-                                    )}
-                                    disabled={loading}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="col-span-1 md:col-span-2 pt-6">
-                            <motion.button
-                                type="submit"
-                                disabled={loading}
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                                className={cn(
-                                    "w-full py-5 bg-white text-black rounded-2xl text-xs font-black uppercase tracking-[0.5em] transition-all shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:bg-cinematic-neon-blue hover:text-white flex items-center justify-center gap-4 group",
-                                    loading && "opacity-50 cursor-not-allowed"
-                                )}
-                            >
-                                {loading ? (isRTL ? "جاري التسجيل..." : "REGISTERING...") : t('register')}
-                                {!loading && <ArrowRight className={cn("w-4 h-4 transition-transform group-hover:translate-x-2", isRTL && "rotate-180 group-hover:-translate-x-2")} />}
-                            </motion.button>
-                        </div>
+                        <button
+                            type="submit" disabled={loading}
+                            className={cn("w-full btn-luxury py-5 rounded-xl group mt-4", loading && "opacity-50 pointer-events-none")}
+                        >
+                            {loading ? (
+                                <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                            ) : (
+                                <>
+                                    <span>{isRTL ? "إنشاء الحساب" : "CREATE ACCOUNT"}</span>
+                                    <ArrowRight className={cn("w-4 h-4 transition-transform", isRTL ? "rotate-180 group-hover:-translate-x-1" : "group-hover:translate-x-1")} />
+                                </>
+                            )}
+                        </button>
                     </form>
 
-                    <div className="text-center pt-6 border-t border-white/5">
-                        <span className="text-[10px] font-bold text-white/20 uppercase tracking-widest">{t('alreadyHaveAccount')} </span>
-                        <Link href="/login" className="text-[10px] font-black text-white hover:text-cinematic-neon-blue transition-colors uppercase tracking-widest">
-                            {t('login')}
+                    <div className="text-center pt-6 mt-6 border-t border-white/5">
+                        <span className="text-[10px] font-bold text-white/20 uppercase tracking-widest">{isRTL ? "لديك حساب؟" : "ALREADY HAVE AN ACCOUNT?"} </span>
+                        <Link href="/login" className="text-[10px] font-bold text-accent-gold hover:text-accent-gold/80 transition-colors uppercase tracking-widest">
+                            {isRTL ? "تسجيل الدخول" : "SIGN IN"}
                         </Link>
                     </div>
                 </div>
             </motion.div>
 
-            {/* --- FOOTER HUD --- */}
-            <div className="fixed bottom-10 flex items-center gap-4 text-[8px] font-black text-white/10 uppercase tracking-[0.6em]">
-                <ShieldCheck className="w-4 h-4" />
-                Encrypted Data Handling Protocol Active
+            {/* Footer */}
+            <div className="fixed bottom-8 text-center opacity-10">
+                <span className="text-[8px] font-bold uppercase tracking-[0.6em] text-white">
+                    HM CAR SYSTEMS // v4.0
+                </span>
             </div>
         </div>
     );

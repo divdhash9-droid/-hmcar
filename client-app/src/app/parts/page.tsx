@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
-import { ShoppingCart, Search, Filter, Wrench, ArrowRight, Gauge, Cpu, Box, Database, Sparkles } from "lucide-react";
+import { ArrowUpRight, Cpu, Database, Box } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/LanguageContext";
@@ -15,26 +15,24 @@ export default function PartsPage() {
     const [filter, setFilter] = useState('ALL');
     const [parts, setParts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [brands, setBrands] = useState<any[]>([]);
+    const [brandFilter, setBrandFilter] = useState<string>('ALL');
 
     useEffect(() => {
         const loadParts = async () => {
+            setLoading(true);
             try {
-                // Mock delay
-                await new Promise(resolve => setTimeout(resolve, 800));
-
-                // Mock Data for now as backend might be limited
+                await new Promise(resolve => setTimeout(resolve, 600));
                 const mockParts = [
                     { id: '1', name: 'CERAMIC BRAKE KIT', brand: 'BREMBO', price: 15000, img: 'https://images.unsplash.com/photo-1624552467554-ce1aa68cb952?q=80&w=1000', condition: 'NEW' },
                     { id: '2', name: 'CARBON FIBER HOOD', brand: 'MANSORY', price: 45000, img: 'https://images.unsplash.com/photo-1616788494707-ec28f08d05a1?q=80&w=1000', condition: 'USED' },
                     { id: '3', name: 'TITANIUM EXHAUST', brand: 'AKRAPOVIC', price: 28000, img: 'https://images.unsplash.com/photo-1605634584281-d1f8f9d0c9f1?q=80&w=1000', condition: 'NEW' },
                     { id: '4', name: 'ECU TUNING MODULE', brand: 'NOVITEC', price: 12000, img: 'https://images.unsplash.com/photo-1635771382436-1e68710317e0?q=80&w=1000', condition: 'NEW' },
                 ];
-
                 const data = await api.parts.list({
                     category: filter === 'ALL' ? undefined : filter,
                     limit: 12
                 }).catch(() => ({ parts: mockParts }));
-
                 setParts(data.parts && data.parts.length > 0 ? data.parts : mockParts);
             } catch (err) {
                 console.error("Failed to load parts", err);
@@ -44,100 +42,160 @@ export default function PartsPage() {
         };
         loadParts();
     }, [filter]);
+    useEffect(() => {
+        try { const raw = localStorage.getItem('hm_brands'); if (raw) setBrands(JSON.parse(raw)); } catch {}
+    }, []);
+
+    const filters = [
+        { key: 'ALL', label: isRTL ? 'الكل' : 'ALL' },
+        { key: 'ENGINE', label: isRTL ? 'محرك' : 'ENGINE' },
+        { key: 'BODY', label: isRTL ? 'هيكل' : 'BODY' },
+        { key: 'INTERIOR', label: isRTL ? 'داخلي' : 'INTERIOR' },
+        { key: 'WHEELS', label: isRTL ? 'عجلات' : 'WHEELS' },
+    ];
 
     return (
-        <div className="relative min-h-screen bg-[#020202] text-white selection:bg-cinematic-neon-yellow selection:text-black perspective-1000 overflow-x-hidden">
+        <div className={`relative min-h-screen bg-black text-white overflow-x-hidden ${isRTL ? 'font-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
             <Navbar />
 
-            {/* Cinematic Background Atmosphere */}
-            <div className="bg-grid-overlay opacity-20 fixed inset-0 z-0" />
-            <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-                <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-cinematic-neon-yellow/5 blur-[150px] rounded-full animate-float-slow opacity-40" />
-                <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-cinematic-neon-blue/5 blur-[120px] rounded-full opacity-30" />
-                <div className="absolute inset-0 scan-lines opacity-10" />
+            <div className="pt-24 px-6 max-w-[1600px] mx-auto">
+                <ClientPageHeader
+                    title={isRTL ? "قطع الغيار" : "SPARE PARTS"}
+                    subtitle={isRTL ? "سجل المكونات" : "COMPONENT REGISTRY"}
+                    icon={Cpu}
+                />
             </div>
 
-            <main className="relative z-10 pt-40 pb-32 px-6 max-w-[1920px] mx-auto">
+            {/* ── VIDEO HERO ── */}
+            <div className="relative h-[45vh] md:h-[50vh] overflow-hidden mt-8 mx-6 rounded-3xl border border-white/5">
+                <video
+                    autoPlay loop muted playsInline
+                    className="absolute inset-0 w-full h-full object-cover"
+                    style={{ filter: 'brightness(0.25) contrast(1.3) saturate(0.9)' }}
+                >
+                    <source src="/videos/video_2026-02-07_22-25-04.mp4" type="video/mp4" />
+                </video>
+                <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black" />
+                <div className="video-grain" />
 
-                {/* Header Section */}
-                <div className="flex flex-col lg:flex-row justify-between items-end gap-12 mb-24">
-                    <div className="w-full lg:w-auto">
-                        <ClientPageHeader
-                            title={isRTL ? "قطع الغيار" : "SPARE LOGS"}
-                            subtitle={isRTL ? "سجل المكونات النادرة" : "RARE COMPONENT REGISTRY"}
-                            icon={Database}
-                        />
-                    </div>
-
-                    {/* Filter Pills */}
-                    <div className="flex flex-wrap gap-3 p-1.5 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-xl">
-                        {['ALL', 'ENGINE', 'BODY', 'INTERIOR', 'WHEELS'].map((f) => (
-                            <button
-                                key={f}
-                                onClick={() => setFilter(f)}
-                                className={cn(
-                                    "px-6 py-3 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-300 relative overflow-hidden group",
-                                    filter === f
-                                        ? "bg-cinematic-neon-yellow text-black shadow-[0_0_20px_rgba(252,238,10,0.4)]"
-                                        : "text-white/40 hover:text-white hover:bg-white/5"
-                                )}
-                            >
-                                <span className="relative z-10">{f}</span>
-                            </button>
-                        ))}
+                <div className="absolute inset-0 flex items-end z-10">
+                    <div className="max-w-[1600px] mx-auto w-full px-6 pb-16">
+                        <motion.div
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8 }}
+                        >
+                            <span className="text-[9px] font-bold uppercase tracking-[0.5em] text-accent-gold/60 block mb-3">
+                                {isRTL ? "سجل المكونات" : "COMPONENT REGISTRY"}
+                            </span>
+                            <h1 className="text-4xl md:text-5xl font-black tracking-[-0.04em] uppercase">
+                                {isRTL ? "قطع الغيار" : "SPARE PARTS"}
+                            </h1>
+                        </motion.div>
                     </div>
                 </div>
+            </div>
 
-                {/* Parts Grid */}
+            {/* ── AMBIENT ── */}
+            <div className="fixed inset-0 pointer-events-none z-0">
+                <div className="bg-grid-overlay opacity-8" />
+                <div className="orb orb-gold w-[500px] h-[500px] top-0 right-0 animate-breathe opacity-20" />
+            </div>
+
+            <main className="relative z-10 pt-12 pb-32 px-6 max-w-[1600px] mx-auto">
+
+                {/* ── FILTERS ── */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="flex flex-wrap gap-2.5 mb-16 p-1.5 bg-white/[0.03] border border-white/5 rounded-xl backdrop-blur-xl w-fit"
+                >
+                    {filters.map((f) => (
+                        <button
+                            key={f.key}
+                            onClick={() => setFilter(f.key)}
+                            className={cn(
+                                "px-5 py-2.5 rounded-lg text-[9px] font-bold uppercase tracking-[0.15em] transition-all duration-400",
+                                filter === f.key
+                                    ? "bg-accent-gold text-black shadow-[0_0_15px_var(--accent-gold-glow)]"
+                                    : "text-white/35 hover:text-white/60 hover:bg-white/[0.03]"
+                            )}
+                        >
+                            {f.label}
+                        </button>
+                    ))}
+                </motion.div>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-10">
+                    <button onClick={() => setBrandFilter('ALL')} className={cn("p-4 rounded-xl border text-center", brandFilter === 'ALL' ? "bg-white text-black border-white" : "bg-white/[0.03] border-white/10 text-white/60 hover:text-white")}>
+                        <div className="text-[10px] font-black uppercase tracking-[0.3em]">{isRTL ? 'كل الماركات' : 'All Brands'}</div>
+                    </button>
+                    {brands.filter((b:any)=> b.category === 'parts' || b.category === 'both').map((b:any) => (
+                        <Link key={b.id} href={`/brands/${(b.key || b.name || '').toLowerCase()}`}>
+                            <div className={cn("p-4 rounded-xl border text-center group cursor-pointer", brandFilter === b.name ? "bg-white text-black border-white" : "bg-white/[0.03] border-white/10 text-white/60 hover:text-white")}>
+                                <div className="w-12 h-12 mx-auto rounded-lg bg-white/5 border border-white/10 overflow-hidden mb-2">
+                                    {b.logo ? <img src={b.logo} alt={b.name} className="w-full h-full object-cover" /> : <span className="text-xs">{b.name[0]}</span>}
+                                </div>
+                                <div className="text-[10px] font-black uppercase tracking-[0.3em]">{b.name}</div>
+                            </div>
+                        </Link>
+                    ))}
+                </div>
+
+                {/* ── PARTS GRID ── */}
                 {loading ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {[1, 2, 3, 4].map((n) => (
-                            <div key={n} className="h-[400px] rounded-[2rem] bg-white/5 animate-pulse border border-white/5" />
+                            <div key={n} className="h-[380px] rounded-2xl bg-white/[0.02] animate-pulse border border-white/5" />
                         ))}
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <AnimatePresence mode="popLayout">
-                            {parts.map((part, i) => (
+                            {(brandFilter === 'ALL' ? parts : parts.filter((p:any) => String(p.brand || '').toLowerCase().includes(String(brandFilter).toLowerCase()))).map((part, i) => (
                                 <motion.div
                                     key={part.id}
                                     layout
-                                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                                    exit={{ opacity: 0, scale: 0.9 }}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, scale: 0.95 }}
                                     transition={{ delay: i * 0.05 }}
-                                    className="group obsidian-card obsidian-card-hover p-8 relative overflow-hidden"
                                 >
-                                    {/* Holographic Background Effect */}
-                                    <div className="absolute inset-0 bg-gradient-to-br from-cinematic-neon-yellow/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-
-                                    <div className="relative z-10">
-                                        {/* Image Container */}
-                                        <div className="aspect-square bg-black/40 rounded-[2rem] overflow-hidden mb-8 border border-white/5 relative group-hover:border-cinematic-neon-yellow/30 transition-colors">
-                                            <img src={part.img} alt={part.name} className="w-full h-full object-contain p-8 grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700" />
-
-                                            <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
-                                                <span className="text-[8px] font-black uppercase tracking-widest text-white/60">{part.condition}</span>
+                                    <div className="group obsidian-card obsidian-card-hover p-6 h-full">
+                                        {/* Image */}
+                                        <div className="aspect-square bg-black/40 rounded-xl overflow-hidden mb-6 border border-white/5 relative group-hover:border-accent-gold/20 transition-colors">
+                                            <img
+                                                src={part.img}
+                                                alt={part.name}
+                                                className="w-full h-full object-contain p-6 grayscale-[40%] opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700"
+                                            />
+                                            <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-md border border-white/5">
+                                                <span className="text-[7px] font-bold uppercase tracking-widest text-white/50">{part.condition}</span>
                                             </div>
                                         </div>
 
-                                        <div className="space-y-6">
-                                            <div className="space-y-2">
-                                                <div className="flex items-center gap-2 opacity-50">
-                                                    <Cpu className="w-3 h-3 text-cinematic-neon-yellow" />
-                                                    <span className="text-[8px] font-black text-cinematic-neon-yellow tracking-[0.3em] uppercase">{part.brand}</span>
+                                        {/* Content */}
+                                        <div className="space-y-4">
+                                            <div>
+                                                <div className="flex items-center gap-1.5 mb-1.5 opacity-50">
+                                                    <Cpu className="w-2.5 h-2.5 text-accent-gold" />
+                                                    <span className="text-[8px] font-bold text-accent-gold tracking-[0.2em] uppercase">{part.brand}</span>
                                                 </div>
-                                                <h3 className="text-xl font-black tracking-tighter uppercase italic leading-[1.1] text-white group-hover:text-cinematic-neon-yellow transition-colors line-clamp-2 h-[2.75rem]">{part.name}</h3>
+                                                <h3 className="text-base font-black tracking-tight uppercase leading-snug group-hover:text-accent-gold transition-colors line-clamp-2 min-h-[2.5rem]">
+                                                    {part.name}
+                                                </h3>
                                             </div>
 
-                                            <div className="pt-6 border-t border-white/5 flex items-center justify-between">
-                                                <div>
-                                                    <div className="text-xl font-black italic gold-glow">{Number(part.price).toLocaleString()} <span className="text-[10px] tracking-normal opacity-40 not-italic font-bold">SAR</span></div>
-                                                </div>
+                                            <div className="pt-4 border-t border-white/5 flex items-center justify-between">
+                                                <span className="text-lg font-black gradient-text-gold">
+                                                    {Number(part.price).toLocaleString()}
+                                                    <span className="text-[9px] text-white/20 ml-1 font-normal">SAR</span>
+                                                </span>
                                                 <Link href={`/parts/${part.id}`}>
-                                                    <button className="w-10 h-10 rounded-xl bg-white/5 hover:bg-cinematic-neon-yellow hover:text-black flex items-center justify-center transition-all group/btn">
-                                                        <ArrowRight className="w-4 h-4 group-hover/btn:-rotate-45 transition-transform" />
-                                                    </button>
+                                                    <div className="w-9 h-9 rounded-lg bg-white/5 border border-white/5 flex items-center justify-center hover:bg-accent-gold hover:text-black hover:border-accent-gold transition-all group/btn">
+                                                        <ArrowUpRight className="w-3.5 h-3.5 group-hover/btn:scale-110 transition-transform" />
+                                                    </div>
                                                 </Link>
                                             </div>
                                         </div>
@@ -148,20 +206,28 @@ export default function PartsPage() {
                     </div>
                 )}
 
-                {/* Secure Request CTA */}
-                <div className="mt-32">
-                    <div className="obsidian-card p-12 md:p-20 relative overflow-hidden group">
-                        <div className="absolute inset-0 bg-gradient-to-r from-cinematic-neon-yellow/10 via-transparent to-transparent opacity-20" />
-                        <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-12">
-                            <div className="space-y-6 text-center lg:text-left">
-                                <h2 className="text-4xl font-black uppercase italic tracking-tighter">MISSING <span className="text-cinematic-neon-yellow">COMPONENT?</span></h2>
-                                <p className="text-[10px] text-white/40 uppercase tracking-[0.3em] font-bold max-w-xl leading-loose">
-                                    Our global database is vast, but some artifacts are hidden. Initiate a priority search request for specific engineering components.
+                {/* ── CTA BANNER ── */}
+                <div className="mt-24">
+                    <div className="obsidian-card p-10 md:p-16 relative overflow-hidden">
+                        {/* Accent glow */}
+                        <div className="absolute top-0 right-0 w-[400px] h-[400px] orb orb-gold opacity-20" />
+
+                        <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10">
+                            <div className="space-y-4 text-center lg:text-start">
+                                <h2 className="text-3xl font-black uppercase tracking-tight">
+                                    {isRTL ? "قطعة مفقودة؟" : "MISSING A "}
+                                    <span className="gradient-text-gold">{isRTL ? "" : "PART?"}</span>
+                                </h2>
+                                <p className="text-sm text-white/35 max-w-lg leading-relaxed">
+                                    {isRTL
+                                        ? "قاعدة بياناتنا واسعة، لكن بعض القطع نادرة. أرسل طلب بحث مخصص للمكونات الخاصة."
+                                        : "Our database is vast, but some components are rare. Submit a custom search request for specific engineering parts."
+                                    }
                                 </p>
                             </div>
                             <Link href="/concierge">
-                                <button className="px-12 py-6 bg-cinematic-neon-yellow text-black rounded-2xl font-black uppercase tracking-[0.2em] hover:bg-white transition-colors shadow-[0_0_30px_rgba(252,238,10,0.3)]">
-                                    Initiate Request
+                                <button className="btn-gold px-10 py-5 rounded-xl font-bold uppercase tracking-[0.2em] text-[10px]">
+                                    {isRTL ? "إرسال طلب" : "SUBMIT REQUEST"}
                                 </button>
                             </Link>
                         </div>

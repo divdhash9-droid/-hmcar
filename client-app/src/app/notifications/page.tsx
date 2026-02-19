@@ -6,8 +6,9 @@ import {
     Bell, Check, CheckCheck, Trash2, Filter, Clock,
     Car, Gavel, ShoppingBag, AlertTriangle, Gift,
     Megaphone, Settings, Volume2, VolumeX, Sparkles,
-    ChevronRight, X, Eye, Archive, ArrowLeft
+    ChevronRight, X, Eye, Archive, ArrowLeft, ArrowRight
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/lib/LanguageContext';
@@ -36,6 +37,7 @@ const MOCK_NOTIFICATIONS = [
 
 export default function NotificationsPage() {
     const { isRTL } = useLanguage();
+    const router = useRouter();
     const [notifications, setNotifications] = useState(MOCK_NOTIFICATIONS);
     const [filter, setFilter] = useState<string>('all');
     const [soundEnabled, setSoundEnabled] = useState(true);
@@ -99,7 +101,7 @@ export default function NotificationsPage() {
                 >
                     <div className="flex items-center justify-between flex-wrap gap-6">
                         <div className="space-y-3">
-                            <div className="flex items-center gap-4">
+                            <div className="flex flex-col items-start gap-3">
                                 <div className="relative">
                                     <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cinematic-neon-blue to-purple-600 flex items-center justify-center shadow-[0_0_40px_rgba(0,240,255,0.3)]">
                                         <Bell className="w-8 h-8 text-white" />
@@ -114,6 +116,13 @@ export default function NotificationsPage() {
                                         </motion.div>
                                     )}
                                 </div>
+                                <button
+                                    onClick={() => router.back()}
+                                    className="p-2 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all"
+                                    aria-label={isRTL ? "عودة" : "Back"}
+                                >
+                                    {isRTL ? <ArrowRight className="w-5 h-5" /> : <ArrowLeft className="w-5 h-5" />}
+                                </button>
                                 <div>
                                     <h1 className="text-4xl md:text-5xl font-black uppercase italic tracking-tight">
                                         {isRTL ? "الإشعارات" : "Notifications"}

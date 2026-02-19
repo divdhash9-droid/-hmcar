@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
-    ArrowLeft, ArrowRight, Gavel, Clock, Users, TrendingUp,
+    Gavel, Clock, Users, TrendingUp,
     ChevronLeft, ChevronRight, AlertCircle, CheckCircle
 } from 'lucide-react';
 import { api } from '@/lib/api';
@@ -44,8 +44,7 @@ interface Bid {
 
 export default function AuctionDetailsPage() {
     const params = useParams();
-    const router = useRouter();
-    const { t, isRTL, locale } = useLocale();
+    const { isRTL, locale } = useLocale();
     const [auction, setAuction] = useState<AuctionDetails | null>(null);
     const [bids, setBids] = useState<Bid[]>([]);
     const [loading, setLoading] = useState(true);
@@ -146,7 +145,7 @@ export default function AuctionDetailsPage() {
     };
 
     const formatPrice = (price: number) => {
-        return new Intl.NumberFormat(locale === 'ar' ? 'ar-SA' : 'en-US', {
+        return new Intl.NumberFormat(locale === 'AR' ? 'ar-SA' : 'en-US', {
             style: 'currency',
             currency: 'SAR',
             minimumFractionDigits: 0,
@@ -154,7 +153,7 @@ export default function AuctionDetailsPage() {
     };
 
     const formatTime = (dateStr: string) => {
-        return new Date(dateStr).toLocaleString(locale === 'ar' ? 'ar-SA' : 'en-US');
+        return new Date(dateStr).toLocaleString(locale === 'AR' ? 'ar-SA' : 'en-US');
     };
 
     const isActive = auction?.status === 'active' || auction?.status === 'running';
@@ -183,17 +182,8 @@ export default function AuctionDetailsPage() {
 
     return (
         <div className={`min-h-screen bg-black text-white ${isRTL ? 'rtl' : 'ltr'}`} dir={isRTL ? 'rtl' : 'ltr'}>
-            <ClientPageHeader />
-
-            {/* Back Button */}
             <div className="max-w-7xl mx-auto px-4 pt-24 pb-4">
-                <button
-                    onClick={() => router.back()}
-                    className="flex items-center gap-2 text-white/60 hover:text-[#c5a059] transition-colors"
-                >
-                    {isRTL ? <ArrowRight className="w-5 h-5" /> : <ArrowLeft className="w-5 h-5" />}
-                    <span>{isRTL ? 'رجوع' : 'Back'}</span>
-                </button>
+                <ClientPageHeader title={isRTL ? 'تفاصيل المزاد' : 'Auction Details'} icon={Gavel} />
             </div>
 
             <main className="max-w-7xl mx-auto px-4 pb-20">

@@ -13,6 +13,7 @@ import {
     X
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { api } from "@/lib/api";
 
 // أيقونات مخصصة
 const TikTokIcon = ({ className }: { className?: string }) => (
@@ -62,22 +63,21 @@ export default function SocialLinks({
     const [socialLinks, setSocialLinks] = useState(defaultSocialLinks);
     const [isOpen, setIsOpen] = useState(false);
 
-    useEffect(() => {
-        // Load from API
-        loadSocialLinks();
-    }, []);
-
     const loadSocialLinks = async () => {
         try {
-            const response = await fetch('/api/v2/settings/public');
-            const data = await response.json();
-            if (data.success && data.data.socialLinks) {
-                setSocialLinks({ ...defaultSocialLinks, ...data.data.socialLinks });
+            const response = await api.settings.getPublic();
+            if (response.success && response.data.socialLinks) {
+                setSocialLinks({ ...defaultSocialLinks, ...response.data.socialLinks });
             }
         } catch (error) {
             console.error('Failed to load social links');
         }
     };
+
+    useEffect(() => {
+        // Load from API
+        loadSocialLinks();
+    }, []);
 
     const sizeClasses = {
         sm: 'w-8 h-8 md:w-10 md:h-10',
@@ -161,7 +161,7 @@ export default function SocialLinks({
 
     return (
         <div className={cn(
-            "flex gap-2",
+            "flex gap-3",
             vertical ? "flex-col" : "flex-row flex-wrap",
             className
         )}>
@@ -174,16 +174,21 @@ export default function SocialLinks({
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: i * 0.05 }}
-                    whileHover={{ scale: 1.1, y: -2 }}
+                    whileHover={{ scale: 1.05, y: -2 }}
                     whileTap={{ scale: 0.95 }}
                     className={cn(
-                        "flex items-center justify-center rounded-full transition-all shadow-lg",
+                        "flex flex-col items-center justify-center rounded-full transition-all shadow-lg",
                         sizeClasses[size],
                         link.color
                     )}
                     title={link.label}
                 >
                     <link.icon className={iconSizes[size]} />
+                    {showLabels && (
+                        <span className="mt-2 text-[10px] font-black uppercase tracking-widest text-white/80">
+                            {link.label}
+                        </span>
+                    )}
                 </motion.a>
             ))}
         </div>

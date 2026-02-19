@@ -1,23 +1,30 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4001';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4002';
 
 export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
 
-    const defaultOptions: RequestInit = {
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-        },
-        ...options,
-    };
+    // Don't set Content-Type for FormData — let the browser set it with the boundary
+    const isFormData = options.body instanceof FormData;
+
+    const defaultHeaders: Record<string, string> = isFormData
+        ? { 'Accept': 'application/json' }
+        : { 'Content-Type': 'application/json', 'Accept': 'application/json' };
 
     // If using JWT from local storage
     if (typeof window !== 'undefined') {
         const token = localStorage.getItem('hm_token');
         if (token) {
-            (defaultOptions.headers as any)['Authorization'] = `Bearer ${token}`;
+            defaultHeaders['Authorization'] = `Bearer ${token}`;
         }
     }
+
+    const defaultOptions: RequestInit = {
+        ...options,
+        headers: {
+            ...defaultHeaders,
+            ...(options.headers as Record<string, string> || {}),
+        },
+    };
 
     const response = await fetch(url, defaultOptions);
 
@@ -41,6 +48,16 @@ export const api = {
                 method: 'POST',
                 body: JSON.stringify(data),
             }),
+        sendOtp: (payload: { phone: string }) =>
+            fetchAPI('/api/v2/auth/otp/send', {
+                method: 'POST',
+                body: JSON.stringify(payload),
+            }),
+        verifyOtp: (payload: { phone: string; code: string }) =>
+            fetchAPI('/api/v2/auth/otp/verify', {
+                method: 'POST',
+                body: JSON.stringify(payload),
+            }),
         register: (data: any) => fetchAPI('/api/v2/auth/register', {
             method: 'POST',
             body: JSON.stringify(data),
@@ -51,6 +68,10 @@ export const api = {
         }),
     },
     users: {
+        list: (params: any = {}) => {
+            const query = new URLSearchParams(params).toString();
+            return fetchAPI(`/api/v2/users?${query}`);
+        },
         getProfile: () => fetchAPI('/api/v2/users/profile'),
         updateProfile: (data: any) => fetchAPI('/api/v2/users/profile', {
             method: 'PUT',
@@ -76,7 +97,7 @@ export const api = {
         delete: (id: string) => fetchAPI(`/api/v2/cars/${id}`, {
             method: 'DELETE'
         }),
-        getStyles: () => fetchAPI('/api/cars/makes'),
+        getStyles: () => fetchAPI('/api/v2/cars/makes'),
     },
     auctions: {
         list: (params: any = {}) => {
@@ -130,10 +151,6 @@ export const api = {
     upload: {
         image: (formData: FormData) => fetchAPI('/api/v2/upload', {
             method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                // Content-Type must be undefined to let browser set boundary
-            },
             body: formData,
         }),
     },
@@ -152,6 +169,26 @@ export const api = {
             method: 'PUT',
             body: JSON.stringify(data),
         }),
+    },
+    brands: {
+        list: (category?: 'cars' | 'parts') => {
+            const q = category ? `?category=${category}` : '';
+            return fetchAPI(`/api/v2/brands${q}`);
+        },
+        create: (data: { name: string; logoUrl?: string; category: 'cars' | 'parts' | 'both' }) =>
+            fetchAPI('/api/v2/brands', {
+                method: 'POST',
+                body: JSON.stringify(data),
+            }),
+        update: (id: string, data: any) =>
+            fetchAPI(`/api/v2/brands/${id}`, {
+                method: 'PUT',
+                body: JSON.stringify(data),
+            }),
+        delete: (id: string) =>
+            fetchAPI(`/api/v2/brands/${id}`, {
+                method: 'DELETE',
+            }),
     },
     favorites: {
         list: () => fetchAPI('/api/v2/favorites'),

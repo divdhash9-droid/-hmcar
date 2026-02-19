@@ -32,20 +32,21 @@ export default function AdminNotifications() {
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-16">
                     <div className="space-y-4">
                         <div className="flex items-center gap-3">
-                            <Link href="/admin/dashboard" className="p-2 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all">
-                                <ChevronLeft className={cn("w-5 h-5", isRTL && "rotate-180")} />
-                            </Link>
-                            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-white/30 italic">Admin Root / Mainframe Alerts</span>
+                            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-white/30 italic">
+                                {isRTL ? 'لوحة الأدمن / إشعارات النظام' : 'Admin Root / System Notifications'}
+                            </span>
                         </div>
-                        <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-none">{isRTL ? "سجلات النظام" : "MAINFRAME LOGS"}</h1>
+                        <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-none">
+                            {isRTL ? "اشعارات النظام" : "SYSTEM NOTIFICATIONS"}
+                        </h1>
                     </div>
 
                     <div className="flex gap-4">
                         <button className="flex items-center gap-3 px-8 py-4 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all">
-                            <RefreshCcw className="w-4 h-4 animate-spin-slow" /> REFRESH FEED
+                            <RefreshCcw className="w-4 h-4 animate-spin-slow" /> {isRTL ? 'تحديث السجل' : 'REFRESH FEED'}
                         </button>
                         <button className="flex items-center gap-3 px-8 py-4 bg-cinematic-neon-red/10 border border-cinematic-neon-red/40 text-cinematic-neon-red rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-cinematic-neon-red hover:text-white transition-all">
-                            <Trash2 className="w-4 h-4" /> CLEAR ALL
+                            <Trash2 className="w-4 h-4" /> {isRTL ? 'مسح الكل' : 'CLEAR ALL'}
                         </button>
                     </div>
                 </div>
@@ -61,7 +62,7 @@ export default function AdminNotifications() {
                                 filter === t ? "bg-white text-black shadow-xl" : "text-white/40 hover:text-white"
                             )}
                         >
-                            {t}
+                            {isRTL ? (t === 'ALL' ? 'الكل' : t === 'CRITICAL' ? 'حرجة' : t === 'TRANSACTION' ? 'معاملات' : t === 'SYSTEM' ? 'النظام' : 'تحذير') : t}
                         </button>
                     ))}
                 </div>
@@ -89,26 +90,46 @@ export default function AdminNotifications() {
                                 <div className="flex-grow space-y-4 text-center md:text-left">
                                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                         <div className="flex items-center gap-4 justify-center md:justify-start">
-                                            <span className={cn("text-[11px] font-black px-3 py-1 rounded-lg uppercase tracking-widest bg-white/5", log.color)}>{log.type}</span>
-                                            <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] italic">{log.time}</span>
+                                            <span className={cn("text-[11px] font-black px-3 py-1 rounded-lg uppercase tracking-widest bg-white/5", log.color)}>
+                                                {isRTL ? (log.type === 'CRITICAL' ? 'حرجة' : log.type === 'TRANSACTION' ? 'معاملات' : log.type === 'SYSTEM' ? 'النظام' : 'تحذير') : log.type}
+                                            </span>
+                                            <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] italic">
+                                                {isRTL ? 'منذ ' + log.time : log.time}
+                                            </span>
                                         </div>
                                         <div className="flex items-center gap-3 justify-center md:justify-end">
                                             <Terminal className="w-4 h-4 text-white/10" />
-                                            <span className="text-[10px] font-black text-white/40 tracking-[0.2em]">{log.status}</span>
+                                            <span className="text-[10px] font-black text-white/40 tracking-[0.2em]">
+                                                {isRTL ? (log.status === 'BLOCKED' ? 'محظور' : log.status === 'CLEARED' ? 'مكتمل' : log.status === 'SUCCESS' ? 'ناجحة' : 'مراقبة') : log.status}
+                                            </span>
                                         </div>
                                     </div>
 
                                     <h3 className="text-xl md:text-2xl font-black uppercase italic tracking-tighter decoration-white/10 group-hover:decoration-white/40 transition-all underline underline-offset-8">
-                                        {log.title}
+                                        {isRTL ? (
+                                            log.id === 1 ? 'محاولة اختراق الجدار الناري' :
+                                            log.id === 2 ? 'تم التحقق من الدفع: 1.2M ريال' :
+                                            log.id === 3 ? 'اكتمل النسخ الاحتياطي لقاعدة البيانات' :
+                                            'تم رصد ارتفاع في زمن الاستجابة'
+                                        ) : log.title}
                                     </h3>
                                     <p className="text-[11px] md:text-sm text-white/40 uppercase tracking-widest leading-relaxed max-w-4xl font-bold italic">
-                                        {log.content}
+                                        {isRTL ? (
+                                            log.id === 1 ? 'تم رصد IP مشبوه يقوم بحقن SQL على /api/auctions/bid.' :
+                                            log.id === 2 ? 'تمت عملية دفع ناجحة لفهد القحطاني لسيارة Porsche 911 GT3 RS.' :
+                                            log.id === 3 ? 'انتهى النسخ الاحتياطي الليلي لـ RIYADH-DB-01 خلال 4 دقائق و12 ثانية.' :
+                                            'زمن استجابة عقد الـ API ارتفع بنسبة 40% في مناطق أوروبا والشرق الأوسط وإفريقيا.'
+                                        ) : log.content}
                                     </p>
                                 </div>
 
                                 <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-4 w-full md:w-auto mt-6 md:mt-0 justify-center">
-                                    <button className="px-6 py-3 bg-white/5 border border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all">AUDIT</button>
-                                    <button className="px-6 py-3 bg-white/5 border border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-cinematic-neon-red hover:text-white transition-all">DISMISS</button>
+                                    <button className="px-6 py-3 bg-white/5 border border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all">
+                                        {isRTL ? 'تدقيق' : 'AUDIT'}
+                                    </button>
+                                    <button className="px-6 py-3 bg-white/5 border border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-cinematic-neon-red hover:text-white transition-all">
+                                        {isRTL ? 'تجاهل' : 'DISMISS'}
+                                    </button>
                                 </div>
                             </motion.div>
                         ))}

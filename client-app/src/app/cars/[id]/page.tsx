@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
-    ArrowLeft, ArrowRight, Heart, Share2, Phone, MessageCircle,
-    MapPin, Calendar, Gauge, Fuel, Settings, Car, Star,
+    Heart, Share2, Phone, MessageCircle,
+    Gauge, Fuel, Settings, Car,
     ChevronLeft, ChevronRight, Check, X, Plus
 } from 'lucide-react';
 import { api } from '@/lib/api';
@@ -36,14 +36,12 @@ interface CarDetails {
 
 export default function CarDetailsPage() {
     const params = useParams();
-    const router = useRouter();
-    const { t, isRTL, locale } = useLocale();
+    const { isRTL, locale } = useLocale();
     const [car, setCar] = useState<CarDetails | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isFavorite, setIsFavorite] = useState(false);
-    const [showContactModal, setShowContactModal] = useState(false);
 
     useEffect(() => {
         if (params.id) {
@@ -112,7 +110,7 @@ export default function CarDetailsPage() {
     };
 
     const formatPrice = (price: number) => {
-        return new Intl.NumberFormat(locale === 'ar' ? 'ar-SA' : 'en-US', {
+        return new Intl.NumberFormat(locale === 'AR' ? 'ar-SA' : 'en-US', {
             style: 'currency',
             currency: 'SAR',
             minimumFractionDigits: 0,
@@ -141,17 +139,8 @@ export default function CarDetailsPage() {
 
     return (
         <div className={`min-h-screen bg-black text-white ${isRTL ? 'rtl' : 'ltr'}`} dir={isRTL ? 'rtl' : 'ltr'}>
-            <ClientPageHeader />
-
-            {/* Back Button */}
             <div className="max-w-7xl mx-auto px-4 pt-24 pb-4">
-                <button
-                    onClick={() => router.back()}
-                    className="flex items-center gap-2 text-white/60 hover:text-[#c5a059] transition-colors"
-                >
-                    {isRTL ? <ArrowRight className="w-5 h-5" /> : <ArrowLeft className="w-5 h-5" />}
-                    <span>{isRTL ? 'رجوع' : 'Back'}</span>
-                </button>
+                <ClientPageHeader title={isRTL ? 'تفاصيل السيارة' : 'Car Details'} icon={Car} />
             </div>
 
             <main className="max-w-7xl mx-auto px-4 pb-20">
@@ -251,8 +240,8 @@ export default function CarDetailsPage() {
                             <button
                                 onClick={toggleFavorite}
                                 className={`flex items-center gap-2 px-6 py-3 rounded-xl border transition-all ${isFavorite
-                                        ? 'bg-red-500 border-red-500 text-white'
-                                        : 'border-white/20 hover:border-[#c5a059] hover:text-[#c5a059]'
+                                    ? 'bg-red-500 border-red-500 text-white'
+                                    : 'border-white/20 hover:border-[#c5a059] hover:text-[#c5a059]'
                                     }`}
                             >
                                 <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />

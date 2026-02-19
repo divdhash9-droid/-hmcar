@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { AnimatePresence, motion } from "framer-motion";
 import CinematicBackButton from "@/components/ui/CinematicBackButton";
 
 interface ClientLayoutWrapperProps {
@@ -15,21 +16,28 @@ export default function ClientLayoutWrapper({ children }: ClientLayoutWrapperPro
     // - Login/Register pages if we want them clean (optional, but requested 'all client pages')
     // - Admin pages (they have their own navigation usually, but let's stick to client request "all client pages")
 
-    // Let's hide it on home page only as that's the entry point
-    const showBackButton = pathname !== "/";
+    // Disable floating back button
+    const showBackButton = false;
 
     return (
         <div className="relative min-h-screen flex flex-col">
             {/* Floating Back Button Container */}
-            {showBackButton && (
-                <div className="fixed top-24 right-4 z-40 md:top-28 md:right-8 animate-fade-in print:hidden">
-                    <CinematicBackButton />
-                </div>
-            )}
+            {showBackButton && null}
 
-            {/* Main Content */}
+            {/* Main Content with Cinematic Transition */}
             <main className="flex-grow">
-                {children}
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={pathname}
+                        initial={{ opacity: 0, filter: "blur(10px)" }}
+                        animate={{ opacity: 1, filter: "blur(0px)" }}
+                        exit={{ opacity: 0, filter: "blur(5px)" }}
+                        transition={{ duration: 0.4, ease: "easeOut" }}
+                        className="min-h-screen"
+                    >
+                        {children}
+                    </motion.div>
+                </AnimatePresence>
             </main>
         </div>
     );

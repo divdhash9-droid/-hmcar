@@ -9,6 +9,8 @@ import { useLanguage } from "@/lib/LanguageContext";
 import Link from "next/link";
 import ClientPageHeader from "@/components/ClientPageHeader";
 import { api } from "@/lib/api";
+import { useAuth } from "@/lib/AuthContext";
+import { useRouter } from "next/navigation";
 
 interface FavoriteItem {
     id: string;
@@ -27,13 +29,21 @@ interface FavoriteItem {
 
 export default function FavoritesPage() {
     const { t, isRTL } = useLanguage();
+    const { isLoggedIn } = useAuth();
+    const router = useRouter();
     const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
     useEffect(() => {
+        if (!isLoggedIn) {
+            setLoading(false);
+            setFavorites([]);
+            setError(isRTL ? 'يرجى تسجيل الدخول للوصول إلى المفضلة' : 'Please log in to access Favorites');
+            return;
+        }
         loadFavorites();
-    }, []);
+    }, [isLoggedIn]);
 
     const loadFavorites = async () => {
         try {
@@ -44,7 +54,12 @@ export default function FavoritesPage() {
                 setFavorites(response.data);
             }
         } catch (err: any) {
-            setError(err.message || (isRTL ? 'فشل في تحميل المفضلات' : 'Failed to load favorites'));
+            const msg = String(err?.message || '');
+            if (msg.includes('401')) {
+                setError(isRTL ? 'يرجى تسجيل الدخول للوصول إلى المفضلة' : 'Please log in to access Favorites');
+            } else {
+                setError(isRTL ? 'فشل في تحميل المفضلة، حاول مرة أخرى' : 'Failed to load favorites, please try again');
+            }
         } finally {
             setLoading(false);
         }
@@ -119,9 +134,15 @@ export default function FavoritesPage() {
                     <div className="flex items-center gap-3 p-4 bg-red-500/20 text-red-400 rounded-xl mb-8">
                         <AlertCircle className="w-5 h-5" />
                         <span>{error}</span>
-                        <button onClick={loadFavorites} className="ml-auto underline">
-                            {isRTL ? 'إعادة المحاولة' : 'Retry'}
-                        </button>
+                        {!isLoggedIn ? (
+                            <Link href="/login" className="ml-auto underline">
+                                {isRTL ? 'تسجيل الدخول' : 'Log in'}
+                            </Link>
+                        ) : (
+                            <button onClick={loadFavorites} className="ml-auto underline">
+                                {isRTL ? 'إعادة المحاولة' : 'Retry'}
+                            </button>
+                        )}
                     </div>
                 )}
 

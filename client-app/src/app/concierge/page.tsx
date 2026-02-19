@@ -2,10 +2,11 @@
 
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { Send, Upload, Car, Settings, CheckCircle, Shield, Briefcase, User, Phone, FileText } from "lucide-react";
+import { Send, Car, Settings, CheckCircle, Shield, Briefcase, User, Phone, FileText } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { useLanguage } from "@/lib/LanguageContext";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 import ClientPageHeader from "@/components/ClientPageHeader";
 
 export default function ConciergePage() {
@@ -22,164 +23,208 @@ export default function ConciergePage() {
     };
 
     return (
-        <div className="relative min-h-screen bg-[#020202] text-white selection:bg-luxury-gold selection:text-black perspective-1000 overflow-x-hidden">
+        <div className={`relative min-h-screen bg-black text-white overflow-x-hidden ${isRTL ? 'font-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
             <Navbar />
 
-            {/* Background Atmosphere */}
-            <div className="bg-grid-overlay opacity-20 fixed inset-0 z-0" />
-            <div className="fixed inset-0 pointer-events-none z-0">
-                <div className="absolute top-0 right-0 w-[50vh] h-[50vh] bg-luxury-gold/5 blur-[120px] rounded-full animate-pulse" />
-                <div className="absolute bottom-0 left-0 w-[60vh] h-[60vh] bg-cinematic-neon-blue/5 blur-[120px] rounded-full animate-pulse delay-1000" />
-                <div className="absolute inset-0 scan-lines opacity-10" />
+            <div className="pt-24 px-6 max-w-7xl mx-auto">
+                <ClientPageHeader
+                    title={isRTL ? "خدمة الكونسيرج" : "CONCIERGE SERVICE"}
+                    subtitle={isRTL ? "خدمة النخبة" : "ELITE SERVICE"}
+                    icon={Briefcase}
+                />
             </div>
 
-            <main className="relative z-10 pt-40 pb-24 px-6 max-w-7xl mx-auto">
+            {/* ── VIDEO HERO ── */}
+            <div className="relative h-[40vh] md:h-[45vh] overflow-hidden mt-8 rounded-3xl mx-6 border border-white/5">
+                <video
+                    autoPlay loop muted playsInline
+                    className="absolute inset-0 w-full h-full object-cover"
+                    style={{ filter: 'brightness(0.3) contrast(1.2) saturate(1.1)' }}
+                >
+                    <source src="/videos/hero.mp4" type="video/mp4" />
+                </video>
+                <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black" />
+                <div className="video-grain" />
 
-                <div className="flex flex-col md:flex-row items-end justify-between mb-16 gap-8">
-                    <ClientPageHeader
-                        title={isRTL ? "الكونسيرج" : "CONCIERGE"}
-                        subtitle={isRTL ? "خدمة الطلبات الخاصة" : "ELITE REQUEST SERVICE"}
-                        icon={Briefcase}
-                    />
-
-                    {/* Trust Indicators */}
-                    <div className="flex gap-6 text-[10px] font-black uppercase tracking-widest text-white/40">
-                        <div className="flex items-center gap-2"><Shield className="w-4 h-4 text-luxury-gold" /> Secure System</div>
-                        <div className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-500" /> Verified Dealers</div>
+                <div className="absolute inset-0 flex items-end z-10">
+                    <div className="max-w-7xl mx-auto w-full px-6 pb-16">
+                        <motion.div
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="flex flex-col md:flex-row items-start md:items-end justify-between gap-8"
+                        >
+                            <div>
+                                <span className="text-[9px] font-bold uppercase tracking-[0.5em] text-accent-gold/60 block mb-3">
+                                    {isRTL ? "خدمة النخبة" : "ELITE SERVICE"}
+                                </span>
+                                <h1 className="text-4xl md:text-5xl font-black tracking-[-0.04em] uppercase">
+                                    {isRTL ? "الكونسيرج" : "CONCIERGE"}
+                                </h1>
+                            </div>
+                        </motion.div>
                     </div>
                 </div>
+            </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-                    {/* Info Panel */}
-                    <div className="lg:col-span-5 space-y-12">
-                        <div className="relative group perspective-1000">
-                            <div className="absolute inset-0 bg-gradient-to-br from-luxury-gold/20 to-transparent blur-xl opacity-20 group-hover:opacity-40 transition-opacity" />
-                            <div className="relative p-10 bg-white/5 border border-white/10 rounded-[2.5rem] backdrop-blur-xl transform-style-3d group-hover:rotate-x-2 transition-transform duration-700">
-                                <h3 className="text-3xl font-black italic mb-6">Create Your Legacy.</h3>
-                                <p className="text-white/60 leading-relaxed mb-8">
+            {/* ── AMBIENT ── */}
+            <div className="fixed inset-0 pointer-events-none z-0">
+                <div className="bg-grid-overlay opacity-8" />
+                <div className="orb orb-gold w-[500px] h-[500px] top-[-200px] right-[-100px] animate-breathe opacity-20" />
+                <div className="orb orb-blue w-[400px] h-[400px] bottom-[-100px] left-[-100px] animate-breathe delay-1000 opacity-15" />
+            </div>
+
+            <main className="relative z-10 pt-12 pb-24 px-6 max-w-7xl mx-auto">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+
+                    {/* ── INFO PANEL ── */}
+                    <div className="lg:col-span-5 space-y-8">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                        >
+                            <div className="glass-card p-8 space-y-6">
+                                <h3 className="text-2xl font-black tracking-tight">
+                                    {isRTL ? "اصنع إرثك." : "Create Your Legacy."}
+                                </h3>
+                                <p className="text-sm text-white/45 leading-relaxed">
                                     {isRTL
                                         ? "سواء كنت تبحث عن سيارة أحلامك النادرة أو قطع غيار حصرية، فريقنا المتخصص سيتولى المهمة بدقة واحترافية."
                                         : "Whether sourcing a rare hypercar or exclusive components, our specialized team executes with precision and discretion."}
                                 </p>
-                                <div className="space-y-6">
+                                <div className="space-y-4 pt-4">
                                     {[
-                                        { icon: Car, title: 'Vehicle Sourcing', desc: 'Global network access' },
-                                        { icon: Settings, title: 'Parts Acquisition', desc: 'OEM & Aftermarket elite parts' },
-                                        { icon: Shield, title: 'Verified Inspection', desc: 'Comprehensive quality checks' }
+                                        { icon: Car, title: isRTL ? 'توريد السيارات' : 'Vehicle Sourcing', desc: isRTL ? 'شبكة عالمية' : 'Global network access' },
+                                        { icon: Settings, title: isRTL ? 'قطع الغيار' : 'Parts Acquisition', desc: isRTL ? 'أصلية ومعدّلة' : 'OEM & Aftermarket elite' },
+                                        { icon: Shield, title: isRTL ? 'فحص معتمد' : 'Verified Inspection', desc: isRTL ? 'فحص شامل' : 'Comprehensive checks' },
                                     ].map((item, i) => (
-                                        <div key={i} className="flex items-center gap-4 p-4 bg-black/20 rounded-2xl border border-white/5">
-                                            <div className="w-12 h-12 bg-luxury-gold/10 rounded-xl flex items-center justify-center text-luxury-gold">
-                                                <item.icon className="w-5 h-5" />
+                                        <div key={i} className="flex items-center gap-4 p-4 bg-white/[0.02] rounded-xl border border-white/5 hover:border-accent-gold/15 transition-all">
+                                            <div className="w-10 h-10 bg-accent-gold/10 rounded-lg flex items-center justify-center text-accent-gold shrink-0 border border-accent-gold/10">
+                                                <item.icon className="w-4 h-4" />
                                             </div>
                                             <div>
-                                                <h4 className="text-sm font-bold uppercase tracking-wider">{item.title}</h4>
-                                                <p className="text-[10px] text-white/40 uppercase tracking-widest">{item.desc}</p>
+                                                <h4 className="text-sm font-bold uppercase tracking-tight">{item.title}</h4>
+                                                <p className="text-[10px] text-white/35 uppercase tracking-wider">{item.desc}</p>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
                             </div>
-                        </div>
+                        </motion.div>
                     </div>
 
-                    {/* Form Panel */}
+                    {/* ── FORM PANEL ── */}
                     <div className="lg:col-span-7">
-                        <div className="obsidian-card p-10 md:p-14 relative overflow-hidden">
-                            {/* Tabs */}
-                            <div className="flex mb-12 p-1.5 bg-black/40 rounded-2xl border border-white/5 relative z-10 w-fit mx-auto lg:mx-0">
-                                {[
-                                    { id: 'car', icon: Car, label: isRTL ? 'طلب سيارة' : 'VEHICLE REQUEST' },
-                                    { id: 'parts', icon: Settings, label: isRTL ? 'قطع غيار' : 'PARTS REQUEST' },
-                                ].map((tab) => (
-                                    <button
-                                        key={tab.id}
-                                        onClick={() => setActiveTab(tab.id as any)}
-                                        className={cn(
-                                            "flex items-center gap-3 px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300",
-                                            activeTab === tab.id
-                                                ? "bg-luxury-gold text-black shadow-[0_0_20px_rgba(197,160,89,0.3)]"
-                                                : "text-white/40 hover:text-white"
-                                        )}
-                                    >
-                                        <tab.icon className="w-4 h-4" />
-                                        {tab.label}
-                                    </button>
-                                ))}
-                            </div>
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.3 }}
+                        >
+                            <div className="obsidian-card p-8 md:p-10">
+                                {/* Tabs */}
+                                <div className="flex mb-10 p-1.5 bg-white/[0.03] rounded-xl border border-white/5 w-fit">
+                                    {[
+                                        { id: 'car', icon: Car, label: isRTL ? 'طلب سيارة' : 'VEHICLE' },
+                                        { id: 'parts', icon: Settings, label: isRTL ? 'قطع غيار' : 'PARTS' },
+                                    ].map((tab) => (
+                                        <button
+                                            key={tab.id}
+                                            onClick={() => setActiveTab(tab.id as any)}
+                                            className={cn(
+                                                "flex items-center gap-2.5 px-7 py-3 rounded-lg text-[10px] font-bold uppercase tracking-[0.15em] transition-all duration-300",
+                                                activeTab === tab.id
+                                                    ? "bg-accent-gold text-black shadow-[0_0_15px_var(--accent-gold-glow)]"
+                                                    : "text-white/30 hover:text-white/50"
+                                            )}
+                                        >
+                                            <tab.icon className="w-3.5 h-3.5" />
+                                            {tab.label}
+                                        </button>
+                                    ))}
+                                </div>
 
-                            <form onSubmit={handleSubmit} className="space-y-8 relative z-10">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                    <div className="space-y-2">
-                                        <label className="text-[9px] font-black uppercase tracking-widest text-white/40 ml-2">Full Name</label>
-                                        <div className="relative group">
-                                            <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-hover:text-luxury-gold transition-colors" />
+                                <form onSubmit={handleSubmit} className="space-y-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                        <div className="space-y-2">
+                                            <label className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/25 px-1">
+                                                {isRTL ? "الاسم الكامل" : "FULL NAME"}
+                                            </label>
+                                            <div className="relative group">
+                                                <User className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/10 group-focus-within:text-white/30 transition-colors", isRTL ? "right-4" : "left-4")} />
+                                                <input
+                                                    type="text" required
+                                                    onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                                    className={cn("glass-input", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
+                                                    placeholder={isRTL ? "أدخل اسمك" : "Enter your name"}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/25 px-1">
+                                                {isRTL ? "الهاتف" : "PHONE"}
+                                            </label>
+                                            <div className="relative group">
+                                                <Phone className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/10 group-focus-within:text-white/30 transition-colors", isRTL ? "right-4" : "left-4")} />
+                                                <input
+                                                    type="tel" required
+                                                    onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                                                    className={cn("glass-input", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
+                                                    placeholder="+966 ..."
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                        <div className="space-y-2">
+                                            <label className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/25 px-1">
+                                                {isRTL ? "الماركة" : "BRAND / MAKE"}
+                                            </label>
                                             <input
                                                 type="text"
-                                                required
-                                                onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-sm font-bold text-white focus:outline-none focus:border-luxury-gold/50 transition-all placeholder:text-white/10"
-                                                placeholder="ENTER NAME"
+                                                onChange={e => setFormData({ ...formData, brand: e.target.value })}
+                                                className="glass-input"
+                                                placeholder={isRTL ? "مثال: مرسيدس" : "e.g. MERCEDES"}
                                             />
                                         </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[9px] font-black uppercase tracking-widest text-white/40 ml-2">Phone</label>
-                                        <div className="relative group">
-                                            <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-hover:text-luxury-gold transition-colors" />
+                                        <div className="space-y-2">
+                                            <label className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/25 px-1">
+                                                {isRTL ? "الموديل / السنة" : "MODEL / YEAR"}
+                                            </label>
                                             <input
-                                                type="tel"
-                                                required
-                                                onChange={e => setFormData({ ...formData, phone: e.target.value })}
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-sm font-bold text-white focus:outline-none focus:border-luxury-gold/50 transition-all placeholder:text-white/10"
-                                                placeholder="+966 ..."
+                                                type="text"
+                                                onChange={e => setFormData({ ...formData, model: e.target.value })}
+                                                className="glass-input"
+                                                placeholder={isRTL ? "مثال: S-CLASS 2024" : "e.g. S-CLASS 2024"}
                                             />
                                         </div>
                                     </div>
-                                </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                     <div className="space-y-2">
-                                        <label className="text-[9px] font-black uppercase tracking-widest text-white/40 ml-2">Brand / Make</label>
-                                        <input
-                                            type="text"
-                                            onChange={e => setFormData({ ...formData, brand: e.target.value })}
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-6 text-sm font-bold text-white focus:outline-none focus:border-luxury-gold/50 transition-all placeholder:text-white/10"
-                                            placeholder="e.g. MERCEDES"
-                                        />
+                                        <label className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/25 px-1">
+                                            {isRTL ? "تفاصيل إضافية" : "SPECIFICATIONS"}
+                                        </label>
+                                        <div className="relative group">
+                                            <FileText className={cn("absolute top-5 w-4 h-4 text-white/10 group-focus-within:text-white/30 transition-colors", isRTL ? "right-4" : "left-4")} />
+                                            <textarea
+                                                rows={4}
+                                                onChange={e => setFormData({ ...formData, details: e.target.value })}
+                                                className={cn("glass-input resize-none", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
+                                                placeholder={isRTL ? 'صف المواصفات المطلوبة...' : 'Describe specific features, colors, part numbers...'}
+                                            />
+                                        </div>
                                     </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[9px] font-black uppercase tracking-widest text-white/40 ml-2">Model / Year</label>
-                                        <input
-                                            type="text"
-                                            onChange={e => setFormData({ ...formData, model: e.target.value })}
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-6 text-sm font-bold text-white focus:outline-none focus:border-luxury-gold/50 transition-all placeholder:text-white/10"
-                                            placeholder="e.g. S-CLASS 2024"
-                                        />
-                                    </div>
-                                </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-[9px] font-black uppercase tracking-widest text-white/40 ml-2">Additional Specifications</label>
-                                    <div className="relative group">
-                                        <FileText className="absolute left-4 top-6 w-4 h-4 text-white/20 group-hover:text-luxury-gold transition-colors" />
-                                        <textarea
-                                            rows={4}
-                                            onChange={e => setFormData({ ...formData, details: e.target.value })}
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-sm font-bold text-white focus:outline-none focus:border-luxury-gold/50 transition-all placeholder:text-white/10 resize-none"
-                                            placeholder="Describe specific features, colors, part numbers..."
-                                        />
-                                    </div>
-                                </div>
-
-                                <button
-                                    type="submit"
-                                    className="w-full py-6 bg-white text-black rounded-xl font-black uppercase tracking-[0.3em] hover:bg-luxury-gold transition-all shadow-lg flex items-center justify-center gap-4 group mt-8"
-                                >
-                                    <span>{isRTL ? 'إرسال الطلب' : 'INITIATE REQUEST'}</span>
-                                    <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                                </button>
-                            </form>
-                        </div>
+                                    <button
+                                        type="submit"
+                                        className="w-full btn-luxury py-5 rounded-xl group mt-4"
+                                    >
+                                        <span>{isRTL ? 'إرسال الطلب' : 'SUBMIT REQUEST'}</span>
+                                        <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                    </button>
+                                </form>
+                            </div>
+                        </motion.div>
                     </div>
                 </div>
             </main>

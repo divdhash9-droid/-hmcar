@@ -144,11 +144,7 @@ export default function AdminCarsPage() {
             <main className="relative z-10 pt-32 pb-24 px-6 max-w-7xl mx-auto">
 
                 <header className="mb-16">
-                    {/* Back Button */}
-                    <Link href="/admin/dashboard" className="inline-flex items-center gap-2 mb-6 text-white/40 hover:text-white transition-colors group">
-                        <ChevronLeft className={cn("w-4 h-4 transition-transform group-hover:-translate-x-1", isRTL && "rotate-180 group-hover:translate-x-1")} />
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em]">{isRTL ? 'العودة للرئيسية' : 'BACK TO DASHBOARD'}</span>
-                    </Link>
+                    
 
                     <div className="flex items-center gap-4 mb-6">
                         <div className="h-[2px] w-12 bg-cinematic-neon-blue shadow-[0_0_10px_rgba(0,240,255,1)]" />
@@ -167,7 +163,7 @@ export default function AdminCarsPage() {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => { resetForm(); setShowModal(true); }}
-                            className="px-8 py-4 bg-cinematic-neon-blue text-black rounded-xl text-[11px] font-black uppercase tracking-[0.3em] shadow-[0_0_30px_rgba(0,240,255,0.3)] flex items-center gap-3"
+                            className="btn-glow px-8 py-4 bg-cinematic-neon-blue text-black rounded-xl text-[11px] font-black uppercase tracking-[0.3em] shadow-[0_0_30px_rgba(0,240,255,0.3)] flex items-center gap-3"
                         >
                             <Plus className="w-5 h-5" />
                             {isRTL ? 'إضافة سيارة' : 'ADD CAR'}
@@ -193,13 +189,17 @@ export default function AdminCarsPage() {
                                 key={status}
                                 onClick={() => setFilter(status)}
                                 className={cn(
-                                    "px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-[0.3em] transition-all",
+                                    "px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-[0.3em] transition-colors select-none",
                                     filter === status
-                                        ? "bg-cinematic-neon-blue text-black shadow-[0_0_20px_rgba(0,240,255,0.3)]"
-                                        : "bg-white/[0.02] text-white/60 hover:bg-white/[0.05] border border-white/5"
+                                        ? "relative bg-cinematic-neon-blue text-white shadow-[0_0_35px_rgba(0,240,255,0.45)] ring-2 ring-cinematic-neon-blue after:content-[''] after:absolute after:-inset-1 after:rounded-xl after:bg-cinematic-neon-blue/25 after:blur-md after:-z-10"
+                                        : "bg-white/[0.14] text-white hover:bg-white/[0.18] ring-1 ring-white/10"
                                 )}
+                                aria-pressed={filter === status}
                             >
-                                {status}
+                                <span className="inline-flex items-center gap-2 justify-center">
+                                    {filter === status && <span className="w-2 h-2 rounded-full bg-white" />}
+                                    <span>{isRTL ? (status === 'active' ? 'نشط' : status === 'sold' ? 'مباع' : status === 'inactive' ? 'غير نشط' : 'الكل') : status}</span>
+                                </span>
                             </button>
                         ))}
                     </div>
@@ -256,14 +256,14 @@ export default function AdminCarsPage() {
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
                                             onClick={() => handleEdit(car)}
-                                            className="py-2 bg-cinematic-neon-blue/10 border border-cinematic-neon-blue/30 text-cinematic-neon-blue rounded-lg text-[10px] font-black uppercase flex items-center justify-center gap-1"
+                                            className="btn-glow py-2 bg-cinematic-neon-blue/10 border border-cinematic-neon-blue/30 text-cinematic-neon-blue rounded-lg text-[10px] font-black uppercase flex items-center justify-center gap-1"
                                         >
                                             <Edit className="w-3 h-3" />
                                         </motion.button>
                                         <motion.button
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
-                                            className="py-2 bg-white/5 border border-white/10 text-white/60 rounded-lg text-[10px] font-black uppercase flex items-center justify-center gap-1"
+                                            className="btn-glow py-2 bg-white/5 border border-white/10 text-white/80 rounded-lg text-[10px] font-black uppercase flex items-center justify-center gap-1"
                                         >
                                             <Eye className="w-3 h-3" />
                                         </motion.button>
@@ -271,7 +271,7 @@ export default function AdminCarsPage() {
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
                                             onClick={() => handleDelete(car.id)}
-                                            className="py-2 bg-cinematic-neon-red/10 border border-cinematic-neon-red/30 text-cinematic-neon-red rounded-lg text-[10px] font-black uppercase flex items-center justify-center gap-1"
+                                            className="btn-glow py-2 bg-cinematic-neon-red/10 border border-cinematic-neon-red/30 text-cinematic-neon-red rounded-lg text-[10px] font-black uppercase flex items-center justify-center gap-1"
                                         >
                                             <Trash2 className="w-3 h-3" />
                                         </motion.button>
@@ -367,15 +367,24 @@ export default function AdminCarsPage() {
                                     </div>
                                     <div>
                                         <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/60 mb-2">
-                                            {isRTL ? 'الصانع' : 'MAKE'}
+                                            {isRTL ? 'الماركة' : 'BRAND'}
                                         </label>
-                                        <input
-                                            type="text"
-                                            required
+                                        <select
                                             value={formData.make}
                                             onChange={(e) => setFormData({ ...formData, make: e.target.value })}
                                             className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 px-4 text-sm font-bold text-white focus:outline-none focus:border-cinematic-neon-blue/40"
-                                        />
+                                        >
+                                            {(() => {
+                                                let list: any[] = [];
+                                                try {
+                                                    // Prefer API brands
+                                                    // Note: synchronous render cannot await; fallback to localStorage if present
+                                                    list = JSON.parse(localStorage.getItem('hm_brands_cache') || '[]');
+                                                } catch {}
+                                                const carBrands = list.filter((b: any) => b.category === 'cars' || b.category === 'both');
+                                                return carBrands.length ? carBrands.map((b: any) => <option key={b.id} value={b.name}>{b.name}</option>) : [<option key="manual" value={formData.make || ''}>{formData.make || (isRTL ? 'اكتب الماركة' : 'Type brand')}</option>];
+                                            })()}
+                                        </select>
                                     </div>
                                     <div>
                                         <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/60 mb-2">

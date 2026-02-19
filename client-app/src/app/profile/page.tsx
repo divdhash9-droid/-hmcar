@@ -21,6 +21,7 @@ import { useLanguage } from "@/lib/LanguageContext";
 import { api } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import ClientPageHeader from "@/components/ClientPageHeader";
 
 export default function ProfilePage() {
     const { t, isRTL } = useLanguage();
@@ -126,17 +127,12 @@ export default function ProfilePage() {
 
 
                 {/* Header */}
-                <header className="mb-16">
-                    <div className="flex items-center gap-4 mb-6">
-                        <div className="h-[2px] w-12 bg-cinematic-neon-blue shadow-[0_0_10px_rgba(0,240,255,1)]" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.5em] text-cinematic-neon-blue italic">User Profile</span>
-                    </div>
-                    <h1 className="text-5xl md:text-7xl font-black tracking-tighter uppercase italic leading-[0.9] mb-4">
-                        {isRTL ? 'الملف' : 'PROFILE'} <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/20">{isRTL ? 'الشخصي' : 'SETTINGS'}</span>
-                    </h1>
-                    <p className="text-[11px] text-white/40 uppercase tracking-[0.3em] font-bold max-w-2xl leading-relaxed">
-                        {isRTL ? 'إدارة معلوماتك الشخصية وإعدادات الحساب' : 'MANAGE YOUR PERSONAL INFORMATION AND ACCOUNT SETTINGS'}
-                    </p>
+                <header className="mb-12">
+                    <ClientPageHeader
+                        title={isRTL ? 'الملف الشخصي' : 'PROFILE SETTINGS'}
+                        subtitle={isRTL ? 'إدارة معلوماتك الشخصية وإعدادات الحساب' : 'MANAGE YOUR PERSONAL INFORMATION AND ACCOUNT SETTINGS'}
+                        icon={User}
+                    />
                 </header>
 
                 {/* Message */}
@@ -155,7 +151,8 @@ export default function ProfilePage() {
                     {/* Sidebar */}
                     <div className="space-y-6">
                         {/* Profile Card */}
-                        <div className="glass-card p-8 bg-white/[0.01] border-white/5 text-center space-y-6">
+                        <div className="glass-card p-8 bg-white/[0.01] border-white/5 text-center space-y-6 relative overflow-hidden group">
+                            <div className="absolute inset-0 bg-luxury-gold/5 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                             <div className="w-24 h-24 mx-auto rounded-full bg-cinematic-neon-blue/10 border-2 border-cinematic-neon-blue/30 flex items-center justify-center shadow-[0_0_30px_rgba(0,240,255,0.2)]">
                                 <User className="w-12 h-12 text-cinematic-neon-blue" />
                             </div>
@@ -165,24 +162,8 @@ export default function ProfilePage() {
                             </div>
                         </div>
 
-                        {/* Quick Links */}
-                        <div className="glass-card p-6 bg-white/[0.01] border-white/5 space-y-3">
-                            <button className="w-full flex items-center gap-4 p-4 bg-white/[0.02] hover:bg-white/[0.05] rounded-xl transition-all text-left">
-                                <Bell className="w-5 h-5 text-cinematic-neon-yellow" />
-                                <span className="text-sm font-bold uppercase tracking-wide">{isRTL ? 'الإشعارات' : 'Notifications'}</span>
-                            </button>
-                            <button className="w-full flex items-center gap-4 p-4 bg-white/[0.02] hover:bg-white/[0.05] rounded-xl transition-all text-left">
-                                <CreditCard className="w-5 h-5 text-white/60" />
-                                <span className="text-sm font-bold uppercase tracking-wide">{isRTL ? 'طرق الدفع' : 'Payment Methods'}</span>
-                            </button>
-                            <button
-                                onClick={handleLogout}
-                                className="w-full flex items-center gap-4 p-4 bg-cinematic-neon-red/10 hover:bg-cinematic-neon-red/20 rounded-xl transition-all text-left border border-cinematic-neon-red/20"
-                            >
-                                <LogOut className="w-5 h-5 text-cinematic-neon-red" />
-                                <span className="text-sm font-bold uppercase tracking-wide text-cinematic-neon-red">{isRTL ? 'تسجيل الخروج' : 'Logout'}</span>
-                            </button>
-                        </div>
+                        {/* Quick Links (hidden for now) */}
+                        <div className="hidden" />
                     </div>
 
                     {/* Main Content */}

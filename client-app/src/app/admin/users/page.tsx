@@ -46,54 +46,27 @@ export default function AdminUsersPage() {
     const loadUsers = async () => {
         try {
             setLoading(true);
-            // مؤقتاً: بيانات تجريبية
-            const mockUsers = [
-                {
-                    id: '1',
-                    name: 'Ahmed Al-Rashid',
-                    email: 'ahmed@example.com',
-                    phone: '+966501234567',
-                    role: 'buyer',
-                    isActive: true,
-                    createdAt: new Date().toISOString(),
-                    ordersCount: 5,
-                    totalSpent: 1200000
-                },
-                {
-                    id: '2',
-                    name: 'Mohammed Al-Saud',
-                    email: 'mohammed@example.com',
-                    phone: '+966507654321',
-                    role: 'seller',
-                    isActive: true,
-                    createdAt: new Date(Date.now() - 86400000 * 30).toISOString(),
-                    ordersCount: 0,
-                    totalSpent: 0
-                },
-                {
-                    id: '3',
-                    name: 'Admin User',
-                    email: 'admin@local.test',
-                    phone: '+966500000000',
-                    role: 'admin',
-                    isActive: true,
-                    createdAt: new Date(Date.now() - 86400000 * 90).toISOString(),
-                    ordersCount: 0,
-                    totalSpent: 0
-                },
-            ];
-
-            const filtered = filter === 'all'
-                ? mockUsers
-                : mockUsers.filter(u => u.role === filter);
-
-            setUsers(filtered);
+            const params: any = {};
+            if (filter !== 'all') params.role = filter;
+            if (searchTerm) params.search = searchTerm;
+            params.limit = 50;
+            const res = await api.users.list(params);
+            const list = Array.isArray(res?.data) ? res.data : [];
+            setUsers(list.map((u: any) => ({
+                id: u._id || u.id,
+                name: u.name,
+                email: u.email,
+                phone: u.phone,
+                role: u.role,
+                isActive: (u.status || 'active') === 'active',
+                createdAt: u.createdAt
+            })));
             setStats({
-                total: mockUsers.length,
-                buyers: mockUsers.filter(u => u.role === 'buyer').length,
-                sellers: mockUsers.filter(u => u.role === 'seller').length,
-                admins: mockUsers.filter(u => u.role === 'admin').length,
-                active: mockUsers.filter(u => u.isActive).length,
+                total: res?.pagination?.total || list.length,
+                buyers: list.filter((u: any) => u.role === 'buyer').length,
+                sellers: list.filter((u: any) => u.role === 'seller').length,
+                admins: list.filter((u: any) => u.role === 'admin' || u.role === 'super_admin').length,
+                active: list.filter((u: any) => (u.status || 'active') === 'active').length,
             });
         } catch (err) {
             console.error('Failed to load users', err);
@@ -180,18 +153,7 @@ export default function AdminUsersPage() {
 
                 {/* ... existing code ... */}
 
-                {/* Add User Button - Floating or Header */}
-                <div className="absolute top-32 right-6 z-20">
-                    <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => setShowAddModal(true)}
-                        className="px-6 py-3 bg-cinematic-neon-blue text-black font-black uppercase text-[10px] tracking-widest rounded-xl shadow-[0_0_20px_rgba(0,240,255,0.3)] hover:bg-white transition-all flex items-center gap-2"
-                    >
-                        <Users className="w-4 h-4" />
-                        {isRTL ? 'إضافة مستخدم / مسؤول' : 'ADD USER / ADMIN'}
-                    </motion.button>
-                </div>
+                {/* Add User button removed per request */}
 
                 {/* Users Table (Updated with Click Handler) */}
                 <div className="glass-card bg-white/[0.01] border-white/5 overflow-hidden">
@@ -199,10 +161,10 @@ export default function AdminUsersPage() {
                     <table className="w-full">
                         <thead>
                             <tr className="border-b border-white/5">
-                                <th className="text-left p-6 text-[10px] font-black uppercase tracking-[0.3em] text-white/60">USER</th>
-                                <th className="text-left p-6 text-[10px] font-black uppercase tracking-[0.3em] text-white/60">ROLE</th>
-                                <th className="text-left p-6 text-[10px] font-black uppercase tracking-[0.3em] text-white/60">STATUS</th>
-                                <th className="text-left p-6 text-[10px] font-black uppercase tracking-[0.3em] text-white/60">ACTIONS</th>
+                                <th className="text-left p-6 text-[10px] font-black uppercase tracking-[0.3em] text-white/60">{isRTL ? 'المستخدم' : 'USER'}</th>
+                                <th className="text-left p-6 text-[10px] font-black uppercase tracking-[0.3em] text-white/60">{isRTL ? 'الدور' : 'ROLE'}</th>
+                                <th className="text-left p-6 text-[10px] font-black uppercase tracking-[0.3em] text-white/60">{isRTL ? 'الحالة' : 'STATUS'}</th>
+                                <th className="text-left p-6 text-[10px] font-black uppercase tracking-[0.3em] text-white/60">{isRTL ? 'الإجراءات' : 'ACTIONS'}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -232,17 +194,17 @@ export default function AdminUsersPage() {
                                                 user.role === 'seller' ? "bg-cinematic-neon-yellow/10 border-cinematic-neon-yellow/30 text-cinematic-neon-yellow" :
                                                     "bg-cinematic-neon-blue/10 border-cinematic-neon-blue/30 text-cinematic-neon-blue"
                                         )}>
-                                            {user.role}
+                                            {isRTL ? (user.role === 'admin' ? 'مسؤول' : user.role === 'seller' ? 'بائع' : 'مشتري') : user.role.toUpperCase()}
                                         </span>
                                     </td>
                                     <td className="p-6">
                                         <span className={cn("text-[9px] font-black uppercase tracking-widest", user.isActive ? "text-green-400" : "text-red-400")}>
-                                            {user.isActive ? "ACTIVE" : "INACTIVE"}
+                                            {isRTL ? (user.isActive ? "نشط" : "غير نشط") : (user.isActive ? "ACTIVE" : "INACTIVE")}
                                         </span>
                                     </td>
                                     <td className="p-6">
                                         <button className="text-[9px] font-black uppercase tracking-widest text-white/40 hover:text-white border border-white/10 px-4 py-2 rounded hover:bg-white/5 transition-all">
-                                            MANAGE
+                                            {isRTL ? 'إدارة' : 'MANAGE'}
                                         </button>
                                     </td>
                                 </motion.tr>
@@ -253,9 +215,9 @@ export default function AdminUsersPage() {
 
                 {/* MODALS */}
                 <AnimatePresence>
-                    {showAddModal && <AddUserModal onClose={() => setShowAddModal(false)} onAdd={(u) => { setUsers([...users, u]); setShowAddModal(false); }} isRTL={isRTL} />}
-                    {selectedUser && <UserDetailModal user={selectedUser} onClose={() => setSelectedUser(null)} onUpdate={(updated) => {
-                        setUsers(users.map(u => u.id === updated.id ? updated : u));
+                    {showAddModal && <AddUserModal onClose={() => setShowAddModal(false)} onAdd={(u: any) => { setUsers([...users, u]); setShowAddModal(false); }} isRTL={isRTL} />}
+                    {selectedUser && <UserDetailModal user={selectedUser} onClose={() => setSelectedUser(null)} onUpdate={(updated: any) => {
+                        setUsers(users.map((u: any) => u.id === updated.id ? updated : u));
                         setSelectedUser(null);
                     }} isRTL={isRTL} />}
                 </AnimatePresence>
@@ -380,7 +342,9 @@ const UserDetailModal = ({ user, onClose, onUpdate, isRTL }: any) => {
                     <div>
                         <h2 className="text-3xl font-black uppercase italic text-white mb-2">{user.name}</h2>
                         <div className="flex gap-3">
-                            <span className="px-2 py-1 bg-white/10 rounded text-[9px] font-bold uppercase tracking-widest">{user.role}</span>
+                            <span className="px-2 py-1 bg-white/10 rounded text-[9px] font-bold uppercase tracking-widest">
+                                {isRTL ? (user.role === 'admin' ? 'مسؤول' : user.role === 'seller' ? 'بائع' : 'مشتري') : user.role}
+                            </span>
                             <span className="text-white/40 text-xs">{user.email}</span>
                         </div>
                     </div>
@@ -394,10 +358,10 @@ const UserDetailModal = ({ user, onClose, onUpdate, isRTL }: any) => {
                         <div className="space-y-4">
                             <div className="flex justify-between items-center">
                                 <h3 className="text-sm font-bold text-cinematic-neon-blue uppercase tracking-widest flex items-center gap-2">
-                                    <Shield className="w-4 h-4" /> Device Security
+                                    <Shield className="w-4 h-4" /> {isRTL ? 'أمان الأجهزة' : 'Device Security'}
                                 </h3>
                                 <div className="flex items-center gap-3">
-                                    <span className="text-[10px] font-bold text-white/40 uppercase">Lock to Bound Devices</span>
+                                    <span className="text-[10px] font-bold text-white/40 uppercase">{isRTL ? 'قفل على الأجهزة المرتبطة' : 'Lock to Bound Devices'}</span>
                                     <div onClick={() => setIsDeviceLocked(!isDeviceLocked)} className={cn("w-10 h-5 rounded-full relative cursor-pointer transition-colors", isDeviceLocked ? "bg-cinematic-neon-blue" : "bg-white/10")}>
                                         <div className={cn("absolute top-1 w-3 h-3 bg-black rounded-full transition-all", isDeviceLocked ? "left-6" : "left-1")} />
                                     </div>
@@ -408,20 +372,20 @@ const UserDetailModal = ({ user, onClose, onUpdate, isRTL }: any) => {
                                 {devices.map((dev: any) => (
                                     <div key={dev.deviceId} className="p-4 border-b border-white/5 last:border-0 flex justify-between items-center hover:bg-white/5 transition-colors">
                                         <div>
-                                            <div className="text-sm font-bold text-white mb-1">{dev.browser} on {dev.os}</div>
-                                            <div className="text-[10px] text-white/40 font-mono">IP: {dev.ip} • Last: {new Date(dev.lastUsedAt).toLocaleDateString()}</div>
+                                            <div className="text-sm font-bold text-white mb-1">{dev.browser} {isRTL ? 'على' : 'on'} {dev.os}</div>
+                                            <div className="text-[10px] text-white/40 font-mono">{isRTL ? 'العنوان IP' : 'IP'}: {dev.ip} • {isRTL ? 'آخر استخدام' : 'Last'}: {new Date(dev.lastUsedAt).toLocaleDateString()}</div>
                                         </div>
                                         <div className="flex items-center gap-4">
                                             <span className={cn("text-[8px] font-black uppercase tracking-widest", dev.isActive ? "text-green-500" : "text-red-500")}>
-                                                {dev.isActive ? "Trusted" : "Blocked"}
+                                                {isRTL ? (dev.isActive ? 'موثوق' : 'محظور') : (dev.isActive ? "Trusted" : "Blocked")}
                                             </span>
                                             <button onClick={() => toggleDevice(dev.deviceId)} className={cn("px-3 py-1 rounded text-[9px] font-bold uppercase tracking-widest transition-all", dev.isActive ? "bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white" : "bg-green-500/10 text-green-500 hover:bg-green-500 hover:text-white")}>
-                                                {dev.isActive ? "Block" : "Unblock"}
+                                                {isRTL ? (dev.isActive ? 'حظر' : 'إلغاء الحظر') : (dev.isActive ? "Block" : "Unblock")}
                                             </button>
                                         </div>
                                     </div>
                                 ))}
-                                {devices.length === 0 && <div className="p-8 text-center text-white/20 text-xs uppercase tracking-widest">No devices bound</div>}
+                                {devices.length === 0 && <div className="p-8 text-center text-white/20 text-xs uppercase tracking-widest">{isRTL ? 'لا توجد أجهزة مربوطة' : 'No devices bound'}</div>}
                             </div>
                         </div>
                     )}
@@ -430,15 +394,24 @@ const UserDetailModal = ({ user, onClose, onUpdate, isRTL }: any) => {
                     {user.role === 'admin' && (
                         <div className="space-y-4">
                             <h3 className="text-sm font-bold text-cinematic-neon-red uppercase tracking-widest flex items-center gap-2">
-                                <Shield className="w-4 h-4" /> Access Control
+                                <Shield className="w-4 h-4" /> {isRTL ? 'صلاحيات الوصول' : 'Access Control'}
                             </h3>
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                                 {['manage_cars', 'manage_auctions', 'manage_users', 'manage_settings', 'manage_concierge', 'view_analytics'].map(perm => (
                                     <div key={perm} onClick={() => togglePermission(perm)}
                                         className={cn("p-4 border rounded-xl cursor-pointer transition-all",
                                             permissions.includes(perm) ? "bg-cinematic-neon-red/10 border-cinematic-neon-red text-white shadow-[0_0_10px_rgba(255,0,60,0.1)]" : "bg-white/5 border-white/5 text-white/40 hover:bg-white/10")}>
-                                        <div className="text-[10px] font-black uppercase tracking-widest mb-1">{perm.split('_')[1]}</div>
-                                        <div className="text-[9px] opacity-60">Full Access</div>
+                                        <div className="text-[10px] font-black uppercase tracking-widest mb-1">
+                                            {isRTL
+                                                ? (perm.includes('cars') ? 'السيارات' :
+                                                   perm.includes('auctions') ? 'المزادات' :
+                                                   perm.includes('users') ? 'المستخدمين' :
+                                                   perm.includes('settings') ? 'الإعدادات' :
+                                                   perm.includes('concierge') ? 'الكونسيرج' :
+                                                   'التحليلات')
+                                                : perm.split('_')[1]}
+                                        </div>
+                                        <div className="text-[9px] opacity-60">{isRTL ? 'وصول كامل' : 'Full Access'}</div>
                                     </div>
                                 ))}
                             </div>
@@ -448,8 +421,12 @@ const UserDetailModal = ({ user, onClose, onUpdate, isRTL }: any) => {
                 </div>
 
                 <div className="p-6 border-t border-white/10 bg-white/[0.02] flex justify-end gap-4">
-                    <button onClick={onClose} className="px-8 py-3 rounded-xl border border-white/10 text-white/60 font-black uppercase tracking-widest hover:bg-white/5">Close</button>
-                    <button onClick={handleSave} className="px-8 py-3 rounded-xl bg-white text-black font-black uppercase tracking-widest hover:bg-cinematic-neon-blue transition-colors">Save Changes</button>
+                    <button onClick={onClose} className="px-8 py-3 rounded-xl border border-white/10 text-white/60 font-black uppercase tracking-widest hover:bg-white/5">
+                        {isRTL ? 'إغلاق' : 'Close'}
+                    </button>
+                    <button onClick={handleSave} className="px-8 py-3 rounded-xl bg-white text-black font-black uppercase tracking-widest hover:bg-cinematic-neon-blue transition-colors">
+                        {isRTL ? 'حفظ التغييرات' : 'Save Changes'}
+                    </button>
                 </div>
             </motion.div>
         </div>

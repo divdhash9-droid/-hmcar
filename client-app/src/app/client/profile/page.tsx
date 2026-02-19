@@ -51,7 +51,6 @@ export default function Profile() {
                         {[
                             { label: isRTL ? "البيانات الشخصية" : "IDENTITY", icon: User, active: true },
                             { label: isRTL ? "الأمان والخصوصية" : "SECURITY", icon: Shield },
-                            { label: isRTL ? "طرق الدفع" : "PAYMENTS", icon: CreditCard },
                             { label: isRTL ? "التنبيهات" : "ALERTS", icon: Bell },
                         ].map((item, i) => (
                             <button

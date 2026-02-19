@@ -15,86 +15,79 @@ export default function LoadingScreen() {
             setProgress(prev => {
                 if (prev >= 100) {
                     clearInterval(timer);
-                    setTimeout(() => setIsVisible(false), 800);
+                    setTimeout(() => setIsVisible(false), 600);
                     return 100;
                 }
-                return prev + Math.floor(Math.random() * 5) + 1;
+                return prev + Math.random() * 15 + 5;
             });
-        }, 50);
+        }, 120);
 
         return () => clearInterval(timer);
     }, []);
 
-    if (!isVisible) return null;
-
     return (
-        <motion.div
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0, filter: "blur(20px)" }}
-            className="fixed inset-0 z-[100] bg-[#020202] flex flex-col items-center justify-center overflow-hidden"
-        >
-            {/* 3D Tunnel Effect */}
-            <div className="absolute inset-0 perspective-1000">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-luxury-gold/5 via-transparent to-transparent opacity-20 animate-pulse" />
-                <div className="absolute inset-0 scan-lines opacity-10" />
-            </div>
+        <AnimatePresence mode="wait">
+            {isVisible && (
+                <motion.div
+                    exit={{ opacity: 0, scale: 1.05 }}
+                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                    className={cn(
+                        "fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black",
+                        isRTL && "font-arabic"
+                    )}
+                >
+                    {/* Film grain */}
+                    <div className="video-grain" />
 
-            <div className="relative z-10 flex flex-col items-center gap-12 max-w-md w-full px-6">
-                {/* Logo Glitch */}
-                <div className="relative group">
-                    <motion.h1
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="text-6xl md:text-8xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-white/50 mix-blend-screen relative z-10"
-                    >
-                        HM <span className="text-luxury-gold gold-glow">CAR</span>
-                    </motion.h1>
-                    <div className="absolute inset-0 text-6xl md:text-8xl font-black italic tracking-tighter text-cinematic-neon-blue opacity-50 blur-[2px] animate-pulse mix-blend-screen translate-x-[2px]">
-                        HM CAR
+                    {/* Background glow */}
+                    <div className="absolute inset-0 pointer-events-none">
+                        <div className="orb orb-gold w-[500px] h-[500px] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-breathe" />
                     </div>
-                    <div className="absolute inset-0 text-6xl md:text-8xl font-black italic tracking-tighter text-cinematic-neon-red opacity-50 blur-[2px] animate-pulse mix-blend-screen -translate-x-[2px]">
-                        HM CAR
-                    </div>
-                </div>
 
-                {/* Progress Ring with 3D Rotate */}
-                <div className="relative w-24 h-24 perspective-500">
-                    <motion.div
-                        animate={{ rotateX: 360, rotateY: 360 }}
-                        transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                        className="absolute inset-0 rounded-full border-2 border-white/5 border-t-luxury-gold shadow-[0_0_30px_rgba(197,160,89,0.3)]"
-                    />
-                    <motion.div
-                        animate={{ rotate: -360 }}
-                        transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                        className="absolute inset-2 rounded-full border-2 border-white/5 border-b-cinematic-neon-blue shadow-[0_0_30px_rgba(0,240,255,0.2)]"
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center font-mono font-black text-xl text-white">
-                        {Math.min(progress, 100)}%
-                    </div>
-                </div>
-
-                {/* Loading Status Text */}
-                <div className="space-y-2 text-center w-full">
-                    <div className="h-[2px] w-full bg-white/5 rounded-full overflow-hidden">
+                    {/* Content */}
+                    <div className="relative z-10 flex flex-col items-center gap-8">
+                        {/* Logo */}
                         <motion.div
-                            className="h-full bg-gradient-to-r from-luxury-gold via-white to-luxury-gold"
-                            style={{ width: `${progress}%` }}
-                        />
-                    </div>
-                    <div className="flex justify-between text-[8px] font-black uppercase tracking-[0.3em] text-white/40">
-                        <span>{isRTL ? "جار التحميل" : "LOADING SYSTEM"}</span>
-                        <span>{isRTL ? "يرجى الانتظار" : "ESTABLISHING LINK"}</span>
-                    </div>
-                </div>
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+                            className="text-center space-y-2"
+                        >
+                            <h1 className="text-6xl md:text-8xl font-black tracking-[-0.06em] leading-none">
+                                <span className="gradient-text-platinum block">HM</span>
+                                <span className="font-display italic gradient-text-gold">CAR</span>
+                            </h1>
+                        </motion.div>
 
-                {/* System Logs */}
-                <div className="absolute bottom-12 font-mono text-[9px] text-white/20 text-center tracking-widest uppercase space-y-2">
-                    <div className="animate-pulse">Initializing Secure Protocol...</div>
-                    <div>Verifying User Credentials...</div>
-                    <div className="text-luxury-gold/50">Access Granted</div>
-                </div>
-            </div>
-        </motion.div>
+                        {/* Progress bar */}
+                        <motion.div
+                            initial={{ opacity: 0, width: 0 }}
+                            animate={{ opacity: 1, width: '200px' }}
+                            transition={{ delay: 0.3, duration: 0.8 }}
+                            className="h-[2px] bg-white/5 rounded-full overflow-hidden relative"
+                        >
+                            <motion.div
+                                className="absolute inset-0 bg-gradient-to-r from-transparent via-accent-gold to-transparent"
+                                style={{ width: `${Math.min(progress, 100)}%` }}
+                                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                            />
+                        </motion.div>
+
+                        {/* Status */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 0.3 }}
+                            transition={{ delay: 0.5 }}
+                            className="flex items-center gap-4"
+                        >
+                            <div className="w-1 h-1 rounded-full bg-accent-gold animate-pulse" />
+                            <span className="text-[7px] font-bold uppercase tracking-[0.6em] text-white/25">
+                                {isRTL ? "جاري التحميل..." : "LOADING..."}
+                            </span>
+                        </motion.div>
+                    </div>
+                </motion.div>
+            )}
+        </AnimatePresence>
     );
 }

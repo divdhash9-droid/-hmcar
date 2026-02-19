@@ -63,7 +63,7 @@ router.post('/register', async (req, res) => {
         role: user.role,
         permissions: user.permissions
       },
-      process.env.JWT_SECRET || 'your-secret-key',
+      process.env.JWT_SECRET,
       {
         expiresIn: '24h',
         issuer: 'hm-car-auction',
@@ -403,7 +403,7 @@ router.post('/login', async (req, res) => {
         role: user.role,
         permissions: user.permissions || []
       },
-      process.env.JWT_SECRET || 'your-secret-key',
+      process.env.JWT_SECRET,
       {
         expiresIn: rememberMe ? '30d' : '24h',
         issuer: 'hm-car-auction',
@@ -511,7 +511,7 @@ router.post('/refresh', requireAuthAPI, async (req, res) => {
         role: user.role,
         permissions: user.permissions
       },
-      process.env.JWT_SECRET || 'your-secret-key',
+      process.env.JWT_SECRET,
       {
         expiresIn: '24h',
         issuer: 'hm-car-auction',
@@ -651,7 +651,7 @@ router.post('/forgot-password', async (req, res) => {
     // Generate reset token
     const resetToken = jwt.sign(
       { userId: user._id, type: 'password-reset' },
-      process.env.JWT_SECRET || 'your-secret-key',
+      process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
 
@@ -699,7 +699,7 @@ router.post('/reset-password', async (req, res) => {
     }
 
     // Verify reset token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     if (decoded.type !== 'password-reset') {
       return res.status(400).json({

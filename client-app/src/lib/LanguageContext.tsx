@@ -113,6 +113,32 @@ export const translations: Translations = {
     settings: { AR: "الإعدادات", EN: "Settings" },
     serverStatus: { AR: "حالة السيرفر", EN: "Server Status" },
 
+    // Social
+    social: { AR: "التواصل الاجتماعي", EN: "Social" },
+    socialSettings: { AR: "إعدادات التواصل", EN: "Social Settings" },
+    whatsappNumber: { AR: "رقم واتساب", EN: "WhatsApp Number" },
+    socialLinks: { AR: "روابط التواصل", EN: "Social Links" },
+    addLink: { AR: "إضافة رابط", EN: "Add Link" },
+    platform: { AR: "المنصة", EN: "Platform" },
+    url: { AR: "الرابط", EN: "URL" },
+    saveChanges: { AR: "حفظ التغييرات", EN: "Save Changes" },
+    publicSocialPage: { AR: "صفحتنا الاجتماعية", EN: "Our Social Page" },
+    followUs: { AR: "تابعنا", EN: "Follow Us" },
+    contactUs: { AR: "تواصل معنا", EN: "Contact Us" },
+    supportChat: { AR: "دعم العملاء", EN: "Customer Support" },
+    describeIssue: { AR: "اكتب مشكلتك هنا...", EN: "Describe your issue..." },
+    send: { AR: "إرسال", EN: "Send" },
+    submitted: { AR: "تم الإرسال", EN: "Submitted" },
+    failed: { AR: "فشل الإرسال", EN: "Failed to submit" },
+    brands: { AR: "الماركات", EN: "Brands" },
+    addBrand: { AR: "إضافة ماركة", EN: "Add Brand" },
+    brandName: { AR: "اسم الماركة", EN: "Brand Name" },
+    brandLogo: { AR: "شعار الماركة", EN: "Brand Logo" },
+    brandCategory: { AR: "تصنيف", EN: "Category" },
+    brandCars: { AR: "سيارات", EN: "Cars" },
+    brandParts: { AR: "قطع غيار", EN: "Parts" },
+    brandBoth: { AR: "الكل", EN: "Both" },
+
     // Admin Car Management
     carManagement: { AR: "إدارة السيارات", EN: "CAR MANAGEMENT" },
     carName: { AR: "اسم السيارة", EN: "Car Name" },
@@ -134,19 +160,43 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
     const [lang, setLang] = useState<Language>('AR');
 
+    const persistLang = (value: Language) => {
+        if (typeof window === 'undefined') return;
+        localStorage.setItem('appLang', value);
+        document.cookie = `appLang=${value}; path=/; max-age=${60 * 60 * 24 * 365};`; // 1 year
+    };
+
     useEffect(() => {
-        const savedLang = localStorage.getItem('appLang') as Language;
-        if (savedLang) setLang(savedLang);
+        if (typeof window === 'undefined') return;
+
+        const getInitialLang = (): Language => {
+            const cookieMatch = document.cookie.match(/(?:^|; )appLang=([^;]+)/);
+            const cookieLang = cookieMatch ? decodeURIComponent(cookieMatch[1]) : null;
+            const storedLang = localStorage.getItem('appLang') as Language | null;
+
+            if (cookieLang === 'EN' || cookieLang === 'AR') return cookieLang;
+            if (storedLang === 'EN' || storedLang === 'AR') return storedLang;
+            if (navigator.language?.toLowerCase().startsWith('ar')) return 'AR';
+            return 'AR';
+        };
+
+        const initial = getInitialLang();
+        if (initial !== lang) {
+            setLang(initial);
+        } else {
+            // Ensure cookie is set if missing
+            persistLang(initial);
+        }
     }, []);
 
     const toggleLanguage = () => {
         const newLang = lang === 'AR' ? 'EN' : 'AR';
         setLang(newLang);
-        localStorage.setItem('appLang', newLang);
+        persistLang(newLang);
     };
 
-    const t = (key: keyof typeof translations) => {
-        return translations[key]?.[lang] || key;
+    const t = (key: keyof typeof translations): string => {
+        return translations[key]?.[lang] || String(key);
     };
 
     const isRTL = lang === 'AR';

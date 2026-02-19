@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Menu, X, User, LogOut, Settings,
     Car, Gavel, Search, ShoppingBag,
-    ShieldCheck, LayoutDashboard, Languages, Bell
+    ShieldCheck, LayoutDashboard, Languages, Bell, ArrowLeft, ArrowRight
 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useLanguage } from '@/lib/LanguageContext';
@@ -18,196 +18,161 @@ export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const pathname = usePathname();
-    const { user, logout, isLoggedIn, isAdmin } = useAuth();
+    const router = useRouter();
+    const { user, isLoggedIn, logout } = useAuth();
     const { t, lang, toggleLanguage, isRTL } = useLanguage();
 
     useEffect(() => {
-        const handleScroll = () => setScrolled(window.scrollY > 20);
+        const handleScroll = () => setScrolled(window.scrollY > 50);
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    useEffect(() => {
+        setIsOpen(false);
+    }, [pathname]);
+
     const navLinks = [
-        { href: '/', label: t('home'), icon: LayoutDashboard },
-        { href: '/showroom', label: t('showroom'), icon: Car },
-        { href: '/auctions', label: t('auctions'), icon: Gavel },
-        { href: '/parts', label: t('spareParts'), icon: ShoppingBag },
+        { href: '/showroom', label: isRTL ? 'المعرض' : 'SHOWROOM', icon: Car },
+        { href: '/auctions', label: isRTL ? 'المزادات' : 'AUCTIONS', icon: Gavel },
+        { href: '/parts', label: isRTL ? 'القطع' : 'PARTS', icon: ShoppingBag },
+        { href: '/concierge', label: isRTL ? 'الكونسيرج' : 'CONCIERGE', icon: Settings },
+        { href: '/contact', label: isRTL ? 'تواصل' : 'CONTACT', icon: Search },
     ];
 
-    const adminLinks = [
-        { href: '/admin/dashboard', label: t('dashboard'), icon: ShieldCheck },
-    ];
-
-
+    const isActive = (href: string) => pathname === href;
 
     return (
-        <nav
-            className={cn(
-                "fixed top-0 left-0 right-0 z-50 transition-all duration-500 border-b border-transparent",
-                scrolled
-                    ? "bg-black/80 backdrop-blur-xl border-white/5 py-4 shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
-                    : "bg-transparent py-8"
-            )}
-        >
-            <div className="max-w-[1920px] mx-auto px-6 md:px-12 flex items-center justify-between">
-
-                {/* Logo */}
-                <Link href="/" className="relative z-50 group">
-                    <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="flex flex-col leading-none"
-                    >
-                        <span className="text-3xl font-black italic tracking-tighter text-white group-hover:text-luxury-gold transition-colors duration-500">
-                            HM <span className="text-transparent bg-clip-text bg-gradient-to-r from-luxury-gold via-yellow-200 to-luxury-gold animate-shimmer">CAR</span>
-                        </span>
-                        <span className="text-[8px] font-black uppercase tracking-[0.6em] text-white/30 group-hover:text-white/60 transition-colors">
-                            Systems
-                        </span>
-                    </motion.div>
-                </Link>
-
-                {/* Desktop Navigation */}
-                <div className="hidden lg:flex items-center gap-2 bg-black/20 backdrop-blur-md p-1.5 rounded-full border border-white/5">
-                    {navLinks.map((link) => {
-                        const isActive = pathname === link.href;
-                        return (
-                            <Link key={link.href} href={link.href}>
-                                <div
-                                    className={cn(
-                                        "px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 flex items-center gap-2 relative overflow-hidden group/link",
-                                        isActive
-                                            ? "bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.3)]"
-                                            : "text-white/60 hover:text-white hover:bg-white/5"
-                                    )}
-                                >
-                                    <link.icon className={cn("w-3 h-3 transition-transform group-hover/link:scale-110", isActive ? "text-black" : "text-luxury-gold/50")} />
-                                    <span className="relative z-10">{link.label}</span>
-                                    {isActive && <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] animate-[shimmer_2s_infinite]" />}
-                                </div>
-                            </Link>
-                        );
-                    })}
-                </div>
-
-                {/* Right Actions */}
-                <div className="hidden lg:flex items-center gap-6">
-
-                    {/* Admin Link if Admin */}
-                    {isAdmin && (
-                        <Link href="/admin/dashboard">
-                            <button className="px-4 py-2 bg-red-900/20 border border-red-500/30 text-red-500 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-red-900/40 transition-all flex items-center gap-2 animate-pulse">
-                                <ShieldCheck className="w-3 h-3" />
-                                {t('dashboard')}
-                            </button>
+        <>
+            <motion.nav
+                initial={{ y: -100, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                className={cn(
+                    "fixed top-0 left-0 right-0 z-50 transition-all duration-700",
+                    scrolled
+                        ? "bg-black/70 backdrop-blur-xl border-b border-white/5 py-3"
+                        : "bg-transparent py-5"
+                )}
+                dir={isRTL ? 'rtl' : 'ltr'}
+            >
+                <div className="max-w-[1600px] mx-auto px-6 flex items-center justify-between">
+                    {/* Logo + page-specific back */}
+                    <div className="group flex flex-col items-start gap-2 shrink-0">
+                        <Link href="/" className="flex items-center gap-3">
+                            <div className="relative">
+                                <span className="text-xl font-black tracking-[-0.04em] text-white group-hover:text-white/80 transition-colors drop-shadow-[0_0_10px_rgba(255,255,255,0.6)]">
+                                    HM
+                                </span>
+                                <span className="text-xl font-display italic text-white/30 ml-1 group-hover:text-[#c9a96e] transition-colors drop-shadow-[0_0_8px_rgba(201,169,110,0.5)]">
+                                    CAR
+                                </span>
+                            </div>
                         </Link>
-                    )}
+                        {pathname === '/profile' && (
+                            <div className="w-full">
+                                <button
+                                    onClick={() => router.back()}
+                                    className="p-2 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all"
+                                    aria-label={isRTL ? 'عودة' : 'Back'}
+                                >
+                                    {isRTL ? <ArrowRight className="w-5 h-5" /> : <ArrowLeft className="w-5 h-5" />}
+                                </button>
+                            </div>
+                        )}
+                    </div>
 
-                    {/* Language Toggle */}
-                    <button
-                        onClick={toggleLanguage}
-                        className="w-10 h-10 rounded-full bg-white/5 border border-white/10 hover:border-luxury-gold/50 flex items-center justify-center transition-all group"
-                    >
-                        <span className="text-[10px] font-black uppercase text-white/60 group-hover:text-luxury-gold">{lang}</span>
-                    </button>
+                    {/* Desktop Navigation */}
+                    <div className="hidden lg:flex items-center gap-1"></div>
 
-                    {/* User Actions */}
-                    {isLoggedIn ? (
-                        <div className="flex items-center gap-4 pl-6 border-l border-white/10">
+                    {/* Right Actions */}
+                    <div className="flex items-center gap-2">
+                        {isLoggedIn && pathname !== '/' && (
                             <NotificationDropdown />
-
-                            <Link href="/profile">
-                                <div className="flex items-center gap-3 group cursor-pointer">
-                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-luxury-gold to-yellow-900/50 p-[1px] shadow-[0_0_15px_rgba(197,160,89,0.3)] group-hover:shadow-[0_0_25px_rgba(197,160,89,0.5)] transition-all">
-                                        <div className="w-full h-full rounded-full bg-black flex items-center justify-center overflow-hidden">
-                                            {user?.avatar ? (
-                                                <img src={user.avatar} alt="User" className="w-full h-full object-cover" />
-                                            ) : (
-                                                <User className="w-4 h-4 text-luxury-gold" />
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-[10px] font-black text-white uppercase tracking-widest group-hover:text-luxury-gold transition-colors">{user?.name || 'User'}</span>
-                                        <span className="text-[8px] font-mono text-white/30 uppercase tracking-widest">{user?.role === 'vip' ? 'VIP Access' : 'Standard ID'}</span>
-                                    </div>
-                                </div>
-                            </Link>
-                        </div>
-                    ) : (
-                        <div className="flex items-center gap-4 pl-6 border-l border-white/10">
-                            <Link href="/login">
-                                <button className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60 hover:text-white transition-colors">
-                                    {t('login')}
-                                </button>
-                            </Link>
-                            <Link href="/register">
-                                <button className="px-6 py-2.5 bg-white text-black rounded-lg text-[10px] font-black uppercase tracking-[0.2em] hover:bg-luxury-gold transition-colors shadow-[0_0_20px_rgba(255,255,255,0.2)]">
-                                    {t('register')}
-                                </button>
-                            </Link>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
+            </motion.nav>
 
-                {/* Mobile Menu Button */}
-                <button
-                    className="lg:hidden w-12 h-12 flex items-center justify-center text-white/80 hover:text-white"
-                    onClick={() => setIsOpen(!isOpen)}
-                >
-                    {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-                </button>
-            </div>
-
-            {/* Mobile Menu Overlay */}
+            {/* ═══ MOBILE MENU ═══ */}
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        className="fixed inset-0 top-[88px] bg-black/95 z-40 backdrop-blur-2xl border-t border-white/10 lg:hidden"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="fixed inset-0 z-40 lg:hidden"
                     >
-                        <div className="p-8 flex flex-col gap-6 h-full overflow-y-auto pb-24">
-                            {navLinks.map((link) => (
-                                <Link key={link.href} href={link.href} onClick={() => setIsOpen(false)}>
-                                    <div className="text-3xl font-black uppercase italic tracking-tighter text-white/40 hover:text-white hover:pl-4 transition-all duration-300">
-                                        {link.label}
-                                    </div>
-                                </Link>
-                            ))}
+                        {/* Backdrop */}
+                        <div
+                            className="absolute inset-0 bg-black/70 backdrop-blur-md"
+                            onClick={() => setIsOpen(false)}
+                        />
 
-                            <div className="h-[1px] bg-white/10 my-4" />
-
-                            <div className="flex flex-col gap-4">
-                                {isLoggedIn ? (
-                                    <>
-                                        <Link href="/profile" onClick={() => setIsOpen(false)}>
-                                            <div className="flex items-center gap-4 text-white/60 hover:text-white p-4 bg-white/5 rounded-2xl">
-                                                <User className="w-5 h-5" />
-                                                <span className="text-xs font-black uppercase tracking-widest">Profile</span>
-                                            </div>
-                                        </Link>
-                                        <button onClick={logout} className="flex items-center gap-4 text-red-500/60 hover:text-red-500 p-4 bg-white/5 rounded-2xl">
-                                            <LogOut className="w-5 h-5" />
-                                            <span className="text-xs font-black uppercase tracking-widest">Logout</span>
-                                        </button>
-                                    </>
-                                ) : (
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <Link href="/login" onClick={() => setIsOpen(false)}>
-                                            <button className="w-full py-4 bg-white/5 border border-white/10 rounded-xl text-xs font-black uppercase text-white">Login</button>
-                                        </Link>
-                                        <Link href="/register" onClick={() => setIsOpen(false)}>
-                                            <button className="w-full py-4 bg-white text-black rounded-xl text-xs font-black uppercase">Register</button>
-                                        </Link>
-                                    </div>
-                                )}
+                        {/* Panel */}
+                        <motion.div
+                            initial={{ x: isRTL ? '-100%' : '100%' }}
+                            animate={{ x: 0 }}
+                            exit={{ x: isRTL ? '-100%' : '100%' }}
+                            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+                            className={cn(
+                                "absolute top-0 bottom-0 w-[85%] max-w-sm bg-[#0a0a0a] border-white/5 flex flex-col",
+                                isRTL ? "left-0 border-r" : "right-0 border-l"
+                            )}
+                            dir={isRTL ? 'rtl' : 'ltr'}
+                        >
+                            {/* Header */}
+                            <div className="flex items-center justify-between p-6 border-b border-white/5">
+                                <span className="text-lg font-black">
+                                    HM <span className="font-display italic text-white/30">CAR</span>
+                                </span>
+                                <button onClick={() => setIsOpen(false)} className="w-10 h-10 rounded-lg border border-white/5 flex items-center justify-center text-white/40">
+                                    <X className="w-4 h-4" />
+                                </button>
                             </div>
-                        </div>
+
+                            {/* Links */}
+                            <div className="flex-1 p-6 space-y-2 overflow-y-auto">
+                                {navLinks.map((link, i) => (
+                                    <motion.div
+                                        key={link.href}
+                                        initial={{ opacity: 0, x: isRTL ? -20 : 20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: i * 0.05 }}
+                                    >
+                                        <Link
+                                            href={link.href}
+                                            className={cn(
+                                                "flex items-center gap-4 px-5 py-4 rounded-xl text-sm font-bold uppercase tracking-[0.1em] transition-all",
+                                                isActive(link.href)
+                                                    ? "bg-white/5 text-white border border-white/8"
+                                                    : "text-white/30 hover:text-white/60 hover:bg-white/[0.02]"
+                                            )}
+                                        >
+                                            <link.icon className="w-4.5 h-4.5" />
+                                            {link.label}
+                                        </Link>
+                                    </motion.div>
+                                ))}
+                            </div>
+
+                            {/* Footer */}
+                            <div className="p-6 border-t border-white/5 space-y-3">
+                                {!isLoggedIn && (
+                                    <Link href="/login" className="block">
+                                        <button className="w-full btn-luxury py-4 rounded-xl text-[10px]">
+                                            <User className="w-3.5 h-3.5" />
+                                            {isRTL ? 'تسجيل الدخول' : 'SIGN IN'}
+                                        </button>
+                                    </Link>
+                                )}
+                                
+                            </div>
+                        </motion.div>
                     </motion.div>
                 )}
             </AnimatePresence>
-        </nav>
+        </>
     );
 }

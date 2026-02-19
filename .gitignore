@@ -51,3 +51,6 @@ test-results/
 # Misc
 *.pem
 .qodo/
+
+# Auxly - AI Task Management (internal data)
+.auxly/

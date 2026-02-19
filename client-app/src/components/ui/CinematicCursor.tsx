@@ -1,68 +1,48 @@
 'use client';
 
-import { useEffect, useState } from "react";
-import { motion, useSpring, useMotionValue } from "framer-motion";
+import { useState, useEffect, useCallback } from 'react';
 
 export default function CinematicCursor() {
-    const [isVisible, setIsVisible] = useState(false);
+    const [position, setPosition] = useState({ x: 0, y: 0 });
+    const [visible, setVisible] = useState(false);
 
-    const mouseX = useMotionValue(0);
-    const mouseY = useMotionValue(0);
+    const handleMouseMove = useCallback((e: MouseEvent) => {
+        setPosition({ x: e.clientX, y: e.clientY });
+        if (!visible) setVisible(true);
+    }, [visible]);
 
-    const springConfig = { damping: 25, stiffness: 150 };
-    const cursorX = useSpring(mouseX, springConfig);
-    const cursorY = useSpring(mouseY, springConfig);
-
-    const trailerX = useSpring(mouseX, { damping: 15, stiffness: 50 });
-    const trailerY = useSpring(mouseY, { damping: 15, stiffness: 50 });
+    const handleMouseLeave = useCallback(() => setVisible(false), []);
+    const handleMouseEnter = useCallback(() => setVisible(true), []);
 
     useEffect(() => {
-        const moveMouse = (e: MouseEvent) => {
-            mouseX.set(e.clientX);
-            mouseY.set(e.clientY);
-            if (!isVisible) setIsVisible(true);
-        };
+        // Skip on mobile/touch
+        if (window.matchMedia('(hover: none)').matches) return;
 
-        const handleMouseDown = () => {
-            // Add click effect if needed
-        };
-
-        window.addEventListener("mousemove", moveMouse);
-        window.addEventListener("mousedown", handleMouseDown);
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseleave', handleMouseLeave);
+        document.addEventListener('mouseenter', handleMouseEnter);
 
         return () => {
-            window.removeEventListener("mousemove", moveMouse);
-            window.removeEventListener("mousedown", handleMouseDown);
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseleave', handleMouseLeave);
+            document.removeEventListener('mouseenter', handleMouseEnter);
         };
-    }, [isVisible, mouseX, mouseY]);
+    }, [handleMouseMove, handleMouseLeave, handleMouseEnter]);
 
-    if (typeof window === "undefined") return null;
+    if (!visible) return null;
 
     return (
-        <div className="fixed inset-0 pointer-events-none z-[9999] opacity-0 md:opacity-100">
-            {/* Main Dot */}
-            <motion.div
-                className="fixed top-0 left-0 w-2 h-2 bg-luxury-gold rounded-full"
-                style={{
-                    x: cursorX,
-                    y: cursorY,
-                    translateX: "-50%",
-                    translateY: "-50%",
-                }}
-            />
-
-            {/* Glowing Trailer */}
-            <motion.div
-                className="fixed top-0 left-0 w-12 h-12 border border-luxury-gold/30 rounded-full"
-                style={{
-                    x: trailerX,
-                    y: trailerY,
-                    translateX: "-50%",
-                    translateY: "-50%",
-                }}
-            >
-                <div className="absolute inset-0 bg-luxury-gold/5 blur-xl rounded-full" />
-            </motion.div>
-        </div>
+        <div
+            className="pointer-events-none fixed z-[9999] rounded-full mix-blend-screen"
+            style={{
+                left: position.x - 200,
+                top: position.y - 200,
+                width: 400,
+                height: 400,
+                background: 'radial-gradient(circle, rgba(201, 169, 110, 0.03) 0%, transparent 70%)',
+                transition: 'left 0.3s cubic-bezier(0.16,1,0.3,1), top 0.3s cubic-bezier(0.16,1,0.3,1)',
+                willChange: 'left, top',
+            }}
+        />
     );
 }

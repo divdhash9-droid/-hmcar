@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
     Scale, X, Plus, Car, Gauge, Fuel, Settings,
-    Calendar, Trash2, ArrowLeft, ArrowRight
+    Calendar, Trash2
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useLocale } from '@/hooks/useLocale';
@@ -27,10 +27,21 @@ interface CarData {
     images: string[];
 }
 
-export default function ComparisonsPage() {
-    const router = useRouter();
+export default function ComparisonsPageWrapper() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-black flex items-center justify-center">
+                <div className="w-16 h-16 border-4 border-[#c5a059] border-t-transparent rounded-full animate-spin" />
+            </div>
+        }>
+            <ComparisonsPage />
+        </Suspense>
+    );
+}
+
+function ComparisonsPage() {
     const searchParams = useSearchParams();
-    const { t, isRTL, locale } = useLocale();
+    const { isRTL, locale } = useLocale();
     const [cars, setCars] = useState<CarData[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -83,7 +94,7 @@ export default function ComparisonsPage() {
     };
 
     const formatPrice = (price: number) => {
-        return new Intl.NumberFormat(locale === 'ar' ? 'ar-SA' : 'en-US', {
+        return new Intl.NumberFormat(locale === 'AR' ? 'ar-SA' : 'en-US', {
             style: 'currency',
             currency: 'SAR',
             minimumFractionDigits: 0,
@@ -109,19 +120,10 @@ export default function ComparisonsPage() {
 
     return (
         <div className={`min-h-screen bg-black text-white ${isRTL ? 'rtl' : 'ltr'}`} dir={isRTL ? 'rtl' : 'ltr'}>
-            <ClientPageHeader />
-
-            {/* Header */}
             <section className="pt-32 pb-10 px-4">
                 <div className="max-w-7xl mx-auto">
                     <div className="flex items-center justify-between mb-6">
-                        <button
-                            onClick={() => router.back()}
-                            className="flex items-center gap-2 text-white/60 hover:text-[#c5a059] transition-colors"
-                        >
-                            {isRTL ? <ArrowRight className="w-5 h-5" /> : <ArrowLeft className="w-5 h-5" />}
-                            <span>{isRTL ? 'رجوع' : 'Back'}</span>
-                        </button>
+                        <ClientPageHeader title={isRTL ? 'مقارنة السيارات' : 'Compare Cars'} icon={Scale} />
 
                         {cars.length > 0 && (
                             <button

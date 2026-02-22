@@ -1,0 +1,10 @@
+{
+    "version": 2,
+    "framework": "nextjs",
+    "buildCommand": "npm run build",
+    "outputDirectory": ".next",
+    "env": {
+        "NEXT_PUBLIC_API_URL": "https://car-auction-sand.vercel.app",
+        "NEXT_PUBLIC_ENABLE_DEV_ADMIN": "0"
+    }
+}

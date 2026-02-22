@@ -1,57 +1,38 @@
-
 require('dotenv').config();
 const mongoose = require('mongoose');
-const User = require('../models/User');
+const path = require('path');
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/car-auction';
+const MONGO_URI = process.env.MONGO_URI;
 
-async function createSuperAdmin() {
-    try {
-        await mongoose.connect(MONGO_URI);
-        console.log('Connected to MongoDB');
+mongoose.connect(MONGO_URI).then(async () => {
+    const User = require(path.join(__dirname, '..', 'models', 'User'));
 
-        const email = process.argv[2] || 'admin@hmcar.com';
-        const password = process.argv[3] || 'admin123';
-        const name = 'Super Admin';
+    // حذف المدراء القدامى
+    await User.deleteMany({ role: { $in: ['admin', 'super_admin', 'manager'] } });
+    console.log('🗑️ Deleted old admin users');
 
-        console.log(`Creating/Updating Super Admin: ${email}`);
+    // إنشاء admin جديد
+    const admin = new User({
+        name: 'Admin HM CAR',
+        email: 'admin@hmcar.com',
+        password: 'Admin123456!',
+        role: 'super_admin',
+        status: 'active',
+        isActive: true
+    });
+    await admin.save();
 
-        let admin = await User.findOne({ email });
+    // تأكيد كلمة المرور
+    const check = await User.findOne({ email: 'admin@hmcar.com' });
+    const isValid = await check.comparePassword('Admin123456!');
 
-        if (admin) {
-            console.log('User exists. Promoting to super_admin...');
-            admin.role = 'super_admin';
-            admin.permissions = ['super_admin'];
-            if (process.argv[3]) {
-                admin.password = password; // Only update if explicitly provided
-                console.log('Password updated.');
-            }
-        } else {
-            console.log('Creating new user...');
-            admin = new User({
-                name,
-                email,
-                phone: '+966500000000',
-                password,
-                role: 'super_admin',
-                permissions: ['super_admin'],
-                status: 'active',
-                isDeviceLocked: false // Admin shouldn't be locked out initially
-            });
-        }
+    console.log('✅ Admin created:');
+    console.log('   Email   :', check.email);
+    console.log('   Role    :', check.role);
+    console.log('   Password valid:', isValid);
 
-        await admin.save();
-        console.log('✅ Super Admin configured successfully!');
-        console.log(`Email: ${email}`);
-        console.log(`Password: ${password}`);
-        console.log('You can now log in at /login.');
-
-    } catch (err) {
-        console.error('❌ Error:', err);
-    } finally {
-        await mongoose.connection.close();
-        process.exit();
-    }
-}
-
-createSuperAdmin();
+    process.exit(0);
+}).catch(e => {
+    console.log('❌ Error:', e.message);
+    process.exit(1);
+});

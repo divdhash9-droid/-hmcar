@@ -85,7 +85,11 @@ const security = {
     origin: process.env.NODE_ENV === 'production'
       ? (process.env.ALLOWED_ORIGINS
         ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
-        : ['https://car-auction-sand.vercel.app'])
+        : [
+          'https://car-auction-sand.vercel.app',
+          'https://client-app-iota-eight.vercel.app',
+          'https://client-app-iota-eight.vercel.app'
+        ])
       : ['http://localhost:4001', 'http://localhost:4002', 'http://localhost:3000', 'http://localhost:3001'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],

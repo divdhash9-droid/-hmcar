@@ -16,7 +16,7 @@ async function connectDB() {
     }
     await mongoose.connect(uri, {
         maxPoolSize: 5,
-        serverSelectionTimeoutMS: 10000,
+        serverSelectionTimeoutMS: 15000,
         socketTimeoutMS: 45000,
         bufferCommands: false,
     });
@@ -37,13 +37,33 @@ function buildApp() {
 }
 
 module.exports = async (req, res) => {
-    // Diagnostic endpoint to see real errors
+    // Diagnostic: app load
     if (req.url === '/diag') {
         try {
             const app = buildApp();
             return res.status(200).json({ app: 'loaded', db: mongoose.connection.readyState });
         } catch (err) {
-            return res.status(500).json({ initError: err.message, stack: err.stack });
+            return res.status(500).json({ initError: err.message });
+        }
+    }
+
+    // Diagnostic: db connection
+    if (req.url === '/diag-db') {
+        try {
+            await connectDB();
+            return res.status(200).json({
+                success: true,
+                db: mongoose.connection.readyState,
+                host: mongoose.connection.host,
+                name: mongoose.connection.name
+            });
+        } catch (err) {
+            return res.status(500).json({
+                success: false,
+                error: err.message,
+                uri_set: !!process.env.MONGO_URI,
+                uri_preview: process.env.MONGO_URI ? process.env.MONGO_URI.substring(0, 40) + '...' : 'NOT SET'
+            });
         }
     }
 

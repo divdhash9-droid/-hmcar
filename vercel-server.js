@@ -3,12 +3,12 @@
  */
 
 module.exports = async (req, res) => {
-    // Step 1: Basic response (no requires)
+    // Step 1: Basic ping
     if (req.url === '/ping') {
-        return res.status(200).json({ ok: true, env: process.env.NODE_ENV });
+        return res.status(200).json({ ok: true, env: process.env.NODE_ENV, time: new Date().toISOString() });
     }
 
-    // Step 2: Test mongoose require
+    // Step 2: Test mongoose
     if (req.url === '/test-mongoose') {
         try {
             const mongoose = require('mongoose');
@@ -18,18 +18,40 @@ module.exports = async (req, res) => {
         }
     }
 
-    // Step 3: Test DB connect
+    // Step 3: Test DB connect (short timeout)
     if (req.url === '/test-db') {
         try {
             const mongoose = require('mongoose');
             const uri = process.env.MONGO_URI;
             if (!uri) return res.status(500).json({ error: 'MONGO_URI not set' });
-            if (mongoose.connection.readyState !== 1) {
-                await mongoose.connect(uri, { serverSelectionTimeoutMS: 15000, bufferCommands: false });
+
+            const preview = uri.substring(0, 50) + '...';
+
+            if (mongoose.connection.readyState === 1) {
+                return res.status(200).json({ db: 'already connected', host: mongoose.connection.host });
             }
-            return res.status(200).json({ db: 'connected', host: mongoose.connection.host });
+
+            await mongoose.connect(uri, {
+                maxPoolSize: 3,
+                serverSelectionTimeoutMS: 8000,
+                connectTimeoutMS: 8000,
+                socketTimeoutMS: 8000,
+                bufferCommands: false,
+            });
+
+            return res.status(200).json({
+                success: true,
+                db: 'connected',
+                host: mongoose.connection.host,
+                name: mongoose.connection.name
+            });
         } catch (e) {
-            return res.status(500).json({ error: e.message, uri_preview: (process.env.MONGO_URI || '').substring(0, 50) });
+            return res.status(500).json({
+                success: false,
+                error: e.message,
+                code: e.code,
+                uri_preview: (process.env.MONGO_URI || '').substring(0, 55) + '...'
+            });
         }
     }
 
@@ -40,7 +62,7 @@ module.exports = async (req, res) => {
             const instance = new App();
             return res.status(200).json({ app: 'loaded' });
         } catch (e) {
-            return res.status(500).json({ error: e.message, stack: e.stack ? e.stack.substring(0, 500) : null });
+            return res.status(500).json({ error: e.message, stack: (e.stack || '').substring(0, 800) });
         }
     }
 

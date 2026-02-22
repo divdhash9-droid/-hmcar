@@ -78,6 +78,11 @@ router.use('/notifications', require('./notifications'));
 router.use('/analytics', require('./analytics'));
 router.use('/upload', require('./upload.js'));
 router.use('/settings', require('./settings'));
+router.use('/messages', require('./messages'));
+router.use('/reviews', require('./reviews'));
+router.use('/comparisons', require('./comparisons'));
+router.use('/brands', require('./brands'));
+router.use('/contact', require('./contact'));
 
 // Error handling middleware
 router.use((error, req, res, next) => {

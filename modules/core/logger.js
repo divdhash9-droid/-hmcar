@@ -19,15 +19,25 @@ const config = require('./config');
 class Logger {
   constructor() {
     this.logDir = path.join(__dirname, '..', '..', 'logs');
-    this.ensureLogDirectory();
+    this.fileLoggingEnabled = false;
+    // Only enable file logging in non-serverless environments
+    if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_FILE_LOGS === 'true') {
+      this.ensureLogDirectory();
+    }
   }
 
   /**
    * التأكد من وجود مجلد السجلات
    */
   ensureLogDirectory() {
-    if (!fs.existsSync(this.logDir)) {
-      fs.mkdirSync(this.logDir, { recursive: true });
+    try {
+      if (!fs.existsSync(this.logDir)) {
+        fs.mkdirSync(this.logDir, { recursive: true });
+      }
+      this.fileLoggingEnabled = true;
+    } catch (error) {
+      // Filesystem is read-only (Vercel serverless), use console only
+      this.fileLoggingEnabled = false;
     }
   }
 
@@ -49,23 +59,25 @@ class Logger {
    * كتابة السجل في الملف
    */
   writeToFile(level, message, data = null) {
+    if (!this.fileLoggingEnabled) return; // Skip file logging in serverless
     const logFile = path.join(this.logDir, `app-${this.getCurrentDate()}.log`);
     const timestamp = `${this.getCurrentDate()} ${this.getCurrentTime()}`;
-    
+
     let logEntry = `[${timestamp}] [${level}] ${message}`;
-    
+
     if (data) {
       logEntry += `\n${JSON.stringify(data, null, 2)}`;
     }
-    
+
     logEntry += '\n';
-    
+
     try {
       fs.appendFileSync(logFile, logEntry, 'utf8');
     } catch (error) {
-      console.error('فشل في كتابة السجل:', error.message);
+      // silently ignore file write errors
     }
   }
+
 
   /**
    * تسجيل معلومات
@@ -82,7 +94,7 @@ class Logger {
   error(message, error = null) {
     const logMessage = `❌ ${message}`;
     console.error(logMessage);
-    
+
     let errorData = null;
     if (error) {
       errorData = {
@@ -91,7 +103,7 @@ class Logger {
         name: error.name
       };
     }
-    
+
     this.writeToFile('ERROR', message, errorData);
   }
 
@@ -125,7 +137,7 @@ class Logger {
       deviceInfo,
       timestamp: new Date().toISOString()
     };
-    
+
     this.info(message, data);
   }
 
@@ -140,7 +152,7 @@ class Logger {
       ip,
       timestamp: new Date().toISOString()
     };
-    
+
     this.info(message, data);
   }
 
@@ -156,7 +168,7 @@ class Logger {
       statusCode,
       timestamp: new Date().toISOString()
     };
-    
+
     this.info(message, data);
   }
 
@@ -171,7 +183,7 @@ class Logger {
       result: result ? 'success' : 'failed',
       timestamp: new Date().toISOString()
     };
-    
+
     this.info(message, data);
   }
 
@@ -187,7 +199,7 @@ class Logger {
       details,
       timestamp: new Date().toISOString()
     };
-    
+
     this.warn(message, data);
   }
 
@@ -199,11 +211,11 @@ class Logger {
       const files = fs.readdirSync(this.logDir);
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);
-      
+
       files.forEach(file => {
         const filePath = path.join(this.logDir, file);
         const stats = fs.statSync(filePath);
-        
+
         if (stats.mtime < cutoffDate) {
           fs.unlinkSync(filePath);
           this.info(`تم حذف ملف السجل القديم: ${file}`);

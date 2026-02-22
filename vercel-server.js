@@ -1,81 +1,52 @@
 /**
- * vercel-server.js
- * Vercel serverless entry point
+ * vercel-server.js - Minimal diagnostic version
  */
 
-const mongoose = require('mongoose');
-
-let cachedApp = null;
-let dbConnected = false;
-
-async function connectDB() {
-    if (dbConnected && mongoose.connection.readyState === 1) return;
-    const uri = process.env.MONGO_URI;
-    if (!uri || uri.startsWith('memory://')) {
-        throw new Error('MONGO_URI must be a valid Atlas URI');
-    }
-    await mongoose.connect(uri, {
-        maxPoolSize: 5,
-        serverSelectionTimeoutMS: 15000,
-        socketTimeoutMS: 45000,
-        bufferCommands: false,
-    });
-    dbConnected = true;
-}
-
-function buildApp() {
-    if (cachedApp) return cachedApp;
-    try {
-        const App = require('./modules/app');
-        const instance = new App();
-        cachedApp = instance.app;
-    } catch (err) {
-        console.error('[INIT ERROR]', err.message, err.stack);
-        throw err;
-    }
-    return cachedApp;
-}
-
 module.exports = async (req, res) => {
-    // Diagnostic: app load
-    if (req.url === '/diag') {
+    // Step 1: Basic response (no requires)
+    if (req.url === '/ping') {
+        return res.status(200).json({ ok: true, env: process.env.NODE_ENV });
+    }
+
+    // Step 2: Test mongoose require
+    if (req.url === '/test-mongoose') {
         try {
-            const app = buildApp();
-            return res.status(200).json({ app: 'loaded', db: mongoose.connection.readyState });
-        } catch (err) {
-            return res.status(500).json({ initError: err.message });
+            const mongoose = require('mongoose');
+            return res.status(200).json({ mongoose: 'ok', version: mongoose.version });
+        } catch (e) {
+            return res.status(500).json({ error: e.message });
         }
     }
 
-    // Diagnostic: db connection
-    if (req.url === '/diag-db') {
+    // Step 3: Test DB connect
+    if (req.url === '/test-db') {
         try {
-            await connectDB();
-            return res.status(200).json({
-                success: true,
-                db: mongoose.connection.readyState,
-                host: mongoose.connection.host,
-                name: mongoose.connection.name
-            });
-        } catch (err) {
-            return res.status(500).json({
-                success: false,
-                error: err.message,
-                uri_set: !!process.env.MONGO_URI,
-                uri_preview: process.env.MONGO_URI ? process.env.MONGO_URI.substring(0, 40) + '...' : 'NOT SET'
-            });
+            const mongoose = require('mongoose');
+            const uri = process.env.MONGO_URI;
+            if (!uri) return res.status(500).json({ error: 'MONGO_URI not set' });
+            if (mongoose.connection.readyState !== 1) {
+                await mongoose.connect(uri, { serverSelectionTimeoutMS: 15000, bufferCommands: false });
+            }
+            return res.status(200).json({ db: 'connected', host: mongoose.connection.host });
+        } catch (e) {
+            return res.status(500).json({ error: e.message, uri_preview: (process.env.MONGO_URI || '').substring(0, 50) });
         }
     }
 
-    try {
-        await connectDB();
-        const app = buildApp();
-        return app(req, res);
-    } catch (error) {
-        console.error('❌ Fatal:', error.message);
-        return res.status(500).json({
-            success: false,
-            error: error.message
-        });
+    // Step 4: Test app load
+    if (req.url === '/test-app') {
+        try {
+            const App = require('./modules/app');
+            const instance = new App();
+            return res.status(200).json({ app: 'loaded' });
+        } catch (e) {
+            return res.status(500).json({ error: e.message, stack: e.stack ? e.stack.substring(0, 500) : null });
+        }
     }
+
+    // Default
+    return res.status(200).json({
+        status: 'diagnostic mode',
+        endpoints: ['/ping', '/test-mongoose', '/test-db', '/test-app']
+    });
 };

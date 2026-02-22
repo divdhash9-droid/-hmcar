@@ -1,73 +1,59 @@
 /**
  * vercel-server.js
- * Entry point for Vercel serverless deployment
- * Connects to MongoDB Atlas and serves the Express app.
+ * Vercel serverless entry point - connects to MongoDB Atlas
  */
 
-require('dotenv').config();
 const mongoose = require('mongoose');
-const App = require('./modules/app');
 
-let appInstance = null;
-let dbConnected = false;
+// Cache app + db connection across warm invocations
+let cachedApp = null;
+let cachedDbPromise = null;
 
-async function connectDB() {
-    if (dbConnected && mongoose.connection.readyState === 1) return;
+function connectDB() {
+    if (cachedDbPromise) return cachedDbPromise;
 
     const uri = process.env.MONGO_URI;
-    if (!uri) throw new Error('MONGO_URI environment variable is not set');
 
-    await mongoose.connect(uri, {
+    if (!uri || uri.startsWith('memory://')) {
+        return Promise.reject(new Error('MONGO_URI must be a valid MongoDB Atlas URI in production'));
+    }
+
+    cachedDbPromise = mongoose.connect(uri, {
         maxPoolSize: 5,
         serverSelectionTimeoutMS: 10000,
         socketTimeoutMS: 45000,
         bufferCommands: false,
+    }).then(() => {
+        console.log('✅ Connected to MongoDB Atlas');
+        return true;
+    }).catch((err) => {
+        cachedDbPromise = null; // allow retry on next request
+        throw err;
     });
 
-    dbConnected = true;
-    console.log('✅ MongoDB Atlas connected');
-
-    // Seed dev admin if needed
-    if (process.env.ENABLE_DEV_ADMIN === 'true') {
-        try {
-            const User = require('./models/User');
-            const existing = await User.findOne({ email: process.env.DEV_ADMIN_EMAIL });
-            if (!existing) {
-                await User.create({
-                    name: process.env.DEV_ADMIN_NAME || 'Admin',
-                    email: process.env.DEV_ADMIN_EMAIL,
-                    password: process.env.DEV_ADMIN_PASSWORD,
-                    role: 'admin',
-                    isActive: true,
-                });
-                console.log(`👤 Dev admin created: ${process.env.DEV_ADMIN_EMAIL}`);
-            }
-        } catch (e) {
-            console.warn('⚠️ Could not seed dev admin:', e.message);
-        }
-    }
+    return cachedDbPromise;
 }
 
-function getApp() {
-    if (!appInstance) {
-        const app = new App();
-        appInstance = app.app;
-    }
-    return appInstance;
+function buildApp() {
+    if (cachedApp) return cachedApp;
+    const App = require('./modules/app');
+    const instance = new App();
+    cachedApp = instance.app;
+    return cachedApp;
 }
 
-// Vercel serverless handler
+// Vercel serverless function
 module.exports = async (req, res) => {
     try {
         await connectDB();
-        const app = getApp();
-        app(req, res);
+        const app = buildApp();
+        return app(req, res);
     } catch (error) {
-        console.error('❌ Server initialization error:', error.message);
-        res.status(500).json({
+        console.error('❌ Fatal error:', error.message);
+        return res.status(500).json({
             success: false,
             error: 'Server initialization failed',
-            message: error.message
+            message: process.env.NODE_ENV === 'production' ? 'Internal Server Error' : error.message
         });
     }
 };

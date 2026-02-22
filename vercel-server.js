@@ -1,59 +1,61 @@
 /**
  * vercel-server.js
- * Vercel serverless entry point - connects to MongoDB Atlas
+ * Vercel serverless entry point
  */
 
 const mongoose = require('mongoose');
 
-// Cache app + db connection across warm invocations
 let cachedApp = null;
-let cachedDbPromise = null;
+let dbConnected = false;
 
-function connectDB() {
-    if (cachedDbPromise) return cachedDbPromise;
-
+async function connectDB() {
+    if (dbConnected && mongoose.connection.readyState === 1) return;
     const uri = process.env.MONGO_URI;
-
     if (!uri || uri.startsWith('memory://')) {
-        return Promise.reject(new Error('MONGO_URI must be a valid MongoDB Atlas URI in production'));
+        throw new Error('MONGO_URI must be a valid Atlas URI');
     }
-
-    cachedDbPromise = mongoose.connect(uri, {
+    await mongoose.connect(uri, {
         maxPoolSize: 5,
         serverSelectionTimeoutMS: 10000,
         socketTimeoutMS: 45000,
         bufferCommands: false,
-    }).then(() => {
-        console.log('✅ Connected to MongoDB Atlas');
-        return true;
-    }).catch((err) => {
-        cachedDbPromise = null; // allow retry on next request
-        throw err;
     });
-
-    return cachedDbPromise;
+    dbConnected = true;
 }
 
 function buildApp() {
     if (cachedApp) return cachedApp;
-    const App = require('./modules/app');
-    const instance = new App();
-    cachedApp = instance.app;
+    try {
+        const App = require('./modules/app');
+        const instance = new App();
+        cachedApp = instance.app;
+    } catch (err) {
+        console.error('[INIT ERROR]', err.message, err.stack);
+        throw err;
+    }
     return cachedApp;
 }
 
-// Vercel serverless function
 module.exports = async (req, res) => {
+    // Diagnostic endpoint to see real errors
+    if (req.url === '/diag') {
+        try {
+            const app = buildApp();
+            return res.status(200).json({ app: 'loaded', db: mongoose.connection.readyState });
+        } catch (err) {
+            return res.status(500).json({ initError: err.message, stack: err.stack });
+        }
+    }
+
     try {
         await connectDB();
         const app = buildApp();
         return app(req, res);
     } catch (error) {
-        console.error('❌ Fatal error:', error.message);
+        console.error('❌ Fatal:', error.message);
         return res.status(500).json({
             success: false,
-            error: 'Server initialization failed',
-            message: process.env.NODE_ENV === 'production' ? 'Internal Server Error' : error.message
+            error: error.message
         });
     }
 };

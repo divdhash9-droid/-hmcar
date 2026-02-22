@@ -3,12 +3,12 @@
 const express = require('express');
 const router = express.Router();
 const UserNotification = require('../../../models/UserNotification');
-const { requireAuth } = require('../../../middleware/auth');
+const { requireAuthAPI } = require('../../../middleware/auth');
 
 // جلب جميع الإشعارات للمستخدم الحالي
-router.get('/', requireAuth, async (req, res) => {
+router.get('/', requireAuthAPI, async (req, res) => {
   try {
-    const notifications = await UserNotification.find({ user: req.session.user._id }).sort({ createdAt: -1 }).limit(100);
+    const notifications = await UserNotification.find({ user: req.user.userId }).sort({ createdAt: -1 }).limit(100);
     res.json({ success: true, notifications });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -16,9 +16,9 @@ router.get('/', requireAuth, async (req, res) => {
 });
 
 // تعيين الإشعارات كمقروءة
-router.post('/read', requireAuth, async (req, res) => {
+router.post('/read', requireAuthAPI, async (req, res) => {
   try {
-    await UserNotification.updateMany({ user: req.session.user._id, isRead: false }, { $set: { isRead: true } });
+    await UserNotification.updateMany({ user: req.user.userId, isRead: false }, { $set: { isRead: true } });
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -26,11 +26,11 @@ router.post('/read', requireAuth, async (req, res) => {
 });
 
 // إنشاء إشعار يدوي (للاختبار)
-router.post('/send', requireAuth, async (req, res) => {
+router.post('/send', requireAuthAPI, async (req, res) => {
   try {
     const { title, message, type, actionUrl } = req.body;
     await UserNotification.createNotification({
-      user: req.session.user._id,
+      user: req.user.userId,
       title,
       message,
       type,

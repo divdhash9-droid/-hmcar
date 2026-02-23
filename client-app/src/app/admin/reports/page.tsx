@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
@@ -193,7 +193,7 @@ export default function AdminReportsPage() {
             <main className="relative z-10 pt-32 pb-24 px-6 max-w-7xl mx-auto">
                 {/* Header */}
                 <header className="mb-16">
-                    <Link href="/admin/dashboard" className="inline-flex items-center gap-2 mb-6 text-white/40 hover:text-white transition-colors group">
+                    <Link href="/admin/dashboard" className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white/70 hover:text-white hover:bg-white/10 transition-all group w-fit">
                         <ChevronLeft className={cn("w-4 h-4 transition-transform group-hover:-translate-x-1", isRTL && "rotate-180 group-hover:translate-x-1")} />
                         <span className="text-[10px] font-black uppercase tracking-[0.2em]">{isRTL ? 'العودة للرئيسية' : 'BACK TO DASHBOARD'}</span>
                     </Link>

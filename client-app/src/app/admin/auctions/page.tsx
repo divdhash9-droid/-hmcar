@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Clock, TrendingUp, Users, Eye, Trash2, Edit2, ChevronLeft, X, Trophy } from "lucide-react";
@@ -110,7 +110,7 @@ export default function AdminAuctionsControl() {
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-16">
                     <div className="space-y-4">
                         <div className="flex items-center gap-3">
-                            <Link href="/admin/dashboard" className="inline-flex items-center gap-2 text-white/40 hover:text-white transition-colors group">
+                            <Link href="/admin/dashboard" className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white/70 hover:text-white hover:bg-white/10 transition-all group">
                                 <ChevronLeft className={cn("w-4 h-4 transition-transform group-hover:-translate-x-1", isRTL && "rotate-180 group-hover:translate-x-1")} />
                                 <span className="text-[10px] font-black uppercase tracking-[0.2em]">{isRTL ? 'العودة للرئيسية' : 'BACK TO DASHBOARD'}</span>
                             </Link>

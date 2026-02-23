@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
@@ -144,7 +144,10 @@ export default function AdminCarsPage() {
             <main className="relative z-10 pt-32 pb-24 px-6 max-w-7xl mx-auto">
 
                 <header className="mb-16">
-                    
+                    <Link href="/admin/dashboard" className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-all group w-fit">
+                        <ChevronLeft className={`w-4 h-4 transition-transform group-hover:-translate-x-1 ${isRTL ? 'rotate-180 group-hover:translate-x-1' : ''}`} />
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em]">{isRTL ? 'العودة للرئيسية' : 'BACK TO DASHBOARD'}</span>
+                    </Link>
 
                     <div className="flex items-center gap-4 mb-6">
                         <div className="h-[2px] w-12 bg-cinematic-neon-blue shadow-[0_0_10px_rgba(0,240,255,1)]" />
@@ -380,7 +383,7 @@ export default function AdminCarsPage() {
                                                     // Prefer API brands
                                                     // Note: synchronous render cannot await; fallback to localStorage if present
                                                     list = JSON.parse(localStorage.getItem('hm_brands_cache') || '[]');
-                                                } catch {}
+                                                } catch { }
                                                 const carBrands = list.filter((b: any) => b.category === 'cars' || b.category === 'both');
                                                 return carBrands.length ? carBrands.map((b: any) => <option key={b.id} value={b.name}>{b.name}</option>) : [<option key="manual" value={formData.make || ''}>{formData.make || (isRTL ? 'اكتب الماركة' : 'Type brand')}</option>];
                                             })()}

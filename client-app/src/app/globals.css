@@ -330,7 +330,7 @@
 }
 
 /* ═══════════════════════════════════════════
-   MOBILE & RESPONSIVE FIXES
+   MOBILE & RESPONSIVE FIXES (v4.1 ULTRA-COMPACT)
    ═══════════════════════════════════════════ */
 
 /* Fix iOS Safari fixed background issue */
@@ -343,55 +343,82 @@
   }
 }
 
-/* Mobile: video background fallback */
+/* Mobile Perfection (max-width: 767px) */
 @media (max-width: 767px) {
   .video-bg {
     display: none !important;
   }
 
-  /* Ensure background images show on mobile */
+  /* Optimized Backgrounds for Phones */
   .video-bg-wrapper {
     background-color: #050505;
-    background-size: cover;
-    background-position: center;
+    background-size: 100% auto !important;
+    /* يحافظ على تناسق الصورة بدلاً من التكبير الرهيب */
+    background-position: center top !important;
+    /* يركز على أعلى الصورة (غالباً مكان السيارة أو الشعار) */
     background-repeat: no-repeat;
   }
 
-  /* Touch-friendly tap targets */
-  button,
-  a,
-  [role="button"] {
-    min-height: 44px;
-    min-width: 44px;
+  /* Compact Buttons - صغيرة ولكن ظاهرة ومرتبة */
+  .btn-luxury,
+  .btn-start-engine,
+  .btn-glow {
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
+    min-height: 42px !important;
+    font-size: 11px !important;
+    letter-spacing: 0.05em !important;
   }
 
-  /* Admin pages: stack header buttons vertically */
-  .admin-header-actions {
-    flex-direction: column !important;
-    align-items: stretch !important;
-  }
-
-  /* Reduce font sizes on small screens */
-  h1 {
-    font-size: clamp(2rem, 10vw, 4rem) !important;
-  }
-
-  /* Fix overflow on mobile */
+  /* Tidy Cards - ترتيب البطاقات لتقليل الفوضى */
   .glass-card {
+    padding: 1.25rem !important;
+    /* هوامش أقل لترك مساحة للمحتوى */
+    margin-left: 0.25rem;
+    margin-right: 0.25rem;
+    border-radius: 1.5rem !important;
     overflow: hidden;
+  }
+
+  /* Font Scaling */
+  h1 {
+    font-size: 2rem !important;
+    line-height: 1.1;
+  }
+
+  h2 {
+    font-size: 1.5rem !important;
+  }
+
+  p {
+    font-size: 0.85rem !important;
+  }
+
+  /* Admin Header & Actions */
+  .admin-header-actions {
+    display: flex;
+    flex-direction: row !important;
+    /* العودة للصف الواحد إذا كانت العناصر صغيرة */
+    flex-wrap: wrap;
+    gap: 0.5rem;
   }
 
   /* Admin tables scroll horizontally */
   .admin-table-wrapper {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    border-radius: 1rem;
   }
 }
 
-/* Tablet (768px - 1024px) */
+/* Tablet Tweaks */
 @media (min-width: 768px) and (max-width: 1024px) {
   .admin-sidebar {
-    width: 200px;
+    width: 80px;
+  }
+
+  .admin-sidebar span {
+    display: none;
   }
 }
 

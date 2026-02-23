@@ -232,8 +232,12 @@ export default function Login() {
 
                 {/* ══ موبايل فقط: صورة hmcar.jpg — مخفية على الشاشات الكبيرة ══ */}
                 <div
-                    className="absolute inset-0 bg-cover bg-center bg-no-repeat md:hidden"
-                    style={{ backgroundImage: "url('/images/hmcar.jpg')" }}
+                    className="absolute inset-0 bg-no-repeat md:hidden"
+                    style={{
+                        backgroundImage: "url('/images/hmcar.jpg')",
+                        backgroundSize: '100% auto',
+                        backgroundPosition: 'center 15%'
+                    }}
                 />
 
                 {/* ══ لابتوب/ديسكتوب فقط: فيديو — مخفي على الموبايل ══
@@ -288,9 +292,9 @@ export default function Login() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-                className="relative z-10 w-full max-w-md"
+                className="relative z-10 w-full max-w-md px-2"
             >
-                <div className="glass-card p-8 sm:p-10 md:p-12 rounded-3xl border border-white/10 backdrop-blur-3xl shadow-2xl">
+                <div className="glass-card p-6 sm:p-10 md:p-12 rounded-3xl border border-white/10 backdrop-blur-3xl shadow-2xl">
 
                     {/* ── Header ── */}
                     <div className="text-center space-y-6 mb-10">

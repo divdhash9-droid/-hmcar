@@ -31,6 +31,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import DashboardBackdrop from "@/components/DashboardBackdrop";
 import ParticleBackground from "@/components/ParticleBackground";
+import LiveNotificationsList from "@/components/LiveNotificationsList";
 
 interface DashboardStats {
     totalCars?: number;
@@ -326,37 +327,55 @@ export default function AdminDashboard() {
                             </div>
                         </div>
 
-                        {/* Recent Activity */}
-                        <div className="glass-card p-10 md:p-14 bg-white/[0.01] border-white/5 relative overflow-hidden">
-                            <div className="flex items-center gap-5 mb-8">
-                                <div className="h-[2px] w-12 bg-cinematic-neon-yellow" />
-                                <h2 className="text-[11px] font-black uppercase tracking-[0.6em] text-white">{isRTL ? 'آخر الأنشطة' : 'RECENT ACTIVITY'}</h2>
+                        {/* Live Alerts & Recent Activity */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                            {/* Live Notifications from Sockets */}
+                            <div className="glass-card p-10 md:p-14 bg-white/[0.01] border-white/5 relative overflow-hidden">
+                                <div className="flex items-center justify-between mb-8">
+                                    <div className="flex items-center gap-5">
+                                        <div className="h-[2px] w-12 bg-cinematic-neon-red" />
+                                        <h2 className="text-[11px] font-black uppercase tracking-[0.6em] text-white">{isRTL ? 'تنبيهات مباشرة' : 'LIVE ALERTS'}</h2>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="w-2 h-2 rounded-full bg-cinematic-neon-red animate-pulse" />
+                                        <span className="text-[9px] font-black text-cinematic-neon-red uppercase tracking-widest">Real-time</span>
+                                    </div>
+                                </div>
+                                <LiveNotificationsList isRTL={isRTL} />
                             </div>
-                            <div className="space-y-4">
-                                {[
-                                    { icon: Car, label: isRTL ? 'تمت إضافة سيارة جديدة' : 'New car added', sub: 'Mercedes-Benz S-Class 2024', time: '2m ago', color: 'text-cinematic-neon-blue', bg: 'bg-cinematic-neon-blue/10' },
-                                    { icon: Gavel, label: isRTL ? 'مزاد جديد بدأ' : 'New auction started', sub: 'BMW M5 Competition — Base: 300K SAR', time: '15m ago', color: 'text-cinematic-neon-red', bg: 'bg-cinematic-neon-red/10' },
-                                    { icon: Users, label: isRTL ? 'مستخدم جديد سجّل' : 'New user registered', sub: 'khalid@example.com', time: '1h ago', color: 'text-purple-400', bg: 'bg-purple-400/10' },
-                                    { icon: ShoppingCart, label: isRTL ? 'طلب جديد' : 'New order placed', sub: 'ORD-A1B2C3D4 — 450,000 SAR', time: '3h ago', color: 'text-green-400', bg: 'bg-green-400/10' },
-                                    { icon: MessageCircle, label: isRTL ? 'رسالة عميل جديدة' : 'New customer message', sub: 'Ahmed Al-Rashid', time: '5h ago', color: 'text-cinematic-neon-yellow', bg: 'bg-cinematic-neon-yellow/10' },
-                                ].map((activity, i) => (
-                                    <motion.div
-                                        key={i}
-                                        initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: i * 0.1 }}
-                                        className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all"
-                                    >
-                                        <div className={cn("p-2.5 rounded-xl shrink-0", activity.bg)}>
-                                            <activity.icon className={cn("w-4 h-4", activity.color)} />
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="text-[10px] font-black uppercase tracking-wider text-white/80">{activity.label}</div>
-                                            <div className="text-[9px] text-white/30 truncate">{activity.sub}</div>
-                                        </div>
-                                        <div className="text-[9px] text-white/20 font-bold shrink-0">{activity.time}</div>
-                                    </motion.div>
-                                ))}
+
+                            {/* Recent Activity (Static/Log) */}
+                            <div className="glass-card p-10 md:p-14 bg-white/[0.01] border-white/5 relative overflow-hidden">
+                                <div className="flex items-center gap-5 mb-8">
+                                    <div className="h-[2px] w-12 bg-cinematic-neon-yellow" />
+                                    <h2 className="text-[11px] font-black uppercase tracking-[0.6em] text-white">{isRTL ? 'آخر الأنشطة' : 'RECENT ACTIVITY'}</h2>
+                                </div>
+                                <div className="space-y-4">
+                                    {[
+                                        { icon: Car, label: isRTL ? 'تمت إضافة سيارة جديدة' : 'New car added', sub: 'Mercedes-Benz S-Class 2024', time: '2m ago', color: 'text-cinematic-neon-blue', bg: 'bg-cinematic-neon-blue/10' },
+                                        { icon: Gavel, label: isRTL ? 'مزاد جديد بدأ' : 'New auction started', sub: 'BMW M5 Competition — Base: 300K SAR', time: '15m ago', color: 'text-cinematic-neon-red', bg: 'bg-cinematic-neon-red/10' },
+                                        { icon: Users, label: isRTL ? 'مستخدم جديد سجّل' : 'New user registered', sub: 'khalid@example.com', time: '1h ago', color: 'text-purple-400', bg: 'bg-purple-400/10' },
+                                        { icon: ShoppingCart, label: isRTL ? 'طلب جديد' : 'New order placed', sub: 'ORD-A1B2C3D4 — 450,000 SAR', time: '3h ago', color: 'text-green-400', bg: 'bg-green-400/10' },
+                                        { icon: MessageCircle, label: isRTL ? 'رسالة عميل جديدة' : 'New customer message', sub: 'Ahmed Al-Rashid', time: '5h ago', color: 'text-cinematic-neon-yellow', bg: 'bg-cinematic-neon-yellow/10' },
+                                    ].map((activity, i) => (
+                                        <motion.div
+                                            key={i}
+                                            initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: i * 0.1 }}
+                                            className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all"
+                                        >
+                                            <div className={cn("p-2.5 rounded-xl shrink-0", activity.bg)}>
+                                                <activity.icon className={cn("w-4 h-4", activity.color)} />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="text-[10px] font-black uppercase tracking-wider text-white/80">{activity.label}</div>
+                                                <div className="text-[9px] text-white/30 truncate">{activity.sub}</div>
+                                            </div>
+                                            <div className="text-[9px] text-white/20 font-bold shrink-0">{activity.time}</div>
+                                        </motion.div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
 

@@ -170,13 +170,13 @@ export default function LandingShowcase({ isRTL, latestCars = [] }: LandingShowc
 
                             {/* Content */}
                             <h3 className="relative text-xs sm:text-3xl font-bold text-white sm:mb-3 font-display leading-tight">{card.title}</h3>
-                            <p className="relative text-[10px] sm:text-sm text-gray-300 opacity-60 group-hover:opacity-100 transition-opacity duration-500 hidden sm:block">
+                            <p className="relative text-[10px] sm:text-sm text-gray-300 opacity-90 sm:opacity-60 group-hover:opacity-100 transition-opacity duration-500">
                                 {card.description}
                             </p>
 
                             {/* Arrow — desktop only */}
-                            <div className="absolute bottom-6 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0 hidden sm:block">
-                                <ArrowRight className={`w-6 h-6 text-white ${isRTL ? "rotate-180" : ""}`} />
+                            <div className="absolute bottom-4 sm:bottom-6 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0">
+                                <ArrowRight className={`w-4 h-4 sm:w-6 sm:h-6 text-white ${isRTL ? "rotate-180" : ""}`} />
                             </div>
 
                             {/* Decorative Sparkle */}

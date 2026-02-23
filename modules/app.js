@@ -155,10 +155,15 @@ class App {
     try {
       await database.connect();
 
+      const socketModule = require('./socket');
       const server = this.app.listen(config.server.port, config.server.host, () => {
         logger.info(`🚀 الخادم يعمل على ${config.server.host}:${config.server.port}`);
         logger.info(`🌐 API رابط: http://localhost:${config.server.port}/api/v2`);
       });
+
+      // تهيئة Sockets
+      this.io = socketModule.init(server);
+      this.app.set('io', this.io); // جعلها متاحة في المسارات إذا لزم الأمر
 
       // Graceful Shutdown
       const shutdown = async () => {

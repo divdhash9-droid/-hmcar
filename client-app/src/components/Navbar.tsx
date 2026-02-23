@@ -83,13 +83,49 @@ export default function Navbar() {
                     </div>
 
                     {/* Desktop Navigation */}
-                    <div className="hidden lg:flex items-center gap-1"></div>
+                    <div className="hidden lg:flex items-center gap-6">
+                        {navLinks.map((link) => (
+                            <Link
+                                key={link.href}
+                                href={link.href}
+                                className={cn(
+                                    "text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:text-white",
+                                    isActive(link.href) ? "text-[#c9a96e]" : "text-white/40"
+                                )}
+                            >
+                                {link.label}
+                            </Link>
+                        ))}
+                    </div>
 
                     {/* Right Actions */}
                     <div className="flex items-center gap-2">
-                        {isLoggedIn && pathname !== '/' && (
-                            <NotificationDropdown />
+                        {isLoggedIn ? (
+                            <div className="flex items-center gap-2">
+                                <NotificationDropdown />
+                                <Link
+                                    href={user?.role === 'admin' ? '/admin' : '/profile'}
+                                    className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all"
+                                >
+                                    <User className="w-4 h-4" />
+                                </Link>
+                            </div>
+                        ) : (
+                            <Link href="/login">
+                                <button className="btn-luxury py-2 px-4 sm:px-6 rounded-lg text-[9px] font-black uppercase tracking-widest text-black">
+                                    {isRTL ? 'دخول' : 'LOGIN'}
+                                </button>
+                            </Link>
                         )}
+
+                        {/* Mobile Toggle */}
+                        <button
+                            onClick={() => setIsOpen(true)}
+                            className="lg:hidden w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-white/10 transition-all"
+                            aria-label={isRTL ? "افتح القائمة" : "Open Menu"}
+                        >
+                            <Menu className="w-5 h-5" />
+                        </button>
                     </div>
                 </div>
             </motion.nav>
@@ -167,7 +203,7 @@ export default function Navbar() {
                                         </button>
                                     </Link>
                                 )}
-                                
+
                             </div>
                         </motion.div>
                     </motion.div>

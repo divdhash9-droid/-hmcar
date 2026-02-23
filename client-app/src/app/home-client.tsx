@@ -17,6 +17,8 @@ import SocialLinks from "@/components/SocialLinks";
 
 import LandingShowcase from "@/components/LandingShowcase";
 import { useRouter } from "next/navigation";
+import { useSocket } from "@/lib/SocketContext";
+import { useAuth } from "@/lib/AuthContext";
 
 export type CarType = {
   id?: string;
@@ -71,12 +73,26 @@ function AnimatedCounter({ value, suffix = "" }: { value: number; suffix?: strin
 
 export default function HomeClient({ latestCars }: HomeClientProps) {
   const { isRTL } = useLanguage();
+  const { user, isLoggedIn } = useAuth();
+  const { socket, isConnected } = useSocket();
   const containerRef = useRef<HTMLDivElement>(null);
   const liveRef = useRef<HTMLDivElement>(null);
   const [videoHeight, setVideoHeight] = useState<string>("55vh");
   const [activeTab, setActiveTab] = useState("featured");
   const [activeDock, setActiveDock] = useState<"reviews" | "app" | null>(null);
   const router = useRouter();
+
+  // تتبع دخول العميل وإبلاغ الأدمن في الوقت الحقيقي
+  useEffect(() => {
+    if (isLoggedIn && user && socket && isConnected) {
+      socket.emit('user_navigation', {
+        userId: (user as any)._id || (user as any).id,
+        userName: user.name,
+        page: isRTL ? 'الصفحة الرئيسية' : 'Home Page',
+        timestamp: new Date()
+      });
+    }
+  }, [isLoggedIn, user, socket, isConnected, isRTL]);
   useEffect(() => {
     const updateHeight = () => {
       const top = liveRef.current ? liveRef.current.offsetTop : 0;
@@ -291,7 +307,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
                 <div
                   key={index}
                   className="min-w-[14rem] h-36 rounded-2xl border border-white/10 bg-white/[0.03] overflow-hidden cursor-pointer"
-                  onClick={() => router.push("/login")}
+                  onClick={() => router.push(isLoggedIn ? "/showroom" : "/login")}
                 >
                   <div className="relative w-full h-28">
                     <Image
@@ -393,7 +409,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {liveAuctions.map((auction, index) => (
-              <motion.div key={auction.id} className="group relative cursor-pointer" initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: index * 0.15 }} onClick={() => router.push('/login')}>
+              <motion.div key={auction.id} className="group relative cursor-pointer" initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: index * 0.15 }} onClick={() => router.push(isLoggedIn ? '/auctions' : '/login')}>
                 <div className="relative bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden transition-all duration-500 hover:border-red-500/30 hover:shadow-2xl hover:shadow-red-500/10">
                   <div className="absolute top-4 left-4 z-20 flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/20 border border-red-500/30 backdrop-blur-md">
                     <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />

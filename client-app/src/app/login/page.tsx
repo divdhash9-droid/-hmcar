@@ -8,6 +8,8 @@ import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/LanguageContext";
 import { api } from "@/lib/api";
 import { countryDialCodes } from "@/lib/countries";
+import { useSocket } from "@/lib/SocketContext";
+import { useAuth } from "@/lib/AuthContext";
 
 export default function Login() {
     const { isRTL } = useLanguage();
@@ -26,7 +28,21 @@ export default function Login() {
     const [showCountry, setShowCountry] = useState(false);
     const [otpRequested, setOtpRequested] = useState(false);
     const [otpCode, setOtpCode] = useState('');
+
+    const { socket, isConnected } = useSocket();
+    const { user } = useAuth();
     const DEV_FAKE = process.env.NEXT_PUBLIC_ENABLE_DEV_ADMIN === '1';
+
+    // تتبع دخول العميل لصفحة تسجيل الدخول وإبلاغ الأدمن
+    useEffect(() => {
+        if (socket && isConnected) {
+            socket.emit('user_navigation', {
+                userName: user?.name || (isRTL ? 'زائر' : 'Guest'),
+                page: isRTL ? 'صفحة تسجيل الدخول' : 'Login Page',
+                timestamp: new Date()
+            });
+        }
+    }, [socket, isConnected, isRTL, user]);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -235,8 +251,8 @@ export default function Login() {
                     className="absolute inset-0 bg-no-repeat md:hidden"
                     style={{
                         backgroundImage: "url('/images/hmcar.jpg')",
-                        backgroundSize: '100% auto',
-                        backgroundPosition: 'center 15%'
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center top'
                     }}
                 />
 

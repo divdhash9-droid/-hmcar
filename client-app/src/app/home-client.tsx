@@ -158,7 +158,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
         const parsed = JSON.parse(raw);
         setSocialConfig({ whatsapp: parsed.whatsapp || "", links: Array.isArray(parsed.links) ? parsed.links : [] });
       }
-    } catch {}
+    } catch { }
   }, []);
 
   const getPlatformUrl = (platform: string): string => {
@@ -171,11 +171,13 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
     <div ref={containerRef} className="relative min-h-screen overflow-x-hidden" dir={isRTL ? "rtl" : "ltr"}>
       <Navbar />
 
-      
+
 
       {/* Cinematic Video Background */}
       <CinematicVideoBackground
         videoSrc="/videos/hero.mp4"
+        fallbackImage="/images/photo_2026-02-07_22-24-18.jpg"
+        mobileImage="/images/mazad.jpg"
         overlayOpacity={0.6}
         height={videoHeight}
       />
@@ -205,29 +207,27 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
                 {txt.featuredTitle}
               </h2>
             </div>
-            
+
           </motion.div>
 
           <div className="relative z-10 mb-6">
             <div className="relative z-20 flex justify-end gap-2 mb-4">
               <button
                 onClick={() => setActiveDock(prev => (prev === "reviews" ? null : "reviews"))}
-                className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${
-                  activeDock === "reviews"
+                className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${activeDock === "reviews"
                     ? "bg-[#c9a96e] text-black shadow-[0_0_12px_rgba(201,169,110,0.5)]"
                     : "bg-white/10 border border-white/20 text-white hover:bg-white/20"
-                }`}
+                  }`}
                 aria-label="آراء العملاء"
               >
                 <Star className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setActiveDock(prev => (prev === "app" ? null : "app"))}
-                className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${
-                  activeDock === "app"
+                className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${activeDock === "app"
                     ? "bg-[#c9a96e] text-black shadow-[0_0_12px_rgba(201,169,110,0.5)]"
                     : "bg-white/10 border border-white/20 text-white hover:bg-white/20"
-                }`}
+                  }`}
                 aria-label="تحميل التطبيق"
               >
                 <Smartphone className="w-4 h-4" />
@@ -428,7 +428,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
               </motion.div>
             ))}
           </div>
-          
+
         </div>
       </section>
 
@@ -462,79 +462,79 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
         </div>
       </section>
 
-      
+
 
       {false && (
-      <section className="relative z-10 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <motion.div className="text-center mb-16" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
-            <h2 className="text-4xl md:text-5xl font-bold text-white font-display" style={{ textShadow: "0 0 40px rgba(201,169,110,0.3)" }}>{txt.testimonialsTitle}</h2>
-          </motion.div>
+        <section className="relative z-10 py-12 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
+            <motion.div className="text-center mb-16" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
+              <h2 className="text-4xl md:text-5xl font-bold text-white font-display" style={{ textShadow: "0 0 40px rgba(201,169,110,0.3)" }}>{txt.testimonialsTitle}</h2>
+            </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {testimonials.map((testimonial, index) => (
-              <motion.div key={index} className="relative p-8 rounded-2xl border border-white/10 bg-white/[0.02] backdrop-blur-xl" initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: index * 0.15 }}>
-                <div className="flex gap-1 mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 text-[#c9a96e] fill-[#c9a96e]" />
-                  ))}
-                </div>
-                <p className="text-white/80 mb-6 leading-relaxed">&ldquo;{testimonial.text}&rdquo;</p>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#c9a96e] to-[#8b7355] flex items-center justify-center text-black font-bold">
-                    {testimonial.name.charAt(0)}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {testimonials.map((testimonial, index) => (
+                <motion.div key={index} className="relative p-8 rounded-2xl border border-white/10 bg-white/[0.02] backdrop-blur-xl" initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: index * 0.15 }}>
+                  <div className="flex gap-1 mb-4">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <Star key={i} className="w-5 h-5 text-[#c9a96e] fill-[#c9a96e]" />
+                    ))}
                   </div>
-                  <div>
-                    <p className="font-bold text-white">{testimonial.name}</p>
-                    <p className="text-sm text-white/50">{testimonial.role}</p>
+                  <p className="text-white/80 mb-6 leading-relaxed">&ldquo;{testimonial.text}&rdquo;</p>
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#c9a96e] to-[#8b7355] flex items-center justify-center text-black font-bold">
+                      {testimonial.name.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="font-bold text-white">{testimonial.name}</p>
+                      <p className="text-sm text-white/50">{testimonial.role}</p>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
       )}
 
       {false && (
-      <section className="relative z-10 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <motion.div className="relative overflow-hidden rounded-3xl p-8 md:p-16" initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
-            <div className="absolute inset-0 bg-gradient-to-br from-[#c9a96e]/30 via-[#020202] to-[#8b7355]/20" />
-            <div className="absolute inset-0 bg-[url('/images/grid.svg')] opacity-20" />
-            <motion.div className="absolute top-0 left-0 w-64 h-64 rounded-full bg-[#c9a96e]/30 blur-3xl" animate={{ x: [0, 50, 0], y: [0, 30, 0] }} transition={{ duration: 8, repeat: Infinity }} />
-            <motion.div className="absolute bottom-0 right-0 w-96 h-96 rounded-full bg-[#c9a96e]/20 blur-3xl" animate={{ x: [0, -50, 0], y: [0, -30, 0] }} transition={{ duration: 10, repeat: Infinity }} />
+        <section className="relative z-10 py-12 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
+            <motion.div className="relative overflow-hidden rounded-3xl p-8 md:p-16" initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
+              <div className="absolute inset-0 bg-gradient-to-br from-[#c9a96e]/30 via-[#020202] to-[#8b7355]/20" />
+              <div className="absolute inset-0 bg-[url('/images/grid.svg')] opacity-20" />
+              <motion.div className="absolute top-0 left-0 w-64 h-64 rounded-full bg-[#c9a96e]/30 blur-3xl" animate={{ x: [0, 50, 0], y: [0, 30, 0] }} transition={{ duration: 8, repeat: Infinity }} />
+              <motion.div className="absolute bottom-0 right-0 w-96 h-96 rounded-full bg-[#c9a96e]/20 blur-3xl" animate={{ x: [0, -50, 0], y: [0, -30, 0] }} transition={{ duration: 10, repeat: Infinity }} />
 
-            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-12">
-              <div className="flex-1 text-center md:text-left">
-                <motion.div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#c9a96e]/30 bg-[#c9a96e]/10 backdrop-blur-md mb-6" whileHover={{ scale: 1.05 }}>
-                  <Smartphone className="w-4 h-4 text-[#c9a96e]" />
-                  <span className="text-sm text-[#c9a96e] tracking-wider">App</span>
-                </motion.div>
-                <h2 className="text-4xl md:text-5xl font-bold text-white font-display mb-4" style={{ textShadow: "0 0 40px rgba(201,169,110,0.3)" }}>{txt.downloadTitle}</h2>
-                <p className="text-white/60 mb-8">{txt.downloadSubtitle}</p>
-                <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-                  <motion.button className="flex items-center gap-3 px-6 py-3 bg-white text-black rounded-xl font-bold hover:bg-[#c9a96e] transition-all" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
-                    <Download className="w-5 h-5" />
-                    {txt.appStore}
-                  </motion.button>
-                  <motion.button className="flex items-center gap-3 px-6 py-3 border border-white/30 text-white rounded-xl font-bold hover:bg-white/10 transition-all" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
-                    <Download className="w-5 h-5" />
-                    {txt.playStore}
-                  </motion.button>
+              <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-12">
+                <div className="flex-1 text-center md:text-left">
+                  <motion.div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#c9a96e]/30 bg-[#c9a96e]/10 backdrop-blur-md mb-6" whileHover={{ scale: 1.05 }}>
+                    <Smartphone className="w-4 h-4 text-[#c9a96e]" />
+                    <span className="text-sm text-[#c9a96e] tracking-wider">App</span>
+                  </motion.div>
+                  <h2 className="text-4xl md:text-5xl font-bold text-white font-display mb-4" style={{ textShadow: "0 0 40px rgba(201,169,110,0.3)" }}>{txt.downloadTitle}</h2>
+                  <p className="text-white/60 mb-8">{txt.downloadSubtitle}</p>
+                  <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+                    <motion.button className="flex items-center gap-3 px-6 py-3 bg-white text-black rounded-xl font-bold hover:bg-[#c9a96e] transition-all" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
+                      <Download className="w-5 h-5" />
+                      {txt.appStore}
+                    </motion.button>
+                    <motion.button className="flex items-center gap-3 px-6 py-3 border border-white/30 text-white rounded-xl font-bold hover:bg-white/10 transition-all" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
+                      <Download className="w-5 h-5" />
+                      {txt.playStore}
+                    </motion.button>
+                  </div>
+                </div>
+                <div className="flex-1 flex justify-center">
+                  <motion.div className="relative w-64 h-[500px] rounded-3xl border-4 border-white/20 overflow-hidden bg-gradient-to-b from-[#c9a96e]/20 to-transparent" animate={{ y: [0, -10, 0] }} transition={{ duration: 4, repeat: Infinity }}>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Smartphone className="w-24 h-24 text-[#c9a96e]/30" />
+                    </div>
+                  </motion.div>
                 </div>
               </div>
-              <div className="flex-1 flex justify-center">
-                <motion.div className="relative w-64 h-[500px] rounded-3xl border-4 border-white/20 overflow-hidden bg-gradient-to-b from-[#c9a96e]/20 to-transparent" animate={{ y: [0, -10, 0] }} transition={{ duration: 4, repeat: Infinity }}>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Smartphone className="w-24 h-24 text-[#c9a96e]/30" />
-                  </div>
-                </motion.div>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
+            </motion.div>
+          </div>
+        </section>
       )}
 
       <footer className="relative z-10 py-10 px-4 sm:px-6 lg:px-8 border-t border-white/10 bg-black">
@@ -560,7 +560,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
                   </motion.div>
                 </Link>
               )}
-              {socialConfig.links.slice(0,3).map((item, idx) => (
+              {socialConfig.links.slice(0, 3).map((item, idx) => (
                 <Link href="/social" key={idx}>
                   <motion.div whileHover={{ scale: 1.08 }} className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:text-[#c9a96e] hover:border-[#c9a96e]/40 transition-all">
                     {(() => {

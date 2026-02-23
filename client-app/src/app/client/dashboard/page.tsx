@@ -123,6 +123,7 @@ export default function ClientDashboard() {
     const sideMenuItems = [
         { icon: LayoutGrid, label: isRTL ? 'لوحة التحكم' : 'Dashboard', href: '/client/dashboard', active: true },
         { icon: ShoppingBag, label: isRTL ? 'طلباتي' : 'My Orders', href: '/orders' },
+        { icon: Gavel, label: isRTL ? 'مزايداتي' : 'My Bids', href: '/auctions/my-bids' },
         { icon: Heart, label: isRTL ? 'المفضلة' : 'Favorites', href: '/favorites' },
         { icon: Bell, label: isRTL ? 'الإشعارات' : 'Notifications', href: '/notifications' },
         { icon: MessageCircle, label: isRTL ? 'الرسائل' : 'Messages', href: '/messages' },
@@ -185,7 +186,7 @@ export default function ClientDashboard() {
 
             {/* Enhanced Space Background with Parallax and 3D Elements */}
             <DashboardBackdrop />
-            
+
             <div className="relative z-10 pt-24 flex min-h-screen">
 
                 {/* Sidebar - Enhanced Glassmorphism */}
@@ -201,7 +202,7 @@ export default function ClientDashboard() {
                     {/* Dashboard Logo Section */}
                     <div className="flex items-center gap-3 mb-8 px-2">
                         <div className="w-10 h-10 bg-luxury-gold/20 rounded-lg flex items-center justify-center border border-luxury-gold/30 shadow-[0_0_15px_rgba(201,169,110,0.3)]">
-                             <span className="font-black text-luxury-gold text-xl drop-shadow-md">HM</span>
+                            <span className="font-black text-luxury-gold text-xl drop-shadow-md">HM</span>
                         </div>
                         <span className="font-black text-2xl text-white tracking-tighter italic drop-shadow-lg">
                             HM <span className="text-luxury-gold">CAR</span>

@@ -137,7 +137,7 @@ export default function AdminAuctionsControl() {
                             onClick={() => setActiveArena(tab)}
                             className={cn(
                                 "px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0",
-                                activeArena === tab ? "bg-white text-black shadow-xl" : "text-white/40 hover:text-white"
+                                activeArena === tab ? "bg-white !text-black shadow-xl" : "text-white/40 hover:text-white"
                             )}
                         >
                             {tab}

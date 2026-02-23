@@ -353,7 +353,7 @@ export default function AdminMessagesPage() {
                                             whileTap={{ scale: 0.95 }}
                                             onClick={sendMessage}
                                             disabled={!newMessage.trim() || sending}
-                                            className="p-3.5 bg-cinematic-neon-blue text-black rounded-xl disabled:opacity-30 hover:shadow-[0_0_20px_rgba(0,240,255,0.4)] transition-all"
+                                            className="p-3.5 bg-cinematic-neon-blue !text-black rounded-xl disabled:opacity-30 hover:shadow-[0_0_20px_rgba(0,240,255,0.4)] transition-all"
                                         >
                                             <Send className={cn("w-4 h-4", isRTL && "rotate-180")} />
                                         </motion.button>

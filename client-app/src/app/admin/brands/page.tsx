@@ -126,7 +126,7 @@ export default function AdminBrandsPage() {
                   <option value="both">{t('brandBoth')}</option>
                 </select>
               </div>
-              <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={handleAdd} className="btn-glow w-full py-4 bg-[#c9a96e] text-black rounded-xl text-[11px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-2">
+              <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={handleAdd} className="btn-glow w-full py-4 bg-[#c9a96e] !text-black rounded-xl text-[11px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-2">
                 <Save className="w-4 h-4" />
                 {isRTL ? 'حفظ' : 'SAVE'}
               </motion.button>

@@ -163,7 +163,7 @@ export default function AdminCarsPage() {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => { resetForm(); setShowModal(true); }}
-                            className="btn-glow px-8 py-4 bg-cinematic-neon-blue text-black rounded-xl text-[11px] font-black uppercase tracking-[0.3em] shadow-[0_0_30px_rgba(0,240,255,0.3)] flex items-center gap-3"
+                            className="btn-glow px-8 py-4 bg-cinematic-neon-blue !text-black rounded-xl text-[11px] font-black uppercase tracking-[0.3em] shadow-[0_0_30px_rgba(0,240,255,0.3)] flex items-center gap-3"
                         >
                             <Plus className="w-5 h-5" />
                             {isRTL ? 'إضافة سيارة' : 'ADD CAR'}
@@ -530,7 +530,7 @@ export default function AdminCarsPage() {
                                     </button>
                                     <button
                                         type="submit"
-                                        className="flex-1 py-4 bg-cinematic-neon-blue text-black rounded-xl text-[11px] font-black uppercase tracking-[0.3em] shadow-[0_0_30px_rgba(0,240,255,0.3)] flex items-center justify-center gap-3"
+                                        className="flex-1 py-4 bg-cinematic-neon-blue !text-black rounded-xl text-[11px] font-black uppercase tracking-[0.3em] shadow-[0_0_30px_rgba(0,240,255,0.3)] flex items-center justify-center gap-3"
                                     >
                                         <Save className="w-5 h-5" />
                                         {isRTL ? 'حفظ' : 'SAVE'}

@@ -305,7 +305,7 @@ const AddUserModal = ({ onClose, onAdd, isRTL }: any) => {
 
                     <div className="flex gap-4 pt-4">
                         <button type="button" onClick={onClose} className="flex-1 py-4 border border-white/10 hover:bg-white/5 text-white/60 font-black uppercase tracking-widest rounded-xl">Cancel</button>
-                        <button type="submit" className="flex-1 py-4 bg-cinematic-neon-blue text-black font-black uppercase tracking-widest rounded-xl hover:bg-white transition-all">Create User</button>
+                        <button type="submit" className="flex-1 py-4 bg-cinematic-neon-blue !text-black font-black uppercase tracking-widest rounded-xl hover:bg-white transition-all">Create User</button>
                     </div>
                 </form>
             </motion.div>

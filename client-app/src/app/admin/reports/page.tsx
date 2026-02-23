@@ -213,7 +213,7 @@ export default function AdminReportsPage() {
                                 {(['week', 'month', 'year'] as const).map(p => (
                                     <button key={p} onClick={() => setPeriod(p)} className={cn(
                                         "px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
-                                        period === p ? "bg-green-400 text-black" : "text-white/40 hover:text-white"
+                                        period === p ? "bg-green-400 !text-black" : "text-white/40 hover:text-white"
                                     )}>
                                         {p === 'week' ? (isRTL ? 'أسبوع' : 'WEEK') : p === 'month' ? (isRTL ? 'شهر' : 'MONTH') : (isRTL ? 'سنة' : 'YEAR')}
                                     </button>

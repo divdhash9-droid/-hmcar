@@ -1,7 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #000000; /* Deepest Black */
+  --background: #000000;
+  /* Deepest Black */
   --foreground: #ffffff;
   --card-bg: rgba(20, 20, 20, 0.4);
   --card-border: rgba(255, 255, 255, 0.08);
@@ -37,7 +38,7 @@
   .text-balance {
     text-wrap: balance;
   }
-  
+
   .perspective-1000 {
     perspective: 1000px;
   }
@@ -46,15 +47,15 @@
   .text-glow-gold {
     text-shadow: 0 0 15px var(--accent-gold-glow), 0 0 30px rgba(201, 169, 110, 0.2);
   }
-  
+
   .text-glow-red {
     text-shadow: 0 0 15px rgba(255, 59, 48, 0.5), 0 0 30px rgba(255, 59, 48, 0.2);
   }
-  
+
   .text-glow-blue {
     text-shadow: 0 0 15px rgba(0, 122, 255, 0.5), 0 0 30px rgba(0, 122, 255, 0.2);
   }
-  
+
   .text-glow-white {
     text-shadow: 0 0 15px rgba(255, 255, 255, 0.5), 0 0 30px rgba(255, 255, 255, 0.2);
   }
@@ -66,19 +67,29 @@
 }
 
 @layer components {
+
   /* Global Glow Button */
   .btn-glow {
     position: relative;
     transition: box-shadow 0.2s ease, background-color 0.2s ease, transform 0.1s ease;
     outline: none;
     will-change: box-shadow, transform;
+    isolation: isolate;
   }
+
+  .btn-glow>* {
+    position: relative;
+    z-index: 1;
+  }
+
   .btn-glow:hover {
     transform: translateY(-1px);
   }
+
   .btn-glow:active {
     transform: translateY(0);
   }
+
   .btn-glow::after {
     content: '';
     position: absolute;
@@ -90,6 +101,7 @@
     transition: opacity 0.2s ease;
     opacity: 0;
   }
+
   .btn-glow:active::after,
   .btn-glow[aria-pressed="true"]::after {
     background: rgba(0, 240, 255, 0.18);
@@ -102,6 +114,7 @@
     position: relative;
     transition: box-shadow 0.2s ease, background-color 0.2s ease;
   }
+
   .btn-glow-red::after {
     content: '';
     position: absolute;
@@ -114,9 +127,11 @@
     pointer-events: none;
     transition: opacity 0.2s ease;
   }
+
   .btn-glow-red:hover::after {
     opacity: 1;
   }
+
   /* Cinematic Glass Card */
   .glass-card {
     background: linear-gradient(145deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
@@ -126,7 +141,7 @@
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     transition: all 0.5s var(--ease-cinematic);
   }
-  
+
   .glass-card:hover {
     background: linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
     border-color: rgba(201, 169, 110, 0.3);
@@ -144,7 +159,7 @@
     padding: 1rem;
     transition: all 0.3s ease;
   }
-  
+
   .glass-input:focus {
     background: rgba(255, 255, 255, 0.05);
     border-color: var(--accent-gold);
@@ -162,7 +177,7 @@
     transition: all 0.5s var(--ease-cinematic);
     box-shadow: 0 0 10px rgba(255, 59, 48, 0.1);
   }
-  
+
   .btn-start-engine:hover {
     border-color: var(--accent-red);
     color: #fff;
@@ -170,7 +185,7 @@
     box-shadow: 0 0 30px rgba(255, 59, 48, 0.4), inset 0 0 20px rgba(255, 59, 48, 0.2);
     transform: scale(1.02);
   }
-  
+
   .btn-start-engine::before {
     content: '';
     position: absolute;
@@ -178,12 +193,12 @@
     left: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle, rgba(255,59,48,0.2) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(255, 59, 48, 0.2) 0%, transparent 70%);
     opacity: 0;
     transform: scale(0.5);
     transition: all 0.5s ease;
   }
-  
+
   .btn-start-engine:hover::before {
     opacity: 1;
     transform: scale(1);
@@ -202,7 +217,7 @@
     overflow: hidden;
     transition: all 0.5s var(--ease-cinematic);
   }
-  
+
   .btn-luxury::after {
     content: '';
     position: absolute;
@@ -212,7 +227,7 @@
     z-index: -1;
     transition: opacity 0.3s ease;
   }
-  
+
   .btn-luxury:hover {
     box-shadow: 0 0 30px var(--accent-gold-glow);
     transform: translateY(-2px);
@@ -240,13 +255,11 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: repeating-linear-gradient(
-      to bottom,
-      transparent 0px,
-      transparent 2px,
-      rgba(0, 0, 0, 0.3) 3px,
-      rgba(0, 0, 0, 0.3) 4px
-    );
+    background: repeating-linear-gradient(to bottom,
+        transparent 0px,
+        transparent 2px,
+        rgba(0, 0, 0, 0.3) 3px,
+        rgba(0, 0, 0, 0.3) 4px);
     pointer-events: none;
     z-index: 9999;
     opacity: 0.15;
@@ -255,8 +268,15 @@
 
 /* Animations */
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .animate-float {
@@ -264,8 +284,17 @@
 }
 
 @keyframes pulse-glow {
-  0%, 100% { opacity: 0.5; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.05); }
+
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
 }
 
 .animate-pulse-glow {
@@ -276,13 +305,16 @@
 ::-webkit-scrollbar {
   width: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: #000;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #333;
   border-radius: 3px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: var(--accent-gold);
 }

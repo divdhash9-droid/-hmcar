@@ -128,10 +128,10 @@ export default function Login() {
         } catch (err: unknown) {
             const errMsg = err instanceof Error ? err.message : '';
             const identifier = formData.email.trim();
-            if (role === 'admin' && DEV_FAKE && identifier === 'admin@hmcar.com' && formData.password.length >= 6) {
+            if (role === 'admin' && DEV_FAKE && identifier === 'id_7788' && formData.password.length >= 6) {
                 console.log('[Login] Falling back to DEV_FAKE admin...');
                 localStorage.setItem('hm_token', 'dev_admin_token');
-                localStorage.setItem('hm_user', JSON.stringify({ role: 'admin', name: 'Admin', email: identifier }));
+                localStorage.setItem('hm_user', JSON.stringify({ role: 'admin', name: 'Admin', username: identifier }));
                 document.cookie = `hm_token=dev_admin_token; path=/; max-age=86400; SameSite=Lax`;
                 setSuccessMessage(isRTL ? 'تم الدخول كمدير' : 'Logged in as admin');
                 setTimeout(() => {
@@ -466,12 +466,12 @@ export default function Login() {
                                 <div className="relative">
                                     <span className="pointer-events-none absolute inset-0 -m-px rounded-xl blur-xl opacity-50 -z-10 bg-red-500/25" />
                                     <input
-                                        type="email"
+                                        type="text"
                                         required
                                         value={formData.email}
                                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                         className={cn("w-full glass-input bg-white/5 focus:bg-white/10 outline-none border border-red-500/30 ring-1 ring-red-500/20", isRTL ? "pr-4 pl-4" : "pl-4 pr-4")}
-                                        placeholder="admin@hmcar.com"
+                                        placeholder={isRTL ? "المعرّف الخاص" : "Access ID"}
                                     />
                                 </div>
                             )}

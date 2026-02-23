@@ -245,9 +245,10 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // Find user by email, phone, name, or buyerNameKey
+    // Find user by email, phone, name, buyerNameKey, or username
     const query = {
       $or: [
+        { username: searchKey.toLowerCase() },
         { email: searchKey.toLowerCase() },
         { phone: searchKey },
         { name: { $regex: new RegExp(`^${searchKey.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') } },
@@ -411,10 +412,12 @@ router.post('/login', async (req, res) => {
       }
     );
 
-    // Update last login
-    user.lastLoginAt = new Date();
-    user.activeSessionId = req.sessionID;
-    await user.save();
+    // Update last login — نستخدم updateOne لتجاوز pre-save hook وتجنب إعادة تشفير الباسورد
+    const User = require('../../../models/User');
+    await User.updateOne(
+      { _id: user._id },
+      { $set: { lastLoginAt: new Date(), activeSessionId: req.sessionID || '' } }
+    );
 
     // Log successful login
     await AuditLog.logUserAction(

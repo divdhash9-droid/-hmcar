@@ -9,11 +9,11 @@ const userSchema = new mongoose.Schema({
   name: { type: String, trim: true, required: true },
   // صورة الملف الشخصي (رابط محلي تحت /uploads أو رابط Cloudinary)
   avatar: { type: String, default: '' },
-  // مفتاح مبسط للاسم (يُستخدم لتسجيل دخول العميل بالاسم فقط)
-  buyerNameKey: { type: String, unique: true, required: false, sparse: true },
+  // اسم المستخدم الفريد (يُستخدم لتسجيل الدخول بدلاً من الإيميل لزيادة الأمان)
+  username: { type: String, unique: true, required: false, sparse: true, trim: true, lowercase: true },
   // رقم الهاتف (يُستخدم لحسابات الأدمن غالباً)
   phone: { type: String, unique: true, required: false, sparse: true },
-  // البريد الإلكتروني (اختياري)
+  // البريد الإلكتروني (اختياري، لا يُستخدم للدخول)
   email: { type: String, unique: true, required: false, lowercase: true, sparse: true },
   //معرف فايربيس
   firebaseUid: { type: String, unique: true, required: false, sparse: true },

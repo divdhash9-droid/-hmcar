@@ -219,28 +219,30 @@ export default function Login() {
             {/* ── CINEMATIC VIDEO BACKGROUND ── */}
             <div className="video-bg-wrapper fixed inset-0 z-0">
 
-                {/* Mobile background (shown only on small screens) */}
+                {/* Mobile: unique portrait image */}
                 <div
                     className="absolute inset-0 bg-cover bg-center bg-no-repeat md:hidden"
                     style={{ backgroundImage: "url('/images/hmcar.jpg')", backgroundColor: '#050505' }}
                 />
 
-                {/* Desktop fallback image (shown under video on md+) */}
+                {/* Desktop: fallback photo under the video */}
                 <div
-                    className="absolute inset-0 bg-cover bg-center bg-no-repeat hidden md:block"
+                    className="absolute inset-0 bg-cover bg-top bg-no-repeat hidden md:block"
                     style={{ backgroundImage: "url('/images/photo_2026-02-07_22-24-18.jpg')", backgroundColor: '#050505' }}
                 />
 
-                {/* Desktop video (hidden on mobile) */}
+                {/* Desktop: cinematic video (hidden on mobile) */}
                 <video
-                    autoPlay loop muted playsInline
-                    className="video-bg absolute inset-0 w-full h-full object-cover opacity-60 hidden md:block"
-                    style={{ filter: 'brightness(0.4) contrast(1.2) saturate(1.2)' }}
+                    autoPlay loop muted playsInline preload="auto"
+                    poster="/images/photo_2026-02-07_22-24-18.jpg"
+                    className="video-bg absolute inset-0 w-full h-full object-cover hidden md:block"
+                    style={{ filter: 'brightness(0.45) contrast(1.15) saturate(1.1)' }}
                 >
+                    <source src="/videos/hero.mp4" type="video/mp4" />
                     <source src="/videos/video.mp4" type="video/mp4" />
                 </video>
 
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black opacity-80" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-black/60" />
                 <div className="scanlines hidden md:block" />
             </div>
 

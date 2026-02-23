@@ -177,8 +177,8 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
       <CinematicVideoBackground
         videoSrc="/videos/hero.mp4"
         fallbackImage="/images/photo_2026-02-07_22-24-18.jpg"
-        mobileImage="/images/mazad.jpg"
-        overlayOpacity={0.6}
+        mobileImage="/images/hmcar.jpg"
+        overlayOpacity={0.55}
         height={videoHeight}
       />
 
@@ -215,8 +215,8 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
               <button
                 onClick={() => setActiveDock(prev => (prev === "reviews" ? null : "reviews"))}
                 className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${activeDock === "reviews"
-                    ? "bg-[#c9a96e] text-black shadow-[0_0_12px_rgba(201,169,110,0.5)]"
-                    : "bg-white/10 border border-white/20 text-white hover:bg-white/20"
+                  ? "bg-[#c9a96e] text-black shadow-[0_0_12px_rgba(201,169,110,0.5)]"
+                  : "bg-white/10 border border-white/20 text-white hover:bg-white/20"
                   }`}
                 aria-label="آراء العملاء"
               >
@@ -225,8 +225,8 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
               <button
                 onClick={() => setActiveDock(prev => (prev === "app" ? null : "app"))}
                 className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${activeDock === "app"
-                    ? "bg-[#c9a96e] text-black shadow-[0_0_12px_rgba(201,169,110,0.5)]"
-                    : "bg-white/10 border border-white/20 text-white hover:bg-white/20"
+                  ? "bg-[#c9a96e] text-black shadow-[0_0_12px_rgba(201,169,110,0.5)]"
+                  : "bg-white/10 border border-white/20 text-white hover:bg-white/20"
                   }`}
                 aria-label="تحميل التطبيق"
               >

@@ -93,35 +93,34 @@ export default function LandingShowcase({ isRTL, latestCars = [] }: LandingShowc
     ];
 
     return (
-        <div className="relative min-h-screen w-full flex flex-col justify-center items-center px-4 overflow-hidden">
-            {/* Hero Text with Soft Reveal */}
+        <div className="relative min-h-screen w-full flex flex-col justify-center items-center px-3 sm:px-4 overflow-hidden">
             <motion.div
-                className="text-center z-20 mb-16 pt-20"
+                className="text-center z-20 mb-8 sm:mb-16 pt-16 sm:pt-20"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1.5, ease: "easeOut" }}
             >
                 <motion.h1
-                    className="text-6xl md:text-8xl font-bold font-display tracking-tight mb-6"
+                    className="text-4xl sm:text-6xl md:text-8xl font-bold font-display tracking-tight mb-4 sm:mb-6"
                     initial={{ filter: "blur(10px)", opacity: 0 }}
                     animate={{ filter: "blur(0px)", opacity: 1 }}
                     transition={{ duration: 1.2, delay: 0.2 }}
                     style={{ transformStyle: "preserve-3d" }}
                 >
-                    <span className="relative inline-block px-10 py-4 rounded-[2.5rem] border border-white/25 bg-white/10 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.35)]">
+                    <span className="relative inline-block px-6 sm:px-10 py-3 sm:py-4 rounded-[2rem] sm:rounded-[2.5rem] border border-white/25 bg-white/10 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.35)]">
                         <span
                             className="relative block bg-gradient-to-b from-white via-white/70 to-white/30 bg-clip-text text-transparent tracking-widest"
                             style={{ WebkitTextStroke: "1px rgba(255,255,255,0.35)" }}
                         >
                             HM CAR
                         </span>
-                        <span className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-b from-white/30 via-transparent to-white/10 opacity-35" />
+                        <span className="absolute inset-0 rounded-[2rem] sm:rounded-[2.5rem] bg-gradient-to-b from-white/30 via-transparent to-white/10 opacity-35" />
                         <span className="absolute -top-6 -left-8 w-28 h-28 rounded-full bg-white/25 blur-3xl opacity-30" />
                         <span className="absolute -bottom-6 -right-8 w-24 h-24 rounded-full bg-[#c9a96e]/20 blur-3xl opacity-30" />
                     </span>
                 </motion.h1>
                 <motion.p
-                    className="text-lg md:text-2xl text-gray-200 font-light"
+                    className="text-sm sm:text-lg md:text-2xl text-gray-200 font-light px-4"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 1.5, delay: 0.8 }}
@@ -130,10 +129,10 @@ export default function LandingShowcase({ isRTL, latestCars = [] }: LandingShowc
                         ? "HM CAR لتصدير السيارات وقطع الغيار من كوريا الى جميع انحاء العالم"
                         : "HM CAR — Exporting cars and spare parts from Korea worldwide"}
                 </motion.p>
-                <div className="mt-6">
+                <div className="mt-4 sm:mt-6">
                     <Link
                         href="/login"
-                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#c9a96e] text-black font-bold hover:bg-[#c9a96e]/90 transition-colors"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#c9a96e] text-black font-bold hover:bg-[#c9a96e]/90 transition-colors text-sm sm:text-base"
                     >
                         {isRTL ? "تسجيل الدخول" : "Login"}
                         <ArrowRight className={`w-4 h-4 ${isRTL ? "rotate-180" : ""}`} />
@@ -142,15 +141,19 @@ export default function LandingShowcase({ isRTL, latestCars = [] }: LandingShowc
             </motion.div>
 
             {/* Glass Cards Shop Sections */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-6xl z-20 px-4">
+            {/* Mobile: 1 row of 3 compact cards | Desktop: 3 columns full cards */}
+            <div className="grid grid-cols-3 md:grid-cols-3 gap-3 sm:gap-6 w-full max-w-6xl z-20 px-2 sm:px-4 pb-8">
                 {cards.map((card, index) => (
-                    <button key={index} className="w-full perspective-1000" onClick={() => { setCategory(card.key as any); setShowSearch(true); }}>
+                    <button key={index} className="w-full" onClick={() => { setCategory(card.key as any); setShowSearch(true); }}>
                         <motion.div
-                            className={`glass-card group relative h-72 rounded-3xl overflow-hidden cursor-pointer p-6 flex flex-col items-center justify-center text-center`}
+                            className={`glass-card group relative rounded-2xl sm:rounded-3xl overflow-hidden cursor-pointer
+                                p-3 sm:p-6
+                                flex flex-col items-center justify-center text-center
+                                h-36 sm:h-72`}
                             initial={{ opacity: 0, y: 50 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8, delay: 1 + index * 0.2 }}
-                            whileHover={{ 
+                            whileHover={{
                                 scale: 1.05,
                                 rotateX: 5,
                                 rotateY: 5,
@@ -159,20 +162,20 @@ export default function LandingShowcase({ isRTL, latestCars = [] }: LandingShowc
                         >
                             {/* Inner Glow */}
                             <div className={`absolute inset-0 bg-gradient-to-br ${card.color} opacity-20 group-hover:opacity-40 transition-opacity duration-500`} />
-                            
-                            {/* Icon */}
-                            <div className={`relative p-5 rounded-full bg-white/5 border border-white/10 mb-6 backdrop-blur-md transition-all duration-500 group-hover:scale-110 group-hover:bg-white/10 ${card.iconColor} shadow-[0_0_20px_rgba(0,0,0,0.3)]`}>
-                                <card.icon className="w-12 h-12" />
+
+                            {/* Icon — small on mobile, large on desktop */}
+                            <div className={`relative p-2.5 sm:p-5 rounded-full bg-white/5 border border-white/10 mb-2 sm:mb-6 backdrop-blur-md transition-all duration-500 group-hover:scale-110 group-hover:bg-white/10 ${card.iconColor} shadow-[0_0_20px_rgba(0,0,0,0.3)]`}>
+                                <card.icon className="w-5 h-5 sm:w-12 sm:h-12" />
                             </div>
-                            
+
                             {/* Content */}
-                            <h3 className="relative text-3xl font-bold text-white mb-3 font-display">{card.title}</h3>
-                            <p className="relative text-sm text-gray-300 opacity-60 group-hover:opacity-100 transition-opacity duration-500">
+                            <h3 className="relative text-xs sm:text-3xl font-bold text-white sm:mb-3 font-display leading-tight">{card.title}</h3>
+                            <p className="relative text-[10px] sm:text-sm text-gray-300 opacity-60 group-hover:opacity-100 transition-opacity duration-500 hidden sm:block">
                                 {card.description}
                             </p>
-                            
-                            {/* Arrow */}
-                            <div className="absolute bottom-6 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0">
+
+                            {/* Arrow — desktop only */}
+                            <div className="absolute bottom-6 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0 hidden sm:block">
                                 <ArrowRight className={`w-6 h-6 text-white ${isRTL ? "rotate-180" : ""}`} />
                             </div>
 

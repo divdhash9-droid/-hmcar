@@ -39,7 +39,7 @@ export default function CinematicVideoBackground({
   return (
     <div
       className="fixed top-0 left-0 right-0 overflow-hidden z-0"
-      style={{ height: height || "55vh" }}
+      style={{ height: height || "100svh" }}
     >
       {/* ── Desktop fallback image (always rendered, under video) ── */}
       <div
@@ -67,7 +67,12 @@ export default function CinematicVideoBackground({
            Uses z-10 to appear ABOVE the video, hidden on md+ ── */}
       <div
         className="absolute inset-0 z-10 bg-cover bg-center bg-no-repeat md:hidden"
-        style={{ backgroundImage: `url(${mobileImage})`, backgroundColor: "#050505" }}
+        style={{
+          backgroundImage: `url(${mobileImage})`,
+          backgroundColor: "#050505",
+          backgroundPosition: "center center",
+          backgroundSize: "cover",
+        }}
       />
 
       {/* ── Dark cinematic overlay (above video, below mobile image) ── */}

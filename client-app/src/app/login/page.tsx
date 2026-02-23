@@ -239,16 +239,17 @@ export default function Login() {
         <div className={`relative min-h-screen bg-black text-white flex items-center justify-center p-6 overflow-hidden ${isRTL ? 'font-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
 
             {/* ── CINEMATIC VIDEO BACKGROUND ── */}
-            <div className="video-bg-wrapper fixed inset-0 z-0">
+            <div className="video-bg-wrapper fixed inset-0 z-0" style={{ backgroundColor: '#050505' }}>
 
-                {/* Desktop fallback image (always rendered under the video) */}
+                {/* ══ موبايل فقط: صورة hmcar.jpg — مخفية على الشاشات الكبيرة ══ */}
                 <div
-                    className="absolute inset-0 bg-cover bg-center"
-                    style={{ backgroundImage: "url('/images/photo_2026-02-07_22-24-18.jpg')", backgroundColor: '#050505' }}
+                    className="absolute inset-0 bg-cover bg-center bg-no-repeat md:hidden"
+                    style={{ backgroundImage: "url('/images/hmcar.jpg')" }}
                 />
 
-                {/* Video: يُعرض دائماً — المتصفح يحمله ويشغله فوراً.
-                    لا تستخدم hidden على عناصر الفيديو، يمنع التحميل! */}
+                {/* ══ لابتوب/ديسكتوب فقط: فيديو — مخفي على الموبايل ══
+                    نستخدم opacity-0 md:opacity-100 بدلاً من hidden
+                    حتى لا نمنع تحميل الفيديو عند التبديل من موبايل لديسكتوب */}
                 <video
                     ref={videoRef}
                     autoPlay
@@ -257,10 +258,9 @@ export default function Login() {
                     playsInline
                     preload="auto"
                     poster="/images/photo_2026-02-07_22-24-18.jpg"
-                    className="video-bg absolute inset-0 w-full h-full object-cover"
-                    style={{ filter: 'brightness(0.4) contrast(1.2) saturate(1.2)', opacity: 0.6 }}
+                    className="absolute inset-0 w-full h-full object-cover opacity-0 md:opacity-100"
+                    style={{ filter: 'brightness(0.45) contrast(1.2) saturate(1.2)' }}
                     onError={(e) => {
-                        // إذا فشل تحميل الفيديو، أخفيه وأظهر الصورة الاحتياطية
                         (e.target as HTMLVideoElement).style.opacity = '0';
                     }}
                 >
@@ -268,13 +268,8 @@ export default function Login() {
                     <source src="/videos/hero.mp4" type="video/mp4" />
                 </video>
 
-                {/* Mobile overlay: يغطي الفيديو على الأجهزة الصغيرة فقط */}
-                <div
-                    className="absolute inset-0 z-10 bg-cover bg-center md:hidden"
-                    style={{ backgroundImage: "url('/images/hmcar.jpg')", backgroundColor: '#050505' }}
-                />
-
-                <div className="absolute inset-0 z-20 bg-gradient-to-t from-black via-transparent to-black opacity-80" />
+                {/* طبقة التعتيم — تعمل على الجهازين */}
+                <div className="absolute inset-0 z-20 bg-gradient-to-t from-black via-black/30 to-black/60" />
                 <div className="scanlines absolute inset-0 z-20" />
             </div>
 

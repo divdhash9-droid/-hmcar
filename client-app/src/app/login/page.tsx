@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { User, ShieldCheck, Mail, Lock, ArrowRight, ChevronLeft, ChevronRight, Key, UserCheck, Sparkles, Power, Eye, EyeOff, Phone, Search } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -213,30 +213,63 @@ export default function Login() {
         }
     }, [role]);
 
+    const videoRef = useRef<HTMLVideoElement>(null);
+
+    useEffect(() => {
+        const video = videoRef.current;
+        if (!video) return;
+        // تشغيل الفيديو بسرعة سينمائية
+        video.playbackRate = 0.8;
+        const tryPlay = () => {
+            video.play().catch(() => {
+                // إذا فشل التشغيل التلقائي، ابق على الصورة الاحتياطية
+                if (videoRef.current) {
+                    videoRef.current.style.opacity = '0';
+                }
+            });
+        };
+        if (video.readyState >= 2) {
+            tryPlay();
+        } else {
+            video.addEventListener('canplay', tryPlay, { once: true });
+        }
+    }, []);
+
     return (
         <div className={`relative min-h-screen bg-black text-white flex items-center justify-center p-6 overflow-hidden ${isRTL ? 'font-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
 
             {/* ── CINEMATIC VIDEO BACKGROUND ── */}
             <div className="video-bg-wrapper fixed inset-0 z-0">
 
-                {/* Desktop fallback image (under video) */}
+                {/* Desktop fallback image (always rendered under the video) */}
                 <div
                     className="absolute inset-0 bg-cover bg-center"
                     style={{ backgroundImage: "url('/images/photo_2026-02-07_22-24-18.jpg')", backgroundColor: '#050505' }}
                 />
 
-                {/* Video: ALWAYS rendered — browser loads & plays it immediately.
-                    Never use "hidden" on video elements, it prevents loading! */}
+                {/* Video: يُعرض دائماً — المتصفح يحمله ويشغله فوراً.
+                    لا تستخدم hidden على عناصر الفيديو، يمنع التحميل! */}
                 <video
-                    autoPlay loop muted playsInline preload="auto"
+                    ref={videoRef}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    preload="auto"
                     poster="/images/photo_2026-02-07_22-24-18.jpg"
                     className="video-bg absolute inset-0 w-full h-full object-cover"
                     style={{ filter: 'brightness(0.4) contrast(1.2) saturate(1.2)', opacity: 0.6 }}
+                    onError={(e) => {
+                        // إذا فشل تحميل الفيديو، أخفيه وأظهر الصورة الاحتياطية
+                        (e.target as HTMLVideoElement).style.opacity = '0';
+                    }}
                 >
-                    <source src="/videos/video.mp4" type="video/mp4" />
+                    {/* المصادر مرتبة من الأصغر للأكبر حجماً */}
+                    <source src="/videos/hero.mp4" type="video/mp4" />
+                    <source src="/videos/carz.mp4" type="video/mp4" />
                 </video>
 
-                {/* Mobile overlay: covers the video on small screens only */}
+                {/* Mobile overlay: يغطي الفيديو على الأجهزة الصغيرة فقط */}
                 <div
                     className="absolute inset-0 z-10 bg-cover bg-center md:hidden"
                     style={{ backgroundImage: "url('/images/hmcar.jpg')", backgroundColor: '#050505' }}

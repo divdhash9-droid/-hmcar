@@ -83,6 +83,8 @@ router.use('/reviews', require('./reviews'));
 router.use('/comparisons', require('./comparisons'));
 router.use('/brands', require('./brands'));
 router.use('/contact', require('./contact'));
+router.use('/favorites', require('./favorites'));
+router.use('/bids', require('./bids'));
 
 // Error handling middleware
 router.use((error, req, res, next) => {

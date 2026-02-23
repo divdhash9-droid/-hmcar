@@ -83,7 +83,7 @@ router.get('/car/:carId', async (req, res) => {
 // إضافة تقييم جديد
 router.post('/', requireAuthAPI, async (req, res) => {
     try {
-        const userId = req.user._id || req.user.id;
+        const userId = req.user.userId || req.user._id || req.user.id;
         const { carId, rating, comment } = req.body;
 
         if (!carId || !rating) {

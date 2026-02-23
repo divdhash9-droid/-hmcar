@@ -9,7 +9,7 @@ const { requireAuthAPI } = require('../../../middleware/auth');
 // الحصول على مقارنات المستخدم
 router.get('/', requireAuthAPI, async (req, res) => {
     try {
-        const userId = req.user._id || req.user.id;
+        const userId = req.user.userId || req.user._id || req.user.id;
 
         const comparison = await Comparison.findOne({ user: userId })
             .populate({
@@ -30,7 +30,7 @@ router.get('/', requireAuthAPI, async (req, res) => {
 // إضافة سيارة للمقارنة
 router.post('/add', requireAuthAPI, async (req, res) => {
     try {
-        const userId = req.user._id || req.user.id;
+        const userId = req.user.userId || req.user._id || req.user.id;
         const { carId } = req.body;
 
         if (!carId) {
@@ -85,7 +85,7 @@ router.post('/add', requireAuthAPI, async (req, res) => {
 // إزالة سيارة من المقارنة
 router.delete('/remove/:carId', requireAuthAPI, async (req, res) => {
     try {
-        const userId = req.user._id || req.user.id;
+        const userId = req.user.userId || req.user._id || req.user.id;
         const { carId } = req.params;
 
         const comparison = await Comparison.findOne({ user: userId });
@@ -111,7 +111,7 @@ router.delete('/remove/:carId', requireAuthAPI, async (req, res) => {
 // مسح جميع المقارنات
 router.delete('/clear', requireAuthAPI, async (req, res) => {
     try {
-        const userId = req.user._id || req.user.id;
+        const userId = req.user.userId || req.user._id || req.user.id;
 
         await Comparison.findOneAndDelete({ user: userId });
 

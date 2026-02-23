@@ -9,7 +9,7 @@ const { requireAuthAPI } = require('../../../middleware/auth');
 // الحصول على جميع المفضلات للمستخدم الحالي
 router.get('/', requireAuthAPI, async (req, res) => {
     try {
-        const userId = req.user._id || req.user.id;
+        const userId = req.user.userId || req.user._id || req.user.id;
 
         const favorites = await Favorite.find({ user: userId })
             .populate({
@@ -35,7 +35,7 @@ router.get('/', requireAuthAPI, async (req, res) => {
 // التحقق من وجود سيارة في المفضلة
 router.get('/check/:carId', requireAuthAPI, async (req, res) => {
     try {
-        const userId = req.user._id || req.user.id;
+        const userId = req.user.userId || req.user._id || req.user.id;
         const { carId } = req.params;
 
         const favorite = await Favorite.findOne({ user: userId, car: carId });
@@ -54,7 +54,7 @@ router.get('/check/:carId', requireAuthAPI, async (req, res) => {
 // إضافة سيارة إلى المفضلة
 router.post('/', requireAuthAPI, async (req, res) => {
     try {
-        const userId = req.user._id || req.user.id;
+        const userId = req.user.userId || req.user._id || req.user.id;
         const { carId } = req.body;
 
         if (!carId) {
@@ -92,7 +92,7 @@ router.post('/', requireAuthAPI, async (req, res) => {
 // حذف سيارة من المفضلة
 router.delete('/:carId', requireAuthAPI, async (req, res) => {
     try {
-        const userId = req.user._id || req.user.id;
+        const userId = req.user.userId || req.user._id || req.user.id;
         const { carId } = req.params;
 
         const result = await Favorite.findOneAndDelete({ user: userId, car: carId });
@@ -114,7 +114,7 @@ router.delete('/:carId', requireAuthAPI, async (req, res) => {
 // حذف جميع المفضلات
 router.delete('/', requireAuthAPI, async (req, res) => {
     try {
-        const userId = req.user._id || req.user.id;
+        const userId = req.user.userId || req.user._id || req.user.id;
 
         await Favorite.deleteMany({ user: userId });
 

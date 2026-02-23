@@ -9,7 +9,7 @@ const { requireAuthAPI } = require('../../../middleware/auth');
 // الحصول على جميع مزايدات المستخدم
 router.get('/my', requireAuthAPI, async (req, res) => {
     try {
-        const userId = req.user._id || req.user.id;
+        const userId = req.user.userId || req.user._id || req.user.id;
 
         const bids = await Bid.find({ bidder: userId })
             .populate({
@@ -66,7 +66,7 @@ router.get('/auction/:auctionId', async (req, res) => {
 // إضافة مزايدة جديدة
 router.post('/', requireAuthAPI, async (req, res) => {
     try {
-        const userId = req.user._id || req.user.id;
+        const userId = req.user.userId || req.user._id || req.user.id;
         const { auctionId, amount } = req.body;
 
         if (!auctionId || !amount) {

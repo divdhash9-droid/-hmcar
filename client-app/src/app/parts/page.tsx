@@ -114,26 +114,27 @@ export default function PartsPage() {
 
             {/* ── BACK BUTTON ── */}
             <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 }}
-                className={cn("fixed top-8 z-[60]", isRTL ? "right-8" : "left-8")}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.5 }}
+                className={cn("fixed top-24 z-[60]", isRTL ? "right-12" : "left-12")}
             >
-                <Link href="/" className="group flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.3em] text-white/40 hover:text-accent-gold transition-all duration-500">
-                    <div className="w-11 h-11 border border-white/10 rounded-xl flex items-center justify-center group-hover:border-accent-gold/50 group-hover:bg-accent-gold/10 transition-all backdrop-blur-md">
-                        {isRTL ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-                    </div>
-                    <span className="hidden lg:block">{isRTL ? "الرئيسية" : "HOME"}</span>
+                <Link
+                    href="/client/dashboard"
+                    className="group w-12 h-12 border border-white/10 rounded-2xl flex items-center justify-center bg-black/40 backdrop-blur-xl hover:border-accent-gold/50 hover:bg-accent-gold/10 transition-all duration-500 shadow-2xl"
+                    title={isRTL ? "لوحة القيادة" : "Dashboard"}
+                >
+                    {isRTL ? <ChevronRight className="w-5 h-5 text-white/60 group-hover:text-accent-gold transition-colors" /> : <ChevronLeft className="w-5 h-5 text-white/60 group-hover:text-accent-gold transition-colors" />}
                 </Link>
             </motion.div>
 
             {/* ── CINEMATIC HERO ── */}
             <section className="relative h-[85vh] flex items-center justify-center pt-20">
                 <CinematicVideoBackground
-                    videoSrc="/videos/hero.mp4"
-                    fallbackImage="/images/photo_2026-02-07_22-24-18.jpg"
-                    mobileImage="/images/hmcar.jpg"
-                    overlayOpacity={0.65}
+                    videoSrc=""
+                    fallbackImage="/images/gata.jpg"
+                    mobileImage="/images/gata.jpg"
+                    overlayOpacity={0.7}
                 />
 
                 <div className="relative z-20 w-full max-w-6xl px-6 text-center space-y-8">

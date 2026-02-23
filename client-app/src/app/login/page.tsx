@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { User, ShieldCheck, Lock, ArrowRight, ChevronLeft, ChevronRight, Key, UserCheck, Sparkles, Power, Eye, EyeOff, Phone } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -10,6 +10,7 @@ import { api } from "@/lib/api";
 import { countryDialCodes } from "@/lib/countries";
 import { useSocket } from "@/lib/SocketContext";
 import { useAuth } from "@/lib/AuthContext";
+import CinematicVideoBackground from "@/components/CinematicVideoBackground";
 
 export default function Login() {
     const { isRTL } = useLanguage();
@@ -218,69 +219,15 @@ export default function Login() {
 
     // تم حذف التعبئة التلقائية لبيانات الأدمن لأسباب أمنية
 
-    const videoRef = useRef<HTMLVideoElement>(null);
-
-    useEffect(() => {
-        const video = videoRef.current;
-        if (!video) return;
-        // تشغيل الفيديو بسرعة سينمائية
-        video.playbackRate = 0.8;
-        const tryPlay = () => {
-            video.play().catch(() => {
-                // إذا فشل التشغيل التلقائي، ابق على الصورة الاحتياطية
-                if (videoRef.current) {
-                    videoRef.current.style.opacity = '0';
-                }
-            });
-        };
-        if (video.readyState >= 2) {
-            tryPlay();
-        } else {
-            video.addEventListener('canplay', tryPlay, { once: true });
-        }
-    }, []);
-
     return (
         <div className={`relative min-h-screen bg-black text-white flex items-center justify-center p-6 overflow-hidden ${isRTL ? 'font-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
-
-            {/* ── CINEMATIC VIDEO BACKGROUND ── */}
-            <div className="video-bg-wrapper fixed inset-0 z-0" style={{ backgroundColor: '#050505' }}>
-
-                {/* ══ موبايل فقط: صورة hmcar.jpg — مخفية على الشاشات الكبيرة ══ */}
-                <div
-                    className="absolute inset-0 bg-no-repeat md:hidden"
-                    style={{
-                        backgroundImage: "url('/images/hmcar.jpg')",
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center top'
-                    }}
-                />
-
-                {/* ══ لابتوب/ديسكتوب فقط: فيديو — مخفي على الموبايل ══
-                    نستخدم opacity-0 md:opacity-100 بدلاً من hidden
-                    حتى لا نمنع تحميل الفيديو عند التبديل من موبايل لديسكتوب */}
-                <video
-                    ref={videoRef}
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    preload="auto"
-                    poster="/images/photo_2026-02-07_22-24-18.jpg"
-                    className="absolute inset-0 w-full h-full object-cover opacity-0 md:opacity-100"
-                    style={{ filter: 'brightness(0.45) contrast(1.2) saturate(1.2)' }}
-                    onError={(e) => {
-                        (e.target as HTMLVideoElement).style.opacity = '0';
-                    }}
-                >
-                    <source src="/videos/video.mp4" type="video/mp4" />
-                    <source src="/videos/hero.mp4" type="video/mp4" />
-                </video>
-
-                {/* طبقة التعتيم — تعمل على الجهازين */}
-                <div className="absolute inset-0 z-20 bg-gradient-to-t from-black via-black/30 to-black/60" />
-                <div className="scanlines absolute inset-0 z-20" />
-            </div>
+            {/* Cinematic Background */}
+            <CinematicVideoBackground
+                videoSrc="/videos/hero.mp4"
+                fallbackImage="/images/photo_2026-02-07_22-24-18.jpg"
+                mobileImage="/images/hmcar.jpg"
+                overlayOpacity={0.55}
+            />
 
             {/* ── AMBIENT ORBS ── */}
             <div className="fixed inset-0 pointer-events-none z-[1]">
@@ -625,6 +572,6 @@ export default function Login() {
                     HM CAR SYSTEMS // v4.0 CINEMATIC
                 </span>
             </div>
-        </div>
+        </div >
     );
 }

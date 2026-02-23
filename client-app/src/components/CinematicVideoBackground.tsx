@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 interface CinematicVideoBackgroundProps {
   videoSrc?: string;
@@ -21,8 +22,26 @@ export default function CinematicVideoBackground({
   height,
 }: CinematicVideoBackgroundProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [isDesktop, setIsDesktop] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
+    const checkViewport = () => setIsDesktop(window.innerWidth >= 768);
+    checkViewport();
+    window.addEventListener("resize", checkViewport);
+
+    // نستخدم timeout لتجنب التحميل المتزامن الذي قد يبطئ الواجهة
+    const timer = setTimeout(() => setIsLoaded(true), 100);
+
+    return () => {
+      window.removeEventListener("resize", checkViewport);
+      clearTimeout(timer);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isDesktop || !isLoaded) return;
+
     const video = videoRef.current;
     if (!video) return;
     video.playbackRate = 0.75;
@@ -34,48 +53,53 @@ export default function CinematicVideoBackground({
     } else {
       video.addEventListener("canplay", play, { once: true });
     }
-  }, []);
+  }, [isDesktop, isLoaded]);
 
   return (
     <div
-      className="fixed top-0 left-0 right-0 overflow-hidden z-0"
+      className="fixed top-0 left-0 right-0 overflow-hidden z-0 bg-[#050505]"
       style={{ height: height || "100svh" }}
     >
-      {/* ── Desktop fallback image (always rendered, under video) ── */}
-      <div
-        className="absolute inset-0 bg-cover bg-top bg-no-repeat"
-        style={{ backgroundImage: `url(${fallbackImage})`, backgroundColor: "#050505" }}
+      {/* ── Base Fallback Image (Desktop) ── */}
+      <Image
+        src={fallbackImage}
+        alt="Background"
+        fill
+        priority
+        quality={75}
+        className="object-cover object-top"
+        style={{ zIndex: -2 }}
       />
 
-      {/* ── Video: ALWAYS rendered so browser loads & plays it ──
-           On desktop it's visible. Mobile image covers it via z-index below. ── */}
-      <video
-        ref={videoRef}
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-        poster={fallbackImage}
-        className="absolute inset-0 w-full h-full object-cover"
-        style={{ opacity: 0.85 }}
-      >
-        <source src={videoSrc} type="video/mp4" />
-      </video>
+      {/* ── Video: Desktop only ── */}
+      {isDesktop && isLoaded && (
+        <video
+          ref={videoRef}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
+          style={{ opacity: 0.85 }}
+        >
+          <source src={videoSrc} type="video/mp4" />
+        </video>
+      )}
 
-      {/* ── Mobile image overlay: covers the video only on small screens ──
-           Uses z-10 to appear ABOVE the video, hidden on md+ ── */}
-      <div
-        className="absolute inset-0 z-10 bg-cover bg-center bg-no-repeat md:hidden"
-        style={{
-          backgroundImage: `url(${mobileImage})`,
-          backgroundColor: "#050505",
-          backgroundPosition: "center center",
-          backgroundSize: "cover",
-        }}
-      />
+      {/* ── Mobile image overlay ── */}
+      <div className="absolute inset-0 z-10 md:hidden">
+        <Image
+          src={mobileImage}
+          alt="Mobile Background"
+          fill
+          priority
+          quality={75}
+          className="object-cover object-center"
+        />
+      </div>
 
-      {/* ── Dark cinematic overlay (above video, below mobile image) ── */}
+      {/* ── Dark cinematic overlay ── */}
       <motion.div
         className="absolute inset-0 z-20 bg-gradient-to-b from-black/50 via-black/20 to-black/80"
         initial={{ opacity: 0 }}
@@ -84,15 +108,9 @@ export default function CinematicVideoBackground({
       />
 
       {/* ── Vignette ── */}
-      <div
-        className="absolute inset-0 z-20 pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.7) 100%)",
-        }}
-      />
+      <div className="absolute inset-0 z-20 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(0,0,0,0.7)_100%)]" />
 
-      {/* ── Cinematic grid lines (desktop only via opacity) ── */}
+      {/* ── Cinematic grid lines (desktop only) ── */}
       <div className="absolute inset-0 z-20 pointer-events-none opacity-[0.07] hidden md:block">
         <div className="absolute top-1/3 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#c9a96e] to-transparent" />
         <div className="absolute top-2/3 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#c9a96e] to-transparent" />
@@ -100,7 +118,7 @@ export default function CinematicVideoBackground({
         <div className="absolute left-2/3 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-[#c9a96e]/25 to-transparent" />
       </div>
 
-      {/* ── Content sits above everything ── */}
+      {/* ── Content ── */}
       <div className="relative z-30">{children}</div>
     </div>
   );

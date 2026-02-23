@@ -9,6 +9,7 @@ import { useLanguage } from "@/lib/LanguageContext";
 import { api } from "@/lib/api";
 import { useSocket } from "@/lib/SocketContext";
 import { useAuth } from "@/lib/AuthContext";
+import CinematicVideoBackground from "@/components/CinematicVideoBackground";
 
 export default function Register() {
     const { isRTL } = useLanguage();
@@ -62,26 +63,12 @@ export default function Register() {
         <div className={`relative min-h-screen bg-black text-white flex items-center justify-center p-6 overflow-hidden ${isRTL ? 'font-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
 
             {/* Cinematic Background */}
-            <div className="video-bg-wrapper fixed inset-0 z-0" style={{ backgroundColor: '#050505' }}>
-                {/* Mobile Poster Image */}
-                <div
-                    className="absolute inset-0 bg-no-repeat md:hidden"
-                    style={{
-                        backgroundImage: "url('/images/hmcar.jpg')",
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center top'
-                    }}
-                />
-                <video
-                    autoPlay loop muted playsInline preload="auto"
-                    poster="/images/photo_2026-02-07_22-24-18.jpg"
-                    className="absolute inset-0 w-full h-full object-cover opacity-0 md:opacity-100"
-                    style={{ filter: 'brightness(0.4) contrast(1.2)' }}
-                >
-                    <source src="/videos/hero.mp4" type="video/mp4" />
-                </video>
-                <div className="absolute inset-0 z-20 bg-gradient-to-t from-black via-black/40 to-black/60" />
-            </div>
+            <CinematicVideoBackground
+                videoSrc="/videos/hero.mp4"
+                fallbackImage="/images/photo_2026-02-07_22-24-18.jpg"
+                mobileImage="/images/hmcar.jpg"
+                overlayOpacity={0.6}
+            />
 
             {/* Back Button */}
             <motion.div

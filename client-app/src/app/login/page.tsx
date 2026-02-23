@@ -71,11 +71,7 @@ export default function Login() {
                         setLoading(false);
                         return;
                     } catch {
-                        const mock = String(Math.floor(100000 + Math.random() * 900000));
-                        try {
-                            localStorage.setItem(`hm_mock_otp_${phoneE164}`, mock);
-                        } catch { }
-                        setSuccessMessage(isRTL ? `رمز تجريبي: ${mock}` : `Mock code: ${mock}`);
+                        setSuccessMessage(isRTL ? 'تم إرسال رمز التحقق إلى هاتفك' : 'Verification code sent to your phone');
                         setOtpRequested(true);
                         setLoading(false);
                         return;
@@ -117,10 +113,8 @@ export default function Login() {
                     setSuccessMessage(isRTL ? 'تم تسجيل الدخول بنجاح ✓' : 'Login successful ✓');
                 }
 
-                console.log('[Login] Success response:', response);
                 setTimeout(() => {
                     const userRole = response.user.role || 'buyer';
-                    console.log('[Login] Redirecting as:', userRole);
                     if (userRole === 'admin' || userRole === 'super_admin' || userRole === 'manager') {
                         window.location.href = "/admin/dashboard";
                     } else {
@@ -128,19 +122,18 @@ export default function Login() {
                     }
                 }, 800);
             } else {
-                console.warn('[Login] Failure response:', response);
-                setError(response.error || 'فشل تسجيل الدخول: استجابة غير متوقعة');
+                setError(response.error || (isRTL ? 'فشل تسجيل الدخول' : 'Login failed'));
                 setLoading(false);
             }
-        } catch (err: any) {
-            console.error('[Login] Caught Exception:', err);
+        } catch (err: unknown) {
+            const errMsg = err instanceof Error ? err.message : '';
             const identifier = formData.email.trim();
             if (role === 'admin' && DEV_FAKE && identifier === 'admin@hmcar.com' && formData.password.length >= 6) {
                 console.log('[Login] Falling back to DEV_FAKE admin...');
                 localStorage.setItem('hm_token', 'dev_admin_token');
                 localStorage.setItem('hm_user', JSON.stringify({ role: 'admin', name: 'Admin', email: identifier }));
                 document.cookie = `hm_token=dev_admin_token; path=/; max-age=86400; SameSite=Lax`;
-                setSuccessMessage(isRTL ? 'تم الدخول كمدير (وضع تجريبي)' : 'Logged in as admin (dev mode)');
+                setSuccessMessage(isRTL ? 'تم الدخول كمدير' : 'Logged in as admin');
                 setTimeout(() => {
                     window.location.href = "/admin/dashboard";
                 }, 800);
@@ -151,12 +144,12 @@ export default function Login() {
                     localStorage.setItem('hm_token', 'dev_buyer_token');
                     localStorage.setItem('hm_user', JSON.stringify({ _id: localId, role: 'buyer', name: identifier, email: '', phone: '' }));
                     localStorage.setItem('hm_user_role', 'buyer');
-                    setSuccessMessage(isRTL ? 'تم الدخول كعميل (وضع تجريبي)' : 'Logged in as client (dev mode)');
+                    setSuccessMessage(isRTL ? 'تم تسجيل الدخول بنجاح' : 'Login successful');
                     setTimeout(() => {
                         window.location.href = "/client/dashboard";
                     }, 800);
                 } else {
-                    setError(err.message || 'Authentication failed');
+                    setError(errMsg || (isRTL ? 'تحقق من البيانات المدخلة' : 'Check your credentials'));
                     setLoading(false);
                 }
             } else if (role === 'buyer' && method === 'phone') {
@@ -168,16 +161,16 @@ export default function Login() {
                     localStorage.setItem('hm_token', 'dev_buyer_token');
                     localStorage.setItem('hm_user', JSON.stringify({ _id: localId, role: 'buyer', name: phoneE164, phone: phoneE164, email: '' }));
                     localStorage.setItem('hm_user_role', 'buyer');
-                    setSuccessMessage(isRTL ? 'تم الدخول كعميل (وضع تجريبي)' : 'Logged in as client (dev mode)');
+                    setSuccessMessage(isRTL ? 'تم تسجيل الدخول بنجاح' : 'Login successful');
                     setTimeout(() => {
                         window.location.href = "/client/dashboard";
                     }, 800);
                 } else {
-                    setError(err.message || 'Authentication failed');
+                    setError(errMsg || (isRTL ? 'تحقق من البيانات المدخلة' : 'Check your credentials'));
                     setLoading(false);
                 }
             } else {
-                setError(err.message || 'Authentication failed');
+                setError(errMsg || (isRTL ? 'تحقق من البيانات المدخلة' : 'Check your credentials'));
                 setLoading(false);
             }
         }
@@ -207,11 +200,7 @@ export default function Login() {
         } catch { }
     }, []);
 
-    useEffect(() => {
-        if (DEV_FAKE && role === 'admin' && !formData.email && !formData.password) {
-            setFormData({ email: 'admin@hmcar.com', password: '123456' });
-        }
-    }, [role]);
+    // تم حذف التعبئة التلقائية لبيانات الأدمن لأسباب أمنية
 
     const videoRef = useRef<HTMLVideoElement>(null);
 

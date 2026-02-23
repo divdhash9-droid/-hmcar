@@ -303,7 +303,7 @@ export default function Login() {
                             <Key className={cn("w-3 h-3", role === 'admin' ? "text-accent-red" : "text-accent-gold")} />
                             <span className="text-[8px] font-bold uppercase tracking-[0.4em] text-white/50">
                                 {role === 'admin'
-                                    ? (isRTL ? "دخول المدير" : "ADMIN ACCESS")
+                                    ? (isRTL ? "دخول النظام" : "SYSTEM ACCESS")
                                     : (isRTL ? "دخول العميل" : "CLIENT ACCESS")
                                 }
                             </span>
@@ -463,16 +463,21 @@ export default function Login() {
                                     )}
                                 </div>
                             ) : (
-                                <div className="relative">
-                                    <span className="pointer-events-none absolute inset-0 -m-px rounded-xl blur-xl opacity-50 -z-10 bg-red-500/25" />
-                                    <input
-                                        type="text"
-                                        required
-                                        value={formData.email}
-                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                        className={cn("w-full glass-input bg-white/5 focus:bg-white/10 outline-none border border-red-500/30 ring-1 ring-red-500/20", isRTL ? "pr-4 pl-4" : "pl-4 pr-4")}
-                                        placeholder={isRTL ? "المعرّف الخاص" : "Access ID"}
-                                    />
+                                <div className="space-y-2">
+                                    <label className="text-[9px] font-bold text-white/30 uppercase tracking-[0.3em] block px-1">
+                                        {isRTL ? "اسم المستخدم / المعرّف" : "USERNAME / ACCESS ID"}
+                                    </label>
+                                    <div className="relative">
+                                        <span className="pointer-events-none absolute inset-0 -m-px rounded-xl blur-xl opacity-50 -z-10 bg-red-500/25" />
+                                        <input
+                                            type="text"
+                                            required
+                                            value={formData.email}
+                                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                            className={cn("w-full glass-input bg-white/5 focus:bg-white/10 outline-none border border-red-500/30 ring-1 ring-red-500/20", isRTL ? "pr-4 pl-4" : "pl-4 pr-4")}
+                                            placeholder={isRTL ? "أدخل اسم المستخدم هنا" : "Enter username here"}
+                                        />
+                                    </div>
                                 </div>
                             )}
                         </div>

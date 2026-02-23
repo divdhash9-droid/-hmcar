@@ -209,7 +209,12 @@ export default function Login() {
             if (saved) {
                 const data = JSON.parse(saved);
                 if (data && typeof data.identifier === 'string' && typeof data.password === 'string') {
-                    setFormData({ email: data.identifier, password: data.password });
+                    // لأسباب أمنية: لا نقوم بتعبئة معرف الأدمن تلقائياً حتى لا يراه أي شخص يقف بجانب الشاشة
+                    const isSystemAccount = data.role === 'admin' || data.identifier.toLowerCase().includes('admin');
+                    setFormData({
+                        email: isSystemAccount ? '' : data.identifier,
+                        password: data.password
+                    });
                     setRememberMe(true);
                     if (data.role) setRole(data.role);
                 }
@@ -301,7 +306,13 @@ export default function Login() {
                             {isRTL ? "عميل" : "CLIENT"}
                         </button>
                         <button
-                            onClick={() => setRole('admin')}
+                            onClick={() => {
+                                setRole('admin');
+                                // مسح البريد إذا كان يحتوي على كلمة admin عند التبديل لزيادة الخصوصية
+                                if (formData.email.toLowerCase().includes('admin')) {
+                                    setFormData(prev => ({ ...prev, email: '' }));
+                                }
+                            }}
                             className={cn(
                                 "relative overflow-hidden flex-1 py-3 rounded-lg flex items-center justify-center gap-2 transition-all duration-500 text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.1em] sm:tracking-[0.15em]",
                                 role === 'admin'
@@ -440,7 +451,7 @@ export default function Login() {
                                             value={formData.email}
                                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                             className={cn("w-full glass-input bg-white/5 focus:bg-white/10 outline-none border border-red-500/30 ring-1 ring-red-500/20", isRTL ? "pr-4 pl-4" : "pl-4 pr-4")}
-                                            placeholder={isRTL ? "أدخل اسم المستخدم هنا" : "Enter username here"}
+                                            placeholder={isRTL ? "المعرف السري (ACCESS ID)" : "SECRET ACCESS ID"}
                                         />
                                     </div>
                                 </div>

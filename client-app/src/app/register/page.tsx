@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { User, Mail, Lock, ArrowRight, ChevronLeft, ChevronRight, ShieldCheck } from "lucide-react";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/LanguageContext";
 import { api } from "@/lib/api";
 import { useSocket } from "@/lib/SocketContext";
@@ -52,8 +51,9 @@ export default function Register() {
             } else {
                 setError(response.error || (isRTL ? 'فشل إنشاء الحساب' : 'Registration failed'));
             }
-        } catch (err: any) {
-            setError(err.message || (isRTL ? 'حدث خطأ ما' : 'Something went wrong'));
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : (isRTL ? 'حدث خطأ ما' : 'Something went wrong');
+            setError(message);
         } finally {
             setLoading(false);
         }

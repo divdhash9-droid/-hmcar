@@ -264,9 +264,8 @@ export default function Login() {
                         (e.target as HTMLVideoElement).style.opacity = '0';
                     }}
                 >
-                    {/* المصادر مرتبة من الأصغر للأكبر حجماً */}
+                    <source src="/videos/video.mp4" type="video/mp4" />
                     <source src="/videos/hero.mp4" type="video/mp4" />
-                    <source src="/videos/carz.mp4" type="video/mp4" />
                 </video>
 
                 {/* Mobile overlay: يغطي الفيديو على الأجهزة الصغيرة فقط */}

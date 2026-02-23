@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
-import { User, ShieldCheck, Mail, Lock, ArrowRight, ChevronLeft, ChevronRight, Key, UserCheck, Sparkles, Power, Eye, EyeOff, Phone, Search } from "lucide-react";
+import { User, ShieldCheck, Lock, ArrowRight, ChevronLeft, ChevronRight, Key, UserCheck, Sparkles, Power, Eye, EyeOff, Phone } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/LanguageContext";
@@ -10,7 +10,7 @@ import { api } from "@/lib/api";
 import { countryDialCodes } from "@/lib/countries";
 
 export default function Login() {
-    const { t, isRTL, lang, toggleLanguage } = useLanguage();
+    const { isRTL } = useLanguage();
     const [role, setRole] = useState<'buyer' | 'admin'>('buyer');
     const [formData, setFormData] = useState({ email: '', password: '' });
     const [loading, setLoading] = useState(false);
@@ -320,31 +320,29 @@ export default function Login() {
                     </div>
 
                     {/* ── Role Switcher ── */}
-                    <div className="flex bg-black/20 p-1.5 rounded-xl border border-white/5 mb-8 backdrop-blur-md">
+                    <div className="flex bg-black/20 p-1 rounded-xl border border-white/5 mb-8 backdrop-blur-md">
                         <button
                             onClick={() => setRole('buyer')}
                             className={cn(
-                                "relative overflow-visible flex-1 py-3.5 rounded-lg flex items-center justify-center gap-3 transition-all duration-500 text-[10px] font-bold uppercase tracking-[0.15em]",
+                                "relative overflow-hidden flex-1 py-3 rounded-lg flex items-center justify-center gap-2 transition-all duration-500 text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.1em] sm:tracking-[0.15em]",
                                 role === 'buyer'
-                                    ? "bg-white text-black shadow-lg shadow-white/10 ring-1 ring-blue-500/30 border border-blue-500/30 shadow-[0_0_25px_rgba(59,130,246,0.25)]"
+                                    ? "bg-white text-black shadow-lg shadow-white/10"
                                     : "text-white/30 hover:text-white/50"
                             )}
                         >
-                            {role === 'buyer' && <span className="pointer-events-none absolute inset-0 -m-px rounded-lg bg-blue-500/30 blur-xl opacity-50 -z-10" />}
-                            <UserCheck className="w-3.5 h-3.5" />
+                            <UserCheck className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
                             {isRTL ? "عميل" : "CLIENT"}
                         </button>
                         <button
                             onClick={() => setRole('admin')}
                             className={cn(
-                                "relative overflow-visible flex-1 py-3.5 rounded-lg flex items-center justify-center gap-3 transition-all duration-500 text-[10px] font-bold uppercase tracking-[0.15em]",
+                                "relative overflow-hidden flex-1 py-3 rounded-lg flex items-center justify-center gap-2 transition-all duration-500 text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.1em] sm:tracking-[0.15em]",
                                 role === 'admin'
-                                    ? "bg-accent-red text-white shadow-lg shadow-red-500/20 ring-1 ring-red-500/30 border border-red-500/30 shadow-[0_0_25px_rgba(255,0,0,0.25)]"
+                                    ? "bg-accent-red text-white shadow-lg shadow-red-500/20"
                                     : "text-white/30 hover:text-white/50"
                             )}
                         >
-                            {role === 'admin' && <span className="pointer-events-none absolute inset-0 -m-px rounded-lg bg-red-500/30 blur-xl opacity-50 -z-10" />}
-                            <ShieldCheck className="w-3.5 h-3.5" />
+                            <ShieldCheck className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
                             {isRTL ? "مدير" : "ADMIN"}
                         </button>
                     </div>

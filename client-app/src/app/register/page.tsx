@@ -46,17 +46,23 @@ export default function Register() {
     return (
         <div className={`relative min-h-screen bg-black text-white flex items-center justify-center p-6 overflow-hidden ${isRTL ? 'font-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
 
-            {/* ── VIDEO BACKGROUND ── */}
-            <div className="video-bg-wrapper">
+            {/* ── CINEMATIC VIDEO BACKGROUND ── */}
+            <div className="video-bg-wrapper fixed inset-0 z-0" style={{ backgroundColor: '#050505' }}>
+                {/* Mobile Poster Image */}
+                <div
+                    className="absolute inset-0 bg-cover bg-center bg-no-repeat md:hidden"
+                    style={{ backgroundImage: "url('/images/hmcar.jpg')" }}
+                />
                 <video
-                    autoPlay loop muted playsInline
-                    className="video-bg"
-                    style={{ filter: 'brightness(0.3) contrast(1.2) saturate(1.1)' }}
+                    autoPlay loop muted playsInline preload="auto"
+                    poster="/images/photo_2026-02-07_22-24-18.jpg"
+                    className="absolute inset-0 w-full h-full object-cover opacity-0 md:opacity-100"
+                    style={{ filter: 'brightness(0.35) contrast(1.2) saturate(1.1)' }}
                 >
                     <source src="/videos/video_2026-02-07_22-24-58.mp4" type="video/mp4" />
                 </video>
-                <div className="video-overlay-dark" />
-                <div className="video-grain" />
+                <div className="absolute inset-0 z-20 bg-gradient-to-t from-black via-black/30 to-black/60" />
+                <div className="scanlines absolute inset-0 z-20" />
             </div>
 
             {/* ── AMBIENT ── */}
@@ -152,7 +158,7 @@ export default function Register() {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <label className="text-[9px] font-bold text-white/20 uppercase tracking-[0.3em] px-1">{isRTL ? "كلمة المرور" : "PASSWORD"}</label>
                                 <div className="relative group">

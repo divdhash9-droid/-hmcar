@@ -87,6 +87,15 @@ export const api = {
             method: 'PUT',
             body: JSON.stringify(data),
         }),
+        updateRole: (id: string, role: string) => fetchAPI(`/api/v2/users/${id}/role`, {
+            method: 'PATCH',
+            body: JSON.stringify({ role }),
+        }),
+        ban: (id: string, banned: boolean) => fetchAPI(`/api/v2/users/${id}/ban`, {
+            method: 'PATCH',
+            body: JSON.stringify({ banned }),
+        }),
+        delete: (id: string) => fetchAPI(`/api/v2/users/${id}`, { method: 'DELETE' }),
     },
     cars: {
         list: (params: any = {}) => {
@@ -124,6 +133,10 @@ export const api = {
         delete: (id: string) => fetchAPI(`/api/v2/auctions/${id}`, {
             method: 'DELETE',
         }),
+        update: (id: string, data: any) => fetchAPI(`/api/v2/auctions/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        }),
     },
     parts: {
         list: (params: any = {}) => {
@@ -155,6 +168,11 @@ export const api = {
             return fetchAPI(`/api/v2/orders?${query}`);
         },
         getById: (id: string) => fetchAPI(`/api/v2/orders/${id}`),
+        updateStatus: (id: string, status: string) => fetchAPI(`/api/v2/orders/${id}/status`, {
+            method: 'PATCH',
+            body: JSON.stringify({ status }),
+        }),
+        delete: (id: string) => fetchAPI(`/api/v2/orders/${id}`, { method: 'DELETE' }),
     },
     upload: {
         image: (formData: FormData) => fetchAPI('/api/v2/upload', {

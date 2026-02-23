@@ -1,32 +1,27 @@
 'use client';
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
-    ShieldCheck,
-    BarChart3,
-    Users,
+    Activity,
+    PlusCircle,
     Car,
-    Gavel,
     Layers,
+    Gavel,
+    Users,
     Bell,
     ShoppingCart,
     Settings,
-    Activity,
-    PlusCircle,
-    Database,
-    Lock,
-    ChevronLeft,
     Search,
     LogOut,
-    AlertCircle,
-    CheckCircle2,
-    Clock,
     Menu,
     X,
     FileText,
     Share2,
     MessageCircle,
-    Tag
+    Tag,
+    TrendingUp,
+    Mail,
+    ChevronLeft
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -36,6 +31,17 @@ import { usePathname, useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import DashboardBackdrop from "@/components/DashboardBackdrop";
 import ParticleBackground from "@/components/ParticleBackground";
+
+interface DashboardStats {
+    totalCars?: number;
+    totalUsers?: number;
+    runningAuctions?: number;
+    totalOrders?: number;
+    totalRevenue?: number;
+    pendingOrders?: number;
+    totalParts?: number;
+    totalBrands?: number;
+}
 
 export default function AdminDashboard() {
     const { t, lang, isRTL, toggleLanguage } = useLanguage();
@@ -63,7 +69,7 @@ export default function AdminDashboard() {
         setMounted(true);
     }, []);
 
-    const [stats, setStats] = useState<any>(null);
+    const [stats, setStats] = useState<DashboardStats | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -82,6 +88,7 @@ export default function AdminDashboard() {
             }
         };
         loadStats();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
@@ -100,6 +107,7 @@ export default function AdminDashboard() {
                 router.push('/login');
             }
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const adminStats = [
@@ -113,10 +121,10 @@ export default function AdminDashboard() {
         { icon: PlusCircle, label: t('addCar'), href: '/admin/cars', accent: 'bg-cinematic-neon-blue/20 text-cinematic-neon-blue' },
         { icon: Gavel, label: t('createAuction'), href: '/admin/auctions', accent: 'bg-cinematic-neon-red/20 text-cinematic-neon-red' },
         { icon: Layers, label: isRTL ? 'قطع الغيار' : 'SPARE PARTS', href: '/admin/parts', accent: 'bg-cinematic-neon-yellow/20 text-cinematic-neon-yellow' },
-        { icon: FileText, label: isRTL ? 'طلبات الكونسيرج' : 'VIP REQUESTS', href: '/admin/orders', accent: 'bg-white/10 text-white' },
+        { icon: ShoppingCart, label: isRTL ? 'الطلبات' : 'ORDERS', href: '/admin/orders', accent: 'bg-white/10 text-white' },
         { icon: Users, label: isRTL ? 'إدارة الأعضاء' : 'MEMBER DIR', href: '/admin/users', accent: 'bg-white/10 text-white' },
-        { icon: Bell, label: t('notifications'), href: '/admin/notifications', accent: 'bg-cinematic-neon-yellow/20 text-cinematic-neon-yellow' },
-        { icon: ShoppingCart, label: t('orders'), href: '/admin/orders', accent: 'bg-white/10 text-white' },
+        { icon: Mail, label: isRTL ? 'رسائل العملاء' : 'MESSAGES', href: '/admin/messages', accent: 'bg-cinematic-neon-blue/20 text-cinematic-neon-blue' },
+        { icon: TrendingUp, label: isRTL ? 'التقارير' : 'REPORTS', href: '/admin/reports', accent: 'bg-green-400/20 text-green-400' },
         { icon: Settings, label: t('settings'), href: '/admin/settings', accent: 'bg-white/5 text-white/40' },
     ];
 
@@ -126,9 +134,13 @@ export default function AdminDashboard() {
         { id: 'parts', icon: Layers, label: isRTL ? 'قطع الغيار' : 'PARTS', href: '/admin/parts' },
         { id: 'auctions', icon: Gavel, label: isRTL ? 'المزادات' : 'AUCTIONS', href: '/admin/auctions' },
         { id: 'brands', icon: Tag, label: t('brands'), href: '/admin/brands' },
+        { id: 'orders', icon: ShoppingCart, label: isRTL ? 'الطلبات' : 'ORDERS', href: '/admin/orders' },
         { id: 'users', icon: Users, label: isRTL ? 'المستخدمون' : 'DIRECTORY', href: '/admin/users' },
-        { id: 'security', icon: Lock, label: isRTL ? 'الأمان' : 'SECURITY', href: '/admin/notifications' },
+        { id: 'messages', icon: MessageCircle, label: isRTL ? 'الرسائل' : 'MESSAGES', href: '/admin/messages' },
+        { id: 'reports', icon: TrendingUp, label: isRTL ? 'التقارير' : 'REPORTS', href: '/admin/reports' },
+        { id: 'notifications', icon: Bell, label: isRTL ? 'الإشعارات' : 'ALERTS', href: '/admin/notifications' },
         { id: 'social', icon: Share2, label: t('social'), href: '/admin/social' },
+        { id: 'settings', icon: Settings, label: isRTL ? 'الإعدادات' : 'SETTINGS', href: '/admin/settings' },
     ];
 
     if (!mounted) return null;
@@ -151,18 +163,18 @@ export default function AdminDashboard() {
                     </div>
                 </Link>
 
-                <div className="flex flex-col gap-10 w-full px-6">
+                <div className="flex-1 flex flex-col gap-4 w-full px-4 overflow-y-auto scrollbar-hide">
                     {sidebarItems.map((item) => (
                         <Link href={item.href} key={item.id}>
                             <button
                                 onClick={() => setIsSidebarOpen(false)}
                                 className={cn(
-                                    "flex flex-col items-center gap-3 group transition-all w-full py-4 rounded-2xl relative",
+                                    "flex flex-col items-center gap-2 group transition-all w-full py-3 rounded-2xl relative",
                                     pathname === item.href ? "text-cinematic-neon-red bg-white/5 shadow-inner" : "text-white/20 hover:text-white hover:bg-white/[0.02]"
                                 )}
                             >
-                                <item.icon className={cn("w-8 h-8 lg:w-9 lg:h-9 shrink-0 transition-transform group-hover:scale-110", pathname === item.href && "drop-shadow-[0_0_15px_rgba(255,0,60,1)]")} />
-                                <span className="text-[9px] lg:text-[10px] font-black uppercase tracking-[0.25em] lg:tracking-[0.3em]">{item.label}</span>
+                                <item.icon className={cn("w-6 h-6 lg:w-7 lg:h-7 shrink-0 transition-transform group-hover:scale-110", pathname === item.href && "drop-shadow-[0_0_15px_rgba(255,0,60,1)]")} />
+                                <span className="text-[8px] lg:text-[9px] font-black uppercase tracking-[0.15em] lg:tracking-[0.2em]">{item.label}</span>
                                 {pathname === item.href && <motion.div layoutId="activeInd" className="absolute left-0 top-0 bottom-0 w-[2px] bg-cinematic-neon-red" />}
                             </button>
                         </Link>
@@ -314,6 +326,39 @@ export default function AdminDashboard() {
                             </div>
                         </div>
 
+                        {/* Recent Activity */}
+                        <div className="glass-card p-10 md:p-14 bg-white/[0.01] border-white/5 relative overflow-hidden">
+                            <div className="flex items-center gap-5 mb-8">
+                                <div className="h-[2px] w-12 bg-cinematic-neon-yellow" />
+                                <h2 className="text-[11px] font-black uppercase tracking-[0.6em] text-white">{isRTL ? 'آخر الأنشطة' : 'RECENT ACTIVITY'}</h2>
+                            </div>
+                            <div className="space-y-4">
+                                {[
+                                    { icon: Car, label: isRTL ? 'تمت إضافة سيارة جديدة' : 'New car added', sub: 'Mercedes-Benz S-Class 2024', time: '2m ago', color: 'text-cinematic-neon-blue', bg: 'bg-cinematic-neon-blue/10' },
+                                    { icon: Gavel, label: isRTL ? 'مزاد جديد بدأ' : 'New auction started', sub: 'BMW M5 Competition — Base: 300K SAR', time: '15m ago', color: 'text-cinematic-neon-red', bg: 'bg-cinematic-neon-red/10' },
+                                    { icon: Users, label: isRTL ? 'مستخدم جديد سجّل' : 'New user registered', sub: 'khalid@example.com', time: '1h ago', color: 'text-purple-400', bg: 'bg-purple-400/10' },
+                                    { icon: ShoppingCart, label: isRTL ? 'طلب جديد' : 'New order placed', sub: 'ORD-A1B2C3D4 — 450,000 SAR', time: '3h ago', color: 'text-green-400', bg: 'bg-green-400/10' },
+                                    { icon: MessageCircle, label: isRTL ? 'رسالة عميل جديدة' : 'New customer message', sub: 'Ahmed Al-Rashid', time: '5h ago', color: 'text-cinematic-neon-yellow', bg: 'bg-cinematic-neon-yellow/10' },
+                                ].map((activity, i) => (
+                                    <motion.div
+                                        key={i}
+                                        initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: i * 0.1 }}
+                                        className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all"
+                                    >
+                                        <div className={cn("p-2.5 rounded-xl shrink-0", activity.bg)}>
+                                            <activity.icon className={cn("w-4 h-4", activity.color)} />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="text-[10px] font-black uppercase tracking-wider text-white/80">{activity.label}</div>
+                                            <div className="text-[9px] text-white/30 truncate">{activity.sub}</div>
+                                        </div>
+                                        <div className="text-[9px] text-white/20 font-bold shrink-0">{activity.time}</div>
+                                    </motion.div>
+                                ))}
+                            </div>
+                        </div>
 
                     </div>
 

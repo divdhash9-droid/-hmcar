@@ -110,10 +110,10 @@ export default function AdminAuctionsControl() {
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-16">
                     <div className="space-y-4">
                         <div className="flex items-center gap-3">
-                            <Link href="/admin/dashboard" className="p-2 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all">
-                                <ChevronLeft className={cn("w-5 h-5", isRTL && "rotate-180")} />
+                            <Link href="/admin/dashboard" className="inline-flex items-center gap-2 text-white/40 hover:text-white transition-colors group">
+                                <ChevronLeft className={cn("w-4 h-4 transition-transform group-hover:-translate-x-1", isRTL && "rotate-180 group-hover:translate-x-1")} />
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em]">{isRTL ? 'العودة للرئيسية' : 'BACK TO DASHBOARD'}</span>
                             </Link>
-                            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-white/30 italic">Admin Root / Auction Arena control</span>
                         </div>
                         <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-none">{isRTL ? "إدارة المزادات" : "ARENA CONTROL"}</h1>
                     </div>
@@ -209,9 +209,10 @@ export default function AdminAuctionsControl() {
                                     <div className="flex gap-3">
                                         <button
                                             onClick={() => handleDelete(auc.id)}
-                                            className="p-4 bg-white/5 rounded-xl hover:bg-cinematic-neon-red/20 transition-all text-white/40 hover:text-cinematic-neon-red border border-white/5 flex-grow lg:flex-none"
+                                            className="px-4 py-3 bg-white/5 rounded-xl hover:bg-cinematic-neon-red/20 transition-all text-white/40 hover:text-cinematic-neon-red border border-white/5 flex-grow lg:flex-none flex items-center justify-center gap-2 text-[9px] font-black uppercase"
                                         >
                                             <Trash2 className="w-4 h-4" />
+                                            {isRTL ? 'حذف' : 'DELETE'}
                                         </button>
                                     </div>
                                 </div>

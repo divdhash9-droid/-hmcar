@@ -136,7 +136,10 @@ export default function AdminPartsPage() {
             <main className="relative z-10 pt-32 pb-24 px-6 max-w-7xl mx-auto">
 
                 <header className="mb-16">
-                    
+                    <Link href="/admin/dashboard" className="inline-flex items-center gap-2 mb-6 text-white/40 hover:text-white transition-colors group">
+                        <ChevronLeft className={`w-4 h-4 transition-transform group-hover:-translate-x-1 ${isRTL ? 'rotate-180 group-hover:translate-x-1' : ''}`} />
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em]">{isRTL ? 'العودة للرئيسية' : 'BACK TO DASHBOARD'}</span>
+                    </Link>
 
                     <div className="flex items-center gap-4 mb-6">
                         <div className="h-[2px] w-12 bg-cinematic-neon-blue shadow-[0_0_10px_rgba(0,240,255,1)]" />
@@ -354,7 +357,7 @@ export default function AdminPartsPage() {
                                         >
                                             {(() => {
                                                 let list: any[] = [];
-                                                try { list = JSON.parse(localStorage.getItem('hm_brands_cache') || '[]'); } catch {}
+                                                try { list = JSON.parse(localStorage.getItem('hm_brands_cache') || '[]'); } catch { }
                                                 const partBrands = list.filter((b: any) => b.category === 'parts' || b.category === 'both');
                                                 return partBrands.length ? partBrands.map((b: any) => <option key={b.id} value={b.name}>{b.name}</option>) : [<option key="manual" value={formData.brand || ''}>{formData.brand || (isRTL ? 'اكتب الماركة' : 'Type brand')}</option>];
                                             })()}

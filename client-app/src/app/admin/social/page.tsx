@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { MessageCircle, Save, Trash2, CheckCircle2, SquarePen } from "lucide-react";
+import { MessageCircle, Save, Trash2, CheckCircle2, SquarePen, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/lib/LanguageContext";
 import { cn } from "@/lib/utils";
@@ -33,7 +33,7 @@ function AdminSocialSettings() {
       try {
         const parsed = JSON.parse(raw);
         setConfig({ whatsapp: parsed.whatsapp || "", links: Array.isArray(parsed.links) ? parsed.links : [] });
-      } catch {}
+      } catch { }
     }
   }, []);
 
@@ -71,6 +71,10 @@ function AdminSocialSettings() {
   return (
     <div className={cn("min-h-screen bg-black text-white px-6 sm:px-12 lg:px-20 py-24")}>
       <div className="max-w-4xl mx-auto space-y-10">
+        <Link href="/admin/dashboard" className="inline-flex items-center gap-2 text-white/40 hover:text-white transition-colors group">
+          <ChevronLeft className={`w-4 h-4 transition-transform group-hover:-translate-x-1 ${isRTL ? 'rotate-180 group-hover:translate-x-1' : ''}`} />
+          <span className="text-[10px] font-black uppercase tracking-[0.2em]">{isRTL ? 'العودة للرئيسية' : 'BACK TO DASHBOARD'}</span>
+        </Link>
         <div className="flex items-center gap-4">
           <MessageCircle className="w-7 h-7 text-cinematic-neon-blue" />
           <h1 className="text-2xl font-black uppercase tracking-[0.4em]">
@@ -126,17 +130,17 @@ function AdminSocialSettings() {
                       onClick={() => {
                         const el = document.getElementById(`social-input-${p.key}`) as HTMLInputElement | null;
                       }}
-                      className="p-3 rounded-lg bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-all"
-                      aria-label="Edit"
+                      className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-all flex items-center gap-1 text-[9px] font-black uppercase"
                     >
-                      <SquarePen className="w-4 h-4" />
+                      <SquarePen className="w-3 h-3" />
+                      {isRTL ? 'تعديل' : 'EDIT'}
                     </button>
                     <button
                       onClick={() => removePlatformUrl(p.key)}
-                      className="p-3 rounded-lg bg-cinematic-neon-red/10 text-cinematic-neon-red border border-cinematic-neon-red/20 hover:bg-cinematic-neon-red hover:text-white transition-all"
-                      aria-label="Remove"
+                      className="px-3 py-2 rounded-lg bg-cinematic-neon-red/10 text-cinematic-neon-red border border-cinematic-neon-red/20 hover:bg-cinematic-neon-red hover:text-white transition-all flex items-center gap-1 text-[9px] font-black uppercase"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-3 h-3" />
+                      {isRTL ? 'حذف' : 'REMOVE'}
                     </button>
                   </div>
                 </div>

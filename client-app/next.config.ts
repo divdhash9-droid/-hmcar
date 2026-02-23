@@ -15,6 +15,19 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Add proper headers for video streaming (required for Safari & Edge)
+  async headers() {
+    return [
+      {
+        source: "/videos/:path*",
+        headers: [
+          { key: "Accept-Ranges", value: "bytes" },
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+          { key: "Content-Type", value: "video/mp4" },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

@@ -218,9 +218,15 @@ export default function Login() {
 
             {/* ── CINEMATIC VIDEO BACKGROUND ── */}
             <div className="video-bg-wrapper fixed inset-0 z-0">
+                {/* Fallback image — always visible, especially on mobile */}
+                <div
+                    className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                    style={{ backgroundImage: "url('/images/photo_2026-02-07_22-24-18.jpg')", backgroundColor: '#050505' }}
+                />
+                {/* Video — hidden on mobile via CSS media query */}
                 <video
                     autoPlay loop muted playsInline
-                    className="video-bg w-full h-full object-cover opacity-60"
+                    className="video-bg w-full h-full object-cover opacity-60 hidden md:block"
                     style={{ filter: 'brightness(0.4) contrast(1.2) saturate(1.2)' }}
                 >
                     <source src="/videos/video.mp4" type="video/mp4" />

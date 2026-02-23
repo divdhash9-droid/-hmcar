@@ -19,60 +19,64 @@ export default function CinematicVideoBackground({
   height
 }: CinematicVideoBackgroundProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [hasError, setHasError] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
+  const [isMobile, setIsMobile] = useState(true); // default true for SSR safety
 
   useEffect(() => {
-    const video = videoRef.current;
-    if (video) {
-      video.playbackRate = 0.7; // Slow cinematic speed
-      // Ensure video plays
-      video.play().catch(e => console.error("Video play error:", e));
-      video.addEventListener("loadeddata", () => setIsLoaded(true));
-      video.addEventListener("error", () => setHasError(true));
+    // Detect mobile/tablet
+    const mobile = /iPhone|iPad|iPod|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+      || window.innerWidth < 768;
+    setIsMobile(mobile);
+
+    if (!mobile && videoRef.current) {
+      const video = videoRef.current;
+      video.playbackRate = 0.7;
+      video.play().then(() => {
+        setVideoReady(true);
+      }).catch(() => {
+        // Video failed, keep fallback image
+      });
+      video.addEventListener("loadeddata", () => setVideoReady(true));
     }
   }, []);
 
   return (
-    <div className="fixed top-0 left-0 right-0 overflow-hidden z-0" style={{ height: height || "55vh" }}>
-      {/* Video Layer */}
-      <div className="absolute inset-0">
-        {!hasError ? (
-          <video
-            ref={videoRef}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            className={`w-full h-full object-cover transition-opacity duration-1000 ${isLoaded ? "opacity-100" : "opacity-0"}`}
-            poster={fallbackImage}
-          >
-            <source src={videoSrc} type="video/mp4" />
-          </video>
-        ) : (
-          <div
-            className="w-full h-full bg-cover bg-center"
-            style={{ backgroundImage: `url(${fallbackImage})` }}
-          />
-        )}
-      </div>
+    <div
+      className="fixed top-0 left-0 right-0 overflow-hidden z-0"
+      style={{ height: height || "55vh" }}
+    >
+      {/* Always visible fallback image — shows instantly on mobile */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${fallbackImage})` }}
+      />
 
-      {/* Cinematic Dust/Particles Overlay */}
-      <div className="absolute inset-0 pointer-events-none">
-        <CinematicDust />
-      </div>
+      {/* Video — only rendered on non-mobile, fades in when ready */}
+      {!isMobile && (
+        <video
+          ref={videoRef}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          poster={fallbackImage}
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${videoReady ? "opacity-100" : "opacity-0"
+            }`}
+        >
+          <source src={videoSrc} type="video/mp4" />
+        </video>
+      )}
 
-      {/* Dark Cinematic Overlay */}
+      {/* Dark cinematic overlay */}
       <motion.div
         className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80"
         initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+        animate={{ opacity: overlayOpacity }}
         transition={{ duration: 1.5 }}
-        style={{ opacity: overlayOpacity }}
       />
 
-      {/* Vignette Effect */}
+      {/* Vignette */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -80,69 +84,24 @@ export default function CinematicVideoBackground({
         }}
       />
 
-      {/* Cinematic Grid Lines */}
+      {/* Cinematic grid lines */}
       <div className="absolute inset-0 pointer-events-none opacity-10">
         <div className="absolute top-1/3 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#c9a96e] to-transparent" />
         <div className="absolute top-2/3 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#c9a96e] to-transparent" />
       </div>
 
-      {/* Animated Light Rays */}
-      <LightRays />
+      {/* Animated light rays — desktop only for performance */}
+      {!isMobile && <LightRays />}
 
-      {/* Children content */}
       {children}
     </div>
   );
 }
 
-// Cinematic Dust Particles Component
-function CinematicDust() {
-  // Use a fixed seed or simple deterministic generation to avoid hydration mismatch
-  // However, Math.random() in render is the cause. We need to move it to useEffect.
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
-
-  return (
-    <div className="absolute inset-0 overflow-hidden">
-      {[...Array(50)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute w-1 h-1 rounded-full bg-[#c9a96e]/30"
-          initial={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-          }}
-          animate={{
-            y: [0, -100, 0],
-            x: [0, Math.random() * 50 - 25, 0],
-            opacity: [0, 0.6, 0],
-            scale: [0, 1.5, 0],
-          }}
-          transition={{
-            duration: 10 + Math.random() * 10,
-            repeat: Infinity,
-            delay: Math.random() * 10,
-            ease: "easeInOut",
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
-// Animated Light Rays Component
+// Animated Light Rays
 function LightRays() {
   const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
+  useEffect(() => { setMounted(true); }, []);
   if (!mounted) return null;
 
   return (
@@ -151,22 +110,12 @@ function LightRays() {
         <motion.div
           key={i}
           className="absolute top-0 h-full w-32 bg-gradient-to-b from-transparent via-[#c9a96e]/5 to-transparent"
-          initial={{
-            left: `${20 + i * 30}%`,
-            transform: "rotate(15deg)",
-          }}
-          animate={{
-            x: [-100, 100],
-            opacity: [0, 0.3, 0],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            delay: i * 3,
-            ease: "easeInOut",
-          }}
+          initial={{ left: `${20 + i * 30}%`, transform: "rotate(15deg)" }}
+          animate={{ x: [-100, 100], opacity: [0, 0.3, 0] }}
+          transition={{ duration: 8, repeat: Infinity, delay: i * 3, ease: "easeInOut" }}
         />
       ))}
     </div>
   );
 }
+

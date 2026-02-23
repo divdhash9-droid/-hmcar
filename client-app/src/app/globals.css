@@ -328,3 +328,89 @@
 ::-webkit-scrollbar-thumb:hover {
   background: var(--accent-gold);
 }
+
+/* ═══════════════════════════════════════════
+   MOBILE & RESPONSIVE FIXES
+   ═══════════════════════════════════════════ */
+
+/* Fix iOS Safari fixed background issue */
+@supports (-webkit-touch-callout: none) {
+
+  .video-bg-wrapper,
+  .fixed-bg {
+    position: absolute !important;
+    background-attachment: scroll !important;
+  }
+}
+
+/* Mobile: video background fallback */
+@media (max-width: 767px) {
+  .video-bg {
+    display: none !important;
+  }
+
+  /* Ensure background images show on mobile */
+  .video-bg-wrapper {
+    background-color: #050505;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  /* Touch-friendly tap targets */
+  button,
+  a,
+  [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Admin pages: stack header buttons vertically */
+  .admin-header-actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  /* Reduce font sizes on small screens */
+  h1 {
+    font-size: clamp(2rem, 10vw, 4rem) !important;
+  }
+
+  /* Fix overflow on mobile */
+  .glass-card {
+    overflow: hidden;
+  }
+
+  /* Admin tables scroll horizontally */
+  .admin-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Tablet (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .admin-sidebar {
+    width: 200px;
+  }
+}
+
+/* Ensure images don't overflow on mobile */
+img,
+video {
+  max-width: 100%;
+}
+
+/* Prevent horizontal scroll on all pages */
+html,
+body {
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* RTL support improvements on mobile */
+@media (max-width: 767px) {
+  [dir="rtl"] .flex {
+    flex-wrap: wrap;
+  }
+}

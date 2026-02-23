@@ -26,14 +26,24 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
         },
     };
 
-    const response = await fetch(url, defaultOptions);
+    console.log(`[API Request] ${options.method || 'GET'} ${url}`, options.body ? JSON.parse(options.body as string) : '');
 
-    if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `API request failed: ${response.status}`);
+    try {
+        const response = await fetch(url, defaultOptions);
+        console.log(`[API Response Status] ${response.status} for ${url}`);
+
+        const data = await response.json().catch(() => ({}));
+        console.log(`[API Response Data]`, data);
+
+        if (!response.ok) {
+            throw new Error(data.error || data.message || `فشل الطلب: ${response.status}`);
+        }
+
+        return data;
+    } catch (error: any) {
+        console.error(`[API Error] ${url}:`, error);
+        throw error;
     }
-
-    return response.json();
 }
 
 export const api = {
@@ -86,12 +96,10 @@ export const api = {
         getById: (id: string) => fetchAPI(`/api/v2/cars/${id}`),
         create: (data: any) => fetchAPI('/api/v2/cars', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         }),
         update: (id: string, data: any) => fetchAPI(`/api/v2/cars/${id}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         }),
         delete: (id: string) => fetchAPI(`/api/v2/cars/${id}`, {

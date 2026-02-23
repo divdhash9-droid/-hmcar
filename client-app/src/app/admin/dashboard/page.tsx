@@ -87,8 +87,16 @@ export default function AdminDashboard() {
     useEffect(() => {
         if (typeof window !== 'undefined') {
             const token = localStorage.getItem('hm_token');
-            const role = localStorage.getItem('hm_user_role');
-            if (!token || !role) {
+            const roleKey = localStorage.getItem('hm_user_role');
+            // أيضاً نقرأ الدور من hm_user إذا لم يكن hm_user_role موجوداً
+            let userRole = roleKey;
+            if (!userRole) {
+                try {
+                    const userData = JSON.parse(localStorage.getItem('hm_user') || '{}');
+                    userRole = userData.role || null;
+                } catch { userRole = null; }
+            }
+            if (!token || !userRole) {
                 router.push('/login');
             }
         }
@@ -192,7 +200,7 @@ export default function AdminDashboard() {
                 {/* Header HUD */}
                 <header className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-10 mb-20 border-b border-white/5 pb-16">
                     <div className="space-y-6 w-full lg:w-auto">
-                        
+
                         <h1 className="text-5xl sm:text-6xl md:text-8xl font-black tracking-tighter uppercase leading-[0.8] mb-4 text-center text-glow-white">
                             {isRTL ? (
                                 <span className="inline-block mx-auto px-8 py-4 rounded-2xl border border-white/10 bg-white/[0.06] text-white font-black tracking-[0.1em] not-italic text-center ring-1 ring-white/10 hover:ring-cinematic-neon-red/40 transition-all hover:scale-[1.02] shadow-[0_0_25px_rgba(255,0,60,0.25)] bg-gradient-to-r from-white/[0.06] via-white/[0.02] to-white/[0.06] backdrop-blur-sm">
@@ -306,15 +314,15 @@ export default function AdminDashboard() {
                             </div>
                         </div>
 
-                        
+
                     </div>
 
                     {/* Admin Sidebar Widgets */}
                     <div className="space-y-12">
 
-                        
 
-                        
+
+
 
                         {/* Load & Performance Monitor */}
                         <div className="glass-card p-12 bg-white/[0.01] border-white/5 space-y-8">
@@ -353,7 +361,7 @@ export default function AdminDashboard() {
                     </div>
                 </div>
 
-                
+
 
             </main>
 

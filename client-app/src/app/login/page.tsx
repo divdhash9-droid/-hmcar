@@ -74,7 +74,7 @@ export default function Login() {
                         const mock = String(Math.floor(100000 + Math.random() * 900000));
                         try {
                             localStorage.setItem(`hm_mock_otp_${phoneE164}`, mock);
-                        } catch {}
+                        } catch { }
                         setSuccessMessage(isRTL ? `رمز تجريبي: ${mock}` : `Mock code: ${mock}`);
                         setOtpRequested(true);
                         setLoading(false);
@@ -102,41 +102,44 @@ export default function Login() {
             }
 
             if (response.success) {
+                // حفظ التوكن وبيانات المستخدم
                 localStorage.setItem('hm_token', response.token);
                 localStorage.setItem('hm_user', JSON.stringify(response.user));
+                // حفظ الدور منفصلاً لأن dashboard يقرأها بشكل منفصل
+                const savedRole = response.user?.role || 'buyer';
+                localStorage.setItem('hm_user_role', savedRole);
+                // حفظ في Cookie للـ middleware
+                document.cookie = `hm_token=${response.token}; path=/; max-age=86400; SameSite=Lax`;
 
                 if (response.isNewUser) {
                     setSuccessMessage(isRTL ? 'تم إنشاء حسابك بنجاح! جاري الدخول...' : 'Account created! Logging in...');
+                } else {
+                    setSuccessMessage(isRTL ? 'تم تسجيل الدخول بنجاح ✓' : 'Login successful ✓');
                 }
 
+                console.log('[Login] Success response:', response);
                 setTimeout(() => {
                     const userRole = response.user.role || 'buyer';
+                    console.log('[Login] Redirecting as:', userRole);
                     if (userRole === 'admin' || userRole === 'super_admin' || userRole === 'manager') {
                         window.location.href = "/admin/dashboard";
                     } else {
                         window.location.href = "/client/dashboard";
                     }
-                }, 1500);
-                try {
-                    if (rememberMe) {
-                        localStorage.setItem('hm_remember', JSON.stringify({
-                            role,
-                            method,
-                            identifier,
-                            country: selectedCountry.code,
-                            phone: phoneNumber,
-                            password: formData.password
-                        }));
-                    } else {
-                        localStorage.removeItem('hm_remember');
-                    }
-                } catch {}
+                }, 800);
+            } else {
+                console.warn('[Login] Failure response:', response);
+                setError(response.error || 'فشل تسجيل الدخول: استجابة غير متوقعة');
+                setLoading(false);
             }
         } catch (err: any) {
+            console.error('[Login] Caught Exception:', err);
             const identifier = formData.email.trim();
-            if (role === 'admin' && DEV_FAKE && identifier === 'admin@hmcar.sa' && formData.password.length >= 6) {
+            if (role === 'admin' && DEV_FAKE && identifier === 'admin@hmcar.com' && formData.password.length >= 6) {
+                console.log('[Login] Falling back to DEV_FAKE admin...');
                 localStorage.setItem('hm_token', 'dev_admin_token');
                 localStorage.setItem('hm_user', JSON.stringify({ role: 'admin', name: 'Admin', email: identifier }));
+                document.cookie = `hm_token=dev_admin_token; path=/; max-age=86400; SameSite=Lax`;
                 setSuccessMessage(isRTL ? 'تم الدخول كمدير (وضع تجريبي)' : 'Logged in as admin (dev mode)');
                 setTimeout(() => {
                     window.location.href = "/admin/dashboard";
@@ -187,7 +190,7 @@ export default function Login() {
             if (path.includes('/admin/login') || sp?.get('role') === 'admin') {
                 setRole('admin');
             }
-        } catch {}
+        } catch { }
     }, []);
 
     useEffect(() => {
@@ -201,12 +204,12 @@ export default function Login() {
                     if (data.role) setRole(data.role);
                 }
             }
-        } catch {}
+        } catch { }
     }, []);
 
     useEffect(() => {
         if (DEV_FAKE && role === 'admin' && !formData.email && !formData.password) {
-            setFormData({ email: 'admin@hmcar.sa', password: '123456' });
+            setFormData({ email: 'admin@hmcar.com', password: '123456' });
         }
     }, [role]);
 
@@ -435,7 +438,7 @@ export default function Login() {
                                         value={formData.email}
                                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                         className={cn("w-full glass-input bg-white/5 focus:bg-white/10 outline-none border border-red-500/30 ring-1 ring-red-500/20", isRTL ? "pr-4 pl-4" : "pl-4 pr-4")}
-                                        placeholder="admin@hmcar.sa"
+                                        placeholder="admin@hmcar.com"
                                     />
                                 </div>
                             )}
@@ -502,7 +505,7 @@ export default function Login() {
                                                 const mock = String(Math.floor(100000 + Math.random() * 900000));
                                                 try {
                                                     localStorage.setItem(`hm_mock_otp_${phoneE164}`, mock);
-                                                } catch {}
+                                                } catch { }
                                                 setSuccessMessage(isRTL ? `رمز تجريبي جديد: ${mock}` : `New mock code: ${mock}`);
                                             }
                                         }}

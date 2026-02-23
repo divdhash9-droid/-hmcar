@@ -1,23 +1,14 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
-    MessageCircle, Send, Search, User, Check, CheckCheck,
-    ArrowLeft, ArrowRight, MoreVertical
+    Send, Check, CheckCheck,
+    Headphones, Loader2, AlertCircle, RefreshCw
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
-import { cn } from '@/lib/utils';
 import { useLanguage } from '@/lib/LanguageContext';
-import { api } from '@/lib/api';
 import ClientPageHeader from '@/components/ClientPageHeader';
-
-interface Conversation {
-    id: string;
-    user: { name: string; email?: string };
-    lastMessage: { content: string; createdAt: string; isFromMe: boolean };
-    unreadCount: number;
-}
 
 interface Message {
     id: string;
@@ -27,26 +18,49 @@ interface Message {
     createdAt: string;
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4001';
+
+async function apiFetch(path: string, options: RequestInit = {}) {
+    const token = localStorage.getItem('hm_token') || sessionStorage.getItem('hm_token');
+    const res = await fetch(`${API_URL}/api/v2${path}`, {
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            ...options.headers,
+        },
+    });
+    return res.json();
+}
+
 export default function MessagesPage() {
-    const { t, isRTL } = useLanguage();
-    const [conversations, setConversations] = useState<Conversation[]>([]);
-    const [selectedConvo, setSelectedConvo] = useState<Conversation | null>(null);
+    const { isRTL } = useLanguage();
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const [loading, setLoading] = useState(true);
     const [sending, setSending] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
+    const [error, setError] = useState('');
+    const [supportName, setSupportName] = useState('خدمة العملاء HM CAR');
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const pollRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
-        loadConversations();
-    }, []);
-
-    useEffect(() => {
-        if (selectedConvo) {
-            loadMessages(selectedConvo.id);
+        const token = localStorage.getItem('hm_token') || sessionStorage.getItem('hm_token');
+        if (token) {
+            setIsLoggedIn(true);
+            loadMessages();
+            // Auto-refresh every 10 seconds
+            pollRef.current = setInterval(loadMessages, 10000);
+        } else {
+            setIsLoggedIn(false);
+            setLoading(false);
         }
-    }, [selectedConvo]);
+        return () => {
+            if (pollRef.current) clearInterval(pollRef.current);
+        };
+    }, []);
 
     useEffect(() => {
         scrollToBottom();
@@ -56,51 +70,60 @@ export default function MessagesPage() {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
-    const loadConversations = async () => {
+    const loadMessages = async () => {
         try {
-            setLoading(true);
-            const response = await api.messages.conversations();
-            if (response.success) {
-                setConversations(response.data);
+            const data = await apiFetch('/messages/support');
+            if (data.success) {
+                setMessages(data.data || []);
+                if (data.supportName) setSupportName(data.supportName);
+                setError('');
+            } else {
+                setError(data.error || 'فشل في تحميل الرسائل');
             }
-        } catch (err) {
-            console.error('Failed to load conversations:', err);
+        } catch {
+            setError('تعذر الاتصال بالخادم');
         } finally {
             setLoading(false);
         }
     };
 
-    const loadMessages = async (userId: string) => {
-        try {
-            const response = await api.messages.conversation(userId);
-            if (response.success) {
-                setMessages(response.data);
-            }
-        } catch (err) {
-            console.error('Failed to load messages:', err);
-        }
-    };
-
     const sendMessage = async () => {
-        if (!newMessage.trim() || !selectedConvo) return;
+        const text = newMessage.trim();
+        if (!text || sending) return;
+
+        setSending(true);
+        const tempId = `temp-${Date.now()}`;
+        // Optimistic update
+        setMessages(prev => [...prev, {
+            id: tempId,
+            content: text,
+            isFromMe: true,
+            read: false,
+            createdAt: new Date().toISOString()
+        }]);
+        setNewMessage('');
 
         try {
-            setSending(true);
-            const response = await api.messages.send(selectedConvo.id, newMessage.trim());
-            if (response.success) {
-                setMessages([...messages, {
-                    id: response.data.id,
-                    content: newMessage.trim(),
-                    isFromMe: true,
-                    read: false,
-                    createdAt: new Date().toISOString()
-                }]);
-                setNewMessage('');
+            const data = await apiFetch('/messages/support', {
+                method: 'POST',
+                body: JSON.stringify({ content: text }),
+            });
+            if (data.success) {
+                // Replace temp with real
+                setMessages(prev => prev.map(m =>
+                    m.id === tempId ? { ...m, id: data.data.id } : m
+                ));
+            } else {
+                // Remove temp on failure
+                setMessages(prev => prev.filter(m => m.id !== tempId));
+                setError(data.error || 'فشل الإرسال');
             }
-        } catch (err) {
-            console.error('Failed to send message:', err);
+        } catch {
+            setMessages(prev => prev.filter(m => m.id !== tempId));
+            setError('فشل الإرسال، تحقق من اتصالك');
         } finally {
             setSending(false);
+            inputRef.current?.focus();
         }
     };
 
@@ -109,22 +132,32 @@ export default function MessagesPage() {
         const now = new Date();
         const diff = now.getTime() - date.getTime();
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-
-        if (days === 0) {
-            return date.toLocaleTimeString(isRTL ? 'ar-SA' : 'en-US', { hour: '2-digit', minute: '2-digit' });
-        } else if (days === 1) {
-            return isRTL ? 'أمس' : 'Yesterday';
-        } else if (days < 7) {
-            return date.toLocaleDateString(isRTL ? 'ar-SA' : 'en-US', { weekday: 'short' });
-        } else {
-            return date.toLocaleDateString(isRTL ? 'ar-SA' : 'en-US', { month: 'short', day: 'numeric' });
-        }
+        if (days === 0) return date.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
+        if (days === 1) return 'أمس';
+        if (days < 7) return date.toLocaleDateString('ar-SA', { weekday: 'short' });
+        return date.toLocaleDateString('ar-SA', { month: 'short', day: 'numeric' });
     };
 
-    const filteredConversations = conversations.filter(convo =>
-        convo.user.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    // Not logged in
+    if (!isLoggedIn) {
+        return (
+            <div className={`min-h-screen bg-black text-white ${isRTL ? 'rtl' : 'ltr'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+                <Navbar />
+                <main className="pt-24 pb-8 px-4 max-w-2xl mx-auto flex flex-col items-center justify-center min-h-screen">
+                    <div className="text-center p-12 rounded-3xl bg-white/5 border border-white/10">
+                        <Headphones className="w-20 h-20 text-[#c5a059] mx-auto mb-6" />
+                        <h2 className="text-2xl font-bold mb-3">تواصل مع خدمة العملاء</h2>
+                        <p className="text-white/60 mb-8">يجب تسجيل الدخول أولاً للتحدث مع فريق الدعم</p>
+                        <a href="/login" className="px-8 py-3 bg-[#c5a059] text-black font-bold rounded-xl hover:bg-[#d4af68] transition-colors">
+                            تسجيل الدخول
+                        </a>
+                    </div>
+                </main>
+            </div>
+        );
+    }
 
+    // Loading
     if (loading) {
         return (
             <div className="min-h-screen bg-black flex items-center justify-center">
@@ -137,162 +170,134 @@ export default function MessagesPage() {
         <div className={`min-h-screen bg-black text-white ${isRTL ? 'rtl' : 'ltr'}`} dir={isRTL ? 'rtl' : 'ltr'}>
             <Navbar />
 
-            <main className="pt-24 pb-8 px-4 max-w-7xl mx-auto h-screen flex flex-col">
-                <ClientPageHeader
-                    title={isRTL ? 'الرسائل' : 'MESSAGES'}
-                    subtitle={isRTL ? 'المحادثات' : 'CONVERSATIONS'}
-                    icon={MessageCircle}
-                />
+            <main className="pt-20 h-screen flex flex-col max-w-4xl mx-auto px-4">
+                <div className="py-4">
+                    <ClientPageHeader
+                        title="تواصل مع الدعم"
+                        subtitle="CUSTOMER SUPPORT"
+                        icon={Headphones}
+                    />
+                </div>
 
-                <div className="flex-1 mt-8 flex rounded-3xl overflow-hidden bg-white/5 border border-white/10">
-                    {/* Conversations List */}
-                    <div className={cn(
-                        "w-full md:w-96 border-r border-white/10 flex flex-col",
-                        selectedConvo && "hidden md:flex"
-                    )}>
-                        {/* Search */}
-                        <div className="p-4 border-b border-white/10">
-                            <div className="relative">
-                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
-                                <input
-                                    type="text"
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    placeholder={isRTL ? 'بحث...' : 'Search...'}
-                                    className="w-full bg-black/50 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-white/40 focus:outline-none focus:border-[#c5a059]"
-                                />
+                {/* Chat Container */}
+                <div className="flex-1 flex flex-col rounded-3xl overflow-hidden bg-white/5 border border-white/10 mb-4 min-h-0">
+
+                    {/* Chat Header */}
+                    <div className="flex items-center gap-4 p-4 border-b border-white/10 bg-black/30">
+                        <div className="relative">
+                            <div className="w-12 h-12 rounded-full bg-[#c5a059]/20 border border-[#c5a059]/40 flex items-center justify-center">
+                                <Headphones className="w-6 h-6 text-[#c5a059]" />
+                            </div>
+                            <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-black" />
+                        </div>
+                        <div className="flex-1">
+                            <div className="font-bold text-white">{supportName}</div>
+                            <div className="text-xs text-green-400 flex items-center gap-1">
+                                <span className="w-1.5 h-1.5 bg-green-400 rounded-full inline-block" />
+                                متاح للمساعدة
                             </div>
                         </div>
-
-                        {/* Conversation List */}
-                        <div className="flex-1 overflow-y-auto">
-                            {filteredConversations.length === 0 ? (
-                                <div className="p-8 text-center text-white/40">
-                                    {isRTL ? 'لا توجد محادثات' : 'No conversations'}
-                                </div>
-                            ) : (
-                                filteredConversations.map((convo) => (
-                                    <button
-                                        key={convo.id}
-                                        onClick={() => setSelectedConvo(convo)}
-                                        className={cn(
-                                            "w-full p-4 flex items-center gap-4 hover:bg-white/5 transition-colors border-b border-white/5",
-                                            selectedConvo?.id === convo.id && "bg-white/10"
-                                        )}
-                                    >
-                                        <div className="w-12 h-12 rounded-full bg-[#c5a059]/20 flex items-center justify-center">
-                                            <User className="w-6 h-6 text-[#c5a059]" />
-                                        </div>
-                                        <div className="flex-1 text-left">
-                                            <div className="flex items-center justify-between">
-                                                <span className="font-bold">{convo.user.name}</span>
-                                                <span className="text-xs text-white/40">{formatTime(convo.lastMessage.createdAt)}</span>
-                                            </div>
-                                            <p className="text-sm text-white/50 truncate">
-                                                {convo.lastMessage.isFromMe && (
-                                                    <span className="text-[#c5a059]">{isRTL ? 'أنت: ' : 'You: '}</span>
-                                                )}
-                                                {convo.lastMessage.content}
-                                            </p>
-                                        </div>
-                                        {convo.unreadCount > 0 && (
-                                            <div className="w-6 h-6 bg-[#c5a059] rounded-full flex items-center justify-center text-xs font-bold text-black">
-                                                {convo.unreadCount}
-                                            </div>
-                                        )}
-                                    </button>
-                                ))
-                            )}
-                        </div>
+                        <button
+                            onClick={loadMessages}
+                            className="p-2 hover:bg-white/10 rounded-xl transition-colors text-white/40 hover:text-white"
+                            title="تحديث"
+                        >
+                            <RefreshCw className="w-4 h-4" />
+                        </button>
                     </div>
 
-                    {/* Chat Area */}
-                    <div className={cn(
-                        "flex-1 flex flex-col",
-                        !selectedConvo && "hidden md:flex"
-                    )}>
-                        {selectedConvo ? (
-                            <>
-                                {/* Chat Header */}
-                                <div className="p-4 border-b border-white/10 flex items-center gap-4">
-                                    <button
-                                        onClick={() => setSelectedConvo(null)}
-                                        className="md:hidden p-2 hover:bg-white/10 rounded-xl"
-                                    >
-                                        {isRTL ? <ArrowRight className="w-5 h-5" /> : <ArrowLeft className="w-5 h-5" />}
-                                    </button>
-                                    <div className="w-10 h-10 rounded-full bg-[#c5a059]/20 flex items-center justify-center">
-                                        <User className="w-5 h-5 text-[#c5a059]" />
-                                    </div>
-                                    <div className="flex-1">
-                                        <div className="font-bold">{selectedConvo.user.name}</div>
-                                    </div>
-                                    <button className="p-2 hover:bg-white/10 rounded-xl">
-                                        <MoreVertical className="w-5 h-5" />
-                                    </button>
-                                </div>
+                    {/* Messages Area */}
+                    <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-0">
 
-                                {/* Messages */}
-                                <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                                    {messages.map((msg) => (
-                                        <motion.div
-                                            key={msg.id}
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            className={cn(
-                                                "flex",
-                                                msg.isFromMe ? "justify-end" : "justify-start"
-                                            )}
-                                        >
-                                            <div className={cn(
-                                                "max-w-[70%] p-4 rounded-2xl",
-                                                msg.isFromMe
-                                                    ? "bg-[#c5a059] text-black rounded-br-none"
-                                                    : "bg-white/10 rounded-bl-none"
-                                            )}>
-                                                <p>{msg.content}</p>
-                                                <div className={cn(
-                                                    "flex items-center gap-1 mt-1 text-xs",
-                                                    msg.isFromMe ? "text-black/60 justify-end" : "text-white/40"
-                                                )}>
-                                                    <span>{formatTime(msg.createdAt)}</span>
-                                                    {msg.isFromMe && (
-                                                        msg.read ? <CheckCheck className="w-4 h-4" /> : <Check className="w-4 h-4" />
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </motion.div>
-                                    ))}
-                                    <div ref={messagesEndRef} />
-                                </div>
-
-                                {/* Input */}
-                                <div className="p-4 border-t border-white/10">
-                                    <div className="flex items-center gap-4">
-                                        <input
-                                            type="text"
-                                            value={newMessage}
-                                            onChange={(e) => setNewMessage(e.target.value)}
-                                            onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                                            placeholder={isRTL ? 'اكتب رسالة...' : 'Type a message...'}
-                                            className="flex-1 bg-black/50 border border-white/10 rounded-xl py-3 px-4 text-white placeholder:text-white/40 focus:outline-none focus:border-[#c5a059]"
-                                        />
-                                        <button
-                                            onClick={sendMessage}
-                                            disabled={sending || !newMessage.trim()}
-                                            className="w-12 h-12 bg-[#c5a059] rounded-xl flex items-center justify-center hover:bg-[#d4af68] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                        >
-                                            <Send className="w-5 h-5 text-black" />
-                                        </button>
+                        {/* Welcome message */}
+                        {messages.length === 0 && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="flex justify-start"
+                            >
+                                <div className="max-w-[80%] bg-white/10 rounded-2xl rounded-bl-none p-4">
+                                    <p className="text-white">
+                                        مرحباً! 👋 أنا هنا لمساعدتك. كيف يمكنني خدمتك اليوم؟
+                                    </p>
+                                    <div className="text-xs text-white/40 mt-1">
+                                        فريق خدمة العملاء HM CAR
                                     </div>
                                 </div>
-                            </>
-                        ) : (
-                            <div className="flex-1 flex flex-col items-center justify-center text-white/40">
-                                <MessageCircle className="w-24 h-24 mb-4 opacity-20" />
-                                <p>{isRTL ? 'اختر محادثة للبدء' : 'Select a conversation to start'}</p>
-                            </div>
+                            </motion.div>
                         )}
+
+                        <AnimatePresence>
+                            {messages.map((msg) => (
+                                <motion.div
+                                    key={msg.id}
+                                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    transition={{ duration: 0.2 }}
+                                    className={`flex ${msg.isFromMe ? 'justify-end' : 'justify-start'}`}
+                                >
+                                    {!msg.isFromMe && (
+                                        <div className="w-8 h-8 rounded-full bg-[#c5a059]/20 flex items-center justify-center ml-2 flex-shrink-0 self-end">
+                                            <Headphones className="w-4 h-4 text-[#c5a059]" />
+                                        </div>
+                                    )}
+                                    <div className={`max-w-[75%] ${msg.isFromMe
+                                        ? 'bg-[#c5a059] text-black rounded-2xl rounded-br-none'
+                                        : 'bg-white/10 text-white rounded-2xl rounded-bl-none'
+                                        } p-3 shadow-lg`}>
+                                        <p className="leading-relaxed">{msg.content}</p>
+                                        <div className={`flex items-center gap-1 mt-1 text-xs ${msg.isFromMe ? 'text-black/50 justify-end' : 'text-white/40'}`}>
+                                            <span>{formatTime(msg.createdAt)}</span>
+                                            {msg.isFromMe && (
+                                                msg.read
+                                                    ? <CheckCheck className="w-3.5 h-3.5" />
+                                                    : <Check className="w-3.5 h-3.5" />
+                                            )}
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
+
+                        <div ref={messagesEndRef} />
+                    </div>
+
+                    {/* Error Banner */}
+                    {error && (
+                        <div className="mx-4 mb-2 p-3 bg-red-500/10 border border-red-500/30 rounded-xl flex items-center gap-2 text-red-400 text-sm">
+                            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                            <span>{error}</span>
+                            <button onClick={() => setError('')} className="mr-auto text-red-300 hover:text-white">✕</button>
+                        </div>
+                    )}
+
+                    {/* Input Area */}
+                    <div className="p-4 border-t border-white/10 bg-black/20">
+                        <div className="flex items-center gap-3">
+                            <input
+                                ref={inputRef}
+                                type="text"
+                                value={newMessage}
+                                onChange={(e) => setNewMessage(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage()}
+                                placeholder="اكتب رسالتك هنا..."
+                                maxLength={2000}
+                                className="flex-1 bg-black/50 border border-white/10 rounded-2xl py-3 px-5 text-white placeholder:text-white/30 focus:outline-none focus:border-[#c5a059] transition-colors"
+                            />
+                            <button
+                                onClick={sendMessage}
+                                disabled={sending || !newMessage.trim()}
+                                className="w-12 h-12 bg-[#c5a059] rounded-2xl flex items-center justify-center hover:bg-[#d4af68] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+                            >
+                                {sending
+                                    ? <Loader2 className="w-5 h-5 text-black animate-spin" />
+                                    : <Send className="w-5 h-5 text-black" />
+                                }
+                            </button>
+                        </div>
+                        <p className="text-xs text-white/20 mt-2 text-center">
+                            سيرد عليك فريق الدعم في أقرب وقت ممكن
+                        </p>
                     </div>
                 </div>
             </main>

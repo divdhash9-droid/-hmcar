@@ -219,31 +219,24 @@ export default function Login() {
             {/* ── CINEMATIC VIDEO BACKGROUND ── */}
             <div className="video-bg-wrapper fixed inset-0 z-0">
 
-                {/* Mobile: unique portrait image */}
+                {/* Mobile: dedicated portrait image (no video on mobile) */}
                 <div
                     className="absolute inset-0 bg-cover bg-center bg-no-repeat md:hidden"
                     style={{ backgroundImage: "url('/images/hmcar.jpg')", backgroundColor: '#050505' }}
                 />
 
-                {/* Desktop: fallback photo under the video */}
-                <div
-                    className="absolute inset-0 bg-cover bg-top bg-no-repeat hidden md:block"
-                    style={{ backgroundImage: "url('/images/photo_2026-02-07_22-24-18.jpg')", backgroundColor: '#050505' }}
-                />
-
-                {/* Desktop: cinematic video (hidden on mobile) */}
+                {/* Desktop: original video background */}
                 <video
                     autoPlay loop muted playsInline preload="auto"
                     poster="/images/photo_2026-02-07_22-24-18.jpg"
                     className="video-bg absolute inset-0 w-full h-full object-cover hidden md:block"
-                    style={{ filter: 'brightness(0.45) contrast(1.15) saturate(1.1)' }}
+                    style={{ filter: 'brightness(0.4) contrast(1.2) saturate(1.2)', opacity: 0.6 }}
                 >
-                    <source src="/videos/hero.mp4" type="video/mp4" />
                     <source src="/videos/video.mp4" type="video/mp4" />
                 </video>
 
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-black/60" />
-                <div className="scanlines hidden md:block" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black opacity-80" />
+                <div className="scanlines" />
             </div>
 
             {/* ── AMBIENT ORBS ── */}

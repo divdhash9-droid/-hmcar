@@ -1,5 +1,15 @@
 @import "tailwindcss";
 
+@theme {
+  /* Cinematic Neon Colors */
+  --color-cinematic-neon-blue: #00f0ff;
+  --color-cinematic-neon-red: #ff3b30;
+  --color-cinematic-neon-gold: #c9a96e;
+  --color-cinematic-neon-green: #00ff88;
+  --color-cinematic-dark: #0a0a0a;
+  --color-cinematic-darker: #050505;
+}
+
 :root {
   --background: #000000;
   /* Deepest Black */

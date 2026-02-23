@@ -1,11 +1,11 @@
 'use client';
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import {
     ArrowUpRight, Cpu, Settings, Box, Search, Filter,
-    CheckCircle2, AlertCircle, ChevronDown, Zap, Shield,
-    Layers, Truck, Info, X
+    CheckCircle2, AlertCircle, Zap, Shield,
+    Layers, Truck, X, ChevronLeft, ChevronRight
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { cn } from "@/lib/utils";
@@ -35,7 +35,6 @@ export default function PartsPage() {
     const [parts, setParts] = useState<Part[]>([]);
     const [loading, setLoading] = useState(true);
     const [compatibilityModel, setCompatibilityModel] = useState('');
-    const [brandFilter, setBrandFilter] = useState('ALL');
     const [priceRange, setPriceRange] = useState<[number, number]>([0, 100000]);
     const [showFilters, setShowFilters] = useState(false);
 
@@ -112,6 +111,21 @@ export default function PartsPage() {
     return (
         <div className={`relative min-h-screen bg-[#050505] text-white overflow-x-hidden ${isRTL ? 'font-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
             <Navbar />
+
+            {/* ── BACK BUTTON ── */}
+            <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+                className={cn("fixed top-8 z-[60]", isRTL ? "right-8" : "left-8")}
+            >
+                <Link href="/" className="group flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.3em] text-white/40 hover:text-accent-gold transition-all duration-500">
+                    <div className="w-11 h-11 border border-white/10 rounded-xl flex items-center justify-center group-hover:border-accent-gold/50 group-hover:bg-accent-gold/10 transition-all backdrop-blur-md">
+                        {isRTL ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+                    </div>
+                    <span className="hidden lg:block">{isRTL ? "الرئيسية" : "HOME"}</span>
+                </Link>
+            </motion.div>
 
             {/* ── CINEMATIC HERO ── */}
             <section className="relative h-[85vh] flex items-center justify-center pt-20">

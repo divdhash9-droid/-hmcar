@@ -413,7 +413,6 @@ router.post('/login', async (req, res) => {
     );
 
     // Update last login — نستخدم updateOne لتجاوز pre-save hook وتجنب إعادة تشفير الباسورد
-    const User = require('../../../models/User');
     await User.updateOne(
       { _id: user._id },
       { $set: { lastLoginAt: new Date(), activeSessionId: req.sessionID || '' } }

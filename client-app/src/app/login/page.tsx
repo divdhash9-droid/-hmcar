@@ -456,7 +456,7 @@ export default function Login() {
                                             value={formData.email}
                                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                             className={cn("w-full glass-input bg-white/5 focus:bg-white/10 outline-none border border-red-500/30 ring-1 ring-red-500/20", isRTL ? "pr-4 pl-4" : "pl-4 pr-4")}
-                                            placeholder={isRTL ? "المعرف السري (ACCESS ID)" : "SECRET ACCESS ID"}
+                                            placeholder={isRTL ? "ايميل   (ACCESS ID)" : "SECRET ACCESS ID"}
                                         />
                                     </div>
                                 </div>

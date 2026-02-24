@@ -31,8 +31,8 @@ export default function AdminPartsPage() {
     const [editingPart, setEditingPart] = useState<any>(null);
     const [formData, setFormData] = useState({
         name: '',
-        brand: '',
-        model: '',
+        brand: 'TOYOTA', // Representing the Agency
+        model: '', // Representing the Car Model (e.g. Camry)
         year: new Date().getFullYear(),
         price: 0,
         category: 'Engine',
@@ -348,30 +348,34 @@ export default function AdminPartsPage() {
 
                                     <div>
                                         <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/60 mb-2">
-                                            {isRTL ? 'الماركة' : 'BRAND'}
+                                            {isRTL ? 'الوكالة' : 'AGENCY / BRAND'}
                                         </label>
                                         <select
                                             value={formData.brand}
                                             onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
                                             className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 px-4 text-sm font-bold text-white focus:outline-none focus:border-cinematic-neon-blue/40"
                                         >
-                                            {(() => {
-                                                let list: any[] = [];
-                                                try { list = JSON.parse(localStorage.getItem('hm_brands_cache') || '[]'); } catch { }
-                                                const partBrands = list.filter((b: any) => b.category === 'parts' || b.category === 'both');
-                                                return partBrands.length ? partBrands.map((b: any) => <option key={b.id} value={b.name}>{b.name}</option>) : [<option key="manual" value={formData.brand || ''}>{formData.brand || (isRTL ? 'اكتب الماركة' : 'Type brand')}</option>];
-                                            })()}
+                                            <option value="TOYOTA">TOYOTA</option>
+                                            <option value="KIA">KIA</option>
+                                            <option value="HYUNDAI">HYUNDAI</option>
+                                            <option value="FORD">FORD</option>
+                                            <option value="NISSAN">NISSAN</option>
+                                            <option value="MERCEDES">MERCEDES</option>
+                                            <option value="BMW">BMW</option>
+                                            <option value="LEXUS">LEXUS</option>
                                         </select>
                                     </div>
 
                                     <div>
                                         <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/60 mb-2">
-                                            {isRTL ? 'الموديل المتوافق' : 'COMPATIBLE MODEL'}
+                                            {isRTL ? 'موديل السيارة (مثل: كامري)' : 'CAR MODEL (e.g. Camry)'}
                                         </label>
                                         <input
                                             type="text"
+                                            required
+                                            placeholder={isRTL ? "مثال: كامري" : "e.g. Camry"}
                                             value={formData.model}
-                                            onChange={(e) => setFormData({ ...formData, model: e.target.value })}
+                                            onChange={(e) => setFormData({ ...formData, model: e.target.value.toUpperCase() })}
                                             className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 px-4 text-sm font-bold text-white focus:outline-none focus:border-cinematic-neon-blue/40"
                                         />
                                     </div>

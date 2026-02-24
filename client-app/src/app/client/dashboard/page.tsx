@@ -140,7 +140,7 @@ export default function ClientDashboard() {
             icon: Activity,
             color: 'text-cinematic-neon-red',
             bg: 'bg-cinematic-neon-red/10',
-            trend: '+12%'
+            glow: 'shadow-[0_0_20px_rgba(255,0,60,0.3)]'
         },
         {
             label: isRTL ? 'سيارات متاحة' : 'AVAILABLE CARS',
@@ -148,7 +148,7 @@ export default function ClientDashboard() {
             icon: Car,
             color: 'text-cinematic-neon-blue',
             bg: 'bg-cinematic-neon-blue/10',
-            trend: '+8%'
+            glow: 'shadow-[0_0_20px_rgba(0,240,255,0.3)]'
         },
         {
             label: isRTL ? 'طلباتي' : 'MY ORDERS',
@@ -156,7 +156,7 @@ export default function ClientDashboard() {
             icon: ShoppingBag,
             color: 'text-amber-400',
             bg: 'bg-amber-400/10',
-            trend: ''
+            glow: 'shadow-[0_0_20px_rgba(251,191,36,0.2)]'
         },
         {
             label: isRTL ? 'المفضلة' : 'FAVORITES',
@@ -164,7 +164,7 @@ export default function ClientDashboard() {
             icon: Heart,
             color: 'text-pink-500',
             bg: 'bg-pink-500/10',
-            trend: ''
+            glow: 'shadow-[0_0_20px_rgba(236,72,153,0.2)]'
         },
     ];
 
@@ -349,22 +349,39 @@ export default function ClientDashboard() {
                         </motion.div>
                     </header>
 
-                    {/* Stats Grid */}
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12 relative z-10 pt-8">
+                    {/* Stats Grid - Floating Capsules */}
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 mb-16 relative z-10">
                         {statCards.map((stat, i) => (
                             <motion.div
                                 key={i}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: i * 0.1 }}
-                                className="p-6 rounded-[2rem] bg-white/[0.03] backdrop-blur-md border border-white/10 hover:border-luxury-gold/50 shadow-[0_8px_32px_rgba(0,0,0,0.5)] group relative overflow-hidden transition-all duration-500 hover:scale-105 hover:shadow-[0_0_40px_rgba(255,255,255,0.1)]"
+                                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                transition={{ delay: i * 0.1, duration: 0.8 }}
+                                className="relative group cursor-default"
                             >
-                                <div className="absolute inset-0 bg-gradient-to-br from-luxury-gold/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                                <div className={cn("p-4 rounded-2xl w-fit mb-4 bg-white/5 border border-white/10 backdrop-blur-sm group-hover:bg-white/10 transition-colors", stat.bg.replace('bg-', 'text-').replace('/10', ''))}>
-                                    <stat.icon className={cn("w-6 h-6 drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]", stat.color)} />
+                                <div className={cn(
+                                    "relative z-10 p-8 rounded-[2.5rem] bg-white/[0.03] backdrop-blur-2xl border border-white/10 overflow-hidden transition-all duration-700",
+                                    "group-hover:translate-y-[-10px] group-hover:border-white/20",
+                                    stat.glow
+                                )}>
+                                    {/* Ambient Glow */}
+                                    <div className={cn("absolute -right-4 -top-4 w-24 h-24 blur-3xl opacity-0 group-hover:opacity-20 transition-opacity duration-700 rounded-full", stat.bg.replace('bg-', 'bg-'))} />
+
+                                    <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center bg-white/5 border border-white/10 mb-6 transition-transform duration-700 group-hover:rotate-[360deg]", stat.color)}>
+                                        <stat.icon className="w-7 h-7" />
+                                    </div>
+
+                                    <div className="space-y-1">
+                                        <div className="text-5xl font-black italic tracking-tighter text-white">
+                                            {stat.value}
+                                        </div>
+                                        <div className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 group-hover:text-white/80 transition-colors">
+                                            {stat.label}
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="text-4xl font-black tracking-tighter mb-2 italic text-white drop-shadow-lg">{stat.value}</div>
-                                <div className="text-[10px] text-white/60 uppercase tracking-[0.2em] font-bold group-hover:text-white transition-colors">{stat.label}</div>
+                                {/* Shadow Capsule */}
+                                <div className="absolute inset-0 translate-y-4 blur-2xl opacity-20 bg-black -z-10 group-hover:opacity-40 transition-all duration-700" />
                             </motion.div>
                         ))}
                     </div>
@@ -380,7 +397,7 @@ export default function ClientDashboard() {
                                 {isRTL ? "توصيات لك" : "RECOMMENDED FOR YOU"}
                             </h2>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                             {(dashboardData?.recommended || [
                                 { id: "c1", title: "Lexus LX600 2024", price: 620000, img: "https://images.unsplash.com/photo-1619767886558-efdc259b66a4?q=80&w=1200" },
                                 { id: "c2", title: "Porsche 911 Turbo", price: 950000, img: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=1200" },
@@ -388,22 +405,32 @@ export default function ClientDashboard() {
                             ]).map((car: { id?: string; title: string; price: number; img: string }, i: number) => (
                                 <Link key={car.id || i} href={`/showroom/${car.id || ""}`}>
                                     <motion.div
-                                        whileHover={{ scale: 1.03, y: -5 }}
-                                        className="rounded-2xl overflow-hidden border border-white/5 bg-white/[0.01]"
+                                        whileHover={{ y: -10 }}
+                                        className="group relative rounded-[2rem] overflow-hidden border border-white/5 bg-white/[0.02] backdrop-blur-md"
                                     >
-                                        <div className="h-48 overflow-hidden">
-                                            <motion.img
+                                        <div className="h-64 overflow-hidden relative">
+                                            {/* HUD Overlay for Car */}
+                                            <div className="absolute inset-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                                                <div className="absolute top-4 left-4 w-10 h-10 border-l border-t border-accent-gold/40" />
+                                                <div className="absolute bottom-4 right-4 w-10 h-10 border-r border-b border-accent-gold/40" />
+                                            </div>
+
+                                            <img
                                                 src={car.img}
                                                 alt={car.title}
-                                                className="w-full h-full object-cover grayscale transition-all duration-700 hover:grayscale-0"
-                                                animate={{ x: [0, 8, 0, -8, 0], y: [8, 0, -8, 0, 8] }}
-                                                transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                                                whileHover={{ scale: 1.1 }}
+                                                className="w-full h-full object-cover grayscale brightness-75 transition-all duration-1000 group-hover:grayscale-0 group-hover:scale-110 group-hover:brightness-100"
                                             />
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80" />
                                         </div>
-                                        <div className="p-6 flex items-center justify-between">
-                                            <div className="text-sm font-black uppercase tracking-tighter line-clamp-1">{car.title}</div>
-                                            <div className="text-sm font-black italic">{Number(car.price).toLocaleString()} <span className="text-[10px] opacity-40">SAR</span></div>
+                                        <div className="p-8">
+                                            <div className="text-[9px] font-black text-accent-gold uppercase tracking-[0.4em] mb-2">{isRTL ? "موصى به" : "RECOMMENDED"}</div>
+                                            <div className="flex items-end justify-between gap-4">
+                                                <div className="text-xl font-black uppercase tracking-tighter italic line-clamp-1 text-white">{car.title}</div>
+                                                <div className="text-lg font-black italic text-white/90 shrink-0">
+                                                    {Number(car.price).toLocaleString()}
+                                                    <span className="text-[10px] opacity-40 ml-2">SAR</span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </motion.div>
                                 </Link>

@@ -47,14 +47,14 @@ export default function PartsPage() {
     const [parts, setParts] = useState<Part[]>([]);
     const [loading, setLoading] = useState(false);
 
-    // --- Mock Agencies Data ---
+    // --- Mock Agencies Data with Bilingual support ---
     const AGENCIES: Agency[] = [
-        { id: 'toyota', name: 'TOYOTA', logo: '/images/شعارات/TOYOTA.jpg', models: ['CAMRY', 'COROLLA', 'LAND CRUISER', 'HILUX', 'YARIS'] },
-        { id: 'kia', name: 'KIA', logo: '/images/شعارات/photo_6_2026-02-05_20-57-23.jpg', models: ['K5', 'SPORTAGE', 'SORENTO', 'CERATO', 'PICANTO'] },
-        { id: 'hyundai', name: 'HYUNDAI', logo: '/images/شعارات/photo_7_2026-02-05_20-57-23.jpg', models: ['SONATA', 'ELANTRA', 'ACCENT', 'TUCSON', 'SANTA FE'] },
-        { id: 'ford', name: 'FORD', logo: '/images/شعارات/photo_8_2026-02-05_20-57-23.jpg', models: ['MUSTANG', 'F-150', 'EXPLORER', 'EXPEDITION', 'TAURUS'] },
-        { id: 'nissan', name: 'NISSAN', logo: '/images/شعارات/photo_9_2026-02-05_20-57-23.jpg', models: ['PATROL', 'ALTIMA', 'MAXIMA', 'SUNNY', 'X-TERRA'] },
-        { id: 'mercedes', name: 'MERCEDES', logo: '/images/شعارات/photo_10_2026-02-05_20-57-23.jpg', models: ['S-CLASS', 'E-CLASS', 'C-CLASS', 'G-WAGON', 'GLE'] },
+        { id: 'toyota', name: isRTL ? 'تويوتا' : 'TOYOTA', logo: '/images/شعارات/TOYOTA.jpg', models: isRTL ? ['كامري', 'كورولا', 'لاند كروزر', 'هايلوكس', 'يارس'] : ['CAMRY', 'COROLLA', 'LAND CRUISER', 'HILUX', 'YARIS'] },
+        { id: 'kia', name: isRTL ? 'كيا' : 'KIA', logo: '/images/شعارات/photo_6_2026-02-05_20-57-23.jpg', models: isRTL ? ['K5', 'سبورتج', 'سورينتو', 'سيراتو', 'بيكانتو'] : ['K5', 'SPORTAGE', 'SORENTO', 'CERATO', 'PICANTO'] },
+        { id: 'hyundai', name: isRTL ? 'هيونداي' : 'HYUNDAI', logo: '/images/شعارات/photo_7_2026-02-05_20-57-23.jpg', models: isRTL ? ['سوناتا', 'إلنترا', 'أكسنت', 'توسان', 'سانتا في'] : ['SONATA', 'ELANTRA', 'ACCENT', 'TUCSON', 'SANTA FE'] },
+        { id: 'ford', name: isRTL ? 'فورد' : 'FORD', logo: '/images/شعارات/photo_8_2026-02-05_20-57-23.jpg', models: isRTL ? ['موستنج', 'F-150', 'اكسبلورر', 'اكسبيديشن', 'تورس'] : ['MUSTANG', 'F-150', 'EXPLORER', 'EXPEDITION', 'TAURUS'] },
+        { id: 'nissan', name: isRTL ? 'نيسان' : 'NISSAN', logo: '/images/شعارات/photo_9_2026-02-05_20-57-23.jpg', models: isRTL ? ['باترول', 'ألتيما', 'ماكسيما', 'صني', 'إكس تيررا'] : ['PATROL', 'ALTIMA', 'MAXIMA', 'SUNNY', 'X-TERRA'] },
+        { id: 'mercedes', name: isRTL ? 'مرسيدس' : 'MERCEDES', logo: '/images/شعارات/photo_10_2026-02-05_20-57-23.jpg', models: isRTL ? ['S-CLASS', 'E-CLASS', 'C-CLASS', 'جي واجن', 'GLE'] : ['S-CLASS', 'E-CLASS', 'C-CLASS', 'G-WAGON', 'GLE'] },
     ];
 
     const MOCK_PARTS: Part[] = [
@@ -104,19 +104,39 @@ export default function PartsPage() {
     const filteredAgencies = AGENCIES.filter(a => a.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
     return (
-        <div className={`relative min-h-screen text-white overflow-x-hidden ${isRTL ? 'font-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
+        <div className={`relative min-h-screen bg-[#050505] text-white overflow-x-hidden ${isRTL ? 'font-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
             <Navbar />
 
-            {/* ── FULL SCREEN BACKGROUND ── */}
-            <div className="fixed inset-0 z-0">
-                <Image
-                    src="/images/gata.jpg"
-                    alt="Background"
-                    fill
-                    className="object-cover opacity-60"
-                    priority
+            {/* ── ADVANCED TECH BACKGROUND ── */}
+            <div className="fixed inset-0 -z-20">
+                <div
+                    className="absolute inset-0 bg-cover bg-center opacity-30 brightness-[0.4] contrast-125"
+                    style={{ backgroundImage: "url('/images/gata.jpg')" }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-black/90 pb-20" />
+                <div className="absolute inset-0 bg-gradient-to-b from-[#050505] via-transparent to-[#050505]" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(0,240,255,0.05)_0%,_transparent_50%)]" />
+            </div>
+
+            {/* ── FLOATING PARTICLES ── */}
+            <div className="fixed inset-0 pointer-events-none z-0">
+                {[...Array(15)].map((_, i) => (
+                    <motion.div
+                        key={i}
+                        initial={{ opacity: 0, scale: 0 }}
+                        animate={{
+                            opacity: [0, 0.4, 0],
+                            scale: [0, 1, 0],
+                            x: [(i % 5) * 200 - 400, (i % 3) * 300 - 450, (i % 5) * 200 - 400],
+                            y: [(i % 4) * 200 - 400, (i % 2) * 400 - 400, (i % 4) * 200 - 400]
+                        }}
+                        transition={{
+                            duration: 15 + (i % 10),
+                            repeat: Infinity,
+                            delay: i * 0.5
+                        }}
+                        className="absolute top-1/2 left-1/2 w-1.5 h-1.5 bg-cinematic-neon-blue rounded-full blur-[3px]"
+                    />
+                ))}
             </div>
 
             {/* ── BACK BUTTON ── */}
@@ -195,37 +215,53 @@ export default function PartsPage() {
                 {/* ── CONTENT VIEWS ── */}
                 <AnimatePresence mode="wait">
 
-                    {/* 1. AGENCIES GRID */}
                     {viewMode === 'AGENCIES' && (
                         <motion.div
-                            key="agencies"
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 1.05 }}
-                            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6"
+                            key="agencies-tech"
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 1.1, filter: "blur(20px)" }}
+                            className="max-w-6xl mx-auto py-16"
                         >
-                            {filteredAgencies.map((agency, idx) => (
-                                <motion.div
-                                    key={agency.id}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: idx * 0.05 }}
-                                    onClick={() => handleAgencySelect(agency)}
-                                    className="group relative cursor-pointer"
-                                >
-                                    <div className="aspect-square glass-card bg-white/[0.02] border border-white/10 rounded-3xl p-8 flex flex-col items-center justify-center gap-6 group-hover:border-accent-gold/40 transition-all duration-700 hover:shadow-[0_20px_50px_rgba(201,169,110,0.1)]">
-                                        <div className="relative w-full h-full grayscale group-hover:grayscale-0 transition-all duration-700">
-                                            <Image
-                                                src={agency.logo}
-                                                alt={agency.name}
-                                                fill
-                                                className="object-contain p-2 group-hover:scale-110 transition-transform duration-700"
-                                            />
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-10 md:gap-14">
+                                {filteredAgencies.map((agency, idx) => (
+                                    <motion.div
+                                        key={agency.id}
+                                        initial={{ opacity: 0, y: 40 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: idx * 0.1, duration: 0.8, ease: "circOut" }}
+                                        onClick={() => handleAgencySelect(agency)}
+                                        className="group relative cursor-pointer"
+                                    >
+                                        <div className="aspect-[4/5] glass-card bg-white/[0.01] border border-white/5 rounded-[40px] p-8 flex flex-col items-center justify-between overflow-hidden group-hover:border-cinematic-neon-blue/40 transition-all duration-700">
+                                            {/* Tech Background Deco */}
+                                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120%] h-1 bg-gradient-to-r from-transparent via-cinematic-neon-blue/20 to-transparent" />
+                                            <div className="absolute bottom-10 left-0 w-full h-[1px] bg-white/[0.03]" />
+
+                                            {/* Capsule Shell */}
+                                            <div className="relative w-full aspect-square rounded-[30px] bg-white shadow-[0_10px_40px_rgba(0,0,0,0.5)] flex items-center justify-center p-6 group-hover:scale-105 transition-transform duration-700">
+                                                <div className="absolute inset-0 rounded-[30px] border border-black/5" />
+                                                <Image
+                                                    src={agency.logo}
+                                                    alt={agency.name}
+                                                    fill
+                                                    className="object-contain p-2"
+                                                />
+                                            </div>
+
+                                            <div className="text-center w-full z-10">
+                                                <div className="text-[10px] font-black uppercase tracking-[0.5em] text-cinematic-neon-blue mb-2 opacity-60 group-hover:opacity-100 transition-opacity">Select Agency</div>
+                                                <h3 className="text-2xl font-black italic uppercase tracking-tighter group-hover:text-cinematic-neon-blue transition-colors">
+                                                    {agency.name}
+                                                </h3>
+                                            </div>
+
+                                            {/* Animated Glow on Hover */}
+                                            <div className="absolute -inset-20 bg-cinematic-neon-blue/10 blur-[100px] opacity-0 group-hover:opacity-100 transition-opacity duration-1000 -z-10" />
                                         </div>
-                                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 group-hover:text-accent-gold transition-colors">{agency.name}</span>
-                                    </div>
-                                </motion.div>
-                            ))}
+                                    </motion.div>
+                                ))}
+                            </div>
                         </motion.div>
                     )}
 

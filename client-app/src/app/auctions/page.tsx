@@ -59,11 +59,17 @@ export default function Auctions() {
 
                 {/* Animated scan line */}
                 <motion.div
-                    animate={{ y: [-50, 800] }}
-                    transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
-                    className="absolute left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-accent-red/30 to-transparent pointer-events-none"
+                    animate={{ y: [-50, 1000] }}
+                    transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                    className="absolute left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-accent-red/50 to-transparent pointer-events-none z-20"
                 />
                 <div className="video-grain" />
+
+                {/* HUD Overlay Elements */}
+                <div className="absolute inset-0 z-10 pointer-events-none">
+                    <div className="absolute top-10 left-10 w-20 h-20 border-l-2 border-t-2 border-accent-red/30" />
+                    <div className="absolute bottom-10 right-10 w-20 h-20 border-r-2 border-b-2 border-accent-red/30" />
+                </div>
 
                 {/* Hero Content */}
                 <div className="absolute inset-0 flex items-end z-10">
@@ -140,10 +146,17 @@ export default function Auctions() {
                                     <img
                                         src={auction.car?.images?.[0] || ''}
                                         alt={auction.car?.title}
-                                        className="w-full h-full object-cover grayscale-[30%] transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105 opacity-70 group-hover:opacity-100"
+                                        className="w-full h-full object-cover grayscale-[30%] transition-all duration-1000 group-hover:grayscale-0 group-hover:scale-110 opacity-60 group-hover:opacity-100"
                                     />
-                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent to-[#0a0a0a] hidden lg:block" />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent lg:hidden" />
+                                    <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-transparent to-transparent hidden lg:block" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent lg:hidden" />
+
+                                    {/* Scanning Beam effect for image */}
+                                    <motion.div
+                                        animate={{ x: ['-100%', '200%'] }}
+                                        transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                                        className="absolute top-0 bottom-0 w-1/3 skew-x-[20deg] bg-gradient-to-r from-transparent via-white/5 to-transparent pointer-events-none"
+                                    />
 
                                     {/* Live Badge */}
                                     <div className="absolute top-6 left-6 flex items-center gap-2.5 px-3.5 py-1.5 bg-black/60 backdrop-blur-xl border border-accent-red/30 rounded-lg">
@@ -169,7 +182,14 @@ export default function Auctions() {
                                             </div>
                                             <div className="text-2xl lg:text-3xl font-black gold-glow">
                                                 {Number(auction.currentBid).toLocaleString()}
-                                                <span className="text-xs text-white/30 ml-1.5 font-medium">SAR</span>
+                                                <span className="text-[10px] text-accent-red/60 ml-1.5 font-black tracking-widest uppercase">SAR</span>
+                                            </div>
+                                            <div className="h-1 w-full bg-white/5 mt-3 overflow-hidden rounded-full">
+                                                <motion.div
+                                                    initial={{ width: 0 }}
+                                                    animate={{ width: '70%' }}
+                                                    className="h-full bg-accent-red shadow-[0_0_10px_rgba(232,54,78,1)]"
+                                                />
                                             </div>
                                         </div>
                                         <div>

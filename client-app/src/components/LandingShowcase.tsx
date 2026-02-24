@@ -1,8 +1,8 @@
-
 import { motion } from "framer-motion";
 import { Car, Wrench, Gavel, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface LandingShowcaseProps {
     isRTL: boolean;
@@ -93,144 +93,164 @@ export default function LandingShowcase({ isRTL, latestCars = [] }: LandingShowc
     ];
 
     return (
-        <div className="relative min-h-screen w-full flex flex-col justify-center items-center px-3 sm:px-4 overflow-hidden">
-            <motion.div
-                className="text-center z-20 mb-8 sm:mb-16 pt-16 sm:pt-20"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1.5, ease: "easeOut" }}
-            >
-                <motion.h1
-                    className="text-4xl sm:text-6xl md:text-8xl font-bold font-display tracking-tight mb-4 sm:mb-6"
-                    initial={{ filter: "blur(10px)", opacity: 0 }}
-                    animate={{ filter: "blur(0px)", opacity: 1 }}
-                    transition={{ duration: 1.2, delay: 0.2 }}
-                    style={{ transformStyle: "preserve-3d" }}
-                >
-                    <span className="relative inline-block px-6 sm:px-10 py-3 sm:py-4 rounded-[2rem] sm:rounded-[2.5rem] border border-white/25 bg-white/10 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.35)]">
-                        <span
-                            className="relative block bg-gradient-to-b from-white via-white/70 to-white/30 bg-clip-text text-transparent tracking-widest"
-                            style={{ WebkitTextStroke: "1px rgba(255,255,255,0.35)" }}
-                        >
-                            HM CAR
-                        </span>
-                        <span className="absolute inset-0 rounded-[2rem] sm:rounded-[2.5rem] bg-gradient-to-b from-white/30 via-transparent to-white/10 opacity-35" />
-                        <span className="absolute -top-6 -left-8 w-28 h-28 rounded-full bg-white/25 blur-3xl opacity-30" />
-                        <span className="absolute -bottom-6 -right-8 w-24 h-24 rounded-full bg-[#c9a96e]/20 blur-3xl opacity-30" />
-                    </span>
-                </motion.h1>
-                <motion.p
-                    className="text-sm sm:text-lg md:text-2xl text-gray-200 font-light px-4"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 1.5, delay: 0.8 }}
-                >
-                    {isRTL
-                        ? "HM CAR لتصدير السيارات وقطع الغيار من كوريا الى جميع انحاء العالم"
-                        : "HM CAR — Exporting cars and spare parts from Korea worldwide"}
-                </motion.p>
-                <div className="mt-4 sm:mt-6">
-                    <Link
-                        href="/login"
-                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#c9a96e] text-black font-bold hover:bg-[#c9a96e]/90 transition-colors text-sm sm:text-base"
-                    >
-                        {isRTL ? "تسجيل الدخول" : "Login"}
-                        <ArrowRight className={`w-4 h-4 ${isRTL ? "rotate-180" : ""}`} />
-                    </Link>
-                </div>
-            </motion.div>
-
-            {/* Glass Cards Shop Sections */}
-            {/* Mobile: 1 row of 3 compact cards | Desktop: 3 columns full cards */}
-            <div className="grid grid-cols-3 md:grid-cols-3 gap-3 sm:gap-6 w-full max-w-6xl z-20 px-2 sm:px-4 pb-8">
-                {cards.map((card, index) => (
-                    <button key={index} className="w-full" onClick={() => { setCategory(card.key as any); setShowSearch(true); }}>
-                        <motion.div
-                            className={`glass-card group relative rounded-2xl sm:rounded-3xl overflow-hidden cursor-pointer
-                                p-3 sm:p-6
-                                flex flex-col items-center justify-center text-center
-                                h-36 sm:h-72`}
-                            initial={{ opacity: 0, y: 50 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8, delay: 1 + index * 0.2 }}
-                            whileHover={{
-                                scale: 1.05,
-                                rotateX: 5,
-                                rotateY: 5,
-                                transition: { duration: 0.4 }
-                            }}
-                        >
-                            {/* Inner Glow */}
-                            <div className={`absolute inset-0 bg-gradient-to-br ${card.color} opacity-20 group-hover:opacity-40 transition-opacity duration-500`} />
-
-                            {/* Icon — small on mobile, large on desktop */}
-                            <div className={`relative p-2.5 sm:p-5 rounded-full bg-white/5 border border-white/10 mb-2 sm:mb-6 backdrop-blur-md transition-all duration-500 group-hover:scale-110 group-hover:bg-white/10 ${card.iconColor} shadow-[0_0_20px_rgba(0,0,0,0.3)]`}>
-                                <card.icon className="w-5 h-5 sm:w-12 sm:h-12" />
-                            </div>
-
-                            {/* Content */}
-                            <h3 className="relative text-xs sm:text-3xl font-bold text-white sm:mb-3 font-display leading-tight">{card.title}</h3>
-                            <p className="relative text-[10px] sm:text-sm text-gray-300 opacity-90 sm:opacity-60 group-hover:opacity-100 transition-opacity duration-500">
-                                {card.description}
-                            </p>
-
-                            {/* Arrow — desktop only */}
-                            <div className="absolute bottom-4 sm:bottom-6 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0">
-                                <ArrowRight className={`w-4 h-4 sm:w-6 sm:h-6 text-white ${isRTL ? "rotate-180" : ""}`} />
-                            </div>
-
-                            {/* Decorative Sparkle */}
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-3xl -mr-16 -mt-16 transition-all duration-700 group-hover:bg-white/10" />
-                        </motion.div>
-                    </button>
-                ))}
+        <div className="relative min-h-screen w-full flex flex-col justify-center items-center px-4 overflow-hidden bg-black/40">
+            {/* ── CINEMATIC PATHWAYS (NEON BEAMS) ── */}
+            <div className="fixed inset-0 pointer-events-none z-10 overflow-hidden">
+                <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-[1px] bg-gradient-to-r from-transparent via-accent-gold/20 to-transparent rotate-[30deg]"
+                />
+                <motion.div
+                    animate={{ rotate: -360 }}
+                    transition={{ duration: 75, repeat: Infinity, ease: "linear" }}
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-[1px] bg-gradient-to-r from-transparent via-cinematic-neon-blue/20 to-transparent rotate-[-45deg]"
+                />
             </div>
 
+            {/* ── GATEWAY TITLE ── */}
+            <motion.div
+                className="text-center z-20 mb-20 pt-12"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1.2 }}
+            >
+                <div className="relative inline-block mb-4">
+                    <motion.div
+                        animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.6, 0.3] }}
+                        transition={{ duration: 4, repeat: Infinity }}
+                        className="absolute inset-0 bg-accent-gold/20 blur-3xl rounded-full"
+                    />
+                    <h1 className="text-6xl md:text-9xl font-black font-display tracking-tighter text-white relative">
+                        HM <span className="text-transparent bg-clip-text bg-gradient-to-b from-accent-gold to-[#8b7355]">CAR</span>
+                    </h1>
+                </div>
+                <p className="text-lg md:text-2xl text-white/40 font-light tracking-[0.3em] uppercase max-w-2xl mx-auto px-6">
+                    {isRTL ? "بوابة النخبة لتصدير السيارات الكورية" : "Elite Korean Automotive Gateway"}
+                </p>
+            </motion.div>
+
+            {/* ── CINEMATIC GATEWAY GRID ── */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-7xl z-20 px-6 pb-24">
+                {
+                    cards.map((card, index) => (
+                        <motion.button
+                            key={index}
+                            onClick={() => { setCategory(card.key as any); setShowSearch(true); }}
+                            className="group relative"
+                            initial={{ opacity: 0, scale: 0.9, y: 50 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            transition={{ delay: 0.5 + index * 0.2, duration: 1 }}
+                        >
+                            {/* ── PORTAL RING ── */}
+                            <div className="absolute inset-0 -z-10 bg-black rounded-[40px] border border-white/5 transition-all duration-700 group-hover:border-white/20 shadow-2xl" />
+
+                            {/* ── ENERGY CORE ── */}
+                            <div className={cn(
+                                "relative overflow-hidden rounded-[40px] p-10 h-[450px] flex flex-col items-center justify-center text-center transition-all duration-700",
+                                "bg-white/[0.02] backdrop-blur-2xl",
+                                "group-hover:translate-y-[-10px]"
+                            )}>
+                                {/* Energy Aura */}
+                                <div className={cn(
+                                    "absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-1000 bg-gradient-to-b",
+                                    card.color
+                                )} />
+
+                                {/* 3D Floating Icon Hub */}
+                                <motion.div
+                                    animate={{ y: [0, -10, 0] }}
+                                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                                    className="relative mb-8"
+                                >
+                                    <div className={cn(
+                                        "w-32 h-32 rounded-full flex items-center justify-center bg-black/40 border border-white/10 relative z-10 transition-all duration-700 group-hover:border-accent-gold/50 shadow-2xl group-hover:rotate-[360deg]",
+                                        card.iconColor
+                                    )}>
+                                        <card.icon className="w-14 h-14" />
+                                    </div>
+                                    <div className={cn("absolute inset-0 blur-3xl opacity-20 group-hover:opacity-50 transition-opacity duration-700", card.iconColor.replace('text-', 'bg-'))} />
+                                </motion.div>
+
+                                {/* Text Reveal */}
+                                <div className="space-y-4">
+                                    <h3 className="text-4xl font-black text-white uppercase tracking-tighter group-hover:text-accent-gold transition-colors">
+                                        {card.title}
+                                    </h3>
+                                    <div className="h-[1px] w-12 bg-white/10 mx-auto group-hover:w-24 group-hover:bg-accent-gold transition-all duration-500" />
+                                    <p className="text-white/40 text-sm font-medium uppercase tracking-[0.2em] group-hover:text-white/80 transition-colors">
+                                        {card.description}
+                                    </p>
+                                </div>
+
+                                {/* Interaction Label */}
+                                <div className="mt-12 flex items-center gap-3 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-700">
+                                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-accent-gold">
+                                        {isRTL ? "اضغط للدخول" : "INITIATE ACCESS"}
+                                    </span>
+                                    <ArrowRight className={cn("w-4 h-4 text-accent-gold", isRTL && "rotate-180")} />
+                                </div>
+                            </div>
+
+                            {/* Ambient Particle for Card */}
+                            <div className={cn("absolute -bottom-4 -left-4 w-24 h-24 blur-3xl opacity-0 group-hover:opacity-30 transition-all duration-1000 rounded-full", card.iconColor.replace('text-', 'bg-'))} />
+                        </motion.button>
+                    ))
+                }
+            </div>
             {showSearch && (
-                <div className="fixed inset-0 z-40 flex items-center justify-center px-4">
-                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => { setShowSearch(false); setResults([]); setQuery(""); setSubmitted(false); }} />
-                    <div className="relative w-full max-w-3xl rounded-3xl border border-white/20 bg-white/10 backdrop-blur-2xl shadow-[0_20px_60px_rgba(0,0,0,0.5)] p-6">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-xl font-bold text-white">{isRTL ? "بحث" : "Search"}</h3>
-                            <button className="px-3 py-1 rounded-lg bg-white/10 text-white" onClick={() => { setShowSearch(false); setResults([]); setQuery(""); setSubmitted(false); }}>{isRTL ? "إغلاق" : "Close"}</button>
+                <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
+                    <div className="absolute inset-0 bg-black/80 backdrop-blur-xl" onClick={() => { setShowSearch(false); setResults([]); setQuery(""); setSubmitted(false); }} />
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        className="relative w-full max-w-3xl rounded-[40px] border border-white/10 bg-black/40 backdrop-blur-3xl shadow-[0_0_100px_rgba(0,0,0,0.8)] p-10"
+                    >
+                        <div className="flex items-center justify-between mb-8">
+                            <h3 className="text-2xl font-black text-white uppercase tracking-widest italic">{isRTL ? "منظومة البحث" : "SEARCH SYSTEM"}</h3>
+                            <button className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-white/10 transition-all" onClick={() => { setShowSearch(false); setResults([]); setQuery(""); setSubmitted(false); }}>✕</button>
                         </div>
-                        <div className="flex gap-3 mb-4">
-                            <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={isRTL ? "اكتب الاسم أو الموديل..." : "Type name or model..."} className="flex-1 px-4 py-2 rounded-xl bg-black/40 border border-white/20 text-white outline-none" />
-                            <button className="px-4 py-2 rounded-xl bg-[#c9a96e] text-black font-bold" onClick={runSearch}>{isRTL ? "بحث" : "Search"}</button>
+                        <div className="flex gap-4 mb-8">
+                            <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={isRTL ? "اكتب الاسم أو الموديل..." : "ENTER PROTOCOL / MODEL..."} className="flex-1 px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-white outline-none focus:border-accent-gold/50 transition-all font-bold tracking-widest" />
+                            <button className="px-8 py-4 rounded-2xl bg-accent-gold text-black font-black uppercase tracking-widest shadow-lg shadow-accent-gold/20" onClick={runSearch}>{isRTL ? "بحث" : "QUERY"}</button>
                         </div>
+
                         {category === "cars" && results.length > 0 && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[400px] overflow-auto pr-4 scrollbar-thin">
                                 {results.map((c, i) => (
-                                    <div key={i} className="rounded-xl border border-white/20 bg-white/5 overflow-hidden flex">
-                                        <div className="relative w-32 h-24">
-                                            <img src={c.images && c.images.length ? c.images[0] : "/images/placeholder.jpg"} alt={c.title || "Car"} className="w-full h-full object-cover" />
+                                    <div key={i} className="group rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden flex transition-all hover:border-accent-gold/30">
+                                        <div className="relative w-40 h-28 shrink-0">
+                                            <img src={c.images && c.images.length ? c.images[0] : "/images/placeholder.jpg"} alt={c.title || "Car"} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                         </div>
-                                        <div className="p-3 flex-1">
-                                            <p className="text-white font-bold text-sm">{typeof c.make === "string" ? c.make : c.make?.name || c.title}</p>
-                                            <p className="text-white/60 text-xs">{c.model || ""}</p>
+                                        <div className="p-4 flex flex-col justify-center">
+                                            <p className="text-white font-black text-sm uppercase italic tracking-tighter">{typeof c.make === "string" ? c.make : c.make?.name || c.title}</p>
+                                            <p className="text-accent-gold text-[10px] font-bold uppercase tracking-widest mt-1">{c.model || ""}</p>
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         )}
-                        {results.length === 0 && (
-                            <div className="mt-2">
-                                <p className="text-white/80 mb-3 text-sm">{isRTL ? "غير متوفر حالياً، قدم طلبك:" : "Not available. Submit a request:"}</p>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                    <input className="px-3 py-2 rounded-lg bg-black/40 border border-white/20 text-white outline-none" placeholder={isRTL ? "الاسم" : "Name"} value={lead.name} onChange={(e) => setLead({ ...lead, name: e.target.value })} />
-                                    <input className="px-3 py-2 rounded-lg bg-black/40 border border-white/20 text-white outline-none" placeholder={isRTL ? "الموديل" : "Model"} value={lead.model} onChange={(e) => setLead({ ...lead, model: e.target.value })} />
-                                    <input className="px-3 py-2 rounded-lg bg-black/40 border border-white/20 text-white outline-none" placeholder={isRTL ? "الشركة" : "Company"} value={lead.company} onChange={(e) => setLead({ ...lead, company: e.target.value })} />
-                                    <input className="px-3 py-2 rounded-lg bg-black/40 border border-white/20 text-white outline-none" placeholder={isRTL ? "رقم الهاتف" : "Phone"} value={lead.phone} onChange={(e) => setLead({ ...lead, phone: e.target.value })} />
+
+                        {(results.length === 0 || category !== "cars") && (
+                            <div className="mt-4">
+                                <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5">
+                                    <p className="text-white/60 mb-6 text-sm font-medium uppercase tracking-[0.2em]">{isRTL ? "غير متوفر حالياً، قدم طلبك:" : "PROTOCOL NOT FOUND. SUBMIT REQUEST:"}</p>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <input className="px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white outline-none focus:border-accent-gold/30 text-xs" placeholder={isRTL ? "الاسم" : "NAME"} value={lead.name} onChange={(e) => setLead({ ...lead, name: e.target.value })} />
+                                        <input className="px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white outline-none focus:border-accent-gold/30 text-xs" placeholder={isRTL ? "الموديل" : "MODEL"} value={lead.model} onChange={(e) => setLead({ ...lead, model: e.target.value })} />
+                                        <input className="px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white outline-none focus:border-accent-gold/30 text-xs" placeholder={isRTL ? "الشركة" : "COMPANY"} value={lead.company} onChange={(e) => setLead({ ...lead, company: e.target.value })} />
+                                        <input className="px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white outline-none focus:border-accent-gold/30 text-xs" placeholder={isRTL ? "رقم الهاتف" : "PHONE"} value={lead.phone} onChange={(e) => setLead({ ...lead, phone: e.target.value })} />
+                                    </div>
+                                    <div className="mt-8 flex justify-end">
+                                        <button className="px-8 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-black uppercase tracking-widest hover:bg-accent-gold hover:text-black transition-all" onClick={submitLead}>{isRTL ? "إرسال البروتوكول" : "SUBMIT PROTOCOL"}</button>
+                                    </div>
+                                    {submitted && (
+                                        <div className="mt-4 text-accent-gold text-xs font-bold animate-pulse text-center">{isRTL ? "✓ تم استلام المعطيات بنجاح" : "✓ DATA PROTOCOL RECEIVED"}</div>
+                                    )}
                                 </div>
-                                <div className="mt-3 flex justify-end">
-                                    <button className="px-4 py-2 rounded-xl bg-[#c9a96e] text-black font-bold" onClick={submitLead}>{isRTL ? "قدم الطلب" : "Submit Request"}</button>
-                                </div>
-                                {submitted && (
-                                    <div className="mt-2 text-[#c9a96e] text-sm">{isRTL ? "تم استلام طلبك، سيتم التواصل عبر واتساب من الإدارة." : "Your request was received. Admin will contact you via WhatsApp."}</div>
-                                )}
                             </div>
                         )}
-                    </div>
+                    </motion.div>
                 </div>
             )}
         </div>

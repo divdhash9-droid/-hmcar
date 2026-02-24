@@ -134,20 +134,26 @@ export default function AdminBrandsPage() {
           </div>
 
           <div className="lg:col-span-2 glass-card p-8 bg-white/[0.02] border-white/10 rounded-2xl">
-            <h3 className="text-lg font-black mb-6">{isRTL ? 'الماركات المضافة' : 'Added Brands'}</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <h3 className="text-lg font-black mb-8 px-2">{isRTL ? 'الوكالات والماركات المضافة' : 'Registered Agencies & Brands'}</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-8">
               {brands.map((b) => (
-                <div key={b.id} className="p-4 rounded-xl border border-white/10 bg-white/[0.03] flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-lg bg-white/5 border border-white/10 overflow-hidden flex items-center justify-center">
-                    {b.logo ? <Image src={b.logo} alt={b.name} fill className="object-cover" unoptimized /> : <Tag className="w-6 h-6 text-white/30" />}
+                <div key={b.id} className="group relative flex flex-col items-center gap-4">
+                  <div className="relative w-24 h-24 rounded-full bg-white shadow-inner border border-white/10 overflow-hidden flex items-center justify-center transition-transform duration-500 group-hover:scale-110">
+                    {b.logo ? (
+                      <div className="relative w-2/3 h-2/3">
+                        <Image src={b.logo} alt={b.name} fill className="object-contain" unoptimized />
+                      </div>
+                    ) : <Tag className="w-8 h-8 text-black/10" />}
                   </div>
-                  <div className="flex-1">
-                    <div className="text-sm font-black">{b.name}</div>
-                    <div className="text-[10px] text-white/40 uppercase tracking-[0.3em]">{b.category}</div>
+                  <div className="text-center">
+                    <div className="text-[11px] font-black uppercase tracking-widest">{b.name}</div>
+                    <div className="text-[8px] text-white/30 uppercase mt-1">{b.category}</div>
                   </div>
-                  <button onClick={() => handleDelete(b.id)} className="btn-glow px-3 py-2 rounded-lg bg-cinematic-neon-red/10 border border-cinematic-neon-red/30 text-cinematic-neon-red flex items-center gap-1 text-[9px] font-black uppercase">
-                    <Trash2 className="w-3 h-3" />
-                    {isRTL ? 'حذف' : 'DELETE'}
+                  <button
+                    onClick={() => handleDelete(b.id)}
+                    className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-cinematic-neon-red text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                  >
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               ))}

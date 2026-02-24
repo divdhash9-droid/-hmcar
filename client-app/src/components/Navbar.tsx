@@ -51,8 +51,8 @@ export default function Navbar() {
                 className={cn(
                     "fixed top-0 left-0 right-0 z-50 transition-all duration-700",
                     scrolled
-                        ? "bg-black/70 backdrop-blur-xl border-b border-white/5 py-3"
-                        : "bg-transparent py-5"
+                        ? "bg-black/40 backdrop-blur-[24px] border-b border-white/10 py-3 shadow-[0_10px_40px_rgba(0,0,0,0.5)]"
+                        : "bg-transparent py-6"
                 )}
                 dir={isRTL ? 'rtl' : 'ltr'}
             >
@@ -60,14 +60,22 @@ export default function Navbar() {
                     {/* Logo + page-specific back */}
                     <div className="group flex flex-col items-start gap-2 shrink-0">
                         <Link href="/" className="flex items-center gap-3">
-                            <div className="relative">
-                                <span className="text-xl font-black tracking-[-0.04em] text-white group-hover:text-white/80 transition-colors drop-shadow-[0_0_10px_rgba(255,255,255,0.6)]">
+                            <motion.div
+                                whileHover={{ scale: 1.05 }}
+                                className="relative flex items-center"
+                            >
+                                <span className="text-2xl font-black tracking-[-0.04em] text-white transition-all drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">
                                     HM
                                 </span>
-                                <span className="text-xl font-display italic text-white/30 ml-1 group-hover:text-[#c9a96e] transition-colors drop-shadow-[0_0_8px_rgba(201,169,110,0.5)]">
+                                <span className="text-2xl font-display italic text-accent-gold ml-1 transition-all drop-shadow-[0_0_12px_rgba(201,169,110,0.5)]">
                                     CAR
                                 </span>
-                            </div>
+                                <motion.div
+                                    initial={{ width: 0 }}
+                                    whileHover={{ width: '100%' }}
+                                    className="absolute -bottom-1 left-0 h-[1px] bg-accent-gold opacity-50"
+                                />
+                            </motion.div>
                         </Link>
                         {pathname === '/profile' && (
                             <div className="w-full">

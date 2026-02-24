@@ -228,7 +228,7 @@ export default function Login() {
         <div className={`relative min-h-screen bg-black text-white flex items-center justify-center p-6 overflow-hidden ${isRTL ? 'font-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
             {/* Cinematic Background */}
             <CinematicVideoBackground
-                videoSrc="/videos/hero.mp4"
+                videoSrc="/videos/video.mp4"
                 fallbackImage="/images/photo_2026-02-07_22-24-18.jpg"
                 mobileImage="/images/hmcar.jpg"
                 overlayOpacity={0.55}
@@ -240,20 +240,7 @@ export default function Login() {
                 <div className="orb orb-blue w-[400px] h-[400px] bottom-[-100px] left-[-100px] animate-breathe delay-1000 blur-[100px] opacity-20" />
             </div>
 
-            {/* ── BACK BUTTON ── */}
-            <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 }}
-                className="fixed top-8 left-8 z-50"
-            >
-                <Link href="/" className="group flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.3em] text-white/40 hover:text-[#c9a96e] transition-all duration-500">
-                    <div className="w-11 h-11 border border-white/10 rounded-xl flex items-center justify-center group-hover:border-[#c9a96e]/50 group-hover:bg-[#c9a96e]/10 transition-all backdrop-blur-md">
-                        {isRTL ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-                    </div>
-                    <span className="hidden sm:block">{isRTL ? "الرئيسية" : "HOME"}</span>
-                </Link>
-            </motion.div>
+
 
             {/* ── LOGIN CARD ── */}
             <motion.div
@@ -262,7 +249,25 @@ export default function Login() {
                 transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
                 className="relative z-10 w-full max-w-md px-2"
             >
-                <div className="glass-card p-6 sm:p-10 md:p-12 rounded-3xl border border-white/10 backdrop-blur-3xl shadow-2xl">
+                <div className="relative glass-card p-6 sm:p-10 md:p-12 rounded-3xl border border-white/10 backdrop-blur-3xl shadow-2xl">
+                    {/* ── BACK BUTTON (داخل البطاقة، أعلى اليمين) ── */}
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.4 }}
+                        className={`absolute top-4 ${isRTL ? 'left-4' : 'right-4'} z-20`}
+                    >
+                        <Link href="/">
+                            <motion.div
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.95 }}
+                                title={isRTL ? 'الرئيسية' : 'Home'}
+                                className="w-10 h-10 rounded-xl border border-white/10 bg-white/5 backdrop-blur-md flex items-center justify-center text-white/40 hover:text-accent-gold hover:border-accent-gold/40 hover:bg-accent-gold/10 transition-all duration-300 shadow-lg"
+                            >
+                                {isRTL ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+                            </motion.div>
+                        </Link>
+                    </motion.div>
 
                     {/* ── Header ── */}
                     <div className="text-center space-y-6 mb-10">

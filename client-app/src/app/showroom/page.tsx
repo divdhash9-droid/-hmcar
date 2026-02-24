@@ -163,14 +163,12 @@ export default function Showroom() {
                                             <div className="absolute -inset-4 rounded-full border border-accent-gold/0 group-hover:border-accent-gold/10 group-hover:scale-110 transition-all duration-1000 opacity-0 group-hover:opacity-100 blur-sm" />
 
                                             {/* Main Circle Body */}
-                                            <div className="absolute inset-2 rounded-full bg-gradient-to-br from-white/[0.08] to-transparent backdrop-blur-3xl border border-white/10 overflow-hidden flex items-center justify-center p-6 shadow-2xl group-hover:shadow-accent-gold/5 transition-all duration-700">
-                                                <div className="relative w-full h-full bg-white rounded-full flex items-center justify-center shadow-[inset_0_4px_30px_rgba(0,0,0,0.2)] p-4 transform group-hover:scale-105 transition-transform duration-700">
-                                                    <img
-                                                        src={agency.logo}
-                                                        alt={agency.name}
-                                                        className="w-full h-full object-contain"
-                                                    />
-                                                </div>
+                                            <div className="absolute inset-2 rounded-full bg-white overflow-hidden flex items-center justify-center shadow-2xl group-hover:shadow-accent-gold/10 transition-all duration-700">
+                                                <img
+                                                    src={agency.logo}
+                                                    alt={agency.name}
+                                                    className="w-3/4 h-3/4 object-contain"
+                                                />
                                             </div>
 
                                             {/* Floating Badge */}

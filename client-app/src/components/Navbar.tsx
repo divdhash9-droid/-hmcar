@@ -90,21 +90,7 @@ export default function Navbar() {
                         )}
                     </div>
 
-                    {/* Desktop Navigation */}
-                    <div className="hidden lg:flex items-center gap-6">
-                        {navLinks.map((link) => (
-                            <Link
-                                key={link.href}
-                                href={link.href}
-                                className={cn(
-                                    "text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:text-white",
-                                    isActive(link.href) ? "text-[#c9a96e]" : "text-white/40"
-                                )}
-                            >
-                                {link.label}
-                            </Link>
-                        ))}
-                    </div>
+
 
                     {/* Right Actions */}
                     <div className="flex items-center gap-2">

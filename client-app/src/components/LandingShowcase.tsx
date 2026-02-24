@@ -128,6 +128,32 @@ export default function LandingShowcase({ isRTL, latestCars = [] }: LandingShowc
                 <p className="text-lg md:text-2xl text-white/40 font-light tracking-[0.3em] uppercase max-w-2xl mx-auto px-6">
                     {isRTL ? "بوابة النخبة لتصدير السيارات الكورية" : "Elite Korean Automotive Gateway"}
                 </p>
+
+                {/* ── LOGIN BUTTON ── */}
+                <motion.div
+                    className="mt-10 flex justify-center"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.8, duration: 0.8 }}
+                >
+                    <Link href="/login">
+                        <motion.span
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.97 }}
+                            className="relative inline-flex items-center gap-3 px-10 py-4 rounded-2xl font-black uppercase tracking-[0.25em] text-sm text-black bg-gradient-to-r from-accent-gold to-[#e8c97a] shadow-[0_0_40px_rgba(201,169,110,0.4)] cursor-pointer select-none"
+                        >
+                            <motion.div
+                                animate={{ opacity: [0.4, 0.9, 0.4] }}
+                                transition={{ duration: 2.5, repeat: Infinity }}
+                                className="absolute inset-0 rounded-2xl bg-white/20 blur-sm"
+                            />
+                            <span className="relative z-10">
+                                {isRTL ? "تسجيل الدخول" : "LOGIN"}
+                            </span>
+                            <ArrowRight className={`relative z-10 w-4 h-4 ${isRTL ? "rotate-180" : ""}`} />
+                        </motion.span>
+                    </Link>
+                </motion.div>
             </motion.div>
 
             {/* ── CINEMATIC GATEWAY GRID ── */}

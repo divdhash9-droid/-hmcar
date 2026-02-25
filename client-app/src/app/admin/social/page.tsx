@@ -132,7 +132,7 @@ function AdminSocialSettings() {
 
           <div className="space-y-4">
             {platforms.map((p) => {
-              const Icon = getSocialIcon(p.key) as React.ElementType;
+              const Icon = getSocialIcon(p.key) as React.ComponentType<{ className?: string }>;
               const val = (config.links.find(l => (l.platform || '').toLowerCase() === p.key) || {}).url || "";
               return (
                 <div key={p.key} className="flex items-center gap-4 bg-white/[0.02] border border-white/10 rounded-xl p-4">

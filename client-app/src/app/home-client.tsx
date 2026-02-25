@@ -344,14 +344,14 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
                   {socialConfig.whatsapp && (
                     <Link href={whatsappUrl} target="_blank">
                       <motion.div whileHover={{ scale: 1.1 }} className="w-12 h-12 rounded-full bg-black/40 border border-white/10 flex items-center justify-center shadow-lg transition-all hover:bg-cinematic-neon-green/20">
-                        {(() => { const Icon = getSocialIcon("whatsapp") as React.ElementType; return Icon ? <Icon className="w-6 h-6 text-cinematic-neon-green" /> : <MessageCircle className="w-6 h-6 text-cinematic-neon-green" /> })()}
+                        {(() => { const Icon = getSocialIcon("whatsapp") as React.ComponentType<{ className?: string }>; return Icon ? <Icon className="w-6 h-6 text-cinematic-neon-green" /> : <MessageCircle className="w-6 h-6 text-cinematic-neon-green" /> })()}
                       </motion.div>
                     </Link>
                   )}
                   {socialConfig.links.map((link, idx) => (
                     <Link key={idx} href={link.url} target="_blank">
                       <motion.div whileHover={{ scale: 1.1 }} className="w-12 h-12 rounded-full bg-black/40 border border-white/10 flex items-center justify-center shadow-lg transition-all hover:bg-white/10">
-                        {(() => { const Icon = getSocialIcon(link.platform) as React.ElementType; return Icon ? <Icon className="w-6 h-6 text-white" /> : <LinkIcon className="w-6 h-6 text-white" /> })()}
+                        {(() => { const Icon = getSocialIcon(link.platform) as React.ComponentType<{ className?: string }>; return Icon ? <Icon className="w-6 h-6 text-white" /> : <LinkIcon className="w-6 h-6 text-white" /> })()}
                       </motion.div>
                     </Link>
                   ))}

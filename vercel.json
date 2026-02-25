@@ -8,26 +8,24 @@
         "maxDuration": 30,
         "memory": 1024
       }
+    },
+    {
+      "src": "client-app/package.json",
+      "use": "@vercel/next"
     }
   ],
   "routes": [
     {
-      "src": "^/api/(.*)",
-      "methods": [
-        "OPTIONS"
-      ],
-      "headers": {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET,POST,PUT,PATCH,DELETE,OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type,Authorization,X-Requested-With",
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Max-Age": "86400"
-      },
-      "continue": true
+      "src": "/api/(.*)",
+      "dest": "vercel-server.js"
     },
     {
-      "src": "^/api/(.*)",
+      "src": "/uploads/(.*)",
       "dest": "vercel-server.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "client-app/$1"
     }
   ],
   "env": {

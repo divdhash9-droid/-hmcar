@@ -18,7 +18,7 @@ interface Message {
     createdAt: string;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4001';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4002';
 
 async function apiFetch(path: string, options: RequestInit = {}) {
     const token = localStorage.getItem('hm_token') || sessionStorage.getItem('hm_token');

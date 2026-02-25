@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4002';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://car-auction-sand.vercel.app';
 
 export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
@@ -26,7 +26,7 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
         },
     };
 
-    console.log(`[API Request] ${options.method || 'GET'} ${url}`, options.body ? JSON.parse(options.body as string) : '');
+    console.log(`[API Request] ${options.method || 'GET'} ${url}`, options.body && !isFormData ? JSON.parse(options.body as string) : options.body);
 
     try {
         const response = await fetch(url, defaultOptions);
@@ -290,5 +290,29 @@ export const api = {
                 method: 'POST',
                 body: JSON.stringify(data),
             }),
+    },
+    liveAuctions: {
+        list: (params: any = {}) => {
+            const query = new URLSearchParams(params).toString();
+            return fetchAPI(`/api/v2/live-auctions?${query}`);
+        },
+        getById: (id: string) => fetchAPI(`/api/v2/live-auctions/${id}`),
+        create: (data: any) => fetchAPI('/api/v2/live-auctions', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        }),
+        update: (id: string, data: any) => fetchAPI(`/api/v2/live-auctions/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        }),
+        delete: (id: string) => fetchAPI(`/api/v2/live-auctions/${id}`, {
+            method: 'DELETE',
+        }),
+        start: (id: string) => fetchAPI(`/api/v2/live-auctions/${id}/start`, {
+            method: 'POST',
+        }),
+        end: (id: string) => fetchAPI(`/api/v2/live-auctions/${id}/end`, {
+            method: 'POST',
+        }),
     },
 };

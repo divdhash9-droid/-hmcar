@@ -153,9 +153,9 @@ router.patch('/:id/status', requireAuthAPI, requireAdmin, async (req, res) => {
 // حذف تقييم
 router.delete('/:id', requireAuthAPI, async (req, res) => {
     try {
-        const userId = req.user._id || req.user.id;
+        const userId = req.user.userId || req.user._id || req.user.id;
         const { id } = req.params;
-        const isAdmin = req.user.role === 'admin';
+        const isAdmin = req.user.role === 'admin' || req.user.role === 'super_admin';
 
         const query = isAdmin ? { _id: id } : { _id: id, user: userId };
         const review = await Review.findOneAndDelete(query);

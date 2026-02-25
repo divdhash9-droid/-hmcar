@@ -8,6 +8,7 @@
   "scripts": {
     "set-admin-claim": "node scripts/setAdminClaim.js",
     "create-local-admin": "node scripts/createLocalAdmin.js",
+    "create:admin": "node scripts/createProductionAdmin.js",
     "create-firebase-admin": "node scripts/createFirebaseAdmin.js",
     "link-local-to-firebase": "node scripts/linkLocalToFirebase.js",
     "create-full-admin": "node createFullAdmin.js",
@@ -34,7 +35,7 @@
     "pm2:restart": "pm2 restart car-auction",
     "pm2:logs": "pm2 logs car-auction",
     "pm2:monit": "pm2 monit",
-    "clean": "node scripts/clean-project.ps1",
+    "clean": "powershell -ExecutionPolicy Bypass -File scripts/clean-project.ps1",
     "clean:db": "node scripts/reset-database.js",
     "fresh-start": "npm run clean && npm install && npm run clean:db && npm run dev",
     "check:env": "node scripts/checkEnvironment.js",
@@ -88,6 +89,7 @@
   "devDependencies": {
     "@types/node": "^24.10.9",
     "chai": "^4.3.7",
+    "concurrently": "^9.2.1",
     "mocha": "^10.2.0",
     "mongodb-memory-server": "^8.12.0",
     "nodemon": "^3.1.11",

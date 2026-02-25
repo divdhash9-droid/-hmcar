@@ -16,7 +16,9 @@ const requireAuthAPI = (req, res, next) => {
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const token = authHeader.split(' ')[1];
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+      const jwtSecret = process.env.JWT_SECRET;
+      if (!jwtSecret) return res.status(500).json({ error: 'Server configuration error' });
+      const decoded = jwt.verify(token, jwtSecret);
       req.user = decoded;
       return next();
     } catch (err) {
@@ -25,10 +27,10 @@ const requireAuthAPI = (req, res, next) => {
   }
 
   // Fallback to session
-  if (!req.session.user) {
+  if (!req.session || !req.session.user) {
     return res.status(401).json({ error: 'يجب تسجيل الدخول' });
   }
-  req.user = req.session.user; // Make user available in API routes
+  req.user = req.session.user;
   next();
 };
 
@@ -39,16 +41,17 @@ const auth = (req, res, next) => {
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const token = authHeader.split(' ')[1];
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+      const jwtSecret = process.env.JWT_SECRET;
+      if (!jwtSecret) return res.status(500).json({ error: 'Server configuration error' });
+      const decoded = jwt.verify(token, jwtSecret);
       req.user = decoded;
       return next();
     } catch (err) {
-      // Continue to session check? Or fail? Let's fail if token is bad.
       return res.status(401).json({ error: 'Token invalid' });
     }
   }
 
-  if (!req.session.user) {
+  if (!req.session || !req.session.user) {
     return res.status(401).json({ error: 'يجب تسجيل الدخول' });
   }
   req.user = req.session.user;

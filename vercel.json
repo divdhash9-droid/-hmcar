@@ -5,7 +5,7 @@
       "src": "vercel-server.js",
       "use": "@vercel/node",
       "config": {
-        "maxDuration": 10,
+        "maxDuration": 30,
         "memory": 1024
       }
     }
@@ -17,21 +17,17 @@
         "OPTIONS"
       ],
       "headers": {
-        "Access-Control-Allow-Origin": "https://client-app-iota-eight.vercel.app",
-        "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS,PATCH",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET,POST,PUT,PATCH,DELETE,OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type,Authorization,X-Requested-With",
-        "Access-Control-Allow-Credentials": "true"
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Max-Age": "86400"
       },
       "continue": true
     },
     {
       "src": "^/api/(.*)",
       "dest": "vercel-server.js"
-    },
-    {
-      "src": "^/(.*)",
-      "dest": "vercel-server.js",
-      "check": true
     }
   ],
   "env": {

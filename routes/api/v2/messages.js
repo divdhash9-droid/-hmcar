@@ -17,7 +17,7 @@ async function getSupportAgentId() {
 // ===== التواصل مع خدمة العملاء (للعملاء) =====
 router.post('/support', requireAuthAPI, async (req, res) => {
     try {
-        const senderId = req.user._id || req.user.id || req.user.userId;
+        const senderId = req.user.userId || req.user._id || req.user.id;
         const { content } = req.body;
 
         if (!content || !content.trim()) {
@@ -59,7 +59,7 @@ router.post('/support', requireAuthAPI, async (req, res) => {
 // ===== جلب محادثة العميل مع خدمة العملاء =====
 router.get('/support', requireAuthAPI, async (req, res) => {
     try {
-        const userId = req.user._id || req.user.id || req.user.userId;
+        const userId = req.user.userId || req.user._id || req.user.id;
 
         const support = await getSupportAgentId();
         if (!support) {
@@ -100,7 +100,7 @@ router.get('/support', requireAuthAPI, async (req, res) => {
 // الحصول على جميع المحادثات
 router.get('/conversations', requireAuthAPI, async (req, res) => {
     try {
-        const userId = req.user._id || req.user.id;
+        const userId = req.user.userId || req.user._id || req.user.id;
 
         // جلب آخر رسالة من كل محادثة
         const messages = await Message.aggregate([
@@ -163,7 +163,7 @@ router.get('/conversations', requireAuthAPI, async (req, res) => {
 // الحصول على رسائل محادثة معينة
 router.get('/conversation/:userId', requireAuthAPI, async (req, res) => {
     try {
-        const currentUserId = req.user._id || req.user.id;
+        const currentUserId = req.user.userId || req.user._id || req.user.id;
         const { userId } = req.params;
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 50;
@@ -204,7 +204,7 @@ router.get('/conversation/:userId', requireAuthAPI, async (req, res) => {
 // إرسال رسالة جديدة
 router.post('/', requireAuthAPI, async (req, res) => {
     try {
-        const senderId = req.user._id || req.user.id;
+        const senderId = req.user.userId || req.user._id || req.user.id;
         const { receiverId, content } = req.body;
 
         if (!receiverId || !content) {
@@ -246,7 +246,7 @@ router.post('/', requireAuthAPI, async (req, res) => {
 // تحديد رسالة كمقروءة
 router.patch('/:id/read', requireAuthAPI, async (req, res) => {
     try {
-        const userId = req.user._id || req.user.id;
+        const userId = req.user.userId || req.user._id || req.user.id;
         const { id } = req.params;
 
         const message = await Message.findOneAndUpdate(
@@ -272,7 +272,7 @@ router.patch('/:id/read', requireAuthAPI, async (req, res) => {
 // حذف رسالة
 router.delete('/:id', requireAuthAPI, async (req, res) => {
     try {
-        const userId = req.user._id || req.user.id;
+        const userId = req.user.userId || req.user._id || req.user.id;
         const { id } = req.params;
 
         const message = await Message.findOneAndDelete({
@@ -297,7 +297,7 @@ router.delete('/:id', requireAuthAPI, async (req, res) => {
 // عدد الرسائل غير المقروءة
 router.get('/unread-count', requireAuthAPI, async (req, res) => {
     try {
-        const userId = req.user._id || req.user.id;
+        const userId = req.user.userId || req.user._id || req.user.id;
 
         const count = await Message.countDocuments({
             receiver: userId,

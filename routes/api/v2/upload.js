@@ -7,20 +7,19 @@ const { requireAuthAPI } = require('../../../middleware/auth');
 const config = require('../../../modules/core/config');
 const cloudinaryLib = require('cloudinary').v2;
 
-// Configure storage
+const os = require('os');
+
+// Configure storage for Vercel compatibility
+// We use the OS temp directory because Vercel's filesystem is read-only except for /tmp
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        const uploadDir = 'uploads/';
-        // Create directory if it doesn't exist
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-        }
-        cb(null, uploadDir);
+        const tempDir = os.tmpdir();
+        cb(null, tempDir);
     },
     filename: function (req, file, cb) {
         // Generate unique filename
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, uniqueSuffix + path.extname(file.originalname));
+        cb(null, 'upload-' + uniqueSuffix + path.extname(file.originalname));
     }
 });
 
@@ -72,7 +71,7 @@ router.post('/', requireAuthAPI, upload.single('image'), async (req, res) => {
                 unique_filename: true
             });
             // cleanup local file
-            try { fs.unlinkSync(req.file.path); } catch {}
+            try { fs.unlinkSync(req.file.path); } catch { }
             return res.json({
                 success: true,
                 url: result.secure_url,
@@ -81,12 +80,20 @@ router.post('/', requireAuthAPI, upload.single('image'), async (req, res) => {
             });
         }
 
-        // Fallback: local uploads
+        // Production check: Local upload is not allowed on Vercel
+        if (process.env.NODE_ENV === 'production') {
+            return res.status(500).json({
+                error: 'Configuration Error',
+                message: 'Cloudinary is not configured on production server. Local uploads are disabled.'
+            });
+        }
+
+        // Fallback: local uploads (only for dev)
         const imageUrl = `/uploads/${req.file.filename}`;
         res.json({
             success: true,
             url: imageUrl,
-            message: 'Image uploaded successfully'
+            message: 'Image uploaded successfully (local)'
         });
     } catch (error) {
         console.error('Upload error:', error);

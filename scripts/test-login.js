@@ -5,7 +5,7 @@ async function testClientLogin() {
     const email = `client.${Date.now()}@test.com`;
     const name = "Test Client";
     const password = "password123";
-    const API_URL = "http://localhost:4001/api/v2";
+    const API_URL = "http://localhost:4002/api/v2";
 
     try {
         console.log(`Testing with: Name='${name}', Email='${email}'`);

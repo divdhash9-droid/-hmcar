@@ -17,21 +17,24 @@ export default function Auctions() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const loadAuctions = async () => {
+        const loadData = async () => {
             setLoading(true);
             try {
-                const status = activeTab === 'LIVE' ? 'running' : 'scheduled';
-                const data = await api.auctions.list({ status });
-                if (data.success) {
-                    setAuctions(data.data || []);
+                if (activeTab === 'SHOWROOM') {
+                    const data = await api.liveAuctions.list();
+                    if (data.success) setAuctions(data.data || []);
+                } else {
+                    const status = activeTab === 'LIVE' ? 'running' : 'scheduled';
+                    const data = await api.auctions.list({ status });
+                    if (data.success) setAuctions(data.data || []);
                 }
             } catch (err) {
-                console.error("Failed to load auctions", err);
+                console.error("Failed to load data", err);
             } finally {
                 setLoading(false);
             }
         };
-        loadAuctions();
+        loadData();
     }, [activeTab]);
 
     return (
@@ -41,7 +44,7 @@ export default function Auctions() {
             <div className="pt-24 px-6 max-w-[1500px] mx-auto">
                 <ClientPageHeader
                     title={isRTL ? "المزادات" : "AUCTIONS"}
-                    subtitle={isRTL ? "بث مباشر" : "LIVE FEED"}
+                    subtitle={activeTab === 'SHOWROOM' ? (isRTL ? "المعرض المباشر" : "LIVE SHOWROOM") : (isRTL ? "بث مباشر" : "LIVE FEED")}
                     icon={Gavel}
                 />
             </div>
@@ -57,20 +60,6 @@ export default function Auctions() {
                 </video>
                 <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/70" />
 
-                {/* Animated scan line */}
-                <motion.div
-                    animate={{ y: [-50, 1000] }}
-                    transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                    className="absolute left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-accent-red/50 to-transparent pointer-events-none z-20"
-                />
-                <div className="video-grain" />
-
-                {/* HUD Overlay Elements */}
-                <div className="absolute inset-0 z-10 pointer-events-none">
-                    <div className="absolute top-10 left-10 w-20 h-20 border-l-2 border-t-2 border-accent-red/30" />
-                    <div className="absolute bottom-10 right-10 w-20 h-20 border-r-2 border-b-2 border-accent-red/30" />
-                </div>
-
                 {/* Hero Content */}
                 <div className="absolute inset-0 flex items-end z-10">
                     <div className="max-w-[1500px] mx-auto w-full px-6 pb-16">
@@ -84,8 +73,8 @@ export default function Auctions() {
                                 <span className="text-[9px] font-bold uppercase tracking-[0.5em] text-accent-red/80 block mb-3">
                                     {isRTL ? "بث مباشر" : "LIVE FEED"}
                                 </span>
-                                <h1 className="text-4xl md:text-5xl font-black tracking-[-0.04em] uppercase">
-                                    {isRTL ? "المزادات" : "AUCTIONS"}
+                                <h1 className="text-4xl md:text-5xl font-black tracking-[-0.04em] uppercase italic">
+                                    {activeTab === 'SHOWROOM' ? (isRTL ? "المعرض المباشر" : "SHOW SHOWROOM") : (isRTL ? "المزادات" : "AUCTIONS")}
                                 </h1>
                             </div>
 
@@ -104,6 +93,18 @@ export default function Auctions() {
                                     {isRTL ? "مباشر" : "LIVE"}
                                 </button>
                                 <button
+                                    onClick={() => setActiveTab('SHOWROOM')}
+                                    className={cn(
+                                        "px-8 py-3.5 rounded-lg text-[10px] font-bold uppercase tracking-[0.15em] transition-all duration-400 flex items-center gap-3",
+                                        activeTab === 'SHOWROOM'
+                                            ? "bg-cinematic-neon-blue text-black shadow-lg"
+                                            : "text-white/30 hover:text-white/50"
+                                    )}
+                                >
+                                    <Gavel className="w-3.5 h-3.5" />
+                                    {isRTL ? "المعرض" : "SHOWROOM"}
+                                </button>
+                                <button
                                     onClick={() => setActiveTab('UPCOMING')}
                                     className={cn(
                                         "px-8 py-3.5 rounded-lg text-[10px] font-bold uppercase tracking-[0.15em] transition-all duration-400",
@@ -120,141 +121,104 @@ export default function Auctions() {
                 </div>
             </div>
 
-            {/* ── AMBIENT ── */}
-            <div className="fixed inset-0 pointer-events-none z-0">
-                <div className="bg-grid-overlay opacity-8" />
-                <div className="orb orb-red w-[500px] h-[500px] top-0 left-0 animate-breathe opacity-20" />
-            </div>
-
             <main className="relative z-10 pt-16 pb-32 px-6 max-w-[1500px] mx-auto">
-
-                {/* ── AUCTION CARDS ── */}
-                <div className="space-y-8">
+                <div className="grid grid-cols-1 gap-8">
                     <AnimatePresence mode="popLayout">
-                        {auctions.map((auction, i) => (
-                            <motion.div
-                                key={auction.id}
-                                layout
-                                initial={{ opacity: 0, y: 25 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, scale: 0.98 }}
-                                transition={{ delay: i * 0.1 }}
-                                className="group obsidian-card obsidian-card-hover flex flex-col lg:flex-row overflow-hidden"
+                        {auctions.map((item, i) => (
+                            <motion.div key={item._id || item.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
+                                className="group obsidian-card overflow-hidden flex flex-col lg:flex-row"
                             >
-                                {/* Image */}
-                                <div className="relative w-full lg:w-[40%] h-60 lg:h-auto min-h-[320px] overflow-hidden">
-                                    <img
-                                        src={auction.car?.images?.[0] || ''}
-                                        alt={auction.car?.title}
-                                        className="w-full h-full object-cover grayscale-[30%] transition-all duration-1000 group-hover:grayscale-0 group-hover:scale-110 opacity-60 group-hover:opacity-100"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-transparent to-transparent hidden lg:block" />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent lg:hidden" />
-
-                                    {/* Scanning Beam effect for image */}
-                                    <motion.div
-                                        animate={{ x: ['-100%', '200%'] }}
-                                        transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                                        className="absolute top-0 bottom-0 w-1/3 skew-x-[20deg] bg-gradient-to-r from-transparent via-white/5 to-transparent pointer-events-none"
-                                    />
-
-                                    {/* Live Badge */}
-                                    <div className="absolute top-6 left-6 flex items-center gap-2.5 px-3.5 py-1.5 bg-black/60 backdrop-blur-xl border border-accent-red/30 rounded-lg">
-                                        <div className="w-2 h-2 rounded-full bg-accent-red animate-pulse shadow-[0_0_10px_rgba(232,54,78,0.8)]" />
-                                        <span className="text-[9px] font-bold text-white uppercase tracking-[0.2em]">{isRTL ? "مباشر" : "LIVE"}</span>
-                                    </div>
-                                </div>
-
-                                {/* Content */}
-                                <div className="flex-1 p-8 lg:p-12 flex flex-col justify-center gap-8">
-                                    <div>
-                                        <span className="text-[9px] font-bold text-accent-red/50 tracking-[0.4em] uppercase">{auction.car?.make}</span>
-                                        <h2 className="text-3xl lg:text-5xl font-black tracking-[-0.03em] uppercase leading-tight mt-2 line-clamp-1">
-                                            {auction.car?.title}
-                                        </h2>
-                                    </div>
-
-                                    {/* Stats */}
-                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 py-8 border-y border-white/5">
-                                        <div>
-                                            <div className="flex items-center gap-2 text-[9px] font-bold text-white/20 uppercase tracking-widest mb-2">
-                                                <TrendingUp className="w-3.5 h-3.5 text-accent-red" /> {t('currentBid')}
+                                {activeTab === 'SHOWROOM' ? (
+                                    <>
+                                        <div className="lg:w-[40%] h-64 lg:h-auto overflow-hidden relative">
+                                            <img src={(item.cars && item.cars[0]?.images[0]) || 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d'} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt="" />
+                                            {item.status === 'live' && (
+                                                <div className="absolute top-6 left-6 px-4 py-2 bg-cinematic-neon-red/20 border border-cinematic-neon-red/40 rounded-lg backdrop-blur-md">
+                                                    <span className="text-[10px] font-black text-white uppercase tracking-widest flex items-center gap-2">
+                                                        <div className="w-2 h-2 rounded-full bg-cinematic-neon-red animate-pulse" /> {isRTL ? 'بث مباشر' : 'LIVE'}
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="flex-1 p-10 space-y-8 flex flex-col justify-center">
+                                            <div>
+                                                <h2 className="text-4xl font-black italic uppercase tracking-tighter">{item.title}</h2>
+                                                <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest mt-2">{item.externalUrl ? 'Linked to Official Platform' : 'Internal Selection'}</p>
                                             </div>
-                                            <div className="text-2xl lg:text-3xl font-black gold-glow">
-                                                {Number(auction.currentBid).toLocaleString()}
-                                                <span className="text-[10px] text-accent-red/60 ml-1.5 font-black tracking-widest uppercase">SAR</span>
+                                            <div className="flex items-center gap-10">
+                                                <div>
+                                                    <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em] block mb-1">Cars Available</span>
+                                                    <div className="text-2xl font-black">{item.cars?.length || 0}</div>
+                                                </div>
+                                                <div>
+                                                    <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em] block mb-1">Session Status</span>
+                                                    <div className={cn("text-xs font-black uppercase tracking-widest", item.status === 'live' ? "text-cinematic-neon-blue" : "text-white/40")}>{item.status}</div>
+                                                </div>
                                             </div>
-                                            <div className="h-1 w-full bg-white/5 mt-3 overflow-hidden rounded-full">
-                                                <motion.div
-                                                    initial={{ width: 0 }}
-                                                    animate={{ width: '70%' }}
-                                                    className="h-full bg-accent-red shadow-[0_0_10px_rgba(232,54,78,1)]"
-                                                />
+                                            <Link href={`/auctions/live/${item._id || item.id}`}>
+                                                <button className="w-full lg:w-fit px-12 py-5 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-[0.5em] hover:bg-cinematic-neon-blue hover:text-black hover:shadow-[0_0_30px_rgba(0,240,255,0.4)] transition-all">
+                                                    {isRTL ? 'دخول قاعة العرض' : 'ENTER SHOWROOM'}
+                                                </button>
+                                            </Link>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="lg:w-[40%] h-64 lg:h-auto overflow-hidden relative">
+                                            <img src={item.car?.images?.[0]} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt="" />
+                                            {item.status === 'running' && (
+                                                <div className="absolute top-6 left-6 flex items-center gap-2.5 px-3.5 py-1.5 bg-black/60 backdrop-blur-xl border border-accent-red/30 rounded-lg">
+                                                    <div className="w-2 h-2 rounded-full bg-accent-red animate-pulse" />
+                                                    <span className="text-[9px] font-bold text-white uppercase tracking-[0.2em]">{isRTL ? "مباشر" : "LIVE"}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="flex-1 p-10 space-y-8 flex flex-col justify-center">
+                                            <div>
+                                                <span className="text-[10px] font-black text-accent-red/60 uppercase tracking-widest">{item.car?.make}</span>
+                                                <h2 className="text-4xl font-black italic uppercase tracking-tighter">{item.car?.title}</h2>
+                                            </div>
+                                            <div className="grid grid-cols-2 lg:grid-cols-3 gap-8 border-y border-white/5 py-6">
+                                                <div>
+                                                    <span className="text-[9px] font-black text-white/20 uppercase mb-1 block">Current Bid</span>
+                                                    <div className="text-2xl font-black text-cinematic-neon-blue">{Number(item.currentBid).toLocaleString()} SAR</div>
+                                                </div>
+                                                <div>
+                                                    <span className="text-[9px] font-black text-white/20 uppercase mb-1 block">Ends On</span>
+                                                    <div className="text-xl font-black">{new Date(item.endsAt).toLocaleDateString()}</div>
+                                                </div>
+                                                <div className="hidden lg:block">
+                                                    <span className="text-[9px] font-black text-white/20 uppercase mb-1 block">Total Bids</span>
+                                                    <div className="text-xl font-black">{item.bidders || 0}</div>
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-4">
+                                                <Link href={`/auctions/${item.id}`} className="flex-1">
+                                                    <button className="w-full py-5 bg-accent-red text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.5em] hover:shadow-[0_0_30px_rgba(232,54,78,0.4)] transition-all">
+                                                        {isRTL ? 'زايد الآن' : 'PLACE BID'}
+                                                    </button>
+                                                </Link>
+                                                <button className="px-10 py-5 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10">WATCH</button>
                                             </div>
                                         </div>
-                                        <div>
-                                            <div className="flex items-center gap-2 text-[9px] font-bold text-white/20 uppercase tracking-widest mb-2">
-                                                <Timer className="w-3.5 h-3.5 text-white/40" /> {t('timeLeft')}
-                                            </div>
-                                            <div className="text-xl lg:text-2xl font-black text-white/70 tracking-wide">
-                                                {new Date(auction.endsAt).toLocaleDateString()}
-                                            </div>
-                                        </div>
-                                        <div className="hidden sm:block">
-                                            <div className="flex items-center gap-2 text-[9px] font-bold text-white/20 uppercase tracking-widest mb-2">
-                                                <Users className="w-3.5 h-3.5 text-white/40" /> {isRTL ? 'المشاركين' : 'BIDDERS'}
-                                            </div>
-                                            <div className="text-xl lg:text-2xl font-black text-white/70">
-                                                {auction.bidders || '0'}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Actions */}
-                                    <div className="flex flex-col sm:flex-row gap-4">
-                                        <Link href={`/auctions/${auction.id}`} className="flex-1">
-                                            <button className="w-full btn-luxury bg-accent-red text-white py-5 rounded-xl shadow-[0_8px_30px_rgba(232,54,78,0.2)]">
-                                                <span>{t('bidNow')}</span>
-                                                <ChevronRight className={cn("w-4 h-4", isRTL && "rotate-180")} />
-                                            </button>
-                                        </Link>
-                                        <button className="btn-luxury-outline px-8 py-5 rounded-xl">
-                                            {isRTL ? "مراقبة" : "WATCH"}
-                                        </button>
-                                    </div>
-                                </div>
+                                    </>
+                                )}
                             </motion.div>
                         ))}
                     </AnimatePresence>
                 </div>
 
-                {/* ── EMPTY STATE ── */}
                 {auctions.length === 0 && !loading && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="py-32 flex flex-col items-center justify-center text-center space-y-8"
-                    >
-                        <AlertCircle className="w-16 h-16 text-white/5" />
-                        <div className="space-y-3">
-                            <h3 className="text-3xl font-black uppercase tracking-tight text-white/10">
-                                {isRTL ? "لا توجد مزادات نشطة" : "NO ACTIVE AUCTIONS"}
-                            </h3>
-                            <button
-                                onClick={() => setActiveTab('UPCOMING')}
-                                className="text-[10px] font-bold uppercase tracking-[0.3em] text-accent-gold/60 hover:text-accent-gold transition-colors"
-                            >
-                                {isRTL ? 'عرض القادمة' : 'VIEW UPCOMING'}
-                            </button>
-                        </div>
-                    </motion.div>
+                    <div className="py-32 text-center space-y-4">
+                        <AlertCircle className="w-16 h-16 text-white/5 mx-auto" />
+                        <h3 className="text-2xl font-black text-white/20 uppercase tracking-widest">{isRTL ? "لا توجد نتائج حالياً" : "NO SESSIONS FOUND"}</h3>
+                    </div>
                 )}
 
-                {/* ── LOADING ── */}
                 {loading && (
                     <div className="space-y-8">
                         {[1, 2].map((n) => (
-                            <div key={n} className="h-[350px] rounded-2xl bg-white/[0.02] animate-pulse border border-white/5" />
+                            <div key={n} className="h-80 rounded-3xl bg-white/[0.02] animate-pulse border border-white/5" />
                         ))}
                     </div>
                 )}

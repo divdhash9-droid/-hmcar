@@ -155,10 +155,10 @@ export default function AdminCarsPage() {
                     </div>
                     <div className="flex items-center justify-between">
                         <div>
-                            <h1 className="text-5xl md:text-7xl font-black tracking-tighter uppercase italic leading-[0.9] mb-4">
+                            <h1 className="text-6xl md:text-8xl font-black tracking-tighter uppercase italic leading-[0.85] mb-6">
                                 {isRTL ? 'إدارة' : 'MANAGE'} <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/20">{isRTL ? 'السيارات' : 'CARS'}</span>
                             </h1>
-                            <p className="text-[11px] text-white/40 uppercase tracking-[0.3em] font-bold">
+                            <p className="text-[13px] text-white/40 uppercase tracking-[0.4em] font-bold">
                                 {isRTL ? 'إضافة وتعديل وحذف السيارات من المخزون' : 'ADD, EDIT, AND REMOVE VEHICLES FROM INVENTORY'}
                             </p>
                         </div>
@@ -166,41 +166,41 @@ export default function AdminCarsPage() {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => { resetForm(); setShowModal(true); }}
-                            className="btn-glow px-8 py-4 bg-cinematic-neon-blue !text-black rounded-xl text-[11px] font-black uppercase tracking-[0.3em] shadow-[0_0_30px_rgba(0,240,255,0.3)] flex items-center gap-3"
+                            className="btn-glow px-10 py-5 bg-cinematic-neon-blue !text-black rounded-xl text-[13px] font-black uppercase tracking-[0.3em] shadow-[0_0_40px_rgba(0,240,255,0.4)] flex items-center gap-4"
                         >
-                            <Plus className="w-5 h-5" />
+                            <Plus className="w-6 h-6" />
                             {isRTL ? 'إضافة سيارة' : 'ADD CAR'}
                         </motion.button>
                     </div>
                 </header>
 
                 {/* Filters */}
-                <div className="flex flex-col md:flex-row gap-6 mb-12">
+                <div className="flex flex-col md:flex-row gap-8 mb-16">
                     <div className="flex-1 relative">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20" />
+                        <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-white/20" />
                         <input
                             type="text"
                             placeholder={isRTL ? 'بحث...' : 'SEARCH...'}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-4 pl-12 pr-4 text-sm font-bold text-white placeholder:text-white/20 focus:outline-none focus:border-cinematic-neon-blue/40 transition-all"
+                            className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-5 pl-16 pr-6 text-base font-bold text-white placeholder:text-white/20 focus:outline-none focus:border-cinematic-neon-blue/40 transition-all"
                         />
                     </div>
-                    <div className="flex gap-3">
+                    <div className="flex gap-4">
                         {['active', 'sold', 'inactive', 'all'].map((status) => (
                             <button
                                 key={status}
                                 onClick={() => setFilter(status)}
                                 className={cn(
-                                    "px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-[0.3em] transition-colors select-none",
+                                    "px-8 py-4 rounded-xl text-[12px] font-black uppercase tracking-[0.3em] transition-colors select-none",
                                     filter === status
-                                        ? "relative bg-cinematic-neon-blue text-white shadow-[0_0_35px_rgba(0,240,255,0.45)] ring-2 ring-cinematic-neon-blue after:content-[''] after:absolute after:-inset-1 after:rounded-xl after:bg-cinematic-neon-blue/25 after:blur-md after:-z-10"
+                                        ? "relative bg-cinematic-neon-blue text-white shadow-[0_0_35px_rgba(0,240,255,0.45)] ring-2 ring-cinematic-neon-blue"
                                         : "bg-white/[0.14] text-white hover:bg-white/[0.18] ring-1 ring-white/10"
                                 )}
                                 aria-pressed={filter === status}
                             >
-                                <span className="inline-flex items-center gap-2 justify-center">
-                                    {filter === status && <span className="w-2 h-2 rounded-full bg-white" />}
+                                <span className="inline-flex items-center gap-3 justify-center">
+                                    {filter === status && <span className="w-2.5 h-2.5 rounded-full bg-white shadow-[0_0_10px_white]" />}
                                     <span>{isRTL ? (status === 'active' ? 'نشط' : status === 'sold' ? 'مباع' : status === 'inactive' ? 'غير نشط' : 'الكل') : status}</span>
                                 </span>
                             </button>
@@ -211,10 +211,10 @@ export default function AdminCarsPage() {
                 {/* Cars Grid */}
                 {loading ? (
                     <div className="text-center py-32">
-                        <div className="text-white text-xl animate-pulse">Loading...</div>
+                        <div className="text-white text-2xl font-black uppercase tracking-widest animate-pulse">Initializing Data Stream...</div>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {cars.map((car, i) => (
                             <motion.div
                                 key={car.id}
@@ -223,34 +223,34 @@ export default function AdminCarsPage() {
                                 transition={{ delay: i * 0.1 }}
                                 className="glass-card bg-white/[0.01] border-white/5 overflow-hidden group hover:border-cinematic-neon-blue/30 transition-all"
                             >
-                                <div className="relative h-48 overflow-hidden">
+                                <div className="relative h-64 overflow-hidden">
                                     <img
                                         src={car.images?.[0] || 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=1000&auto=format&fit=crop'}
                                         alt={car.title}
-                                        className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 transition-all duration-700"
+                                        className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110"
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
                                     {!car.isActive && (
-                                        <div className="absolute top-4 right-4 px-3 py-1 bg-cinematic-neon-red/80 backdrop-blur-md rounded-lg">
-                                            <span className="text-[8px] font-black text-white uppercase tracking-widest">INACTIVE</span>
+                                        <div className="absolute top-6 right-6 px-4 py-2 bg-cinematic-neon-red/80 backdrop-blur-md rounded-xl">
+                                            <span className="text-[10px] font-black text-white uppercase tracking-widest">INACTIVE</span>
                                         </div>
                                     )}
                                     {car.isSold && (
-                                        <div className="absolute top-4 right-4 px-3 py-1 bg-green-400/80 backdrop-blur-md rounded-lg">
-                                            <span className="text-[8px] font-black text-black uppercase tracking-widest">SOLD</span>
+                                        <div className="absolute top-6 right-6 px-4 py-2 bg-green-400/80 backdrop-blur-md rounded-xl">
+                                            <span className="text-[10px] font-black text-black uppercase tracking-widest">SOLD</span>
                                         </div>
                                     )}
                                 </div>
 
-                                <div className="p-6 space-y-4">
+                                <div className="p-8 space-y-6">
                                     <div>
-                                        <div className="text-[9px] font-black text-cinematic-neon-blue/80 uppercase tracking-[0.3em] mb-2">{car.make}</div>
-                                        <h3 className="text-lg font-black uppercase italic tracking-tighter line-clamp-1">{car.title}</h3>
+                                        <div className="text-[11px] font-black text-cinematic-neon-blue/80 uppercase tracking-[0.4em] mb-3 italic">{car.make}</div>
+                                        <h3 className="text-2xl font-black uppercase italic tracking-tighter line-clamp-1">{car.title}</h3>
                                     </div>
 
-                                    <div className="flex items-center justify-between pt-3 border-t border-white/5">
-                                        <div className="text-xl font-black text-cinematic-neon-blue italic">
-                                            {Number(car.price || 0).toLocaleString()} <span className="text-xs">SAR</span>
+                                    <div className="flex items-center justify-between pt-4 border-t border-white/5">
+                                        <div className="text-2xl font-black text-cinematic-neon-blue italic">
+                                            {Number(car.price || 0).toLocaleString()} <span className="text-[11px] opacity-60">SAR</span>
                                         </div>
                                     </div>
 
@@ -341,10 +341,13 @@ export default function AdminCarsPage() {
                                                             const res = await api.upload.image(data);
                                                             if (res.success) {
                                                                 setFormData({ ...formData, images: [res.url] });
+                                                            } else {
+                                                                alert(res.message || (isRTL ? 'فشل الرفع' : 'Upload failed'));
                                                             }
-                                                        } catch (err) {
+                                                        } catch (err: any) {
                                                             console.error('Upload failed', err);
-                                                            alert('Upload failed');
+                                                            const msg = err.response?.data?.message || err.message || (isRTL ? 'خطأ في الاتصال بالسيرفر' : 'Server connection error');
+                                                            alert(`${isRTL ? 'فشل الرفع: ' : 'Upload failed: '} ${msg}`);
                                                         }
                                                     }}
                                                 />

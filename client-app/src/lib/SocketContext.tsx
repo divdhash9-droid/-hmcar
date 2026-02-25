@@ -23,7 +23,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
     useEffect(() => {
         // الاتصال بالخادم (استبدل بالرابط الفعلي في الإنتاج)
-        const socketInstance = io(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000', {
+        const socketInstance = io(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4002', {
             transports: ['websocket'],
             reconnection: true,
         });

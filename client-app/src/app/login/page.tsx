@@ -145,6 +145,7 @@ export default function Login() {
         } catch (err: unknown) {
             const errMsg = err instanceof Error ? err.message : '';
             const identifier = formData.email.trim();
+            // DEV_FAKE: Only allow admin fallback with specific dev credentials
             if (role === 'admin' && DEV_FAKE && identifier === 'id_7788' && formData.password.length >= 6) {
                 console.log('[Login] Falling back to DEV_FAKE admin...');
                 localStorage.setItem('hm_token', 'dev_admin_token');
@@ -154,40 +155,9 @@ export default function Login() {
                 setTimeout(() => {
                     window.location.href = "/admin/dashboard";
                 }, 800);
-            } else if (role === 'buyer' && method === 'name') {
-                const parts = identifier.split(/\s+/).filter(Boolean);
-                if (parts.length >= 2 && formData.password.length >= 6) {
-                    const localId = `local_${Date.now()}`;
-                    localStorage.setItem('hm_token', 'dev_buyer_token');
-                    localStorage.setItem('hm_user', JSON.stringify({ _id: localId, role: 'buyer', name: identifier, email: '', phone: '' }));
-                    localStorage.setItem('hm_user_role', 'buyer');
-                    setSuccessMessage(isRTL ? 'تم تسجيل الدخول بنجاح' : 'Login successful');
-                    setTimeout(() => {
-                        window.location.href = "/client/dashboard";
-                    }, 800);
-                } else {
-                    setError(errMsg || (isRTL ? 'تحقق من البيانات المدخلة' : 'Check your credentials'));
-                    setLoading(false);
-                }
-            } else if (role === 'buyer' && method === 'phone') {
-                const digits = phoneNumber.replace(/\D/g, '');
-                const phoneE164 = `${selectedCountry.dial}${digits}`;
-                const codeOk = !otpRequested || (otpCode && otpCode.replace(/\D/g, '').length >= 4);
-                if (digits.length >= 8 && digits.length <= 15 && formData.password.length >= 6 && codeOk) {
-                    const localId = `local_${Date.now()}`;
-                    localStorage.setItem('hm_token', 'dev_buyer_token');
-                    localStorage.setItem('hm_user', JSON.stringify({ _id: localId, role: 'buyer', name: phoneE164, phone: phoneE164, email: '' }));
-                    localStorage.setItem('hm_user_role', 'buyer');
-                    setSuccessMessage(isRTL ? 'تم تسجيل الدخول بنجاح' : 'Login successful');
-                    setTimeout(() => {
-                        window.location.href = "/client/dashboard";
-                    }, 800);
-                } else {
-                    setError(errMsg || (isRTL ? 'تحقق من البيانات المدخلة' : 'Check your credentials'));
-                    setLoading(false);
-                }
             } else {
-                setError(errMsg || (isRTL ? 'تحقق من البيانات المدخلة' : 'Check your credentials'));
+                // All other login failures show the error - no local bypass allowed
+                setError(errMsg || (isRTL ? 'فشل تسجيل الدخول. تحقق من البيانات أو تواصل مع الدعم.' : 'Login failed. Check your credentials or contact support.'));
                 setLoading(false);
             }
         }

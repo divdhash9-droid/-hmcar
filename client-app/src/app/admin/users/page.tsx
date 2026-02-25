@@ -97,25 +97,25 @@ export default function AdminUsersPage() {
 
                 <header className="mb-16">
                     {/* Back Button */}
-                    <Link href="/admin/dashboard" className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white/70 hover:text-white hover:bg-white/10 transition-all group w-fit">
-                        <ChevronLeft className={cn("w-4 h-4 transition-transform group-hover:-translate-x-1", isRTL && "rotate-180 group-hover:translate-x-1")} />
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em]">{isRTL ? 'العودة للرئيسية' : 'BACK TO DASHBOARD'}</span>
+                    <Link href="/admin/dashboard" className="inline-flex items-center gap-3 mb-8 px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-white/70 hover:text-white hover:bg-white/10 transition-all group w-fit">
+                        <ChevronLeft className={cn("w-5 h-5 transition-transform group-hover:-translate-x-1", isRTL && "rotate-180 group-hover:translate-x-1")} />
+                        <span className="text-[11px] font-black uppercase tracking-[0.2em]">{isRTL ? 'العودة للرئيسية' : 'BACK TO DASHBOARD'}</span>
                     </Link>
 
-                    <div className="flex items-center gap-4 mb-6">
-                        <div className="h-[2px] w-12 bg-cinematic-neon-blue shadow-[0_0_10px_rgba(0,240,255,1)]" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.5em] text-cinematic-neon-blue italic">User Management</span>
+                    <div className="flex items-center gap-5 mb-8">
+                        <div className="h-[3px] w-16 bg-cinematic-neon-blue shadow-[0_0_15px_rgba(0,240,255,1)]" />
+                        <span className="text-[11px] font-black uppercase tracking-[0.5em] text-cinematic-neon-blue italic">User Management</span>
                     </div>
-                    <h1 className="text-5xl md:text-7xl font-black tracking-tighter uppercase italic leading-[0.9] mb-4">
+                    <h1 className="text-6xl md:text-8xl font-black tracking-tighter uppercase italic leading-[0.85] mb-6">
                         {isRTL ? 'إدارة' : 'MANAGE'} <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/20">{isRTL ? 'المستخدمين' : 'USERS'}</span>
                     </h1>
-                    <p className="text-[11px] text-white/40 uppercase tracking-[0.3em] font-bold">
+                    <p className="text-[13px] text-white/40 uppercase tracking-[0.3em] font-bold">
                         {isRTL ? 'مراقبة وإدارة جميع المستخدمين والصلاحيات' : 'MONITOR AND MANAGE ALL USERS AND PERMISSIONS'}
                     </p>
                 </header>
 
                 {/* Stats */}
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-12">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-6 mb-16">
                     {[
                         { label: isRTL ? 'الكل' : 'TOTAL', value: stats.total, key: 'all', color: 'text-white' },
                         { label: isRTL ? 'مشترين' : 'BUYERS', value: stats.buyers, key: 'buyer', color: 'text-cinematic-neon-blue' },
@@ -129,12 +129,12 @@ export default function AdminUsersPage() {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             className={cn(
-                                "glass-card p-6 bg-white/[0.01] border-white/5 text-center transition-all",
-                                filter === stat.key && "border-cinematic-neon-blue/30 bg-cinematic-neon-blue/5"
+                                "glass-card p-8 bg-white/[0.01] border-white/5 text-center transition-all",
+                                filter === stat.key && "border-cinematic-neon-blue/40 bg-cinematic-neon-blue/5 shadow-[0_0_30px_rgba(0,240,255,0.1)]"
                             )}
                         >
-                            <div className={cn("text-3xl font-black tracking-tighter mb-2", stat.color)}>{stat.value}</div>
-                            <div className="text-[9px] font-black uppercase tracking-[0.3em] text-white/60">{stat.label}</div>
+                            <div className={cn("text-4xl font-black tracking-tighter mb-3", stat.color)}>{stat.value}</div>
+                            <div className="text-[11px] font-black uppercase tracking-[0.3em] text-white/60">{stat.label}</div>
                         </motion.button>
                     ))}
                 </div>
@@ -404,11 +404,11 @@ const UserDetailModal = ({ user, onClose, onUpdate, isRTL }: any) => {
                                         <div className="text-[10px] font-black uppercase tracking-widest mb-1">
                                             {isRTL
                                                 ? (perm.includes('cars') ? 'السيارات' :
-                                                   perm.includes('auctions') ? 'المزادات' :
-                                                   perm.includes('users') ? 'المستخدمين' :
-                                                   perm.includes('settings') ? 'الإعدادات' :
-                                                   perm.includes('concierge') ? 'الكونسيرج' :
-                                                   'التحليلات')
+                                                    perm.includes('auctions') ? 'المزادات' :
+                                                        perm.includes('users') ? 'المستخدمين' :
+                                                            perm.includes('settings') ? 'الإعدادات' :
+                                                                perm.includes('concierge') ? 'الكونسيرج' :
+                                                                    'التحليلات')
                                                 : perm.split('_')[1]}
                                         </div>
                                         <div className="text-[9px] opacity-60">{isRTL ? 'وصول كامل' : 'Full Access'}</div>

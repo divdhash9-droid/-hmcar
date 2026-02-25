@@ -232,171 +232,53 @@ router.post('/login', async (req, res) => {
   try {
     const { email, phone, name, identifier, password, role, deviceInfo, deviceId, rememberMe } = req.body;
 
-    // Determine the value to search for
     const searchKey = (identifier || email || phone || name || '').trim();
-
     console.log(`[AUTH] Login attempt for: '${searchKey}', Role: ${role}`);
 
-    if (!searchKey) {
-      console.warn('[AUTH] Login failed: No search key provided');
-      return res.status(400).json({
-        error: 'Validation Error',
-        message: 'Email, Phone, or Name is required'
-      });
+    if (!searchKey || !password) {
+      return res.status(400).json({ error: 'Validation Error', message: 'Identifier and password are required' });
     }
 
-    // Find user by email, phone, name, buyerNameKey, or username
-    const query = {
+    // استخدام findOne بدل find لتفادي جلب كل المستخدمين
+    const safeKey = searchKey.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const user = await User.findOne({
       $or: [
-        { username: searchKey.toLowerCase() },
         { email: searchKey.toLowerCase() },
+        { username: searchKey.toLowerCase() },
         { phone: searchKey },
-        { name: { $regex: new RegExp(`^${searchKey.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') } },
-        { buyerNameKey: searchKey }
+        { name: { $regex: new RegExp(`^${safeKey}$`, 'i') } }
       ]
-    };
-
-    console.log('[AUTH] Login Query:', JSON.stringify(query));
-
-    // If role is specified, favor users with that role but don't strictly enforce it for lookup 
-    // (validation happens later, or we can enforce it here if strict)
-    // strict role check might be better:
-    if (role && role !== 'admin') {
-      // If logging in as buyer, allow finding the user. 
-      // If logging in as admin, we might want to ensure they are admin? 
-      // The original code didn't check role during findOne, but checked it later or just checked password.
-    }
-
-    // Find ALL matching users to handle duplicate names or overlapping identifiers
-    const users = await User.find(query);
-
-    if (users.length === 0) {
-      console.warn(`[AUTH] User not found for searchKey: ${searchKey}`);
-      return res.status(401).json({
-        error: 'Authentication Failed',
-        message: 'Invalid credentials'
-      });
-    }
-
-    console.log(`[AUTH] Found ${users.length} potential users. Checking passwords...`);
-
-    let user = null;
-    // Iterate through all found users to find the one with the correct password
-    for (const potentialUser of users) {
-      const isMatch = await potentialUser.comparePassword(password);
-      if (isMatch) {
-        user = potentialUser;
-        break;
-      }
-    }
+    }).select('+password').lean(false);
 
     if (!user) {
-      console.warn(`[AUTH] Password validation failed for all ${users.length} found users.`);
-      // Log failed login attempt for the *first* user found, or generic log
-      await AuditLog.logUserAction(
-        users[0]._id,
-        'LOGIN',
-        'User',
-        'Failed login attempt',
-        {
-          ipAddress: req.ip,
-          userAgent: req.get('User-Agent'),
-          sessionId: req.sessionID,
-          result: 'FAILURE',
-          errorMessage: 'Invalid password (checked multiple candidates)'
-        }
-      );
-
-      return res.status(401).json({
-        error: 'Authentication Failed',
-        message: 'Invalid credentials'
-      });
+      console.warn(`[AUTH] User not found: ${searchKey}`);
+      return res.status(401).json({ error: 'Authentication Failed', message: 'Invalid credentials' });
     }
 
-    console.log(`[AUTH] User successfully authenticated: ${user.email} (${user._id})`);
+    // التحقق من كلمة المرور
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      console.warn(`[AUTH] Wrong password for: ${searchKey}`);
+      // fire-and-forget — لا ننتظر AuditLog لتفادي timeout
+      AuditLog.logUserAction(user._id, 'LOGIN', 'User', 'Failed login', { ipAddress: req.ip, result: 'FAILURE' }).catch(() => { });
+      return res.status(401).json({ error: 'Authentication Failed', message: 'Invalid credentials' });
+    }
 
-    // RBAC: Check authorization
+    // التحقق من الدور
     if (role === 'admin') {
-      const allowedAdminRoles = ['admin', 'super_admin', 'manager'];
-      if (!allowedAdminRoles.includes(user.role)) {
-        console.warn(`[AUTH] Admin login attempt denied for user ${user.email} with role ${user.role}`);
-        return res.status(403).json({
-          error: 'Access Denied',
-          message: 'You are not authorized to access the admin portal'
-        });
+      const adminRoles = ['admin', 'super_admin', 'manager'];
+      if (!adminRoles.includes(user.role)) {
+        console.warn(`[AUTH] Admin access denied for role: ${user.role}`);
+        return res.status(403).json({ error: 'Access Denied', message: 'You are not authorized to access the admin portal' });
       }
-    } else if (role === 'buyer') {
-      // Allow logic to proceed.
-      // Note: Admins *can* login as buyers to view client side if they wish, unless we restrict it.
-      // Current requirement doesn't explicitly forbid it.
     }
 
-    // Check if user is active
+    // التحقق من حالة الحساب
     if (user.status !== 'active') {
-      return res.status(403).json({
-        error: 'Account Suspended',
-        message: 'Your account has been suspended'
-      });
+      return res.status(403).json({ error: 'Account Suspended', message: 'Your account has been suspended' });
     }
 
-    // DEVICE BINDING & SECURITY LOGIC
-    if (user.role === 'buyer' && user.isDeviceLocked) {
-      if (!deviceId) {
-        // Optionally enforce deviceId presence. For now, we might skip if not provided to avoid breaking dev, 
-        // but strictly we should require it.
-        // console.warn("Login attempt without deviceId");
-      } else {
-        const existingDevice = user.boundDevices.find(d => d.deviceId === deviceId);
-
-        if (existingDevice) {
-          if (!existingDevice.isActive) {
-            return res.status(403).json({
-              error: 'Device Blocked',
-              message: 'This device has been blocked by administration. Please contact support.'
-            });
-          }
-          // Update usage stats
-          existingDevice.lastUsedAt = new Date();
-          existingDevice.ip = req.ip;
-        } else {
-          // New Device
-          if (user.boundDevices.length > 0) {
-            // Device is locked and user already has devices -> BLOCK
-            console.warn(`[AUTH] Device restriction for user ${user.email}. Device ${deviceId} not recognized.`);
-            await AuditLog.logUserAction(user._id, 'LOGIN', 'User', 'Login blocked - unrecognized device', {
-              deviceId,
-              result: 'FAILURE'
-            });
-
-            return res.status(403).json({
-              error: 'Device Restriction',
-              message: 'This account is bound to another device. Please login from your registered device or contact support.'
-            });
-          } else {
-            // First device - Bind it
-            user.boundDevices.push({
-              deviceId,
-              browser: deviceInfo?.browser || 'Unknown',
-              os: deviceInfo?.os || 'Unknown',
-              ip: req.ip,
-              isActive: true,
-              isTrusted: true
-            });
-          }
-        }
-        user.markModified('boundDevices'); // Ensure change is tracked
-        try {
-          await user.save();
-          console.log(`[AUTH] Device bound/updated for user ${user.email}`);
-        } catch (saveErr) {
-          console.error(`[AUTH] Failed to save user device binding: ${saveErr.message}`);
-          // Proceed with login anyway, don't block user for internal db error? 
-          // Or should we block? Prefer not to block.
-        }
-      }
-    }
-
-    // Generate JWT token
+    // توليد التوكن
     const token = jwt.sign(
       {
         userId: user._id,
@@ -405,35 +287,16 @@ router.post('/login', async (req, res) => {
         permissions: user.permissions || []
       },
       process.env.JWT_SECRET,
-      {
-        expiresIn: rememberMe ? '30d' : '24h',
-        issuer: 'hm-car-auction',
-        audience: 'api-users'
-      }
+      { expiresIn: rememberMe ? '30d' : '7d', issuer: 'hm-car-auction', audience: 'api-users' }
     );
 
-    // Update last login — نستخدم updateOne لتجاوز pre-save hook وتجنب إعادة تشفير الباسورد
-    await User.updateOne(
-      { _id: user._id },
-      { $set: { lastLoginAt: new Date(), activeSessionId: req.sessionID || '' } }
-    );
+    // تحديث وقت الدخول + AuditLog — fire-and-forget لا ننتظرهما
+    User.updateOne({ _id: user._id }, { $set: { lastLoginAt: new Date() } }).catch(() => { });
+    AuditLog.logUserAction(user._id, 'LOGIN', 'User', 'Successful login', { ipAddress: req.ip, result: 'SUCCESS' }).catch(() => { });
 
-    // Log successful login
-    await AuditLog.logUserAction(
-      user._id,
-      'LOGIN',
-      'User',
-      'Successful login',
-      {
-        ipAddress: req.ip,
-        userAgent: req.get('User-Agent'),
-        sessionId: req.sessionID,
-        result: 'SUCCESS',
-        metadata: { deviceInfo }
-      }
-    );
+    console.log(`[AUTH] ✅ Login success: ${user.email} (${user.role})`);
 
-    res.json({
+    return res.json({
       success: true,
       token,
       user: {
@@ -442,19 +305,19 @@ router.post('/login', async (req, res) => {
         email: user.email,
         phone: user.phone,
         role: user.role,
-        permissions: user.permissions,
+        permissions: user.permissions || [],
         lastLoginAt: user.lastLoginAt
       },
-      expiresIn: '24h'
+      expiresIn: '7d'
     });
+
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({
-      error: 'Internal Server Error',
-      message: 'An error occurred during login'
-    });
+    res.status(500).json({ error: 'Internal Server Error', message: 'An error occurred during login' });
   }
 });
+
+
 
 // Logout endpoint
 router.post('/logout', requireAuthAPI, async (req, res) => {

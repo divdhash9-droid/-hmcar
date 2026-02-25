@@ -30,10 +30,10 @@ export default function AdminHeader({
                         <motion.button
                             whileHover={{ scale: 1.05, x: isRTL ? 5 : -5 }}
                             whileTap={{ scale: 0.95 }}
-                            className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-cinematic-neon-red/30 hover:bg-cinematic-neon-red/10 transition-all group"
+                            className="p-5 rounded-2xl bg-white/5 border border-white/10 hover:border-cinematic-neon-red/30 hover:bg-cinematic-neon-red/10 transition-all group shadow-xl"
                         >
                             <ArrowLeft className={cn(
-                                "w-5 h-5 text-white/60 group-hover:text-cinematic-neon-red transition-colors",
+                                "w-7 h-7 text-white/60 group-hover:text-cinematic-neon-red transition-colors",
                                 isRTL && "rotate-180"
                             )} />
                         </motion.button>
@@ -42,14 +42,14 @@ export default function AdminHeader({
                     {/* العنوان */}
                     <div>
                         {subtitle && (
-                            <div className="flex items-center gap-3 mb-2">
-                                <div className="h-[2px] w-8 bg-cinematic-neon-red shadow-[0_0_10px_rgba(255,0,60,1)]" />
-                                <span className="text-[9px] font-black uppercase tracking-[0.5em] text-cinematic-neon-red">
+                            <div className="flex items-center gap-4 mb-3">
+                                <div className="h-[3px] w-12 bg-cinematic-neon-red shadow-[0_0_15px_rgba(255,0,60,1)]" />
+                                <span className="text-[11px] font-black uppercase tracking-[0.6em] text-cinematic-neon-red italic">
                                     {subtitle}
                                 </span>
                             </div>
                         )}
-                        <h1 className="text-3xl md:text-4xl font-black tracking-tighter uppercase italic">
+                        <h1 className="text-5xl md:text-6xl font-black tracking-tighter uppercase italic leading-none">
                             {title}
                         </h1>
                     </div>

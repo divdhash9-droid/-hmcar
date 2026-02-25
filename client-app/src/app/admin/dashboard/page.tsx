@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
     Activity,
     PlusCircle,
@@ -21,7 +21,8 @@ import {
     Tag,
     TrendingUp,
     Mail,
-    ChevronLeft
+    ChevronLeft,
+    Radio
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -121,6 +122,7 @@ export default function AdminDashboard() {
     const quickActions = [
         { icon: PlusCircle, label: t('addCar'), href: '/admin/cars', accent: 'bg-cinematic-neon-blue/20 text-cinematic-neon-blue' },
         { icon: Gavel, label: t('createAuction'), href: '/admin/auctions', accent: 'bg-cinematic-neon-red/20 text-cinematic-neon-red' },
+        { icon: Radio, label: isRTL ? 'المعرض المباشر' : 'LIVE SHOWROOM', href: '/admin/live-auctions', accent: 'bg-cinematic-neon-red/30 text-cinematic-neon-red shadow-[0_0_15px_rgba(255,0,60,0.3)]' },
         { icon: Layers, label: isRTL ? 'قطع الغيار' : 'SPARE PARTS', href: '/admin/parts', accent: 'bg-cinematic-neon-yellow/20 text-cinematic-neon-yellow' },
         { icon: ShoppingCart, label: isRTL ? 'الطلبات' : 'ORDERS', href: '/admin/orders', accent: 'bg-white/10 text-white' },
         { icon: Users, label: isRTL ? 'إدارة الأعضاء' : 'MEMBER DIR', href: '/admin/users', accent: 'bg-white/10 text-white' },
@@ -132,6 +134,7 @@ export default function AdminDashboard() {
     const sidebarItems = [
         { id: 'overview', icon: Activity, label: isRTL ? 'المركزية' : 'MAINFRAME', href: '/admin/dashboard' },
         { id: 'inventory', icon: Car, label: isRTL ? 'المخزون' : 'INVENTORY', href: '/admin/cars' },
+        { id: 'live-showroom', icon: Radio, label: isRTL ? 'المعرض المباشر' : 'LIVE SHOW', href: '/admin/live-auctions' },
         { id: 'parts', icon: Layers, label: isRTL ? 'قطع الغيار' : 'PARTS', href: '/admin/parts' },
         { id: 'auctions', icon: Gavel, label: isRTL ? 'المزادات' : 'AUCTIONS', href: '/admin/auctions' },
         { id: 'brands', icon: Tag, label: t('brands'), href: '/admin/brands' },
@@ -156,39 +159,39 @@ export default function AdminDashboard() {
             <aside className={cn(
                 "fixed top-0 bottom-0 z-[100] transition-all duration-500 bg-black/40 border-white/5 backdrop-blur-3xl flex flex-col items-center py-10 justify-between",
                 isRTL ? "right-0 border-l" : "left-0 border-r",
-                isSidebarOpen ? "w-64" : "w-0 lg:w-32 overflow-hidden lg:overflow-visible shadow-2xl"
+                isSidebarOpen ? "w-64" : "w-0 lg:w-40 overflow-hidden lg:overflow-visible shadow-2xl"
             )}>
-                <Link href="/" className="mb-8">
-                    <div className="w-14 h-14 rounded-full border-2 border-cinematic-neon-red flex items-center justify-center shadow-[0_0_20px_rgba(255,0,60,0.3)] shrink-0 group hover:rotate-12 transition-all">
-                        <span className="text-2xl font-black italic text-cinematic-neon-red tracking-tighter">HM</span>
+                <Link href="/" className="mb-10">
+                    <div className="w-16 h-16 rounded-full border-2 border-cinematic-neon-red flex items-center justify-center shadow-[0_0_20px_rgba(255,0,60,0.3)] shrink-0 group hover:rotate-12 transition-all">
+                        <span className="text-3xl font-black italic text-cinematic-neon-red tracking-tighter">HM</span>
                     </div>
                 </Link>
 
-                <div className="flex-1 flex flex-col gap-4 w-full px-4 overflow-y-auto scrollbar-hide">
+                <div className="flex-1 flex flex-col gap-6 w-full px-4 overflow-y-auto scrollbar-hide">
                     {sidebarItems.map((item) => (
                         <Link href={item.href} key={item.id}>
                             <button
                                 onClick={() => setIsSidebarOpen(false)}
                                 className={cn(
-                                    "flex flex-col items-center gap-2 group transition-all w-full py-3 rounded-2xl relative",
+                                    "flex flex-col items-center gap-3 group transition-all w-full py-4 rounded-2xl relative",
                                     pathname === item.href ? "text-cinematic-neon-red bg-white/5 shadow-inner" : "text-white/20 hover:text-white hover:bg-white/[0.02]"
                                 )}
                             >
-                                <item.icon className={cn("w-6 h-6 lg:w-7 lg:h-7 shrink-0 transition-transform group-hover:scale-110", pathname === item.href && "drop-shadow-[0_0_15px_rgba(255,0,60,1)]")} />
-                                <span className="text-[8px] lg:text-[9px] font-black uppercase tracking-[0.15em] lg:tracking-[0.2em]">{item.label}</span>
-                                {pathname === item.href && <motion.div layoutId="activeInd" className="absolute left-0 top-0 bottom-0 w-[2px] bg-cinematic-neon-red" />}
+                                <item.icon className={cn("w-8 h-8 lg:w-9 lg:h-9 shrink-0 transition-transform group-hover:scale-110", pathname === item.href && "drop-shadow-[0_0_15px_rgba(255,0,60,1)]")} />
+                                <span className="text-[10px] lg:text-[11px] font-black uppercase tracking-[0.1em] lg:tracking-[0.12em] text-center">{item.label}</span>
+                                {pathname === item.href && <motion.div layoutId="activeInd" className="absolute left-0 top-0 bottom-0 w-[3px] bg-cinematic-neon-red" />}
                             </button>
                         </Link>
                     ))}
                 </div>
 
-                <div className="flex flex-col gap-8 w-full items-center">
-                    <button onClick={toggleLanguage} className="text-white/20 hover:text-white transition-colors p-2 uppercase text-[10px] font-black border border-white/5 bg-white/5 rounded-lg active:scale-95">
+                <div className="flex flex-col gap-12 w-full items-center pb-8">
+                    <button onClick={toggleLanguage} className="text-white/20 hover:text-white transition-colors p-4 uppercase text-[14px] font-black border border-white/5 bg-white/5 rounded-lg active:scale-95">
                         {lang}
                     </button>
-                    <button onClick={handleLogout} className="btn-glow-red flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 text-white/80 hover:text-white transition-all">
-                        <LogOut className="w-5 h-5 text-cinematic-neon-red" />
-                        <span className="text-[10px] font-black uppercase tracking-widest">{isRTL ? "تسجيل الخروج" : "LOG OUT"}</span>
+                    <button onClick={handleLogout} className="btn-glow-red flex items-center gap-4 px-8 py-4 rounded-xl border border-white/10 text-white/80 hover:text-white transition-all">
+                        <LogOut className="w-7 h-7 text-cinematic-neon-red" />
+                        <span className="text-[13px] font-black uppercase tracking-[0.2em]">{isRTL ? "تسجيل الخروج" : "LOG OUT"}</span>
                     </button>
                 </div>
             </aside>
@@ -207,7 +210,7 @@ export default function AdminDashboard() {
             {/* --- MAIN MAIN BATTLESTATION --- */}
             <main className={cn(
                 "min-h-screen relative z-10 py-28 lg:py-12 px-6 sm:px-12 lg:px-20 transition-all duration-500",
-                isRTL ? "lg:pr-40" : "lg:pl-40"
+                isRTL ? "lg:pr-48" : "lg:pl-48"
             )}>
 
                 {/* Header HUD */}
@@ -279,13 +282,13 @@ export default function AdminDashboard() {
                                 </div>
                                 <div className="relative z-10 space-y-6">
                                     <div className={cn("p-5 rounded-2xl bg-white/5 w-fit shadow-xl transition-all", stat.color, stat.shadow)}>
-                                        <stat.icon className="w-7 h-7" />
+                                        <stat.icon className="w-8 h-8" />
                                     </div>
                                     <div className="space-y-2">
-                                        <div className="text-6xl font-black tracking-tighter text-white drop-shadow-2xl">{stat.val}</div>
+                                        <div className="text-7xl font-black tracking-tighter text-white drop-shadow-2xl">{stat.val}</div>
                                         <div className="flex flex-col gap-1">
-                                            <span className="text-[11px] font-black text-white uppercase italic tracking-[0.1em]">{stat.label}</span>
-                                            <span className="text-[8px] text-white/20 uppercase tracking-[0.3em] font-bold">{stat.sub}</span>
+                                            <span className="text-[13px] font-black text-white uppercase italic tracking-[0.1em]">{stat.label}</span>
+                                            <span className="text-[10px] text-white/20 uppercase tracking-[0.3em] font-bold">{stat.sub}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -350,7 +353,8 @@ export default function AdminDashboard() {
                                     <div className="h-[2px] w-12 bg-cinematic-neon-yellow" />
                                     <h2 className="text-[11px] font-black uppercase tracking-[0.6em] text-white">{isRTL ? 'آخر الأنشطة' : 'RECENT ACTIVITY'}</h2>
                                 </div>
-                                <div className="space-y-4">
+                                {/* Activity Log */}
+                                <div className="space-y-5">
                                     {[
                                         { icon: Car, label: isRTL ? 'تمت إضافة سيارة جديدة' : 'New car added', sub: 'Mercedes-Benz S-Class 2024', time: '2m ago', color: 'text-cinematic-neon-blue', bg: 'bg-cinematic-neon-blue/10' },
                                         { icon: Gavel, label: isRTL ? 'مزاد جديد بدأ' : 'New auction started', sub: 'BMW M5 Competition — Base: 300K SAR', time: '15m ago', color: 'text-cinematic-neon-red', bg: 'bg-cinematic-neon-red/10' },
@@ -363,16 +367,16 @@ export default function AdminDashboard() {
                                             initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
                                             animate={{ opacity: 1, x: 0 }}
                                             transition={{ delay: i * 0.1 }}
-                                            className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all"
+                                            className="flex items-center gap-5 p-5 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all"
                                         >
-                                            <div className={cn("p-2.5 rounded-xl shrink-0", activity.bg)}>
-                                                <activity.icon className={cn("w-4 h-4", activity.color)} />
+                                            <div className={cn("p-4 rounded-xl shrink-0", activity.bg)}>
+                                                <activity.icon className={cn("w-6 h-6", activity.color)} />
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <div className="text-[10px] font-black uppercase tracking-wider text-white/80">{activity.label}</div>
-                                                <div className="text-[9px] text-white/30 truncate">{activity.sub}</div>
+                                                <div className="text-[13px] font-black uppercase tracking-wider text-white/80">{activity.label}</div>
+                                                <div className="text-[11px] text-white/30 truncate font-bold">{activity.sub}</div>
                                             </div>
-                                            <div className="text-[9px] text-white/20 font-bold shrink-0">{activity.time}</div>
+                                            <div className="text-[10px] text-white/20 font-black shrink-0 italic">{activity.time}</div>
                                         </motion.div>
                                     ))}
                                 </div>

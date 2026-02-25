@@ -82,17 +82,39 @@ const security = {
 
   // إعدادات CORS
   cors: {
-    origin: process.env.NODE_ENV === 'production'
-      ? (process.env.ALLOWED_ORIGINS
-        ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
-        : [
-          'https://car-auction-sand.vercel.app',
-          'https://client-app-iota-eight.vercel.app',
-          'https://client-app-iota-eight.vercel.app'
-        ])
-      : ['http://localhost:4001', 'http://localhost:4002', 'http://localhost:3000', 'http://localhost:3001'],
+    origin: function (origin, callback) {
+      // السماح بالطلبات بدون origin (مثل curl وPostman والسيرفر-إلى-سيرفر)
+      if (!origin) return callback(null, true);
+
+      const allowedInDev = [
+        'http://localhost:3000',
+        'http://localhost:3001',
+        'http://localhost:4002'
+      ];
+
+      // في بيئة التطوير
+      if (process.env.NODE_ENV !== 'production') {
+        return callback(null, allowedInDev.includes(origin) || origin.startsWith('http://localhost'));
+      }
+
+      // في بيئة الإنتاج: السماح لـ Vercel + ALLOWED_ORIGINS
+      const allowedProd = [
+        'https://car-auction-sand.vercel.app',
+        'https://client-app-iota-eight.vercel.app',
+        'https://client-app-iota-eight-daood-alhashdis-projects.vercel.app',
+        ...(process.env.ALLOWED_ORIGINS
+          ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
+          : [])
+      ];
+
+      // اقبل أي نطاق ينتهي بـ .vercel.app أو أي من القائمة
+      const isVercel = origin.endsWith('.vercel.app');
+      const isAllowed = allowedProd.includes(origin) || isVercel;
+
+      callback(isAllowed ? null : new Error(`CORS blocked: ${origin}`), isAllowed);
+    },
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
   },
 

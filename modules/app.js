@@ -80,51 +80,20 @@ class App {
    */
   setupApiRoutes() {
     try {
-      // مسارات API v2 Only
-      const authRoutes = require('../routes/api/v2/auth');
-      const carsRoutes = require('../routes/api/v2/cars');
-      const auctionsRoutes = require('../routes/api/v2/auctions');
-      const ordersRoutes = require('../routes/api/v2/orders');
-      const dashboardRoutes = require('../routes/api/v2/dashboard');
-      const analyticsV2Routes = require('../routes/api/v2/analytics');
-      const partsRoutes = require('../routes/api/v2/parts');
-      const settingsRoutes = require('../routes/api/v2/settings');
-      const usersRoutes = require('../routes/api/v2/users');
-      const favoritesRoutes = require('../routes/api/v2/favorites');
-      const bidsRoutes = require('../routes/api/v2/bids');
-      const reviewsRoutes = require('../routes/api/v2/reviews');
-      const messagesRoutes = require('../routes/api/v2/messages');
-      const comparisonsRoutes = require('../routes/api/v2/comparisons');
-      const contactRoutes = require('../routes/api/v2/contact');
-      const brandsRoutes = require('../routes/api/v2/brands');
-      const uploadRoutes = require('../routes/api/v2/upload');
-      const notificationsRoutes = require('../routes/api/v2/notifications');
+      // تحميل جميع مسارات API v2 عبر index.js الذي يتضمن:
+      // - Rate Limiting
+      // - معالجة الأخطاء الموحدة
+      // - جميع المسارات الفرعية
+      const apiV2Router = require('../routes/api/v2/index');
+      this.app.use('/api/v2', apiV2Router);
 
-      this.app.use('/api/v2/auth', authRoutes);
-      this.app.use('/api/v2/cars', carsRoutes);
-      this.app.use('/api/v2/auctions', auctionsRoutes);
-      this.app.use('/api/v2/orders', ordersRoutes);
-      this.app.use('/api/v2/dashboard', dashboardRoutes);
-      this.app.use('/api/v2/analytics', analyticsV2Routes);
-      this.app.use('/api/v2/parts', partsRoutes);
-      this.app.use('/api/v2/settings', settingsRoutes);
-      this.app.use('/api/v2/users', usersRoutes);
-      this.app.use('/api/v2/favorites', favoritesRoutes);
-      this.app.use('/api/v2/bids', bidsRoutes);
-      this.app.use('/api/v2/reviews', reviewsRoutes);
-      this.app.use('/api/v2/messages', messagesRoutes);
-      this.app.use('/api/v2/comparisons', comparisonsRoutes);
-      this.app.use('/api/v2/contact', contactRoutes);
-      this.app.use('/api/v2/brands', brandsRoutes);
-      this.app.use('/api/v2/upload', uploadRoutes);
-      this.app.use('/api/v2/notifications', notificationsRoutes);
-
-      logger.info('تم تحميل مسارات API v2 بنجاح');
+      logger.info('تم تحميل مسارات API v2 بنجاح عبر index.js');
     } catch (error) {
       logger.error('خطأ في تحميل مسارات API v2:', error.message);
       console.error(error);
     }
   }
+
 
   /**
    * إعداد معالجة الأخطاء

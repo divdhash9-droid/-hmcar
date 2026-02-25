@@ -3,12 +3,8 @@
 const express = require('express');
 const router = express.Router();
 const rateLimit = require('express-rate-limit');
-const helmet = require('helmet');
 
-// Security middleware
-router.use(helmet());
-
-// Rate limiting
+// Rate limiting per IP for API v2 routes
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // limit each IP to 100 requests per windowMs
@@ -18,6 +14,7 @@ const limiter = rateLimit({
   }
 });
 router.use(limiter);
+
 
 // API version info
 router.get('/', (req, res) => {
@@ -85,6 +82,7 @@ router.use('/brands', require('./brands'));
 router.use('/contact', require('./contact'));
 router.use('/favorites', require('./favorites'));
 router.use('/bids', require('./bids'));
+router.use('/live-auctions', require('./live-auctions'));
 
 // Error handling middleware
 router.use((error, req, res, next) => {

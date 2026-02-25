@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (services/InventoryService.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 /**
  * [[خدمة إدارة المخزون]] - services/InventoryService.js
  * 

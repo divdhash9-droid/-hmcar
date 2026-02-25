@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (routes/api/v2/live-auctions.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const express = require('express');
 const router = express.Router();
 const LiveAuction = require('../../../models/LiveAuction');

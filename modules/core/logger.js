@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (modules/core/logger.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 /**
  * [[ملف تسجيل الأحداث]] - modules/core/logger.js
  * 

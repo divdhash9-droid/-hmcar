@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (modules/services/client-service.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 /**
  * [[ملف خدمة العملاء]] - modules/services/client-service.js
  * 

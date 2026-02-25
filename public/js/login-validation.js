@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (public/js/login-validation.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 // Enhanced Form Validation for HM CAR Login
 document.addEventListener('DOMContentLoaded', function() {
     const loginForm = document.getElementById('loginForm');

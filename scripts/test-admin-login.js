@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (scripts/test-admin-login.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 
 const axios = require('axios');
 

@@ -21,7 +21,7 @@ export default function Login() {
     const [rememberMe, setRememberMe] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const [method, setMethod] = useState<'name' | 'phone'>('phone');
+    const [method, setMethod] = useState<'name' | 'phone'>('name');
     const countryList = countryDialCodes.map(c => ({ code: c.code, dial: c.dial, name: isRTL ? (c.nameAr || c.nameEn) : c.nameEn }));
     const [countrySearch, setCountrySearch] = useState('');
     const [selectedCountry, setSelectedCountry] = useState(countryList[0]);
@@ -251,7 +251,7 @@ export default function Login() {
                             <span className="text-[8px] font-bold uppercase tracking-[0.4em] text-white/50">
                                 {role === 'admin'
                                     ? (isRTL ? "دخول النظام" : "SYSTEM ACCESS")
-                                    : (isRTL ? "دخول العميل" : "CLIENT ACCESS")
+                                    : (isRTL ? "من دخول العميل" : "CLIENT ACCESS")
                                 }
                             </span>
                         </motion.div>
@@ -350,14 +350,21 @@ export default function Login() {
                                         </button>
                                     </div>
                                     {method === 'name' ? (
-                                        <div className="relative">
+                                        <div className="relative group">
                                             <span className="pointer-events-none absolute inset-0 -m-px rounded-xl blur-xl opacity-50 -z-10 bg-blue-500/25" />
+                                            <User className={cn(
+                                                "absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-blue-400 transition-colors",
+                                                isRTL ? "right-4" : "left-4"
+                                            )} />
                                             <input
                                                 type="text"
                                                 required
                                                 value={formData.email}
                                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                                className={cn("w-full glass-input bg-white/5 focus:bg-white/10 outline-none border border-blue-500/30 ring-1 ring-blue-500/20", isRTL ? "pr-4 pl-4" : "pl-4 pr-4")}
+                                                className={cn(
+                                                    "w-full glass-input bg-white/5 focus:bg-white/10 outline-none border border-blue-500/30 ring-1 ring-blue-500/20",
+                                                    isRTL ? "pr-12 pl-4" : "pl-12 pr-4"
+                                                )}
                                                 placeholder={isRTL ? "اكتب الاسم الكامل" : "Enter full name"}
                                             />
                                         </div>

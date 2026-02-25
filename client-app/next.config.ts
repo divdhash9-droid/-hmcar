@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (client-app/next.config.ts) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {

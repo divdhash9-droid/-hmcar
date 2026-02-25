@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (client-app/src/lib/countries.ts) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 export type CountryDialCode = {
   code: string
   dial: string

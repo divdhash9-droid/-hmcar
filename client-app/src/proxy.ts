@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (client-app/src/proxy.ts) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 

@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (scripts/createProductionAdmin.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 /**
  * createProductionAdmin.js
  * سكريبت لإنشاء حساب المشرف الرئيسي في قاعدة بيانات الإنتاج (MongoDB Atlas)

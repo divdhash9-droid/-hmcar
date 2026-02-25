@@ -1,6 +1,10 @@
+// [[ARABIC_HEADER]] هذا الملف (routes/api/v2/brands.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const express = require('express');
 const router = express.Router();
 const Brand = require('../../../models/Brand');
+const AuditLog = require('../../../models/AuditLog');
+const { requireAuthAPI, requirePermissionAPI } = require('../../../middleware/auth');
 
 // List brands
 router.get('/', async (req, res) => {
@@ -16,8 +20,8 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Create brand
-router.post('/', async (req, res) => {
+// Create brand (Admin only)
+router.post('/', requireAuthAPI, requirePermissionAPI('manage_brands'), async (req, res) => {
   try {
     const { name, logoUrl, category } = req.body || {};
     const payload = {
@@ -27,16 +31,33 @@ router.post('/', async (req, res) => {
       forSpareParts: category === 'parts' || category === 'both',
     };
     const brand = await Brand.create(payload);
+
+    // Log brand creation
+    await AuditLog.logUserAction(
+      req.user.userId,
+      'CREATE',
+      'Brand',
+      `Created new brand: ${brand.name}`,
+      {
+        targetId: brand._id,
+        after: brand.toObject(),
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent'),
+        sessionId: req.sessionID || 'api'
+      }
+    );
+
     res.json({ success: true, brand });
   } catch (e) {
     res.status(400).json({ success: false, message: e.message });
   }
 });
 
-// Update brand
-router.put('/:id', async (req, res) => {
+// Update brand (Admin only)
+router.put('/:id', requireAuthAPI, requirePermissionAPI('manage_brands'), async (req, res) => {
   try {
     const { name, logoUrl, category } = req.body || {};
+    const oldBrand = await Brand.findById(req.params.id);
     const payload = {
       ...(name !== undefined ? { name } : {}),
       ...(logoUrl !== undefined ? { logoUrl } : {}),
@@ -45,16 +66,53 @@ router.put('/:id', async (req, res) => {
         : {}),
     };
     const brand = await Brand.findByIdAndUpdate(req.params.id, payload, { new: true });
+
+    if (brand) {
+      // Log brand update
+      await AuditLog.logUserAction(
+        req.user.userId,
+        'UPDATE',
+        'Brand',
+        `Updated brand: ${brand.name}`,
+        {
+          targetId: brand._id,
+          before: oldBrand ? oldBrand.toObject() : null,
+          after: brand.toObject(),
+          ipAddress: req.ip,
+          userAgent: req.get('User-Agent'),
+          sessionId: req.sessionID || 'api'
+        }
+      );
+    }
+
     res.json({ success: true, brand });
   } catch (e) {
     res.status(400).json({ success: false, message: e.message });
   }
 });
 
-// Delete brand
-router.delete('/:id', async (req, res) => {
+// Delete brand (Admin only)
+router.delete('/:id', requireAuthAPI, requirePermissionAPI('manage_brands'), async (req, res) => {
   try {
-    await Brand.findByIdAndDelete(req.params.id);
+    const brand = await Brand.findByIdAndDelete(req.params.id);
+
+    if (brand) {
+      // Log brand deletion
+      await AuditLog.logUserAction(
+        req.user.userId,
+        'DELETE',
+        'Brand',
+        `Deleted brand: ${brand.name}`,
+        {
+          targetId: req.params.id,
+          before: brand.toObject(),
+          ipAddress: req.ip,
+          userAgent: req.get('User-Agent'),
+          sessionId: req.sessionID || 'api'
+        }
+      );
+    }
+
     res.json({ success: true });
   } catch (e) {
     res.status(400).json({ success: false, message: e.message });

@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (public/js/login-secure.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 // Secure Login System - HM CAR
 document.addEventListener('DOMContentLoaded', function() {
     

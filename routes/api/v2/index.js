@@ -1,44 +1,57 @@
 // [[ARABIC_HEADER]] هذا الملف (routes/api/v2/index.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
 
+/**
+ * @file routes/api/v2/index.js
+ * @description الموجه الرئيسي لإصدار API الثاني (V2).
+ * يقوم بتجميع كافة المسارات الفرعية (المستخدمين، السيارات، المزادات، إلخ) مع تفعيل سياسة تقييد الطلبات (Rate Limiting).
+ */
+
 const express = require('express');
 const router = express.Router();
 const rateLimit = require('express-rate-limit');
 
-// Rate limiting per IP for API v2 routes
+/**
+ * إعداد طبقة تقييد الطلبات (Rate Limiter)
+ * لحماية الخادم من الهجمات وزيادة عدد الطلبات من نفس العنوان.
+ */
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  windowMs: 15 * 60 * 1000,   // فترة 15 دقيقة
+  max: 100,                   // بحد أقصى 100 طلب لكل IP
   message: {
-    error: 'Too many requests from this IP, please try again later.',
+    error: 'تم تجاوز عدد الطلبات المسموح به، يرجى المحاولة لاحقاً بعد 15 دقيقة.',
     retryAfter: '15 minutes'
   }
 });
 router.use(limiter);
 
-
-// API version info
+/**
+ * معلومات الإصدار الحالي للـ API
+ */
 router.get('/', (req, res) => {
   res.json({
-    name: 'HM CAR Auction API',
+    name: 'واجهة برمجة تطبيقات HM CAR',
     version: '2.0.0',
-    description: 'Advanced RESTful API for car auction management system',
+    description: 'نظام متطور لإدارة مزادات السيارات وبيع القطع',
     endpoints: {
-      auth: '/auth',
-      users: '/users',
-      notifications: '/notifications',
-      analytics: '/analytics'
+      auth: 'نظام المصادقة والدخول',
+      users: 'إدارة حسابات المستخدمين',
+      cars: 'إدارة بيانات السيارات المعروضة',
+      auctions: 'إدارة المزادات والمزايدات الفورية',
+      analytics: 'نظام الإحصائيات والتقارير'
     },
-    documentation: '/docs',
-    status: 'active',
-    timestamp: new Date().toISOString()
+    status: 'Active',
+    serverTime: new Date().toISOString()
   });
 });
 
-// Health check endpoint
+/**
+ * نقطة فحص الحالة الصحية المتقدمة (Advanced Health Check)
+ * تقوم بفحص حالة الاتصال بقاعدة البيانات واستهلاك الذاكرة.
+ */
 router.get('/health', async (req, res) => {
   try {
     const mongoose = require('mongoose');
-    const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
+    const dbStatus = mongoose.connection.readyState === 1 ? 'متصل' : 'غير متصل';
 
     const health = {
       status: 'healthy',
@@ -49,7 +62,6 @@ router.get('/health', async (req, res) => {
         name: mongoose.connection.name
       },
       memory: process.memoryUsage(),
-      version: process.version,
       environment: process.env.NODE_ENV || 'development'
     };
 
@@ -57,80 +69,80 @@ router.get('/health', async (req, res) => {
   } catch (error) {
     res.status(503).json({
       status: 'unhealthy',
-      timestamp: new Date().toISOString(),
       error: error.message
     });
   }
 });
 
-// API routes
-router.use('/auth', require('./auth'));
-router.use('/users', require('./users'));
-router.use('/cars', require('./cars'));
-router.use('/auctions', require('./auctions'));
-router.use('/parts', require('./parts'));
-router.use('/dashboard', require('./dashboard'));
-router.use('/orders', require('./orders'));
-router.use('/notifications', require('./notifications'));
-router.use('/analytics', require('./analytics'));
-router.use('/upload', require('./upload.js'));
-router.use('/settings', require('./settings'));
-router.use('/messages', require('./messages'));
-router.use('/reviews', require('./reviews'));
-router.use('/comparisons', require('./comparisons'));
-router.use('/brands', require('./brands'));
-router.use('/contact', require('./contact'));
-router.use('/favorites', require('./favorites'));
-router.use('/bids', require('./bids'));
-router.use('/live-auctions', require('./live-auctions'));
+// --- ربط المسارات الفرعية (Sub-Routes) ---
 
-// Error handling middleware
+router.use('/auth', require('./auth'));                  // المصادقة
+router.use('/users', require('./users'));                // المستخدمين
+router.use('/cars', require('./cars'));                  // السيارات
+router.use('/auctions', require('./auctions'));          // المزادات
+router.use('/parts', require('./parts'));                // قطع الغيار
+router.use('/dashboard', require('./dashboard'));        // لوحة التحكم
+router.use('/orders', require('./orders'));              // الطلبات
+router.use('/notifications', require('./notifications')); // التنبيهات
+router.use('/analytics', require('./analytics'));        // التحليلات
+router.use('/upload', require('./upload.js'));           // رفع الملفات
+router.use('/settings', require('./settings'));          // الإعدادات
+router.use('/messages', require('./messages'));          // الرسائل
+router.use('/reviews', require('./reviews'));            // التقييمات
+router.use('/comparisons', require('./comparisons'));    // المقارنات
+router.use('/brands', require('./brands'));              // الماركات
+router.use('/contact', require('./contact'));            // الاتصال
+router.use('/favorites', require('./favorites'));        // المفضلة
+router.use('/bids', require('./bids'));                  // المزايدات
+router.use('/live-auctions', require('./live-auctions'));// المزادات المباشرة
+
+/**
+ * معالج الأخطاء المركزي لمسارات API
+ * يقوم بتحليل نوع الخطأ وإرجاع رسالة واضحة للمبرمج/العميل.
+ */
 router.use((error, req, res, next) => {
-  console.error('API Error:', error);
+  console.error('⚠️ خطأ في API:', error);
 
+  // أخطاء التحقق من البيانات (Mongoose Validation)
   if (error.name === 'ValidationError') {
     return res.status(400).json({
-      error: 'Validation Error',
+      error: 'خطأ في صحة البيانات',
       message: error.message,
       details: error.errors
     });
   }
 
+  // أخطاء المعرفات غير الصحيحة (Invalid IDs)
   if (error.name === 'CastError') {
     return res.status(400).json({
-      error: 'Invalid ID',
-      message: 'The provided ID is not valid'
+      error: 'معرف غير صالح',
+      message: 'المعرف الممرر غير موجود أو بتنسيق خاطئ'
     });
   }
 
+  // أخطاء تكرار البيانات الفريدة (Duplicate Key)
   if (error.code === 11000) {
     return res.status(409).json({
-      error: 'Duplicate Entry',
-      message: 'A record with this value already exists'
+      error: 'بيانات مكررة',
+      message: 'هذا السجل موجود بالفعل في النظام'
     });
   }
 
+  // خطأ عام غير متوقع
   res.status(error.status || 500).json({
-    error: error.name || 'Internal Server Error',
-    message: error.message || 'Something went wrong',
-    timestamp: new Date().toISOString(),
+    error: error.name || 'خطأ داخلي',
+    message: error.message || 'حدث خطأ غير متوقع في الخادم',
     path: req.path
   });
 });
 
-// 404 handler
+/**
+ * معالجة الروابط غير المعروفة لـ API
+ */
 router.use('*', (req, res) => {
   res.status(404).json({
-    error: 'Not Found',
-    message: `The requested endpoint ${req.method} ${req.originalUrl} was not found`,
-    availableEndpoints: [
-      'GET /',
-      'GET /health',
-      'GET /auth',
-      'GET /users',
-      'GET /notifications',
-      'GET /analytics'
-    ]
+    error: 'غير موجود',
+    message: `المسار ${req.method} ${req.originalUrl} غير متاح في النظام.`
   });
 });
 

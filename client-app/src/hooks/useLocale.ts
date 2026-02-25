@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (client-app/src/hooks/useLocale.ts) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 'use client';
 
 import { useLanguage } from '@/lib/LanguageContext';

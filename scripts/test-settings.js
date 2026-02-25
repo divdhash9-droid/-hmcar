@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (scripts/test-settings.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const http = require('http');
 
 const options = {

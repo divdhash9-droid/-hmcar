@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (public/js/login-simple.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 // Simple Login Role Switching - HM CAR
 document.addEventListener('DOMContentLoaded', function() {
     

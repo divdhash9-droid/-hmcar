@@ -3,6 +3,7 @@
 const express = require('express');
 const router = express.Router();
 const Car = require('../../../models/Car');
+const AuditLog = require('../../../models/AuditLog');
 const { requireAuthAPI, requirePermissionAPI } = require('../../../middleware/auth');
 
 // GET /api/v2/cars - جلب قائمة السيارات
@@ -136,9 +137,23 @@ router.get('/:id', async (req, res) => {
 // POST /api/v2/cars - إضافة سيارة جديدة (Admin only)
 router.post('/', requireAuthAPI, requirePermissionAPI('manage_cars'), async (req, res) => {
     try {
-        const carData = req.body;
         const car = new Car(carData);
         await car.save();
+
+        // Log car creation
+        await AuditLog.logUserAction(
+            req.user.userId,
+            'CREATE',
+            'Car',
+            `Created new car: ${car.title}`,
+            {
+                targetId: car._id,
+                after: car.toObject(),
+                ipAddress: req.ip,
+                userAgent: req.get('User-Agent'),
+                sessionId: req.sessionID || 'api'
+            }
+        );
 
         res.status(201).json({
             success: true,
@@ -158,6 +173,7 @@ router.post('/', requireAuthAPI, requirePermissionAPI('manage_cars'), async (req
 // PUT /api/v2/cars/:id - تحديث سيارة (Admin only)
 router.put('/:id', requireAuthAPI, requirePermissionAPI('manage_cars'), async (req, res) => {
     try {
+        const oldCar = await Car.findById(req.params.id);
         const car = await Car.findByIdAndUpdate(
             req.params.id,
             req.body,
@@ -170,6 +186,22 @@ router.put('/:id', requireAuthAPI, requirePermissionAPI('manage_cars'), async (r
                 error: 'Car not found'
             });
         }
+
+        // Log car update
+        await AuditLog.logUserAction(
+            req.user.userId,
+            'UPDATE',
+            'Car',
+            `Updated car: ${car.title}`,
+            {
+                targetId: car._id,
+                before: oldCar ? oldCar.toObject() : null,
+                after: car.toObject(),
+                ipAddress: req.ip,
+                userAgent: req.get('User-Agent'),
+                sessionId: req.sessionID || 'api'
+            }
+        );
 
         res.json({
             success: true,

@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (modules/utils/helpers.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 /**
  * [[ملف الدوال المساعدة]] - modules/utils/helpers.js
  * 

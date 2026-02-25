@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (client-app/eslint.config.mjs) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";

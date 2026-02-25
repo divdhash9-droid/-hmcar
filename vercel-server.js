@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (vercel-server.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 /**
  * vercel-server.js
  * HM CAR - Vercel Serverless Entry Point

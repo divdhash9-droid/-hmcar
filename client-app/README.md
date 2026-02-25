@@ -1,3 +1,5 @@
+> [[ARABIC_HEADER]] هذا الملف (client-app/README.md) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started

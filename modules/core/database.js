@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (modules/core/database.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 /**
  * [[ملف الاتصال بقاعدة البيانات]] - modules/core/database.js
  * 

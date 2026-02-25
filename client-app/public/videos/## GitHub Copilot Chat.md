@@ -1,3 +1,5 @@
+> [[ARABIC_HEADER]] هذا الملف (client-app/public/videos/## GitHub Copilot Chat.md) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 ## GitHub Copilot Chat
 
 - Extension: 0.37.1 (prod)

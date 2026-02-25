@@ -1,196 +1,56 @@
-# 🚗 HM CAR - منصة مزادات السيارات الفاخرة
+> [[ARABIC_HEADER]] هذا الملف (README.md) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
 
-<div align="center">
+# نظام HM CAR - مزادات السيارات العالمية
 
-![HM CAR Logo](public/images/logo.png)
+نظام متكامل واحترافي لإدارة وتسويق السيارات، يجمع بين قوة الأداء وسلاسة التصميم السينمائي. تم تطوير هذا النظام لخدمة العملاء الراغبين في اقتناء أفضل السيارات من كوريا الجنوبية وغيرها عبر تجربة مزاد فريدة.
 
-**منصة متكاملة لمزادات وبيع السيارات الفاخرة**
+## 🌟 المميزات الرئيسية
 
-[![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
-[![Next.js](https://img.shields.io/badge/Next.js-16+-black.svg)](https://nextjs.org/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-7+-green.svg)](https://mongodb.com/)
-[![License](https://img.shields.io/badge/License-Private-red.svg)]()
+- **الواجهة السينمائية:** تصميم عصري يعتمد على خلفيات فيديو ديناميكية تتكيف مع نوع جهاز المستخدم لضمان انطباع بصري مبهر.
+- **المزادات المباشرة:** نظام مزايدة فوري مدعوم بتقنية WebSockets للتحديث اللحظي للأسعار والظهور المباشر للعمليات.
+- **أداء فائق السرعة:** تم تحسين النظام ليكون خفيفاً وسريع الاستجابة عبر تقنيات الضغط (Compression) والتحميل الذكي للوسائط، مما يجعله مثالياً للاستخدام عبر الإنترنت.
+- **توثيق دقيق (Audit Logs):** نظام تتبع شامل لكل العمليات الإدارية (إضافة، تعديل، حذف) لضمان الشفافية والمراقبة المستمرة.
+- **إدارة الوكالات والسيارات:** تحكم كامل للمدير في كافة عناصر النظام بما في ذلك ماركات السيارات (Agencies) والمخزون.
+- **تغيير كلمة المرور:** توفير ميزة تغيير كلمة المرور للمستخدمين والمديرين من داخل الملف الشخصي.
+- **الحماية والأمان:** تشفير متقدم للبيانات، نظام صلاحيات دقيق، وتوثيق ثنائي.
 
-[العربية](#العربية) | [English](#english)
+## 🏗 التقنيات المستخدمة
 
-</div>
+- **Frontend:** [Next.js](https://nextjs.org/) (React), [Framer Motion](https://www.framer.com/motion/) (Animations).
+- **Backend:** [Node.js](https://nodejs.org/) (Express), [Socket.io](https://socket.io/) (Real-time).
+- **Database:** [MongoDB](https://www.mongodb.com/) (Mongoose).
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/).
 
----
+## 📁 هيكلية المشروع
 
-## العربية
+- `client-app/`: ملفات الواجهة الأمامية وتطبيقات العميل.
+- `models/`: تعريف نماذج البيانات (السيارات، المستخدمين، المزادات، سجلات التدقيق).
+- `modules/`: المكونات البرمجية المركزية للنظام (التطبيق، السوكيت، الأمان).
+- `routes/`: مسارات الـ API المنظمة (v2).
+- `services/`: خدمات معالجة المدفوعات، التنبيهات، والنسخ الاحتياطي.
+- `docs/`: التوثيق التفصيلي للنظام باللغة العربية.
 
-### 📋 نظرة عامة
+## 🚀 التشغيل السريع
 
-**HM CAR** هي منصة متطورة لمزادات وبيع السيارات الفاخرة، مبنية بأحدث التقنيات لتوفير تجربة مستخدم استثنائية.
+1. قم بتثبيت التبعيات:
 
-### ⚡ المميزات الرئيسية
+   ```bash
+   npm install
+   cd client-app && npm install
+   ```
 
-- 🏎️ **معرض السيارات** - عرض السيارات مع صور عالية الجودة ومواصفات تفصيلية
-- 🔨 **نظام المزادات** - مزادات حية مع تحديثات فورية
-- ❤️ **المفضلات** - حفظ السيارات المفضلة
-- ⚖️ **مقارنة السيارات** - مقارنة مواصفات عدة سيارات
-- 💬 **نظام الرسائل** - تواصل مباشر بين المستخدمين
-- 🔧 **قطع الغيار** - متجر قطع الغيار الأصلية
-- 👤 **لوحة تحكم العملاء** - إدارة الحساب والطلبات
-- 🔐 **لوحة تحكم الإدارة** - إدارة كاملة للمنصة
+2. قم بضبط المتغيرات في ملف `.env`.
+3. تشغيل الخادم الرئيسي:
 
-### 🛠️ التقنيات المستخدمة
+   ```bash
+   npm start
+   ```
 
-| التقنية | الوصف |
-|---------|-------|
-| **Backend** | Node.js + Express.js |
-| **Frontend** | Next.js 16 + React 19 |
-| **Database** | MongoDB |
-| **Styling** | Tailwind CSS v4 |
-| **Animations** | Framer Motion |
-| **Auth** | JWT + Sessions |
+4. تشغيل واجهة المستخدم (للتطوير):
 
-### 🚀 البدء السريع
-
-```bash
-# 1. تثبيت التبعيات
-npm install
-cd client-app && npm install
-
-# 2. إعداد متغيرات البيئة
-cp .env.example .env
-
-# 3. تشغيل قاعدة البيانات
-./start-database.bat  # Windows
-# أو
-mongod --dbpath ./database-data  # Linux/Mac
-
-# 4. تشغيل السيرفر
-npm run dev
-
-# 5. تشغيل الواجهة الأمامية (في terminal آخر)
-cd client-app && npm run dev
-```
-
-### 📁 هيكل المشروع
-
-```
-car-auction/
-├── client-app/          # Next.js Frontend
-│   ├── src/
-│   │   ├── app/         # صفحات التطبيق
-│   │   ├── components/  # المكونات
-│   │   ├── hooks/       # React Hooks
-│   │   └── lib/         # المكتبات والأدوات
-│   └── public/          # الملفات الثابتة
-├── modules/             # وحدات Backend المنظمة
-├── routes/              # مسارات API
-│   └── api/v2/          # API الإصدار 2
-├── models/              # نماذج MongoDB
-├── middleware/          # وسطاء Express
-├── services/            # خدمات الأعمال
-├── config/              # إعدادات التطبيق
-└── server.js            # نقطة الدخول
-```
-
-### 🔗 الروابط
-
-| الخدمة | الرابط |
-|--------|--------|
-| **Frontend** | http://localhost:3001 |
-| **Backend API** | http://localhost:4001 |
-| **API Docs** | http://localhost:4001/api/v2/docs |
+   ```bash
+   cd client-app && npm run dev
+   ```
 
 ---
-
-## English
-
-### 📋 Overview
-
-**HM CAR** is a sophisticated luxury car auction and sales platform, built with cutting-edge technologies to provide an exceptional user experience.
-
-### ⚡ Key Features
-
-- 🏎️ **Car Showroom** - Display cars with HD images and detailed specs
-- 🔨 **Auction System** - Live auctions with real-time updates
-- ❤️ **Favorites** - Save favorite cars
-- ⚖️ **Car Comparison** - Compare multiple car specifications
-- 💬 **Messaging System** - Direct communication between users
-- 🔧 **Spare Parts** - Original spare parts store
-- 👤 **Client Dashboard** - Account and orders management
-- 🔐 **Admin Dashboard** - Complete platform management
-
-### 🛠️ Tech Stack
-
-| Technology | Description |
-|------------|-------------|
-| **Backend** | Node.js + Express.js |
-| **Frontend** | Next.js 16 + React 19 |
-| **Database** | MongoDB |
-| **Styling** | Tailwind CSS v4 |
-| **Animations** | Framer Motion |
-| **Auth** | JWT + Sessions |
-
-### 🚀 Quick Start
-
-```bash
-# 1. Install dependencies
-npm install
-cd client-app && npm install
-
-# 2. Setup environment variables
-cp .env.example .env
-
-# 3. Start database
-./start-database.bat  # Windows
-# or
-mongod --dbpath ./database-data  # Linux/Mac
-
-# 4. Start backend server
-npm run dev
-
-# 5. Start frontend (in another terminal)
-cd client-app && npm run dev
-```
-
-### 📁 Project Structure
-
-```
-car-auction/
-├── client-app/          # Next.js Frontend
-│   ├── src/
-│   │   ├── app/         # App pages
-│   │   ├── components/  # Components
-│   │   ├── hooks/       # React Hooks
-│   │   └── lib/         # Libraries & utilities
-│   └── public/          # Static files
-├── modules/             # Organized Backend modules
-├── routes/              # API routes
-│   └── api/v2/          # API Version 2
-├── models/              # MongoDB models
-├── middleware/          # Express middleware
-├── services/            # Business services
-├── config/              # App configuration
-└── server.js            # Entry point
-```
-
-### 🔗 Links
-
-| Service | URL |
-|---------|-----|
-| **Frontend** | http://localhost:3001 |
-| **Backend API** | http://localhost:4001 |
-| **API Docs** | http://localhost:4001/api/v2/docs |
-
----
-
-## 📄 License
-
-This project is private and proprietary. All rights reserved.
-
-## 👥 Team
-
-Developed by **HM CAR Team**
-
----
-
-<div align="center">
-
-**© 2026 HM CAR. All Rights Reserved.**
-
-</div>
+تم التطوير بواسطة فريق **HM CAR**. جميع الحقوق محفوظة 2026.

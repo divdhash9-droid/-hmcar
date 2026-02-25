@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (utils/uploadStorage.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');

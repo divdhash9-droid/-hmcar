@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (client-app/src/lib/api.ts) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://car-auction-sand.vercel.app';
 
 export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
@@ -75,6 +77,10 @@ export const api = {
         verify: () => fetchAPI('/api/v2/auth/verify'),
         logout: () => fetchAPI('/api/v2/auth/logout', {
             method: 'POST',
+        }),
+        changePassword: (data: any) => fetchAPI('/api/v2/auth/change-password', {
+            method: 'POST',
+            body: JSON.stringify(data),
         }),
     },
     users: {

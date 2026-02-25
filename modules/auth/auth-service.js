@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (modules/auth/auth-service.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 /**
  * [[ملف خدمة المصادقة]] - modules/auth/auth-service.js
  * 

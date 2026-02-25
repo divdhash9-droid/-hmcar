@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (modules/auth/middleware.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 /**
  * [[ملف الوسيط للمصادقة]] - modules/auth/middleware.js
  * 

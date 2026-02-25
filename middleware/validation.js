@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (middleware/validation.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 /**
  * [[وسيط التحقق من البيانات]] - middleware/validation.js
  * 

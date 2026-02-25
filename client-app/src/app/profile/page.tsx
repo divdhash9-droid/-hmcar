@@ -94,13 +94,16 @@ export default function ProfilePage() {
         setMessage('');
 
         try {
-            // هنا يمكن إضافة API call لتغيير كلمة المرور
-            // await api.auth.changePassword(passwordData);
+            // تنفيذ طلب تغيير كلمة المرور عبر الـ API
+            await api.auth.changePassword({
+                currentPassword: passwordData.currentPassword,
+                newPassword: passwordData.newPassword
+            });
 
             setMessage(isRTL ? 'تم تغيير كلمة المرور بنجاح' : 'Password changed successfully');
             setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
         } catch (err: any) {
-            setMessage(err.message || (isRTL ? 'حدث خطأ' : 'An error occurred'));
+            setMessage(err.message || (isRTL ? 'حدث خطأ في النظام' : 'Protocol error occurred'));
         } finally {
             setLoading(false);
         }

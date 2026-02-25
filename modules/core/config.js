@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (modules/core/config.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 /**
  * [[ملف الإعدادات الأساسية]] - modules/core/config.js
  * 

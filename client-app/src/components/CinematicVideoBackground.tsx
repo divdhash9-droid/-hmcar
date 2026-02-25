@@ -1,16 +1,19 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 
+/**
+ * مكون الخلفية السينمائية - يعرض فيديو على أجهزة الكمبيوتر وصورة على الجوال
+ */
 interface CinematicVideoBackgroundProps {
-  videoSrc?: string;
-  fallbackImage?: string;
-  mobileImage?: string;
-  overlayOpacity?: number;
+  videoSrc?: string;        // مسار الفيديو
+  fallbackImage?: string;   // صورة احتياطية للكمبيوتر (تظهر أثناء تحميل الفيديو)
+  mobileImage?: string;     // صورة مخصصة للجوال
+  overlayOpacity?: number;  // درجة شفافية الطبقة المظلمة
   children?: React.ReactNode;
-  height?: string;
+  height?: string;          // ارتفاع المكون
 }
 
 export default function CinematicVideoBackground({
@@ -24,13 +27,15 @@ export default function CinematicVideoBackground({
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isDesktop, setIsDesktop] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
 
+  // التحقق من نوع الجهاز (كمبيوتر أم جوال) عند التحميل وتغير الحجم
   useEffect(() => {
     const checkViewport = () => setIsDesktop(window.innerWidth >= 768);
     checkViewport();
     window.addEventListener("resize", checkViewport);
 
-    // نستخدم timeout لتجنب التحميل المتزامن الذي قد يبطئ الواجهة
+    // تأخير بسيط لضمان استقرار الواجهة قبل البدء
     const timer = setTimeout(() => setIsLoaded(true), 100);
 
     return () => {
@@ -39,20 +44,38 @@ export default function CinematicVideoBackground({
     };
   }, []);
 
+  // التحكم في تشغيل الفيديو وإعداده
   useEffect(() => {
     if (!isDesktop || !isLoaded) return;
 
     const video = videoRef.current;
     if (!video) return;
+
+    // تقليل سرعة التشغيل لإضفاء لمسة سينمائية هادئة
     video.playbackRate = 0.75;
 
-    const play = () => video.play().catch(() => { });
+    const onPlay = () => setVideoReady(true);
+
+    const play = () => {
+      video.play()
+        .then(() => setVideoReady(true))
+        .catch(() => {
+          // في حال فشل التشغيل التلقائي (بسبب قيود المتصفح)
+          console.log("Video autoplay prevented");
+        });
+    };
 
     if (video.readyState >= 2) {
       play();
     } else {
       video.addEventListener("canplay", play, { once: true });
     }
+
+    video.addEventListener("playing", onPlay);
+
+    return () => {
+      video.removeEventListener("playing", onPlay);
+    };
   }, [isDesktop, isLoaded]);
 
   return (
@@ -60,18 +83,29 @@ export default function CinematicVideoBackground({
       className="fixed top-0 left-0 right-0 overflow-hidden z-0 bg-[#050505]"
       style={{ height: height || "100svh" }}
     >
-      {/* ── Base Fallback Image (Desktop) ── */}
-      <Image
-        src={fallbackImage}
-        alt="Background"
-        fill
-        priority
-        quality={75}
-        className="object-cover object-top"
-        style={{ zIndex: -2 }}
-      />
+      {/* ── صورة الخلفية للكمبيوتر (تظهر كاحتياط فقط) ── */}
+      <AnimatePresence>
+        {isDesktop && !videoReady && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1 }}
+            className="absolute inset-0"
+            style={{ zIndex: -2 }}
+          >
+            <Image
+              src={fallbackImage}
+              alt="Background Fallback"
+              fill
+              priority
+              quality={75}
+              className="object-cover object-top"
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* ── Video: Desktop only ── */}
+      {/* ── الفيديو: يظهر فقط على أجهزة الكمبيوتر ── */}
       {isDesktop && isLoaded && (
         <video
           ref={videoRef}
@@ -79,27 +113,32 @@ export default function CinematicVideoBackground({
           muted
           loop
           playsInline
-          preload="auto"
+          preload="metadata"
           className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
-          style={{ opacity: 0.85 }}
+          style={{
+            opacity: videoReady ? 0.85 : 0,
+            zIndex: -1
+          }}
         >
           <source src={videoSrc} type="video/mp4" />
         </video>
       )}
 
-      {/* ── Mobile image overlay ── */}
-      <div className="absolute inset-0 z-10 md:hidden">
-        <Image
-          src={mobileImage}
-          alt="Mobile Background"
-          fill
-          priority
-          quality={75}
-          className="object-cover object-center"
-        />
-      </div>
+      {/* ── صورة الجوال: تظهر فقط عندما يكون العرض صغيراً ── */}
+      {!isDesktop && (
+        <div className="absolute inset-0 z-10">
+          <Image
+            src={mobileImage}
+            alt="Mobile Background"
+            fill
+            priority
+            quality={75}
+            className="object-cover object-center"
+          />
+        </div>
+      )}
 
-      {/* ── Dark cinematic overlay ── */}
+      {/* ── الطبقة السينمائية المظلمة ── */}
       <motion.div
         className="absolute inset-0 z-20 bg-gradient-to-b from-black/50 via-black/20 to-black/80"
         initial={{ opacity: 0 }}
@@ -107,19 +146,22 @@ export default function CinematicVideoBackground({
         transition={{ duration: 1.5 }}
       />
 
-      {/* ── Vignette ── */}
+      {/* ── تأثير التغطية الداكنة (Vignette) ── */}
       <div className="absolute inset-0 z-20 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(0,0,0,0.7)_100%)]" />
 
-      {/* ── Cinematic grid lines (desktop only) ── */}
-      <div className="absolute inset-0 z-20 pointer-events-none opacity-[0.07] hidden md:block">
-        <div className="absolute top-1/3 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#c9a96e] to-transparent" />
-        <div className="absolute top-2/3 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#c9a96e] to-transparent" />
-        <div className="absolute left-1/3 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-[#c9a96e]/25 to-transparent" />
-        <div className="absolute left-2/3 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-[#c9a96e]/25 to-transparent" />
-      </div>
+      {/* ── الخطوط السينمائية الدقيقة (للكمبيوتر فقط) ── */}
+      {isDesktop && (
+        <div className="absolute inset-0 z-20 pointer-events-none opacity-[0.07]">
+          <div className="absolute top-1/3 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#c9a96e] to-transparent" />
+          <div className="absolute top-2/3 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#c9a96e] to-transparent" />
+          <div className="absolute left-1/3 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-[#c9a96e]/25 to-transparent" />
+          <div className="absolute left-2/3 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-[#c9a96e]/25 to-transparent" />
+        </div>
+      )}
 
-      {/* ── Content ── */}
+      {/* ── محتوى الصفحة الممرر فوق الخلفية ── */}
       <div className="relative z-30">{children}</div>
     </div>
   );
 }
+

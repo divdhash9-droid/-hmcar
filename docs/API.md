@@ -1,3 +1,5 @@
+> [[ARABIC_HEADER]] هذا الملف (docs/API.md) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 # 📡 API Documentation - HM CAR
 
 ## Base URL

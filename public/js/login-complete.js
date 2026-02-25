@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (public/js/login-complete.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 // Simple Login System - HM CAR
 document.addEventListener('DOMContentLoaded', function() {
     

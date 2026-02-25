@@ -1,13 +1,9 @@
+// [[ARABIC_HEADER]] هذا الملف (modules/app.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 /**
- * [[ملف التطبيق الرئيسي]] - modules/app.js
- * 
- * هذا الملف هو نقطة بداية التطبيق المنظم (Backend API Server)
- * - إعداد Express
- * - تحميل الوسطاء
- * - تحميل مسارات API v2
- * - معالجة الأخطاء
- * 
- * @author HM CAR Team
+ * @file modules/app.js
+ * @description المكون الأساسي لتطبيق Express. 
+ * هذا الملف مسؤول عن تجميع الإعدادات، المسارات، طبقات الحماية، وربط قاعدة البيانات.
  */
 
 const express = require('express');
@@ -17,9 +13,11 @@ const database = require('./core/database');
 const logger = require('./core/logger');
 const cors = require('cors');
 const helmet = require('helmet');
+const compression = require('compression');
 
 /**
- * فئة التطبيق
+ * فئة التطبيق (App Class)
+ * تقوم بتنظيم دورة حياة الخادم وتجهيز البيئة البرمجية.
  */
 class App {
   constructor() {
@@ -28,116 +26,130 @@ class App {
   }
 
   /**
-   * إعداد التطبيق
+   * الإعداد الأولي للتطبيق
    */
   setupApp() {
-    this.setupMiddleware();
-    this.setupRoutes();
-    this.setupErrorHandling();
+    this.setupMiddleware();      // إعداد الوسطاء (Middlewares)
+    this.setupRoutes();          // إعداد المسارات (Routes)
+    this.setupErrorHandling();    // إعداد معالجة الأخطاء
   }
 
   /**
-   * إعداد الوسطاء
+   * إعداد طبقات الحماية والوسطاء
    */
   setupMiddleware() {
-    // إعدادات الأمان الأساسية
+    // استخدام Helmet لتأمين ترويسات HTTP
     this.app.use(helmet(config.security.helmet));
+
+    // تفعيل ضغط البيانات لتحسين سرعة التحميل
+    this.app.use(compression());
+
+    // تفعيل سياسة مشاركة الموارد (CORS)
     this.app.use(cors(config.security.cors));
 
-    // تحليل البيانات
+    // تحليل بيانات الطلبات بصيغة JSON و URL-encoded
     this.app.use(express.json({ limit: '10mb' }));
     this.app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-    // الملفات الثابتة (للملفات المرفوعة فقط)
+    // تقديم الملفات الثابتة (الصور والوسائط المرفوعة)
     this.app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
     this.app.use('/public', express.static(path.join(__dirname, '..', 'public')));
 
-    logger.info('تم إعداد الوسطاء والأمان');
+    logger.info('✅ تم إعداد الوسطاء وطبقات الأمان بنجاح');
   }
 
   /**
-   * إعداد المسارات
+   * تعريف المسارات الرئيسية للنظام
    */
   setupRoutes() {
-    // نقطة فحص الصحة
+    // نقطة فحص حالة الخادم (Health Check)
     this.app.get('/health', (req, res) => {
-      res.json({ status: 'ok', timestamp: new Date() });
+      res.json({ status: 'ok', timestamp: new Date(), engine: 'HM-CAR-V2' });
     });
 
-    // تحميل مسارات API v2
+    // تحميل إصدار الـ API الثاني (V2)
     this.setupApiRoutes();
 
-    // توجيه الصفحة الرئيسية للجذر (يمكن إزالتها إذا كان الـ Frontend منفصل تماماً)
+    // رسالة الترحيب واختبار الاتصال بالجذر
     this.app.get('/', (req, res) => {
-      res.json({ message: 'HM CAR API v2 Running', docs: '/api/v2/docs' });
+      res.json({
+        message: 'مرحباً بك في واجهة برمجة تطبيقات HM CAR V2',
+        status: 'Online',
+        documentation: '/api/v2/docs'
+      });
     });
 
-    logger.info('تم إعداد المسارات');
+    logger.info('✅ تم إعداد المسارات الأساسية');
   }
 
   /**
-   * إعداد مسارات API
+   * تحميل مسارات الـ API المنظمة
    */
   setupApiRoutes() {
     try {
-      // تحميل جميع مسارات API v2 عبر index.js الذي يتضمن:
-      // - Rate Limiting
-      // - معالجة الأخطاء الموحدة
-      // - جميع المسارات الفرعية
+      // استيراد الموجه الرئيسي لنسخة API v2
       const apiV2Router = require('../routes/api/v2/index');
       this.app.use('/api/v2', apiV2Router);
 
-      logger.info('تم تحميل مسارات API v2 بنجاح عبر index.js');
+      logger.info('✅ تم تحميل جميع مسارات API v2 بنجاح');
     } catch (error) {
-      logger.error('خطأ في تحميل مسارات API v2:', error.message);
+      logger.error('❌ خطأ في تحميل مسارات API v2:', error.message);
       console.error(error);
     }
   }
 
-
   /**
-   * إعداد معالجة الأخطاء
+   * نظام معالجة الأخطاء الشامل
    */
   setupErrorHandling() {
-    // 404 Handler
+    // معالجة الروابط غير الموجودة (404)
     this.app.use((req, res, next) => {
-      res.status(404).json({ success: false, message: 'المسار غير موجود', code: 'NOT_FOUND' });
-    });
-
-    // General Error Handler
-    this.app.use((err, req, res, next) => {
-      logger.error('خطأ غير معالج:', err);
-      res.status(500).json({
+      res.status(404).json({
         success: false,
-        message: 'حدث خطأ في الخادم',
-        error: process.env.NODE_ENV === 'development' ? err.message : undefined
+        message: 'عذراً، المسار المطلوب غير موجود',
+        code: 'NOT_FOUND'
       });
     });
 
-    logger.info('تم إعداد معالجة الأخطاء');
+    // المعالج العام للأخطاء البرمجية والتقنية
+    this.app.use((err, req, res, next) => {
+      logger.error('⚠️ خطأ غير متوقع:', err);
+      res.status(500).json({
+        success: false,
+        message: 'حدث خطأ تقني داخلي في الخادم',
+        error: process.env.NODE_ENV === 'development' ? err.message : 'Internal Server Error'
+      });
+    });
+
+    logger.info('✅ تم تفعيل نظام معالجة الأخطاء');
   }
 
   /**
-   * بدء التطبيق
+   * تشغيل الخادم وربط قاعدة البيانات
    */
   async start() {
     try {
+      // الاتصال بقاعدة بيانات MongoDB
       await database.connect();
+      logger.info('✅ تم الاتصال بقاعدة البيانات بنجاح');
 
       const socketModule = require('./socket');
+
+      // بدء الاستماع للطلبات عبر البورت المحدد
       const server = this.app.listen(config.server.port, config.server.host, () => {
-        logger.info(`🚀 الخادم يعمل على ${config.server.host}:${config.server.port}`);
-        logger.info(`🌐 API رابط: http://localhost:${config.server.port}/api/v2`);
+        logger.info(`🚀 الخادم يعمل حالياً على http://${config.server.host}:${config.server.port}`);
       });
 
-      // تهيئة Sockets
+      // تهيئة نظام الـ WebSockets للتواصل الفوري (للمزادات والتنبيهات)
       this.io = socketModule.init(server);
-      this.app.set('io', this.io); // جعلها متاحة في المسارات إذا لزم الأمر
+      this.app.set('io', this.io); // جعل كائن IO متاحاً في كامل التطبيق
 
-      // Graceful Shutdown
+      // آلية الإغلاق الآمن للنظام (Graceful Shutdown)
       const shutdown = async () => {
-        logger.info('جاري إيقاف الخادم...');
-        server.close(() => logger.info('تم إغلاق الخادم'));
+        logger.info('⏳ جاري إغلاق النظام بأمان...');
+        server.close(() => {
+          logger.info('🛑 تم إيقاف استقبال الطلبات');
+        });
         await database.disconnect();
         process.exit(0);
       };
@@ -146,7 +158,7 @@ class App {
       process.on('SIGINT', shutdown);
 
     } catch (error) {
-      logger.error('فشل في بدء التطبيق', error);
+      logger.error('❌ فشل تشغيل التطبيق:', error);
       process.exit(1);
     }
   }

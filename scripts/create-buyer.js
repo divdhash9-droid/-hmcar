@@ -1,3 +1,5 @@
+// [[ARABIC_HEADER]] هذا الملف (scripts/create-buyer.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
 require('dotenv').config();
 const mongoose = require('mongoose');
 const User = require('../models/User');

@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { MessageCircle, X, ExternalLink, ChevronLeft, ShieldCheck, Info, Tag, AlertTriangle } from "lucide-react";

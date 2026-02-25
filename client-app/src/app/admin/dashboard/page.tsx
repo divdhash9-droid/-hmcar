@@ -177,8 +177,8 @@ export default function AdminDashboard() {
                                     pathname === item.href ? "text-cinematic-neon-red bg-white/5 shadow-inner" : "text-white/20 hover:text-white hover:bg-white/[0.02]"
                                 )}
                             >
-                                <item.icon className={cn("w-8 h-8 lg:w-9 lg:h-9 shrink-0 transition-transform group-hover:scale-110", pathname === item.href && "drop-shadow-[0_0_15px_rgba(255,0,60,1)]")} />
-                                <span className="text-[10px] lg:text-[11px] font-black uppercase tracking-[0.1em] lg:tracking-[0.12em] text-center">{item.label}</span>
+                                <item.icon className={cn("w-10 h-10 lg:w-11 lg:h-11 shrink-0 transition-transform group-hover:scale-110", pathname === item.href && "drop-shadow-[0_0_15px_rgba(255,0,60,1)]")} />
+                                <span className="text-[12px] lg:text-[13px] font-black uppercase tracking-[0.1em] lg:tracking-[0.12em] text-center leading-tight">{item.label}</span>
                                 {pathname === item.href && <motion.div layoutId="activeInd" className="absolute left-0 top-0 bottom-0 w-[3px] bg-cinematic-neon-red" />}
                             </button>
                         </Link>

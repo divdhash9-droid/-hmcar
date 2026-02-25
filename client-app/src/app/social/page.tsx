@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { MessageCircle, Link as LinkIcon, Globe, Phone } from "lucide-react";
+import { MessageCircle, Link as LinkIcon, Globe } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/lib/LanguageContext";
 import { cn } from "@/lib/utils";
 import { getSocialIcon } from "@/lib/socialIcons";
+import { api } from "@/lib/api";
 
 type SocialConfig = {
   whatsapp?: string;
@@ -14,18 +15,29 @@ type SocialConfig = {
 };
 
 export default function PublicSocialPage() {
-  const { t, isRTL } = useLanguage();
+  const { t } = useLanguage();
   const [config, setConfig] = useState<SocialConfig>({ whatsapp: "", links: [] });
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const raw = localStorage.getItem('hm_social_links');
-    if (raw) {
+    const fetchLinks = async () => {
       try {
-        const parsed = JSON.parse(raw);
-        setConfig({ whatsapp: parsed.whatsapp || "", links: Array.isArray(parsed.links) ? parsed.links : [] });
-      } catch {}
-    }
+        const response = await api.settings.getPublic();
+        if (response.success && response.data.socialLinks) {
+          const sl = response.data.socialLinks;
+          const linksArray = Object.entries(sl)
+            .filter(([k, v]) => k !== 'whatsapp' && v)
+            .map(([k, v]) => ({ platform: k, url: v as string }));
+
+          setConfig({
+            whatsapp: sl.whatsapp || "",
+            links: linksArray
+          });
+        }
+      } catch (err) {
+        console.error("Failed to fetch social links", err);
+      }
+    };
+    fetchLinks();
   }, []);
 
   return (

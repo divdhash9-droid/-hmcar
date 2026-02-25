@@ -9,11 +9,11 @@ import {
     Trash2,
     Eye,
     Search,
-    Filter,
     X,
     Upload,
     Save,
-    ChevronLeft
+    ChevronLeft,
+    DollarSign
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
@@ -29,12 +29,14 @@ export default function AdminCarsPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [editingCar, setEditingCar] = useState<any>(null);
+    const [usdToSar, setUsdToSar] = useState(3.75); // Default USD to SAR conversion rate
     const [formData, setFormData] = useState({
         title: '',
         make: '',
         model: '',
         year: new Date().getFullYear(),
-        price: 0,
+        price: 0, // SAR price
+        usdPrice: 0, // USD price for input
         category: 'sedan',
         images: [''],
         description: '',
@@ -46,21 +48,25 @@ export default function AdminCarsPage() {
     });
 
     useEffect(() => {
-        loadCars();
+        loadData();
     }, [filter, searchTerm]);
 
-    const loadCars = async () => {
+    const loadData = async () => {
+        setLoading(true);
         try {
-            setLoading(true);
-            const params: any = { status: filter };
-            if (searchTerm) params.search = searchTerm;
+            const [carsRes, settingsRes] = await Promise.all([
+                api.cars.list({ status: filter, search: searchTerm }),
+                api.settings.getPublic()
+            ]);
 
-            const response = await api.cars.list(params);
-            if (response.success) {
-                setCars(response.data.cars);
+            if (carsRes.success) {
+                setCars(carsRes.data.cars);
+            }
+            if (settingsRes.success && settingsRes.data.currencySettings) {
+                setUsdToSar(settingsRes.data.currencySettings.usdToSar || 3.75);
             }
         } catch (err) {
-            console.error('Failed to load cars', err);
+            console.error("Failed to load data", err);
         } finally {
             setLoading(false);
         }
@@ -77,7 +83,7 @@ export default function AdminCarsPage() {
             setShowModal(false);
             setEditingCar(null);
             resetForm();
-            loadCars();
+            loadData();
         } catch (err) {
             console.error('Failed to save car', err);
         }
@@ -87,7 +93,7 @@ export default function AdminCarsPage() {
         if (confirm(isRTL ? 'هل أنت متأكد من حذف هذه السيارة؟' : 'Are you sure you want to delete this car?')) {
             try {
                 await api.cars.delete(id);
-                loadCars();
+                loadData();
             } catch (err) {
                 console.error('Failed to delete car', err);
             }
@@ -109,7 +115,8 @@ export default function AdminCarsPage() {
             fuelType: car.fuelType || 'Petrol',
             transmission: car.transmission || 'Automatic',
             color: car.color || '',
-            isActive: car.isActive !== false
+            isActive: car.isActive !== false,
+            usdPrice: parseFloat((car.price / usdToSar).toFixed(2))
         });
         setShowModal(true);
     };
@@ -128,7 +135,8 @@ export default function AdminCarsPage() {
             fuelType: 'Petrol',
             transmission: 'Automatic',
             color: '',
-            isActive: true
+            isActive: true,
+            usdPrice: 0
         });
     };
 
@@ -420,14 +428,31 @@ export default function AdminCarsPage() {
                                     {/* Tech Specs */}
                                     <div>
                                         <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/60 mb-2">
-                                            {isRTL ? 'السعر (رس)' : 'PRICE (SAR)'}
+                                            {isRTL ? 'السعر (دولار)' : 'PRICE (USD)'}
+                                        </label>
+                                        <div className="relative">
+                                            <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                                            <input
+                                                type="number"
+                                                placeholder="0.00"
+                                                onChange={(e) => {
+                                                    const usd = parseFloat(e.target.value) || 0;
+                                                    setFormData({ ...formData, price: parseFloat((usd * usdToSar).toFixed(2)) });
+                                                }}
+                                                className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 pl-12 pr-4 text-sm font-bold text-white focus:outline-none focus:border-cinematic-neon-blue/40"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/60 mb-2">
+                                            {isRTL ? 'السعر (ريال سعودي)' : 'PRICE (SAR)'}
                                         </label>
                                         <input
                                             type="number"
                                             required
                                             value={formData.price}
                                             onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
-                                            className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 px-4 text-sm font-bold text-white focus:outline-none focus:border-cinematic-neon-blue/40"
+                                            className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 px-4 text-sm font-bold text-cinematic-neon-blue focus:outline-none focus:border-cinematic-neon-blue/40"
                                         />
                                     </div>
                                     <div>

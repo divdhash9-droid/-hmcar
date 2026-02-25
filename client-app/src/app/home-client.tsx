@@ -1,11 +1,11 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import { motion, useInView, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  Car, ArrowRight, Sparkles, Timer, Users, Shield,
-  Truck, CreditCard, Award, Star, Heart, Zap, Globe,
-  Phone, Mail, MessageCircle, Smartphone, Download, Link as LinkIcon
+  Sparkles, Shield,
+  Truck, CreditCard, Award, Star, Zap, Globe,
+  MessageCircle, Smartphone, Download, Link as LinkIcon
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -14,6 +14,7 @@ import CinematicVideoBackground from "@/components/CinematicVideoBackground";
 import { useLanguage } from "@/lib/LanguageContext";
 import { getSocialIcon } from "@/lib/socialIcons";
 import SocialLinks from "@/components/SocialLinks";
+import { api } from "@/lib/api";
 
 import LandingShowcase from "@/components/LandingShowcase";
 import { useRouter } from "next/navigation";
@@ -38,38 +39,7 @@ interface HomeClientProps {
   latestCars: CarType[];
 }
 
-function AnimatedCounter({ value, suffix = "" }: { value: number; suffix?: string }) {
-  const [count, setCount] = useState(0);
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
-
-  useEffect(() => {
-    if (isInView) {
-      let start = 0;
-      const end = value;
-      const duration = 2000;
-      const increment = end / (duration / 16);
-
-      const timer = setInterval(() => {
-        start += increment;
-        if (start >= end) {
-          setCount(end);
-          clearInterval(timer);
-        } else {
-          setCount(Math.floor(start));
-        }
-      }, 16);
-
-      return () => clearInterval(timer);
-    }
-  }, [isInView, value]);
-
-  return (
-    <span ref={ref}>
-      {count.toLocaleString()}{suffix}
-    </span>
-  );
-}
+export const revalidate = 60;
 
 export default function HomeClient({ latestCars }: HomeClientProps) {
   const { isRTL } = useLanguage();
@@ -78,15 +48,15 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const liveRef = useRef<HTMLDivElement>(null);
   const [videoHeight, setVideoHeight] = useState<string>("55vh");
-  const [activeTab, setActiveTab] = useState("featured");
   const [activeDock, setActiveDock] = useState<"reviews" | "app" | null>(null);
   const router = useRouter();
 
   // تتبع دخول العميل وإبلاغ الأدمن في الوقت الحقيقي
   useEffect(() => {
     if (isLoggedIn && user && socket && isConnected) {
+      const userId = (user as { _id?: string; id?: string })._id || (user as { _id?: string; id?: string }).id;
       socket.emit('user_navigation', {
-        userId: (user as any)._id || (user as any).id,
+        userId,
         userName: user.name,
         page: isRTL ? 'الصفحة الرئيسية' : 'Home Page',
         timestamp: new Date()
@@ -115,10 +85,6 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
     currentBid: isRTL ? "المزايدة الحالية" : "Current Bid",
     whyTitle: isRTL ? "لماذا تختارنا؟" : "Why Choose Us?",
     whySubtitle: isRTL ? "نقدم لك تجربة فريدة في عالم السيارات" : "We offer you a unique experience",
-    statsCars: isRTL ? "سيارة متاحة" : "Cars Available",
-    statsClients: isRTL ? "عميل سعيد" : "Happy Clients",
-    statsAuctions: isRTL ? "مزاد منتهي" : "Auction Completed",
-    statsCountries: isRTL ? "دولة نخدمها" : "Countries Served",
     testimonialsTitle: isRTL ? "آراء عملائنا" : "What Our Clients Say",
     downloadTitle: isRTL ? "حمّل تطبيقنا الآن" : "Download Our App",
     downloadSubtitle: isRTL ? "تابع المزادات أينما كنت" : "Follow auctions anywhere",
@@ -150,12 +116,6 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
     { icon: Globe, title: isRTL ? "سيارات كورية" : "Korean Cars", desc: isRTL ? "أفضل السيارات الكورية" : "Best Korean vehicles" }
   ];
 
-  const stats = [
-    { value: 10000, suffix: "+", label: txt.statsCars, icon: Car },
-    { value: 5000, suffix: "+", label: txt.statsClients, icon: Users },
-    { value: 2500, suffix: "+", label: txt.statsAuctions, icon: Award },
-    { value: 50, suffix: "+", label: txt.statsCountries, icon: Globe }
-  ];
   const formatNumber = (v: number | string) => new Intl.NumberFormat("en-US").format(Number(v || 0));
 
   const testimonials = [
@@ -166,22 +126,30 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
 
   const [socialConfig, setSocialConfig] = useState<{ whatsapp?: string; links: { platform: string; url: string }[] }>({ whatsapp: "", links: [] });
   const [showSocialBar, setShowSocialBar] = useState(false);
+
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    try {
-      const raw = localStorage.getItem('hm_social_links');
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        setSocialConfig({ whatsapp: parsed.whatsapp || "", links: Array.isArray(parsed.links) ? parsed.links : [] });
+    const fetchSocialLinks = async () => {
+      try {
+        const response = await api.settings.getPublic();
+        if (response.success && response.data.socialLinks) {
+          const sl = response.data.socialLinks;
+          const linksArray = Object.entries(sl)
+            .filter(([k, v]) => k !== 'whatsapp' && v)
+            .map(([k, v]) => ({ platform: k, url: v as string }));
+
+          setSocialConfig({
+            whatsapp: sl.whatsapp || "",
+            links: linksArray
+          });
+        }
+      } catch (err) {
+        console.error("Failed to fetch social links", err);
       }
-    } catch { }
+    };
+    fetchSocialLinks();
   }, []);
 
-  const getPlatformUrl = (platform: string): string => {
-    const found = socialConfig.links.find(l => (l.platform || '').toLowerCase() === platform.toLowerCase());
-    return found?.url || "/social";
-  };
-  const whatsappUrl = socialConfig.whatsapp ? `https://wa.me/${String(socialConfig.whatsapp).replace(/\D/g, '')}` : "/social";
+  const whatsappUrl = socialConfig.whatsapp ? `https://wa.me/${String(socialConfig.whatsapp).replace(/\D/g, '')}` : "#";
 
   return (
     <div ref={containerRef} className="relative min-h-screen overflow-x-hidden" dir={isRTL ? "rtl" : "ltr"}>
@@ -372,22 +340,21 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
                 transition={{ duration: 0.35 }}
                 className="relative"
               >
-                <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.04] border border-white/10 backdrop-blur-md">
-                  <Link href={whatsappUrl} target={whatsappUrl.startsWith("http") ? "_blank" : undefined}>
-                    <motion.div whileHover={{ scale: 1.1 }} className="w-10 h-10 rounded-full bg-black/40 border border-white/10 flex items-center justify-center">
-                      {(() => { const Icon = getSocialIcon("whatsapp"); return Icon ? <Icon className="w-5 h-5 text-cinematic-neon-green" /> : <MessageCircle className="w-5 h-5 text-cinematic-neon-green" /> })()}
-                    </motion.div>
-                  </Link>
-                  <Link href={getPlatformUrl("facebook")} target={getPlatformUrl("facebook").startsWith("http") ? "_blank" : undefined}>
-                    <motion.div whileHover={{ scale: 1.1 }} className="w-10 h-10 rounded-full bg-black/40 border border-white/10 flex items-center justify-center">
-                      {(() => { const Icon = getSocialIcon("facebook"); return Icon ? <Icon className="w-5 h-5 text-blue-500" /> : <LinkIcon className="w-5 h-5 text-blue-500" /> })()}
-                    </motion.div>
-                  </Link>
-                  <Link href={getPlatformUrl("instagram")} target={getPlatformUrl("instagram").startsWith("http") ? "_blank" : undefined}>
-                    <motion.div whileHover={{ scale: 1.1 }} className="w-10 h-10 rounded-full bg-black/40 border border-white/10 flex items-center justify-center">
-                      {(() => { const Icon = getSocialIcon("instagram"); return Icon ? <Icon className="w-5 h-5 text-pink-500" /> : <LinkIcon className="w-5 h-5 text-pink-500" /> })()}
-                    </motion.div>
-                  </Link>
+                <div className="flex flex-wrap items-center gap-4 p-4 rounded-2xl bg-white/[0.04] border border-white/10 backdrop-blur-md">
+                  {socialConfig.whatsapp && (
+                    <Link href={whatsappUrl} target="_blank">
+                      <motion.div whileHover={{ scale: 1.1 }} className="w-12 h-12 rounded-full bg-black/40 border border-white/10 flex items-center justify-center shadow-lg transition-all hover:bg-cinematic-neon-green/20">
+                        {(() => { const Icon = getSocialIcon("whatsapp") as React.ElementType; return Icon ? <Icon className="w-6 h-6 text-cinematic-neon-green" /> : <MessageCircle className="w-6 h-6 text-cinematic-neon-green" /> })()}
+                      </motion.div>
+                    </Link>
+                  )}
+                  {socialConfig.links.map((link, idx) => (
+                    <Link key={idx} href={link.url} target="_blank">
+                      <motion.div whileHover={{ scale: 1.1 }} className="w-12 h-12 rounded-full bg-black/40 border border-white/10 flex items-center justify-center shadow-lg transition-all hover:bg-white/10">
+                        {(() => { const Icon = getSocialIcon(link.platform) as React.ElementType; return Icon ? <Icon className="w-6 h-6 text-white" /> : <LinkIcon className="w-6 h-6 text-white" /> })()}
+                      </motion.div>
+                    </Link>
+                  ))}
                 </div>
               </motion.div>
             )}

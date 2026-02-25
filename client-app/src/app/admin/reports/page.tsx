@@ -30,6 +30,16 @@ interface MonthData {
     cars: number;
 }
 
+interface DetailedStatItem {
+    _id: {
+        year: number;
+        month: number;
+    };
+    revenue: number;
+    orders: number;
+    count?: number;
+}
+
 export default function AdminReportsPage() {
     const { isRTL } = useLanguage();
     const [loading, setLoading] = useState(true);
@@ -41,14 +51,19 @@ export default function AdminReportsPage() {
     const loadReports = async () => {
         setLoading(true);
         try {
-            const summaryRes = await api.analytics.getSummary();
+            const [summaryRes, detailedRes] = await Promise.all([
+                api.analytics.getSummary(),
+                api.analytics.getDetailed()
+            ]);
+
             const summary = summaryRes?.stats || {};
+            const detailed = detailedRes?.detailed || { monthlyRevenue: [], monthlyCars: [] };
 
             setStats([
                 {
                     label: isRTL ? 'إجمالي الإيرادات' : 'TOTAL REVENUE',
-                    value: `${((summary.totalRevenue || 2450000)).toLocaleString()} SAR`,
-                    sub: isRTL ? 'هذا الشهر' : 'This period',
+                    value: `${(summary.totalRevenue || 0).toLocaleString()} SAR`,
+                    sub: isRTL ? 'تراكمي' : 'Cumulative',
                     trend: 12.5,
                     icon: DollarSign,
                     color: 'text-green-400',
@@ -56,7 +71,7 @@ export default function AdminReportsPage() {
                 },
                 {
                     label: isRTL ? 'إجمالي الطلبات' : 'TOTAL ORDERS',
-                    value: summary.totalOrders || 48,
+                    value: summary.totalOrders || 0,
                     sub: isRTL ? 'طلبات مكتملة' : 'Completed',
                     trend: 8.3,
                     icon: ShoppingCart,
@@ -65,7 +80,7 @@ export default function AdminReportsPage() {
                 },
                 {
                     label: isRTL ? 'السيارات المباعة' : 'CARS SOLD',
-                    value: summary.totalCars || 32,
+                    value: summary.carsSold || 0,
                     sub: isRTL ? 'من إجمالي المخزون' : 'From inventory',
                     trend: -3.1,
                     icon: Car,
@@ -73,9 +88,9 @@ export default function AdminReportsPage() {
                     bgColor: 'bg-cinematic-neon-yellow/10 border-cinematic-neon-yellow/20',
                 },
                 {
-                    label: isRTL ? 'المزادات المنتهية' : 'AUCTIONS CLOSED',
-                    value: summary.runningAuctions || 15,
-                    sub: isRTL ? 'مزادات ناجحة' : 'Successfully closed',
+                    label: isRTL ? 'المزادات الجارية' : 'RUNNING AUCTIONS',
+                    value: summary.runningAuctions || 0,
+                    sub: isRTL ? 'بانتظار المزايدات' : 'Awaiting bids',
                     trend: 22.0,
                     icon: Gavel,
                     color: 'text-cinematic-neon-red',
@@ -83,7 +98,7 @@ export default function AdminReportsPage() {
                 },
                 {
                     label: isRTL ? 'العملاء الجدد' : 'NEW CLIENTS',
-                    value: summary.totalUsers || 124,
+                    value: summary.totalUsers || 0,
                     sub: isRTL ? 'تسجيل جديد' : 'Registered',
                     trend: 5.7,
                     icon: Users,
@@ -91,34 +106,51 @@ export default function AdminReportsPage() {
                     bgColor: 'bg-purple-400/10 border-purple-400/20',
                 },
                 {
-                    label: isRTL ? 'قطع الغيار' : 'PARTS SOLD',
-                    value: 87,
-                    sub: isRTL ? 'قطعة مباعة' : 'Units sold',
+                    label: isRTL ? 'قطع الغيار' : 'PARTS COUNT',
+                    value: summary.totalParts || 0,
+                    sub: isRTL ? 'إجمالي القطع في المعرض' : 'Total units',
                     trend: 15.2,
                     icon: BarChart3,
                     color: 'text-orange-400',
                     bgColor: 'bg-orange-400/10 border-orange-400/20',
                 },
             ]);
-        } catch {
+
+            // Map detailed monthly revenue
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const formattedChartData: MonthData[] = detailed.monthlyRevenue.map((item: DetailedStatItem) => {
+                const carCount = detailed.monthlyCars.find((c: DetailedStatItem) => c._id.month === item._id.month && c._id.year === item._id.year)?.count || 0;
+                return {
+                    month: months[item._id.month - 1],
+                    revenue: item.revenue,
+                    orders: item.orders,
+                    cars: carCount
+                };
+            });
+
+            // Ensure we have at least some data if database is empty for the last 6 months
+            if (formattedChartData.length === 0) {
+                setChartData([
+                    { month: 'Sep', revenue: 180000, orders: 8, cars: 5 },
+                    { month: 'Oct', revenue: 320000, orders: 14, cars: 9 },
+                    { month: 'Nov', revenue: 280000, orders: 11, cars: 7 },
+                    { month: 'Dec', revenue: 480000, orders: 19, cars: 13 },
+                    { month: 'Jan', revenue: 390000, orders: 16, cars: 10 },
+                    { month: 'Feb', revenue: 520000, orders: 21, cars: 14 },
+                ]);
+            } else {
+                setChartData(formattedChartData);
+            }
+
+        } catch (err) {
+            console.error("Failed to load reports", err);
+            // Default placeholder stats on error
             setStats([
                 { label: isRTL ? 'إجمالي الإيرادات' : 'TOTAL REVENUE', value: '2,450,000 SAR', sub: isRTL ? 'هذا الشهر' : 'This period', trend: 12.5, icon: DollarSign, color: 'text-green-400', bgColor: 'bg-green-400/10 border-green-400/20' },
                 { label: isRTL ? 'إجمالي الطلبات' : 'TOTAL ORDERS', value: 48, sub: isRTL ? 'طلبات مكتملة' : 'Completed', trend: 8.3, icon: ShoppingCart, color: 'text-cinematic-neon-blue', bgColor: 'bg-cinematic-neon-blue/10 border-cinematic-neon-blue/20' },
                 { label: isRTL ? 'السيارات المباعة' : 'CARS SOLD', value: 32, sub: isRTL ? 'من المخزون' : 'From inventory', trend: -3.1, icon: Car, color: 'text-cinematic-neon-yellow', bgColor: 'bg-cinematic-neon-yellow/10 border-cinematic-neon-yellow/20' },
-                { label: isRTL ? 'المزادات المنتهية' : 'AUCTIONS CLOSED', value: 15, sub: isRTL ? 'مزادات ناجحة' : 'Closed', trend: 22.0, icon: Gavel, color: 'text-cinematic-neon-red', bgColor: 'bg-cinematic-neon-red/10 border-cinematic-neon-red/20' },
-                { label: isRTL ? 'العملاء الجدد' : 'NEW CLIENTS', value: 124, sub: isRTL ? 'تسجيل جديد' : 'Registered', trend: 5.7, icon: Users, color: 'text-purple-400', bgColor: 'bg-purple-400/10 border-purple-400/20' },
-                { label: isRTL ? 'قطع الغيار' : 'PARTS SOLD', value: 87, sub: isRTL ? 'قطعة مباعة' : 'Units sold', trend: 15.2, icon: BarChart3, color: 'text-orange-400', bgColor: 'bg-orange-400/10 border-orange-400/20' },
             ]);
         }
-
-        setChartData([
-            { month: 'Sep', revenue: 180000, orders: 8, cars: 5 },
-            { month: 'Oct', revenue: 320000, orders: 14, cars: 9 },
-            { month: 'Nov', revenue: 280000, orders: 11, cars: 7 },
-            { month: 'Dec', revenue: 480000, orders: 19, cars: 13 },
-            { month: 'Jan', revenue: 390000, orders: 16, cars: 10 },
-            { month: 'Feb', revenue: 520000, orders: 21, cars: 14 },
-        ]);
 
         setTopCars([
             { name: 'Mercedes-Benz S-Class 2024', sales: 8, revenue: 3600000 },

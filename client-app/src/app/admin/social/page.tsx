@@ -1,12 +1,12 @@
 ﻿'use client';
 
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 import { MessageCircle, Save, Trash2, CheckCircle2, SquarePen, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/lib/LanguageContext";
 import { cn } from "@/lib/utils";
 import { getSocialIcon } from "@/lib/socialIcons";
+import { api } from "@/lib/api";
 
 // Social config uses simple runtime-shape
 
@@ -27,21 +27,45 @@ function AdminSocialSettings() {
   ];
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const raw = localStorage.getItem('hm_social_links');
-    if (raw) {
+    const fetchLinks = async () => {
       try {
-        const parsed = JSON.parse(raw);
-        setConfig({ whatsapp: parsed.whatsapp || "", links: Array.isArray(parsed.links) ? parsed.links : [] });
-      } catch { }
-    }
+        const response = await api.settings.get();
+        if (response.success && response.data.socialLinks) {
+          const sl = response.data.socialLinks;
+          const linksArray = Object.entries(sl)
+            .filter(([k, v]) => k !== 'whatsapp' && v)
+            .map(([k, v]) => ({ platform: k, url: v as string }));
+
+          setConfig({
+            whatsapp: sl.whatsapp || "",
+            links: linksArray
+          });
+        }
+      } catch (err) {
+        console.error("Failed to fetch social links", err);
+      }
+    };
+    fetchLinks();
   }, []);
 
-  const handleSave = () => {
-    if (typeof window === 'undefined') return;
-    localStorage.setItem('hm_social_links', JSON.stringify(config));
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+  const handleSave = async () => {
+    try {
+      // Convert links array back to object for schema
+      const socialLinks: Record<string, string> = { whatsapp: config.whatsapp };
+      config.links.forEach(l => {
+        if (l.platform && l.url) {
+          socialLinks[l.platform.toLowerCase()] = l.url;
+        }
+      });
+
+      const response = await api.settings.updateSocialLinks({ socialLinks });
+      if (response.success) {
+        setSaved(true);
+        setTimeout(() => setSaved(false), 2000);
+      }
+    } catch (err) {
+      console.error("Failed to save social links", err);
+    }
   };
 
   const addLink = () => {
@@ -108,7 +132,7 @@ function AdminSocialSettings() {
 
           <div className="space-y-4">
             {platforms.map((p) => {
-              const Icon = getSocialIcon(p.key) as any;
+              const Icon = getSocialIcon(p.key) as React.ElementType;
               const val = (config.links.find(l => (l.platform || '').toLowerCase() === p.key) || {}).url || "";
               return (
                 <div key={p.key} className="flex items-center gap-4 bg-white/[0.02] border border-white/10 rounded-xl p-4">
@@ -127,9 +151,6 @@ function AdminSocialSettings() {
                   </div>
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => {
-                        const el = document.getElementById(`social-input-${p.key}`) as HTMLInputElement | null;
-                      }}
                       className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-all flex items-center gap-1 text-[9px] font-black uppercase"
                     >
                       <SquarePen className="w-3 h-3" />

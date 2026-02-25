@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
     Activity,
     PlusCircle,
@@ -45,6 +45,17 @@ interface DashboardStats {
     totalBrands?: number;
 }
 
+interface AuditLogEntry {
+    target: string;
+    action: string;
+    description: string;
+    createdAt: string;
+    user?: {
+        name: string;
+        email: string;
+    };
+}
+
 export default function AdminDashboard() {
     const { t, lang, isRTL, toggleLanguage } = useLanguage();
     const [mounted, setMounted] = useState(false);
@@ -74,22 +85,30 @@ export default function AdminDashboard() {
     const [stats, setStats] = useState<DashboardStats | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [recentActivities, setRecentActivities] = useState<AuditLogEntry[]>([]);
 
     useEffect(() => {
-        const loadStats = async () => {
+        const loadDashboardData = async () => {
             try {
-                const data = await api.analytics.getSummary();
-                if (data.success) {
-                    setStats(data.stats);
+                const [summaryRes, activitiesRes] = await Promise.all([
+                    api.analytics.getSummary(),
+                    api.analytics.getActivities(5)
+                ]);
+
+                if (summaryRes.success) {
+                    setStats(summaryRes.stats);
+                }
+                if (activitiesRes.success) {
+                    setRecentActivities(activitiesRes.activities);
                 }
             } catch (err) {
-                console.error("Failed to load stats", err);
-                setError(isRTL ? "تعذر تحميل الإحصائيات" : "Failed to load statistics");
+                console.error("Failed to load dashboard data", err);
+                setError(isRTL ? "تعذر تحميل البيانات" : "Failed to load dashboard data");
             } finally {
                 setLoading(false);
             }
         };
-        loadStats();
+        loadDashboardData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -116,7 +135,7 @@ export default function AdminDashboard() {
         { label: t('activeInventory'), val: stats?.totalCars || "...", sub: isRTL ? "السيارات والقطع" : "Cars & Components", icon: Car, color: "text-cinematic-neon-blue", shadow: "shadow-[0_0_20px_rgba(0,240,255,0.3)]" },
         { label: t('totalUsers'), val: stats?.totalUsers || "...", sub: isRTL ? "العملاء حول العالم" : "Global Clients", icon: Users, color: "text-cinematic-neon-red", shadow: "shadow-[0_0_20px_rgba(255,0,60,0.3)]" },
         { label: t('urgentAlerts'), val: stats?.runningAuctions || "0", sub: isRTL ? "المزادات الجارية" : "Live Events", icon: Bell, color: "text-cinematic-neon-yellow", shadow: "shadow-[0_0_20px_rgba(252,238,10,0.3)]" },
-        { label: isRTL ? 'طلبات خاصة' : 'CONCIERGE', val: stats?.totalOrders || "0", sub: isRTL ? "طلبات VIP" : "VIP Requests", icon: FileText, color: "text-white", shadow: "shadow-[0_0_20px_rgba(255,255,255,0.1)]" },
+        { label: isRTL ? 'إجمالي الإيرادات' : 'REVENUE', val: stats?.totalRevenue ? `${(stats.totalRevenue / 1000).toFixed(0)}K` : "0", sub: isRTL ? "إجمالي المبيعات" : "Total Revenue", icon: FileText, color: "text-white", shadow: "shadow-[0_0_20px_rgba(255,255,255,0.1)]" },
     ];
 
     const quickActions = [
@@ -148,6 +167,38 @@ export default function AdminDashboard() {
     ];
 
     if (!mounted) return null;
+
+    const getActivityIcon = (target: string) => {
+        switch (target) {
+            case 'Car': return Car;
+            case 'Auction': return Gavel;
+            case 'Order': return ShoppingCart;
+            case 'User': return Users;
+            case 'Brand': return Tag;
+            case 'SparePart': return Layers;
+            default: return Activity;
+        }
+    };
+
+    const getActivityColor = (action: string) => {
+        switch (action) {
+            case 'CREATE': return { color: 'text-cinematic-neon-blue', bg: 'bg-cinematic-neon-blue/10' };
+            case 'UPDATE': return { color: 'text-cinematic-neon-yellow', bg: 'bg-cinematic-neon-yellow/10' };
+            case 'DELETE': return { color: 'text-cinematic-neon-red', bg: 'bg-cinematic-neon-red/10' };
+            case 'LOGIN': return { color: 'text-green-400', bg: 'bg-green-400/10' };
+            default: return { color: 'text-white', bg: 'bg-white/10' };
+        }
+    };
+
+    const timeAgo = (date: string) => {
+        const diff = Date.now() - new Date(date).getTime();
+        const minutes = Math.floor(diff / 60000);
+        if (minutes < 1) return isRTL ? 'الآن' : 'Now';
+        if (minutes < 60) return `${minutes}${isRTL ? 'د' : 'm ago'}`;
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `${hours}${isRTL ? 'س' : 'h ago'}`;
+        return new Date(date).toLocaleDateString();
+    };
 
     return (
         <div className="relative min-h-screen bg-black text-white font-sans overflow-hidden selection:bg-cinematic-neon-red selection:text-white">
@@ -347,7 +398,7 @@ export default function AdminDashboard() {
                                 <LiveNotificationsList isRTL={isRTL} />
                             </div>
 
-                            {/* Recent Activity (Static/Log) */}
+                            {/* Recent Activity (Dynamic from Audit Logs) */}
                             <div className="glass-card p-10 md:p-14 bg-white/[0.01] border-white/5 relative overflow-hidden">
                                 <div className="flex items-center gap-5 mb-8">
                                     <div className="h-[2px] w-12 bg-cinematic-neon-yellow" />
@@ -355,30 +406,40 @@ export default function AdminDashboard() {
                                 </div>
                                 {/* Activity Log */}
                                 <div className="space-y-5">
-                                    {[
-                                        { icon: Car, label: isRTL ? 'تمت إضافة سيارة جديدة' : 'New car added', sub: 'Mercedes-Benz S-Class 2024', time: '2m ago', color: 'text-cinematic-neon-blue', bg: 'bg-cinematic-neon-blue/10' },
-                                        { icon: Gavel, label: isRTL ? 'مزاد جديد بدأ' : 'New auction started', sub: 'BMW M5 Competition — Base: 300K SAR', time: '15m ago', color: 'text-cinematic-neon-red', bg: 'bg-cinematic-neon-red/10' },
-                                        { icon: Users, label: isRTL ? 'مستخدم جديد سجّل' : 'New user registered', sub: 'khalid@example.com', time: '1h ago', color: 'text-purple-400', bg: 'bg-purple-400/10' },
-                                        { icon: ShoppingCart, label: isRTL ? 'طلب جديد' : 'New order placed', sub: 'ORD-A1B2C3D4 — 450,000 SAR', time: '3h ago', color: 'text-green-400', bg: 'bg-green-400/10' },
-                                        { icon: MessageCircle, label: isRTL ? 'رسالة عميل جديدة' : 'New customer message', sub: 'Ahmed Al-Rashid', time: '5h ago', color: 'text-cinematic-neon-yellow', bg: 'bg-cinematic-neon-yellow/10' },
-                                    ].map((activity, i) => (
-                                        <motion.div
-                                            key={i}
-                                            initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: i * 0.1 }}
-                                            className="flex items-center gap-5 p-5 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all"
-                                        >
-                                            <div className={cn("p-4 rounded-xl shrink-0", activity.bg)}>
-                                                <activity.icon className={cn("w-6 h-6", activity.color)} />
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <div className="text-[13px] font-black uppercase tracking-wider text-white/80">{activity.label}</div>
-                                                <div className="text-[11px] text-white/30 truncate font-bold">{activity.sub}</div>
-                                            </div>
-                                            <div className="text-[10px] text-white/20 font-black shrink-0 italic">{activity.time}</div>
-                                        </motion.div>
-                                    ))}
+                                    {loading ? (
+                                        Array.from({ length: 5 }).map((_, i) => (
+                                            <div key={i} className="h-20 bg-white/5 rounded-2xl animate-pulse" />
+                                        ))
+                                    ) : recentActivities.length === 0 ? (
+                                        <div className="text-center py-10 text-white/20 text-[10px] uppercase font-black tracking-widest">
+                                            {isRTL ? 'لا يوجد أنشطة مؤخراً' : 'NO RECENT ACTIVITY'}
+                                        </div>
+                                    ) : (
+                                        recentActivities.map((activity, i) => {
+                                            const Icon = getActivityIcon(activity.target);
+                                            const { color, bg } = getActivityColor(activity.action);
+                                            return (
+                                                <motion.div
+                                                    key={i}
+                                                    initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    transition={{ delay: i * 0.1 }}
+                                                    className="flex items-center gap-5 p-5 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all"
+                                                >
+                                                    <div className={cn("p-4 rounded-xl shrink-0", bg)}>
+                                                        <Icon className={cn("w-6 h-6", color)} />
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="text-[12px] font-black uppercase tracking-wider text-white/80">{activity.description}</div>
+                                                        <div className="text-[10px] text-white/30 truncate font-bold">
+                                                            {activity.user?.name || (isRTL ? 'النظام' : 'System')} • {activity.action}
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-[9px] text-white/20 font-black shrink-0 italic">{timeAgo(activity.createdAt)}</div>
+                                                </motion.div>
+                                            );
+                                        })
+                                    )}
                                 </div>
                             </div>
                         </div>

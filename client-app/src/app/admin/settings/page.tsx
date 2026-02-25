@@ -15,26 +15,25 @@ import {
     Instagram,
     Youtube,
     Facebook,
-    Linkedin,
-    Send,
     Camera,
+    Send,
+    Linkedin,
+    Trash2,
+    AlertCircle,
+    DollarSign,
     MapPin,
-    Clock,
-    Link as LinkIcon,
-    CheckCircle
+    Clock
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/LanguageContext";
 import { useAuth } from "@/lib/AuthContext";
 import { api } from "@/lib/api";
-import { useRouter } from "next/navigation";
 
 export default function AdminSettings() {
     const { isRTL } = useLanguage();
     const { user } = useAuth();
-    const router = useRouter();
-    const [activeTab, setActiveTab] = useState<'profile' | 'social' | 'contact'>('profile');
+    const [activeTab, setActiveTab] = useState<'profile' | 'social' | 'contact' | 'currency'>('profile');
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
 
@@ -69,6 +68,12 @@ export default function AdminSettings() {
         workingHours: ''
     });
 
+    // Currency settings
+    const [currencySettings, setCurrencySettings] = useState({
+        usdToSar: 3.75,
+        activeCurrency: 'SAR'
+    });
+
     useEffect(() => {
         loadSettings();
         if (user) {
@@ -87,6 +92,9 @@ export default function AdminSettings() {
             if (response.success) {
                 setSocialLinks(response.data.socialLinks || {});
                 setContactInfo(response.data.contactInfo || {});
+                if (response.data.currencySettings) {
+                    setCurrencySettings(response.data.currencySettings);
+                }
             }
         } catch (error) {
             console.error('Failed to load settings', error);
@@ -152,10 +160,25 @@ export default function AdminSettings() {
         }
     };
 
+    const handleSaveCurrencySettings = async () => {
+        setLoading(true);
+        setMessage({ type: '', text: '' });
+
+        try {
+            await api.settings.updateCurrencySettings({ currencySettings });
+            setMessage({ type: 'success', text: isRTL ? 'تم حفظ إعدادات العملة' : 'Currency settings saved' });
+        } catch (error: any) {
+            setMessage({ type: 'error', text: error.message || 'Error saving' });
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const tabs = [
         { id: 'profile', label: isRTL ? 'الملف الشخصي' : 'Profile', icon: User },
         { id: 'social', label: isRTL ? 'التواصل الاجتماعي' : 'Social Links', icon: Globe },
-        { id: 'contact', label: isRTL ? 'معلومات الاتصال' : 'Contact Info', icon: Phone }
+        { id: 'contact', label: isRTL ? 'معلومات الاتصال' : 'Contact Info', icon: Phone },
+        { id: 'currency', label: isRTL ? 'إعدادات العملة' : 'Currency', icon: DollarSign }
     ];
 
     const socialFields = [
@@ -495,6 +518,70 @@ export default function AdminSettings() {
                             >
                                 <Save className="w-5 h-5" />
                                 {loading ? (isRTL ? 'جاري الحفظ...' : 'Saving...') : (isRTL ? 'حفظ المعلومات' : 'Save Info')}
+                            </motion.button>
+                        </motion.div>
+                    )}
+
+                    {/* Currency Settings Tab */}
+                    {activeTab === 'currency' && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="space-y-6"
+                        >
+                            <div className="p-8 bg-white/[0.02] border border-white/5 rounded-3xl">
+                                <h2 className="text-lg font-black uppercase tracking-wider mb-6 flex items-center gap-3">
+                                    <DollarSign className="w-5 h-5 text-cinematic-neon-red" />
+                                    {isRTL ? 'إعدادات العملة والصرف' : 'Currency & Exchange Settings'}
+                                </h2>
+                                <p className="text-sm text-white/40 mb-8">
+                                    {isRTL
+                                        ? 'قم بتعيين سعر صرف الدولار مقابل الريال السعودي لتحويل الأسعار تلقائياً'
+                                        : 'Set the USD to SAR exchange rate for automatic price conversion'}
+                                </p>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">
+                                            {isRTL ? 'سعر صرف الدولار (1 USD = ? SAR)' : 'USD Exchange Rate (1 USD = ? SAR)'}
+                                        </label>
+                                        <div className="relative">
+                                            <input
+                                                type="number"
+                                                step="0.01"
+                                                value={currencySettings.usdToSar}
+                                                onChange={(e) => setCurrencySettings({ ...currencySettings, usdToSar: parseFloat(e.target.value) || 0 })}
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">
+                                            {isRTL ? 'العملة النشطة للعرض' : 'Active Display Currency'}
+                                        </label>
+                                        <select
+                                            title={isRTL ? 'العملة النشطة' : 'Active Currency'}
+                                            value={currencySettings.activeCurrency}
+                                            onChange={(e) => setCurrencySettings({ ...currencySettings, activeCurrency: e.target.value })}
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40 appearance-none cursor-pointer"
+                                        >
+                                            <option value="SAR" className="bg-black">SAR (ريال سعودي)</option>
+                                            <option value="USD" className="bg-black">USD (دولار أمريكي)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <motion.button
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={handleSaveCurrencySettings}
+                                disabled={loading}
+                                className="w-full py-5 bg-cinematic-neon-red text-white font-black uppercase tracking-wider rounded-xl shadow-[0_0_30px_rgba(255,0,60,0.3)] hover:shadow-[0_0_50px_rgba(255,0,60,0.5)] transition-all flex items-center justify-center gap-3"
+                            >
+                                <Save className="w-5 h-5" />
+                                {loading ? (isRTL ? 'جاري الحفظ...' : 'Saving...') : (isRTL ? 'حفظ إعدادات العملة' : 'Save Currency Settings')}
                             </motion.button>
                         </motion.div>
                     )}

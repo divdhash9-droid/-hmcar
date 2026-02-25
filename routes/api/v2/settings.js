@@ -15,7 +15,8 @@ router.get('/public', async (req, res) => {
             data: {
                 socialLinks: settings.socialLinks,
                 contactInfo: settings.contactInfo,
-                siteInfo: settings.siteInfo
+                siteInfo: settings.siteInfo,
+                currencySettings: settings.currencySettings
             }
         });
     } catch (error) {
@@ -113,6 +114,30 @@ router.put('/site-info', requireAuthAPI, requireAdmin, async (req, res) => {
         res.status(500).json({
             error: 'Internal Server Error',
             message: 'فشل في تحديث معلومات الموقع'
+        });
+    }
+});
+
+// تحديث إعدادات العملة
+router.put('/currency-settings', requireAuthAPI, requireAdmin, async (req, res) => {
+    try {
+        const { currencySettings } = req.body;
+
+        const settings = await SiteSettings.updateSettings(
+            { currencySettings },
+            req.user._id
+        );
+
+        res.json({
+            success: true,
+            message: 'تم تحديث إعدادات العملة',
+            data: settings.currencySettings
+        });
+    } catch (error) {
+        console.error('Error updating currency settings:', error);
+        res.status(500).json({
+            error: 'Internal Server Error',
+            message: 'فشل في تحديث إعدادات العملة'
         });
     }
 });

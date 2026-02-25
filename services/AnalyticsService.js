@@ -6,6 +6,8 @@ const Car = require('../models/Car');
 const Bid = require('../models/Bid');
 const Order = require('../models/Order');
 
+const AuditLog = require('../models/AuditLog');
+
 class AnalyticsService {
   static async getSummary() {
     const now = new Date();
@@ -21,7 +23,9 @@ class AnalyticsService {
       totalOrders,
       totalBids,
       bidsLast24h,
-      avgBid
+      avgBid,
+      totalBrands,
+      totalParts
     ] = await Promise.all([
       User.countDocuments(),
       Car.countDocuments(),
@@ -38,7 +42,9 @@ class AnalyticsService {
           { $group: { _id: null, avg: { $avg: '$amount' } } }
         ]);
         return (res[0] && res[0].avg) ? Number(res[0].avg.toFixed(2)) : 0;
-      })()
+      })(),
+      require('../models/Brand').countDocuments(),
+      require('../models/SparePart').countDocuments()
     ]);
 
     // recent orders and revenue (last 7 days)
@@ -54,6 +60,13 @@ class AnalyticsService {
       })()
     ]);
 
+    // Get total revenue
+    const totalRevenueRes = await Order.aggregate([
+      { $match: { status: { $in: ['confirmed', 'shipped', 'completed'] } } },
+      { $group: { _id: null, total: { $sum: '$totalAmount' } } }
+    ]);
+    const totalRevenue = (totalRevenueRes[0] && totalRevenueRes[0].total) ? Number(totalRevenueRes[0].total) : 0;
+
     return {
       totalUsers,
       totalCars,
@@ -67,7 +80,67 @@ class AnalyticsService {
       avgBid,
       ordersLast7,
       revenueLast7,
+      totalRevenue,
+      totalBrands,
+      totalParts,
       generatedAt: now
+    };
+  }
+
+  static async getRecentActivities(limit = 10) {
+    return await AuditLog.find()
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .populate('user', 'name email')
+      .lean();
+  }
+
+  static async getMonthlyStats() {
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+    const monthlyRevenue = await Order.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: sixMonthsAgo },
+          status: { $in: ['confirmed', 'shipped', 'completed'] }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            year: { $year: "$createdAt" },
+            month: { $month: "$createdAt" }
+          },
+          revenue: { $sum: "$totalAmount" },
+          orders: { $sum: 1 }
+        }
+      },
+      { $sort: { "_id.year": 1, "_id.month": 1 } }
+    ]);
+
+    const monthlyCars = await Car.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: sixMonthsAgo },
+          isSold: true
+        }
+      },
+      {
+        $group: {
+          _id: {
+            year: { $year: "$createdAt" },
+            month: { $month: "$createdAt" }
+          },
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { "_id.year": 1, "_id.month": 1 } }
+    ]);
+
+    return {
+      monthlyRevenue,
+      monthlyCars
     };
   }
 }

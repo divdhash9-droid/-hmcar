@@ -48,9 +48,16 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
     }
 }
 
+export interface ApiResponse<T = any> {
+    success: boolean;
+    data: T;
+    message?: string;
+    error?: string;
+}
+
 export const api = {
     auth: {
-        login: (credentials: any) => fetchAPI('/api/v2/auth/login', {
+        login: (credentials: object) => fetchAPI('/api/v2/auth/login', {
             method: 'POST',
             body: JSON.stringify(credentials),
         }),
@@ -70,7 +77,7 @@ export const api = {
                 method: 'POST',
                 body: JSON.stringify(payload),
             }),
-        register: (data: any) => fetchAPI('/api/v2/auth/register', {
+        register: (data: object) => fetchAPI('/api/v2/auth/register', {
             method: 'POST',
             body: JSON.stringify(data),
         }),
@@ -78,18 +85,18 @@ export const api = {
         logout: () => fetchAPI('/api/v2/auth/logout', {
             method: 'POST',
         }),
-        changePassword: (data: any) => fetchAPI('/api/v2/auth/change-password', {
+        changePassword: (data: object) => fetchAPI('/api/v2/auth/change-password', {
             method: 'POST',
             body: JSON.stringify(data),
         }),
     },
     users: {
-        list: (params: any = {}) => {
-            const query = new URLSearchParams(params).toString();
+        list: (params: Record<string, string | number | boolean> = {}) => {
+            const query = new URLSearchParams(params as Record<string, string>).toString();
             return fetchAPI(`/api/v2/users?${query}`);
         },
         getProfile: () => fetchAPI('/api/v2/users/profile'),
-        updateProfile: (data: any) => fetchAPI('/api/v2/users/profile', {
+        updateProfile: (data: object) => fetchAPI('/api/v2/users/profile', {
             method: 'PUT',
             body: JSON.stringify(data),
         }),
@@ -163,6 +170,8 @@ export const api = {
     },
     analytics: {
         getSummary: () => fetchAPI('/api/v2/analytics'),
+        getActivities: (limit?: number) => fetchAPI(`/api/v2/analytics/activities?limit=${limit || 10}`),
+        getDetailed: () => fetchAPI('/api/v2/analytics/detailed'),
     },
     dashboard: {
         getClientData: () => fetchAPI('/api/v2/dashboard/client'),
@@ -198,6 +207,10 @@ export const api = {
             body: JSON.stringify(data),
         }),
         updateSiteInfo: (data: any) => fetchAPI('/api/v2/settings/site-info', {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        }),
+        updateCurrencySettings: (data: any) => fetchAPI('/api/v2/settings/currency-settings', {
             method: 'PUT',
             body: JSON.stringify(data),
         }),

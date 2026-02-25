@@ -35,6 +35,12 @@ const siteSettingsSchema = new mongoose.Schema({
         faviconUrl: { type: String, default: '' },
     },
 
+    // إعدادات العملة والصرف
+    currencySettings: {
+        usdToSar: { type: Number, default: 3.75 },       // سعر صرف الدولار مقابل الريال السعودي
+        activeCurrency: { type: String, default: 'SAR' }, // العملة النشطة للعرض
+    },
+
     // آخر تحديث
     updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 

@@ -33,7 +33,7 @@ import { api } from "@/lib/api";
 export default function AdminSettings() {
     const { isRTL } = useLanguage();
     const { user } = useAuth();
-    const [activeTab, setActiveTab] = useState<'profile' | 'social' | 'contact' | 'currency'>('profile');
+    const [activeTab, setActiveTab] = useState<'profile' | 'social' | 'contact' | 'currency' | 'site'>('profile');
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
 
@@ -74,6 +74,14 @@ export default function AdminSettings() {
         activeCurrency: 'SAR'
     });
 
+    // Site info
+    const [siteInfo, setSiteInfo] = useState({
+        siteName: 'HM CAR',
+        siteDescription: '',
+        logoUrl: '',
+        faviconUrl: ''
+    });
+
     useEffect(() => {
         loadSettings();
         if (user) {
@@ -94,6 +102,9 @@ export default function AdminSettings() {
                 setContactInfo(response.data.contactInfo || {});
                 if (response.data.currencySettings) {
                     setCurrencySettings(response.data.currencySettings);
+                }
+                if (response.data.siteInfo) {
+                    setSiteInfo(response.data.siteInfo);
                 }
             }
         } catch (error) {
@@ -174,8 +185,43 @@ export default function AdminSettings() {
         }
     };
 
+    const handleSaveSiteInfo = async () => {
+        setLoading(true);
+        setMessage({ type: '', text: '' });
+
+        try {
+            await api.settings.updateSiteInfo({ siteInfo });
+            setMessage({ type: 'success', text: isRTL ? 'تم حفظ معلومات الموقع' : 'Site info saved' });
+        } catch (error: any) {
+            setMessage({ type: 'error', text: error.message || 'Error saving' });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setLoading(true);
+        try {
+            const formData = new FormData();
+            formData.append('image', file);
+            const res = await api.upload.image(formData);
+            if (res.success) {
+                setSiteInfo(prev => ({ ...prev, logoUrl: res.url }));
+                setMessage({ type: 'success', text: isRTL ? 'تم رفع الشعار بنجاح' : 'Logo uploaded successfully' });
+            }
+        } catch (error: any) {
+            setMessage({ type: 'error', text: error.message || 'Upload failed' });
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const tabs = [
         { id: 'profile', label: isRTL ? 'الملف الشخصي' : 'Profile', icon: User },
+        { id: 'site', label: isRTL ? 'هوية الموقع' : 'Site Identity', icon: Camera },
         { id: 'social', label: isRTL ? 'التواصل الاجتماعي' : 'Social Links', icon: Globe },
         { id: 'contact', label: isRTL ? 'معلومات الاتصال' : 'Contact Info', icon: Phone },
         { id: 'currency', label: isRTL ? 'إعدادات العملة' : 'Currency', icon: DollarSign }
@@ -582,6 +628,85 @@ export default function AdminSettings() {
                             >
                                 <Save className="w-5 h-5" />
                                 {loading ? (isRTL ? 'جاري الحفظ...' : 'Saving...') : (isRTL ? 'حفظ إعدادات العملة' : 'Save Currency Settings')}
+                            </motion.button>
+                        </motion.div>
+                    )}
+
+                    {/* Site Identity Tab */}
+                    {activeTab === 'site' && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="space-y-6"
+                        >
+                            <div className="p-8 bg-white/[0.02] border border-white/5 rounded-3xl">
+                                <h2 className="text-lg font-black uppercase tracking-wider mb-6 flex items-center gap-3">
+                                    <Camera className="w-5 h-5 text-cinematic-neon-red" />
+                                    {isRTL ? 'هوية الشعار والموقع' : 'Site Identity & logo'}
+                                </h2>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                                    {/* Logo Upload */}
+                                    <div className="space-y-4">
+                                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider block">
+                                            {isRTL ? 'شعار الموقع' : 'Site Logo'}
+                                        </label>
+                                        <div className="relative group">
+                                            <div className="w-full aspect-video bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center overflow-hidden">
+                                                {siteInfo.logoUrl ? (
+                                                    <img src={siteInfo.logoUrl} alt="Logo" className="max-h-full object-contain" />
+                                                ) : (
+                                                    <div className="text-center">
+                                                        <Camera className="w-8 h-8 text-white/10 mx-auto mb-2" />
+                                                        <span className="text-[10px] text-white/20 font-bold uppercase">{isRTL ? 'بدون شعار' : 'No Logo'}</span>
+                                                    </div>
+                                                )}
+                                                <label className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
+                                                    <input type="file" title={isRTL ? "رفع شعار جديد" : "Upload new logo"} className="hidden" accept="image/*" onChange={handleLogoUpload} />
+                                                    <span className="text-[10px] font-black uppercase tracking-widest">{isRTL ? 'تغيير الشعار' : 'CHANGE LOGO'}</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Site Info Fields */}
+                                    <div className="space-y-6">
+                                        <div>
+                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">
+                                                {isRTL ? 'اسم الموقع' : 'Site Name'}
+                                            </label>
+                                            <input
+                                                title={isRTL ? 'اسم الموقع' : 'Site Name'}
+                                                type="text"
+                                                value={siteInfo.siteName}
+                                                onChange={(e) => setSiteInfo({ ...siteInfo, siteName: e.target.value })}
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">
+                                                {isRTL ? 'وصف الموقع' : 'Site Description'}
+                                            </label>
+                                            <textarea
+                                                title={isRTL ? 'وصف الموقع' : 'Site Description'}
+                                                value={siteInfo.siteDescription}
+                                                onChange={(e) => setSiteInfo({ ...siteInfo, siteDescription: e.target.value })}
+                                                rows={4}
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40 resize-none"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <motion.button
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={handleSaveSiteInfo}
+                                disabled={loading}
+                                className="w-full bg-white text-black py-4 rounded-2xl font-black uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:shadow-[0_0_40px_rgba(255,255,255,0.4)] transition-all disabled:opacity-50"
+                            >
+                                {loading ? (isRTL ? 'جاري الحفظ...' : 'SAVING...') : (isRTL ? 'حفظ هوية الموقع' : 'SAVE SITE IDENTITY')}
                             </motion.button>
                         </motion.div>
                     )}

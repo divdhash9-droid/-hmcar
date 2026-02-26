@@ -6,27 +6,32 @@ export default function DashboardBackdrop() {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
-  // Smooth spring physics for mouse movement
-  const springConfig = { damping: 25, stiffness: 150, mass: 0.5 }; // Snappy but smooth
+  // Simpler spring physics for better performance
+  const springConfig = { damping: 40, stiffness: 100, mass: 1 };
   const x = useSpring(mouseX, springConfig);
   const y = useSpring(mouseY, springConfig);
 
   useEffect(() => {
+    let frameId: number;
     const handleMouseMove = (e: MouseEvent) => {
-      // Normalize mouse position from -1 to 1
-      const normalizedX = (e.clientX / window.innerWidth) * 2 - 1;
-      const normalizedY = (e.clientY / window.innerHeight) * 2 - 1;
-      mouseX.set(normalizedX);
-      mouseY.set(normalizedY);
+      frameId = requestAnimationFrame(() => {
+        const normalizedX = (e.clientX / window.innerWidth) * 2 - 1;
+        const normalizedY = (e.clientY / window.innerHeight) * 2 - 1;
+        mouseX.set(normalizedX);
+        mouseY.set(normalizedY);
+      });
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      cancelAnimationFrame(frameId);
+    };
   }, [mouseX, mouseY]);
 
-  // Parallax transforms based on mouse spring values
-  const bgX = useTransform(x, [-1, 1], ["-2%", "2%"]);
-  const bgY = useTransform(y, [-1, 1], ["-2%", "2%"]);
+  // Reduced range from 2% to 1% to reduce GPU paint area
+  const bgX = useTransform(x, [-1, 1], ["-1%", "1%"]);
+  const bgY = useTransform(y, [-1, 1], ["-1%", "1%"]);
 
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden bg-black">
@@ -52,7 +57,7 @@ export default function DashboardBackdrop() {
         {/* Fallback tint in case the video fails to load */}
         <div className="absolute inset-0 bg-[url('/images/hmcar.jpg')] bg-cover bg-center opacity-0" aria-hidden />
       </motion.div>
-      
+
       {/* Overlay Gradient for UI readability */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/90 pointer-events-none" />
     </div>

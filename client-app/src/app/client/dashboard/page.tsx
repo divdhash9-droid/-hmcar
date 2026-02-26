@@ -399,9 +399,9 @@ export default function ClientDashboard() {
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                             {(dashboardData?.recommended || [
-                                { id: "c1", title: "Lexus LX600 2024", price: 620000, img: "https://images.unsplash.com/photo-1619767886558-efdc259b66a4?q=80&w=1200" },
-                                { id: "c2", title: "Porsche 911 Turbo", price: 950000, img: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=1200" },
-                                { id: "c3", title: "Range Rover Sport", price: 480000, img: "https://images.unsplash.com/photo-1520170359211-7ad475a968b6?q=80&w=1200" },
+                                { id: "c1", title: "Lexus LX600 2024", price: 620000, img: "https://images.unsplash.com/photo-1619767886558-efdc259b66a4?q=75&w=800" },
+                                { id: "c2", title: "Porsche 911 Turbo", price: 950000, img: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=75&w=800" },
+                                { id: "c3", title: "Range Rover Sport", price: 480000, img: "https://images.unsplash.com/photo-1520170359211-7ad475a968b6?q=75&w=800" },
                             ]).map((car: { id?: string; title: string; price: number; img: string }, i: number) => (
                                 <Link key={car.id || i} href={`/showroom/${car.id || ""}`}>
                                     <motion.div

@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import {
-    Settings, Bell, Shield, Palette, Globe, Moon,
+    Settings, Bell, Palette, Globe, Moon,
     Save, ChevronLeft, ChevronRight,
     Lock, Eye, EyeOff, Smartphone, Mail, Volume2
 } from "lucide-react";
@@ -25,12 +25,6 @@ export default function ClientSettingsPage() {
         priceDrops: true,
         newMessages: true,
         marketing: false,
-    });
-
-    const [privacy, setPrivacy] = useState({
-        showProfile: true,
-        showFavorites: false,
-        twoFactorAuth: false,
     });
 
     const [appearance, setAppearance] = useState({
@@ -187,24 +181,6 @@ export default function ClientSettingsPage() {
                             <SettingRow icon={Bell} title={isRTL ? 'تنبيهات المزادات' : 'Auction Alerts'} subtitle={isRTL ? 'عند بدء مزاد جديد أو انتهائه' : 'New & ending auctions'} value={notifications.auctionAlerts} onChange={() => setNotifications(p => ({ ...p, auctionAlerts: !p.auctionAlerts }))} color="text-cinematic-neon-yellow" />
                             <SettingRow icon={Bell} title={isRTL ? 'تنبيهات انخفاض الأسعار' : 'Price Drop Alerts'} subtitle={isRTL ? 'عند تخفيض سعر سيارة محفوظة' : 'When saved car price drops'} value={notifications.priceDrops} onChange={() => setNotifications(p => ({ ...p, priceDrops: !p.priceDrops }))} color="text-cinematic-neon-yellow" />
                             <SettingRow icon={Mail} title={isRTL ? 'الرسائل الجديدة' : 'New Messages'} subtitle={isRTL ? 'عند وصول رسالة جديدة' : 'When you receive a message'} value={notifications.newMessages} onChange={() => setNotifications(p => ({ ...p, newMessages: !p.newMessages }))} color="text-cinematic-neon-yellow" />
-                        </div>
-                    </motion.section>
-
-                    {/* ─── Privacy & Security ─── */}
-                    <motion.section
-                        initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-                        className="glass-card p-8 md:p-12 bg-white/[0.01] border-white/5"
-                    >
-                        <div className={cn("flex items-center gap-4 mb-8", isRTL && "flex-row-reverse")}>
-                            <Shield className="w-6 h-6 text-cinematic-neon-red" />
-                            <h2 className="text-[13px] font-black uppercase tracking-[0.5em] text-white">
-                                {isRTL ? 'الخصوصية والأمان' : 'PRIVACY & SECURITY'}
-                            </h2>
-                        </div>
-                        <div className="space-y-4">
-                            <SettingRow icon={Eye} title={isRTL ? 'عرض ملفي الشخصي للعامة' : 'Public Profile Visibility'} subtitle={isRTL ? 'يمكن للآخرين رؤية ملفك' : 'Others can see your profile'} value={privacy.showProfile} onChange={() => setPrivacy(p => ({ ...p, showProfile: !p.showProfile }))} color="text-cinematic-neon-red" />
-                            <SettingRow icon={Eye} title={isRTL ? 'عرض قائمة المفضلة' : 'Show Favorites List'} subtitle={isRTL ? 'مشاركة قائمة المفضلة' : 'Share your favorites publicly'} value={privacy.showFavorites} onChange={() => setPrivacy(p => ({ ...p, showFavorites: !p.showFavorites }))} color="text-cinematic-neon-red" />
-                            <SettingRow icon={Shield} title={isRTL ? 'التحقق بخطوتين (2FA)' : 'Two-Factor Authentication'} subtitle={isRTL ? 'طبقة حماية إضافية لحسابك' : 'Extra layer of security'} value={privacy.twoFactorAuth} onChange={() => setPrivacy(p => ({ ...p, twoFactorAuth: !p.twoFactorAuth }))} color="text-cinematic-neon-red" />
                         </div>
                     </motion.section>
 

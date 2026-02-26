@@ -1,443 +1,499 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    Bell, Check, CheckCheck, Trash2, Filter, Clock,
+    Bell, Check, CheckCheck, Trash2, Clock,
     Car, Gavel, ShoppingBag, AlertTriangle, Gift,
-    Megaphone, Settings, Volume2, VolumeX, Sparkles,
-    ChevronRight, X, Eye, Archive, ArrowLeft, ArrowRight
+    Settings, Volume2, VolumeX, Sparkles,
+    X, Eye, ArrowLeft, ArrowRight, Filter
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/lib/LanguageContext';
-import Link from 'next/link';
 
-// Notification Types with icons and colors
+// ─── Types ─────────────────────────────────────────────────────────────────────
 const NOTIFICATION_TYPES = {
-    bid: { icon: Gavel, color: 'from-amber-500 to-orange-600', label: 'مزايدات', labelEn: 'Bids' },
-    order: { icon: ShoppingBag, color: 'from-emerald-500 to-green-600', label: 'طلبات', labelEn: 'Orders' },
-    car: { icon: Car, color: 'from-blue-500 to-cyan-600', label: 'سيارات', labelEn: 'Cars' },
-    promo: { icon: Gift, color: 'from-pink-500 to-rose-600', label: 'عروض', labelEn: 'Promos' },
-    system: { icon: Settings, color: 'from-slate-500 to-gray-600', label: 'النظام', labelEn: 'System' },
-    alert: { icon: AlertTriangle, color: 'from-red-500 to-rose-600', label: 'تنبيهات', labelEn: 'Alerts' },
+    bid: { icon: Gavel, color: 'from-amber-500 to-orange-600', bg: 'bg-amber-500/10', border: 'border-amber-500/20', label: 'مزايدات', labelEn: 'Bids' },
+    order: { icon: ShoppingBag, color: 'from-emerald-500 to-green-600', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', label: 'طلبات', labelEn: 'Orders' },
+    car: { icon: Car, color: 'from-blue-500 to-cyan-600', bg: 'bg-blue-500/10', border: 'border-blue-500/20', label: 'سيارات', labelEn: 'Cars' },
+    promo: { icon: Gift, color: 'from-pink-500 to-rose-600', bg: 'bg-pink-500/10', border: 'border-pink-500/20', label: 'عروض', labelEn: 'Promos' },
+    system: { icon: Settings, color: 'from-slate-500 to-gray-600', bg: 'bg-slate-500/10', border: 'border-slate-500/20', label: 'النظام', labelEn: 'System' },
+    alert: { icon: AlertTriangle, color: 'from-red-500 to-rose-600', bg: 'bg-red-500/10', border: 'border-red-500/20', label: 'تنبيهات', labelEn: 'Alerts' },
 };
 
-// Mock notifications data
 const MOCK_NOTIFICATIONS = [
     { id: 1, type: 'bid', title: 'مزايدة جديدة!', titleEn: 'New Bid!', message: 'تم تقديم مزايدة بقيمة 450,000 ر.س على Mercedes AMG GT', messageEn: 'A bid of 450,000 SAR was placed on Mercedes AMG GT', time: '2 دقيقة', timeEn: '2 min ago', read: false, priority: 'high' },
-    { id: 2, type: 'order', title: 'طلبك قيد المعالجة', titleEn: 'Order Processing', message: 'طلب #HM-2024-0892 قيد المعالجة وسيتم الشحن قريباً', messageEn: 'Order #HM-2024-0892 is being processed', time: '15 دقيقة', timeEn: '15 min ago', read: false, priority: 'medium' },
-    { id: 3, type: 'car', title: 'سيارة أحلامك متوفرة!', titleEn: 'Your Dream Car Available!', message: 'Lamborghini Urus 2024 الآن في معرضنا', messageEn: 'Lamborghini Urus 2024 now in our showroom', time: 'ساعة', timeEn: '1 hour ago', read: false, priority: 'high' },
-    { id: 4, type: 'promo', title: 'عرض حصري 🎉', titleEn: 'Exclusive Offer 🎉', message: 'خصم 15% على جميع قطع الغيار لفترة محدودة', messageEn: '15% off on all spare parts for limited time', time: '3 ساعات', timeEn: '3 hours ago', read: true, priority: 'low' },
-    { id: 5, type: 'alert', title: 'تنبيه أمني', titleEn: 'Security Alert', message: 'تم تسجيل دخول جديد من جهاز غير معروف', messageEn: 'New login detected from unknown device', time: '5 ساعات', timeEn: '5 hours ago', read: true, priority: 'high' },
-    { id: 6, type: 'system', title: 'تحديث النظام', titleEn: 'System Update', message: 'تم تحديث سياسة الخصوصية. اطلع على التفاصيل.', messageEn: 'Privacy policy updated. Check details.', time: 'أمس', timeEn: 'Yesterday', read: true, priority: 'low' },
-    { id: 7, type: 'bid', title: 'تم قبول مزايدتك!', titleEn: 'Bid Accepted!', message: 'تهانينا! فزت بالمزاد على BMW M5 Competition', messageEn: 'Congratulations! You won the auction on BMW M5 Competition', time: 'أمس', timeEn: 'Yesterday', read: true, priority: 'high' },
+    { id: 2, type: 'order', title: 'طلبك قيد المعالجة', titleEn: 'Order Processing', message: 'طلب #HM-2024-0892 قيد المعالجة وسيتم الشحن قريباً', messageEn: 'Order #HM-2024-0892 is being processed and will ship soon', time: '15 دقيقة', timeEn: '15 min ago', read: false, priority: 'medium' },
+    { id: 3, type: 'car', title: 'سيارة أحلامك متوفرة!', titleEn: 'Your Dream Car!', message: 'Lamborghini Urus 2024 الآن في معرضنا بسعر مميز', messageEn: 'Lamborghini Urus 2024 now in our showroom at special price', time: 'ساعة', timeEn: '1 hour ago', read: false, priority: 'high' },
+    { id: 4, type: 'promo', title: 'عرض حصري 🎉', titleEn: 'Exclusive Offer 🎉', message: 'خصم 15% على جميع قطع الغيار لفترة محدودة حتى نهاية الشهر', messageEn: '15% off on all spare parts for limited time until end of month', time: '3 ساعات', timeEn: '3 hours ago', read: true, priority: 'low' },
+    { id: 5, type: 'alert', title: 'تنبيه أمني', titleEn: 'Security Alert', message: 'تم تسجيل دخول جديد من جهاز غير معروف في الرياض', messageEn: 'New login detected from unknown device in Riyadh', time: '5 ساعات', timeEn: '5 hours ago', read: true, priority: 'high' },
+    { id: 6, type: 'system', title: 'تحديث النظام', titleEn: 'System Update', message: 'تم تحديث سياسة الخصوصية. اطلع على التفاصيل الكاملة.', messageEn: 'Privacy policy updated. Check the full details.', time: 'أمس', timeEn: 'Yesterday', read: true, priority: 'low' },
+    { id: 7, type: 'bid', title: 'تم قبول مزايدتك!', titleEn: 'Bid Accepted!', message: 'تهانينا! فزت بالمزاد على BMW M5 Competition 2024', messageEn: 'Congratulations! You won BMW M5 Competition 2024 auction', time: 'أمس', timeEn: 'Yesterday', read: true, priority: 'high' },
 ];
 
+// ─── Main Page ──────────────────────────────────────────────────────────────────
 export default function NotificationsPage() {
     const { isRTL } = useLanguage();
     const router = useRouter();
+
     const [notifications, setNotifications] = useState(MOCK_NOTIFICATIONS);
     const [filter, setFilter] = useState<string>('all');
     const [soundEnabled, setSoundEnabled] = useState(true);
-    const [selectedNotification, setSelectedNotification] = useState<any>(null);
+    const [selected, setSelected] = useState<any>(null);
 
     const unreadCount = notifications.filter(n => !n.read).length;
 
-    const filteredNotifications = filter === 'all'
+    const filtered = filter === 'all'
         ? notifications
         : filter === 'unread'
             ? notifications.filter(n => !n.read)
             : notifications.filter(n => n.type === filter);
 
-    const markAsRead = (id: number) => {
-        setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
-    };
+    const markRead = (id: number) => setNotifications(p => p.map(n => n.id === id ? { ...n, read: true } : n));
+    const markAllRead = () => setNotifications(p => p.map(n => ({ ...n, read: true })));
+    const remove = (id: number) => setNotifications(p => p.filter(n => n.id !== id));
+    const clearAll = () => setNotifications([]);
 
-    const markAllAsRead = () => {
-        setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-    };
-
-    const deleteNotification = (id: number) => {
-        setNotifications(prev => prev.filter(n => n.id !== id));
-    };
-
-    const clearAll = () => {
-        setNotifications([]);
-    };
+    // sidebar filter items
+    const filterItems = [
+        { key: 'all', label: 'الكل', labelEn: 'All', icon: Sparkles, count: notifications.length },
+        { key: 'unread', label: 'غير مقروء', labelEn: 'Unread', icon: Eye, count: unreadCount },
+        ...Object.entries(NOTIFICATION_TYPES).map(([key, val]) => ({
+            key, label: val.label, labelEn: val.labelEn, icon: val.icon,
+            count: notifications.filter(n => n.type === key).length,
+        })),
+    ];
 
     return (
-        <div className={cn("min-h-screen bg-black text-white font-sans", isRTL && "rtl")}>
+        <div className={cn("min-h-screen bg-black text-white font-sans overflow-x-hidden", isRTL && "rtl")}>
             <Navbar />
 
             {/* Cinematic Background */}
             <div className="fixed inset-0 z-0 pointer-events-none">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-cinematic-neon-blue/10 via-black to-black" />
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(0,240,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(0,240,255,0.02)_1px,transparent_1px)] bg-[size:80px_80px]" />
-
-                {/* Floating Orbs */}
-                <motion.div
-                    animate={{ y: [0, -30, 0], opacity: [0.3, 0.6, 0.3] }}
-                    transition={{ duration: 8, repeat: Infinity }}
-                    className="absolute top-1/4 right-1/4 w-96 h-96 bg-cinematic-neon-blue/10 rounded-full blur-[120px]"
-                />
-                <motion.div
-                    animate={{ y: [0, 30, 0], opacity: [0.2, 0.4, 0.2] }}
-                    transition={{ duration: 10, repeat: Infinity, delay: 2 }}
-                    className="absolute bottom-1/4 left-1/4 w-80 h-80 bg-purple-500/10 rounded-full blur-[100px]"
-                />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-cinematic-neon-blue/8 via-black to-black" />
+                <div className="absolute inset-0 bg-[linear-gradient(rgba(0,240,255,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(0,240,255,0.015)_1px,transparent_1px)] bg-[size:60px_60px]" />
+                <motion.div animate={{ y: [0, -20, 0], opacity: [0.15, 0.3, 0.15] }} transition={{ duration: 8, repeat: Infinity }} className="absolute top-1/3 right-1/4 w-80 h-80 bg-cinematic-neon-blue/10 rounded-full blur-[100px]" />
+                <motion.div animate={{ y: [0, 25, 0], opacity: [0.1, 0.2, 0.1] }} transition={{ duration: 11, repeat: Infinity, delay: 3 }} className="absolute bottom-1/4 left-1/4 w-64 h-64 bg-purple-500/10 rounded-full blur-[90px]" />
             </div>
 
-            <main className="relative z-10 pt-28 pb-20 px-6 max-w-6xl mx-auto">
+            <div className="relative z-10 flex h-screen pt-20">
 
+                {/* ── LEFT SIDEBAR (Filters + Stats) ─────── */}
+                <aside className={cn(
+                    "hidden lg:flex flex-col w-72 shrink-0 h-[calc(100vh-5rem)] sticky top-20",
+                    "bg-white/[0.02] backdrop-blur-2xl border-white/5 overflow-y-auto",
+                    isRTL ? "border-l" : "border-r"
+                )}>
+                    <div className="p-6 flex flex-col h-full gap-6">
 
+                        {/* Header */}
+                        <div>
+                            <button
+                                onClick={() => router.back()}
+                                className={cn(
+                                    "flex items-center gap-2 text-white/40 hover:text-white text-[11px] font-black uppercase tracking-wider mb-5 transition-colors",
+                                    isRTL && "flex-row-reverse"
+                                )}
+                            >
+                                {isRTL ? <ArrowRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />}
+                                {isRTL ? 'عودة' : 'Back'}
+                            </button>
 
-                {/* Header Section */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mb-12"
-                >
-                    <div className="flex items-center justify-between flex-wrap gap-6">
-                        <div className="space-y-3">
-                            <div className="flex flex-col items-start gap-3">
+                            {/* Bell Icon + Count */}
+                            <div className="flex items-center gap-3 mb-2">
                                 <div className="relative">
-                                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cinematic-neon-blue to-purple-600 flex items-center justify-center shadow-[0_0_40px_rgba(0,240,255,0.3)]">
-                                        <Bell className="w-8 h-8 text-white" />
+                                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-cinematic-neon-blue to-purple-600 flex items-center justify-center shadow-[0_0_30px_rgba(0,240,255,0.3)]">
+                                        <Bell className="w-6 h-6 text-white" />
                                     </div>
                                     {unreadCount > 0 && (
-                                        <motion.div
-                                            initial={{ scale: 0 }}
-                                            animate={{ scale: 1 }}
-                                            className="absolute -top-2 -right-2 w-7 h-7 bg-cinematic-neon-red rounded-full flex items-center justify-center text-xs font-black shadow-[0_0_20px_rgba(255,0,60,0.5)]"
+                                        <motion.span
+                                            initial={{ scale: 0 }} animate={{ scale: 1 }}
+                                            className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-cinematic-neon-red rounded-full text-[9px] font-black flex items-center justify-center shadow-[0_0_12px_rgba(255,0,60,0.6)]"
                                         >
                                             {unreadCount}
-                                        </motion.div>
+                                        </motion.span>
                                     )}
                                 </div>
-                                <button
-                                    onClick={() => router.back()}
-                                    className="p-2 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all"
-                                    aria-label={isRTL ? "عودة" : "Back"}
-                                >
-                                    {isRTL ? <ArrowRight className="w-5 h-5" /> : <ArrowLeft className="w-5 h-5" />}
-                                </button>
                                 <div>
-                                    <h1 className="text-4xl md:text-5xl font-black uppercase italic tracking-tight">
-                                        {isRTL ? "الإشعارات" : "Notifications"}
+                                    <h1 className="text-xl font-black uppercase italic tracking-tight">
+                                        {isRTL ? 'الإشعارات' : 'Notifications'}
                                     </h1>
-                                    <p className="text-xs text-white/40 uppercase tracking-[0.3em] font-bold mt-1">
-                                        {isRTL ? `${unreadCount} غير مقروءة` : `${unreadCount} Unread`}
+                                    <p className="text-[10px] text-white/30 uppercase tracking-widest">
+                                        {isRTL ? `${unreadCount} غير مقروءة` : `${unreadCount} unread`}
                                     </p>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Actions */}
-                        <div className="flex items-center gap-3">
+                        {/* Filter List */}
+                        <div className="flex-1 space-y-1">
+                            <p className={cn("text-[9px] font-black uppercase tracking-[0.3em] text-white/20 mb-3 flex items-center gap-2", isRTL && "flex-row-reverse")}>
+                                <Filter className="w-3 h-3" /> {isRTL ? 'تصفية' : 'Filter by'}
+                            </p>
+                            {filterItems.map(item => (
+                                <button
+                                    key={item.key}
+                                    onClick={() => setFilter(item.key)}
+                                    className={cn(
+                                        "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-[11px] font-black uppercase tracking-wider",
+                                        isRTL && "flex-row-reverse text-right",
+                                        filter === item.key
+                                            ? "bg-white text-black shadow-lg"
+                                            : item.key === 'unread' && item.count > 0
+                                                ? "bg-cinematic-neon-blue/10 text-cinematic-neon-blue border border-cinematic-neon-blue/20 hover:bg-cinematic-neon-blue/20"
+                                                : "text-white/50 hover:text-white hover:bg-white/5"
+                                    )}
+                                >
+                                    <item.icon className="w-4 h-4 shrink-0" />
+                                    <span className="flex-1">{isRTL ? item.label : item.labelEn}</span>
+                                    {item.count > 0 && (
+                                        <span className={cn(
+                                            "px-2 py-0.5 rounded-md text-[9px] shrink-0",
+                                            filter === item.key ? "bg-black/10" : "bg-white/10"
+                                        )}>
+                                            {item.count}
+                                        </span>
+                                    )}
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Bottom Actions */}
+                        <div className="space-y-2 pt-4 border-t border-white/5">
+                            {/* Sound Toggle */}
                             <button
                                 onClick={() => setSoundEnabled(!soundEnabled)}
                                 className={cn(
-                                    "p-3 rounded-xl border transition-all",
+                                    "w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-all text-[11px] font-black uppercase tracking-wider",
+                                    isRTL && "flex-row-reverse",
                                     soundEnabled
-                                        ? "bg-cinematic-neon-blue/10 border-cinematic-neon-blue/30 text-cinematic-neon-blue"
+                                        ? "bg-cinematic-neon-blue/10 border-cinematic-neon-blue/20 text-cinematic-neon-blue"
                                         : "bg-white/5 border-white/10 text-white/40"
                                 )}
                             >
-                                {soundEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+                                {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+                                <span>{isRTL ? (soundEnabled ? 'صوت مفعّل' : 'صوت مكتوم') : (soundEnabled ? 'Sound On' : 'Sound Off')}</span>
                             </button>
+
+                            {/* Mark All Read */}
                             <button
-                                onClick={markAllAsRead}
-                                className="px-5 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-xs font-bold uppercase tracking-wider flex items-center gap-2"
+                                onClick={markAllRead}
+                                disabled={unreadCount === 0}
+                                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-[11px] font-black uppercase tracking-wider text-white/60 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+                                style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}
                             >
-                                <CheckCheck className="w-4 h-4" />
-                                {isRTL ? "قراءة الكل" : "Mark All Read"}
+                                <CheckCheck className="w-4 h-4 shrink-0" />
+                                <span>{isRTL ? 'قراءة الكل' : 'Mark All Read'}</span>
                             </button>
+
+                            {/* Clear All */}
                             <button
                                 onClick={clearAll}
-                                className="px-5 py-3 rounded-xl bg-cinematic-neon-red/10 border border-cinematic-neon-red/30 text-cinematic-neon-red hover:bg-cinematic-neon-red/20 transition-all text-xs font-bold uppercase tracking-wider flex items-center gap-2"
+                                disabled={notifications.length === 0}
+                                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-cinematic-neon-red/10 border border-cinematic-neon-red/20 text-cinematic-neon-red hover:bg-cinematic-neon-red/20 transition-all text-[11px] font-black uppercase tracking-wider disabled:opacity-30 disabled:cursor-not-allowed"
+                                style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}
                             >
-                                <Trash2 className="w-4 h-4" />
-                                {isRTL ? "مسح الكل" : "Clear All"}
+                                <Trash2 className="w-4 h-4 shrink-0" />
+                                <span>{isRTL ? 'مسح الكل' : 'Clear All'}</span>
                             </button>
                         </div>
                     </div>
-                </motion.div>
+                </aside>
 
-                {/* Filter Tabs */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="mb-8 overflow-x-auto scrollbar-hide"
-                >
-                    <div className="flex gap-2 p-1.5 bg-white/[0.02] rounded-2xl border border-white/5 w-fit min-w-full">
-                        <FilterButton
-                            active={filter === 'all'}
-                            onClick={() => setFilter('all')}
-                            icon={<Sparkles className="w-4 h-4" />}
-                            label={isRTL ? "الكل" : "All"}
-                            count={notifications.length}
-                        />
-                        <FilterButton
-                            active={filter === 'unread'}
-                            onClick={() => setFilter('unread')}
-                            icon={<Eye className="w-4 h-4" />}
-                            label={isRTL ? "غير مقروء" : "Unread"}
-                            count={unreadCount}
-                            highlight
-                        />
-                        {Object.entries(NOTIFICATION_TYPES).map(([key, val]) => (
-                            <FilterButton
-                                key={key}
-                                active={filter === key}
-                                onClick={() => setFilter(key)}
-                                icon={<val.icon className="w-4 h-4" />}
-                                label={isRTL ? val.label : val.labelEn}
-                                count={notifications.filter(n => n.type === key).length}
-                            />
-                        ))}
-                    </div>
-                </motion.div>
+                {/* ── MAIN CONTENT ───────────────────────── */}
+                <main className="flex-1 h-[calc(100vh-5rem)] overflow-y-auto">
+                    <div className="max-w-3xl mx-auto px-4 md:px-8 py-8">
 
-                {/* Notifications List */}
-                <div className="space-y-4">
-                    <AnimatePresence mode="popLayout">
-                        {filteredNotifications.length === 0 ? (
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                className="py-32 text-center"
-                            >
-                                <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-white/5 flex items-center justify-center">
-                                    <Bell className="w-10 h-10 text-white/20" />
+                        {/* Mobile Header */}
+                        <div className="lg:hidden mb-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <button onClick={() => router.back()} className="p-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all">
+                                    {isRTL ? <ArrowRight className="w-5 h-5" /> : <ArrowLeft className="w-5 h-5" />}
+                                </button>
+                                <h1 className="text-2xl font-black uppercase italic">
+                                    {isRTL ? 'الإشعارات' : 'Notifications'}
+                                </h1>
+                                <div className="flex items-center gap-2">
+                                    <button onClick={() => setSoundEnabled(!soundEnabled)} className="p-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all">
+                                        {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+                                    </button>
                                 </div>
-                                <h3 className="text-2xl font-black uppercase italic text-white/40 mb-2">
-                                    {isRTL ? "لا توجد إشعارات" : "No Notifications"}
-                                </h3>
-                                <p className="text-xs text-white/20 uppercase tracking-[0.2em]">
-                                    {isRTL ? "أنت على اطلاع بكل شيء!" : "You're all caught up!"}
-                                </p>
-                            </motion.div>
-                        ) : (
-                            filteredNotifications.map((notification, index) => (
-                                <NotificationCard
-                                    key={notification.id}
-                                    notification={notification}
-                                    index={index}
-                                    isRTL={isRTL}
-                                    onRead={() => markAsRead(notification.id)}
-                                    onDelete={() => deleteNotification(notification.id)}
-                                    onSelect={() => setSelectedNotification(notification)}
-                                />
-                            ))
-                        )}
-                    </AnimatePresence>
-                </div>
-            </main>
+                            </div>
+                            {/* Mobile Filter Scroll */}
+                            <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
+                                {filterItems.map(item => (
+                                    <button
+                                        key={item.key}
+                                        onClick={() => setFilter(item.key)}
+                                        className={cn(
+                                            "flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider whitespace-nowrap shrink-0 transition-all",
+                                            filter === item.key ? "bg-white text-black" : "bg-white/5 text-white/40 hover:text-white hover:bg-white/10"
+                                        )}
+                                    >
+                                        <item.icon className="w-3.5 h-3.5" />
+                                        {isRTL ? item.label : item.labelEn}
+                                        {item.count > 0 && <span className="ml-1 opacity-60">{item.count}</span>}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
 
-            {/* Notification Detail Modal */}
-            <AnimatePresence>
-                {selectedNotification && (
-                    <NotificationModal
-                        notification={selectedNotification}
-                        isRTL={isRTL}
-                        onClose={() => setSelectedNotification(null)}
-                    />
-                )}
-            </AnimatePresence>
+                        {/* Section Title */}
+                        <div className={cn("flex items-center justify-between mb-6", isRTL && "flex-row-reverse")}>
+                            <div className={cn("flex items-center gap-3", isRTL && "flex-row-reverse")}>
+                                <div className="h-[2px] w-8 bg-cinematic-neon-blue shadow-[0_0_10px_rgba(0,240,255,1)]" />
+                                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-cinematic-neon-blue">
+                                    {filter === 'all' ? (isRTL ? 'جميع الإشعارات' : 'All Notifications')
+                                        : filter === 'unread' ? (isRTL ? 'غير المقروءة' : 'Unread')
+                                            : isRTL ? NOTIFICATION_TYPES[filter as keyof typeof NOTIFICATION_TYPES]?.label : NOTIFICATION_TYPES[filter as keyof typeof NOTIFICATION_TYPES]?.labelEn}
+                                </span>
+                            </div>
+                            <span className="text-[10px] text-white/20 font-black uppercase tracking-wider">
+                                {filtered.length} {isRTL ? 'إشعار' : 'items'}
+                            </span>
+                        </div>
+
+                        {/* Notifications List */}
+                        <div className="space-y-3">
+                            <AnimatePresence mode="popLayout">
+                                {filtered.length === 0 ? (
+                                    <motion.div
+                                        key="empty"
+                                        initial={{ opacity: 0, scale: 0.95 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        className="py-24 text-center"
+                                    >
+                                        <div className="w-20 h-20 mx-auto mb-5 rounded-full bg-white/[0.03] border border-white/5 flex items-center justify-center">
+                                            <Bell className="w-9 h-9 text-white/10" />
+                                        </div>
+                                        <h3 className="text-xl font-black uppercase italic text-white/20 mb-2">
+                                            {isRTL ? 'لا توجد إشعارات' : 'No Notifications'}
+                                        </h3>
+                                        <p className="text-[11px] text-white/10 uppercase tracking-[0.3em]">
+                                            {isRTL ? 'أنت على اطلاع بكل شيء!' : "You're all caught up!"}
+                                        </p>
+                                    </motion.div>
+                                ) : (
+                                    filtered.map((notification, idx) => (
+                                        <NotifCard
+                                            key={notification.id}
+                                            n={notification}
+                                            idx={idx}
+                                            isRTL={isRTL}
+                                            onRead={() => markRead(notification.id)}
+                                            onDelete={() => remove(notification.id)}
+                                            onSelect={() => { markRead(notification.id); setSelected(notification); }}
+                                        />
+                                    ))
+                                )}
+                            </AnimatePresence>
+                        </div>
+
+                    </div>
+                </main>
+
+                {/* ── DETAIL PANEL (right side on wide screens) ── */}
+                <AnimatePresence>
+                    {selected && (
+                        <>
+                            {/* Overlay for small screens */}
+                            <motion.div
+                                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                                className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm lg:hidden"
+                                onClick={() => setSelected(null)}
+                            />
+
+                            {/* Panel */}
+                            <motion.div
+                                initial={{ x: isRTL ? '-100%' : '100%' }}
+                                animate={{ x: 0 }}
+                                exit={{ x: isRTL ? '-100%' : '100%' }}
+                                transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+                                className={cn(
+                                    "fixed top-20 bottom-0 z-50 w-full max-w-sm",
+                                    "bg-zinc-950/95 backdrop-blur-2xl border-white/10",
+                                    "flex flex-col shadow-[-20px_0_60px_rgba(0,0,0,0.6)]",
+                                    isRTL ? "left-72 border-r" : "right-72 border-l",
+                                    "lg:sticky lg:top-20 lg:h-[calc(100vh-5rem)] lg:w-80 lg:shrink-0 lg:flex"
+                                )}
+                            >
+                                <DetailPanel
+                                    n={selected}
+                                    isRTL={isRTL}
+                                    onClose={() => setSelected(null)}
+                                    onDelete={() => { remove(selected.id); setSelected(null); }}
+                                />
+                            </motion.div>
+                        </>
+                    )}
+                </AnimatePresence>
+
+            </div>
         </div>
     );
 }
 
-// Filter Button Component
-function FilterButton({ active, onClick, icon, label, count, highlight = false }: any) {
-    return (
-        <button
-            onClick={onClick}
-            className={cn(
-                "px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all text-[10px] font-black uppercase tracking-wider whitespace-nowrap",
-                active
-                    ? "bg-white text-black shadow-lg"
-                    : highlight && count > 0
-                        ? "bg-cinematic-neon-blue/10 text-cinematic-neon-blue border border-cinematic-neon-blue/30"
-                        : "text-white/40 hover:text-white hover:bg-white/5"
-            )}
-        >
-            {icon}
-            <span>{label}</span>
-            {count > 0 && (
-                <span className={cn(
-                    "px-1.5 py-0.5 rounded text-[8px]",
-                    active ? "bg-black/10" : highlight ? "bg-cinematic-neon-blue/20" : "bg-white/10"
-                )}>
-                    {count}
-                </span>
-            )}
-        </button>
-    );
-}
-
-// Notification Card Component
-function NotificationCard({ notification, index, isRTL, onRead, onDelete, onSelect }: any) {
-    const TypeIcon = NOTIFICATION_TYPES[notification.type as keyof typeof NOTIFICATION_TYPES]?.icon || Bell;
-    const typeColor = NOTIFICATION_TYPES[notification.type as keyof typeof NOTIFICATION_TYPES]?.color || 'from-gray-500 to-slate-600';
+// ─── Notification Card ─────────────────────────────────────────────────────────
+function NotifCard({ n, idx, isRTL, onRead, onDelete, onSelect }: any) {
+    const typeInfo = NOTIFICATION_TYPES[n.type as keyof typeof NOTIFICATION_TYPES];
+    const TypeIcon = typeInfo?.icon || Bell;
 
     return (
         <motion.div
             layout
-            initial={{ opacity: 0, x: isRTL ? 50 : -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: isRTL ? -100 : 100, scale: 0.9 }}
-            transition={{ delay: index * 0.05 }}
-            onClick={() => { onRead(); onSelect(); }}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, x: isRTL ? -60 : 60, scale: 0.95 }}
+            transition={{ delay: idx * 0.04, duration: 0.3 }}
+            onClick={onSelect}
             className={cn(
-                "group relative p-6 rounded-3xl border cursor-pointer transition-all duration-300 overflow-hidden",
-                notification.read
-                    ? "bg-white/[0.02] border-white/5 hover:bg-white/[0.04]"
-                    : "bg-white/[0.04] border-white/10 hover:bg-white/[0.06] shadow-[0_0_30px_rgba(0,240,255,0.05)]"
+                "group relative flex items-start gap-4 p-5 rounded-2xl border cursor-pointer transition-all duration-300",
+                n.read
+                    ? "bg-white/[0.015] border-white/5 hover:bg-white/[0.03] hover:border-white/10"
+                    : "bg-white/[0.04] border-white/10 hover:bg-white/[0.06] shadow-[0_4px_24px_rgba(0,0,0,0.3)]",
+                isRTL && "flex-row-reverse"
             )}
         >
-            {/* Unread Indicator */}
-            {!notification.read && (
-                <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className={cn(
-                        "absolute top-6 w-2.5 h-2.5 rounded-full bg-cinematic-neon-blue shadow-[0_0_10px_rgba(0,240,255,0.8)]",
-                        isRTL ? "left-6" : "right-6"
-                    )}
-                />
-            )}
-
-            {/* Priority Bar */}
-            {notification.priority === 'high' && !notification.read && (
+            {/* Priority Stripe */}
+            {n.priority === 'high' && !n.read && (
                 <div className={cn(
-                    "absolute top-0 bottom-0 w-1 bg-gradient-to-b from-cinematic-neon-red via-orange-500 to-cinematic-neon-red",
-                    isRTL ? "right-0" : "left-0"
+                    "absolute top-0 bottom-0 w-[3px] rounded-full bg-gradient-to-b from-cinematic-neon-red via-orange-500 to-cinematic-neon-red",
+                    isRTL ? "right-0 rounded-r-2xl" : "left-0 rounded-l-2xl"
                 )} />
             )}
 
-            <div className="flex items-start gap-5">
-                {/* Icon */}
-                <div className={cn(
-                    "w-14 h-14 rounded-2xl bg-gradient-to-br flex items-center justify-center flex-shrink-0 shadow-lg",
-                    typeColor
-                )}>
-                    <TypeIcon className="w-6 h-6 text-white" />
-                </div>
-
-                {/* Content */}
-                <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-4 mb-2">
-                        <h3 className={cn(
-                            "font-bold text-lg leading-tight",
-                            notification.read ? "text-white/70" : "text-white"
-                        )}>
-                            {isRTL ? notification.title : notification.titleEn}
-                        </h3>
-                        <div className="flex items-center gap-2 flex-shrink-0">
-                            <span className="text-[10px] text-white/30 uppercase tracking-wider flex items-center gap-1">
-                                <Clock className="w-3 h-3" />
-                                {isRTL ? notification.time : notification.timeEn}
-                            </span>
-                        </div>
-                    </div>
-                    <p className={cn(
-                        "text-sm leading-relaxed",
-                        notification.read ? "text-white/40" : "text-white/60"
-                    )}>
-                        {isRTL ? notification.message : notification.messageEn}
-                    </p>
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    {!notification.read && (
-                        <button
-                            onClick={(e) => { e.stopPropagation(); onRead(); }}
-                            className="p-2 rounded-lg bg-white/5 hover:bg-cinematic-neon-blue/20 text-white/40 hover:text-cinematic-neon-blue transition-all"
-                        >
-                            <Check className="w-4 h-4" />
-                        </button>
-                    )}
-                    <button
-                        onClick={(e) => { e.stopPropagation(); onDelete(); }}
-                        className="p-2 rounded-lg bg-white/5 hover:bg-cinematic-neon-red/20 text-white/40 hover:text-cinematic-neon-red transition-all"
-                    >
-                        <Trash2 className="w-4 h-4" />
-                    </button>
-                    <ChevronRight className={cn("w-5 h-5 text-white/20", isRTL && "rotate-180")} />
-                </div>
+            {/* Icon */}
+            <div className={cn(
+                "w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center shrink-0 shadow-lg",
+                typeInfo?.color || 'from-gray-500 to-slate-600'
+            )}>
+                <TypeIcon className="w-5 h-5 text-white" />
             </div>
 
-            {/* Hover Glow Effect */}
-            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                <div className={cn("absolute inset-0 bg-gradient-to-r opacity-5", typeColor)} />
+            {/* Content */}
+            <div className="flex-1 min-w-0">
+                <div className={cn("flex items-start justify-between gap-3 mb-1", isRTL && "flex-row-reverse")}>
+                    <h3 className={cn("font-bold text-[14px] leading-snug", n.read ? "text-white/60" : "text-white")}>
+                        {isRTL ? n.title : n.titleEn}
+                    </h3>
+                    <span className={cn("text-[10px] text-white/25 uppercase tracking-wider flex items-center gap-1 shrink-0", isRTL && "flex-row-reverse")}>
+                        <Clock className="w-3 h-3" />
+                        {isRTL ? n.time : n.timeEn}
+                    </span>
+                </div>
+                <p className={cn("text-[12px] leading-relaxed line-clamp-2", n.read ? "text-white/30" : "text-white/50")}>
+                    {isRTL ? n.message : n.messageEn}
+                </p>
+            </div>
+
+            {/* Unread Dot */}
+            {!n.read && (
+                <div className="w-2 h-2 rounded-full bg-cinematic-neon-blue mt-1 shrink-0 shadow-[0_0_8px_rgba(0,240,255,0.8)]" />
+            )}
+
+            {/* Hover Actions */}
+            <div className={cn(
+                "absolute top-4 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity",
+                isRTL ? "left-4" : "right-4"
+            )}>
+                {!n.read && (
+                    <button onClick={e => { e.stopPropagation(); onRead(); }}
+                        className="p-1.5 rounded-lg bg-white/5 hover:bg-cinematic-neon-blue/20 text-white/30 hover:text-cinematic-neon-blue transition-all">
+                        <Check className="w-3.5 h-3.5" />
+                    </button>
+                )}
+                <button onClick={e => { e.stopPropagation(); onDelete(); }}
+                    className="p-1.5 rounded-lg bg-white/5 hover:bg-cinematic-neon-red/20 text-white/30 hover:text-cinematic-neon-red transition-all">
+                    <Trash2 className="w-3.5 h-3.5" />
+                </button>
             </div>
         </motion.div>
     );
 }
 
-// Notification Modal
-function NotificationModal({ notification, isRTL, onClose }: any) {
-    const TypeIcon = NOTIFICATION_TYPES[notification.type as keyof typeof NOTIFICATION_TYPES]?.icon || Bell;
-    const typeColor = NOTIFICATION_TYPES[notification.type as keyof typeof NOTIFICATION_TYPES]?.color || 'from-gray-500 to-slate-600';
+// ─── Detail Panel ──────────────────────────────────────────────────────────────
+function DetailPanel({ n, isRTL, onClose, onDelete }: any) {
+    const typeInfo = NOTIFICATION_TYPES[n.type as keyof typeof NOTIFICATION_TYPES];
+    const TypeIcon = typeInfo?.icon || Bell;
 
     return (
-        <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-blur-xl"
-            onClick={onClose}
-        >
-            <motion.div
-                initial={{ scale: 0.9, y: 50 }}
-                animate={{ scale: 1, y: 0 }}
-                exit={{ scale: 0.9, y: 50 }}
-                onClick={(e) => e.stopPropagation()}
-                className="w-full max-w-lg bg-black/90 border border-white/10 rounded-[2rem] p-8 relative overflow-hidden"
-            >
-                {/* Close Button */}
-                <button
-                    onClick={onClose}
-                    className="absolute top-6 right-6 p-2 rounded-full bg-white/5 hover:bg-white/10 transition-all"
-                >
-                    <X className="w-5 h-5 text-white/60" />
+        <div className="flex flex-col h-full">
+            {/* Panel Header */}
+            <div className={cn("flex items-center justify-between p-5 border-b border-white/5", isRTL && "flex-row-reverse")}>
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30">
+                    {isRTL ? 'تفاصيل الإشعار' : 'Notification Detail'}
+                </span>
+                <button onClick={onClose} className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-all text-white/40 hover:text-white">
+                    <X className="w-4 h-4" />
                 </button>
+            </div>
 
-                {/* Icon */}
-                <div className={cn(
-                    "w-20 h-20 rounded-3xl bg-gradient-to-br flex items-center justify-center mb-6 shadow-2xl",
-                    typeColor
-                )}>
-                    <TypeIcon className="w-10 h-10 text-white" />
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto p-6">
+                {/* Icon & Badge */}
+                <div className="flex flex-col items-center text-center mb-8">
+                    <div className={cn(
+                        "w-20 h-20 rounded-3xl bg-gradient-to-br flex items-center justify-center mb-4 shadow-2xl",
+                        typeInfo?.color || 'from-gray-500 to-slate-600'
+                    )}>
+                        <TypeIcon className="w-10 h-10 text-white" />
+                    </div>
+
+                    {/* Type Badge */}
+                    <span className={cn(
+                        "px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-[0.2em] border",
+                        typeInfo?.bg, typeInfo?.border,
+                        "text-white/70"
+                    )}>
+                        {isRTL ? typeInfo?.label : typeInfo?.labelEn}
+                    </span>
                 </div>
 
-                {/* Content */}
-                <h2 className="text-2xl font-black uppercase italic mb-3">
-                    {isRTL ? notification.title : notification.titleEn}
+                {/* Title */}
+                <h2 className="text-2xl font-black uppercase italic mb-3 text-center leading-tight">
+                    {isRTL ? n.title : n.titleEn}
                 </h2>
-                <p className="text-white/60 leading-relaxed mb-6">
-                    {isRTL ? notification.message : notification.messageEn}
+
+                {/* Message */}
+                <p className="text-white/60 leading-relaxed text-sm text-center mb-6">
+                    {isRTL ? n.message : n.messageEn}
                 </p>
 
                 {/* Time */}
-                <div className="flex items-center gap-2 text-white/30 text-xs uppercase tracking-wider">
+                <div className={cn("flex items-center justify-center gap-2 text-white/25 text-[11px] uppercase tracking-wider mb-8")}>
                     <Clock className="w-4 h-4" />
-                    {isRTL ? notification.time : notification.timeEn}
+                    {isRTL ? n.time : n.timeEn}
                 </div>
 
-                {/* Action Button */}
-                <button className="w-full mt-8 py-4 bg-white text-black font-black uppercase tracking-[0.3em] text-xs rounded-xl hover:bg-cinematic-neon-blue hover:text-white transition-all">
-                    {isRTL ? "عرض التفاصيل" : "View Details"}
-                </button>
+                {/* Priority Tag */}
+                {n.priority === 'high' && (
+                    <div className="flex items-center justify-center gap-2 mb-6 px-4 py-2 bg-cinematic-neon-red/10 border border-cinematic-neon-red/20 rounded-xl">
+                        <AlertTriangle className="w-4 h-4 text-cinematic-neon-red" />
+                        <span className="text-[10px] font-black uppercase tracking-wider text-cinematic-neon-red">
+                            {isRTL ? 'أولوية عالية' : 'High Priority'}
+                        </span>
+                    </div>
+                )}
 
-                {/* Background Glow */}
-                <div className={cn("absolute -top-20 -right-20 w-60 h-60 rounded-full blur-[100px] opacity-20 bg-gradient-to-br", typeColor)} />
-            </motion.div>
-        </motion.div>
+                {/* Divider */}
+                <div className="border-t border-white/5 mb-6" />
+
+                {/* Actions */}
+                <div className="space-y-3">
+                    <button className="w-full py-4 bg-white text-black font-black uppercase tracking-[0.2em] text-xs rounded-xl hover:bg-cinematic-neon-blue hover:text-white transition-all shadow-lg">
+                        {isRTL ? 'عرض التفاصيل' : 'View Details'}
+                    </button>
+                    <button
+                        onClick={onDelete}
+                        className="w-full py-3 bg-cinematic-neon-red/10 border border-cinematic-neon-red/20 text-cinematic-neon-red font-black uppercase tracking-[0.2em] text-xs rounded-xl hover:bg-cinematic-neon-red/20 transition-all flex items-center justify-center gap-2"
+                    >
+                        <Trash2 className="w-4 h-4" />
+                        {isRTL ? 'حذف الإشعار' : 'Delete'}
+                    </button>
+                </div>
+            </div>
+        </div>
     );
 }

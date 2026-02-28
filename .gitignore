@@ -56,3 +56,7 @@ test-results/
 .auxly/
 
 .vercel
+
+# Railway
+.env.railway
+railway.json

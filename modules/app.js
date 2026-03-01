@@ -136,8 +136,11 @@ class App {
       const socketModule = require('./socket');
 
       // بدء الاستماع للطلبات عبر البورت المحدد
-      const server = this.app.listen(config.server.port, config.server.host, () => {
-        logger.info(`🚀 الخادم يعمل حالياً على http://${config.server.host}:${config.server.port}`);
+      const host = process.env.NODE_ENV === 'production' ? '0.0.0.0' : config.server.host;
+      const port = process.env.PORT || config.server.port;
+
+      const server = this.app.listen(port, host, () => {
+        logger.info(`🚀 الخادم يعمل حالياً على http://${host}:${port}`);
       });
 
       // تهيئة نظام الـ WebSockets للتواصل الفوري (للمزادات والتنبيهات)

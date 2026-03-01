@@ -54,8 +54,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY package*.json ./
 
 # تثبيت الملحقات البرمجية (Production only)
-# ملاحظة: نستخدم --legacy-peer-deps إذا كان هناك تعارض في النسخ
-RUN npm ci --only=production
+RUN npm install --omit=dev --no-audit --no-fund
 
 # نسخ كود المشروع بالكامل
 COPY . .

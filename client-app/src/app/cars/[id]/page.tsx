@@ -49,8 +49,8 @@ export default function CarDetailsPage() {
             fetchCarDetails();
             checkFavorite();
         }
-        // جلب رقم الاتصال من الإعدادات
-        api.settings.get().then((res: any) => {
+        // جلب رقم الاتصال من الإعدادات العامة (لا يحتاج تسجيل دخول)
+        api.settings.getPublic().then((res: any) => {
             if (res?.success && res?.data?.socialLinks?.whatsapp) {
                 setContactPhone(res.data.socialLinks.whatsapp);
             }

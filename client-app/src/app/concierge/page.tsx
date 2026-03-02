@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Send, Car, Settings, CheckCircle, Shield, Briefcase, User, Phone, FileText } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { useLanguage } from "@/lib/LanguageContext";
@@ -12,14 +12,27 @@ import ClientPageHeader from "@/components/ClientPageHeader";
 export default function ConciergePage() {
     const { t, isRTL } = useLanguage();
     const [activeTab, setActiveTab] = useState<'car' | 'parts'>('car');
+    const [whatsappNumber, setWhatsappNumber] = useState('+966500000000');
     const [formData, setFormData] = useState({
         name: '', phone: '', details: '', budget: '', brand: '', model: '', year: ''
     });
 
+    // جلب رقم الواتساب من الإعدادات العامة عند تحميل الصفحة
+    useEffect(() => {
+        fetch('/api/v2/settings/public')
+            .then(r => r.json())
+            .then(res => {
+                if (res?.success && res?.data?.socialLinks?.whatsapp) {
+                    setWhatsappNumber(res.data.socialLinks.whatsapp);
+                }
+            }).catch(() => { });
+    }, []);
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         const text = `New Request (${activeTab}):\nName: ${formData.name}\nPhone: ${formData.phone}\nDetails: ${formData.details}\nBudget: ${formData.budget}`;
-        window.open(`https://wa.me/966500000000?text=${encodeURIComponent(text)}`, '_blank');
+        const cleanNumber = whatsappNumber.replace(/[^0-9]/g, '');
+        window.open(`https://wa.me/${cleanNumber}?text=${encodeURIComponent(text)}`, '_blank');
     };
 
     return (

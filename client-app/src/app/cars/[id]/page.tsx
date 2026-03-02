@@ -42,7 +42,7 @@ export default function CarDetailsPage() {
     const [error, setError] = useState('');
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isFavorite, setIsFavorite] = useState(false);
-    const [contactPhone, setContactPhone] = useState('+966500000000');
+    const [contactPhone, setContactPhone] = useState('+967781007805');
 
     useEffect(() => {
         if (params.id) {

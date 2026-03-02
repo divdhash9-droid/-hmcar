@@ -133,6 +133,29 @@ class App {
       await database.connect();
       logger.info('✅ تم الاتصال بقاعدة البيانات بنجاح');
 
+      // تهيئة الإعدادات الافتراضية (رقم الواتساب ومعلومات الاتصال)
+      try {
+        const SiteSettings = require('../models/SiteSettings');
+        const existing = await SiteSettings.findOne({ key: 'main' });
+        if (!existing || !existing.socialLinks?.whatsapp) {
+          await SiteSettings.findOneAndUpdate(
+            { key: 'main' },
+            {
+              $set: {
+                'socialLinks.whatsapp': process.env.DEFAULT_WHATSAPP || '+967781007805',
+                'contactInfo.phone': process.env.DEFAULT_WHATSAPP || '+967781007805',
+                'contactInfo.email': 'info@hmcar.com',
+                'siteInfo.siteName': 'HM CAR',
+              }
+            },
+            { upsert: true, new: true }
+          );
+          logger.info('✅ تم تهيئة إعدادات الموقع الافتراضية');
+        }
+      } catch (settingsErr) {
+        logger.warn('⚠️ تعذّر تهيئة الإعدادات الافتراضية:', settingsErr.message);
+      }
+
       const socketModule = require('./socket');
 
       // بدء الاستماع للطلبات عبر البورت المحدد

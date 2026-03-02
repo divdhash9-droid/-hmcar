@@ -31,9 +31,10 @@ async function connectDB() {
     dbConnected = true;
     console.log('✅ MongoDB Atlas connected:', mongoose.connection.host);
 
-    // إنشاء حساب الأدمن والبيانات الحقيقية
+    // إنشاء حساب الأدمن والبيانات الحقيقية والإعدادات الافتراضية
     await seedProductionAdmin();
     await seedRealData();
+    await seedDefaultSettings();
 }
 
 /**
@@ -138,6 +139,37 @@ async function seedRealData() {
         console.log('✅ Real data seeding complete.');
     } catch (e) {
         console.warn('⚠️ Data seed warning:', e.message);
+    }
+}
+
+/**
+ * تهيئة إعدادات الموقع الافتراضية (رقم الواتساب، معلومات الاتصال)
+ * يعمل مرة واحدة فقط عند أول تشغيل
+ */
+async function seedDefaultSettings() {
+    try {
+        const SiteSettings = require('./models/SiteSettings');
+        const existing = await SiteSettings.findOne({ key: 'main' });
+
+        // إذا كان الرقم فارغاً أو لم توجد إعدادات بعد
+        if (!existing || !existing.socialLinks?.whatsapp) {
+            await SiteSettings.findOneAndUpdate(
+                { key: 'main' },
+                {
+                    $set: {
+                        'socialLinks.whatsapp': '+967781007805',
+                        'contactInfo.phone': '+967781007805',
+                        'contactInfo.email': 'info@hmcar.com',
+                        'siteInfo.siteName': 'HM CAR',
+                        'siteInfo.siteDescription': 'منصة مزادات ومبيعات السيارات الفاخرة',
+                    }
+                },
+                { upsert: true, new: true }
+            );
+            console.log('✅ Default site settings initialized (WhatsApp: +967781007805)');
+        }
+    } catch (e) {
+        console.warn('⚠️ Settings seed warning:', e.message);
     }
 }
 

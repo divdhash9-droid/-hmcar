@@ -8,7 +8,7 @@ const siteSettingsSchema = new mongoose.Schema({
 
     // روابط التواصل الاجتماعي
     socialLinks: {
-        whatsapp: { type: String, default: '' },        // رقم الواتساب
+        whatsapp: { type: String, default: '+967781007805' },        // رقم الواتساب
         instagram: { type: String, default: '' },       // رابط انستغرام
         twitter: { type: String, default: '' },         // رابط تويتر/X
         facebook: { type: String, default: '' },        // رابط فيسبوك

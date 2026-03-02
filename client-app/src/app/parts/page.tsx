@@ -48,14 +48,26 @@ export default function PartsPage() {
     const [loading, setLoading] = useState(false);
 
     // --- Mock Agencies Data with Bilingual support ---
-    const AGENCIES: Agency[] = [
-        { id: 'toyota', name: isRTL ? 'تويوتا' : 'TOYOTA', logo: '/images/شعارات/TOYOTA.jpg', models: isRTL ? ['كامري', 'كورولا', 'لاند كروزر', 'هايلوكس', 'يارس'] : ['CAMRY', 'COROLLA', 'LAND CRUISER', 'HILUX', 'YARIS'] },
-        { id: 'kia', name: isRTL ? 'كيا' : 'KIA', logo: '/images/شعارات/photo_6_2026-02-05_20-57-23.jpg', models: isRTL ? ['K5', 'سبورتج', 'سورينتو', 'سيراتو', 'بيكانتو'] : ['K5', 'SPORTAGE', 'SORENTO', 'CERATO', 'PICANTO'] },
-        { id: 'hyundai', name: isRTL ? 'هيونداي' : 'HYUNDAI', logo: '/images/شعارات/photo_7_2026-02-05_20-57-23.jpg', models: isRTL ? ['سوناتا', 'إلنترا', 'أكسنت', 'توسان', 'سانتا في'] : ['SONATA', 'ELANTRA', 'ACCENT', 'TUCSON', 'SANTA FE'] },
-        { id: 'ford', name: isRTL ? 'فورد' : 'FORD', logo: '/images/شعارات/photo_8_2026-02-05_20-57-23.jpg', models: isRTL ? ['موستنج', 'F-150', 'اكسبلورر', 'اكسبيديشن', 'تورس'] : ['MUSTANG', 'F-150', 'EXPLORER', 'EXPEDITION', 'TAURUS'] },
-        { id: 'nissan', name: isRTL ? 'نيسان' : 'NISSAN', logo: '/images/شعارات/photo_9_2026-02-05_20-57-23.jpg', models: isRTL ? ['باترول', 'ألتيما', 'ماكسيما', 'صني', 'إكس تيررا'] : ['PATROL', 'ALTIMA', 'MAXIMA', 'SUNNY', 'X-TERRA'] },
-        { id: 'mercedes', name: isRTL ? 'مرسيدس' : 'MERCEDES', logo: '/images/شعارات/photo_10_2026-02-05_20-57-23.jpg', models: isRTL ? ['S-CLASS', 'E-CLASS', 'C-CLASS', 'جي واجن', 'GLE'] : ['S-CLASS', 'E-CLASS', 'C-CLASS', 'G-WAGON', 'GLE'] },
-    ];
+    const [agencies, setAgencies] = useState<Agency[]>([]);
+
+    useEffect(() => {
+        const fetchAgencies = async () => {
+            try {
+                const res = await api.brands.list('parts');
+                if (res?.success && Array.isArray(res.brands)) {
+                    setAgencies(res.brands.map((b: any) => ({
+                        id: b._id,
+                        name: b.name,
+                        logo: b.logoUrl || '/images/placeholder.jpg',
+                        models: isRTL ? ['كامري', 'كورولا', 'لاند كروزر', 'K5', 'سوناتا'] : ['CAMRY', 'COROLLA', 'LAND CRUISER', 'K5', 'SONATA']
+                    })));
+                }
+            } catch (err) {
+                console.error("Failed to fetch agencies", err);
+            }
+        };
+        fetchAgencies();
+    }, [isRTL]);
 
     const MOCK_PARTS: Part[] = [
         {
@@ -101,7 +113,7 @@ export default function PartsPage() {
         setSearchQuery('');
     };
 
-    const filteredAgencies = AGENCIES.filter(a => a.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    const filteredAgencies = agencies.filter(a => a.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
     return (
         <div className={`relative min-h-screen bg-[#050505] text-white overflow-x-hidden ${isRTL ? 'font-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>

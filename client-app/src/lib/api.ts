@@ -309,6 +309,19 @@ export const api = {
                 method: 'POST',
                 body: JSON.stringify(data),
             }),
+        list: (params: any = {}) => {
+            const query = new URLSearchParams(params).toString();
+            return fetchAPI(`/api/v2/contact?${query}`);
+        },
+        updateStatus: (id: string, status: string) =>
+            fetchAPI(`/api/v2/contact/${id}/status`, {
+                method: 'PATCH',
+                body: JSON.stringify({ status }),
+            }),
+        delete: (id: string) =>
+            fetchAPI(`/api/v2/contact/${id}`, {
+                method: 'DELETE',
+            }),
     },
     liveAuctions: {
         list: (params: any = {}) => {

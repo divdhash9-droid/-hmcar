@@ -14,18 +14,12 @@ class AnalyticsService {
     const last24 = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
     const [
-      totalUsers,
-      totalCars,
-      carsSold,
-      totalAuctions,
-      runningAuctions,
-      scheduledAuctions,
-      totalOrders,
       totalBids,
       bidsLast24h,
       avgBid,
       totalBrands,
-      totalParts
+      totalParts,
+      newContacts
     ] = await Promise.all([
       User.countDocuments(),
       Car.countDocuments(),
@@ -44,7 +38,8 @@ class AnalyticsService {
         return (res[0] && res[0].avg) ? Number(res[0].avg.toFixed(2)) : 0;
       })(),
       require('../models/Brand').countDocuments(),
-      require('../models/SparePart').countDocuments()
+      require('../models/SparePart').countDocuments(),
+      require('../models/Contact').countDocuments({ status: 'new' })
     ]);
 
     // recent orders and revenue (last 7 days)
@@ -83,6 +78,7 @@ class AnalyticsService {
       totalRevenue,
       totalBrands,
       totalParts,
+      newContacts,
       generatedAt: now
     };
   }

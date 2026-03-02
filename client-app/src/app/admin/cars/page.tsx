@@ -29,6 +29,7 @@ export default function AdminCarsPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [editingCar, setEditingCar] = useState<any>(null);
+    const [brands, setBrands] = useState<any[]>([]);
     const [usdToSar, setUsdToSar] = useState(3.75); // Default USD to SAR conversion rate
     const [formData, setFormData] = useState({
         title: '',
@@ -54,9 +55,10 @@ export default function AdminCarsPage() {
     const loadData = async () => {
         setLoading(true);
         try {
-            const [carsRes, settingsRes] = await Promise.all([
+            const [carsRes, settingsRes, brandsRes] = await Promise.all([
                 api.cars.list({ status: filter, search: searchTerm }),
-                api.settings.getPublic()
+                api.settings.getPublic(),
+                api.brands.list('cars')
             ]);
 
             if (carsRes.success) {
@@ -64,6 +66,9 @@ export default function AdminCarsPage() {
             }
             if (settingsRes.success && settingsRes.data.currencySettings) {
                 setUsdToSar(settingsRes.data.currencySettings.usdToSar || 3.75);
+            }
+            if (brandsRes.success) {
+                setBrands(brandsRes.brands || []);
             }
         } catch (err) {
             console.error("Failed to load data", err);
@@ -388,16 +393,13 @@ export default function AdminCarsPage() {
                                             onChange={(e) => setFormData({ ...formData, make: e.target.value })}
                                             className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 px-4 text-sm font-bold text-white focus:outline-none focus:border-cinematic-neon-blue/40"
                                         >
-                                            {(() => {
-                                                let list: any[] = [];
-                                                try {
-                                                    // Prefer API brands
-                                                    // Note: synchronous render cannot await; fallback to localStorage if present
-                                                    list = JSON.parse(localStorage.getItem('hm_brands_cache') || '[]');
-                                                } catch { }
-                                                const carBrands = list.filter((b: any) => b.category === 'cars' || b.category === 'both');
-                                                return carBrands.length ? carBrands.map((b: any) => <option key={b.id} value={b.name}>{b.name}</option>) : [<option key="manual" value={formData.make || ''}>{formData.make || (isRTL ? 'اكتب الماركة' : 'Type brand')}</option>];
-                                            })()}
+                                            <option value="">{isRTL ? 'اختر الماركة' : 'Select Brand'}</option>
+                                            {brands.map((b: any) => (
+                                                <option key={b._id} value={b.name}>{b.name}</option>
+                                            ))}
+                                            {!brands.some(b => b.name === formData.make) && formData.make && (
+                                                <option value={formData.make}>{formData.make}</option>
+                                            )}
                                         </select>
                                     </div>
                                     <div>

@@ -21,14 +21,25 @@ export default function Showroom() {
     const [loading, setLoading] = useState(false);
 
     // --- Mock Brands for Agencies ---
-    const AGENCIES = [
-        { id: 'toyota', name: isRTL ? 'تويوتا' : 'TOYOTA', logo: '/images/شعارات/TOYOTA.jpg' },
-        { id: 'kia', name: isRTL ? 'كيا' : 'KIA', logo: '/images/شعارات/photo_6_2026-02-05_20-57-23.jpg' },
-        { id: 'hyundai', name: isRTL ? 'هيونداي' : 'HYUNDAI', logo: '/images/شعارات/photo_7_2026-02-05_20-57-23.jpg' },
-        { id: 'ford', name: isRTL ? 'فورد' : 'FORD', logo: '/images/شعارات/photo_8_2026-02-05_20-57-23.jpg' },
-        { id: 'nissan', name: isRTL ? 'نيسان' : 'NISSAN', logo: '/images/شعارات/photo_9_2026-02-05_20-57-23.jpg' },
-        { id: 'mercedes', name: isRTL ? 'مرسيدس' : 'MERCEDES', logo: '/images/شعارات/photo_10_2026-02-05_20-57-23.jpg' },
-    ];
+    const [agencies, setAgencies] = useState<any[]>([]);
+
+    useEffect(() => {
+        const fetchAgencies = async () => {
+            try {
+                const res = await api.brands.list('cars');
+                if (res?.success && Array.isArray(res.brands)) {
+                    setAgencies(res.brands.map((b: any) => ({
+                        id: b._id,
+                        name: b.name,
+                        logo: b.logoUrl || '/images/placeholder.jpg'
+                    })));
+                }
+            } catch (err) {
+                console.error("Failed to fetch agencies", err);
+            }
+        };
+        fetchAgencies();
+    }, []);
 
     const handleAgencySelect = async (agency: any) => {
         setSelectedAgency(agency);
@@ -36,10 +47,11 @@ export default function Showroom() {
         setLoading(true);
         try {
             const data = await api.cars.list({ limit: 50 });
-            // Filter by agency name or ID if supported by API
-            const filtered = (data.cars || []).filter((c: any) =>
-                String(c.make?.name || c.make || '').toLowerCase().includes(agency.id.toLowerCase())
-            );
+            // Filter by agency name or ID
+            const filtered = (data.cars || []).filter((c: any) => {
+                const carMake = typeof c.make === 'object' ? c.make.name : c.make;
+                return String(carMake || '').toLowerCase() === agency.name.toLowerCase();
+            });
             setCars(filtered);
         } catch { } finally {
             setLoading(false);
@@ -146,7 +158,7 @@ export default function Showroom() {
                             </div>
 
                             <div className="grid grid-cols-2 gap-x-12 gap-y-20">
-                                {AGENCIES.map((agency, idx) => (
+                                {agencies.map((agency, idx) => (
                                     <motion.div
                                         key={agency.id}
                                         initial={{ opacity: 0, y: 50 }}

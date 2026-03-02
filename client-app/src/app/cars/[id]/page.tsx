@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useLocale } from '@/hooks/useLocale';
+import Image from 'next/image';
 import ClientPageHeader from '@/components/ClientPageHeader';
 
 interface CarDetails {
@@ -44,20 +45,7 @@ export default function CarDetailsPage() {
     const [isFavorite, setIsFavorite] = useState(false);
     const [contactPhone, setContactPhone] = useState('+967781007805');
 
-    useEffect(() => {
-        if (params.id) {
-            fetchCarDetails();
-            checkFavorite();
-        }
-        // جلب رقم الاتصال من الإعدادات العامة (لا يحتاج تسجيل دخول)
-        api.settings.getPublic().then((res: any) => {
-            if (res?.success && res?.data?.socialLinks?.whatsapp) {
-                setContactPhone(res.data.socialLinks.whatsapp);
-            }
-        }).catch(() => { });
-    }, [params.id]);
-
-    const fetchCarDetails = async () => {
+    const fetchCarDetails = useCallback(async () => {
         try {
             setLoading(true);
             const response = await api.cars.getById(params.id as string);
@@ -66,21 +54,35 @@ export default function CarDetailsPage() {
             } else {
                 setError(isRTL ? 'السيارة غير موجودة' : 'Car not found');
             }
-        } catch (err: any) {
-            setError(err.message || (isRTL ? 'حدث خطأ' : 'An error occurred'));
+        } catch (err: unknown) {
+            const errorMsg = err instanceof Error ? err.message : (isRTL ? 'حدث خطأ' : 'An error occurred');
+            setError(errorMsg);
         } finally {
             setLoading(false);
         }
-    };
+    }, [params.id, isRTL]);
 
-    const checkFavorite = async () => {
+    const checkFavorite = useCallback(async () => {
         try {
             const response = await api.favorites.check(params.id as string);
             setIsFavorite(response.isFavorite);
         } catch (err) {
             // Not logged in or error
         }
-    };
+    }, [params.id]);
+
+    useEffect(() => {
+        if (params.id) {
+            fetchCarDetails();
+            checkFavorite();
+        }
+        // جلب رقم الاتصال من الإعدادات العامة (لا يحتاج تسجيل دخول)
+        api.settings.getPublic().then((res: { success: boolean, data?: any }) => {
+            if (res?.success && res?.data?.socialLinks?.whatsapp) {
+                setContactPhone(res.data.socialLinks.whatsapp);
+            }
+        }).catch(() => { });
+    }, [params.id, fetchCarDetails, checkFavorite]);
 
     const toggleFavorite = async () => {
         try {
@@ -99,8 +101,9 @@ export default function CarDetailsPage() {
         try {
             await api.comparisons.add(params.id as string);
             alert(isRTL ? 'تمت الإضافة للمقارنة' : 'Added to comparison');
-        } catch (err: any) {
-            alert(err.message);
+        } catch (err: unknown) {
+            const errorMsg = err instanceof Error ? err.message : 'Error';
+            alert(errorMsg);
         }
     };
 
@@ -162,10 +165,12 @@ export default function CarDetailsPage() {
                         {/* Main Image */}
                         <div className="relative aspect-[4/3] rounded-3xl overflow-hidden bg-white/5 border border-white/10">
                             {car.images && car.images.length > 0 ? (
-                                <img
+                                <Image
                                     src={car.images[currentImageIndex]}
                                     alt={car.title}
-                                    className="w-full h-full object-cover"
+                                    fill
+                                    className="object-cover"
+                                    priority
                                 />
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center">
@@ -213,10 +218,10 @@ export default function CarDetailsPage() {
                                     <button
                                         key={index}
                                         onClick={() => setCurrentImageIndex(index)}
-                                        className={`flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all ${index === currentImageIndex ? 'border-[#c5a059]' : 'border-transparent opacity-60 hover:opacity-100'
+                                        className={`flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all relative ${index === currentImageIndex ? 'border-[#c5a059]' : 'border-transparent opacity-60 hover:opacity-100'
                                             }`}
                                     >
-                                        <img src={img} alt="" className="w-full h-full object-cover" />
+                                        <Image src={img} alt="" fill className="object-cover" />
                                     </button>
                                 ))}
                             </div>

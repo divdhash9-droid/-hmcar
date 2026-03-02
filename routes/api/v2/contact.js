@@ -35,6 +35,18 @@ router.post('/', async (req, res) => {
             status: 'new'
         });
 
+        // إضافة إلى سجل الأنشطة ليظهر للأدمن
+        try {
+            const AuditLog = require('../../../models/AuditLog');
+            await AuditLog.create({
+                action: 'CREATE',
+                target: 'Contact',
+                targetId: contact._id,
+                description: `رسالة تواصل جديدة من ${name.trim()}: ${subject || 'استفسار عام'}`,
+                metadata: { email: email.trim() }
+            });
+        } catch (auditErr) { console.error('Failed to log contact activity', auditErr); }
+
         res.status(201).json({
             success: true,
             message: 'تم إرسال رسالتك بنجاح، سنتواصل معك قريباً',

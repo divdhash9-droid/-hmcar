@@ -43,6 +43,7 @@ interface DashboardStats {
     pendingOrders?: number;
     totalParts?: number;
     totalBrands?: number;
+    newContacts?: number;
 }
 
 interface AuditLogEntry {
@@ -145,8 +146,10 @@ export default function AdminDashboard() {
         { icon: Layers, label: isRTL ? 'قطع الغيار' : 'SPARE PARTS', href: '/admin/parts', accent: 'bg-cinematic-neon-yellow/20 text-cinematic-neon-yellow' },
         { icon: ShoppingCart, label: isRTL ? 'الطلبات' : 'ORDERS', href: '/admin/orders', accent: 'bg-white/10 text-white' },
         { icon: Users, label: isRTL ? 'إدارة الأعضاء' : 'MEMBER DIR', href: '/admin/users', accent: 'bg-white/10 text-white' },
-        { icon: Mail, label: isRTL ? 'رسائل العملاء' : 'MESSAGES', href: '/admin/messages', accent: 'bg-cinematic-neon-blue/20 text-cinematic-neon-blue' },
+        { id: 'contact', icon: Mail, label: isRTL ? 'استفسارات الموقع' : 'INQUIRIES', href: '/admin/contact', accent: 'bg-cinematic-neon-red/20 text-cinematic-neon-red' },
+        { icon: MessageCircle, label: isRTL ? 'المحادثات المباشرة' : 'DIRECT CHATS', href: '/admin/messages', accent: 'bg-cinematic-neon-blue/20 text-cinematic-neon-blue shadow-[0_0_15px_rgba(0,240,255,0.3)]' },
         { icon: TrendingUp, label: isRTL ? 'التقارير' : 'REPORTS', href: '/admin/reports', accent: 'bg-green-400/20 text-green-400' },
+        { icon: Tag, label: t('brands'), href: '/admin/brands', accent: 'bg-cinematic-neon-yellow/30 text-cinematic-neon-yellow shadow-[0_0_15px_rgba(252,238,10,0.3)]' },
         { icon: Settings, label: t('settings'), href: '/admin/settings', accent: 'bg-white/5 text-white/40' },
     ];
 
@@ -159,7 +162,8 @@ export default function AdminDashboard() {
         { id: 'brands', icon: Tag, label: t('brands'), href: '/admin/brands' },
         { id: 'orders', icon: ShoppingCart, label: isRTL ? 'الطلبات' : 'ORDERS', href: '/admin/orders' },
         { id: 'users', icon: Users, label: isRTL ? 'المستخدمون' : 'DIRECTORY', href: '/admin/users' },
-        { id: 'messages', icon: MessageCircle, label: isRTL ? 'الرسائل' : 'MESSAGES', href: '/admin/messages' },
+        { id: 'contact', icon: Mail, label: isRTL ? 'الاستفسارات' : 'INQUIRIES', href: '/admin/contact' },
+        { id: 'messages', icon: MessageCircle, label: isRTL ? 'المحادثات' : 'CHATS', href: '/admin/messages' },
         { id: 'reports', icon: TrendingUp, label: isRTL ? 'التقارير' : 'REPORTS', href: '/admin/reports' },
         { id: 'notifications', icon: Bell, label: isRTL ? 'الإشعارات' : 'ALERTS', href: '/admin/notifications' },
         { id: 'social', icon: Share2, label: t('social'), href: '/admin/social' },
@@ -367,10 +371,15 @@ export default function AdminDashboard() {
                                             whileHover={{ scale: 1.05, y: -5 }}
                                             whileTap={{ scale: 0.95 }}
                                             className={cn(
-                                                "p-10 rounded-[2.5rem] border border-white/5 flex flex-col items-center gap-6 text-center group cursor-pointer transition-all",
+                                                "p-10 rounded-[2.5rem] border border-white/5 flex flex-col items-center gap-6 text-center group cursor-pointer transition-all relative",
                                                 "bg-white/[0.02] hover:bg-white/[0.05] hover:border-cinematic-neon-red/20 shadow-2xl"
                                             )}
                                         >
+                                            {action.id === 'contact' && stats?.newContacts && stats.newContacts > 0 && (
+                                                <div className="absolute top-6 right-6 w-8 h-8 bg-cinematic-neon-red rounded-full flex items-center justify-center text-[10px] font-black shadow-[0_0_15px_rgba(255,0,60,1)] animate-pulse">
+                                                    {stats.newContacts}
+                                                </div>
+                                            )}
                                             <div className={cn("p-5 rounded-2xl transition-all group-hover:scale-125 duration-500", action.accent)}>
                                                 <action.icon className="w-8 h-8" />
                                             </div>

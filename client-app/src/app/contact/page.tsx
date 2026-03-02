@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Phone, Mail, Clock, Send, CheckCircle, AlertCircle, MessageCircle } from 'lucide-react';
 import { api } from '@/lib/api';
@@ -43,10 +43,30 @@ export default function ContactPage() {
         }
     };
 
+    const [contactData, setContactData] = useState({
+        phone: '+967781007805',
+        email: 'info@hmcar.com',
+        address: isRTL ? 'الرياض، المملكة العربية السعودية' : 'Riyadh, Saudi Arabia',
+        whatsapp: '+967781007805'
+    });
+
+    useEffect(() => {
+        api.settings.getPublic().then((res: any) => {
+            if (res?.success) {
+                setContactData({
+                    phone: res.data.contactInfo?.phone || '+967781007805',
+                    email: res.data.contactInfo?.email || 'info@hmcar.com',
+                    address: res.data.contactInfo?.address || (isRTL ? 'الرياض، المملكة العربية السعودية' : 'Riyadh, Saudi Arabia'),
+                    whatsapp: res.data.socialLinks?.whatsapp || '+967781007805'
+                });
+            }
+        }).catch(() => { });
+    }, [isRTL]);
+
     const contactInfo = [
-        { icon: MapPin, title: isRTL ? 'العنوان' : 'Address', content: isRTL ? 'الرياض، المملكة العربية السعودية' : 'Riyadh, Saudi Arabia' },
-        { icon: Phone, title: isRTL ? 'الهاتف' : 'Phone', content: '+966 50 000 0000' },
-        { icon: Mail, title: isRTL ? 'البريد' : 'Email', content: 'info@hmcar.sa' },
+        { icon: MapPin, title: isRTL ? 'العنوان' : 'Address', content: contactData.address },
+        { icon: Phone, title: isRTL ? 'الهاتف' : 'Phone', content: contactData.phone },
+        { icon: Mail, title: isRTL ? 'البريد' : 'Email', content: contactData.email },
         { icon: Clock, title: isRTL ? 'ساعات العمل' : 'Hours', content: isRTL ? 'السبت - الخميس: 9ص - 9م' : 'Sat - Thu: 9AM - 9PM' },
     ];
 
@@ -132,7 +152,7 @@ export default function ContactPage() {
                             initial={{ opacity: 0, y: 15 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.4 }}
-                            href="https://wa.me/966500000000"
+                            href={`https://wa.me/${contactData.whatsapp.replace(/[^0-9]/g, '')}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center justify-center gap-3 p-5 bg-[#25D366]/10 border border-[#25D366]/20 rounded-xl hover:bg-[#25D366]/20 transition-all"

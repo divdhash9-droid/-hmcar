@@ -43,7 +43,7 @@ interface SocialLinksProps {
 
 // بيانات تجريبية - ستأتي من API
 const defaultSocialLinks = {
-    whatsapp: '+966500000000',
+    whatsapp: '+967781007805',
     instagram: 'https://instagram.com/hmcar',
     twitter: 'https://x.com/hmcar',
     facebook: '',
@@ -197,7 +197,15 @@ export default function SocialLinks({
 
 // مكون العائم (FAB) للواتساب
 export function WhatsAppFAB() {
-    const whatsappNumber = '+966500000000'; // سيأتي من API
+    const [whatsappNumber, setWhatsappNumber] = useState('+967781007805');
+
+    useEffect(() => {
+        api.settings.getPublic().then((res: any) => {
+            if (res?.success && res.data.socialLinks?.whatsapp) {
+                setWhatsappNumber(res.data.socialLinks.whatsapp);
+            }
+        }).catch(() => { });
+    }, []);
 
     return (
         <motion.a

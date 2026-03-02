@@ -17,6 +17,16 @@ export default function LiveAuctionDetails() {
     const [loading, setLoading] = useState(true);
     const [selectedCar, setSelectedCar] = useState<any>(null);
 
+    const [globalWhatsapp, setGlobalWhatsapp] = useState('+967781007805');
+
+    useEffect(() => {
+        api.settings.getPublic().then((res: any) => {
+            if (res?.success && res.data.socialLinks?.whatsapp) {
+                setGlobalWhatsapp(res.data.socialLinks.whatsapp);
+            }
+        }).catch(() => { });
+    }, []);
+
     useEffect(() => {
         const loadSession = async () => {
             try {
@@ -32,7 +42,7 @@ export default function LiveAuctionDetails() {
     }, [id]);
 
     const handleBuyRequest = (car: any) => {
-        const phone = session.whatsappNumber || "966550616161"; // Default if not set
+        const phone = session.whatsappNumber || globalWhatsapp; // استخدم رقم المزاد أو الرقم العام الافتراضي
         const text = encodeURIComponent(
             isRTL
                 ? `السلام عليكم، أريد الاستفسار عن شراء سيارة من المزاد المباشر:\nالسيارة: ${car.title}\nالمزاد: ${session.title}\nرقم اللوت: ${car.lotNumber || 'N/A'}`
@@ -167,7 +177,7 @@ export default function LiveAuctionDetails() {
 
                         <div className="pt-8 border-t border-white/5">
                             <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.4em] mb-6 block">Support</span>
-                            <a href={`https://wa.me/${session.whatsappNumber || '966550616161'}`} className="w-full py-4 bg-green-500/10 border border-green-500/20 rounded-2xl flex items-center justify-center gap-3 text-green-500 hover:bg-green-500/20 transition-all">
+                            <a href={`https://wa.me/${(session.whatsappNumber || globalWhatsapp).replace(/[^0-9]/g, '')}`} className="w-full py-4 bg-green-500/10 border border-green-500/20 rounded-2xl flex items-center justify-center gap-3 text-green-500 hover:bg-green-500/20 transition-all">
                                 <MessageCircle className="w-5 h-5" />
                                 <span className="text-[10px] font-black uppercase tracking-widest">{isRTL ? 'تحدث مع المستشار' : 'TALK TO EXPERT'}</span>
                             </a>

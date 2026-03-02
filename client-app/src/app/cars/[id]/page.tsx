@@ -42,12 +42,19 @@ export default function CarDetailsPage() {
     const [error, setError] = useState('');
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isFavorite, setIsFavorite] = useState(false);
+    const [contactPhone, setContactPhone] = useState('+966500000000');
 
     useEffect(() => {
         if (params.id) {
             fetchCarDetails();
             checkFavorite();
         }
+        // جلب رقم الاتصال من الإعدادات
+        api.settings.get().then((res: any) => {
+            if (res?.success && res?.data?.socialLinks?.whatsapp) {
+                setContactPhone(res.data.socialLinks.whatsapp);
+            }
+        }).catch(() => { });
     }, [params.id]);
 
     const fetchCarDetails = async () => {
@@ -318,14 +325,14 @@ export default function CarDetailsPage() {
                         {!car.isSold && (
                             <div className="flex gap-4 pt-4">
                                 <a
-                                    href="tel:+966500000000"
+                                    href={`tel:${contactPhone}`}
                                     className="flex-1 flex items-center justify-center gap-3 px-8 py-4 bg-[#c5a059] text-black font-bold rounded-xl hover:bg-[#d4af68] transition-all"
                                 >
                                     <Phone className="w-5 h-5" />
                                     <span>{isRTL ? 'اتصل الآن' : 'Call Now'}</span>
                                 </a>
                                 <a
-                                    href="https://wa.me/966500000000"
+                                    href={`https://wa.me/${contactPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(isRTL ? `أريد الاستفسار عن: ${car.title}` : `I'm interested in: ${car.title}`)}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="flex-1 flex items-center justify-center gap-3 px-8 py-4 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition-all"

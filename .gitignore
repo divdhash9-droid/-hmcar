@@ -59,4 +59,3 @@ test-results/
 
 # Railway
 .env.railway
-railway.json

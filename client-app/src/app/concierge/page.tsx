@@ -19,7 +19,7 @@ export default function ConciergePage() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         const text = `New Request (${activeTab}):\nName: ${formData.name}\nPhone: ${formData.phone}\nDetails: ${formData.details}\nBudget: ${formData.budget}`;
-        window.open(`https://wa.me/966555555555?text=${encodeURIComponent(text)}`, '_blank');
+        window.open(`https://wa.me/966500000000?text=${encodeURIComponent(text)}`, '_blank');
     };
 
     return (

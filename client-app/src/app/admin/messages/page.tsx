@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     MessageCircle, Send, Search, ChevronLeft,
@@ -100,7 +100,7 @@ export default function AdminMessagesPage() {
                 ]);
             }
             // Mark as read
-            setConversations(prev => prev.map(c =>
+            setConversations((prev: Conversation[]) => prev.map((c: Conversation) =>
                 c.userId === conv.userId ? { ...c, unreadCount: 0 } : c
             ));
         } catch {
@@ -120,10 +120,10 @@ export default function AdminMessagesPage() {
             createdAt: new Date().toISOString(),
             read: false,
         };
-        setMessages(prev => [...prev, tempMsg]);
+        setMessages((prev: Message[]) => [...prev, tempMsg]);
         try {
             await api.messages.send(selectedConv.userId, content);
-            setConversations(prev => prev.map(c =>
+            setConversations((prev: Conversation[]) => prev.map((c: Conversation) =>
                 c.userId === selectedConv.userId
                     ? { ...c, lastMessage: content, lastMessageAt: new Date().toISOString() }
                     : c
@@ -194,7 +194,7 @@ export default function AdminMessagesPage() {
                                 <Search className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-3" : "left-3")} />
                                 <input
                                     value={search}
-                                    onChange={e => setSearch(e.target.value)}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
                                     placeholder={isRTL ? 'بحث في المحادثات...' : 'Search conversations...'}
                                     className={cn(
                                         "w-full bg-white/5 border border-white/10 rounded-xl py-3 text-[11px] font-bold text-white/60 placeholder-white/20 focus:outline-none focus:border-cinematic-neon-blue/40 transition-all",
@@ -215,7 +215,7 @@ export default function AdminMessagesPage() {
                                     {isRTL ? 'لا توجد محادثات' : 'No conversations'}
                                 </div>
                             ) : (
-                                filtered.map(conv => (
+                                filtered.map((conv: Conversation) => (
                                     <motion.button
                                         key={conv.userId}
                                         whileHover={{ x: isRTL ? -4 : 4 }}
@@ -299,7 +299,7 @@ export default function AdminMessagesPage() {
                                 {/* Messages */}
                                 <div className="flex-1 overflow-y-auto p-5 space-y-4">
                                     <AnimatePresence initial={false}>
-                                        {messages.map(msg => {
+                                        {messages.map((msg: Message) => {
                                             const isMe = msg.isFromMe;
                                             return (
                                                 <motion.div
@@ -328,7 +328,7 @@ export default function AdminMessagesPage() {
                                                         </div>
                                                         <div className={cn("flex items-center gap-1", isMe ? "flex-row-reverse" : "flex-row")}>
                                                             <span className="text-[9px] text-white/20">{formatTime(msg.createdAt)}</span>
-                                                            {isMe && <CheckCheck className={cn("w-3 h-3", msg.isRead ? "text-cinematic-neon-blue" : "text-white/20")} />}
+                                                            {isMe && <CheckCheck className={cn("w-3 h-3", msg.read ? "text-cinematic-neon-blue" : "text-white/20")} />}
                                                         </div>
                                                     </div>
                                                 </motion.div>

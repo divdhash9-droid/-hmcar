@@ -186,7 +186,7 @@ export default function AdminBrandsPage() {
             <div className="space-y-6">
               <div>
                 <label className="block text-[9px] font-black uppercase tracking-[0.3em] text-white/40 mb-2 italic">{isRTL ? 'اسم الوكالة / الماركة' : 'AGENCY / BRAND NAME'}</label>
-                <input value={name} onChange={(e) => setName(e.target.value)} title="Name" placeholder="..." className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-4 px-4 text-sm font-bold text-white focus:outline-none focus:border-[#c9a96e]/40 transition-all" />
+                <input value={name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)} title="Name" placeholder="..." className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-4 px-4 text-sm font-bold text-white focus:outline-none focus:border-[#c9a96e]/40 transition-all" />
               </div>
 
               <div>
@@ -234,13 +234,13 @@ export default function AdminBrandsPage() {
                     <span className="text-[9px] font-black uppercase tracking-widest text-[#c9a96e]">{isRTL ? 'بيانات الوكالة' : 'AGENCY DETAILS'}</span>
                   </div>
                   <div>
-                    <input value={location} onChange={(e) => setLocation(e.target.value)} placeholder={isRTL ? 'الموقع (سيئول، دبي...)' : 'Location (Seoul, Dubai...)'} className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 px-4 text-xs font-bold text-white focus:outline-none focus:border-[#c9a96e]/40" />
+                    <input value={location} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLocation(e.target.value)} placeholder={isRTL ? 'الموقع (سيئول، دبي...)' : 'Location (Seoul, Dubai...)'} className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 px-4 text-xs font-bold text-white focus:outline-none focus:border-[#c9a96e]/40" />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
-                    <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={isRTL ? 'الهاتف' : 'Phone'} className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 px-4 text-xs font-bold text-white focus:outline-none focus:border-[#c9a96e]/40" />
-                    <input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="WhatsApp" className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 px-4 text-xs font-bold text-white focus:outline-none focus:border-[#c9a96e]/40" />
+                    <input value={phone} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPhone(e.target.value)} placeholder={isRTL ? 'الهاتف' : 'Phone'} className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 px-4 text-xs font-bold text-white focus:outline-none focus:border-[#c9a96e]/40" />
+                    <input value={whatsapp} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWhatsapp(e.target.value)} placeholder="WhatsApp" className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 px-4 text-xs font-bold text-white focus:outline-none focus:border-[#c9a96e]/40" />
                   </div>
-                  <textarea value={isRTL ? descriptionAr : description} onChange={(e) => isRTL ? setDescriptionAr(e.target.value) : setDescription(e.target.value)} placeholder={isRTL ? 'وصف مختصر للوكالة...' : 'Short description...'} rows={3} className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 px-4 text-xs font-bold text-white focus:outline-none focus:border-[#c9a96e]/40 resize-none" />
+                  <textarea value={isRTL ? descriptionAr : description} onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => isRTL ? setDescriptionAr(e.target.value) : setDescription(e.target.value)} placeholder={isRTL ? 'وصف مختصر للوكالة...' : 'Short description...'} rows={3} className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 px-4 text-xs font-bold text-white focus:outline-none focus:border-[#c9a96e]/40 resize-none" />
                 </div>
               )}
 

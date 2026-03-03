@@ -178,7 +178,7 @@ export default function Showroom() {
                             </div>
 
                             <div className="grid grid-cols-2 gap-x-12 gap-y-20">
-                                {agencies.map((agency, idx) => (
+                                {agencies.map((agency: any, idx: number) => (
                                     <motion.div
                                         key={agency.id}
                                         initial={{ opacity: 0, y: 50 }}
@@ -241,7 +241,7 @@ export default function Showroom() {
                             ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                     <AnimatePresence mode="popLayout">
-                                        {cars.map((car, i) => (
+                                        {cars.map((car: any, i: number) => (
                                             <motion.div
                                                 key={car.id}
                                                 layout
@@ -260,7 +260,7 @@ export default function Showroom() {
                                                         />
                                                         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
                                                         <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
-                                                            <button className="w-9 h-9 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/30 hover:text-red-400 hover:border-red-400/30 transition-all">
+                                                            <button aria-label="Favorite" className="w-9 h-9 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/30 hover:text-red-400 hover:border-red-400/30 transition-all">
                                                                 <Heart className="w-3.5 h-3.5" />
                                                             </button>
                                                         </div>
@@ -281,7 +281,7 @@ export default function Showroom() {
                                                                 <span className="text-lg font-black gradient-text-gold">{Number(car.price || 0).toLocaleString()}<span className="text-[9px] text-white/20 ml-1 font-normal"> SAR</span></span>
                                                             </div>
                                                             <Link href={`/showroom/${car.id}`}>
-                                                                <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/5 flex items-center justify-center hover:bg-white hover:text-black transition-all">
+                                                                <div aria-label="View Details" className="w-10 h-10 rounded-lg bg-white/5 border border-white/5 flex items-center justify-center hover:bg-white hover:text-black transition-all">
                                                                     <ArrowUpRight className={cn("w-4 h-4", isRTL && "scale-x-[-1]")} />
                                                                 </div>
                                                             </Link>

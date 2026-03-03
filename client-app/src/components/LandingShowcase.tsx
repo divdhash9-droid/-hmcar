@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Car, Wrench, Gavel, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -246,10 +247,16 @@ export default function LandingShowcase({ isRTL, latestCars = [] }: LandingShowc
                                 {results.map((c, i) => (
                                     <div key={i} className="group rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden flex transition-all hover:border-accent-gold/30">
                                         <div className="relative w-40 h-28 shrink-0">
-                                            <img src={c.images && c.images.length ? c.images[0] : "/images/placeholder.jpg"} alt={c.title || "Car"} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                            <Image
+                                                src={c.images && c.images.length ? c.images[0] : "/images/placeholder.jpg"}
+                                                alt={c.title || "Car"}
+                                                fill
+                                                sizes="160px"
+                                                className="object-cover group-hover:scale-110 transition-transform duration-700"
+                                            />
                                         </div>
                                         <div className="p-4 flex flex-col justify-center">
-                                            <p className="text-white font-black text-sm uppercase italic tracking-tighter">{typeof c.make === "string" ? c.make : c.make?.name || c.title}</p>
+                                            <p className="text-white font-bold text-sm uppercase italic tracking-tighter truncate w-32">{typeof c.make === "string" ? c.make : c.make?.name || c.title}</p>
                                             <p className="text-accent-gold text-[10px] font-bold uppercase tracking-widest mt-1">{c.model || ""}</p>
                                         </div>
                                     </div>

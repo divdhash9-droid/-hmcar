@@ -95,11 +95,11 @@ export default function CinematicVideoBackground({
           >
             <Image
               src={fallbackImage}
-              alt="Background Fallback"
+              alt="Background"
               fill
-              priority
+              loading="lazy"
               quality={75}
-              className="object-cover object-top"
+              className="object-cover opacity-50"
             />
           </motion.div>
         )}

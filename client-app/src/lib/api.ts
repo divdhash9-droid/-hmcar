@@ -281,6 +281,11 @@ export const api = {
             method: 'POST',
             body: JSON.stringify({ receiverId, content }),
         }),
+        getSupportMessages: () => fetchAPI('/api/v2/messages/support'),
+        sendSupportMessage: (content: string) => fetchAPI('/api/v2/messages/support', {
+            method: 'POST',
+            body: JSON.stringify({ content }),
+        }),
         markRead: (messageId: string) => fetchAPI(`/api/v2/messages/${messageId}/read`, {
             method: 'PATCH',
         }),

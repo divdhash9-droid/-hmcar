@@ -24,10 +24,9 @@ interface Conversation {
 interface Message {
     id: string;
     content: string;
-    senderId: string;
-    senderName: string;
+    isFromMe: boolean;
     createdAt: string;
-    isRead: boolean;
+    read: boolean;
 }
 
 export default function AdminMessagesPage() {
@@ -60,8 +59,14 @@ export default function AdminMessagesPage() {
         try {
             setLoading(true);
             const data = await api.messages.conversations();
-            if (data.success && Array.isArray(data.conversations)) {
-                setConversations(data.conversations);
+            if (data.success && Array.isArray(data.data)) {
+                setConversations(data.data.map((item: any) => ({
+                    userId: item.user?._id || item.id,
+                    userName: item.user?.name || 'Unknown',
+                    lastMessage: item.lastMessage?.content || '',
+                    lastMessageAt: item.lastMessage?.createdAt || new Date().toISOString(),
+                    unreadCount: item.unreadCount || 0
+                })));
             } else {
                 // Fallback mock if API not ready
                 setConversations([
@@ -85,13 +90,13 @@ export default function AdminMessagesPage() {
         setSelectedConv(conv);
         try {
             const data = await api.messages.conversation(conv.userId);
-            if (data.success && Array.isArray(data.messages)) {
-                setMessages(data.messages);
+            if (data.success && Array.isArray(data.data)) {
+                setMessages(data.data);
             } else {
                 setMessages([
-                    { id: 'm1', content: 'Hello, I am interested in the BMW M5', senderId: conv.userId, senderName: conv.userName, createdAt: new Date(Date.now() - 3600000).toISOString(), isRead: true },
-                    { id: 'm2', content: 'Of course! Which year and spec are you looking for?', senderId: 'admin', senderName: 'Admin', createdAt: new Date(Date.now() - 3500000).toISOString(), isRead: true },
-                    { id: 'm3', content: 'I prefer 2023 Competition Package in black', senderId: conv.userId, senderName: conv.userName, createdAt: new Date(Date.now() - 600000).toISOString(), isRead: false },
+                    { id: 'm1', content: 'Hello, I am interested in the BMW M5', isFromMe: false, createdAt: new Date(Date.now() - 3600000).toISOString(), read: true },
+                    { id: 'm2', content: 'Of course! Which year and spec are you looking for?', isFromMe: true, createdAt: new Date(Date.now() - 3500000).toISOString(), read: true },
+                    { id: 'm3', content: 'I prefer 2023 Competition Package in black', isFromMe: false, createdAt: new Date(Date.now() - 600000).toISOString(), read: false },
                 ]);
             }
             // Mark as read
@@ -111,10 +116,9 @@ export default function AdminMessagesPage() {
         const tempMsg: Message = {
             id: `temp-${Date.now()}`,
             content,
-            senderId: adminId || 'admin',
-            senderName: 'Admin',
+            isFromMe: true,
             createdAt: new Date().toISOString(),
-            isRead: false,
+            read: false,
         };
         setMessages(prev => [...prev, tempMsg]);
         try {
@@ -296,7 +300,7 @@ export default function AdminMessagesPage() {
                                 <div className="flex-1 overflow-y-auto p-5 space-y-4">
                                     <AnimatePresence initial={false}>
                                         {messages.map(msg => {
-                                            const isMe = msg.senderId === adminId || msg.senderId === 'admin';
+                                            const isMe = msg.isFromMe;
                                             return (
                                                 <motion.div
                                                     key={msg.id}
@@ -306,12 +310,12 @@ export default function AdminMessagesPage() {
                                                     className={cn("flex gap-3", isMe ? "flex-row-reverse" : "flex-row")}
                                                 >
                                                     <div className={cn(
-                                                        "w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[9px] font-black",
+                                                        "w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black uppercase",
                                                         isMe
-                                                            ? "bg-cinematic-neon-red/20 border border-cinematic-neon-red/30 text-cinematic-neon-red"
+                                                            ? "bg-accent-gold/20 border border-accent-gold/30 text-accent-gold"
                                                             : "bg-white/10 border border-white/10 text-white/40"
                                                     )}>
-                                                        {isMe ? 'A' : msg.senderName?.[0]?.toUpperCase() || <User className="w-4 h-4" />}
+                                                        {isMe ? 'A' : (selectedConv?.userName?.[0] || 'U')}
                                                     </div>
                                                     <div className={cn("max-w-[70%] space-y-1", isMe ? "items-end" : "items-start", "flex flex-col")}>
                                                         <div className={cn(

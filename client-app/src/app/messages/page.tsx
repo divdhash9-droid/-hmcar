@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import { useLanguage } from '@/lib/LanguageContext';
+import { api } from '@/lib/api';
 import ClientPageHeader from '@/components/ClientPageHeader';
 
 interface Message {
@@ -16,21 +17,6 @@ interface Message {
     isFromMe: boolean;
     read: boolean;
     createdAt: string;
-}
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4002';
-
-async function apiFetch(path: string, options: RequestInit = {}) {
-    const token = localStorage.getItem('hm_token') || sessionStorage.getItem('hm_token');
-    const res = await fetch(`${API_URL}/api/v2${path}`, {
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-            ...options.headers,
-        },
-    });
-    return res.json();
 }
 
 export default function MessagesPage() {
@@ -47,7 +33,7 @@ export default function MessagesPage() {
     const pollRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
-        const token = localStorage.getItem('hm_token') || sessionStorage.getItem('hm_token');
+        const token = typeof window !== 'undefined' ? (localStorage.getItem('hm_token') || sessionStorage.getItem('hm_token')) : null;
         if (token) {
             setIsLoggedIn(true);
             loadMessages();
@@ -72,7 +58,7 @@ export default function MessagesPage() {
 
     const loadMessages = async () => {
         try {
-            const data = await apiFetch('/messages/support');
+            const data = await api.messages.getSupportMessages();
             if (data.success) {
                 setMessages(data.data || []);
                 if (data.supportName) setSupportName(data.supportName);
@@ -104,10 +90,7 @@ export default function MessagesPage() {
         setNewMessage('');
 
         try {
-            const data = await apiFetch('/messages/support', {
-                method: 'POST',
-                body: JSON.stringify({ content: text }),
-            });
+            const data = await api.messages.sendSupportMessage(text);
             if (data.success) {
                 // Replace temp with real
                 setMessages(prev => prev.map(m =>

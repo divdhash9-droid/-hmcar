@@ -1,8 +1,8 @@
 'use client';
 
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
-import { Heart, Car, ArrowUpRight, Sparkles, ChevronLeft, ChevronRight } from "lucide-react";
+import { Heart, Car, ArrowUpRight, Sparkles, ChevronLeft, ChevronRight, MapPin, Phone, MessageSquare } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/LanguageContext";
@@ -31,7 +31,12 @@ export default function Showroom() {
                     setAgencies(res.brands.map((b: any) => ({
                         id: b._id,
                         name: b.name,
-                        logo: b.logoUrl || '/images/placeholder.jpg'
+                        logo: b.logoUrl || '/images/placeholder.jpg',
+                        location: b.location,
+                        phone: b.phone,
+                        whatsapp: b.whatsapp,
+                        description: b.description,
+                        description_ar: b.description_ar
                     })));
                 }
             } catch (err) {
@@ -133,7 +138,22 @@ export default function Showroom() {
                             <h1 className="text-4xl md:text-6xl font-black tracking-[-0.04em] uppercase leading-tight">
                                 {viewMode === 'AGENCIES' ? (isRTL ? "اختر الوكالة" : "SELECT AGENCY") : (isRTL ? `سيارات ${selectedAgency?.name}` : `${selectedAgency?.name} COLLECTION`)}
                             </h1>
-                            <div className="separator-gold w-16 mt-4" />
+                            {viewMode === 'CARS' && selectedAgency && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="flex flex-wrap gap-x-6 gap-y-2 mt-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/40"
+                                >
+                                    {selectedAgency.location && <span className="flex items-center gap-2"><MapPin className="w-3 h-3 text-accent-gold/40" /> {selectedAgency.location}</span>}
+                                    {selectedAgency.phone && <span className="flex items-center gap-2"><Phone className="w-3 h-3 text-accent-gold/40" /> {selectedAgency.phone}</span>}
+                                    {selectedAgency.whatsapp && (
+                                        <a href={`https://wa.me/${selectedAgency.whatsapp}`} target="_blank" className="flex items-center gap-2 text-luxury-gold/60 hover:text-luxury-gold transition-colors">
+                                            <MessageSquare className="w-3 h-3" /> WhatsApp
+                                        </a>
+                                    )}
+                                </motion.div>
+                            )}
+                            <div className="separator-gold w-16 mt-6" />
                         </div>
                     </motion.div>
                 </div>

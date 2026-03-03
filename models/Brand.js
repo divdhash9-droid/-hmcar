@@ -13,6 +13,12 @@ const brandSchema = new mongoose.Schema({
   // Flags for unified brand management
   forCars: { type: Boolean, default: true },
   forSpareParts: { type: Boolean, default: false },
+  // Agency Profile Info (for cars)
+  location: { type: String, default: '' },
+  phone: { type: String, default: '' },
+  whatsapp: { type: String, default: '' },
+  description: { type: String, default: '' },
+  description_ar: { type: String, default: '' },
   createdByFirebaseUid: { type: String, required: false, default: '' },
   updatedByFirebaseUid: { type: String, required: false, default: '' }
 }, { timestamps: true });

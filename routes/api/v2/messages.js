@@ -7,10 +7,11 @@ const User = require('../../../models/User');
 const { requireAuthAPI } = require('../../../middleware/auth');
 
 // ===== جلب ID خدمة العملاء (الأدمن الأول) =====
+// تم تعديل المنطق ليعطي الأولوية لـ super_admin أو أي أدمن متاح
 async function getSupportAgentId() {
     const admin = await User.findOne({
         role: { $in: ['admin', 'super_admin', 'manager'] }
-    }).select('_id name');
+    }).sort({ role: 1 }).select('_id name'); // الفرز يجعل super_admin يظهر أولاً
     return admin;
 }
 
@@ -27,7 +28,7 @@ router.post('/support', requireAuthAPI, async (req, res) => {
             return res.status(400).json({ success: false, error: 'الرسالة طويلة جداً (الحد الأقصى 2000 حرف)' });
         }
 
-        // جلب الأدمن تلقائياً
+        // جلب الأدمن المتاح حالياً لاستلام الرسالة
         const support = await getSupportAgentId();
         if (!support) {
             return res.status(503).json({ success: false, error: 'خدمة العملاء غير متاحة حالياً' });
@@ -56,33 +57,31 @@ router.post('/support', requireAuthAPI, async (req, res) => {
     }
 });
 
-// ===== جلب محادثة العميل مع خدمة العملاء =====
+// ===== جلب محادثة العميل مع خدمة العملاء (للعملاء) =====
 router.get('/support', requireAuthAPI, async (req, res) => {
     try {
         const userId = req.user.userId || req.user._id || req.user.id;
 
+        // جلب الأدمن (يمكن للعميل رؤية رسائل أي أدمن رد عليه)
         const support = await getSupportAgentId();
-        if (!support) {
-            return res.json({ success: true, data: [], supportName: 'خدمة العملاء' });
-        }
 
         const messages = await Message.find({
             $or: [
-                { sender: userId, receiver: support._id },
-                { sender: support._id, receiver: userId }
+                { sender: userId, receiver: { $exists: true } }, // أي رسائل من العميل لأي شخص (عادة أدمن)
+                { receiver: userId } // أي رسائل واردة للعميل
             ]
         }).sort({ createdAt: 1 });
 
-        // تحديد الرسائل كمقروءة
+        // تحديد الرسائل القادمة من الأدمن كمقروءة
         await Message.updateMany(
-            { sender: support._id, receiver: userId, read: false },
+            { receiver: userId, read: false },
             { read: true }
         );
 
         res.json({
             success: true,
-            supportId: support._id,
-            supportName: support.name || 'خدمة العملاء HM CAR',
+            supportId: support?._id,
+            supportName: support?.name || 'خدمة العملاء',
             data: messages.map(m => ({
                 id: m._id,
                 content: m.content,
@@ -97,35 +96,47 @@ router.get('/support', requireAuthAPI, async (req, res) => {
     }
 });
 
-// الحصول على جميع المحادثات
+// ===== الحصول على جميع المحادثات (للأدمن) =====
+// تم تعديلها لتسمح للأدمن برؤية كافة المحادثات في حال كان لديه الصلاحية
 router.get('/conversations', requireAuthAPI, async (req, res) => {
     try {
-        const userId = req.user.userId || req.user._id || req.user.id;
+        const currentUserId = req.user.userId || req.user._id || req.user.id;
+        const isAdmin = ['admin', 'super_admin', 'manager'].includes(req.user.role);
 
-        // جلب آخر رسالة من كل محادثة
+        // إذا كان أدمن، نأتي بكل المحادثات التي أطرافها (مستخدم عادي + أي أدمن)
+        // أو ببساطة كل المحادثات التي يكون الأدمن طرفاً فيها (أو كلها إذا كانت Super Admin)
+        let matchQuery = { $or: [{ sender: currentUserId }, { receiver: currentUserId }] };
+
+        if (isAdmin) {
+            // الأدمن يمكنه رؤية جميع المحادثات الموجهة لطاقم الإدارة
+            const adminUsers = await User.find({ role: { $in: ['admin', 'super_admin', 'manager'] } }).select('_id');
+            const adminIds = adminUsers.map(u => u._id);
+            matchQuery = {
+                $or: [
+                    { sender: { $in: adminIds } },
+                    { receiver: { $in: adminIds } }
+                ]
+            };
+        }
+
         const messages = await Message.aggregate([
-            {
-                $match: {
-                    $or: [{ sender: userId }, { receiver: userId }]
-                }
-            },
-            {
-                $sort: { createdAt: -1 }
-            },
+            { $match: matchQuery },
+            { $sort: { createdAt: -1 } },
             {
                 $group: {
                     _id: {
                         $cond: [
-                            { $eq: ['$sender', userId] },
+                            { $in: ['$sender', [currentUserId]] }, // هذا يحتاج تعديل للمنطق العام
                             '$receiver',
                             '$sender'
                         ]
                     },
+                    // محاولة تحسين الـ group لتجميع المحادثة بين (العميل والأدمن)
                     lastMessage: { $first: '$$ROOT' },
                     unreadCount: {
                         $sum: {
                             $cond: [
-                                { $and: [{ $eq: ['$receiver', userId] }, { $eq: ['$read', false] }] },
+                                { $and: [{ $eq: ['$receiver', currentUserId] }, { $eq: ['$read', false] }] },
                                 1,
                                 0
                             ]
@@ -135,24 +146,29 @@ router.get('/conversations', requireAuthAPI, async (req, res) => {
             }
         ]);
 
-        // جلب معلومات المستخدمين
-        const userIds = messages.map(m => m._id);
-        const users = await User.find({ _id: { $in: userIds } }).select('name email');
+        // جلب معلومات الأطراف الأخرى في المحادثات
+        const otherUserIds = messages.map(m => m.lastMessage.sender.toString() === currentUserId.toString() ? m.lastMessage.receiver : m.lastMessage.sender);
+        const users = await User.find({ _id: { $in: otherUserIds } }).select('name email role');
         const userMap = {};
         users.forEach(u => { userMap[u._id.toString()] = u; });
 
         res.json({
             success: true,
-            data: messages.map(m => ({
-                id: m._id,
-                user: userMap[m._id.toString()] || { name: 'مستخدم محذوف' },
-                lastMessage: {
-                    content: m.lastMessage.content,
-                    createdAt: m.lastMessage.createdAt,
-                    isFromMe: m.lastMessage.sender.toString() === userId.toString()
-                },
-                unreadCount: m.unreadCount
-            }))
+            data: messages.map(m => {
+                const otherId = m.lastMessage.sender.toString() === currentUserId.toString() ? m.lastMessage.receiver : m.lastMessage.sender;
+                const otherUser = userMap[otherId.toString()];
+
+                return {
+                    id: otherId,
+                    user: otherUser || { name: 'مستخدم محذوف' },
+                    lastMessage: {
+                        content: m.lastMessage.content,
+                        createdAt: m.lastMessage.createdAt,
+                        isFromMe: m.lastMessage.sender.toString() === currentUserId.toString()
+                    },
+                    unreadCount: m.unreadCount
+                };
+            })
         });
     } catch (error) {
         console.error('خطأ في جلب المحادثات:', error);

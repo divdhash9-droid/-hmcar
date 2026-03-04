@@ -128,6 +128,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
   const [showSocialBar, setShowSocialBar] = useState(false);
 
   useEffect(() => {
+    // جلب روابط التواصل الاجتماعي من الإعدادات العامة
     const fetchSocialLinks = async () => {
       try {
         const response = await api.settings.getPublic();
@@ -148,6 +149,14 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
     };
     fetchSocialLinks();
   }, []);
+
+  // خريطة لرسم الأيقونات بناءً على الصور المخصصة التي وفرها المستخدم
+  const homeCustomIcons: { [key: string]: string } = {
+    whatsapp: '/images/icons/whatsapp.jpg',
+    instagram: '/images/icons/instagram.jpg',
+    facebook: '/images/icons/facebook.jpg',
+    tiktok: '/images/icons/tiktok.jpg',
+  };
 
   const whatsappUrl = socialConfig.whatsapp ? `https://wa.me/${String(socialConfig.whatsapp).replace(/\D/g, '')}` : "#";
 
@@ -537,21 +546,22 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
               </Link>
               {socialConfig.whatsapp && (
                 <Link href="/social">
-                  <motion.div whileHover={{ scale: 1.08 }} className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:text-[#c9a96e] hover:border-[#c9a96e]/40 transition-all">
-                    {(() => {
-                      const Icon = getSocialIcon("whatsapp");
-                      return Icon ? <Icon className="w-5 h-5" /> : <MessageCircle className="w-5 h-5" />;
-                    })()}
+                  <motion.div whileHover={{ scale: 1.1 }} className="w-10 h-10 rounded-lg overflow-hidden border border-white/10 transition-all">
+                    <img src="/images/icons/whatsapp.jpg" alt="WhatsApp" className="w-full h-full object-cover" />
                   </motion.div>
                 </Link>
               )}
               {socialConfig.links.slice(0, 3).map((item, idx) => (
                 <Link href="/social" key={idx}>
-                  <motion.div whileHover={{ scale: 1.08 }} className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:text-[#c9a96e] hover:border-[#c9a96e]/40 transition-all">
-                    {(() => {
-                      const Icon = getSocialIcon(item.platform);
-                      return Icon ? <Icon className="w-5 h-5" /> : <LinkIcon className="w-5 h-5" />;
-                    })()}
+                  <motion.div whileHover={{ scale: 1.1 }} className="w-10 h-10 rounded-lg overflow-hidden border border-white/10 bg-white/5 flex items-center justify-center transition-all">
+                    {homeCustomIcons[item.platform] ? (
+                      <img src={homeCustomIcons[item.platform]} alt={item.platform} className="w-full h-full object-cover" />
+                    ) : (
+                      (() => {
+                        const Icon = getSocialIcon(item.platform);
+                        return Icon ? <Icon className="w-5 h-5 text-white" /> : <LinkIcon className="w-5 h-5 text-white" />;
+                      })()
+                    )}
                   </motion.div>
                 </Link>
               ))}

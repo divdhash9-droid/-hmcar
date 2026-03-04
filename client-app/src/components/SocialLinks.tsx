@@ -91,67 +91,75 @@ export default function SocialLinks({
         lg: 'w-6 h-6 md:w-7 md:h-7'
     };
 
+    // خريطة لرسم الأيقونات بناءً على الصور المخصصة التي وفرها المستخدم
+    const customIcons: { [key: string]: string } = {
+        whatsapp: '/images/icons/whatsapp.jpg',
+        instagram: '/images/icons/instagram.jpg',
+        facebook: '/images/icons/facebook.jpg',
+        tiktok: '/images/icons/tiktok.jpg',
+    };
+
     const links = [
         {
             key: 'whatsapp',
             icon: MessageCircle,
-            color: 'bg-green-500 hover:bg-green-400',
+            color: 'bg-green-500/10 hover:bg-green-500/20 border border-green-500/20',
             href: socialLinks.whatsapp ? `https://wa.me/${socialLinks.whatsapp.replace(/[^0-9]/g, '')}` : null,
             label: 'WhatsApp'
         },
         {
             key: 'instagram',
             icon: Instagram,
-            color: 'bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 hover:from-purple-400 hover:via-pink-400 hover:to-orange-300',
+            color: 'bg-white/5 hover:bg-white/10 border border-white/10',
             href: socialLinks.instagram,
             label: 'Instagram'
         },
         {
             key: 'twitter',
             icon: XIcon,
-            color: 'bg-black hover:bg-gray-900 border border-white/20',
+            color: 'bg-white/5 hover:bg-white/10 border border-white/10',
             href: socialLinks.twitter,
             label: 'X'
         },
         {
             key: 'facebook',
             icon: Facebook,
-            color: 'bg-blue-600 hover:bg-blue-500',
+            color: 'bg-white/5 hover:bg-white/10 border border-white/10',
             href: socialLinks.facebook,
             label: 'Facebook'
         },
         {
             key: 'youtube',
             icon: Youtube,
-            color: 'bg-red-600 hover:bg-red-500',
+            color: 'bg-white/5 hover:bg-white/10 border border-white/10',
             href: socialLinks.youtube,
             label: 'YouTube'
         },
         {
             key: 'tiktok',
             icon: TikTokIcon,
-            color: 'bg-black hover:bg-gray-900 border border-white/20',
+            color: 'bg-white/5 hover:bg-white/10 border border-white/10',
             href: socialLinks.tiktok,
             label: 'TikTok'
         },
         {
             key: 'snapchat',
             icon: SnapchatIcon,
-            color: 'bg-yellow-400 hover:bg-yellow-300 text-black',
+            color: 'bg-white/5 hover:bg-white/10 border border-white/10',
             href: socialLinks.snapchat ? `https://snapchat.com/add/${socialLinks.snapchat}` : null,
             label: 'Snapchat'
         },
         {
             key: 'telegram',
             icon: Send,
-            color: 'bg-blue-500 hover:bg-blue-400',
+            color: 'bg-white/5 hover:bg-white/10 border border-white/10',
             href: socialLinks.telegram,
             label: 'Telegram'
         },
         {
             key: 'linkedin',
             icon: Linkedin,
-            color: 'bg-blue-700 hover:bg-blue-600',
+            color: 'bg-white/5 hover:bg-white/10 border border-white/10',
             href: socialLinks.linkedin,
             label: 'LinkedIn'
         }
@@ -174,20 +182,24 @@ export default function SocialLinks({
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: i * 0.05 }}
-                    whileHover={{ scale: 1.05, y: -2 }}
+                    whileHover={{ scale: 1.1, y: -4 }}
                     whileTap={{ scale: 0.95 }}
                     className={cn(
-                        "flex flex-col items-center justify-center rounded-full transition-all shadow-lg",
+                        "flex items-center justify-center rounded-2xl transition-all shadow-2xl overflow-hidden",
                         sizeClasses[size],
                         link.color
                     )}
                     title={link.label}
                 >
-                    <link.icon className={iconSizes[size]} />
-                    {showLabels && (
-                        <span className="mt-2 text-[10px] font-black uppercase tracking-widest text-white/80">
-                            {link.label}
-                        </span>
+                    {/* استخدام الصور المخصصة إذا كانت موجودة، وإلا العودة للأيقونة الافتراضية */}
+                    {customIcons[link.key] ? (
+                        <img
+                            src={customIcons[link.key]}
+                            alt={link.label}
+                            className="w-full h-full object-cover"
+                        />
+                    ) : (
+                        <link.icon className={iconSizes[size]} />
                     )}
                 </motion.a>
             ))}
@@ -216,9 +228,9 @@ export function WhatsAppFAB() {
             animate={{ scale: 1 }}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-green-500 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(34,197,94,0.5)] hover:shadow-[0_0_40px_rgba(34,197,94,0.7)] transition-shadow"
+            className="fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full overflow-hidden shadow-[0_0_30px_rgba(34,197,94,0.5)] hover:shadow-[0_0_40px_rgba(34,197,94,0.7)] transition-shadow border-2 border-white/20"
         >
-            <MessageCircle className="w-7 h-7 text-white" />
+            <img src="/images/icons/whatsapp.jpg" alt="WhatsApp" className="w-full h-full object-cover" />
         </motion.a>
     );
 }

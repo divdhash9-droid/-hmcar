@@ -5,6 +5,7 @@ const router = express.Router();
 const Car = require('../../../models/Car');
 const AuditLog = require('../../../models/AuditLog');
 const { requireAuthAPI, requirePermissionAPI } = require('../../../middleware/auth');
+const SmartAlertService = require('../../../services/SmartAlertService');
 
 // GET /api/v2/cars - جلب قائمة السيارات
 router.get('/', async (req, res) => {
@@ -137,7 +138,7 @@ router.get('/:id', async (req, res) => {
 // POST /api/v2/cars - إضافة سيارة جديدة (Admin only)
 router.post('/', requireAuthAPI, requirePermissionAPI('manage_cars'), async (req, res) => {
     try {
-        const car = new Car(carData);
+        const car = new Car(req.body);
         await car.save();
 
         // Log car creation
@@ -153,6 +154,11 @@ router.post('/', requireAuthAPI, requirePermissionAPI('manage_cars'), async (req
                 userAgent: req.get('User-Agent'),
                 sessionId: req.sessionID || 'api'
             }
+        );
+
+        // تفعيل التنبيهات الذكية بشكل غير متزامن (لا يؤخر الاستجابة)
+        SmartAlertService.checkNewCar(car).catch(err =>
+            console.error('[SmartAlert] خطأ في checkNewCar:', err.message)
         );
 
         res.status(201).json({

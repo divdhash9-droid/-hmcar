@@ -41,4 +41,25 @@ const carSchema = new mongoose.Schema({
   pendingSaleAt: { type: Date, default: null }
 }, { timestamps: true });
 
+// ======== Hook: تفعيل التنبيهات الذكية عند إضافة سيارة جديدة ========
+carSchema.post('save', function (doc) {
+  // فقط عند إنشاء وثيقة جديدة (isNew=true عند أول save)
+  if (this.wasNew) {
+    try {
+      const SmartAlertService = require('../services/SmartAlertService');
+      SmartAlertService.checkNewCar(doc).catch(err =>
+        console.error('[Car Model] خطأ في SmartAlert checkNewCar:', err.message)
+      );
+    } catch (err) {
+      // تجاهل الخطأ إذا لم تكن الخدمة متاحة
+    }
+  }
+});
+
+// تخزين حالة isNew قبل الحفظ
+carSchema.pre('save', function (next) {
+  this.wasNew = this.isNew;
+  next();
+});
+
 module.exports = mongoose.model('Car', carSchema);

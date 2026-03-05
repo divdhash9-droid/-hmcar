@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema({
   // صورة الملف الشخصي (رابط محلي تحت /uploads أو رابط Cloudinary)
   avatar: { type: String, default: '' },
   // اسم المستخدم الفريد (يُستخدم لتسجيل الدخول بدلاً من الإيميل لزيادة الأمان)
-  username: { type: String, unique: true, required: false, sparse: true, trim: true, lowercase: true },
+  username: { type: String, unique: true, required: false, sparse: true, trim: true },
   // رقم الهاتف (يُستخدم لحسابات الأدمن غالباً)
   phone: { type: String, unique: true, required: false, sparse: true },
   // البريد الإلكتروني (اختياري، لا يُستخدم للدخول)
@@ -58,6 +58,8 @@ const userSchema = new mongoose.Schema({
 
   // Device Binding and Security
   deviceId: { type: String, default: '' },
+  deviceBindingEnabled: { type: Boolean, default: true }, // خيار للأدمن لإلغاء تقييد الجهاز لهذا المستخدم
+  lockoutCode: { type: String, default: '' }, // الرمز الذي يظهر للمستخدم عند الحظر ليقوم بإرساله للواتساب
   deviceInfo: {
     browser: String,
     os: String,
@@ -107,7 +109,7 @@ userSchema.methods.comparePassword = function (candidate) {
 
 // التحقق من قفل الحساب
 userSchema.virtual('isLocked').get(function () {
-  return !!(this.lockUntil && this.lockUntil > Date.now());
+  return !!(this.status === 'suspended' || (this.lockUntil && this.lockUntil > Date.now()));
 });
 
 // زيادة محاولات الدخول الفاشلة
@@ -115,17 +117,24 @@ userSchema.methods.incLoginAttempts = function () {
   // إذا كان هناك قفل سابق وانتهى، نعيد تعيين المحاولات
   if (this.lockUntil && this.lockUntil < Date.now()) {
     return this.updateOne({
-      $set: { loginAttempts: 1 },
+      $set: { loginAttempts: 1, lockoutCode: '' },
       $unset: { lockUntil: 1 }
     });
   }
 
   const updates = { $inc: { loginAttempts: 1 } };
 
-  // قفل الحساب بعد 5 محاولات فاشلة لمدة 30 دقيقة
+  // قفل الحساب بعد 5 محاولات فاشلة
+  // المستخدم طلب أن يظهر رمز ويحظر المستخدم
   const maxAttempts = 5;
-  if (this.loginAttempts + 1 >= maxAttempts && !this.isLocked) {
-    updates.$set = { lockUntil: Date.now() + 30 * 60 * 1000 }; // 30 دقيقة
+  if (this.loginAttempts + 1 >= maxAttempts) {
+    // توليد رمز عشوائي مكون من 6 أرقام وحروف
+    const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+    updates.$set = {
+      status: 'suspended',
+      lockoutCode: code,
+      lockUntil: Date.now() + 24 * 60 * 60 * 1000 // قفل لمدة يوم أو حتى يفك الأدمن الحظر
+    };
   }
 
   return this.updateOne(updates);
@@ -134,7 +143,7 @@ userSchema.methods.incLoginAttempts = function () {
 // إعادة تعيين محاولات الدخول عند النجاح
 userSchema.methods.resetLoginAttempts = function () {
   return this.updateOne({
-    $set: { loginAttempts: 0 },
+    $set: { loginAttempts: 0, lockoutCode: '' },
     $unset: { lockUntil: 1 }
   });
 };

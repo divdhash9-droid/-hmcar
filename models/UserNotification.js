@@ -22,7 +22,7 @@ const userNotificationSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['info', 'success', 'warning', 'error', 'auction', 'message', 'order', 'system'],
+    enum: ['info', 'success', 'warning', 'error', 'auction', 'message', 'order', 'system', 'smart_alert', 'promotion'],
     default: 'info'
   },
   relatedTo: {
@@ -68,10 +68,10 @@ userNotificationSchema.index({ user: 1, type: 1, read: false });
 userNotificationSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 // Static methods
-userNotificationSchema.statics.createNotification = async function(data) {
+userNotificationSchema.statics.createNotification = async function (data) {
   const notification = new this(data);
   await notification.save();
-  
+
   // Emit real-time notification via socket.io
   try {
     if (global.io) {
@@ -91,18 +91,18 @@ userNotificationSchema.statics.createNotification = async function(data) {
     // ignore websocket errors - do not block notification creation
     console.warn('WebSocket emit failed:', e && e.message);
   }
-  
+
   // Send push notification if available
   await this.sendPushNotification(data.user, notification);
-  
+
   return notification;
 };
 
-userNotificationSchema.statics.sendPushNotification = async function(userId, notification) {
+userNotificationSchema.statics.sendPushNotification = async function (userId, notification) {
   try {
     const admin = require('firebase-admin');
     const User = mongoose.model('User');
-    
+
     const user = await User.findById(userId);
     if (user && user.fcmToken) {
       const message = {
@@ -118,7 +118,7 @@ userNotificationSchema.statics.sendPushNotification = async function(userId, not
         },
         token: user.fcmToken
       };
-      
+
       await admin.messaging().send(message);
     }
   } catch (error) {
@@ -127,13 +127,13 @@ userNotificationSchema.statics.sendPushNotification = async function(userId, not
 };
 
 // Instance methods
-userNotificationSchema.methods.markAsRead = async function() {
+userNotificationSchema.methods.markAsRead = async function () {
   this.read = true;
   this.readAt = new Date();
   return await this.save();
 };
 
-userNotificationSchema.methods.toJSON = function() {
+userNotificationSchema.methods.toJSON = function () {
   const notification = this.toObject();
   if (notification.expiresAt && notification.expiresAt < new Date()) {
     notification.expired = true;

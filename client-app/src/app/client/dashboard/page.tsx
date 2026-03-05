@@ -16,7 +16,8 @@ import {
     MessageCircle,
     User,
     Settings,
-    LayoutGrid
+    LayoutGrid,
+    Sparkles
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { cn } from "@/lib/utils";
@@ -125,6 +126,7 @@ export default function ClientDashboard() {
         { icon: ShoppingBag, label: isRTL ? 'طلباتي' : 'My Orders', href: '/orders' },
         { icon: Gavel, label: isRTL ? 'مزايداتي' : 'My Bids', href: '/auctions/my-bids' },
         { icon: Heart, label: isRTL ? 'المفضلة' : 'Favorites', href: '/favorites' },
+        { icon: Sparkles, label: isRTL ? 'تنبيهاتي الذكية' : 'Smart Alerts', href: '/client/smart-alerts', highlight: true },
         { icon: Bell, label: isRTL ? 'الإشعارات' : 'Notifications', href: '/notifications' },
         { icon: MessageCircle, label: isRTL ? 'الرسائل' : 'Messages', href: '/messages' },
         { icon: User, label: isRTL ? 'الملف الشخصي' : 'Profile', href: '/profile' },

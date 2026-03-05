@@ -352,4 +352,22 @@ export const api = {
             method: 'POST',
         }),
     },
+    smartAlerts: {
+        list: () => fetchAPI('/api/v2/smart-alerts'),
+        stats: () => fetchAPI('/api/v2/smart-alerts/stats'),
+        create: (data: any) => fetchAPI('/api/v2/smart-alerts', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        }),
+        update: (id: string, data: any) => fetchAPI(`/api/v2/smart-alerts/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        }),
+        toggle: (id: string) => fetchAPI(`/api/v2/smart-alerts/${id}/toggle`, {
+            method: 'PATCH',
+        }),
+        delete: (id: string) => fetchAPI(`/api/v2/smart-alerts/${id}`, {
+            method: 'DELETE',
+        }),
+    },
 };

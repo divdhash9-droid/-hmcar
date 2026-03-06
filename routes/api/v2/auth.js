@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require('../../../models/User');
 const AuditLog = require('../../../models/AuditLog');
+const DeviceFingerprint = require('../../../models/DeviceFingerprint');
 const { requireAuthAPI } = require('../../../middleware/auth');
 
 // Register endpoint
@@ -129,6 +130,45 @@ router.post('/auto-login', async (req, res) => {
       });
     }
 
+    // -- تطبيق نظام حظر الأجهزة والتحقق من حساب واحد لكل جهاز --
+    let fingerprint = await DeviceFingerprint.findOne({ ip: clientIP });
+
+    if (fingerprint) {
+      if (fingerprint.banned) {
+        return res.status(403).json({
+          error: 'Banned Device',
+          banned: true,
+          banCode: fingerprint.banCode,
+          message: 'تم حظرك. لمراسلة الإدارة استخدم الرمز بالأسفل.'
+        });
+      }
+
+      if (fingerprint.linkedUsername.toLowerCase() !== name.trim().toLowerCase()) {
+        fingerprint.failedAttempts += 1;
+        if (fingerprint.failedAttempts >= 2) {
+          fingerprint.banned = true;
+          if (!fingerprint.banCode) {
+            fingerprint.banCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+          }
+        }
+        await fingerprint.save();
+
+        if (fingerprint.banned) {
+          return res.status(403).json({
+            error: 'Banned Device',
+            banned: true,
+            banCode: fingerprint.banCode,
+            message: 'تم حظر جهازك لمحاولة الدخول بحساب أو بيانات مختلفة.'
+          });
+        } else {
+          return res.status(401).json({
+            error: 'Authentication Failed',
+            message: 'لا يمكنك الدخول باسم آخر من هذا الجهاز! تحذير: محاولة أخرى وستتعرض للحظر.'
+          });
+        }
+      }
+    }
+
     // Check if user exists with this name
     const existingUser = await User.findOne({
       name: { $regex: new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') }
@@ -156,6 +196,17 @@ router.post('/auto-login', async (req, res) => {
         process.env.JWT_SECRET,
         { expiresIn: '7d' }
       );
+
+      if (!fingerprint) {
+        await DeviceFingerprint.create({
+          ip: clientIP,
+          deviceId: deviceId || '',
+          linkedUsername: name.trim()
+        });
+      } else {
+        fingerprint.failedAttempts = 0;
+        await fingerprint.save();
+      }
 
       console.log(`[AUTH] ✅ Auto-login successful for existing user: ${name}`);
 
@@ -194,6 +245,15 @@ router.post('/auto-login', async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
+
+    // ربط الجهاز بحساب العميل الجديد
+    if (!fingerprint) {
+      await DeviceFingerprint.create({
+        ip: clientIP,
+        deviceId: deviceId || '',
+        linkedUsername: name.trim()
+      });
+    }
 
     // Log the registration
     await AuditLog.logUserAction(
@@ -237,6 +297,31 @@ router.post('/login', async (req, res) => {
 
     if (!searchKey || !password) {
       return res.status(400).json({ error: 'Validation Error', message: 'Identifier and password are required' });
+    }
+
+    const clientIP = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || req.ip || 'unknown';
+    let fingerprint = null;
+
+    if (role === 'buyer') {
+      fingerprint = await DeviceFingerprint.findOne({ ip: clientIP });
+      if (fingerprint) {
+        if (fingerprint.banned) {
+          return res.status(403).json({ banned: true, banCode: fingerprint.banCode, message: 'تم حظرك. لمراسلة الإدارة استخدم الرمز بالأسفل.' });
+        }
+        if (fingerprint.linkedUsername.toLowerCase() !== searchKey.toLowerCase()) {
+          fingerprint.failedAttempts += 1;
+          if (fingerprint.failedAttempts >= 2) {
+            fingerprint.banned = true;
+            if (!fingerprint.banCode) fingerprint.banCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+          }
+          await fingerprint.save();
+          if (fingerprint.banned) {
+            return res.status(403).json({ banned: true, banCode: fingerprint.banCode, message: 'تم حظر جهازك لمحاولة الدخول بحساب مختلف.' });
+          } else {
+            return res.status(401).json({ error: 'Authentication Failed', message: 'لا يمكنك الدخول باسم آخر من هذا الجهاز! (محاولة متبقية قبل الحظر)' });
+          }
+        }
+      }
     }
 
     // استخدام findOne بدل find لتفادي جلب كل المستخدمين
@@ -293,6 +378,19 @@ router.post('/login', async (req, res) => {
     // تحديث وقت الدخول + AuditLog — fire-and-forget لا ننتظرهما
     User.updateOne({ _id: user._id }, { $set: { lastLoginAt: new Date() } }).catch(() => { });
     AuditLog.logUserAction(user, 'LOGIN', 'User', 'Successful login', { ipAddress: req.ip, result: 'SUCCESS' }).catch(() => { });
+
+    if (role === 'buyer') {
+      if (!fingerprint) {
+        await DeviceFingerprint.create({
+          ip: clientIP,
+          deviceId: deviceId || '',
+          linkedUsername: searchKey
+        });
+      } else {
+        fingerprint.failedAttempts = 0;
+        await fingerprint.save();
+      }
+    }
 
     console.log(`[AUTH] ✅ Login success: ${user.email} (${user.role})`);
 
@@ -618,6 +716,42 @@ router.post('/reset-password', async (req, res) => {
       error: 'Internal Server Error',
       message: 'An error occurred while resetting password'
     });
+  }
+});
+
+// Mock OTP endpoints for phone login
+router.post('/otp/send', async (req, res) => {
+  try {
+    const { phone } = req.body;
+    if (!phone) {
+      return res.status(400).json({ error: 'Validation Error', message: 'Phone number is required' });
+    }
+    // In a real app, integrate via Twilio/Unifonic or other SMS gateway.
+    console.log(`[AUTH] Mock OTP send requested for phone: ${phone}`);
+    return res.json({ success: true, message: 'OTP sent successfully (mocked)' });
+  } catch (error) {
+    console.error('OTP Send error:', error);
+    res.status(500).json({ error: 'Internal Server Error', message: 'An error occurred while sending OTP' });
+  }
+});
+
+router.post('/otp/verify', async (req, res) => {
+  try {
+    const { phone, code } = req.body;
+    if (!phone || !code) {
+      return res.status(400).json({ error: 'Validation Error', message: 'Phone and code are required' });
+    }
+    console.log(`[AUTH] Mock OTP verify requested for phone: ${phone}, code: ${code}`);
+    // In a real app, verify against stored code in cache/DB.
+    // For now, accept any code that is 4 digits.
+    if (code.length >= 4) {
+      return res.json({ success: true, message: 'OTP verified successfully' });
+    } else {
+      return res.status(400).json({ error: 'Validation Error', message: 'Invalid OTP code' });
+    }
+  } catch (error) {
+    console.error('OTP Verify error:', error);
+    res.status(500).json({ error: 'Internal Server Error', message: 'An error occurred while verifying OTP' });
   }
 });
 

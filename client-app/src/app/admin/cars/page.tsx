@@ -345,43 +345,59 @@ export default function AdminCarsPage() {
                                         <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/60 mb-2">
                                             {isRTL ? 'صور السيارة' : 'CAR IMAGES'}
                                         </label>
-                                        <div className="flex items-center gap-4">
-                                            <div className="relative w-24 h-24 bg-white/5 border border-white/10 rounded-xl overflow-hidden flex items-center justify-center group">
-                                                {formData.images[0] ? (
-                                                    <Image src={formData.images[0]} alt="Car preview" fill className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <Upload className="w-8 h-8 text-white/20" />
-                                                )}
+                                        <div className="flex flex-wrap items-center gap-4">
+                                            {formData.images.filter((img: string) => img).map((img: string, index: number) => (
+                                                <div key={index} className="relative w-24 h-24 bg-white/5 border border-white/10 rounded-xl overflow-hidden flex items-center justify-center group">
+                                                    <Image src={img} alt={`Car preview ${index + 1}`} fill unoptimized className="w-full h-full object-cover" />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            const newImages = [...formData.images].filter(i => i);
+                                                            newImages.splice(index, 1);
+                                                            setFormData({ ...formData, images: newImages.length > 0 ? newImages : [''] });
+                                                        }}
+                                                        className="absolute top-1 right-1 bg-red-500/80 p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
+                                                    >
+                                                        <Trash2 className="w-4 h-4 text-white" />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                            <div className="relative w-24 h-24 bg-white/5 border border-dashed border-white/20 rounded-xl overflow-hidden flex flex-col items-center justify-center group hover:border-cinematic-neon-blue/50 transition-colors cursor-pointer">
+                                                <Upload className="w-6 h-6 text-white/20 group-hover:text-cinematic-neon-blue/80 mb-1" />
+                                                <span className="text-[8px] text-white/40 uppercase tracking-widest">{isRTL ? 'إضافة صورة' : 'ADD IMAGE'}</span>
                                                 <input
                                                     type="file"
                                                     title={isRTL ? 'رفع صورة' : 'Upload Image'}
                                                     accept="image/*"
+                                                    multiple
                                                     className="absolute inset-0 opacity-0 cursor-pointer"
                                                     onChange={async (e) => {
-                                                        const file = e.target.files?.[0];
-                                                        if (!file) return;
+                                                        const files = Array.from(e.target.files || []);
+                                                        if (files.length === 0) return;
 
-                                                        const data = new FormData();
-                                                        data.append('image', file);
+                                                        for (const file of files) {
+                                                            const data = new FormData();
+                                                            data.append('image', file);
 
-                                                        try {
-                                                            const res = await api.upload.image(data);
-                                                            if (res.success) {
-                                                                setFormData({ ...formData, images: [res.url] });
-                                                            } else {
-                                                                alert(res.message || (isRTL ? 'فشل الرفع' : 'Upload failed'));
+                                                            try {
+                                                                const res = await api.upload.image(data);
+                                                                if (res.success) {
+                                                                    setFormData(prev => {
+                                                                        const existing = prev.images.filter(img => img);
+                                                                        return { ...prev, images: [...existing, res.url] };
+                                                                    });
+                                                                } else {
+                                                                    alert(res.message || (isRTL ? 'فشل الرفع' : 'Upload failed'));
+                                                                }
+                                                            } catch (err: unknown) {
+                                                                console.error('Upload failed', err);
+                                                                const error = err as { response?: { data?: { message?: string } }; message?: string };
+                                                                const msg = error.response?.data?.message || error.message || (isRTL ? 'خطأ في الاتصال بالسيرفر' : 'Server connection error');
+                                                                alert(`${isRTL ? 'فشل الرفع: ' : 'Upload failed: '} ${msg}`);
                                                             }
-                                                        } catch (err: unknown) {
-                                                            console.error('Upload failed', err);
-                                                            const error = err as { response?: { data?: { message?: string } }; message?: string };
-                                                            const msg = error.response?.data?.message || error.message || (isRTL ? 'خطأ في الاتصال بالسيرفر' : 'Server connection error');
-                                                            alert(`${isRTL ? 'فشل الرفع: ' : 'Upload failed: '} ${msg}`);
                                                         }
                                                     }}
                                                 />
-                                            </div>
-                                            <div className="text-[10px] text-white/40">
-                                                {isRTL ? 'اضغط لرفع صورة' : 'Click to upload image'}
                                             </div>
                                         </div>
                                     </div>

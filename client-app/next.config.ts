@@ -29,6 +29,18 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async rewrites() {
+    return [
+      {
+        source: "/api/:path*",
+        // In local development, forward API requests to the Express backend
+        destination: process.env.NEXT_PUBLIC_API_URL
+          ? `${process.env.NEXT_PUBLIC_API_URL}/api/:path*`
+          : "http://localhost:4002/api/:path*",
+      },
+    ];
+  },
 };
 
 export default nextConfig;
+

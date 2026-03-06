@@ -11,6 +11,7 @@ import {
     Bell,
     ShoppingCart,
     Settings,
+    Shield,
     Search,
     LogOut,
     Menu,
@@ -167,6 +168,7 @@ export default function AdminDashboard() {
         { id: 'reports', icon: TrendingUp, label: isRTL ? 'التقارير' : 'REPORTS', href: '/admin/reports' },
         { id: 'notifications', icon: Bell, label: isRTL ? 'الإشعارات' : 'ALERTS', href: '/admin/notifications' },
         { id: 'social', icon: Share2, label: t('social'), href: '/admin/social' },
+        { id: 'security', icon: Shield, label: isRTL ? 'الأمان والحظر' : 'SECURITY', href: '/admin/security' },
         { id: 'settings', icon: Settings, label: isRTL ? 'الإعدادات' : 'SETTINGS', href: '/admin/settings' },
     ];
 

@@ -6,9 +6,11 @@ import Navbar from "@/components/Navbar";
 import { useLanguage } from "@/lib/LanguageContext";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Upload, Save, Trash2, ChevronLeft, Tag, Car, Wrench, Layers } from "lucide-react";
+import { Upload, Save, Trash2, ChevronLeft, Tag, Car, Wrench, Layers, X, Crop } from "lucide-react";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import Cropper from 'react-easy-crop';
+import getCroppedImg from '@/lib/cropImage';
 
 interface BrandRaw {
   _id: string;
@@ -35,6 +37,13 @@ export default function AdminAgenciesPage() {
   const [category, setCategory] = useState<'cars' | 'parts' | 'both'>('both');
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+
+  // States for Image Cropping
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
+  const [showCropper, setShowCropper] = useState(false);
 
   const refresh = async () => {
     try {
@@ -71,6 +80,7 @@ export default function AdminAgenciesPage() {
   const resetForm = () => {
     setEditingId(null);
     setName(""); setLogo(""); setCategory('both');
+    setImageSrc(null); setShowCropper(false);
   };
 
   const startEdit = (b: Brand) => {
@@ -85,12 +95,43 @@ export default function AdminAgenciesPage() {
     try { await api.brands.delete(id); await refresh(); } catch { }
   };
 
-  // 3 خيارات التصنيف مع أيقونات
   const categories = [
     { id: 'cars', labelAr: 'سيارات', labelEn: 'CARS', icon: Car, color: 'text-blue-400' },
     { id: 'parts', labelAr: 'قطع غيار', labelEn: 'PARTS', icon: Wrench, color: 'text-orange-400' },
     { id: 'both', labelAr: 'الكل', labelEn: 'BOTH', icon: Layers, color: 'text-[#c9a96e]' },
   ];
+
+  const onCropComplete = (croppedArea: any, croppedAreaPixels: any) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  };
+
+  const showCroppedImage = async () => {
+    if (!imageSrc || !croppedAreaPixels) return;
+    try {
+      setUploading(true);
+      const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
+      if (!croppedImage) return;
+
+      const fd = new FormData();
+      fd.append('image', croppedImage);
+
+      const res = await api.upload.image(fd);
+      if (res?.success && res.url) {
+        setLogo(res.url);
+        setShowCropper(false);
+        setImageSrc(null);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const getCropShape = () => {
+    // both shows circular visually, but cars are always round, parts square
+    return category === 'parts' ? 'rect' : 'round';
+  };
 
   return (
     <div className="relative min-h-screen bg-black text-white">
@@ -146,7 +187,7 @@ export default function AdminAgenciesPage() {
                   >
                     {logo ? (
                       <>
-                        <Image src={logo} alt="Logo" fill className="object-contain p-4" unoptimized />
+                        <Image src={logo} alt="Logo" fill className={cn("object-contain p-4", getCropShape() === 'round' ? 'rounded-full' : 'rounded-none')} unoptimized />
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                           <Upload className="w-8 h-8 text-white" />
                           <span className="text-white text-xs mr-2">{isRTL ? 'تغيير الصورة' : 'Change'}</span>
@@ -168,19 +209,68 @@ export default function AdminAgenciesPage() {
                       onChange={async (e) => {
                         const file = e.target.files?.[0];
                         if (!file) return;
-                        setUploading(true);
-                        const fd = new FormData(); fd.append('image', file);
-                        try {
-                          const res = await api.upload.image(fd);
-                          if (res?.success && res.url) setLogo(res.url);
-                        } catch { } finally { setUploading(false); }
+                        const src = URL.createObjectURL(file);
+                        setImageSrc(src);
+                        setShowCropper(true);
+                        e.target.value = '';
                       }}
                     />
                   </div>
-                  {logo && (
+                  {logo && !showCropper && (
                     <button onClick={() => setLogo('')} className="mt-2 text-[9px] text-red-400 hover:text-red-300 uppercase tracking-widest">
                       {isRTL ? '× حذف الصورة' : '× Remove'}
                     </button>
+                  )}
+                  {showCropper && imageSrc && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+                      <div className="bg-black border border-white/10 rounded-2xl w-full max-w-lg p-6 flex flex-col items-center">
+                        <div className="flex justify-between w-full mb-4">
+                          <h3 className="text-sm font-bold uppercase tracking-widest text-[#c9a96e] flex items-center gap-2">
+                            <Crop className="w-4 h-4" />
+                            {isRTL ? 'استقطاع الصورة' : 'CROP IMAGE'}
+                          </h3>
+                          <button onClick={() => { setShowCropper(false); setImageSrc(null); }} className="text-white/40 hover:text-white">
+                            <X className="w-5 h-5" />
+                          </button>
+                        </div>
+
+                        <div className="relative w-full h-80 mb-6 bg-white/5 rounded-xl overflow-hidden">
+                          <Cropper
+                            image={imageSrc}
+                            crop={crop}
+                            zoom={zoom}
+                            aspect={1}
+                            cropShape={getCropShape()}
+                            onCropChange={setCrop}
+                            onCropComplete={onCropComplete}
+                            onZoomChange={setZoom}
+                          />
+                        </div>
+
+                        <div className="w-full flex items-center gap-4 mb-6">
+                          <span className="text-white/50 text-[10px] uppercase font-bold">-</span>
+                          <input
+                            type="range"
+                            value={zoom}
+                            min={1}
+                            max={3}
+                            step={0.1}
+                            aria-labelledby="Zoom"
+                            onChange={(e) => setZoom(Number(e.target.value))}
+                            className="w-full accent-[#c9a96e]"
+                          />
+                          <span className="text-white/50 text-[10px] uppercase font-bold">+</span>
+                        </div>
+
+                        <button
+                          onClick={showCroppedImage}
+                          disabled={uploading}
+                          className="w-full py-3 bg-[#c9a96e] text-black font-black uppercase text-xs tracking-widest rounded-xl disabled:opacity-50"
+                        >
+                          {uploading ? (isRTL ? 'جاري الحفظ...' : 'SAVING...') : (isRTL ? 'حفظ الصورة' : 'SAVE IMAGE')}
+                        </button>
+                      </div>
+                    </div>
                   )}
                 </div>
 

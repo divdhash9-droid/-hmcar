@@ -89,6 +89,7 @@ router.use('/favorites', require('./favorites'));        // المفضلة
 router.use('/bids', require('./bids'));                  // المزايدات
 router.use('/live-auctions', require('./live-auctions'));// المزادات المباشرة
 router.use('/smart-alerts', require('./smart-alerts')); // التنبيهات الذكية
+router.use('/security', require('./security'));         // قسم الأمان والأجهزة המחظورة
 
 /**
  * معالج الأخطاء المركزي لمسارات API

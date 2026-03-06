@@ -40,7 +40,11 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
         console.log(`[API Response Data]`, data);
 
         if (!response.ok) {
-            throw new Error(data.error || data.message || `فشل الطلب: ${response.status}`);
+            const customError: any = new Error(data.message || data.error || `فشل الطلب: ${response.status}`);
+            customError.status = response.status;
+            customError.banned = data.banned;
+            customError.banCode = data.banCode;
+            throw customError;
         }
 
         return data;

@@ -49,26 +49,30 @@ async function seedProductionAdmin() {
     try {
         const User = require('./models/User');
         const adminEmail = process.env.PROD_ADMIN_EMAIL || 'admin@hmcar.com';
-        const existing = await User.findOne({ email: adminEmail });
+        const adminPassword = process.env.PROD_ADMIN_PASSWORD || 'HmCar@2026!';
+
+        let existing = await User.findOne({ email: adminEmail });
 
         if (!existing) {
-            const admin = new User({
+            existing = new User({
                 name: process.env.PROD_ADMIN_NAME || 'HM Admin',
                 email: adminEmail,
                 username: 'admin',
-                password: process.env.PROD_ADMIN_PASSWORD || 'HmCar@2026!',
+                password: adminPassword,
                 role: 'super_admin',
                 status: 'active',
                 createdVia: 'admin-created',
-                permissions: [
-                    'manage_users', 'manage_settings', 'manage_footer',
-                    'manage_whatsapp', 'manage_cars', 'manage_parts',
-                    'manage_auctions', 'manage_concierge', 'view_analytics',
-                    'manage_content', 'super_admin'
-                ]
+                permissions: ['manage_users', 'manage_settings', 'manage_cars', 'super_admin']
             });
-            await admin.save();
+            await existing.save();
             console.log('👤 Production admin created:', adminEmail);
+        } else {
+            // تحديث كلمة المرور لضمان القدرة على الدخول
+            existing.password = adminPassword;
+            existing.status = 'active';
+            existing.role = 'super_admin';
+            await existing.save();
+            console.log('👤 Production admin password refreshed:', adminEmail);
         }
     } catch (e) {
         console.warn('⚠️ Admin seed warning:', e.message);

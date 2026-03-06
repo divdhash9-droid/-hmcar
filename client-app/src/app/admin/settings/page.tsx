@@ -18,8 +18,9 @@ import {
     Camera,
     Send,
     Linkedin,
-    Trash2,
-    AlertCircle,
+    Camera,
+    Send,
+    Linkedin,
     DollarSign,
     MapPin,
     Clock
@@ -32,7 +33,7 @@ import { api } from "@/lib/api";
 
 export default function AdminSettings() {
     const { isRTL } = useLanguage();
-    const { user } = useAuth();
+    const { user, refreshUser } = useAuth();
     const [activeTab, setActiveTab] = useState<'profile' | 'social' | 'contact' | 'currency' | 'site'>('profile');
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
@@ -40,6 +41,7 @@ export default function AdminSettings() {
     // Profile data
     const [profileData, setProfileData] = useState({
         name: '',
+        username: '',
         email: '',
         phone: '',
         currentPassword: '',
@@ -88,8 +90,9 @@ export default function AdminSettings() {
             setProfileData(prev => ({
                 ...prev,
                 name: user.name || '',
+                username: user.username || '',
                 email: user.email || '',
-                phone: ''
+                phone: user.phone || ''
             }));
         }
     }, [user]);
@@ -117,23 +120,53 @@ export default function AdminSettings() {
         setMessage({ type: '', text: '' });
 
         try {
-            // Validate password change
+            // 1. Update Profile (Name, Email, Phone, Username)
+            const response = await api.users.updateProfile({
+                name: profileData.name,
+                username: profileData.username,
+                email: profileData.email,
+                phone: profileData.phone
+            });
+
+            if (response.success && response.data) {
+                // Update local storage with new user data
+                const currentUserStr = localStorage.getItem('hm_user');
+                if (currentUserStr) {
+                    const currentUser = JSON.parse(currentUserStr);
+                    const updatedUser = { ...currentUser, ...response.data };
+                    localStorage.setItem('hm_user', JSON.stringify(updatedUser));
+                    // Trigger state update in AuthContext
+                    refreshUser();
+                }
+            }
+
+
+            // 2. Update Password if provided
             if (profileData.newPassword) {
                 if (profileData.newPassword !== profileData.confirmPassword) {
                     setMessage({ type: 'error', text: isRTL ? 'كلمات المرور غير متطابقة' : 'Passwords do not match' });
+                    setLoading(false);
                     return;
                 }
                 if (!profileData.currentPassword) {
                     setMessage({ type: 'error', text: isRTL ? 'يجب إدخال كلمة المرور الحالية' : 'Current password required' });
+                    setLoading(false);
                     return;
                 }
-            }
 
-            await api.users.updateProfile({
-                name: profileData.name,
-                email: profileData.email,
-                phone: profileData.phone
-            });
+                await api.auth.changePassword({
+                    currentPassword: profileData.currentPassword,
+                    newPassword: profileData.newPassword
+                });
+
+                // Clear password fields after success
+                setProfileData(prev => ({
+                    ...prev,
+                    currentPassword: '',
+                    newPassword: '',
+                    confirmPassword: ''
+                }));
+            }
 
             setMessage({ type: 'success', text: isRTL ? 'تم حفظ البيانات بنجاح' : 'Profile saved successfully' });
         } catch (error: any) {
@@ -325,7 +358,9 @@ export default function AdminSettings() {
                                         <div className="relative">
                                             <User className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-4" : "left-4")} />
                                             <input
+                                                title={isRTL ? 'الاسم' : 'Name'}
                                                 type="text"
+                                                placeholder={isRTL ? 'الاسم' : 'Name'}
                                                 value={profileData.name}
                                                 onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
                                                 className={cn("w-full bg-white/5 border border-white/10 rounded-xl py-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
@@ -340,9 +375,28 @@ export default function AdminSettings() {
                                         <div className="relative">
                                             <Mail className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-4" : "left-4")} />
                                             <input
+                                                title={isRTL ? 'البريد الإلكتروني' : 'Email'}
                                                 type="email"
+                                                placeholder={isRTL ? 'البريد الإلكتروني' : 'Email'}
                                                 value={profileData.email}
                                                 onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
+                                                className={cn("w-full bg-white/5 border border-white/10 rounded-xl py-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">
+                                            {isRTL ? 'اسم المستخدم' : 'Username'}
+                                        </label>
+                                        <div className="relative">
+                                            <User className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-4" : "left-4")} />
+                                            <input
+                                                title={isRTL ? 'اسم المستخدم' : 'Username'}
+                                                type="text"
+                                                placeholder={isRTL ? 'اسم المستخدم' : 'Username'}
+                                                value={profileData.username}
+                                                onChange={(e) => setProfileData({ ...profileData, username: e.target.value })}
                                                 className={cn("w-full bg-white/5 border border-white/10 rounded-xl py-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
                                             />
                                         </div>
@@ -355,7 +409,9 @@ export default function AdminSettings() {
                                         <div className="relative">
                                             <Phone className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-4" : "left-4")} />
                                             <input
+                                                title={isRTL ? 'الهاتف' : 'Phone'}
                                                 type="tel"
+                                                placeholder={isRTL ? 'الهاتف' : 'Phone'}
                                                 value={profileData.phone}
                                                 onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
                                                 className={cn("w-full bg-white/5 border border-white/10 rounded-xl py-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
@@ -380,7 +436,9 @@ export default function AdminSettings() {
                                         <div className="relative">
                                             <Lock className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-4" : "left-4")} />
                                             <input
+                                                title={isRTL ? 'كلمة المرور الحالية' : 'Current Password'}
                                                 type="password"
+                                                placeholder={isRTL ? 'كلمة المرور الحالية' : 'Current Password'}
                                                 value={profileData.currentPassword}
                                                 onChange={(e) => setProfileData({ ...profileData, currentPassword: e.target.value })}
                                                 className={cn("w-full bg-white/5 border border-white/10 rounded-xl py-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
@@ -395,7 +453,9 @@ export default function AdminSettings() {
                                         <div className="relative">
                                             <Lock className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-4" : "left-4")} />
                                             <input
+                                                title={isRTL ? 'كلمة المرور الجديدة' : 'New Password'}
                                                 type="password"
+                                                placeholder={isRTL ? 'كلمة المرور الجديدة' : 'New Password'}
                                                 value={profileData.newPassword}
                                                 onChange={(e) => setProfileData({ ...profileData, newPassword: e.target.value })}
                                                 className={cn("w-full bg-white/5 border border-white/10 rounded-xl py-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
@@ -410,7 +470,9 @@ export default function AdminSettings() {
                                         <div className="relative">
                                             <Lock className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-4" : "left-4")} />
                                             <input
+                                                title={isRTL ? 'تأكيد كلمة المرور' : 'Confirm Password'}
                                                 type="password"
+                                                placeholder={isRTL ? 'تأكيد كلمة المرور' : 'Confirm Password'}
                                                 value={profileData.confirmPassword}
                                                 onChange={(e) => setProfileData({ ...profileData, confirmPassword: e.target.value })}
                                                 className={cn("w-full bg-white/5 border border-white/10 rounded-xl py-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}

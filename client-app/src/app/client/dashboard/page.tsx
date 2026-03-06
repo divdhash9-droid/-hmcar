@@ -193,7 +193,7 @@ export default function ClientDashboard() {
 
                 {/* Sidebar - Enhanced Glassmorphism */}
                 <aside className={cn(
-                    "hidden lg:flex flex-col w-72 mr-6 min-h-[calc(100vh-6rem)] bg-white/[0.03] backdrop-blur-2xl border border-white/10 p-6 rounded-r-3xl shadow-[0_0_50px_rgba(0,0,0,0.5)] relative overflow-hidden",
+                    "hidden lg:flex flex-col w-80 mr-6 min-h-[calc(100vh-6rem)] bg-white/[0.03] backdrop-blur-2xl border border-white/10 p-6 rounded-r-3xl shadow-[0_0_50px_rgba(0,0,0,0.5)] relative overflow-hidden",
                     isRTL ? "border-l border-r-0 rounded-l-3xl rounded-r-none ml-6 mr-0" : "border-r border-l-0"
                 )}>
                     <div className="absolute inset-0 -z-10 pointer-events-none">
@@ -225,10 +225,10 @@ export default function ClientDashboard() {
                                             : "hover:bg-white/5 text-white/30 hover:text-white"
                                     )}
                                 >
-                                    <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-white/10 group-hover:shadow-[0_0_18px_rgba(201,169,110,0.35)] transition-all">
-                                        <item.icon className={cn("w-5 h-5", item.active ? "text-black" : "text-white/30 group-hover:text-luxury-gold")} />
+                                    <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-white/10 group-hover:shadow-[0_0_18px_rgba(201,169,110,0.35)] transition-all">
+                                        <item.icon className={cn("w-6 h-6", item.active ? "text-black" : "text-white/30 group-hover:text-luxury-gold")} />
                                     </div>
-                                    <span className="text-[13px] font-black uppercase tracking-[0.15em]">{item.label}</span>
+                                    <span className="text-[16px] font-bold tracking-normal">{item.label}</span>
                                     {item.active && (
                                         <div className={cn("ml-auto", isRTL && "mr-auto ml-0")}>
                                             <Activity className="w-4 h-4 text-black/20" />
@@ -249,8 +249,8 @@ export default function ClientDashboard() {
                                             "hover:bg-white/5 text-white/30 hover:text-white"
                                         )}
                                     >
-                                        <qa.icon className={cn("w-6 h-6 text-white/20 group-hover:text-luxury-gold")} />
-                                        <span className="text-[13px] font-black uppercase tracking-[0.15em]">{qa.label}</span>
+                                        <qa.icon className={cn("w-7 h-7 text-white/20 group-hover:text-luxury-gold")} />
+                                        <span className="text-[16px] font-bold tracking-normal">{qa.label}</span>
                                     </motion.div>
                                 </Link>
                             ))}
@@ -268,10 +268,10 @@ export default function ClientDashboard() {
                                             : "hover:bg-white/5 text-white/30 hover:text-white"
                                     )}
                                 >
-                                    <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-white/10 group-hover:shadow-[0_0_18px_rgba(201,169,110,0.35)] transition-all">
-                                        <item.icon className={cn("w-5 h-5", item.active ? "text-black" : "text-white/30 group-hover:text-luxury-gold")} />
+                                    <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-white/10 group-hover:shadow-[0_0_18px_rgba(201,169,110,0.35)] transition-all">
+                                        <item.icon className={cn("w-6 h-6", item.active ? "text-black" : "text-white/30 group-hover:text-luxury-gold")} />
                                     </div>
-                                    <span className="text-[13px] font-black uppercase tracking-[0.15em]">{item.label}</span>
+                                    <span className="text-[16px] font-bold tracking-normal">{item.label}</span>
                                     {item.active && (
                                         <div className={cn("ml-auto", isRTL && "mr-auto ml-0")}>
                                             <Activity className="w-4 h-4 text-black/20" />
@@ -315,8 +315,8 @@ export default function ClientDashboard() {
                                 isRTL && "flex-row-reverse text_right"
                             )}
                         >
-                            <LogOut className="w-5 h-5 text-cinematic-neon-red" />
-                            <span className="text-[12px] font-black uppercase tracking-[0.2em]">{isRTL ? 'تسجيل الخروج' : 'LOG OUT'}</span>
+                            <LogOut className="w-6 h-6 text-cinematic-neon-red" />
+                            <span className="text-[16px] font-bold tracking-normal">{isRTL ? 'تسجيل الخروج' : 'Log Out'}</span>
                         </button>
                     </div>
                 </aside>

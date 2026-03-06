@@ -103,7 +103,7 @@ router.get('/profile', requireAuthAPI, async (req, res) => {
 // Update current user profile
 router.put('/profile', requireAuthAPI, async (req, res) => {
   try {
-    const allowedFields = ['name', 'email', 'phone'];
+    const allowedFields = ['name', 'email', 'phone', 'username'];
     const updates = {};
 
     // Only allow updating specific fields
@@ -122,20 +122,21 @@ router.put('/profile', requireAuthAPI, async (req, res) => {
       });
     }
 
-    // Check if email/phone is already taken by another user
-    if (updates.email || updates.phone) {
+    // Check if email/phone/username is already taken by another user
+    if (updates.email || updates.phone || updates.username) {
       const existingUser = await User.findOne({
         _id: { $ne: user._id },
         $or: [
           ...(updates.email ? [{ email: updates.email }] : []),
-          ...(updates.phone ? [{ phone: updates.phone }] : [])
+          ...(updates.phone ? [{ phone: updates.phone }] : []),
+          ...(updates.username ? [{ username: updates.username }] : [])
         ]
       });
 
       if (existingUser) {
         return res.status(409).json({
           error: 'Conflict',
-          message: 'Email or phone already exists'
+          message: 'Email, phone or username already exists'
         });
       }
     }
@@ -202,7 +203,7 @@ router.get('/:id', requireAuthAPI, requirePermissionAPI('manage_users'), async (
 // Create user (admin only)
 router.post('/', requireAuthAPI, requirePermissionAPI('manage_users'), async (req, res) => {
   try {
-    const { name, email, phone, password, role = 'buyer', permissions } = req.body;
+    const { name, email, phone, username, password, role = 'buyer', permissions } = req.body;
 
     // Validation
     if (!name || !password) {
@@ -212,10 +213,10 @@ router.post('/', requireAuthAPI, requirePermissionAPI('manage_users'), async (re
       });
     }
 
-    if (!email && !phone) {
+    if (!email && !phone && !username) {
       return res.status(400).json({
         error: 'Validation Error',
-        message: 'Email or phone is required'
+        message: 'Email, phone or username is required'
       });
     }
 
@@ -223,14 +224,15 @@ router.post('/', requireAuthAPI, requirePermissionAPI('manage_users'), async (re
     const existingUser = await User.findOne({
       $or: [
         ...(email ? [{ email }] : []),
-        ...(phone ? [{ phone }] : [])
+        ...(phone ? [{ phone }] : []),
+        ...(username ? [{ username }] : [])
       ]
     });
 
     if (existingUser) {
       return res.status(409).json({
         error: 'Conflict',
-        message: 'User with this email or phone already exists'
+        message: 'User with this email, phone or username already exists'
       });
     }
 
@@ -239,6 +241,7 @@ router.post('/', requireAuthAPI, requirePermissionAPI('manage_users'), async (re
       name,
       email,
       phone,
+      username,
       password,
       role,
       permissions: permissions || [],
@@ -297,7 +300,7 @@ router.put('/:id', requireAuthAPI, requirePermissionAPI('manage_users'), async (
     }
 
     const oldData = { ...user.toObject() };
-    const allowedUpdates = ['name', 'email', 'phone', 'role', 'status', 'permissions', 'boundDevices', 'isDeviceLocked'];
+    const allowedUpdates = ['name', 'email', 'phone', 'username', 'role', 'status', 'permissions', 'boundDevices', 'isDeviceLocked'];
     const updates = {};
 
     Object.keys(req.body).forEach(key => {
@@ -306,20 +309,21 @@ router.put('/:id', requireAuthAPI, requirePermissionAPI('manage_users'), async (
       }
     });
 
-    // Check email/phone uniqueness
-    if (updates.email || updates.phone) {
+    // Check email/phone/username uniqueness
+    if (updates.email || updates.phone || updates.username) {
       const existingUser = await User.findOne({
         _id: { $ne: user._id },
         $or: [
           ...(updates.email ? [{ email: updates.email }] : []),
-          ...(updates.phone ? [{ phone: updates.phone }] : [])
+          ...(updates.phone ? [{ phone: updates.phone }] : []),
+          ...(updates.username ? [{ username: updates.username }] : [])
         ]
       });
 
       if (existingUser) {
         return res.status(409).json({
           error: 'Conflict',
-          message: 'Email or phone already exists'
+          message: 'Email, phone or username already exists'
         });
       }
     }

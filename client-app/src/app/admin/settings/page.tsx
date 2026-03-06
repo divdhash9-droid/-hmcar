@@ -18,9 +18,6 @@ import {
     Camera,
     Send,
     Linkedin,
-    Camera,
-    Send,
-    Linkedin,
     DollarSign,
     MapPin,
     Clock
@@ -169,8 +166,9 @@ export default function AdminSettings() {
             }
 
             setMessage({ type: 'success', text: isRTL ? 'تم حفظ البيانات بنجاح' : 'Profile saved successfully' });
-        } catch (error: any) {
-            setMessage({ type: 'error', text: error.message || 'Error saving profile' });
+        } catch (error) {
+            const err = error as Error;
+            setMessage({ type: 'error', text: err.message || 'Error saving profile' });
         } finally {
             setLoading(false);
         }
@@ -183,8 +181,9 @@ export default function AdminSettings() {
         try {
             await api.settings.updateSocialLinks({ socialLinks });
             setMessage({ type: 'success', text: isRTL ? 'تم حفظ روابط التواصل' : 'Social links saved' });
-        } catch (error: any) {
-            setMessage({ type: 'error', text: error.message || 'Error saving' });
+        } catch (error) {
+            const err = error as Error;
+            setMessage({ type: 'error', text: err.message || 'Error saving' });
         } finally {
             setLoading(false);
         }
@@ -197,8 +196,9 @@ export default function AdminSettings() {
         try {
             await api.settings.updateContactInfo({ contactInfo });
             setMessage({ type: 'success', text: isRTL ? 'تم حفظ معلومات الاتصال' : 'Contact info saved' });
-        } catch (error: any) {
-            setMessage({ type: 'error', text: error.message || 'Error saving' });
+        } catch (error) {
+            const err = error as Error;
+            setMessage({ type: 'error', text: err.message || 'Error saving' });
         } finally {
             setLoading(false);
         }
@@ -211,8 +211,9 @@ export default function AdminSettings() {
         try {
             await api.settings.updateCurrencySettings({ currencySettings });
             setMessage({ type: 'success', text: isRTL ? 'تم حفظ إعدادات العملة' : 'Currency settings saved' });
-        } catch (error: any) {
-            setMessage({ type: 'error', text: error.message || 'Error saving' });
+        } catch (error) {
+            const err = error as Error;
+            setMessage({ type: 'error', text: err.message || 'Error saving' });
         } finally {
             setLoading(false);
         }
@@ -225,8 +226,9 @@ export default function AdminSettings() {
         try {
             await api.settings.updateSiteInfo({ siteInfo });
             setMessage({ type: 'success', text: isRTL ? 'تم حفظ معلومات الموقع' : 'Site info saved' });
-        } catch (error: any) {
-            setMessage({ type: 'error', text: error.message || 'Error saving' });
+        } catch (error) {
+            const err = error as Error;
+            setMessage({ type: 'error', text: err.message || 'Error saving' });
         } finally {
             setLoading(false);
         }
@@ -245,8 +247,9 @@ export default function AdminSettings() {
                 setSiteInfo(prev => ({ ...prev, logoUrl: res.url }));
                 setMessage({ type: 'success', text: isRTL ? 'تم رفع الشعار بنجاح' : 'Logo uploaded successfully' });
             }
-        } catch (error: any) {
-            setMessage({ type: 'error', text: error.message || 'Upload failed' });
+        } catch (error) {
+            const err = error as Error;
+            setMessage({ type: 'error', text: err.message || 'Upload failed' });
         } finally {
             setLoading(false);
         }

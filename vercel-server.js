@@ -231,8 +231,8 @@ function buildApp() {
     app.use(express.json({ limit: '10mb' }));
     app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-    // ── Health Check ──
-    app.get('/health', async (req, res) => {
+    // ── Diagnostic Check ──
+    app.get('/diag', async (req, res) => {
         let adminStatus = 'Unknown';
         try {
             const User = require('./models/User');
@@ -245,7 +245,7 @@ function buildApp() {
         }
 
         res.json({
-            status: 'healthy',
+            status: 'diagnostic',
             timestamp: new Date(),
             engine: 'HM-CAR-V2-Vercel',
             database: {

@@ -92,6 +92,14 @@ export const api = {
             body: JSON.stringify(data),
         }),
     },
+    analytics: {
+        // ملخص إحصائي للداشبورد
+        getSummary: () => fetchAPI('/api/v2/analytics'),
+        // أحدث الأنشطة
+        getActivities: (limit = 10) => fetchAPI(`/api/v2/analytics/activities?limit=${limit}`),
+        // إحصائيات تفصيلية
+        getDetailed: () => fetchAPI('/api/v2/analytics/detailed'),
+    },
     users: {
         list: (params: Record<string, string | number | boolean> = {}) => {
             const query = new URLSearchParams(params as Record<string, string>).toString();
@@ -178,11 +186,6 @@ export const api = {
             method: 'DELETE',
         }),
     },
-    analytics: {
-        getSummary: () => fetchAPI('/api/v2/analytics'),
-        getActivities: (limit?: number) => fetchAPI(`/api/v2/analytics/activities?limit=${limit || 10}`),
-        getDetailed: () => fetchAPI('/api/v2/analytics/detailed'),
-    },
     dashboard: {
         getClientData: () => fetchAPI('/api/v2/dashboard/client'),
         getAdminData: () => fetchAPI('/api/v2/dashboard/admin'),
@@ -205,34 +208,7 @@ export const api = {
             body: formData,
         }),
     },
-    settings: {
-        getPublic: () => fetchAPI('/api/v2/settings/public'),
-        get: () => fetchAPI('/api/v2/settings'),
-        updateSocialLinks: (data: any) => fetchAPI('/api/v2/settings/social-links', {
-            method: 'PUT',
-            body: JSON.stringify(data),
-        }),
-        updateContactInfo: (data: any) => fetchAPI('/api/v2/settings/contact-info', {
-            method: 'PUT',
-            body: JSON.stringify(data),
-        }),
-        updateSiteInfo: (data: any) => fetchAPI('/api/v2/settings/site-info', {
-            method: 'PUT',
-            body: JSON.stringify(data),
-        }),
-        updateCurrencySettings: (data: any) => fetchAPI('/api/v2/settings/currency-settings', {
-            method: 'PUT',
-            body: JSON.stringify(data),
-        }),
-        updateFeatures: (data: any) => fetchAPI('/api/v2/settings/features', {
-            method: 'PUT',
-            body: JSON.stringify(data),
-        }),
-        updateHomeContent: (data: any) => fetchAPI('/api/v2/settings/home-content', {
-            method: 'PUT',
-            body: JSON.stringify(data),
-        }),
-    },
+
     brands: {
         list: (category?: 'cars' | 'parts') => {
             const q = category ? `?category=${category}` : '';

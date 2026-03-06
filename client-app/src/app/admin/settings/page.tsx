@@ -624,38 +624,112 @@ export default function AdminSettings() {
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="space-y-6"
+                            className="space-y-4"
                         >
                             <div className="p-8 bg-white/[0.02] border border-white/5 rounded-3xl">
-                                <h2 className="text-lg font-black uppercase tracking-wider mb-6 flex items-center gap-3">
+                                <h2 className="text-lg font-black uppercase tracking-wider mb-2 flex items-center gap-3">
                                     <Globe className="w-5 h-5 text-cinematic-neon-red" />
                                     {isRTL ? 'روابط التواصل الاجتماعي' : 'Social Media Links'}
                                 </h2>
-                                <p className="text-sm text-white/40 mb-8">
+                                <p className="text-xs text-white/40 mb-8">
                                     {isRTL
-                                        ? 'أضف روابط حساباتك على مواقع التواصل الاجتماعي لتظهر في الموقع'
-                                        : 'Add your social media links to display them on the website'}
+                                        ? '✅ الروابط التي تضيفها فقط ستظهر في الصفحة الرئيسية — الروابط الفارغة لا تظهر أبداً'
+                                        : '✅ Only links you add will appear on the homepage — empty links are hidden'}
                                 </p>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    {socialFields.map((field) => (
-                                        <div key={field.key}>
-                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 flex items-center gap-2">
-                                                <field.icon className={cn("w-4 h-4", field.color)} />
-                                                {field.label}
-                                            </label>
-                                            <input
-                                                type="text"
-                                                value={(socialLinks as Record<string, string>)[field.key]}
-                                                onChange={(e) => setSocialLinks({ ...socialLinks, [field.key]: e.target.value })}
-                                                placeholder={field.placeholder}
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40 placeholder:text-white/20"
-                                            />
-                                        </div>
-                                    ))}
+                                {/* قائمة الروابط - كل رابط له عدل + حذف */}
+                                <div className="space-y-3">
+                                    {socialFields.map((field) => {
+                                        const currentVal = (socialLinks as Record<string, string>)[field.key] || '';
+                                        const hasValue = currentVal.trim() !== '';
+
+                                        return (
+                                            <div
+                                                key={field.key}
+                                                className={`flex items-center gap-3 p-4 rounded-2xl border transition-all ${hasValue
+                                                        ? 'bg-white/[0.04] border-white/15'
+                                                        : 'bg-white/[0.01] border-white/5 opacity-60'
+                                                    }`}
+                                            >
+                                                {/* أيقونة المنصة */}
+                                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${hasValue ? 'bg-white/10' : 'bg-white/5'
+                                                    }`}>
+                                                    <field.icon className={`w-5 h-5 ${field.color}`} />
+                                                </div>
+
+                                                {/* اسم المنصة + الحقل */}
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-1">
+                                                        {field.label}
+                                                        {hasValue && (
+                                                            <span className="mr-2 text-green-400">● موجود</span>
+                                                        )}
+                                                        {!hasValue && (
+                                                            <span className="mr-2 text-white/20">○ فارغ - لن يظهر</span>
+                                                        )}
+                                                    </div>
+                                                    <input
+                                                        type="text"
+                                                        value={currentVal}
+                                                        onChange={(e) => setSocialLinks({ ...socialLinks, [field.key]: e.target.value })}
+                                                        placeholder={field.placeholder}
+                                                        className="w-full bg-transparent text-sm text-white placeholder:text-white/20 outline-none border-b border-white/10 pb-1 focus:border-cinematic-neon-red/40 transition-colors"
+                                                        dir="ltr"
+                                                    />
+                                                </div>
+
+                                                {/* أزرار الإجراءات */}
+                                                <div className="flex items-center gap-2 flex-shrink-0">
+                                                    {/* زر حفظ هذا الرابط منفرداً */}
+                                                    {hasValue && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={async () => {
+                                                                try {
+                                                                    await api.settings.updateSocialLinks({ socialLinks });
+                                                                    setMessage({ type: 'success', text: isRTL ? `✅ تم حفظ ${field.label}` : `✅ ${field.label} saved` });
+                                                                    setTimeout(() => setMessage({ type: '', text: '' }), 2000);
+                                                                } catch {
+                                                                    setMessage({ type: 'error', text: isRTL ? 'فشل الحفظ' : 'Save failed' });
+                                                                }
+                                                            }}
+                                                            title={isRTL ? 'حفظ' : 'Save'}
+                                                            className="px-3 py-2 text-[10px] font-black uppercase tracking-wider rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 transition-all"
+                                                        >
+                                                            {isRTL ? 'حفظ' : 'Save'}
+                                                        </button>
+                                                    )}
+
+                                                    {/* زر الحذف - يمسح الرابط ويحفظ في قاعدة البيانات فوراً */}
+                                                    <button
+                                                        type="button"
+                                                        onClick={async () => {
+                                                            // 1. امسح الرابط من الحالة المحلية
+                                                            const updatedLinks = { ...socialLinks, [field.key]: '' };
+                                                            setSocialLinks(updatedLinks as typeof socialLinks);
+
+                                                            // 2. احفظ في قاعدة البيانات فوراً
+                                                            try {
+                                                                await api.settings.updateSocialLinks({ socialLinks: updatedLinks });
+                                                                setMessage({ type: 'success', text: isRTL ? `🗑️ تم حذف رابط ${field.label}` : `🗑️ ${field.label} removed` });
+                                                                setTimeout(() => setMessage({ type: '', text: '' }), 2000);
+                                                            } catch {
+                                                                setMessage({ type: 'error', text: isRTL ? 'فشل الحذف' : 'Delete failed' });
+                                                            }
+                                                        }}
+                                                        title={isRTL ? 'حذف الرابط' : 'Delete link'}
+                                                        className="px-3 py-2 text-[10px] font-black uppercase tracking-wider rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 transition-all"
+                                                    >
+                                                        {isRTL ? 'حذف' : 'Del'}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </div>
 
+                            {/* زر حفظ الكل */}
                             <motion.button
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
@@ -664,10 +738,11 @@ export default function AdminSettings() {
                                 className="w-full py-5 bg-cinematic-neon-red text-white font-black uppercase tracking-wider rounded-xl shadow-[0_0_30px_rgba(255,0,60,0.3)] hover:shadow-[0_0_50px_rgba(255,0,60,0.5)] transition-all flex items-center justify-center gap-3"
                             >
                                 <Save className="w-5 h-5" />
-                                {loading ? (isRTL ? 'جاري الحفظ...' : 'Saving...') : (isRTL ? 'حفظ الروابط' : 'Save Links')}
+                                {loading ? (isRTL ? 'جاري الحفظ...' : 'Saving...') : (isRTL ? 'حفظ جميع الروابط' : 'Save All Links')}
                             </motion.button>
                         </motion.div>
                     )}
+
 
                     {/* Contact Info Tab */}
                     {activeTab === 'contact' && (

@@ -8,9 +8,7 @@ import {
     Youtube,
     Facebook,
     Linkedin,
-    Send,
-    Twitter,
-    X
+    Send
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { api } from "@/lib/api";
@@ -41,41 +39,45 @@ interface SocialLinksProps {
     vertical?: boolean;
 }
 
-// بيانات تجريبية - ستأتي من API
-const defaultSocialLinks = {
-    whatsapp: '+967781007805',
-    instagram: 'https://instagram.com/hmcar',
-    twitter: 'https://x.com/hmcar',
+// لا توجد قيم افتراضية - فقط الروابط التي يضيفها الأدمن تظهر
+const emptySocialLinks = {
+    whatsapp: '',
+    instagram: '',
+    twitter: '',
     facebook: '',
-    youtube: 'https://youtube.com/@hmcar',
-    tiktok: 'https://tiktok.com/@hmcar',
+    youtube: '',
+    tiktok: '',
     snapchat: '',
-    telegram: 'https://t.me/hmcar',
+    telegram: '',
     linkedin: ''
 };
 
 export default function SocialLinks({
     className,
     size = 'md',
-    showLabels = false,
     vertical = false
 }: SocialLinksProps) {
-    const [socialLinks, setSocialLinks] = useState(defaultSocialLinks);
-    const [isOpen, setIsOpen] = useState(false);
+    const [socialLinks, setSocialLinks] = useState(emptySocialLinks);
 
     const loadSocialLinks = async () => {
         try {
             const response = await api.settings.getPublic();
             if (response.success && response.data.socialLinks) {
-                setSocialLinks({ ...defaultSocialLinks, ...response.data.socialLinks });
+                // استخدام فقط الروابط الواردة من قاعدة البيانات - بدون قيم افتراضية
+                setSocialLinks({ ...emptySocialLinks, ...response.data.socialLinks });
+            } else {
+                // لا توجد إعدادات - ابقَ بروابط فارغة (لن تظهر أيقونات)
+                setSocialLinks(emptySocialLinks);
             }
-        } catch (error) {
+        } catch {
             console.error('Failed to load social links');
+            setSocialLinks(emptySocialLinks);
+        } finally {
+            // تم التحميل
         }
     };
 
     useEffect(() => {
-        // Load from API
         loadSocialLinks();
     }, []);
 
@@ -212,7 +214,7 @@ export function WhatsAppFAB() {
     const [whatsappNumber, setWhatsappNumber] = useState('+967781007805');
 
     useEffect(() => {
-        api.settings.getPublic().then((res: any) => {
+        api.settings.getPublic().then((res: { success: boolean; data: { socialLinks?: { whatsapp?: string } } }) => {
             if (res?.success && res.data.socialLinks?.whatsapp) {
                 setWhatsappNumber(res.data.socialLinks.whatsapp);
             }

@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useLocale } from '@/hooks/useLocale';
+import { useSettings } from '@/lib/SettingsContext';
 import Image from 'next/image';
 import ClientPageHeader from '@/components/ClientPageHeader';
 
@@ -37,12 +38,13 @@ interface CarDetails {
 
 export default function CarDetailsPage() {
     const params = useParams();
-    const { isRTL, locale } = useLocale();
+    const { isRTL } = useLocale();
     const [car, setCar] = useState<CarDetails | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isFavorite, setIsFavorite] = useState(false);
+    const { formatPrice, socialLinks } = useSettings();
     const [contactPhone, setContactPhone] = useState('+967781007805');
 
     const fetchCarDetails = useCallback(async () => {
@@ -66,7 +68,7 @@ export default function CarDetailsPage() {
         try {
             const response = await api.favorites.check(params.id as string);
             setIsFavorite(response.isFavorite);
-        } catch (err) {
+        } catch {
             // Not logged in or error
         }
     }, [params.id]);
@@ -76,13 +78,10 @@ export default function CarDetailsPage() {
             fetchCarDetails();
             checkFavorite();
         }
-        // جلب رقم الاتصال من الإعدادات العامة (لا يحتاج تسجيل دخول)
-        api.settings.getPublic().then((res: { success: boolean, data?: any }) => {
-            if (res?.success && res?.data?.socialLinks?.whatsapp) {
-                setContactPhone(res.data.socialLinks.whatsapp);
-            }
-        }).catch(() => { });
-    }, [params.id, fetchCarDetails, checkFavorite]);
+        if (socialLinks?.whatsapp) {
+            setContactPhone(socialLinks.whatsapp);
+        }
+    }, [params.id, fetchCarDetails, checkFavorite, socialLinks]);
 
     const toggleFavorite = async () => {
         try {
@@ -92,7 +91,7 @@ export default function CarDetailsPage() {
                 await api.favorites.add(params.id as string);
             }
             setIsFavorite(!isFavorite);
-        } catch (err) {
+        } catch {
             alert(isRTL ? 'يرجى تسجيل الدخول أولاً' : 'Please login first');
         }
     };
@@ -119,13 +118,7 @@ export default function CarDetailsPage() {
         }
     };
 
-    const formatPrice = (price: number) => {
-        return new Intl.NumberFormat(locale === 'AR' ? 'ar-SA' : 'en-US', {
-            style: 'currency',
-            currency: 'SAR',
-            minimumFractionDigits: 0,
-        }).format(price);
-    };
+    /* Local formatPrice removed in favor of global useSettings().formatPrice */
 
     if (loading) {
         return (

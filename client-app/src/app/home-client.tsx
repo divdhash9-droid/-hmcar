@@ -20,6 +20,7 @@ import LandingShowcase from "@/components/LandingShowcase";
 import { useRouter } from "next/navigation";
 import { useSocket } from "@/lib/SocketContext";
 import { useAuth } from "@/lib/AuthContext";
+import { useSettings } from "@/lib/SettingsContext";
 
 export type CarType = {
   id?: string;
@@ -45,6 +46,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
   const { isRTL } = useLanguage();
   const { user, isLoggedIn } = useAuth();
   const { socket, isConnected } = useSocket();
+  const { siteInfo, homeContent, formatPrice } = useSettings();
   const containerRef = useRef<HTMLDivElement>(null);
   const liveRef = useRef<HTMLDivElement>(null);
   const [videoHeight, setVideoHeight] = useState<string>("55vh");
@@ -74,7 +76,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
   }, []);
 
   const txt = {
-    brand: isRTL ? "اتش ام كار" : "HM CAR",
+    brand: siteInfo?.siteName || (isRTL ? "اتش ام كار" : "HM CAR"),
     featuredTitle: isRTL ? "السيارات المميزة" : "Featured Cars",
     featuredSubtitle: isRTL ? "اختياراتنا المتميزة لك" : "Our Premium Selection",
     viewAll: isRTL ? "عرض الكل" : "View All",
@@ -116,7 +118,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
     { icon: Globe, title: isRTL ? "سيارات كورية" : "Korean Cars", desc: isRTL ? "أفضل السيارات الكورية" : "Best Korean vehicles" }
   ];
 
-  const formatNumber = (v: number | string) => new Intl.NumberFormat("en-US").format(Number(v || 0));
+  /* Use global formatPrice */
 
   const testimonials = [
     { name: isRTL ? "أحمد محمد" : "Ahmed Mohammed", role: isRTL ? "تاجر سيارات" : "Car Dealer", text: isRTL ? "تجربة رائعة مع HM CAR، حصلت على أفضل السيارات بأسعار مميزة جداً" : "Amazing experience with HM CAR, got the best cars at great prices", rating: 5 },
@@ -168,7 +170,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
 
       {/* Cinematic Video Background */}
       <CinematicVideoBackground
-        videoSrc="/videos/hero.mp4"
+        videoSrc={homeContent?.heroVideoUrl || "/videos/hero.mp4"}
         fallbackImage="/images/photo_2026-02-07_22-24-18.jpg"
         mobileImage="/images/hmcar.jpg"
         overlayOpacity={0.55}
@@ -296,8 +298,9 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
                       className="object-cover"
                     />
                   </div>
-                  <div className="px-3 py-1.5 text-white text-xs line-clamp-1">
-                    {isRTL && car.make && typeof car.make !== 'string' && car.make.name ? car.make.name : (car.title || "")}
+                  <div className="px-3 py-1.5 text-white text-xs line-clamp-1 flex justify-between items-center">
+                    <span>{isRTL && car.make && typeof car.make !== 'string' && car.make.name ? car.make.name : (car.title || "")}</span>
+                    <span className="text-[#c9a96e] font-bold">{formatPrice(Number(car.price || 0))}</span>
                   </div>
                 </div>
               ))}
@@ -402,7 +405,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
                     <div className="flex items-center justify-between mb-4 p-3 bg-white/5 rounded-xl backdrop-blur-md">
                       <div>
                         <p className="text-xs text-white/50 mb-1">{txt.currentBid}</p>
-                        <p className="text-2xl font-bold text-[#c9a96e]">{formatNumber(auction.currentBid)} SAR</p>
+                        <p className="text-2xl font-bold text-[#c9a96e]">{formatPrice(auction.currentBid)}</p>
                       </div>
                       <div className="text-right">
                         <p className="text-xs text-white/50 mb-1">{txt.endingSoon}</p>
@@ -535,8 +538,8 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-8">
             <div className="text-center md:text-left">
-              <h3 className="text-2xl font-bold text-[#c9a96e] font-display mb-2" style={{ textShadow: "0 0 20px rgba(201,169,110,0.3)" }}>HM CAR</h3>
-              <p className="text-white/60 text-sm">{isRTL ? "وجهتك الأولى للسيارات الفاخرة وقطع الغيار الأصلية من كوريا الجنوبية" : "Your first destination for luxury cars and genuine parts from South Korea"}</p>
+              <h3 className="text-2xl font-bold text-[#c9a96e] font-display mb-2" style={{ textShadow: "0 0 20px rgba(201,169,110,0.3)" }}>{siteInfo?.siteName || 'HM CAR'}</h3>
+              <p className="text-white/60 text-sm">{siteInfo?.siteDescription || (isRTL ? "وجهتك الأولى للسيارات الفاخرة وقطع الغيار الأصلية من كوريا الجنوبية" : "Your first destination for luxury cars and genuine parts from South Korea")}</p>
             </div>
             <div className="flex items-center gap-3">
               <Link href="/support">
@@ -568,7 +571,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
             </div>
           </div>
           <div className="pt-6 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-white/40 text-xs">© 2026 HM CAR. {txt.rights}.</p>
+            <p className="text-white/40 text-xs">© 2026 {siteInfo?.siteName || 'HM CAR'}. {txt.rights}.</p>
             <div className="flex items-center gap-4 text-xs text-white/40">
               <Link href="#" className="hover:text-[#c9a96e] transition-colors">{txt.privacy}</Link>
               <Link href="#" className="hover:text-[#c9a96e] transition-colors">{txt.terms}</Link>

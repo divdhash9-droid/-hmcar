@@ -2,26 +2,48 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Heart, Car, ArrowUpRight, Sparkles, ChevronLeft, ChevronRight, MapPin, Phone, MessageSquare } from "lucide-react";
+import { Heart, Car, ArrowUpRight, ChevronLeft, ChevronRight, MapPin, Phone, MessageSquare } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/LanguageContext";
 import { api } from "@/lib/api";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import ClientPageHeader from "@/components/ClientPageHeader";
-import SearchSection from "@/components/SearchSection";
+import Image from "next/image";
+import { useSettings } from "@/lib/SettingsContext";
+
+interface Agency {
+    id: string;
+    name: string;
+    logo: string;
+    location?: string;
+    phone?: string;
+    whatsapp?: string;
+    description?: string;
+    description_ar?: string;
+}
+
+interface CarData {
+    id: string;
+    title: string;
+    images?: string[];
+    price: number;
+    make?: { name?: string } | string;
+    displayCurrency?: 'SAR' | 'USD';
+    previewImage?: string;
+}
 
 export default function Showroom() {
-    const { t, isRTL } = useLanguage();
+    const { isRTL } = useLanguage();
+    const { formatPrice } = useSettings();
     const router = useRouter();
     const [viewMode, setViewMode] = useState<'AGENCIES' | 'CARS'>('AGENCIES');
-    const [selectedAgency, setSelectedAgency] = useState<any>(null);
-    const [cars, setCars] = useState<any[]>([]);
+    const [selectedAgency, setSelectedAgency] = useState<Agency | null>(null);
+    const [cars, setCars] = useState<CarData[]>([]);
     const [loading, setLoading] = useState(false);
 
     // --- Mock Brands for Agencies ---
-    const [agencies, setAgencies] = useState<any[]>([]);
+    const [agencies, setAgencies] = useState<Agency[]>([]);
 
     useEffect(() => {
         const fetchAgencies = async () => {
@@ -46,15 +68,15 @@ export default function Showroom() {
         fetchAgencies();
     }, []);
 
-    const handleAgencySelect = async (agency: any) => {
+    const handleAgencySelect = async (agency: Agency) => {
         setSelectedAgency(agency);
         setViewMode('CARS');
         setLoading(true);
         try {
             const data = await api.cars.list({ limit: 50 });
             // Filter by agency name or ID
-            const filtered = (data.cars || []).filter((c: any) => {
-                const carMake = typeof c.make === 'object' ? c.make.name : c.make;
+            const filtered = (data.cars || []).filter((c: CarData) => {
+                const carMake = typeof c.make === 'object' ? c.make?.name : c.make;
                 return String(carMake || '').toLowerCase() === agency.name.toLowerCase();
             });
             setCars(filtered);
@@ -68,12 +90,7 @@ export default function Showroom() {
         setSelectedAgency(null);
     };
 
-    const filters = [
-        { key: 'ALL', label: isRTL ? 'الكل' : 'ALL' },
-        { key: 'SPORT', label: isRTL ? 'رياضية' : 'SPORT' },
-        { key: 'LUXURY', label: isRTL ? 'فاخرة' : 'LUXURY' },
-        { key: 'SUV', label: isRTL ? 'دفع رباعي' : 'SUV' },
-    ];
+
 
     return (
         <div className={`relative min-h-screen bg-black text-white overflow-x-hidden ${isRTL ? 'font-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
@@ -178,7 +195,7 @@ export default function Showroom() {
                             </div>
 
                             <div className="grid grid-cols-2 gap-x-12 gap-y-20">
-                                {agencies.map((agency: any, idx: number) => (
+                                {agencies.map((agency: Agency, idx: number) => (
                                     <motion.div
                                         key={agency.id}
                                         initial={{ opacity: 0, y: 50 }}
@@ -196,9 +213,10 @@ export default function Showroom() {
 
                                             {/* Main Circle Body */}
                                             <div className="absolute inset-2 rounded-full bg-white overflow-hidden flex items-center justify-center shadow-2xl group-hover:shadow-accent-gold/10 transition-all duration-700">
-                                                <img
+                                                <Image
                                                     src={agency.logo}
                                                     alt={agency.name}
+                                                    fill
                                                     className="w-3/4 h-3/4 object-contain"
                                                 />
                                             </div>
@@ -241,7 +259,7 @@ export default function Showroom() {
                             ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                     <AnimatePresence mode="popLayout">
-                                        {cars.map((car: any, i: number) => (
+                                        {cars.map((car: CarData, i: number) => (
                                             <motion.div
                                                 key={car.id}
                                                 layout
@@ -253,9 +271,10 @@ export default function Showroom() {
                                                 {/* (Same car card code as before) */}
                                                 <div className="group obsidian-card obsidian-card-hover h-full flex flex-col overflow-hidden">
                                                     <div className="relative h-56 overflow-hidden bg-black">
-                                                        <img
+                                                        <Image
                                                             src={car.images?.[0] || car.previewImage || ''}
                                                             alt={car.title}
+                                                            fill
                                                             className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 grayscale-[30%] group-hover:grayscale-0 opacity-70 group-hover:opacity-100"
                                                         />
                                                         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
@@ -269,7 +288,7 @@ export default function Showroom() {
                                                         <div>
                                                             <div className="flex items-center gap-1.5 mb-2 opacity-50">
                                                                 <div className="w-1 h-1 bg-accent-gold rounded-full" />
-                                                                <span className="text-[8px] font-bold text-accent-gold tracking-[0.2em] uppercase">{car.make?.name || car.make}</span>
+                                                                <span className="text-[8px] font-bold text-accent-gold tracking-[0.2em] uppercase">{typeof car.make === 'object' ? car.make?.name : (car.make || '')}</span>
                                                             </div>
                                                             <h3 className="text-lg font-black tracking-tight uppercase leading-snug line-clamp-2 group-hover:text-accent-gold transition-colors min-h-[2.8rem]">
                                                                 {car.title}
@@ -278,7 +297,7 @@ export default function Showroom() {
                                                         <div className="flex items-end justify-between pt-1">
                                                             <div>
                                                                 <span className="text-[8px] font-bold text-white/15 uppercase tracking-wider block mb-0.5">{isRTL ? 'السعر' : 'PRICE'}</span>
-                                                                <span className="text-lg font-black gradient-text-gold">{Number(car.price || 0).toLocaleString()}<span className="text-[9px] text-white/20 ml-1 font-normal"> SAR</span></span>
+                                                                <span className="text-lg font-black gradient-text-gold">{formatPrice(car.price || 0, car.displayCurrency)}</span>
                                                             </div>
                                                             <Link href={`/showroom/${car.id}`}>
                                                                 <div aria-label="View Details" className="w-10 h-10 rounded-lg bg-white/5 border border-white/5 flex items-center justify-center hover:bg-white hover:text-black transition-all">

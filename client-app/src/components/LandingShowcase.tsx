@@ -2,8 +2,9 @@ import { motion } from "framer-motion";
 import { Car, Wrench, Gavel, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useSettings } from "@/lib/SettingsContext";
 
 interface LandingShowcaseProps {
     isRTL: boolean;
@@ -23,6 +24,7 @@ export default function LandingShowcase({ isRTL, latestCars = [] }: LandingShowc
     const [category, setCategory] = useState<"cars" | "parts" | "auctions">("cars");
     const [lead, setLead] = useState({ name: "", model: "", company: "", phone: "" });
     const [submitted, setSubmitted] = useState(false);
+    const { homeContent } = useSettings();
 
     const runSearch = () => {
         if (category === "cars") {
@@ -123,11 +125,15 @@ export default function LandingShowcase({ isRTL, latestCars = [] }: LandingShowc
                         className="absolute inset-0 bg-accent-gold/20 blur-3xl rounded-full"
                     />
                     <h1 className="text-6xl md:text-9xl font-black font-display tracking-tighter text-white relative">
-                        HM <span className="text-transparent bg-clip-text bg-gradient-to-b from-accent-gold to-[#8b7355]">CAR</span>
+                        {homeContent.heroTitle || (
+                            <>
+                                HM <span className="text-transparent bg-clip-text bg-gradient-to-b from-accent-gold to-[#8b7355]">CAR</span>
+                            </>
+                        )}
                     </h1>
                 </div>
                 <p className="text-lg md:text-2xl text-white/40 font-light tracking-[0.3em] uppercase max-w-2xl mx-auto px-6">
-                    {isRTL ? "بوابة النخبة لتصدير السيارات الكورية" : "Elite Korean Automotive Gateway"}
+                    {homeContent.heroSubtitle || (isRTL ? "بوابة النخبة لتصدير السيارات الكورية" : "Elite Korean Automotive Gateway")}
                 </p>
 
                 {/* ── LOGIN BUTTON ── */}

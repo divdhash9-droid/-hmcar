@@ -3,7 +3,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import {
-    Car,
     Plus,
     Edit,
     Trash2,
@@ -17,6 +16,7 @@ import {
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/LanguageContext";
 import { api } from "@/lib/api";
@@ -45,11 +45,13 @@ export default function AdminCarsPage() {
         fuelType: 'Petrol',
         transmission: 'Automatic',
         color: '',
-        isActive: true
+        isActive: true,
+        displayCurrency: 'SAR'
     });
 
     useEffect(() => {
         loadData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [filter, searchTerm]);
 
     const loadData = async () => {
@@ -121,7 +123,8 @@ export default function AdminCarsPage() {
             transmission: car.transmission || 'Automatic',
             color: car.color || '',
             isActive: car.isActive !== false,
-            usdPrice: parseFloat((car.price / usdToSar).toFixed(2))
+            usdPrice: parseFloat((car.price / usdToSar).toFixed(2)),
+            displayCurrency: car.displayCurrency || 'SAR'
         });
         setShowModal(true);
     };
@@ -141,7 +144,8 @@ export default function AdminCarsPage() {
             transmission: 'Automatic',
             color: '',
             isActive: true,
-            usdPrice: 0
+            usdPrice: 0,
+            displayCurrency: 'SAR'
         });
     };
 
@@ -237,9 +241,10 @@ export default function AdminCarsPage() {
                                 className="glass-card bg-white/[0.01] border-white/5 overflow-hidden group hover:border-cinematic-neon-blue/30 transition-all"
                             >
                                 <div className="relative h-64 overflow-hidden">
-                                    <img
+                                    <Image
                                         src={car.images?.[0] || 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=1000&auto=format&fit=crop'}
                                         alt={car.title}
+                                        fill
                                         className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110"
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
@@ -263,7 +268,15 @@ export default function AdminCarsPage() {
 
                                     <div className="flex items-center justify-between pt-4 border-t border-white/5">
                                         <div className="text-2xl font-black text-cinematic-neon-blue italic">
-                                            {Number(car.price || 0).toLocaleString()} <span className="text-[11px] opacity-60">SAR</span>
+                                            {car.displayCurrency === 'USD' ? (
+                                                <>
+                                                    {((car.price || 0) / usdToSar).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-[11px] opacity-60">USD</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {Number(car.price || 0).toLocaleString()} <span className="text-[11px] opacity-60">SAR</span>
+                                                </>
+                                            )}
                                         </div>
                                     </div>
 
@@ -335,12 +348,13 @@ export default function AdminCarsPage() {
                                         <div className="flex items-center gap-4">
                                             <div className="relative w-24 h-24 bg-white/5 border border-white/10 rounded-xl overflow-hidden flex items-center justify-center group">
                                                 {formData.images[0] ? (
-                                                    <img src={formData.images[0]} alt="Car" className="w-full h-full object-cover" />
+                                                    <Image src={formData.images[0]} alt="Car preview" fill className="w-full h-full object-cover" />
                                                 ) : (
                                                     <Upload className="w-8 h-8 text-white/20" />
                                                 )}
                                                 <input
                                                     type="file"
+                                                    title={isRTL ? 'رفع صورة' : 'Upload Image'}
                                                     accept="image/*"
                                                     className="absolute inset-0 opacity-0 cursor-pointer"
                                                     onChange={async (e) => {
@@ -357,9 +371,10 @@ export default function AdminCarsPage() {
                                                             } else {
                                                                 alert(res.message || (isRTL ? 'فشل الرفع' : 'Upload failed'));
                                                             }
-                                                        } catch (err: any) {
+                                                        } catch (err: unknown) {
                                                             console.error('Upload failed', err);
-                                                            const msg = err.response?.data?.message || err.message || (isRTL ? 'خطأ في الاتصال بالسيرفر' : 'Server connection error');
+                                                            const error = err as { response?: { data?: { message?: string } }; message?: string };
+                                                            const msg = error.response?.data?.message || error.message || (isRTL ? 'خطأ في الاتصال بالسيرفر' : 'Server connection error');
                                                             alert(`${isRTL ? 'فشل الرفع: ' : 'Upload failed: '} ${msg}`);
                                                         }
                                                     }}
@@ -456,6 +471,20 @@ export default function AdminCarsPage() {
                                             onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
                                             className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 px-4 text-sm font-bold text-cinematic-neon-blue focus:outline-none focus:border-cinematic-neon-blue/40"
                                         />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/60 mb-2">
+                                            {isRTL ? 'عملة العرض' : 'DISPLAY CURRENCY'}
+                                        </label>
+                                        <select
+                                            title={isRTL ? "عملة العرض" : "Display Currency"}
+                                            value={formData.displayCurrency}
+                                            onChange={(e) => setFormData({ ...formData, displayCurrency: e.target.value })}
+                                            className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 px-4 text-sm font-bold text-white focus:outline-none focus:border-cinematic-neon-blue/40"
+                                        >
+                                            <option value="SAR">SAR (ريال سعودي)</option>
+                                            <option value="USD">USD (دولار أمريكي)</option>
+                                        </select>
                                     </div>
                                     <div>
                                         <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/60 mb-2">

@@ -5,13 +5,13 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    Menu, X, User, LogOut, Settings,
-    Car, Gavel, Search, ShoppingBag,
-    ShieldCheck, LayoutDashboard, Languages, Bell, ArrowLeft, ArrowRight,
-    Headphones, MessageCircle
+    Menu, X, User, Languages, ArrowLeft, ArrowRight,
+    Headphones, MessageCircle,
+    Car, Gavel, ShoppingBag, Settings
 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useLanguage } from '@/lib/LanguageContext';
+import { useSettings } from '@/lib/SettingsContext';
 import { cn } from '@/lib/utils';
 import NotificationDropdown from './NotificationDropdown';
 
@@ -21,7 +21,8 @@ export default function Navbar() {
     const pathname = usePathname();
     const router = useRouter();
     const { user, isLoggedIn } = useAuth();
-    const { isRTL, toggleLanguage } = useLanguage(); // تم إضافة toggleLanguage لتغيير اللغة
+    const { isRTL, toggleLanguage } = useLanguage();
+    const { siteInfo, displayCurrency, setDisplayCurrency } = useSettings();
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -30,8 +31,8 @@ export default function Navbar() {
     }, []);
 
     useEffect(() => {
-        setIsOpen(false);
-    }, [pathname]);
+        if (isOpen) setIsOpen(false);
+    }, [pathname, isOpen]);
 
     const navLinks = [
         { href: '/showroom', label: isRTL ? 'المعرض' : 'SHOWROOM', icon: Car },
@@ -67,10 +68,10 @@ export default function Navbar() {
                                 className="relative flex items-center"
                             >
                                 <span className="text-2xl font-black tracking-[-0.04em] text-white transition-all drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">
-                                    HM
+                                    {siteInfo?.siteName?.split(' ')[0] || 'HM'}
                                 </span>
                                 <span className="text-2xl font-display italic text-accent-gold ml-1 transition-all drop-shadow-[0_0_12px_rgba(201,169,110,0.5)]">
-                                    CAR
+                                    {siteInfo?.siteName?.split(' ')[1] || 'CAR'}
                                 </span>
                                 <motion.div
                                     initial={{ width: 0 }}
@@ -120,7 +121,7 @@ export default function Navbar() {
 
                     {/* Right Actions */}
                     <div className="flex items-center gap-2">
-                        {isLoggedIn ? (
+                        {isLoggedIn && (
                             <div className="flex items-center gap-2">
                                 <NotificationDropdown />
                                 <Link
@@ -130,8 +131,25 @@ export default function Navbar() {
                                     <User className="w-4 h-4" />
                                 </Link>
                             </div>
-                        ) : (
-                            /* استبدال زر تسجيل الدخول بأيقونة اللغة بناءً على طلب المستخدم */
+                        )}
+
+                        {!isLoggedIn && (
+                            <Link href="/login" className="hidden sm:block">
+                                <button className="px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-white hover:bg-white/10 transition-all">
+                                    {isRTL ? 'دخول' : 'SIGN IN'}
+                                </button>
+                            </Link>
+                        )}
+
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => setDisplayCurrency(displayCurrency === 'SAR' ? 'USD' : 'SAR')}
+                                className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all font-bold text-[10px]"
+                                title={isRTL ? "تغيير العملة" : "Change Currency"}
+                            >
+                                {displayCurrency}
+                            </button>
+
                             <button
                                 onClick={toggleLanguage}
                                 className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all"
@@ -139,7 +157,7 @@ export default function Navbar() {
                             >
                                 <Languages className="w-5 h-5 text-accent-gold" />
                             </button>
-                        )}
+                        </div>
 
                         {/* Mobile Toggle */}
                         <button

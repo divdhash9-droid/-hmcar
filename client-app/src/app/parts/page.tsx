@@ -11,6 +11,7 @@ import Navbar from "@/components/Navbar";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/LanguageContext";
 import { api } from "@/lib/api";
+import { useSettings } from "@/lib/SettingsContext";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -39,6 +40,7 @@ interface Agency {
 
 export default function PartsPage() {
     const { isRTL } = useLanguage();
+    const { formatPrice } = useSettings();
     const [viewMode, setViewMode] = useState<'AGENCIES' | 'MODELS' | 'PARTS'>('AGENCIES');
     const [selectedAgency, setSelectedAgency] = useState<Agency | null>(null);
     const [selectedModel, setSelectedModel] = useState<string | null>(null);
@@ -368,7 +370,7 @@ export default function PartsPage() {
                                                     <span className="text-[8px] font-black text-accent-gold uppercase tracking-[0.3em]">{part.brand}</span>
                                                     <h3 className="text-lg font-black uppercase tracking-tight leading-tight min-h-[3rem] group-hover:text-accent-gold transition-colors">{part.name}</h3>
                                                     <div className="flex items-center justify-between pt-4 border-t border-white/10">
-                                                        <div className="text-xl font-black gradient-text-gold">{Number(part.price).toLocaleString()} <span className="text-[10px] text-white/30 truncate uppercase">SAR</span></div>
+                                                        <div className="text-xl font-black gradient-text-gold">{formatPrice(Number(part.price))}</div>
                                                         <Link href={`/parts/${part.id}`} className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-accent-gold hover:text-black transition-all">
                                                             <ArrowUpRight className="w-4 h-4" />
                                                         </Link>

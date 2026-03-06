@@ -7,11 +7,13 @@ import Navbar from "@/components/Navbar";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/LanguageContext";
 import { api } from "@/lib/api";
+import { useSettings } from "@/lib/SettingsContext";
 import Link from "next/link";
 import ClientPageHeader from "@/components/ClientPageHeader";
 
 export default function Auctions() {
     const { t, isRTL } = useLanguage();
+    const { formatPrice } = useSettings();
     const [activeTab, setActiveTab] = useState('LIVE');
     const [auctions, setAuctions] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -181,7 +183,7 @@ export default function Auctions() {
                                             <div className="grid grid-cols-2 lg:grid-cols-3 gap-8 border-y border-white/5 py-6">
                                                 <div>
                                                     <span className="text-[9px] font-black text-white/20 uppercase mb-1 block">Current Bid</span>
-                                                    <div className="text-2xl font-black text-cinematic-neon-blue">{Number(item.currentBid).toLocaleString()} SAR</div>
+                                                    <div className="text-2xl font-black text-cinematic-neon-blue">{formatPrice(Number(item.currentBid))}</div>
                                                 </div>
                                                 <div>
                                                     <span className="text-[9px] font-black text-white/20 uppercase mb-1 block">Ends On</span>

@@ -19,16 +19,20 @@ import {
     Send,
     Linkedin,
     DollarSign,
+    LayoutDashboard,
     MapPin,
-    Clock
-} from "lucide-react";
+    Clock,
+    Eye,
+    EyeOff
+} from 'lucide-react';
 import Link from "next/link";
+import NextImage from "next/image";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/LanguageContext";
 import { useAuth } from "@/lib/AuthContext";
 import { api } from "@/lib/api";
 
-type TabID = 'profile' | 'social' | 'contact' | 'currency' | 'site';
+type TabID = 'profile' | 'security' | 'social' | 'contact' | 'currency' | 'site' | 'home';
 
 export default function AdminSettings() {
     const { isRTL } = useLanguage();
@@ -36,6 +40,7 @@ export default function AdminSettings() {
     const [activeTab, setActiveTab] = useState<TabID>('profile');
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
+    const [showPass, setShowPass] = useState({ current: false, new: false, confirm: false });
 
     // Profile data
     const [profileData, setProfileData] = useState({
@@ -81,6 +86,12 @@ export default function AdminSettings() {
         siteDescription: '',
         logoUrl: '',
         faviconUrl: ''
+    });
+
+    const [homeContent, setHomeContent] = useState({
+        heroTitle: '',
+        heroSubtitle: '',
+        heroVideoUrl: '',
     });
 
     useEffect(() => {
@@ -186,63 +197,93 @@ export default function AdminSettings() {
         }
     };
 
-    const handleSaveSocialLinks = async () => {
-        setLoading(true);
-        setMessage({ type: '', text: '' });
-
+    const handleSaveSocialLinks = async (silent = false) => {
+        if (!silent) {
+            setLoading(true);
+            setMessage({ type: '', text: '' });
+        }
         try {
             await api.settings.updateSocialLinks({ socialLinks });
-            setMessage({ type: 'success', text: isRTL ? 'تم حفظ روابط التواصل' : 'Social links saved' });
+            if (!silent) setMessage({ type: 'success', text: isRTL ? 'تم حفظ روابط التواصل' : 'Social links saved' });
         } catch (error) {
-            const err = error as Error;
-            setMessage({ type: 'error', text: err.message || 'Error saving' });
+            if (!silent) {
+                const err = error as Error;
+                setMessage({ type: 'error', text: err.message || 'Error saving' });
+            }
         } finally {
-            setLoading(false);
+            if (!silent) setLoading(false);
         }
     };
 
-    const handleSaveContactInfo = async () => {
-        setLoading(true);
-        setMessage({ type: '', text: '' });
-
+    const handleSaveContactInfo = async (silent = false) => {
+        if (!silent) {
+            setLoading(true);
+            setMessage({ type: '', text: '' });
+        }
         try {
             await api.settings.updateContactInfo({ contactInfo });
-            setMessage({ type: 'success', text: isRTL ? 'تم حفظ معلومات الاتصال' : 'Contact info saved' });
+            if (!silent) setMessage({ type: 'success', text: isRTL ? 'تم حفظ معلومات الاتصال' : 'Contact info saved' });
         } catch (error) {
-            const err = error as Error;
-            setMessage({ type: 'error', text: err.message || 'Error saving' });
+            if (!silent) {
+                const err = error as Error;
+                setMessage({ type: 'error', text: err.message || 'Error saving' });
+            }
         } finally {
-            setLoading(false);
+            if (!silent) setLoading(false);
         }
     };
 
-    const handleSaveCurrencySettings = async () => {
-        setLoading(true);
-        setMessage({ type: '', text: '' });
-
+    const handleSaveCurrencySettings = async (silent = false) => {
+        if (!silent) {
+            setLoading(true);
+            setMessage({ type: '', text: '' });
+        }
         try {
             await api.settings.updateCurrencySettings({ currencySettings });
-            setMessage({ type: 'success', text: isRTL ? 'تم حفظ إعدادات العملة' : 'Currency settings saved' });
+            if (!silent) setMessage({ type: 'success', text: isRTL ? 'تم حفظ إعدادات العملة' : 'Currency settings saved' });
         } catch (error) {
-            const err = error as Error;
-            setMessage({ type: 'error', text: err.message || 'Error saving' });
+            if (!silent) {
+                const err = error as Error;
+                setMessage({ type: 'error', text: err.message || 'Error saving' });
+            }
         } finally {
-            setLoading(false);
+            if (!silent) setLoading(false);
         }
     };
 
-    const handleSaveSiteInfo = async () => {
-        setLoading(true);
-        setMessage({ type: '', text: '' });
-
+    const handleSaveSiteInfo = async (silent = false) => {
+        if (!silent) {
+            setLoading(true);
+            setMessage({ type: '', text: '' });
+        }
         try {
             await api.settings.updateSiteInfo({ siteInfo });
-            setMessage({ type: 'success', text: isRTL ? 'تم حفظ معلومات الموقع' : 'Site info saved' });
+            if (!silent) setMessage({ type: 'success', text: isRTL ? 'تم حفظ معلومات الموقع' : 'Site info saved' });
         } catch (error) {
-            const err = error as Error;
-            setMessage({ type: 'error', text: err.message || 'Error saving' });
+            if (!silent) {
+                const err = error as Error;
+                setMessage({ type: 'error', text: err.message || 'Error saving' });
+            }
         } finally {
-            setLoading(false);
+            if (!silent) setLoading(false);
+        }
+    };
+
+    const handleSaveHomeContent = async (silent = false) => {
+        if (!silent) {
+            setLoading(true);
+            setMessage({ type: '', text: '' });
+        }
+        try {
+            await api.settings.updateSiteInfo({ siteInfo, homeContent });
+            if (!silent) setMessage({ type: 'success', text: isRTL ? 'تم حفظ محتوى الصفحة الرئيسية' : 'Home content saved' });
+        } catch (error) {
+            if (!silent) {
+                const err = error as Error;
+                setMessage({ type: 'error', text: err.message || 'Error saving' });
+            }
+        } finally {
+            if (!silent) setLoading(false);
         }
     };
 
@@ -270,6 +311,7 @@ export default function AdminSettings() {
     const tabs = [
         { id: 'profile', label: isRTL ? 'الملف الشخصي' : 'Profile', icon: User },
         { id: 'site', label: isRTL ? 'هوية الموقع' : 'Site Identity', icon: Camera },
+        { id: 'home', label: isRTL ? 'محتوى الصفحة الرئيسية' : 'Home Content', icon: LayoutDashboard },
         { id: 'social', label: isRTL ? 'التواصل الاجتماعي' : 'Social Links', icon: Globe },
         { id: 'contact', label: isRTL ? 'معلومات الاتصال' : 'Contact Info', icon: Phone },
         { id: 'currency', label: isRTL ? 'إعدادات العملة' : 'Currency', icon: DollarSign }
@@ -337,7 +379,7 @@ export default function AdminSettings() {
                         {tabs.map((tab) => (
                             <button
                                 key={tab.id}
-                                onClick={() => setActiveTab(tab.id as any)}
+                                onClick={() => setActiveTab(tab.id as TabId)}
                                 className={cn(
                                     "flex-1 flex items-center justify-center gap-3 py-4 rounded-xl font-bold text-sm uppercase tracking-wider transition-all",
                                     activeTab === tab.id
@@ -467,12 +509,19 @@ export default function AdminSettings() {
                                                     name="current-password"
                                                     autoComplete="current-password"
                                                     title={isRTL ? 'كلمة المرور الحالية' : 'Current Password'}
-                                                    type="password"
+                                                    type={showPass.current ? "text" : "password"}
                                                     placeholder={isRTL ? 'كلمة المرور الحالية' : 'Current Password'}
                                                     value={profileData.currentPassword}
                                                     onChange={(e) => setProfileData({ ...profileData, currentPassword: e.target.value })}
-                                                    className={cn("w-full bg-white/5 border border-white/10 rounded-xl py-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
+                                                    className={cn("w-full bg-white/5 border border-white/10 rounded-xl py-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40", isRTL ? "pr-12 pl-12" : "pl-12 pr-12")}
                                                 />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowPass({ ...showPass, current: !showPass.current })}
+                                                    className={cn("absolute top-1/2 -translate-y-1/2 text-white/20 hover:text-white transition-colors", isRTL ? "left-4" : "right-4")}
+                                                >
+                                                    {showPass.current ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                                </button>
                                             </div>
                                         </div>
 
@@ -486,12 +535,19 @@ export default function AdminSettings() {
                                                     name="new-password"
                                                     autoComplete="new-password"
                                                     title={isRTL ? 'كلمة المرور الجديدة' : 'New Password'}
-                                                    type="password"
+                                                    type={showPass.new ? "text" : "password"}
                                                     placeholder={isRTL ? 'كلمة المرور الجديدة' : 'New Password'}
                                                     value={profileData.newPassword}
                                                     onChange={(e) => setProfileData({ ...profileData, newPassword: e.target.value })}
-                                                    className={cn("w-full bg-white/5 border border-white/10 rounded-xl py-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
+                                                    className={cn("w-full bg-white/5 border border-white/10 rounded-xl py-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40", isRTL ? "pr-12 pl-12" : "pl-12 pr-12")}
                                                 />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowPass({ ...showPass, new: !showPass.new })}
+                                                    className={cn("absolute top-1/2 -translate-y-1/2 text-white/20 hover:text-white transition-colors", isRTL ? "left-4" : "right-4")}
+                                                >
+                                                    {showPass.new ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                                </button>
                                             </div>
                                         </div>
 
@@ -505,12 +561,19 @@ export default function AdminSettings() {
                                                     name="confirm-password"
                                                     autoComplete="new-password"
                                                     title={isRTL ? 'تأكيد كلمة المرور' : 'Confirm Password'}
-                                                    type="password"
+                                                    type={showPass.confirm ? "text" : "password"}
                                                     placeholder={isRTL ? 'تأكيد كلمة المرور' : 'Confirm Password'}
                                                     value={profileData.confirmPassword}
                                                     onChange={(e) => setProfileData({ ...profileData, confirmPassword: e.target.value })}
-                                                    className={cn("w-full bg-white/5 border border-white/10 rounded-xl py-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
+                                                    className={cn("w-full bg-white/5 border border-white/10 rounded-xl py-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40", isRTL ? "pr-12 pl-12" : "pl-12 pr-12")}
                                                 />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowPass({ ...showPass, confirm: !showPass.confirm })}
+                                                    className={cn("absolute top-1/2 -translate-y-1/2 text-white/20 hover:text-white transition-colors", isRTL ? "left-4" : "right-4")}
+                                                >
+                                                    {showPass.confirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -570,7 +633,7 @@ export default function AdminSettings() {
                             <motion.button
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
-                                onClick={handleSaveSocialLinks}
+                                onClick={() => handleSaveSocialLinks()}
                                 disabled={loading}
                                 className="w-full py-5 bg-cinematic-neon-red text-white font-black uppercase tracking-wider rounded-xl shadow-[0_0_30px_rgba(255,0,60,0.3)] hover:shadow-[0_0_50px_rgba(255,0,60,0.5)] transition-all flex items-center justify-center gap-3"
                             >
@@ -603,6 +666,7 @@ export default function AdminSettings() {
                                             type="tel"
                                             value={contactInfo.phone}
                                             onChange={(e) => setContactInfo({ ...contactInfo, phone: e.target.value })}
+                                            onBlur={() => handleSaveContactInfo(true)}
                                             placeholder="+966XXXXXXXXX"
                                             className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40"
                                         />
@@ -617,6 +681,7 @@ export default function AdminSettings() {
                                             type="email"
                                             value={contactInfo.email}
                                             onChange={(e) => setContactInfo({ ...contactInfo, email: e.target.value })}
+                                            onBlur={() => handleSaveContactInfo(true)}
                                             placeholder="info@hmcar.com"
                                             className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40"
                                         />
@@ -631,6 +696,7 @@ export default function AdminSettings() {
                                             type="text"
                                             value={contactInfo.address}
                                             onChange={(e) => setContactInfo({ ...contactInfo, address: e.target.value })}
+                                            onBlur={() => handleSaveContactInfo(true)}
                                             placeholder={isRTL ? "المملكة العربية السعودية، الرياض" : "Riyadh, Saudi Arabia"}
                                             className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40"
                                         />
@@ -645,6 +711,7 @@ export default function AdminSettings() {
                                             type="text"
                                             value={contactInfo.workingHours}
                                             onChange={(e) => setContactInfo({ ...contactInfo, workingHours: e.target.value })}
+                                            onBlur={() => handleSaveContactInfo(true)}
                                             placeholder={isRTL ? "السبت - الخميس: 9 صباحاً - 9 مساءً" : "Sat - Thu: 9AM - 9PM"}
                                             className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40"
                                         />
@@ -655,7 +722,7 @@ export default function AdminSettings() {
                             <motion.button
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
-                                onClick={handleSaveContactInfo}
+                                onClick={() => handleSaveContactInfo()}
                                 disabled={loading}
                                 className="w-full py-5 bg-cinematic-neon-red text-white font-black uppercase tracking-wider rounded-xl shadow-[0_0_30px_rgba(255,0,60,0.3)] hover:shadow-[0_0_50px_rgba(255,0,60,0.5)] transition-all flex items-center justify-center gap-3"
                             >
@@ -694,6 +761,7 @@ export default function AdminSettings() {
                                                 step="0.01"
                                                 value={currencySettings.usdToSar}
                                                 onChange={(e) => setCurrencySettings({ ...currencySettings, usdToSar: parseFloat(e.target.value) || 0 })}
+                                                onBlur={() => handleSaveCurrencySettings(true)}
                                                 className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40"
                                             />
                                         </div>
@@ -705,8 +773,10 @@ export default function AdminSettings() {
                                         </label>
                                         <select
                                             title={isRTL ? 'العملة النشطة' : 'Active Currency'}
+                                            id="active-currency"
                                             value={currencySettings.activeCurrency}
                                             onChange={(e) => setCurrencySettings({ ...currencySettings, activeCurrency: e.target.value })}
+                                            onBlur={() => handleSaveCurrencySettings(true)}
                                             className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40 appearance-none cursor-pointer"
                                         >
                                             <option value="SAR" className="bg-black">SAR (ريال سعودي)</option>
@@ -719,7 +789,7 @@ export default function AdminSettings() {
                             <motion.button
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
-                                onClick={handleSaveCurrencySettings}
+                                onClick={() => handleSaveCurrencySettings()}
                                 disabled={loading}
                                 className="w-full py-5 bg-cinematic-neon-red text-white font-black uppercase tracking-wider rounded-xl shadow-[0_0_30px_rgba(255,0,60,0.3)] hover:shadow-[0_0_50px_rgba(255,0,60,0.5)] transition-all flex items-center justify-center gap-3"
                             >
@@ -751,7 +821,12 @@ export default function AdminSettings() {
                                         <div className="relative group">
                                             <div className="w-full aspect-video bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center overflow-hidden">
                                                 {siteInfo.logoUrl ? (
-                                                    <img src={siteInfo.logoUrl} alt="Logo" className="max-h-full object-contain" />
+                                                    <NextImage
+                                                        src={siteInfo.logoUrl}
+                                                        alt={isRTL ? "شعار الموقع" : "Site Logo"}
+                                                        fill
+                                                        className="max-h-full object-contain"
+                                                    />
                                                 ) : (
                                                     <div className="text-center">
                                                         <Camera className="w-8 h-8 text-white/10 mx-auto mb-2" />
@@ -759,7 +834,7 @@ export default function AdminSettings() {
                                                     </div>
                                                 )}
                                                 <label className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
-                                                    <input type="file" title={isRTL ? "رفع شعار جديد" : "Upload new logo"} className="hidden" accept="image/*" onChange={handleLogoUpload} />
+                                                    <input type="file" title={isRTL ? "رفع شعار جديد" : "Upload new logo"} className="hidden" accept="image/*" onChange={(e) => { handleLogoUpload(e); handleSaveSiteInfo(true); }} />
                                                     <span className="text-[10px] font-black uppercase tracking-widest">{isRTL ? 'تغيير الشعار' : 'CHANGE LOGO'}</span>
                                                 </label>
                                             </div>
@@ -777,6 +852,7 @@ export default function AdminSettings() {
                                                 type="text"
                                                 value={siteInfo.siteName}
                                                 onChange={(e) => setSiteInfo({ ...siteInfo, siteName: e.target.value })}
+                                                onBlur={() => handleSaveSiteInfo(true)}
                                                 className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40"
                                             />
                                         </div>
@@ -788,6 +864,7 @@ export default function AdminSettings() {
                                                 title={isRTL ? 'وصف الموقع' : 'Site Description'}
                                                 value={siteInfo.siteDescription}
                                                 onChange={(e) => setSiteInfo({ ...siteInfo, siteDescription: e.target.value })}
+                                                onBlur={() => handleSaveSiteInfo(true)}
                                                 rows={4}
                                                 className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40 resize-none"
                                             />
@@ -799,11 +876,81 @@ export default function AdminSettings() {
                             <motion.button
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
-                                onClick={handleSaveSiteInfo}
+                                onClick={() => handleSaveSiteInfo()}
                                 disabled={loading}
                                 className="w-full bg-white text-black py-4 rounded-2xl font-black uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:shadow-[0_0_40px_rgba(255,255,255,0.4)] transition-all disabled:opacity-50"
                             >
                                 {loading ? (isRTL ? 'جاري الحفظ...' : 'SAVING...') : (isRTL ? 'حفظ هوية الموقع' : 'SAVE SITE IDENTITY')}
+                            </motion.button>
+                        </motion.div>
+                    )}
+                    {/* Home Content Tab */}
+                    {activeTab === 'home' && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="space-y-6"
+                        >
+                            <div className="p-8 bg-white/[0.02] border border-white/5 rounded-3xl">
+                                <h2 className="text-lg font-black uppercase tracking-wider mb-6 flex items-center gap-3">
+                                    <LayoutDashboard className="w-5 h-5 text-cinematic-neon-red" />
+                                    {isRTL ? 'محتوى الصفحة الرئيسية' : 'Home Page Content'}
+                                </h2>
+
+                                <div className="space-y-6">
+                                    <div>
+                                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">
+                                            {isRTL ? 'عنوان البطولة (Hero Title)' : 'Hero Title'}
+                                        </label>
+                                        <input
+                                            title={isRTL ? 'عنوان البطولة' : 'Hero Title'}
+                                            type="text"
+                                            value={homeContent.heroTitle}
+                                            onChange={(e) => setHomeContent({ ...homeContent, heroTitle: e.target.value })}
+                                            onBlur={() => handleSaveHomeContent(true)}
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40"
+                                            placeholder={isRTL ? 'أدخل العنوان الرئيسي...' : 'Enter main title...'}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">
+                                            {isRTL ? 'العنوان الفرعي' : 'Hero Subtitle'}
+                                        </label>
+                                        <input
+                                            title={isRTL ? 'العنوان الفرعي' : 'Hero Subtitle'}
+                                            type="text"
+                                            value={homeContent.heroSubtitle}
+                                            onChange={(e) => setHomeContent({ ...homeContent, heroSubtitle: e.target.value })}
+                                            onBlur={() => handleSaveHomeContent(true)}
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40"
+                                            placeholder={isRTL ? 'أدخل العنوان الفرعي...' : 'Enter subtitle...'}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">
+                                            {isRTL ? 'رابط الفيديو (Hero Video URL)' : 'Hero Video URL'}
+                                        </label>
+                                        <input
+                                            title={isRTL ? 'رابط الفيديو' : 'Hero Video URL'}
+                                            type="text"
+                                            value={homeContent.heroVideoUrl}
+                                            onChange={(e) => setHomeContent({ ...homeContent, heroVideoUrl: e.target.value })}
+                                            onBlur={() => handleSaveHomeContent(true)}
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40"
+                                            placeholder="/videos/hero.mp4"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <motion.button
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={() => handleSaveHomeContent()}
+                                disabled={loading}
+                                className="w-full bg-cinematic-neon-red text-white py-4 rounded-2xl font-black uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(255,10,60,0.2)] hover:shadow-[0_0_40px_rgba(255,10,60,0.4)] transition-all disabled:opacity-50"
+                            >
+                                {loading ? (isRTL ? 'جاري الحفظ...' : 'SAVING...') : (isRTL ? 'حفظ محتوى الصفحة' : 'SAVE HOME CONTENT')}
                             </motion.button>
                         </motion.div>
                     )}

@@ -100,7 +100,7 @@ export default function Navbar() {
                                     key={link.href}
                                     href={link.href}
                                     className={cn(
-                                        "px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all relative group",
+                                        "px-6 py-2.5 rounded-xl text-[12px] font-black uppercase tracking-[0.1em] transition-all relative group",
                                         isActive(link.href)
                                             ? "text-white bg-white/5 border border-white/10 shadow-[0_0_20px_rgba(255,255,255,0.05)]"
                                             : "text-white/30 hover:text-white/60 hover:bg-white/[0.02]"
@@ -220,7 +220,7 @@ export default function Navbar() {
                             <div className="p-6 border-t border-white/5 space-y-3">
                                 {!isLoggedIn && (
                                     <Link href="/login" className="block">
-                                        <button className="w-full btn-luxury py-4 rounded-xl text-[10px]">
+                                        <button className="w-full btn-luxury py-4 rounded-xl text-[12px]">
                                             <User className="w-3.5 h-3.5" />
                                             {isRTL ? 'تسجيل الدخول' : 'SIGN IN'}
                                         </button>

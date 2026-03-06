@@ -228,7 +228,7 @@ export default function ClientDashboard() {
                                     <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-white/10 group-hover:shadow-[0_0_18px_rgba(201,169,110,0.35)] transition-all">
                                         <item.icon className={cn("w-5 h-5", item.active ? "text-black" : "text-white/30 group-hover:text-luxury-gold")} />
                                     </div>
-                                    <span className="text-[11px] font-black uppercase tracking-[0.3em]">{item.label}</span>
+                                    <span className="text-[13px] font-black uppercase tracking-[0.15em]">{item.label}</span>
                                     {item.active && (
                                         <div className={cn("ml-auto", isRTL && "mr-auto ml-0")}>
                                             <Activity className="w-4 h-4 text-black/20" />
@@ -250,7 +250,7 @@ export default function ClientDashboard() {
                                         )}
                                     >
                                         <qa.icon className={cn("w-6 h-6 text-white/20 group-hover:text-luxury-gold")} />
-                                        <span className="text-[11px] font-black uppercase tracking-[0.3em]">{qa.label}</span>
+                                        <span className="text-[13px] font-black uppercase tracking-[0.15em]">{qa.label}</span>
                                     </motion.div>
                                 </Link>
                             ))}
@@ -271,7 +271,7 @@ export default function ClientDashboard() {
                                     <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-white/10 group-hover:shadow-[0_0_18px_rgba(201,169,110,0.35)] transition-all">
                                         <item.icon className={cn("w-5 h-5", item.active ? "text-black" : "text-white/30 group-hover:text-luxury-gold")} />
                                     </div>
-                                    <span className="text-[11px] font-black uppercase tracking-[0.3em]">{item.label}</span>
+                                    <span className="text-[13px] font-black uppercase tracking-[0.15em]">{item.label}</span>
                                     {item.active && (
                                         <div className={cn("ml-auto", isRTL && "mr-auto ml-0")}>
                                             <Activity className="w-4 h-4 text-black/20" />
@@ -316,7 +316,7 @@ export default function ClientDashboard() {
                             )}
                         >
                             <LogOut className="w-5 h-5 text-cinematic-neon-red" />
-                            <span className="text-[10px] font-black uppercase tracking-[0.3em]">{isRTL ? 'تسجيل الخروج' : 'LOG OUT'}</span>
+                            <span className="text-[12px] font-black uppercase tracking-[0.2em]">{isRTL ? 'تسجيل الخروج' : 'LOG OUT'}</span>
                         </button>
                     </div>
                 </aside>
@@ -377,7 +377,7 @@ export default function ClientDashboard() {
                                         <div className="text-5xl font-black italic tracking-tighter text-white">
                                             {stat.value}
                                         </div>
-                                        <div className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 group-hover:text-white/80 transition-colors">
+                                        <div className="text-[12px] font-black uppercase tracking-[0.2em] text-white/40 group-hover:text-white/80 transition-colors">
                                             {stat.label}
                                         </div>
                                     </div>
@@ -395,7 +395,7 @@ export default function ClientDashboard() {
                     <section className="mt-16 relative z-10">
                         <div className={cn("flex items-center gap-4 mb-8", isRTL && "flex-row-reverse")}>
                             <Car className="w-5 h-5 text-luxury-gold" />
-                            <h2 className="text-[11px] font-black uppercase tracking-[0.6em] text-white/60">
+                            <h2 className="text-[13px] font-black uppercase tracking-[0.4em] text-white/60">
                                 {isRTL ? "توصيات لك" : "RECOMMENDED FOR YOU"}
                             </h2>
                         </div>
@@ -425,9 +425,9 @@ export default function ClientDashboard() {
                                             <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80" />
                                         </div>
                                         <div className="p-8">
-                                            <div className="text-[9px] font-black text-accent-gold uppercase tracking-[0.4em] mb-2">{isRTL ? "موصى به" : "RECOMMENDED"}</div>
+                                            <div className="text-[11px] font-black text-accent-gold uppercase tracking-[0.2em] mb-2">{isRTL ? "موصى به" : "RECOMMENDED"}</div>
                                             <div className="flex items-end justify-between gap-4">
-                                                <div className="text-xl font-black uppercase tracking-tighter italic line-clamp-1 text-white">{car.title}</div>
+                                                <div className="text-2xl font-black uppercase tracking-tighter italic line-clamp-1 text-white">{car.title}</div>
                                                 <div className="text-lg font-black italic text-white/90 shrink-0">
                                                     {Number(car.price).toLocaleString()}
                                                     <span className="text-[10px] opacity-40 ml-2">SAR</span>
@@ -443,7 +443,7 @@ export default function ClientDashboard() {
                     <section className="mt-16 relative z-10">
                         <div className={cn("flex items-center gap-4 mb-6", isRTL && "flex-row-reverse")}>
                             <Gavel className="w-5 h-5 text-cinematic-neon-red" />
-                            <h2 className="text-[11px] font-black uppercase tracking-[0.6em] text-white/60">
+                            <h2 className="text-[13px] font-black uppercase tracking-[0.4em] text-white/60">
                                 {isRTL ? "مزادات مباشرة" : "LIVE AUCTIONS"}
                             </h2>
                         </div>
@@ -453,7 +453,7 @@ export default function ClientDashboard() {
                                 { id: "a2", label: "BMW M5", endsIn: "01:12:09" },
                                 { id: "a3", label: "G63 AMG", endsIn: "00:07:51" },
                             ]).map((a: { id?: string; label: string; endsIn: string }, i: number) => (
-                                <span key={a.id || i} className="inline-block mx-3 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest">
+                                <span key={a.id || i} className="inline-block mx-3 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-[12px] font-black uppercase tracking-widest">
                                     {a.label} • {a.endsIn}
                                 </span>
                             ))}

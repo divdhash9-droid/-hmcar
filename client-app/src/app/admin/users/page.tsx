@@ -8,6 +8,8 @@ import {
     Search,
     ChevronLeft,
     Plus,
+    Eye,
+    EyeOff
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { cn } from "@/lib/utils";
@@ -232,6 +234,7 @@ export default function AdminUsersPage() {
 
 function AddUserModal({ onClose, onAdd, isRTL }: { onClose: () => void, onAdd: (u: User) => void, isRTL: boolean }) {
     const [formData, setFormData] = useState({ name: '', email: '', username: '', phone: '', password: '', role: 'buyer', permissions: [] as string[] });
+    const [showPass, setShowPass] = useState(false);
 
     const togglePerm = (p: string) => {
         setFormData(prev => ({
@@ -287,8 +290,13 @@ function AddUserModal({ onClose, onAdd, isRTL }: { onClose: () => void, onAdd: (
                         </div>
                         <div className="space-y-2">
                             <label className="text-[9px] font-black text-white/40 uppercase tracking-widest">{isRTL ? 'كلمة المرور' : 'Password'}</label>
-                            <input required type="password" className="w-full bg-white/5 border border-white/10 p-3 rounded-lg text-white placeholder:text-white/20 text-right"
-                                value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} placeholder="••••••" />
+                            <div className="relative">
+                                <input required type={showPass ? "text" : "password"} className="w-full bg-white/5 border border-white/10 p-3 rounded-lg text-white placeholder:text-white/20 text-right pr-10"
+                                    value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} placeholder="••••••" />
+                                <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors">
+                                    {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                </button>
+                            </div>
                         </div>
                         <div className="space-y-2 col-span-2">
                             <label htmlFor="role-select" className="text-[9px] font-black text-white/40 uppercase tracking-widest">{isRTL ? 'نوع الحساب (الدور)' : 'Role'}</label>
@@ -341,6 +349,7 @@ function UserDetailModal({ user, onClose, onUpdate, isRTL }: { user: User, onClo
     const [isDeviceLocked, setIsDeviceLocked] = useState(user.isDeviceLocked ?? true);
     const [permissions, setPermissions] = useState(user.permissions || []);
     const [loading, setLoading] = useState(false);
+    const [showPass, setShowPass] = useState(false);
 
     const toggleDevice = (id: string) => {
         setDevices(devices.map((d: Device) => d.deviceId === id ? { ...d, isActive: !d.isActive } : d));
@@ -428,8 +437,13 @@ function UserDetailModal({ user, onClose, onUpdate, isRTL }: { user: User, onClo
                                 </div>
                                 <div>
                                     <label className="text-[9px] font-black text-white/40 uppercase mb-1 block">{isRTL ? 'كلمة مرور جديدة (اتركها فارغة لعدم التغيير)' : 'Reset Password'}</label>
-                                    <input type="password" placeholder="••••••" className="w-full bg-white/5 border border-white/10 p-3 rounded-lg text-white text-right"
-                                        value={editData.password} onChange={e => setEditData({ ...editData, password: e.target.value })} />
+                                    <div className="relative">
+                                        <input type={showPass ? "text" : "password"} placeholder="••••••" className="w-full bg-white/5 border border-white/10 p-3 rounded-lg text-white text-right pr-10"
+                                            value={editData.password} onChange={e => setEditData({ ...editData, password: e.target.value })} />
+                                        <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors">
+                                            {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -38,7 +38,7 @@ const upload = multer({
     storage: storage,
     fileFilter: fileFilter,
     limits: {
-        fileSize: 5 * 1024 * 1024 // 5MB limit
+        fileSize: 15 * 1024 * 1024 // 15MB limit
     }
 });
 
@@ -70,7 +70,11 @@ router.post('/', requireAuthAPI, upload.single('image'), async (req, res) => {
                 resource_type: 'image',
                 overwrite: true,
                 use_filename: true,
-                unique_filename: true
+                unique_filename: true,
+                transformation: [
+                    { width: 1200, crop: "limit" },
+                    { quality: "auto", fetch_format: "auto" }
+                ]
             });
             // cleanup local file
             try { fs.unlinkSync(req.file.path); } catch { }

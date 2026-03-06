@@ -24,7 +24,7 @@ export default function SecurityPage() {
         try {
             setLoading(true);
             const token = localStorage.getItem('hm_token');
-            const res = await fetch(`/api/v2/security/banned-devices?search=${encodeURIComponent(searchQuery)}`, {
+            const res = await fetch(`/api/v2/security/devices?search=${encodeURIComponent(searchQuery)}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
@@ -38,18 +38,37 @@ export default function SecurityPage() {
         }
     };
 
-    const unbanDevice = async (id: string) => {
-        if (!confirm(isRTL ? 'هل أنت متأكد من فك الحظر عن هذا الجهاز؟' : 'Are you sure you want to unban this device?')) return;
+    const toggleBan = async (id: string, currentlyBanned: boolean) => {
+        if (!confirm(currentlyBanned ? (isRTL ? 'هل أنت متأكد من فك الحظر عن هذا الجهاز؟' : 'Unban device?') : (isRTL ? 'هل أنت متأكد من حظر هذا الجهاز؟' : 'Ban device?'))) return;
 
         try {
             const token = localStorage.getItem('hm_token');
-            const res = await fetch(`/api/v2/security/unban-device/${id}`, {
+            const res = await fetch(`/api/v2/security/toggle-ban/${id}`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
             if (data.success) {
-                alert(isRTL ? 'تم فك الحظر بنجاح' : 'Device unbanned successfully');
+                fetchDevices();
+            } else {
+                alert(data.message || 'Error');
+            }
+        } catch {
+            alert('Error processing request');
+        }
+    };
+
+    const toggleExempt = async (id: string, currentlyExempt: boolean) => {
+        if (!confirm(currentlyExempt ? (isRTL ? 'إلغاء الإعفاء من نظام الحماية؟' : 'Remove security exemption?') : (isRTL ? 'السماح لهذا المستخدم بالدخول بأكثر من اسم/رقم؟' : 'Exempt this user from multi-account restrictions?'))) return;
+
+        try {
+            const token = localStorage.getItem('hm_token');
+            const res = await fetch(`/api/v2/security/toggle-exempt/${id}`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            if (data.success) {
                 fetchDevices();
             } else {
                 alert(data.message || 'Error');
@@ -86,10 +105,10 @@ export default function SecurityPage() {
                             </div>
                             <div>
                                 <h1 className="text-2xl font-black text-white tracking-widest uppercase">
-                                    {isRTL ? "الأمان والأجهزة المحظورة" : "SECURITY & BANNED DEVICES"}
+                                    {isRTL ? "الأمان وصلاحيات الأجهزة" : "SECURITY & DEVICES"}
                                 </h1>
                                 <p className="text-white/40 text-sm font-medium mt-1">
-                                    {isRTL ? "إدارة وصول الأجهزة ورفع الحظر عن العملاء" : "Manage device access and unban clients"}
+                                    {isRTL ? "إدارة وصول الأجهزة، حظر المخالفين، ومنح صلاحيات استثنائية." : "Manage device access, ban violators, and grant exemptions."}
                                 </p>
                             </div>
                         </div>
@@ -116,7 +135,7 @@ export default function SecurityPage() {
                         ) : devices.length === 0 ? (
                             <div className="col-span-full py-20 text-center glass-card border rounded-3xl border-white/5">
                                 <Shield className="w-12 h-12 text-white/20 mx-auto mb-4" />
-                                <h3 className="text-lg font-bold text-white/60">{isRTL ? "لا توجد أجهزة محظورة" : "No banned devices found"}</h3>
+                                <h3 className="text-lg font-bold text-white/60">{isRTL ? "لا توجد أجهزة مسجلة" : "No devices found"}</h3>
                                 <p className="text-white/40 text-sm mt-2">{isRTL ? "جميع الأجهزة والعملاء في حالة سليمة." : "All devices and clients are in good standing."}</p>
                             </div>
                         ) : (
@@ -125,43 +144,59 @@ export default function SecurityPage() {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     key={device._id}
-                                    className="bg-gradient-to-br from-black/80 to-red-950/20 border border-red-500/20 rounded-3xl p-6 relative overflow-hidden backdrop-blur-xl group"
+                                    className={`border rounded-3xl p-6 relative overflow-hidden backdrop-blur-xl group ${device.banned ? 'bg-gradient-to-br from-black/80 to-red-950/20 border-red-500/20' : device.exemptFromSecurity ? 'bg-gradient-to-br from-black/80 to-emerald-950/20 border-emerald-500/20' : 'bg-black/60 border-white/10'}`}
                                 >
-                                    <div className="absolute top-0 right-0 p-4">
-                                        <span className="px-3 py-1 bg-red-500/20 text-red-400 text-[10px] font-bold tracking-widest uppercase rounded-full border border-red-500/20 flex items-center gap-1.5">
-                                            <AlertOctagon className="w-3 h-3" />
-                                            {isRTL ? "محظور" : "BANNED"}
-                                        </span>
+                                    <div className="absolute top-0 right-0 p-4 flex gap-2">
+                                        {device.banned && (
+                                            <span className="px-3 py-1 bg-red-500/20 text-red-400 text-[10px] font-bold tracking-widest uppercase rounded-full border border-red-500/20 flex items-center gap-1.5">
+                                                <AlertOctagon className="w-3 h-3" />
+                                                {isRTL ? "محظور" : "BANNED"}
+                                            </span>
+                                        )}
+                                        {device.exemptFromSecurity && !device.banned && (
+                                            <span className="px-3 py-1 bg-emerald-500/20 text-emerald-400 text-[10px] font-bold tracking-widest uppercase rounded-full border border-emerald-500/20 flex items-center gap-1.5">
+                                                <Unlock className="w-3 h-3" />
+                                                {isRTL ? "مستثنى من الحماية" : "EXEMPTED"}
+                                            </span>
+                                        )}
                                     </div>
 
                                     <div className="space-y-4 mt-4">
                                         <div>
                                             <p className="text-[10px] uppercase tracking-widest font-bold text-white/30">{isRTL ? "رمز الحظر" : "BAN CODE"}</p>
-                                            <p className="text-2xl font-mono font-bold text-red-500 mt-1 tracking-widest">{device.banCode || '---'}</p>
+                                            <p className={`text-2xl font-mono font-bold mt-1 tracking-widest ${device.banned ? 'text-red-500' : 'text-white/20'}`}>{device.banCode || '---'}</p>
                                         </div>
 
                                         <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
                                             <div>
                                                 <p className="text-[10px] uppercase tracking-widest font-bold text-white/30 flex items-center gap-1.5"><User className="w-3 h-3" /> {isRTL ? "الحساب المرتبط" : "LINKED ACCOUNT"}</p>
-                                                <p className="text-white font-medium mt-1 text-sm truncate">{device.linkedUsername}</p>
+                                                <p className="text-white font-medium mt-1 text-sm truncate">{device.linkedUsername || (isRTL ? "لا يوجد" : "None")}</p>
                                             </div>
                                             <div>
                                                 <p className="text-[10px] uppercase tracking-widest font-bold text-white/30 flex items-center gap-1.5"><Cpu className="w-3 h-3" /> IP ADDRESS</p>
                                                 <p className="text-white/80 font-mono mt-1 text-sm">{device.ip}</p>
                                             </div>
                                             <div className="col-span-2">
-                                                <p className="text-[10px] uppercase tracking-widest font-bold text-white/30 flex items-center gap-1.5"><Calendar className="w-3 h-3" /> {isRTL ? "تاريخ الحظر" : "BANNED AT"}</p>
+                                                <p className="text-[10px] uppercase tracking-widest font-bold text-white/30 flex items-center gap-1.5"><Calendar className="w-3 h-3" /> {isRTL ? "آخر تحديث" : "LAST UPDATE"}</p>
                                                 <p className="text-white/60 mt-1 text-xs">{new Date(device.updatedAt).toLocaleString()}</p>
                                             </div>
                                         </div>
 
-                                        <button
-                                            onClick={() => unbanDevice(device._id)}
-                                            className="w-full mt-2 py-3 bg-red-500/10 hover:bg-green-500 border border-red-500/20 hover:border-green-500 text-red-400 hover:text-white rounded-xl text-xs font-bold uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 group-hover:shadow-[0_0_20px_rgba(34,197,94,0.3)]"
-                                        >
-                                            <Unlock className="w-4 h-4" />
-                                            {isRTL ? "فك الحظر والسماح بدخول جديد" : "UNBAN DEVICE"}
-                                        </button>
+                                        <div className="flex gap-2 w-full mt-2 pt-2 border-t border-white/5">
+                                            <button
+                                                onClick={() => toggleBan(device._id, device.banned)}
+                                                className={`flex-1 py-3 border rounded-xl text-xs font-bold uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 ${device.banned ? 'bg-green-500/10 hover:bg-green-500 border-green-500/20 hover:border-green-500 text-green-400 hover:text-white group-hover:shadow-[0_0_20px_rgba(34,197,94,0.3)]' : 'bg-red-500/10 hover:bg-red-500 border-red-500/20 hover:border-red-500 text-red-500 hover:text-white'}`}
+                                            >
+                                                {device.banned ? (isRTL ? "فك الحظر" : "UNBAN") : (isRTL ? "حظر فوري" : "BAN NOW")}
+                                            </button>
+
+                                            <button
+                                                onClick={() => toggleExempt(device._id, device.exemptFromSecurity)}
+                                                className={`flex-1 py-3 border rounded-xl text-xs font-bold uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 ${device.exemptFromSecurity ? 'bg-orange-500/10 hover:bg-orange-500 border-orange-500/20 hover:border-orange-500 text-orange-400 hover:text-white' : 'bg-emerald-500/10 hover:bg-emerald-500 border-emerald-500/20 hover:border-emerald-500 text-emerald-400 hover:text-white'}`}
+                                            >
+                                                {device.exemptFromSecurity ? (isRTL ? "إلغاء الاستثناء" : "REVOKE EXEMPT") : (isRTL ? "تخطي الحماية" : "BYPASS S.C")}
+                                            </button>
+                                        </div>
                                     </div>
                                 </motion.div>
                             ))

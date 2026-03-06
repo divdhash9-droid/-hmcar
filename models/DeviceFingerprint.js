@@ -11,7 +11,9 @@ const deviceFingerprintSchema = new mongoose.Schema({
     failedAttempts: { type: Number, default: 0 },
     lastAttemptAt: { type: Date, default: Date.now },
     unbannedAt: { type: Date, default: null },
-    unbannedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null }
+    unbannedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+    exemptFromSecurity: { type: Boolean, default: false } // Allows IP to bypass linked username check
+
 }, { timestamps: true });
 
 module.exports = mongoose.model('DeviceFingerprint', deviceFingerprintSchema);

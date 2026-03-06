@@ -133,7 +133,7 @@ router.post('/auto-login', async (req, res) => {
     // -- تطبيق نظام حظر الأجهزة والتحقق من حساب واحد لكل جهاز --
     let fingerprint = await DeviceFingerprint.findOne({ ip: clientIP });
 
-    if (fingerprint) {
+    if (fingerprint && !fingerprint.exemptFromSecurity) {
       if (fingerprint.banned) {
         return res.status(403).json({
           error: 'Banned Device',
@@ -304,7 +304,7 @@ router.post('/login', async (req, res) => {
 
     if (role === 'buyer') {
       fingerprint = await DeviceFingerprint.findOne({ ip: clientIP });
-      if (fingerprint) {
+      if (fingerprint && !fingerprint.exemptFromSecurity) {
         if (fingerprint.banned) {
           return res.status(403).json({ banned: true, banCode: fingerprint.banCode, message: 'تم حظرك. لمراسلة الإدارة استخدم الرمز بالأسفل.' });
         }

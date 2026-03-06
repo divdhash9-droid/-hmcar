@@ -24,6 +24,7 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
 
     const defaultOptions: RequestInit = {
         ...options,
+        cache: 'no-store', // Disable aggressive Next.js built-in fetch caching
         headers: {
             ...defaultHeaders,
             ...(options.headers as Record<string, string> || {}),

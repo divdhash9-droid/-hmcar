@@ -14,15 +14,8 @@ const rateLimit = require('express-rate-limit');
  * إعداد طبقة تقييد الطلبات (Rate Limiter)
  * لحماية الخادم من الهجمات وزيادة عدد الطلبات من نفس العنوان.
  */
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,   // فترة 15 دقيقة
-  max: 100,                   // بحد أقصى 100 طلب لكل IP
-  message: {
-    error: 'تم تجاوز عدد الطلبات المسموح به، يرجى المحاولة لاحقاً بعد 15 دقيقة.',
-    retryAfter: '15 minutes'
-  }
-});
-router.use(limiter);
+// تمت إزالة الـ Rate Limit مؤقتاً لضمان استقرار الدخول عبر Vercel في بيئة السيرفرليس
+// router.use(limiter);
 
 /**
  * معلومات الإصدار الحالي للـ API

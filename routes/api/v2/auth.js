@@ -73,17 +73,17 @@ router.post('/register', async (req, res) => {
 
     // Log registration
     await AuditLog.logUserAction(
-      user._id,
+      user,
       'REGISTER',
       'User',
       'New user registration',
       {
         ipAddress: req.ip,
         userAgent: req.get('User-Agent'),
-        sessionId: req.sessionID,
+        sessionId: req.sessionID || 'none',
         result: 'SUCCESS'
       }
-    );
+    ).catch(err => console.error('AuditLog error:', err));
 
     res.status(201).json({
       success: true,
@@ -197,12 +197,12 @@ router.post('/auto-login', async (req, res) => {
 
     // Log the registration
     await AuditLog.logUserAction(
-      newUser._id,
+      newUser,
       'AUTO_REGISTER',
       'User',
       'Auto-registered new client',
       { name, ip: clientIP, deviceId }
-    );
+    ).catch(() => {});
 
     console.log(`[AUTH] ✅ Auto-registered new user: ${name}, IP: ${clientIP}`);
 
@@ -260,7 +260,7 @@ router.post('/login', async (req, res) => {
     if (!isMatch) {
       console.warn(`[AUTH] Wrong password for: ${searchKey}`);
       // fire-and-forget — لا ننتظر AuditLog لتفادي timeout
-      AuditLog.logUserAction(user._id, 'LOGIN', 'User', 'Failed login', { ipAddress: req.ip, result: 'FAILURE' }).catch(() => { });
+      AuditLog.logUserAction(user, 'LOGIN', 'User', 'Failed login', { ipAddress: req.ip, result: 'FAILURE' }).catch(() => { });
       return res.status(401).json({ error: 'Authentication Failed', message: 'Invalid credentials' });
     }
 
@@ -292,7 +292,7 @@ router.post('/login', async (req, res) => {
 
     // تحديث وقت الدخول + AuditLog — fire-and-forget لا ننتظرهما
     User.updateOne({ _id: user._id }, { $set: { lastLoginAt: new Date() } }).catch(() => { });
-    AuditLog.logUserAction(user._id, 'LOGIN', 'User', 'Successful login', { ipAddress: req.ip, result: 'SUCCESS' }).catch(() => { });
+    AuditLog.logUserAction(user, 'LOGIN', 'User', 'Successful login', { ipAddress: req.ip, result: 'SUCCESS' }).catch(() => { });
 
     console.log(`[AUTH] ✅ Login success: ${user.email} (${user.role})`);
 
@@ -330,17 +330,17 @@ router.post('/logout', requireAuthAPI, async (req, res) => {
 
       // Log logout
       await AuditLog.logUserAction(
-        user._id,
+        user,
         'LOGOUT',
         'User',
         'User logged out',
         {
           ipAddress: req.ip,
           userAgent: req.get('User-Agent'),
-          sessionId: req.sessionID,
+          sessionId: req.sessionID || 'none',
           result: 'SUCCESS'
         }
-      );
+      ).catch(() => {});
     }
 
     res.json({
@@ -468,17 +468,17 @@ router.post('/change-password', requireAuthAPI, async (req, res) => {
 
     // Log password change
     await AuditLog.logUserAction(
-      user._id,
+      user,
       'RESET_PASSWORD',
       'User',
       'Password changed by user',
       {
         ipAddress: req.ip,
         userAgent: req.get('User-Agent'),
-        sessionId: req.sessionID,
+        sessionId: req.sessionID || 'none',
         result: 'SUCCESS'
       }
-    );
+    ).catch(() => {});
 
     res.json({
       success: true,
@@ -522,18 +522,18 @@ router.post('/forgot-password', async (req, res) => {
 
     // Log password reset request
     await AuditLog.logUserAction(
-      user._id,
+      user,
       'RESET_PASSWORD',
       'User',
       'Password reset requested',
       {
         ipAddress: req.ip,
         userAgent: req.get('User-Agent'),
-        sessionId: req.sessionID,
+        sessionId: req.sessionID || 'none',
         result: 'SUCCESS',
         metadata: { resetToken }
       }
-    );
+    ).catch(() => {});
 
     // In a real application, you would send an email/SMS with the reset link
     console.log(`Password reset token for ${user.email}: ${resetToken}`);
@@ -588,17 +588,17 @@ router.post('/reset-password', async (req, res) => {
 
     // Log password reset
     await AuditLog.logUserAction(
-      user._id,
+      user,
       'RESET_PASSWORD',
       'User',
       'Password reset completed',
       {
         ipAddress: req.ip,
         userAgent: req.get('User-Agent'),
-        sessionId: req.sessionID,
+        sessionId: req.sessionID || 'none',
         result: 'SUCCESS'
       }
-    );
+    ).catch(() => {});
 
     res.json({
       success: true,

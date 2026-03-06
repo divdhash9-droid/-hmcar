@@ -58,7 +58,7 @@ export default function Login() {
             const identifier = formData.email.trim();
             if (role === 'admin') {
                 response = await api.auth.login({
-                    identifier: formData.email,
+                    identifier: identifier,
                     password: formData.password,
                     role,
                     rememberMe,
@@ -431,6 +431,9 @@ export default function Login() {
                                             type="text"
                                             required
                                             value={formData.email}
+                                            autoCapitalize="none"
+                                            autoCorrect="off"
+                                            spellCheck="false"
                                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                             className={cn("w-full glass-input bg-white/5 focus:bg-white/10 outline-none border border-red-500/30 ring-1 ring-red-500/20", isRTL ? "pr-4 pl-4" : "pl-4 pr-4")}
                                             placeholder={isRTL ? "ايميل   (ACCESS ID)" : "SECRET ACCESS ID"}
@@ -455,6 +458,8 @@ export default function Login() {
                                     type={showPassword ? "text" : "password"}
                                     required
                                     minLength={6}
+                                    autoCapitalize="none"
+                                    autoCorrect="off"
                                     value={formData.password}
                                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                     className={cn(

@@ -10,15 +10,14 @@
  * أو عبر npm:
  *   npm run create:admin
  */
-
 require('dotenv').config();
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
-// بيانات الأدمن - يمكن تغييرها هنا أو عبر env vars
 const ADMIN_DATA = {
     name: process.env.PROD_ADMIN_NAME || 'HM Admin',
     email: process.env.PROD_ADMIN_EMAIL || 'admin@hmcar.com',
+    username: 'admin',
     password: process.env.PROD_ADMIN_PASSWORD || 'HmCar@2026!',
     role: 'super_admin',
     status: 'active',

@@ -15,9 +15,9 @@ let adminSeeded = false;
 async function connectDB() {
     if (dbConnected && mongoose.connection.readyState === 1) return;
 
-    const uri = process.env.MONGO_URI;
+    const uri = process.env.MONGO_URI || process.env.MONGODB_URI;
     if (!uri || uri.startsWith('memory://')) {
-        throw new Error('MONGO_URI must be a valid MongoDB Atlas URI in production');
+        throw new Error('Database connection string (MONGO_URI/MONGODB_URI) must be provided in production');
     }
 
     await mongoose.connect(uri, {
@@ -51,6 +51,7 @@ async function seedProductionAdmin() {
             const admin = new User({
                 name: process.env.PROD_ADMIN_NAME || 'HM Admin',
                 email: adminEmail,
+                username: 'admin',
                 password: process.env.PROD_ADMIN_PASSWORD || 'HmCar@2026!',
                 role: 'super_admin',
                 status: 'active',

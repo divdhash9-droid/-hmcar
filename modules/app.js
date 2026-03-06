@@ -89,9 +89,13 @@ class App {
     try {
       // استيراد الموجه الرئيسي لنسخة API v2
       const apiV2Router = require('../routes/api/v2/index');
-      this.app.use('/api/v2', apiV2Router);
 
-      logger.info('✅ تم تحميل جميع مسارات API v2 بنجاح');
+      // دعم المسارات المختلفة (ببادئة /api أو بدونها) لضمان العمل على Vercel وجميع البيئات
+      this.app.use('/api/v2', apiV2Router);
+      this.app.use('/v2', apiV2Router);
+      this.app.use('/api', apiV2Router); // في حال تم توجيه كل طلبات api لموجه واحد
+
+      logger.info('✅ تم تحميل جميع مسارات API v2 بنجاح (Aggressive Mount)');
     } catch (error) {
       logger.error('❌ خطأ في تحميل مسارات API v2:', error.message);
       console.error(error);

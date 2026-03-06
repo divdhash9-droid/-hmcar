@@ -44,6 +44,12 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+
+  /* Fix select options being white-on-white by forcing dark background */
+  select option {
+    background-color: #0a0a0a;
+    color: #ffffff;
+  }
 }
 
 @layer utilities {

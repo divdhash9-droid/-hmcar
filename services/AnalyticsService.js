@@ -14,6 +14,13 @@ class AnalyticsService {
     const last24 = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
     const [
+      totalUsers,
+      totalCars,
+      carsSold,
+      totalAuctions,
+      runningAuctions,
+      scheduledAuctions,
+      totalOrders,
       totalBids,
       bidsLast24h,
       avgBid,

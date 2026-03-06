@@ -6,7 +6,7 @@ import Navbar from "@/components/Navbar";
 import { useLanguage } from "@/lib/LanguageContext";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Upload, Save, Trash2, ChevronLeft, Tag } from "lucide-react";
+import { Upload, Save, Trash2, ChevronLeft, Tag, Car, Wrench, Layers } from "lucide-react";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
@@ -16,11 +16,6 @@ interface BrandRaw {
   logoUrl?: string;
   forCars?: boolean;
   forSpareParts?: boolean;
-  location?: string;
-  phone?: string;
-  whatsapp?: string;
-  description?: string;
-  description_ar?: string;
 }
 
 type Brand = {
@@ -28,26 +23,17 @@ type Brand = {
   name: string;
   logo?: string;
   category: 'cars' | 'parts' | 'both';
-  location?: string;
-  phone?: string;
-  whatsapp?: string;
-  description?: string;
-  description_ar?: string;
 };
 
 export default function AdminBrandsPage() {
-  const { isRTL, t } = useLanguage();
+  const { isRTL } = useLanguage();
   const [brands, setBrands] = useState<Brand[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
-
   const [name, setName] = useState("");
   const [logo, setLogo] = useState("");
   const [category, setCategory] = useState<'cars' | 'parts' | 'both'>('both');
-  const [location, setLocation] = useState("");
-  const [phone, setPhone] = useState("");
-  const [whatsapp, setWhatsapp] = useState("");
-  const [description, setDescription] = useState("");
-  const [descriptionAr, setDescriptionAr] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const refresh = async () => {
     try {
@@ -58,35 +44,19 @@ export default function AdminBrandsPage() {
           name: b.name,
           logo: b.logoUrl,
           category: (b.forCars && b.forSpareParts) ? 'both' : (b.forCars ? 'cars' : 'parts'),
-          location: b.location || "",
-          phone: b.phone || "",
-          whatsapp: b.whatsapp || "",
-          description: b.description || "",
-          description_ar: b.description_ar || ""
         } as Brand));
         setBrands(mapped);
       }
     } catch { }
   };
 
-  useEffect(() => {
-    refresh();
-  }, []);
+  useEffect(() => { refresh(); }, []);
 
   const handleSave = async () => {
     if (!name.trim()) return;
-    const payload = {
-      name: name.trim(),
-      logoUrl: logo,
-      category,
-      location,
-      phone,
-      whatsapp,
-      description,
-      description_ar: descriptionAr
-    };
-
+    setSaving(true);
     try {
+      const payload = { name: name.trim(), logoUrl: logo, category };
       if (editingId) {
         await api.brands.update(editingId, payload);
       } else {
@@ -94,14 +64,12 @@ export default function AdminBrandsPage() {
       }
       resetForm();
       await refresh();
-    } catch { }
+    } catch { } finally { setSaving(false); }
   };
 
   const resetForm = () => {
     setEditingId(null);
     setName(""); setLogo(""); setCategory('both');
-    setLocation(""); setPhone(""); setWhatsapp("");
-    setDescription(""); setDescriptionAr("");
   };
 
   const startEdit = (b: Brand) => {
@@ -109,200 +77,248 @@ export default function AdminBrandsPage() {
     setName(b.name);
     setLogo(b.logo || "");
     setCategory(b.category);
-    setLocation(b.location || "");
-    setPhone(b.phone || "");
-    setWhatsapp(b.whatsapp || "");
-    setDescription(b.description || "");
-    setDescriptionAr(b.description_ar || "");
   };
 
   const handleDelete = async (id: string) => {
-    try {
-      await api.brands.delete(id);
-      await refresh();
-    } catch { }
+    if (!confirm(isRTL ? 'هل تريد حذف هذه الوكالة؟' : 'Delete this brand?')) return;
+    try { await api.brands.delete(id); await refresh(); } catch { }
   };
 
-  const seedDefaults = async () => {
-    const defaults = [
-      { name: "Hyundai", logo: "https://res.cloudinary.com/daood-alhashdis/image/upload/v1707335000/hyundai.png", category: 'both' },
-      { name: "Kia", logo: "https://res.cloudinary.com/daood-alhashdis/image/upload/v1707335001/kia.png", category: 'both' },
-      { name: "Genesis", logo: "https://res.cloudinary.com/daood-alhashdis/image/upload/v1707335002/genesis.png", category: 'cars' },
-      { name: "Mobis", logo: "https://res.cloudinary.com/daood-alhashdis/image/upload/v1707335003/mobis.png", category: 'parts' },
-    ];
-    for (const b of defaults) {
-      try { await api.brands.create({ name: b.name, logoUrl: b.logo, category: b.category as any }); } catch { }
-    }
-    await refresh();
-  };
+  // 3 خيارات التصنيف مع أيقونات
+  const categories = [
+    { id: 'cars', labelAr: 'سيارات', labelEn: 'CARS', icon: Car, color: 'text-blue-400' },
+    { id: 'parts', labelAr: 'قطع غيار', labelEn: 'PARTS', icon: Wrench, color: 'text-orange-400' },
+    { id: 'both', labelAr: 'الكل', labelEn: 'BOTH', icon: Layers, color: 'text-[#c9a96e]' },
+  ];
 
   return (
     <div className="relative min-h-screen bg-black text-white">
       <Navbar />
       <main className="relative z-10 pt-32 pb-24 px-6 max-w-7xl mx-auto">
-        <header className="mb-16">
+
+        {/* Header */}
+        <header className="mb-12">
           <Link href="/admin/dashboard" className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white/70 hover:text-white hover:bg-white/10 transition-all group w-fit">
             <ChevronLeft className={`w-4 h-4 transition-transform group-hover:-translate-x-1 ${isRTL ? 'rotate-180 group-hover:translate-x-1' : ''}`} />
             <span className="text-[10px] font-black uppercase tracking-[0.2em]">{isRTL ? 'العودة للرئيسية' : 'BACK TO DASHBOARD'}</span>
           </Link>
-          <div className="flex items-center gap-4 mb-6">
+          <div className="flex items-center gap-4 mb-3">
             <div className="h-[2px] w-12 bg-[#c9a96e] shadow-[0_0_10px_rgba(201,169,110,1)]" />
             <span className="text-[10px] font-black uppercase tracking-[0.5em] text-[#c9a96e] italic">Admin Control</span>
           </div>
-          <div className="flex flex-col md:flex-row items-center gap-4">
-            <div>
-              <h1 className="text-5xl md:text-7xl font-black tracking-tighter uppercase italic leading-[0.9] mb-4">
-                {isRTL ? 'إدارة' : 'MANAGE'} <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/20">{isRTL ? 'الوكالات' : 'AGENCIES'}</span>
-              </h1>
-              <p className="text-[11px] text-white/40 uppercase tracking-[0.3em] font-bold">
-                {isRTL ? 'تحكم في وكالات السيارات والماركات' : 'Control car agencies and brands'}
-              </p>
-            </div>
-            {brands.length === 0 && (
-              <button onClick={seedDefaults} className="ml-auto px-6 py-3 rounded-xl border border-[#c9a96e]/30 bg-[#c9a96e]/10 text-[#c9a96e] text-[10px] font-black uppercase tracking-widest hover:bg-[#c9a96e] hover:text-black transition-all">
-                {isRTL ? 'إضافة الماركات الافتراضية' : 'SEED DEFAULT BRANDS'}
-              </button>
-            )}
-          </div>
+          <h1 className="text-5xl md:text-7xl font-black tracking-tighter uppercase italic leading-[0.9]">
+            {isRTL ? 'إدارة' : 'MANAGE'} <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/20">{isRTL ? 'الوكالات' : 'BRANDS'}</span>
+          </h1>
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Form Column */}
-          <div className="lg:col-span-4 glass-card p-8 bg-white/[0.02] border-white/10 rounded-2xl h-fit sticky top-32">
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-3">
-                <Tag className="w-5 h-5 text-[#c9a96e]" />
-                <h2 className="text-xl font-black uppercase italic tracking-wider">
-                  {editingId ? (isRTL ? 'تعديل' : 'EDIT') : (isRTL ? 'إضافة' : 'ADD')}
-                </h2>
-              </div>
-              {editingId && (
-                <button onClick={resetForm} className="text-[9px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors">
-                  {isRTL ? 'إلغاء' : 'CANCEL'}
-                </button>
-              )}
-            </div>
 
-            <div className="space-y-6">
-              <div>
-                <label className="block text-[9px] font-black uppercase tracking-[0.3em] text-white/40 mb-2 italic">{isRTL ? 'اسم الوكالة / الماركة' : 'AGENCY / BRAND NAME'}</label>
-                <input value={name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)} title="Name" placeholder="..." className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-4 px-4 text-sm font-bold text-white focus:outline-none focus:border-[#c9a96e]/40 transition-all" />
-              </div>
-
-              <div>
-                <label className="block text-[9px] font-black uppercase tracking-[0.3em] text-white/40 mb-2 italic">{isRTL ? 'الشعار' : 'LOGO'}</label>
-                <div className="flex items-center gap-6">
-                  <div className="relative w-20 h-20 bg-white/5 border border-white/10 rounded-2xl overflow-hidden flex items-center justify-center group/logo hover:border-[#c9a96e]/30 transition-all">
-                    {logo ? <Image src={logo} alt="Logo" fill className="object-contain p-3" unoptimized /> : <Upload className="w-6 h-6 text-white/10" />}
-                    <input type="file" title="Upload" className="absolute inset-0 opacity-0 cursor-pointer" onChange={async (eValue: React.ChangeEvent<HTMLInputElement>) => {
-                      const file = eValue.target.files?.[0]; if (!file) return;
-                      const fd = new FormData(); fd.append('image', file);
-                      try {
-                        const res = await api.upload.image(fd);
-                        if (res?.success && res.url) setLogo(res.url);
-                      } catch { }
-                    }} />
-                  </div>
-                  <div className="text-[8px] text-white/20 uppercase tracking-widest leading-relaxed">
-                    {isRTL ? 'انقر على المربع\nلرفع الشعار' : 'CLICK BOX TO\nUPLOAD LOGO'}
-                  </div>
+          {/* ── نموذج الإضافة / التعديل (3 حقول فقط) ── */}
+          <div className="lg:col-span-4">
+            <div className="glass-card p-8 bg-white/[0.02] border border-white/10 rounded-2xl sticky top-32">
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-3">
+                  <Tag className="w-5 h-5 text-[#c9a96e]" />
+                  <h2 className="text-xl font-black uppercase italic tracking-wider">
+                    {editingId ? (isRTL ? 'تعديل الوكالة' : 'EDIT BRAND') : (isRTL ? 'إضافة وكالة' : 'ADD BRAND')}
+                  </h2>
                 </div>
+                {editingId && (
+                  <button onClick={resetForm} className="text-[9px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors">
+                    {isRTL ? 'إلغاء' : 'CANCEL'}
+                  </button>
+                )}
               </div>
 
-              <div>
-                <label className="block text-[9px] font-black uppercase tracking-[0.3em] text-white/40 mb-2 italic">{isRTL ? 'التصنيف' : 'CATEGORY'}</label>
-                <div className="grid grid-cols-3 gap-2">
-                  {['cars', 'parts', 'both'].map((cat) => (
-                    <button
-                      key={cat}
-                      onClick={() => setCategory(cat as any)}
-                      className={cn(
-                        "py-3 rounded-lg text-[10px] font-black uppercase tracking-tighter transition-all border",
-                        category === cat ? "bg-[#c9a96e] text-black border-[#c9a96e]" : "bg-white/5 text-white/40 border-white/10 hover:bg-white/10"
-                      )}
-                    >
-                      {cat === 'cars' ? (isRTL ? 'سيارات' : 'CARS') : cat === 'parts' ? (isRTL ? 'قطع' : 'PARTS') : (isRTL ? 'الكل' : 'BOTH')}
+              <div className="space-y-6">
+
+                {/* ── 1. الشعار ── */}
+                <div>
+                  <label className="block text-[9px] font-black uppercase tracking-[0.3em] text-white/40 mb-3">
+                    {isRTL ? '① الشعار / الصورة' : '① LOGO / IMAGE'}
+                  </label>
+                  <div
+                    className={cn(
+                      "relative w-full h-36 bg-white/[0.03] border-2 border-dashed border-white/10 rounded-2xl overflow-hidden flex flex-col items-center justify-center gap-3 cursor-pointer hover:border-[#c9a96e]/40 hover:bg-[#c9a96e]/5 transition-all group",
+                      uploading && "opacity-60 pointer-events-none"
+                    )}
+                  >
+                    {logo ? (
+                      <>
+                        <Image src={logo} alt="Logo" fill className="object-contain p-4" unoptimized />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <Upload className="w-8 h-8 text-white" />
+                          <span className="text-white text-xs mr-2">{isRTL ? 'تغيير الصورة' : 'Change'}</span>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-8 h-8 text-white/20" />
+                        <span className="text-[10px] text-white/30 uppercase tracking-widest">
+                          {uploading ? (isRTL ? 'جاري الرفع...' : 'Uploading...') : (isRTL ? 'انقر لرفع الشعار' : 'Click to upload')}
+                        </span>
+                      </>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      title="Upload logo"
+                      className="absolute inset-0 opacity-0 cursor-pointer"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        setUploading(true);
+                        const fd = new FormData(); fd.append('image', file);
+                        try {
+                          const res = await api.upload.image(fd);
+                          if (res?.success && res.url) setLogo(res.url);
+                        } catch { } finally { setUploading(false); }
+                      }}
+                    />
+                  </div>
+                  {logo && (
+                    <button onClick={() => setLogo('')} className="mt-2 text-[9px] text-red-400 hover:text-red-300 uppercase tracking-widest">
+                      {isRTL ? '× حذف الصورة' : '× Remove'}
                     </button>
-                  ))}
+                  )}
                 </div>
+
+                {/* ── 2. الاسم ── */}
+                <div>
+                  <label className="block text-[9px] font-black uppercase tracking-[0.3em] text-white/40 mb-3">
+                    {isRTL ? '② اسم الوكالة / الماركة' : '② BRAND NAME'}
+                  </label>
+                  <input
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSave()}
+                    title={isRTL ? 'اسم الوكالة' : 'Brand name'}
+                    placeholder={isRTL ? 'مثال: Hyundai / هيونداي' : 'e.g. Hyundai'}
+                    className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-4 px-5 text-sm font-bold text-white focus:outline-none focus:border-[#c9a96e]/50 transition-all placeholder:text-white/20"
+                  />
+                </div>
+
+                {/* ── 3. التصنيف (3 خيارات) ── */}
+                <div>
+                  <label className="block text-[9px] font-black uppercase tracking-[0.3em] text-white/40 mb-3">
+                    {isRTL ? '③ التصنيف' : '③ CATEGORY'}
+                  </label>
+                  <div className="grid grid-cols-3 gap-3">
+                    {categories.map((cat) => {
+                      const Icon = cat.icon;
+                      const isActive = category === cat.id;
+                      return (
+                        <button
+                          key={cat.id}
+                          onClick={() => setCategory(cat.id as 'cars' | 'parts' | 'both')}
+                          className={cn(
+                            "flex flex-col items-center gap-2 py-4 rounded-xl text-[10px] font-black uppercase tracking-tighter transition-all border",
+                            isActive
+                              ? "bg-[#c9a96e] text-black border-[#c9a96e] shadow-[0_0_20px_rgba(201,169,110,0.3)]"
+                              : "bg-white/5 text-white/50 border-white/10 hover:bg-white/10 hover:text-white"
+                          )}
+                        >
+                          <Icon className={cn("w-5 h-5", isActive ? "text-black" : cat.color)} />
+                          <span>{isRTL ? cat.labelAr : cat.labelEn}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* ── زر الحفظ ── */}
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleSave}
+                  disabled={saving || !name.trim()}
+                  className="w-full py-5 bg-[#c9a96e] text-black rounded-xl text-[12px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-3 shadow-[0_10px_30px_rgba(201,169,110,0.2)] disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+                >
+                  <Save className="w-4 h-4" />
+                  {saving
+                    ? (isRTL ? 'جاري الحفظ...' : 'Saving...')
+                    : editingId
+                      ? (isRTL ? 'تحديث الوكالة' : 'UPDATE BRAND')
+                      : (isRTL ? 'إضافة وكالة جديدة' : 'ADD BRAND')}
+                </motion.button>
               </div>
-
-              {category !== 'parts' && (
-                <div className="space-y-4 pt-4 border-t border-white/5">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-1 h-1 bg-[#c9a96e] rounded-full" />
-                    <span className="text-[9px] font-black uppercase tracking-widest text-[#c9a96e]">{isRTL ? 'بيانات الوكالة' : 'AGENCY DETAILS'}</span>
-                  </div>
-                  <div>
-                    <input value={location} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLocation(e.target.value)} placeholder={isRTL ? 'الموقع (سيئول، دبي...)' : 'Location (Seoul, Dubai...)'} className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 px-4 text-xs font-bold text-white focus:outline-none focus:border-[#c9a96e]/40" />
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <input value={phone} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPhone(e.target.value)} placeholder={isRTL ? 'الهاتف' : 'Phone'} className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 px-4 text-xs font-bold text-white focus:outline-none focus:border-[#c9a96e]/40" />
-                    <input value={whatsapp} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWhatsapp(e.target.value)} placeholder="WhatsApp" className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 px-4 text-xs font-bold text-white focus:outline-none focus:border-[#c9a96e]/40" />
-                  </div>
-                  <textarea value={isRTL ? descriptionAr : description} onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => isRTL ? setDescriptionAr(e.target.value) : setDescription(e.target.value)} placeholder={isRTL ? 'وصف مختصر للوكالة...' : 'Short description...'} rows={3} className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 px-4 text-xs font-bold text-white focus:outline-none focus:border-[#c9a96e]/40 resize-none" />
-                </div>
-              )}
-
-              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={handleSave} className="w-full py-5 bg-[#c9a96e] !text-black rounded-xl text-[12px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-2 shadow-[0_10px_30px_rgba(201,169,110,0.2)] mt-8">
-                <Save className="w-4 h-4" />
-                {editingId ? (isRTL ? 'تحديث البيانات' : 'UPDATE AGENCY') : (isRTL ? 'إضافة وكالة جديدة' : 'CREATE AGENCY')}
-              </motion.button>
             </div>
           </div>
 
-          {/* List Column */}
+          {/* ── قائمة الوكالات ── */}
           <div className="lg:col-span-8">
             <div className="flex items-center justify-between mb-8 px-2">
-              <h3 className="text-xl font-black uppercase italic tracking-widest">{isRTL ? 'السجلات الحالية' : 'CURRENT DIRECTORY'}</h3>
-              <div className="text-[10px] font-bold text-white/20 uppercase tracking-widest">{brands.length} {isRTL ? 'مسجل' : 'ENTRIES'}</div>
+              <h3 className="text-xl font-black uppercase italic tracking-widest">
+                {isRTL ? 'الوكالات المسجلة' : 'REGISTERED BRANDS'}
+              </h3>
+              <div className="text-[10px] font-bold text-white/20 uppercase tracking-widest">
+                {brands.length} {isRTL ? 'وكالة' : 'BRANDS'}
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {brands.map((b: Brand) => (
-                <motion.div
-                  layout
-                  key={b.id}
-                  className="group relative glass-card p-6 bg-white/[0.02] border border-white/10 rounded-2xl hover:bg-white/[0.04] transition-all"
-                >
-                  <div className="flex gap-5">
-                    <div className="relative w-20 h-20 rounded-xl bg-white p-3 flex items-center justify-center shadow-lg transition-transform duration-500 group-hover:scale-105 shrink-0">
-                      {b.logo ? (
-                        <Image src={b.logo} alt={b.name} fill className="object-contain p-2" unoptimized />
-                      ) : <Tag className="w-8 h-8 text-black/10" />}
-                    </div>
-                    <div className="flex-grow">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <h4 className="text-lg font-black uppercase italic leading-none mb-1">{b.name}</h4>
-                          <div className="inline-block px-2 py-1 rounded bg-[#c9a96e]/10 text-[#c9a96e] text-[8px] font-black uppercase tracking-tighter border border-[#c9a96e]/20">{b.category}</div>
-                        </div>
-                        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button onClick={() => startEdit(b)} title="Edit" className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/40 hover:text-white transition-all">
-                            <Tag className="w-3 h-3" />
-                          </button>
-                          <button onClick={() => handleDelete(b.id)} title="Delete" className="w-8 h-8 rounded-lg bg-red-500/10 hover:bg-red-500/20 flex items-center justify-center text-red-500/40 hover:text-red-500 transition-all">
-                            <Trash2 className="w-3 h-3" />
-                          </button>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {brands.map((b) => {
+                const catInfo = categories.find(c => c.id === b.category);
+                const Icon = catInfo?.icon || Tag;
+                return (
+                  <motion.div
+                    layout
+                    key={b.id}
+                    className="group relative glass-card p-5 bg-white/[0.02] border border-white/10 rounded-2xl hover:bg-white/[0.05] hover:border-white/20 transition-all"
+                  >
+                    <div className="flex items-center gap-4">
+                      {/* الشعار */}
+                      <div className="relative w-16 h-16 rounded-xl bg-white flex items-center justify-center shadow-lg flex-shrink-0 overflow-hidden">
+                        {b.logo ? (
+                          <Image src={b.logo} alt={b.name} fill className="object-contain p-2" unoptimized />
+                        ) : (
+                          <Tag className="w-7 h-7 text-black/20" />
+                        )}
+                      </div>
+
+                      {/* الاسم والتصنيف */}
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-lg font-black uppercase italic mb-1 truncate">{b.name}</h4>
+                        <div className={cn(
+                          "inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider border",
+                          b.category === 'cars' ? "bg-blue-500/10 border-blue-500/30 text-blue-400"
+                            : b.category === 'parts' ? "bg-orange-500/10 border-orange-500/30 text-orange-400"
+                              : "bg-[#c9a96e]/10 border-[#c9a96e]/30 text-[#c9a96e]"
+                        )}>
+                          <Icon className="w-3 h-3" />
+                          <span>{isRTL ? catInfo?.labelAr : catInfo?.labelEn}</span>
                         </div>
                       </div>
 
-                      {(b.location || b.phone) && (
-                        <div className="mt-4 space-y-1">
-                          {b.location && <div className="text-[9px] text-white/40 font-bold uppercase tracking-wider">{b.location}</div>}
-                          {b.phone && <div className="text-[9px] text-white/40 font-bold uppercase tracking-wider">{b.phone}</div>}
-                        </div>
-                      )}
+                      {/* أزرار الإجراءات */}
+                      <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                        <button
+                          onClick={() => startEdit(b)}
+                          title={isRTL ? 'تعديل' : 'Edit'}
+                          className="w-9 h-9 rounded-xl bg-[#c9a96e]/10 hover:bg-[#c9a96e]/30 flex items-center justify-center text-[#c9a96e] transition-all border border-[#c9a96e]/20"
+                        >
+                          <Tag className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(b.id)}
+                          title={isRTL ? 'حذف' : 'Delete'}
+                          className="w-9 h-9 rounded-xl bg-red-500/10 hover:bg-red-500/20 flex items-center justify-center text-red-400 hover:text-red-300 transition-all border border-red-500/20"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                );
+              })}
             </div>
 
             {brands.length === 0 && (
               <div className="flex flex-col items-center justify-center py-32 opacity-20 italic">
                 <Tag className="w-16 h-16 mb-4" />
-                <p className="text-sm uppercase tracking-[0.5em]">{isRTL ? 'لا توجد وكالات مسجلة' : 'NO AGENCIES FOUND'}</p>
+                <p className="text-sm uppercase tracking-[0.5em]">
+                  {isRTL ? 'لا توجد وكالات - أضف أول وكالة' : 'NO BRANDS YET — ADD YOUR FIRST'}
+                </p>
               </div>
             )}
           </div>

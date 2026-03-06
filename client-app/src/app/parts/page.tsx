@@ -5,7 +5,8 @@ import { useState, useEffect } from "react";
 import {
     ArrowUpRight, Cpu, Settings, Box, Search, Filter,
     CheckCircle2, AlertCircle, Zap, Shield,
-    Layers, Truck, X, ChevronLeft, ChevronRight, CarFront, Gauge
+    Layers, Truck, X, ChevronLeft, ChevronRight, CarFront, Gauge,
+    Heart, ShoppingCart, MessageCircle
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { cn } from "@/lib/utils";
@@ -40,7 +41,8 @@ interface Agency {
 
 export default function PartsPage() {
     const { isRTL } = useLanguage();
-    const { formatPrice } = useSettings();
+    const { formatPrice, socialLinks } = useSettings();
+    const [favoriteParts, setFavoriteParts] = useState<string[]>([]);
     const [viewMode, setViewMode] = useState<'AGENCIES' | 'MODELS' | 'PARTS'>('AGENCIES');
     const [selectedAgency, setSelectedAgency] = useState<Agency | null>(null);
     const [selectedModel, setSelectedModel] = useState<string | null>(null);
@@ -365,15 +367,67 @@ export default function PartsPage() {
                                                 <div className="relative aspect-square mb-6 rounded-2xl overflow-hidden bg-white/5 border border-white/5">
                                                     <img src={part.img} alt={part.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                                     <div className="absolute top-4 right-4 px-3 py-1 bg-black/60 backdrop-blur-md rounded-full border border-white/10 text-[7px] font-black uppercase tracking-widest">{part.condition}</div>
+                                                    {/* ❤️ زر المفضلة */}
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setFavoriteParts(prev =>
+                                                                prev.includes(part.id)
+                                                                    ? prev.filter(id => id !== part.id)
+                                                                    : [...prev, part.id]
+                                                            );
+                                                        }}
+                                                        className={`absolute top-4 left-4 w-9 h-9 rounded-full flex items-center justify-center transition-all ${favoriteParts.includes(part.id)
+                                                                ? 'bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)]'
+                                                                : 'bg-black/60 backdrop-blur-md border border-white/20 hover:bg-red-500/20'
+                                                            }`}
+                                                    >
+                                                        <Heart className={`w-4 h-4 transition-all ${favoriteParts.includes(part.id) ? 'fill-white text-white scale-110' : 'text-white/70'
+                                                            }`} />
+                                                    </button>
                                                 </div>
                                                 <div className="space-y-4">
                                                     <span className="text-[8px] font-black text-accent-gold uppercase tracking-[0.3em]">{part.brand}</span>
                                                     <h3 className="text-lg font-black uppercase tracking-tight leading-tight min-h-[3rem] group-hover:text-accent-gold transition-colors">{part.name}</h3>
-                                                    <div className="flex items-center justify-between pt-4 border-t border-white/10">
-                                                        <div className="text-xl font-black gradient-text-gold">{formatPrice(Number(part.price))}</div>
-                                                        <Link href={`/parts/${part.id}`} className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-accent-gold hover:text-black transition-all">
-                                                            <ArrowUpRight className="w-4 h-4" />
-                                                        </Link>
+                                                    <div className="text-xl font-black gradient-text-gold">{formatPrice(Number(part.price))}</div>
+
+                                                    {/* أزرار الإجراءات */}
+                                                    <div className="flex gap-2 pt-3 border-t border-white/10">
+                                                        {/* 🛒 أضف للسلة */}
+                                                        <button
+                                                            onClick={() => {
+                                                                const cart = JSON.parse(localStorage.getItem('hm_cart') || '[]');
+                                                                const exists = cart.find((item: { id: string }) => item.id === part.id);
+                                                                if (!exists) {
+                                                                    cart.push({ id: part.id, type: 'part', title: part.name, price: part.price, image: part.img });
+                                                                    localStorage.setItem('hm_cart', JSON.stringify(cart));
+                                                                }
+                                                                alert(isRTL ? `✅ تمت إضافة ${part.name} للسلة` : `✅ ${part.name} added to cart`);
+                                                            }}
+                                                            title={isRTL ? 'أضف للسلة' : 'Add to Cart'}
+                                                            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-[#c9a96e]/10 hover:border-[#c9a96e]/40 hover:text-[#c9a96e] text-white/70 transition-all text-[10px] font-black uppercase tracking-wider"
+                                                        >
+                                                            <ShoppingCart className="w-4 h-4" />
+                                                            <span>{isRTL ? 'السلة' : 'Cart'}</span>
+                                                        </button>
+
+                                                        {/* 💬 شراء عبر WhatsApp */}
+                                                        <a
+                                                            href={(() => {
+                                                                const phone = (socialLinks?.whatsapp || '').replace(/[^0-9]/g, '');
+                                                                const msg = isRTL
+                                                                    ? `🔧 *طلب شراء قطعة غيار*\n━━━━━━━━━━━━━━━━\n📌 *${part.name}*\n🏭 الماركة: ${part.brand}\n📦 الحالة: ${part.condition}\n🚗 متوافق مع: ${part.compatibility.join('، ')}\n━━━━━━━━━━━━━━━━\n💰 السعر: ${formatPrice(part.price)}\n━━━━━━━━━━━━━━━━\n\nأرجو التواصل للإتمام ✅`
+                                                                    : `🔧 *Spare Part Purchase Request*\n━━━━━━━━━━━━━━━━\n📌 *${part.name}*\n🏭 Brand: ${part.brand}\n📦 Condition: ${part.condition}\n🚗 Compatible: ${part.compatibility.join(', ')}\n━━━━━━━━━━━━━━━━\n💰 Price: ${formatPrice(part.price)}\n━━━━━━━━━━━━━━━━\n\nPlease contact me ✅`;
+                                                                return phone ? `https://wa.me/${phone}?text=${encodeURIComponent(msg)}` : '#';
+                                                            })()}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            title={isRTL ? 'شراء عبر واتساب' : 'Buy via WhatsApp'}
+                                                            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-green-600/20 border border-green-500/30 hover:bg-green-600 text-green-400 hover:text-white transition-all text-[10px] font-black uppercase tracking-wider"
+                                                        >
+                                                            <MessageCircle className="w-4 h-4" />
+                                                            <span>{isRTL ? 'شراء' : 'Buy'}</span>
+                                                        </a>
                                                     </div>
                                                 </div>
                                             </div>

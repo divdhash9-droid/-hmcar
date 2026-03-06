@@ -240,28 +240,117 @@ export default function CarDetailsPage() {
                             </div>
                         </div>
 
-                        {/* Quick Actions */}
-                        <div className="flex gap-4">
-                            <button
-                                onClick={toggleFavorite}
-                                className={`flex items-center gap-2 px-6 py-3 rounded-xl border transition-all ${isFavorite
-                                    ? 'bg-red-500 border-red-500 text-white'
-                                    : 'border-white/20 hover:border-[#c5a059] hover:text-[#c5a059]'
-                                    }`}
-                            >
-                                <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
-                                <span>{isRTL ? 'المفضلة' : 'Favorite'}</span>
-                            </button>
-                            <button
-                                onClick={addToComparison}
-                                className="flex items-center gap-2 px-6 py-3 rounded-xl border border-white/20 hover:border-[#c5a059] hover:text-[#c5a059] transition-all"
-                            >
-                                <Plus className="w-5 h-5" />
-                                <span>{isRTL ? 'قارن' : 'Compare'}</span>
-                            </button>
-                            <button className="flex items-center gap-2 px-6 py-3 rounded-xl border border-white/20 hover:border-[#c5a059] hover:text-[#c5a059] transition-all">
-                                <Share2 className="w-5 h-5" />
-                            </button>
+                        {/* ── أزرار الإجراءات الرئيسية ── */}
+                        <div className="space-y-3">
+                            {/* صف أول: قلب المفضلة + مشاركة */}
+                            <div className="flex gap-3">
+                                {/* ❤️ المفضلة */}
+                                <button
+                                    onClick={toggleFavorite}
+                                    title={isRTL ? 'إضافة للمفضلة' : 'Add to Favorites'}
+                                    className={`flex items-center gap-2 px-5 py-3 rounded-xl border-2 font-bold text-sm transition-all ${isFavorite
+                                            ? 'bg-red-500 border-red-500 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)]'
+                                            : 'border-white/20 text-white/70 hover:border-red-400 hover:text-red-400'
+                                        }`}
+                                >
+                                    <Heart className={`w-5 h-5 transition-all ${isFavorite ? 'fill-current scale-110' : ''}`} />
+                                    <span>{isRTL ? (isFavorite ? 'في المفضلة' : 'المفضلة') : (isFavorite ? 'Saved' : 'Favorite')}</span>
+                                </button>
+
+                                {/* مشاركة */}
+                                <button
+                                    onClick={() => {
+                                        if (navigator.share) {
+                                            navigator.share({ title: car.title, url: window.location.href });
+                                        } else {
+                                            navigator.clipboard.writeText(window.location.href);
+                                        }
+                                    }}
+                                    title={isRTL ? 'مشاركة' : 'Share'}
+                                    className="flex items-center gap-2 px-5 py-3 rounded-xl border-2 border-white/20 text-white/70 hover:border-[#c5a059] hover:text-[#c5a059] font-bold text-sm transition-all"
+                                >
+                                    <Share2 className="w-5 h-5" />
+                                </button>
+                            </div>
+
+                            {/* صف ثاني: أضف للسلة + شراء الآن عبر WhatsApp */}
+                            {!car.isSold && (
+                                <div className="flex gap-3">
+                                    {/* 🛒 أضف للسلة */}
+                                    <button
+                                        onClick={() => {
+                                            // حفظ في localStorage كسلة مؤقتة
+                                            const cart = JSON.parse(localStorage.getItem('hm_cart') || '[]');
+                                            const exists = cart.find((item: { id: string }) => item.id === car._id);
+                                            if (!exists) {
+                                                cart.push({
+                                                    id: car._id,
+                                                    type: 'car',
+                                                    title: car.title || `${car.make} ${car.model}`,
+                                                    price: car.price,
+                                                    make: car.make,
+                                                    model: car.model,
+                                                    year: car.year,
+                                                    image: car.images?.[0] || ''
+                                                });
+                                                localStorage.setItem('hm_cart', JSON.stringify(cart));
+                                            }
+                                            alert(isRTL
+                                                ? `✅ تمت إضافة ${car.make} ${car.model} إلى السلة`
+                                                : `✅ ${car.make} ${car.model} added to cart`
+                                            );
+                                        }}
+                                        className="flex-1 flex items-center justify-center gap-3 px-6 py-4 bg-white/10 hover:bg-white/20 border-2 border-white/20 hover:border-[#c5a059] text-white hover:text-[#c5a059] font-bold rounded-xl transition-all"
+                                    >
+                                        <Plus className="w-5 h-5" />
+                                        <span>{isRTL ? 'أضف للسلة' : 'Add to Cart'}</span>
+                                    </button>
+
+                                    {/* 💬 شراء عبر WhatsApp مع فاتورة */}
+                                    <a
+                                        href={(() => {
+                                            const phone = contactPhone.replace(/[^0-9]/g, '');
+                                            // فاتورة المنتج كاملة
+                                            const invoice = isRTL
+                                                ? `🚗 *فاتورة طلب سيارة*\n` +
+                                                `━━━━━━━━━━━━━━━━\n` +
+                                                `📌 *${car.title || `${car.make} ${car.model}`}*\n` +
+                                                `🏭 الماركة: ${car.make}\n` +
+                                                `📅 الموديل: ${car.model} ${car.year}\n` +
+                                                (car.mileage ? `⚡ المسافة: ${car.mileage.toLocaleString()} كم\n` : '') +
+                                                (car.fuelType ? `⛽ الوقود: ${car.fuelType}\n` : '') +
+                                                (car.transmission ? `⚙️ ناقل الحركة: ${car.transmission}\n` : '') +
+                                                (car.color ? `🎨 اللون: ${car.color}\n` : '') +
+                                                `━━━━━━━━━━━━━━━━\n` +
+                                                `💰 السعر: ${formatPrice(car.price)}\n` +
+                                                `━━━━━━━━━━━━━━━━\n` +
+                                                `🔗 رابط السيارة: ${window?.location?.href || ''}\n\n` +
+                                                `أرجو التواصل للإتمام ✅`
+                                                : `🚗 *Car Purchase Request*\n` +
+                                                `━━━━━━━━━━━━━━━━\n` +
+                                                `📌 *${car.title || `${car.make} ${car.model}`}*\n` +
+                                                `🏭 Make: ${car.make}\n` +
+                                                `📅 Model: ${car.model} ${car.year}\n` +
+                                                (car.mileage ? `⚡ Mileage: ${car.mileage.toLocaleString()} km\n` : '') +
+                                                (car.fuelType ? `⛽ Fuel: ${car.fuelType}\n` : '') +
+                                                (car.transmission ? `⚙️ Trans: ${car.transmission}\n` : '') +
+                                                (car.color ? `🎨 Color: ${car.color}\n` : '') +
+                                                `━━━━━━━━━━━━━━━━\n` +
+                                                `💰 Price: ${formatPrice(car.price)}\n` +
+                                                `━━━━━━━━━━━━━━━━\n` +
+                                                `🔗 Link: ${window?.location?.href || ''}\n\n` +
+                                                `Please contact me to complete the purchase ✅`;
+                                            return `https://wa.me/${phone}?text=${encodeURIComponent(invoice)}`;
+                                        })()}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex-1 flex items-center justify-center gap-3 px-6 py-4 bg-green-600 hover:bg-green-500 text-white font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(34,197,94,0.3)] hover:shadow-[0_0_30px_rgba(34,197,94,0.5)]"
+                                    >
+                                        <MessageCircle className="w-5 h-5" />
+                                        <span>{isRTL ? 'شراء الآن 💬' : 'Buy Now 💬'}</span>
+                                    </a>
+                                </div>
+                            )}
                         </div>
 
                         {/* Specs Grid */}

@@ -232,7 +232,7 @@ function buildApp() {
     app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
     // ── Diagnostic Check ──
-    app.get('/diag', async (req, res) => {
+    app.get('/api/diag', async (req, res) => {
         let adminStatus = 'Unknown';
         try {
             const User = require('./models/User');

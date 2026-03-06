@@ -12,7 +12,13 @@ router.get('/', requireAuthAPI, async (req, res) => {
         const { status, page = 1, limit = 10 } = req.query;
 
         // بناء الفلتر
-        const filter = { buyer: userId };
+        let filter = { buyer: userId };
+
+        // إذا كان مسؤولاً، يمكنه رؤية جميع الطلبات
+        if (req.user.role === 'admin' || req.user.role === 'super_admin') {
+            filter = {};
+        }
+
         if (status) {
             filter.status = status;
         }
@@ -76,10 +82,12 @@ router.get('/', requireAuthAPI, async (req, res) => {
 router.get('/:id', requireAuthAPI, async (req, res) => {
     try {
         const userId = req.user.userId || req.user._id;
-        const order = await Order.findOne({
-            _id: req.params.id,
-            buyer: userId
-        })
+        const query = { _id: req.params.id };
+        if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
+            query.buyer = userId;
+        }
+
+        const order = await Order.findOne(query)
             .populate('car', 'title make model year images price category')
             .populate('buyer', 'name email phone')
             .lean();
@@ -123,6 +131,94 @@ router.get('/:id', requireAuthAPI, async (req, res) => {
         });
     } catch (error) {
         console.error('Get order details error:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Internal Server Error'
+        });
+    }
+});
+
+// PATCH /api/v2/orders/:id/status - تحديث حالة الطلب (admin only)
+router.patch('/:id/status', requireAuthAPI, async (req, res) => {
+    try {
+        // التحقق من الصلاحيات
+        if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
+            return res.status(403).json({
+                success: false,
+                error: 'Forbidden',
+                message: 'Admin access required'
+            });
+        }
+
+        const { status } = req.body;
+        const allowedStatuses = ['pending', 'confirmed', 'cancelled', 'completed'];
+
+        if (!allowedStatuses.includes(status)) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid status'
+            });
+        }
+
+        const order = await Order.findById(req.params.id);
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                error: 'Order not found'
+            });
+        }
+
+        const oldStatus = order.status;
+        order.status = status;
+
+        // سجل تاريخ التغيير
+        order.statusHistory.push({
+            from: oldStatus,
+            to: status,
+            by: req.user.userId || req.user._id,
+            at: new Date()
+        });
+
+        await order.save();
+
+        res.json({
+            success: true,
+            message: 'Order status updated successfully',
+            data: { status: order.status }
+        });
+    } catch (error) {
+        console.error('Update order status error:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Internal Server Error'
+        });
+    }
+});
+
+// DELETE /api/v2/orders/:id - حذف طلب (admin only)
+router.delete('/:id', requireAuthAPI, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
+            return res.status(403).json({
+                success: false,
+                error: 'Forbidden'
+            });
+        }
+
+        const order = await Order.findByIdAndDelete(req.params.id);
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                error: 'Order not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'Order deleted successfully'
+        });
+    } catch (error) {
+        console.error('Delete order error:', error);
         res.status(500).json({
             success: false,
             error: 'Internal Server Error'

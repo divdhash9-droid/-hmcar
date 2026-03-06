@@ -102,6 +102,14 @@ export const api = {
             method: 'PUT',
             body: JSON.stringify(data),
         }),
+        create: (data: object) => fetchAPI('/api/v2/users', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        }),
+        update: (id: string, data: object) => fetchAPI(`/api/v2/users/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        }),
         updateRole: (id: string, role: string) => fetchAPI(`/api/v2/users/${id}/role`, {
             method: 'PATCH',
             body: JSON.stringify({ role }),

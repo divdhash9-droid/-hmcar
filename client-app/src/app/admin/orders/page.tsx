@@ -3,8 +3,8 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import {
-    ShoppingCart, Clock, CheckCircle, XCircle, Eye,
-    TrendingUp, ChevronLeft, X, AlertCircle, RefreshCcw
+    TrendingUp, ChevronLeft, X, AlertCircle, RefreshCcw, Trash2, Printer,
+    ShoppingCart, Clock, CheckCircle, XCircle, Eye
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Link from 'next/link';
@@ -103,13 +103,26 @@ export default function AdminOrdersPage() {
             if (selectedOrder?.id === orderId) setSelectedOrder(prev => prev ? { ...prev, status: newStatus } : null);
             showToast(isRTL ? 'تم تحديث حالة الطلب' : 'Order status updated');
         } catch {
-            // Update locally anyway for demo
-            setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
-            if (selectedOrder?.id === orderId) setSelectedOrder(prev => prev ? { ...prev, status: newStatus } : null);
-            showToast(isRTL ? 'تم تحديث الحالة (محلياً)' : 'Status updated (locally)', 'success');
+            showToast(isRTL ? 'فشل تحديث الحالة' : 'Failed to update status', 'error');
         } finally {
             setUpdatingId(null);
         }
+    };
+
+    const deleteOrder = async (orderId: string) => {
+        if (!confirm(isRTL ? 'هل أنت متأكد من حذف هذا الطلب؟' : 'Are you sure you want to delete this order?')) return;
+        try {
+            await api.orders.delete(orderId);
+            setOrders(prev => prev.filter(o => o.id !== orderId));
+            if (selectedOrder?.id === orderId) setSelectedOrder(null);
+            showToast(isRTL ? 'تم حذف الطلب بنجاح' : 'Order deleted successfully');
+        } catch {
+            showToast(isRTL ? 'فشل حذف الطلب' : 'Failed to delete order', 'error');
+        }
+    };
+
+    const printInvoice = () => {
+        window.print();
     };
 
     const viewOrder = (order: Order) => {
@@ -199,6 +212,13 @@ export default function AdminOrdersPage() {
                                         {updatingId === selectedOrder.id && selectedOrder.status !== s ? '...' : s}
                                     </button>
                                 ))}
+                                <div className="w-full h-px bg-white/5 my-2" />
+                                <button onClick={printInvoice} className="flex-1 py-3 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-white hover:bg-white/10 transition-all flex items-center justify-center gap-2">
+                                    <Printer className="w-4 h-4" /> {isRTL ? 'طباعة الفاتورة' : 'PRINT INVOICE'}
+                                </button>
+                                <button onClick={() => deleteOrder(selectedOrder.id)} className="flex-1 py-3 bg-cinematic-neon-red/10 border border-cinematic-neon-red/30 rounded-xl text-[10px] font-black uppercase tracking-widest text-cinematic-neon-red hover:bg-cinematic-neon-red hover:text-white transition-all flex items-center justify-center gap-2">
+                                    <Trash2 className="w-4 h-4" /> {isRTL ? 'حذف الطلب' : 'DELETE ORDER'}
+                                </button>
                             </div>
                         </motion.div>
                     </motion.div>

@@ -9,7 +9,8 @@ import {
     ChevronLeft,
     Plus,
     Eye,
-    EyeOff
+    EyeOff,
+    ChevronDown
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { cn } from "@/lib/utils";
@@ -89,7 +90,12 @@ export default function AdminUsersPage() {
     }, [filter, searchTerm]);
 
     useEffect(() => {
-        loadUsers();
+        let isMounted = true;
+        const fetch = async () => {
+            if (isMounted) await loadUsers();
+        };
+        fetch();
+        return () => { isMounted = false; };
     }, [loadUsers]);
 
     return (
@@ -300,12 +306,15 @@ function AddUserModal({ onClose, onAdd, isRTL }: { onClose: () => void, onAdd: (
                         </div>
                         <div className="space-y-2 col-span-2">
                             <label htmlFor="role-select" className="text-[9px] font-black text-white/40 uppercase tracking-widest">{isRTL ? 'نوع الحساب (الدور)' : 'Role'}</label>
-                            <select id="role-select" title="اختر الصلاحية" className="w-full bg-white/5 border border-white/10 p-3 rounded-lg text-white text-right appearance-none cursor-pointer"
-                                value={formData.role} onChange={e => setFormData({ ...formData, role: e.target.value })}>
-                                <option value="buyer">{isRTL ? 'مشتري / عميل' : 'Buyer / Client'}</option>
-                                <option value="admin">{isRTL ? 'مسؤول / موظف' : 'Admin / Staff'}</option>
-                                <option value="seller">{isRTL ? 'بائع' : 'Seller'}</option>
-                            </select>
+                            <div className="relative">
+                                <select id="role-select" title="اختر الصلاحية" className="w-full bg-white/10 border border-white/10 p-3 rounded-lg text-white text-right appearance-none cursor-pointer focus:border-cinematic-neon-blue/40 outline-none transition-all"
+                                    value={formData.role} onChange={e => setFormData({ ...formData, role: e.target.value })}>
+                                    <option value="buyer" className="bg-zinc-900 text-white">{isRTL ? 'مشتري / عميل' : 'Buyer / Client'}</option>
+                                    <option value="admin" className="bg-zinc-900 text-white">{isRTL ? 'مسؤول / موظف' : 'Admin / Staff'}</option>
+                                    <option value="seller" className="bg-zinc-900 text-white">{isRTL ? 'بائع' : 'Seller'}</option>
+                                </select>
+                                <ChevronDown className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none" />
+                            </div>
                         </div>
                     </div>
 
@@ -417,23 +426,35 @@ function UserDetailModal({ user, onClose, onUpdate, isRTL }: { user: User, onClo
                             <div className="space-y-3">
                                 <div>
                                     <label className="text-[9px] font-black text-white/40 uppercase mb-1 block">{isRTL ? 'الاسم' : 'Name'}</label>
-                                    <input className="w-full bg-white/5 border border-white/10 p-3 rounded-lg text-white text-right"
+                                    <input title={isRTL ? 'الاسم' : 'Name'} placeholder={isRTL ? 'الاسم' : 'Name'} className="w-full bg-white/5 border border-white/10 p-3 rounded-lg text-white text-right"
                                         value={editData.name} onChange={e => setEditData({ ...editData, name: e.target.value })} />
                                 </div>
                                 <div>
                                     <label className="text-[9px] font-black text-white/40 uppercase mb-1 block">{isRTL ? 'اسم المستخدم' : 'Username'}</label>
-                                    <input className="w-full bg-white/5 border border-white/10 p-3 rounded-lg text-white text-right"
+                                    <input title={isRTL ? 'اسم المستخدم' : 'Username'} placeholder={isRTL ? 'اسم المستخدم' : 'Username'} className="w-full bg-white/5 border border-white/10 p-3 rounded-lg text-white text-right"
                                         value={editData.username} onChange={e => setEditData({ ...editData, username: e.target.value })} />
                                 </div>
                                 <div>
                                     <label className="text-[9px] font-black text-white/40 uppercase mb-1 block">{isRTL ? 'البريد الإلكتروني' : 'Email'}</label>
-                                    <input className="w-full bg-white/5 border border-white/10 p-3 rounded-lg text-white text-right"
+                                    <input title={isRTL ? 'البريد الإلكتروني' : 'Email'} placeholder={isRTL ? 'البريد الإلكتروني' : 'Email'} className="w-full bg-white/5 border border-white/10 p-3 rounded-lg text-white text-right"
                                         value={editData.email} onChange={e => setEditData({ ...editData, email: e.target.value })} />
                                 </div>
                                 <div>
                                     <label className="text-[9px] font-black text-white/40 uppercase mb-1 block">{isRTL ? 'رقم الهاتف' : 'Phone'}</label>
-                                    <input className="w-full bg-white/5 border border-white/10 p-3 rounded-lg text-white text-right"
+                                    <input title={isRTL ? 'رقم الهاتف' : 'Phone'} placeholder={isRTL ? 'رقم الهاتف' : 'Phone'} className="w-full bg-white/5 border border-white/10 p-3 rounded-lg text-white text-right"
                                         value={editData.phone} onChange={e => setEditData({ ...editData, phone: e.target.value })} />
+                                </div>
+                                <div>
+                                    <label className="text-[9px] font-black text-white/40 uppercase mb-1 block">{isRTL ? 'نوع الحساب (الدور)' : 'Role'}</label>
+                                    <div className="relative">
+                                        <select title={isRTL ? 'نوع الحساب' : 'Role'} className="w-full bg-white/10 border border-white/10 p-3 rounded-lg text-white text-right appearance-none cursor-pointer focus:border-cinematic-neon-blue/40 outline-none transition-all"
+                                            value={editData.role} onChange={e => setEditData({ ...editData, role: e.target.value })}>
+                                            <option value="buyer" className="bg-zinc-900 text-white">{isRTL ? 'مشتري / عميل' : 'Buyer / Client'}</option>
+                                            <option value="admin" className="bg-zinc-900 text-white">{isRTL ? 'مسؤول / موظف' : 'Admin / Staff'}</option>
+                                            <option value="seller" className="bg-zinc-900 text-white">{isRTL ? 'بائع' : 'Seller'}</option>
+                                        </select>
+                                        <ChevronDown className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none" />
+                                    </div>
                                 </div>
                                 <div>
                                     <label className="text-[9px] font-black text-white/40 uppercase mb-1 block">{isRTL ? 'كلمة مرور جديدة (اتركها فارغة لعدم التغيير)' : 'Reset Password'}</label>

@@ -302,7 +302,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
                     />
                   </div>
                   <div className="px-3 py-1.5 text-white text-xs line-clamp-1 flex justify-between items-center">
-                    <span>{isRTL && car.make && typeof car.make !== 'string' && car.make.name ? car.make.name : (car.title || "")}</span>
+                    <span>{typeof car.make === 'object' ? car.make?.name : (car.make || car.title || "")}</span>
                     <span className="text-[#c9a96e] font-bold">{formatPrice(Number(car.price || 0))}</span>
                   </div>
                 </div>

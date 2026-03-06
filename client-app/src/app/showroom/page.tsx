@@ -73,11 +73,11 @@ export default function Showroom() {
         setViewMode('CARS');
         setLoading(true);
         try {
-            const data = await api.cars.list({ limit: 50 });
-            // Filter by agency name or ID
+            const data = await api.cars.list({ limit: 500 });
+            // Filter by agency name
             const filtered = (data.cars || []).filter((c: CarData) => {
                 const carMake = typeof c.make === 'object' ? c.make?.name : c.make;
-                return String(carMake || '').toLowerCase() === agency.name.toLowerCase();
+                return String(carMake || '').trim().toLowerCase() === String(agency.name || '').trim().toLowerCase();
             });
             setCars(filtered);
         } catch { } finally {

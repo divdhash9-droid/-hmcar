@@ -46,7 +46,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
   const { isRTL } = useLanguage();
   const { user, isLoggedIn } = useAuth();
   const { socket, isConnected } = useSocket();
-  const { siteInfo, homeContent, formatPrice } = useSettings();
+  const { siteInfo, homeContent, formatPrice, features } = useSettings();
   const containerRef = useRef<HTMLDivElement>(null);
   const liveRef = useRef<HTMLDivElement>(null);
   const [videoHeight, setVideoHeight] = useState<string>("55vh");
@@ -109,13 +109,18 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
     { id: "a3", car: isRTL ? "لكزس ال اكس 600" : "Lexus LX 600", currentBid: 520000, bids: 32, endsIn: "02:15:45", image: "/images/photo_2026-02-07_22-24-44.jpg" }
   ];
 
-  const features = [
-    { icon: Shield, title: isRTL ? "ضمان شامل" : "Full Warranty", desc: isRTL ? "ضمان شامل على جميع السيارات" : "Comprehensive warranty on all cars" },
-    { icon: Truck, title: isRTL ? "شحن عالمي" : "Global Shipping", desc: isRTL ? "توصيل إلى أي مكان في العالم" : "Delivery to anywhere worldwide" },
-    { icon: CreditCard, title: isRTL ? "دفع آمن" : "Secure Payment", desc: isRTL ? "طرق دفع متعددة وآمنة" : "Multiple secure payment methods" },
-    { icon: Award, title: isRTL ? "فحص شامل" : "Full Inspection", desc: isRTL ? "فحص 200 نقطة للسيارات" : "200-point vehicle inspection" },
-    { icon: Zap, title: isRTL ? "مزايدة سريعة" : "Quick Bid", desc: isRTL ? "نظام مزايدة فوري وسريع" : "Instant and fast bidding system" },
-    { icon: Globe, title: isRTL ? "سيارات كورية" : "Korean Cars", desc: isRTL ? "أفضل السيارات الكورية" : "Best Korean vehicles" }
+  // خريطة لتنسيق الأيقونات من مسمياتها في قاعدة البيانات
+  const lucideIcons: Record<string, any> = {
+    Shield, Truck, CreditCard, Award, Zap, Globe, Star, Smartphone, MessageCircle, Heart: Sparkles
+  };
+
+  const currentFeatures = features.length > 0 ? features : [
+    { icon: 'Shield', title: isRTL ? "ضمان شامل" : "Full Warranty", desc: isRTL ? "ضمان شامل على جميع السيارات" : "Comprehensive warranty on all cars" },
+    { icon: 'Truck', title: isRTL ? "شحن عالمي" : "Global Shipping", desc: isRTL ? "توصيل إلى أي مكان في العالم" : "Delivery to anywhere worldwide" },
+    { icon: 'CreditCard', title: isRTL ? "دفع آمن" : "Secure Payment", desc: isRTL ? "طرق دفع متعددة وآمنة" : "Multiple secure payment methods" },
+    { icon: 'Award', title: isRTL ? "فحص شامل" : "Full Inspection", desc: isRTL ? "فحص 200 نقطة للسيارات" : "200-point vehicle inspection" },
+    { icon: 'Zap', title: isRTL ? "مزايدة سريعة" : "Quick Bid", desc: isRTL ? "نظام مزايدة فوري وسريع" : "Instant and fast bidding system" },
+    { icon: 'Globe', title: isRTL ? "سيارات كورية" : "Korean Cars", desc: isRTL ? "أفضل السيارات الكورية" : "Best Korean vehicles" }
   ];
 
   /* Use global formatPrice */
@@ -309,17 +314,13 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
         </div>
       </section>
 
-      {/* Bottom Social Dock */}
+      {/* Bottom Social Dock - Centered Icons */}
       <div className="fixed bottom-0 left-0 right-0 z-40">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-center justify-between gap-4 bg-black/50 border border-white/10 backdrop-blur-xl rounded-t-2xl px-4 py-3">
+          <div className="flex items-center justify-center gap-4 bg-black/50 border border-white/10 backdrop-blur-xl rounded-t-2xl px-4 py-3">
             <div className="flex items-center gap-3">
               <SocialLinks size="sm" showLabels />
             </div>
-            <Link href="/social" className="group flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all">
-              <LinkIcon className="w-4 h-4" />
-              <span className="text-[10px] font-black uppercase tracking-widest">{isRTL ? 'إضافة رابط' : 'Add Link'}</span>
-            </Link>
           </div>
         </div>
       </div>
@@ -429,7 +430,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Features Section - Dynamic from Settings */}
       <section className="relative z-10 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <motion.div className="text-center mb-16" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
@@ -441,20 +442,23 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
           </motion.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature, index) => (
-              <motion.div key={feature.title} className="group relative" initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: index * 0.1 }}>
-                <div className="relative p-8 rounded-2xl border border-white/10 bg-white/[0.02] backdrop-blur-xl overflow-hidden transition-all duration-500 hover:border-[#c9a96e]/30 hover:bg-white/[0.05]">
-                  <div className="absolute -top-20 -right-20 w-40 h-40 bg-[#c9a96e]/20 rounded-full blur-3xl group-hover:bg-[#c9a96e]/30 transition-all" />
-                  <div className="relative z-10">
-                    <motion.div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#c9a96e] to-[#8b7355] flex items-center justify-center mb-6" whileHover={{ rotate: 10, scale: 1.1 }}>
-                      <feature.icon className="w-7 h-7 text-black" />
-                    </motion.div>
-                    <h3 className="text-xl font-bold text-white mb-2">{feature.title}</h3>
-                    <p className="text-white/60">{feature.desc}</p>
+            {currentFeatures.map((feature: any, index: number) => {
+              const Icon = lucideIcons[feature.icon] || Shield;
+              return (
+                <motion.div key={index} className="group relative" initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: index * 0.1 }}>
+                  <div className="relative p-8 rounded-2xl border border-white/10 bg-white/[0.02] backdrop-blur-xl overflow-hidden transition-all duration-500 hover:border-[#c9a96e]/30 hover:bg-white/[0.05]">
+                    <div className="absolute -top-20 -right-20 w-40 h-40 bg-[#c9a96e]/20 rounded-full blur-3xl group-hover:bg-[#c9a96e]/30 transition-all" />
+                    <div className="relative z-10">
+                      <motion.div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#c9a96e] to-[#8b7355] flex items-center justify-center mb-6" whileHover={{ rotate: 10, scale: 1.1 }}>
+                        <Icon className="w-7 h-7 text-black" />
+                      </motion.div>
+                      <h3 className="text-xl font-bold text-white mb-2">{isRTL ? feature.title : (feature.titleEn || feature.title)}</h3>
+                      <p className="text-white/60">{isRTL ? feature.desc : (feature.descEn || feature.desc)}</p>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>

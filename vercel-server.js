@@ -181,7 +181,7 @@ async function seedDefaultSettings() {
         const SiteSettings = require('./models/SiteSettings');
         const existing = await SiteSettings.findOne({ key: 'main' });
 
-        if (!existing || !existing.socialLinks?.whatsapp) {
+        if (!existing || !existing.socialLinks?.whatsapp || !existing.features?.length) {
             await SiteSettings.findOneAndUpdate(
                 { key: 'main' },
                 {
@@ -191,11 +191,21 @@ async function seedDefaultSettings() {
                         'contactInfo.email': 'info@hmcar.com',
                         'siteInfo.siteName': 'HM CAR',
                         'siteInfo.siteDescription': 'منصة مزادات ومبيعات السيارات الفاخرة',
+                        'currencySettings.usdToSar': 3.75,
+                        'currencySettings.usdToKrw': 1350,
+                        'features': [
+                            { icon: 'Shield', title: 'ضمان شامل', titleEn: 'Full Warranty', desc: 'ضمان شامل على جميع السيارات', descEn: 'Comprehensive warranty on all cars' },
+                            { icon: 'Truck', title: 'شحن عالمي', titleEn: 'Global Shipping', desc: 'توصيل إلى أي مكان في العالم', descEn: 'Delivery to anywhere worldwide' },
+                            { icon: 'CreditCard', title: 'دفع آمن', titleEn: 'Secure Payment', desc: 'طرق دفع متعددة وآمنة', descEn: 'Multiple secure payment methods' },
+                            { icon: 'Award', title: 'فحص شامل', titleEn: 'Full Inspection', desc: 'فحص 200 نقطة للسيارات', descEn: '200-point vehicle inspection' },
+                            { icon: 'Zap', title: 'مزايدة سريعة', titleEn: 'Quick Bid', desc: 'نظام مزايدة فوري وسريع', descEn: 'Instant and fast bidding system' },
+                            { icon: 'Globe', title: 'سيارات كورية', titleEn: 'Korean Cars', desc: 'أفضل السيارات الكورية', descEn: 'Best Korean vehicles' }
+                        ]
                     }
                 },
                 { upsert: true, new: true }
             );
-            console.log('✅ Default site settings initialized (WhatsApp: +967781007805)');
+            console.log('✅ Default site settings initialized with KRW and Features');
         }
     } catch (e) {
         console.warn('⚠️ Settings seed warning:', e.message);

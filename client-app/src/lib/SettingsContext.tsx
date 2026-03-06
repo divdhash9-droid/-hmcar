@@ -5,7 +5,17 @@ import { api } from '@/lib/api';
 
 interface CurrencySettings {
     usdToSar: number;
+    usdToKrw: number;
     activeCurrency: string;
+}
+
+interface Feature {
+    _id?: string;
+    icon: string;
+    title: string;
+    titleEn?: string;
+    desc: string;
+    descEn?: string;
 }
 
 interface SiteInfo {
@@ -38,22 +48,24 @@ interface SettingsContextType {
     siteInfo: SiteInfo;
     socialLinks: SocialLinks;
     homeContent: HomeContent;
+    features: Feature[];
     loading: boolean;
     refreshSettings: () => Promise<void>;
-    displayCurrency: 'SAR' | 'USD';
-    setDisplayCurrency: (c: 'SAR' | 'USD') => void;
-    formatPrice: (price: number, forcedCurrency?: 'SAR' | 'USD') => string;
+    displayCurrency: 'SAR' | 'USD' | 'KRW';
+    setDisplayCurrency: (c: 'SAR' | 'USD' | 'KRW') => void;
+    formatPrice: (priceInSar: number, forcedCurrency?: 'SAR' | 'USD' | 'KRW') => string;
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
 
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
-    const [currency, setCurrency] = useState<CurrencySettings>({ usdToSar: 3.75, activeCurrency: 'SAR' });
+    const [currency, setCurrency] = useState<CurrencySettings>({ usdToSar: 3.75, usdToKrw: 1350, activeCurrency: 'SAR' });
     const [siteInfo, setSiteInfo] = useState<SiteInfo>({ siteName: 'HM CAR', siteDescription: '', logoUrl: '', faviconUrl: '' });
     const [socialLinks, setSocialLinks] = useState<SocialLinks>({});
     const [homeContent, setHomeContent] = useState<HomeContent>({});
+    const [features, setFeatures] = useState<Feature[]>([]);
     const [loading, setLoading] = useState(true);
-    const [displayCurrency, setDisplayCurrency] = useState<'SAR' | 'USD'>('SAR');
+    const [displayCurrency, setDisplayCurrency] = useState<'SAR' | 'USD' | 'KRW'>('SAR');
 
     const refreshSettings = useCallback(async () => {
         try {
@@ -63,13 +75,14 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
                 if (res.data.siteInfo) setSiteInfo(res.data.siteInfo);
                 if (res.data.socialLinks) setSocialLinks(res.data.socialLinks);
                 if (res.data.homeContent) setHomeContent(res.data.homeContent);
+                if (res.data.features) setFeatures(res.data.features);
 
                 // Set initial display currency from settings if not manually changed
                 const stored = localStorage.getItem('displayCurrency');
-                if (stored === 'USD' || stored === 'SAR') {
-                    setDisplayCurrency(stored as 'SAR' | 'USD');
+                if (stored === 'USD' || stored === 'SAR' || stored === 'KRW') {
+                    setDisplayCurrency(stored as 'SAR' | 'USD' | 'KRW');
                 } else {
-                    setDisplayCurrency(res.data.currencySettings?.activeCurrency === 'USD' ? 'USD' : 'SAR');
+                    setDisplayCurrency(res.data.currencySettings?.activeCurrency === 'USD' ? 'USD' : (res.data.currencySettings?.activeCurrency === 'KRW' ? 'KRW' : 'SAR'));
                 }
             }
         } catch (err) {
@@ -83,27 +96,48 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
         refreshSettings();
     }, [refreshSettings]);
 
-    const handleSetDisplayCurrency = (c: 'SAR' | 'USD') => {
+    const handleSetDisplayCurrency = (c: 'SAR' | 'USD' | 'KRW') => {
         setDisplayCurrency(c);
         localStorage.setItem('displayCurrency', c);
     };
 
-    const formatPrice = (priceInSar: number, forcedCurrency?: 'SAR' | 'USD') => {
+    /**
+     * تنسيق السعر بناءً على العملة المختارة
+     * السعر الأساسي في المتغير هو "ريال سعودي"
+     */
+    const formatPrice = (priceInSar: number, forcedCurrency?: 'SAR' | 'USD' | 'KRW') => {
         const activeCurr = forcedCurrency || displayCurrency;
         let finalPrice = priceInSar;
 
+        // التحويل من الريال إلى الدولار أولاً ثم العملة المطلوبة إذا لزم الأمر
+        const priceInUsd = priceInSar / currency.usdToSar;
+
         if (activeCurr === 'USD') {
-            finalPrice = priceInSar / currency.usdToSar;
+            finalPrice = priceInUsd;
+        } else if (activeCurr === 'KRW') {
+            finalPrice = priceInUsd * currency.usdToKrw;
         }
 
-        // Use custom formatting to match design (e.g. "SAR 100,000")
-        const formatter = new Intl.NumberFormat(activeCurr === 'SAR' ? 'ar-SA' : 'en-US', {
+        // استخدام التنسيق المناسب حسب العملة
+        let locale = 'ar-SA';
+        if (activeCurr === 'USD') locale = 'en-US';
+        if (activeCurr === 'KRW') locale = 'ko-KR';
+
+        const formatter = new Intl.NumberFormat(locale, {
             minimumFractionDigits: 0,
             maximumFractionDigits: activeCurr === 'USD' ? 2 : 0,
         });
 
         const formattedNumber = formatter.format(finalPrice);
-        return `${formattedNumber} ${activeCurr}`;
+
+        // رموز العملات
+        const symbols: Record<string, string> = {
+            'SAR': 'ر.س',
+            'USD': '$',
+            'KRW': '₩'
+        };
+
+        return `${symbols[activeCurr]} ${formattedNumber}`;
     };
 
     return (
@@ -112,6 +146,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
             siteInfo,
             socialLinks,
             homeContent,
+            features,
             loading,
             refreshSettings,
             displayCurrency,

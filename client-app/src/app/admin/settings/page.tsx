@@ -32,7 +32,7 @@ import { useLanguage } from "@/lib/LanguageContext";
 import { useAuth } from "@/lib/AuthContext";
 import { api } from "@/lib/api";
 
-type TabID = 'profile' | 'security' | 'social' | 'contact' | 'currency' | 'site' | 'home';
+type TabID = 'profile' | 'security' | 'social' | 'contact' | 'currency' | 'site' | 'home' | 'features';
 
 export default function AdminSettings() {
     const { isRTL } = useLanguage();
@@ -77,6 +77,7 @@ export default function AdminSettings() {
     // Currency settings
     const [currencySettings, setCurrencySettings] = useState({
         usdToSar: 3.75,
+        usdToKrw: 1300,
         activeCurrency: 'SAR'
     });
 
@@ -94,6 +95,9 @@ export default function AdminSettings() {
         heroVideoUrl: '',
     });
 
+    interface Feature { icon: string; title: string; description: string; }
+    const [features, setFeatures] = useState<Feature[]>([]);
+
     useEffect(() => {
         loadSettings();
         if (user) {
@@ -109,7 +113,7 @@ export default function AdminSettings() {
 
     const loadSettings = async () => {
         try {
-            const response = await api.settings.get();
+            const response = await api.settings.getAll();
             if (response.success) {
                 setSocialLinks(response.data.socialLinks || {});
                 setContactInfo(response.data.contactInfo || {});
@@ -118,6 +122,9 @@ export default function AdminSettings() {
                 }
                 if (response.data.siteInfo) {
                     setSiteInfo(response.data.siteInfo);
+                }
+                if (response.data.features) {
+                    setFeatures(response.data.features);
                 }
             }
         } catch (error) {
@@ -275,8 +282,26 @@ export default function AdminSettings() {
             setMessage({ type: '', text: '' });
         }
         try {
-            await api.settings.updateSiteInfo({ siteInfo, homeContent });
+            await api.settings.updateHomeContent({ homeContent });
             if (!silent) setMessage({ type: 'success', text: isRTL ? 'تم حفظ محتوى الصفحة الرئيسية' : 'Home content saved' });
+        } catch (error) {
+            if (!silent) {
+                const err = error as Error;
+                setMessage({ type: 'error', text: err.message || 'Error saving' });
+            }
+        } finally {
+            if (!silent) setLoading(false);
+        }
+    };
+
+    const handleSaveFeatures = async (silent = false) => {
+        if (!silent) {
+            setLoading(true);
+            setMessage({ type: '', text: '' });
+        }
+        try {
+            await api.settings.updateFeatures({ features });
+            if (!silent) setMessage({ type: 'success', text: isRTL ? 'تم حفظ مميزات الموقع' : 'Features saved' });
         } catch (error) {
             if (!silent) {
                 const err = error as Error;
@@ -314,7 +339,8 @@ export default function AdminSettings() {
         { id: 'home', label: isRTL ? 'محتوى الصفحة الرئيسية' : 'Home Content', icon: LayoutDashboard },
         { id: 'social', label: isRTL ? 'التواصل الاجتماعي' : 'Social Links', icon: Globe },
         { id: 'contact', label: isRTL ? 'معلومات الاتصال' : 'Contact Info', icon: Phone },
-        { id: 'currency', label: isRTL ? 'إعدادات العملة' : 'Currency', icon: DollarSign }
+        { id: 'currency', label: isRTL ? 'إعدادات العملة' : 'Currency', icon: DollarSign },
+        { id: 'features', label: isRTL ? 'لماذا تختارنا' : 'Features', icon: Shield }
     ];
 
     const socialFields = [
@@ -781,7 +807,23 @@ export default function AdminSettings() {
                                         >
                                             <option value="SAR" className="bg-black">SAR (ريال سعودي)</option>
                                             <option value="USD" className="bg-black">USD (دولار أمريكي)</option>
+                                            <option value="KRW" className="bg-black">KRW (وون كوري)</option>
                                         </select>
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">
+                                            {isRTL ? 'سعر صرف الدولار مقابل الون الكوري (1 USD = ? KRW)' : 'USD to KRW Exchange Rate (1 USD = ? KRW)'}
+                                        </label>
+                                        <div className="relative">
+                                            <input
+                                                type="number"
+                                                step="1"
+                                                value={currencySettings.usdToKrw}
+                                                onChange={(e) => setCurrencySettings({ ...currencySettings, usdToKrw: parseFloat(e.target.value) || 0 })}
+                                                onBlur={() => handleSaveCurrencySettings(true)}
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -951,6 +993,97 @@ export default function AdminSettings() {
                                 className="w-full bg-cinematic-neon-red text-white py-4 rounded-2xl font-black uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(255,10,60,0.2)] hover:shadow-[0_0_40px_rgba(255,10,60,0.4)] transition-all disabled:opacity-50"
                             >
                                 {loading ? (isRTL ? 'جاري الحفظ...' : 'SAVING...') : (isRTL ? 'حفظ محتوى الصفحة' : 'SAVE HOME CONTENT')}
+                            </motion.button>
+                        </motion.div>
+                    )}
+
+                    {/* Features Tab */}
+                    {activeTab === 'features' && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="space-y-6"
+                        >
+                            <div className="p-8 bg-white/[0.02] border border-white/5 rounded-3xl">
+                                <div className="flex justify-between items-center mb-6">
+                                    <h2 className="text-lg font-black uppercase tracking-wider flex items-center gap-3">
+                                        <Shield className="w-5 h-5 text-cinematic-neon-red" />
+                                        {isRTL ? 'لماذا تختارنا' : 'Why Choose Us'}
+                                    </h2>
+                                    <button
+                                        onClick={() => setFeatures([...features, { icon: 'Star', title: '', description: '' }])}
+                                        className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
+                                    >
+                                        {isRTL ? '+ إضافة ميزة' : '+ ADD FEATURE'}
+                                    </button>
+                                </div>
+
+                                <div className="grid grid-cols-1 gap-6">
+                                    {features.map((feature, idx) => (
+                                        <div key={idx} className="p-6 bg-white/5 border border-white/10 rounded-2xl relative group">
+                                            <button
+                                                onClick={() => setFeatures(features.filter((_, i) => i !== idx))}
+                                                className="absolute top-4 right-4 text-white/20 hover:text-cinematic-neon-red transition-colors"
+                                            >
+                                                ✕
+                                            </button>
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                <div>
+                                                    <label className="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-1 block">Icon Name (Lucide)</label>
+                                                    <input
+                                                        type="text"
+                                                        value={feature.icon}
+                                                        onChange={(e) => {
+                                                            const newFeatures = [...features];
+                                                            newFeatures[idx].icon = e.target.value;
+                                                            setFeatures(newFeatures);
+                                                        }}
+                                                        className="w-full bg-black/40 border border-white/10 rounded-lg py-3 px-4 text-xs text-white"
+                                                        placeholder="e.g. Shield, Star, Zap"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-1 block">Title</label>
+                                                    <input
+                                                        type="text"
+                                                        value={feature.title}
+                                                        onChange={(e) => {
+                                                            const newFeatures = [...features];
+                                                            newFeatures[idx].title = e.target.value;
+                                                            setFeatures(newFeatures);
+                                                        }}
+                                                        className="w-full bg-black/40 border border-white/10 rounded-lg py-3 px-4 text-xs text-white"
+                                                        placeholder="Feature Title"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-1 block">Description</label>
+                                                    <input
+                                                        type="text"
+                                                        value={feature.description}
+                                                        onChange={(e) => {
+                                                            const newFeatures = [...features];
+                                                            newFeatures[idx].description = e.target.value;
+                                                            setFeatures(newFeatures);
+                                                        }}
+                                                        className="w-full bg-black/40 border border-white/10 rounded-lg py-3 px-4 text-xs text-white font-arabic"
+                                                        placeholder="Feature Description"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <motion.button
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={() => handleSaveFeatures()}
+                                disabled={loading}
+                                className="w-full bg-cinematic-neon-red text-white py-4 rounded-2xl font-black uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(255,10,60,0.2)] hover:shadow-[0_0_40px_rgba(255,10,60,0.4)] transition-all disabled:opacity-50"
+                            >
+                                {loading ? (isRTL ? 'جاري الحفظ...' : 'SAVING...') : (isRTL ? 'حفظ المميزات' : 'SAVE FEATURES')}
                             </motion.button>
                         </motion.div>
                     )}

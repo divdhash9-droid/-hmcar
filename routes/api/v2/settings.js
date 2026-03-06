@@ -16,7 +16,9 @@ router.get('/public', async (req, res) => {
                 socialLinks: settings.socialLinks,
                 contactInfo: settings.contactInfo,
                 siteInfo: settings.siteInfo,
-                currencySettings: settings.currencySettings
+                currencySettings: settings.currencySettings,
+                features: settings.features,
+                homeContent: settings.homeContent
             }
         });
     } catch (error) {
@@ -138,6 +140,54 @@ router.put('/currency-settings', requireAuthAPI, requireAdmin, async (req, res) 
         res.status(500).json({
             error: 'Internal Server Error',
             message: 'فشل في تحديث إعدادات العملة'
+        });
+    }
+});
+
+// تحديث ميزات "لماذا تختارنا"
+router.put('/features', requireAuthAPI, requireAdmin, async (req, res) => {
+    try {
+        const { features } = req.body;
+
+        const settings = await SiteSettings.updateSettings(
+            { features },
+            req.user._id
+        );
+
+        res.json({
+            success: true,
+            message: 'تم تحديث ميزات لماذا تختارنا بنجاح',
+            data: settings.features
+        });
+    } catch (error) {
+        console.error('Error updating features:', error);
+        res.status(500).json({
+            error: 'Internal Server Error',
+            message: 'فشل في تحديث الميزات'
+        });
+    }
+});
+
+// تحديث محتوى الصفحة الرئيسية
+router.put('/home-content', requireAuthAPI, requireAdmin, async (req, res) => {
+    try {
+        const { homeContent } = req.body;
+
+        const settings = await SiteSettings.updateSettings(
+            { homeContent },
+            req.user._id
+        );
+
+        res.json({
+            success: true,
+            message: 'تم تحديث محتوى الصفحة الرئيسية بنجاح',
+            data: settings.homeContent
+        });
+    } catch (error) {
+        console.error('Error updating home content:', error);
+        res.status(500).json({
+            error: 'Internal Server Error',
+            message: 'فشل في تحديث المحتوى'
         });
     }
 });

@@ -38,7 +38,24 @@ const siteSettingsSchema = new mongoose.Schema({
     // إعدادات العملة والصرف
     currencySettings: {
         usdToSar: { type: Number, default: 3.75 },       // سعر صرف الدولار مقابل الريال السعودي
-        activeCurrency: { type: String, default: 'SAR' }, // العملة النشطة للعرض
+        usdToKrw: { type: Number, default: 1350 },       // سعر صرف الدولار مقابل الوون الكوري
+        activeCurrency: { type: String, default: 'SAR' }, // العملة الافتراضية للعرض
+    },
+
+    // محتوى الصفحة الرئيسية الديناميكي (لماذا تختارنا)
+    features: [{
+        icon: { type: String, default: 'Shield' },      // اسم الأيقونة من Lucide
+        title: { type: String, required: true },        // العنوان (عربي)
+        titleEn: { type: String, default: '' },         // العنوان (إنجليزي)
+        desc: { type: String, required: true },         // الوصف (عربي)
+        descEn: { type: String, default: '' },          // الوصف (إنجليزي)
+    }],
+
+    // محتوى إضافي
+    homeContent: {
+        heroTitle: String,
+        heroSubtitle: String,
+        heroVideoUrl: String,
     },
 
     // آخر تحديث

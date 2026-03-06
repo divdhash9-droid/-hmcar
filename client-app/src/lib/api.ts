@@ -224,6 +224,14 @@ export const api = {
             method: 'PUT',
             body: JSON.stringify(data),
         }),
+        updateFeatures: (data: any) => fetchAPI('/api/v2/settings/features', {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        }),
+        updateHomeContent: (data: any) => fetchAPI('/api/v2/settings/home-content', {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        }),
     },
     brands: {
         list: (category?: 'cars' | 'parts') => {
@@ -379,5 +387,47 @@ export const api = {
         delete: (id: string) => fetchAPI(`/api/v2/smart-alerts/${id}`, {
             method: 'DELETE',
         }),
+    },
+    settings: {
+        // جلب الإعدادات العامة (بدون توثيق)
+        getPublic: () => fetchAPI('/api/v2/settings/public'),
+        // جلب كل الإعدادات (للأدمن)
+        getAll: () => fetchAPI('/api/v2/settings'),
+        // تحديث روابط التواصل الاجتماعي
+        updateSocialLinks: (data: { socialLinks: Record<string, string> }) =>
+            fetchAPI('/api/v2/settings/social-links', {
+                method: 'PUT',
+                body: JSON.stringify(data),
+            }),
+        // تحديث معلومات الاتصال
+        updateContactInfo: (data: { contactInfo: Record<string, string> }) =>
+            fetchAPI('/api/v2/settings/contact-info', {
+                method: 'PUT',
+                body: JSON.stringify(data),
+            }),
+        // تحديث معلومات الموقع
+        updateSiteInfo: (data: { siteInfo: Record<string, string> }) =>
+            fetchAPI('/api/v2/settings/site-info', {
+                method: 'PUT',
+                body: JSON.stringify(data),
+            }),
+        // تحديث إعدادات العملة
+        updateCurrencySettings: (data: { currencySettings: Record<string, unknown> }) =>
+            fetchAPI('/api/v2/settings/currency-settings', {
+                method: 'PUT',
+                body: JSON.stringify(data),
+            }),
+        // تحديث ميزات "لماذا تختارنا"
+        updateFeatures: (data: { features: Array<Record<string, string>> }) =>
+            fetchAPI('/api/v2/settings/features', {
+                method: 'PUT',
+                body: JSON.stringify(data),
+            }),
+        // تحديث محتوى الصفحة الرئيسية
+        updateHomeContent: (data: { homeContent: Record<string, string> }) =>
+            fetchAPI('/api/v2/settings/home-content', {
+                method: 'PUT',
+                body: JSON.stringify(data),
+            }),
     },
 };

@@ -28,10 +28,12 @@ import { useLanguage } from "@/lib/LanguageContext";
 import { useAuth } from "@/lib/AuthContext";
 import { api } from "@/lib/api";
 
+type TabID = 'profile' | 'social' | 'contact' | 'currency' | 'site';
+
 export default function AdminSettings() {
     const { isRTL } = useLanguage();
     const { user, refreshUser } = useAuth();
-    const [activeTab, setActiveTab] = useState<'profile' | 'social' | 'contact' | 'currency' | 'site'>('profile');
+    const [activeTab, setActiveTab] = useState<TabID>('profile');
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
 
@@ -112,9 +114,11 @@ export default function AdminSettings() {
         }
     };
 
-    const handleSaveProfile = async () => {
-        setLoading(true);
-        setMessage({ type: '', text: '' });
+    const handleSaveProfile = async (silent = false) => {
+        if (!silent) {
+            setLoading(true);
+            setMessage({ type: '', text: '' });
+        }
 
         try {
             // 1. Update Profile (Name, Email, Phone, Username)
@@ -146,8 +150,10 @@ export default function AdminSettings() {
                     return;
                 }
                 if (!profileData.currentPassword) {
-                    setMessage({ type: 'error', text: isRTL ? 'يجب إدخال كلمة المرور الحالية' : 'Current password required' });
-                    setLoading(false);
+                    if (!silent) {
+                        setMessage({ type: 'error', text: isRTL ? 'يجب إدخال كلمة المرور الحالية' : 'Current password required' });
+                        setLoading(false);
+                    }
                     return;
                 }
 
@@ -165,12 +171,18 @@ export default function AdminSettings() {
                 }));
             }
 
-            setMessage({ type: 'success', text: isRTL ? 'تم حفظ البيانات بنجاح' : 'Profile saved successfully' });
+            if (!silent) {
+                setMessage({ type: 'success', text: isRTL ? 'تم حفظ البيانات بنجاح' : 'Profile saved successfully' });
+            }
         } catch (error) {
-            const err = error as Error;
-            setMessage({ type: 'error', text: err.message || 'Error saving profile' });
+            if (!silent) {
+                const err = error as Error;
+                setMessage({ type: 'error', text: err.message || 'Error saving profile' });
+            }
         } finally {
-            setLoading(false);
+            if (!silent) {
+                setLoading(false);
+            }
         }
     };
 
@@ -346,155 +358,175 @@ export default function AdminSettings() {
                             animate={{ opacity: 1, y: 0 }}
                             className="space-y-8"
                         >
-                            {/* Profile Card */}
-                            <div className="p-8 bg-white/[0.02] border border-white/5 rounded-3xl">
-                                <h2 className="text-lg font-black uppercase tracking-wider mb-6 flex items-center gap-3">
-                                    <User className="w-5 h-5 text-cinematic-neon-red" />
-                                    {isRTL ? 'البيانات الشخصية' : 'Personal Information'}
-                                </h2>
+                            <form onSubmit={(e) => { e.preventDefault(); handleSaveProfile(); }} className="space-y-8">
+                                {/* Profile Card */}
+                                <div className="p-8 bg-white/[0.02] border border-white/5 rounded-3xl">
+                                    <h2 className="text-lg font-black uppercase tracking-wider mb-6 flex items-center gap-3">
+                                        <User className="w-5 h-5 text-cinematic-neon-red" />
+                                        {isRTL ? 'البيانات الشخصية' : 'Personal Information'}
+                                    </h2>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">
-                                            {isRTL ? 'الاسم' : 'Name'}
-                                        </label>
-                                        <div className="relative">
-                                            <User className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-4" : "left-4")} />
-                                            <input
-                                                title={isRTL ? 'الاسم' : 'Name'}
-                                                type="text"
-                                                placeholder={isRTL ? 'الاسم' : 'Name'}
-                                                value={profileData.name}
-                                                onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
-                                                className={cn("w-full bg-white/5 border border-white/10 rounded-xl py-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
-                                            />
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">
+                                                {isRTL ? 'الاسم' : 'Name'}
+                                            </label>
+                                            <div className="relative">
+                                                <User className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-4" : "left-4")} />
+                                                <input
+                                                    name="full-name"
+                                                    autoComplete="name"
+                                                    title={isRTL ? 'الاسم' : 'Name'}
+                                                    type="text"
+                                                    placeholder={isRTL ? 'الاسم' : 'Name'}
+                                                    value={profileData.name}
+                                                    onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
+                                                    onBlur={() => handleSaveProfile(true)}
+                                                    className={cn("w-full bg-white/5 border border-white/10 rounded-xl py-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
+                                                />
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div>
-                                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">
-                                            {isRTL ? 'البريد الإلكتروني' : 'Email'}
-                                        </label>
-                                        <div className="relative">
-                                            <Mail className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-4" : "left-4")} />
-                                            <input
-                                                title={isRTL ? 'البريد الإلكتروني' : 'Email'}
-                                                type="email"
-                                                placeholder={isRTL ? 'البريد الإلكتروني' : 'Email'}
-                                                value={profileData.email}
-                                                onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
-                                                className={cn("w-full bg-white/5 border border-white/10 rounded-xl py-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
-                                            />
+                                        <div>
+                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">
+                                                {isRTL ? 'البريد الإلكتروني' : 'Email'}
+                                            </label>
+                                            <div className="relative">
+                                                <Mail className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-4" : "left-4")} />
+                                                <input
+                                                    name="email"
+                                                    autoComplete="email"
+                                                    title={isRTL ? 'البريد الإلكتروني' : 'Email'}
+                                                    type="email"
+                                                    placeholder={isRTL ? 'البريد الإلكتروني' : 'Email'}
+                                                    value={profileData.email}
+                                                    onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
+                                                    onBlur={() => handleSaveProfile(true)}
+                                                    className={cn("w-full bg-white/5 border border-white/10 rounded-xl py-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
+                                                />
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div>
-                                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">
-                                            {isRTL ? 'اسم المستخدم' : 'Username'}
-                                        </label>
-                                        <div className="relative">
-                                            <User className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-4" : "left-4")} />
-                                            <input
-                                                title={isRTL ? 'اسم المستخدم' : 'Username'}
-                                                type="text"
-                                                placeholder={isRTL ? 'اسم المستخدم' : 'Username'}
-                                                value={profileData.username}
-                                                onChange={(e) => setProfileData({ ...profileData, username: e.target.value })}
-                                                className={cn("w-full bg-white/5 border border-white/10 rounded-xl py-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
-                                            />
+                                        <div>
+                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">
+                                                {isRTL ? 'اسم المستخدم' : 'Username'}
+                                            </label>
+                                            <div className="relative">
+                                                <User className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-4" : "left-4")} />
+                                                <input
+                                                    name="username"
+                                                    autoComplete="username"
+                                                    title={isRTL ? 'اسم المستخدم' : 'Username'}
+                                                    type="text"
+                                                    placeholder={isRTL ? 'اسم المستخدم' : 'Username'}
+                                                    value={profileData.username}
+                                                    onChange={(e) => setProfileData({ ...profileData, username: e.target.value })}
+                                                    onBlur={() => handleSaveProfile(true)}
+                                                    className={cn("w-full bg-white/5 border border-white/10 rounded-xl py-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
+                                                />
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div>
-                                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">
-                                            {isRTL ? 'الهاتف' : 'Phone'}
-                                        </label>
-                                        <div className="relative">
-                                            <Phone className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-4" : "left-4")} />
-                                            <input
-                                                title={isRTL ? 'الهاتف' : 'Phone'}
-                                                type="tel"
-                                                placeholder={isRTL ? 'الهاتف' : 'Phone'}
-                                                value={profileData.phone}
-                                                onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
-                                                className={cn("w-full bg-white/5 border border-white/10 rounded-xl py-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Password Card */}
-                            <div className="p-8 bg-white/[0.02] border border-white/5 rounded-3xl">
-                                <h2 className="text-lg font-black uppercase tracking-wider mb-6 flex items-center gap-3">
-                                    <Shield className="w-5 h-5 text-cinematic-neon-red" />
-                                    {isRTL ? 'تغيير كلمة المرور' : 'Change Password'}
-                                </h2>
-
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                    <div>
-                                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">
-                                            {isRTL ? 'كلمة المرور الحالية' : 'Current Password'}
-                                        </label>
-                                        <div className="relative">
-                                            <Lock className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-4" : "left-4")} />
-                                            <input
-                                                title={isRTL ? 'كلمة المرور الحالية' : 'Current Password'}
-                                                type="password"
-                                                placeholder={isRTL ? 'كلمة المرور الحالية' : 'Current Password'}
-                                                value={profileData.currentPassword}
-                                                onChange={(e) => setProfileData({ ...profileData, currentPassword: e.target.value })}
-                                                className={cn("w-full bg-white/5 border border-white/10 rounded-xl py-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">
-                                            {isRTL ? 'كلمة المرور الجديدة' : 'New Password'}
-                                        </label>
-                                        <div className="relative">
-                                            <Lock className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-4" : "left-4")} />
-                                            <input
-                                                title={isRTL ? 'كلمة المرور الجديدة' : 'New Password'}
-                                                type="password"
-                                                placeholder={isRTL ? 'كلمة المرور الجديدة' : 'New Password'}
-                                                value={profileData.newPassword}
-                                                onChange={(e) => setProfileData({ ...profileData, newPassword: e.target.value })}
-                                                className={cn("w-full bg-white/5 border border-white/10 rounded-xl py-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">
-                                            {isRTL ? 'تأكيد كلمة المرور' : 'Confirm Password'}
-                                        </label>
-                                        <div className="relative">
-                                            <Lock className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-4" : "left-4")} />
-                                            <input
-                                                title={isRTL ? 'تأكيد كلمة المرور' : 'Confirm Password'}
-                                                type="password"
-                                                placeholder={isRTL ? 'تأكيد كلمة المرور' : 'Confirm Password'}
-                                                value={profileData.confirmPassword}
-                                                onChange={(e) => setProfileData({ ...profileData, confirmPassword: e.target.value })}
-                                                className={cn("w-full bg-white/5 border border-white/10 rounded-xl py-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
-                                            />
+                                        <div>
+                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">
+                                                {isRTL ? 'الهاتف' : 'Phone'}
+                                            </label>
+                                            <div className="relative">
+                                                <Phone className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-4" : "left-4")} />
+                                                <input
+                                                    name="phone"
+                                                    autoComplete="tel"
+                                                    title={isRTL ? 'الهاتف' : 'Phone'}
+                                                    type="tel"
+                                                    placeholder={isRTL ? 'الهاتف' : 'Phone'}
+                                                    value={profileData.phone}
+                                                    onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
+                                                    onBlur={() => handleSaveProfile(true)}
+                                                    className={cn("w-full bg-white/5 border border-white/10 rounded-xl py-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <motion.button
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                                onClick={handleSaveProfile}
-                                disabled={loading}
-                                className="w-full py-5 bg-cinematic-neon-red text-white font-black uppercase tracking-wider rounded-xl shadow-[0_0_30px_rgba(255,0,60,0.3)] hover:shadow-[0_0_50px_rgba(255,0,60,0.5)] transition-all flex items-center justify-center gap-3"
-                            >
-                                <Save className="w-5 h-5" />
-                                {loading ? (isRTL ? 'جاري الحفظ...' : 'Saving...') : (isRTL ? 'حفظ البيانات' : 'Save Profile')}
-                            </motion.button>
+                                {/* Password Card */}
+                                <div className="p-8 bg-white/[0.02] border border-white/5 rounded-3xl">
+                                    <h2 className="text-lg font-black uppercase tracking-wider mb-6 flex items-center gap-3">
+                                        <Shield className="w-5 h-5 text-cinematic-neon-red" />
+                                        {isRTL ? 'تغيير كلمة المرور' : 'Change Password'}
+                                    </h2>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        <div>
+                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">
+                                                {isRTL ? 'كلمة المرور الحالية' : 'Current Password'}
+                                            </label>
+                                            <div className="relative">
+                                                <Lock className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-4" : "left-4")} />
+                                                <input
+                                                    name="current-password"
+                                                    autoComplete="current-password"
+                                                    title={isRTL ? 'كلمة المرور الحالية' : 'Current Password'}
+                                                    type="password"
+                                                    placeholder={isRTL ? 'كلمة المرور الحالية' : 'Current Password'}
+                                                    value={profileData.currentPassword}
+                                                    onChange={(e) => setProfileData({ ...profileData, currentPassword: e.target.value })}
+                                                    className={cn("w-full bg-white/5 border border-white/10 rounded-xl py-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">
+                                                {isRTL ? 'كلمة المرور الجديدة' : 'New Password'}
+                                            </label>
+                                            <div className="relative">
+                                                <Lock className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-4" : "left-4")} />
+                                                <input
+                                                    name="new-password"
+                                                    autoComplete="new-password"
+                                                    title={isRTL ? 'كلمة المرور الجديدة' : 'New Password'}
+                                                    type="password"
+                                                    placeholder={isRTL ? 'كلمة المرور الجديدة' : 'New Password'}
+                                                    value={profileData.newPassword}
+                                                    onChange={(e) => setProfileData({ ...profileData, newPassword: e.target.value })}
+                                                    className={cn("w-full bg-white/5 border border-white/10 rounded-xl py-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">
+                                                {isRTL ? 'تأكيد كلمة المرور' : 'Confirm Password'}
+                                            </label>
+                                            <div className="relative">
+                                                <Lock className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-4" : "left-4")} />
+                                                <input
+                                                    name="confirm-password"
+                                                    autoComplete="new-password"
+                                                    title={isRTL ? 'تأكيد كلمة المرور' : 'Confirm Password'}
+                                                    type="password"
+                                                    placeholder={isRTL ? 'تأكيد كلمة المرور' : 'Confirm Password'}
+                                                    value={profileData.confirmPassword}
+                                                    onChange={(e) => setProfileData({ ...profileData, confirmPassword: e.target.value })}
+                                                    className={cn("w-full bg-white/5 border border-white/10 rounded-xl py-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <motion.button
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    type="submit"
+                                    disabled={loading}
+                                    className="w-full py-5 bg-cinematic-neon-red text-white font-black uppercase tracking-wider rounded-xl shadow-[0_0_30px_rgba(255,0,60,0.3)] hover:shadow-[0_0_50px_rgba(255,0,60,0.5)] transition-all flex items-center justify-center gap-3"
+                                >
+                                    <Save className="w-5 h-5" />
+                                    {loading ? (isRTL ? 'جاري الحفظ...' : 'Saving...') : (isRTL ? 'حفظ البيانات' : 'Save Profile')}
+                                </motion.button>
+                            </form>
                         </motion.div>
                     )}
 
@@ -525,7 +557,7 @@ export default function AdminSettings() {
                                             </label>
                                             <input
                                                 type="text"
-                                                value={(socialLinks as any)[field.key]}
+                                                value={(socialLinks as Record<string, string>)[field.key]}
                                                 onChange={(e) => setSocialLinks({ ...socialLinks, [field.key]: e.target.value })}
                                                 placeholder={field.placeholder}
                                                 className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40 placeholder:text-white/20"

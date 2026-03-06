@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import {
   Sparkles, Shield,
   Truck, CreditCard, Award, Star, Zap, Globe,
-  MessageCircle, Smartphone, Download, Link as LinkIcon
+  MessageCircle, Smartphone, Download, Link as LinkIcon, ArrowUpRight
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -101,12 +101,6 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
   };
 
 
-
-  const liveAuctions = [
-    { id: "a1", car: isRTL ? "مرسيدس اس كلاس 2024" : "Mercedes S-Class 2024", currentBid: 450000, bids: 24, endsIn: "00:45:12", image: "/images/photo_2026-02-07_22-24-18.jpg" },
-    { id: "a2", car: isRTL ? "بي ام دبليو اكس 7 2024" : "BMW X7 2024", currentBid: 380000, bids: 18, endsIn: "01:20:30", image: "/images/photo_2026-02-07_22-24-39.jpg" },
-    { id: "a3", car: isRTL ? "لكزس ال اكس 600" : "Lexus LX 600", currentBid: 520000, bids: 32, endsIn: "02:15:45", image: "/images/photo_2026-02-07_22-24-44.jpg" }
-  ];
 
   // خريطة لتنسيق الأيقونات من مسمياتها في قاعدة البيانات
   const lucideIcons: Record<string, any> = {
@@ -385,56 +379,99 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
         </section>
       )}
 
-      {/* Live Auctions Section */}
-      <section ref={liveRef} className="relative z-10 py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent via-[#c9a96e]/5 to-transparent">
-        <div className="max-w-7xl mx-auto">
+      {/* ── AVAILABLE CARS CREATIVE TICKER ── */}
+      <section ref={liveRef} className="relative z-10 py-16 bg-gradient-to-b from-transparent via-[#c9a96e]/5 to-transparent overflow-hidden">
+        <div className="max-w-[100vw] mx-auto">
           <motion.div className="text-center mb-16" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
-            <motion.div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-red-500/30 bg-red-500/10 backdrop-blur-md mb-4" whileHover={{ scale: 1.05 }}>
-              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-              <span className="text-sm text-red-400 tracking-wider">{isRTL ? "مباشر الآن" : "Live Now"}</span>
+            <motion.div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full border border-[#c9a96e]/30 bg-[#c9a96e]/10 backdrop-blur-md mb-6 shadow-[0_0_20px_rgba(201,169,110,0.15)]" whileHover={{ scale: 1.05 }}>
+              <Sparkles className="w-5 h-5 text-[#c9a96e] animate-pulse" />
+              <span className="text-sm font-black text-[#c9a96e] tracking-[0.2em] uppercase">{isRTL ? "تشكيلة المعرض" : "SHOWROOM COLLECTION"}</span>
             </motion.div>
-            <h2 className="text-4xl md:text-5xl font-bold text-white font-display mb-4" style={{ textShadow: "0 0 40px rgba(201,169,110,0.3)" }}>{txt.liveAuctions}</h2>
-            <p className="text-white/60">{txt.liveSubtitle}</p>
+            <h2 className="text-5xl md:text-6xl font-black text-white italic uppercase tracking-tighter mb-4" style={{ textShadow: "0 0 40px rgba(201,169,110,0.4)" }}>
+              {isRTL ? "سيارات متوفرة الآن" : "AVAILABLE CARS"}
+            </h2>
+            <p className="text-white/50 text-sm font-medium uppercase tracking-[0.1em]">{isRTL ? "اكتشف أحدث الموديلات المضافة إلى مستودعاتنا" : "DISCOVER THE LATEST MODELS ADDED TO OUR INVENTORY"}</p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {liveAuctions.map((auction, index) => (
-              <motion.div key={auction.id} className="group relative cursor-pointer" initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: index * 0.15 }} onClick={() => router.push(isLoggedIn ? '/auctions' : '/login')}>
-                <div className="relative bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden transition-all duration-500 hover:border-red-500/30 hover:shadow-2xl hover:shadow-red-500/10">
-                  <div className="absolute top-4 left-4 z-20 flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/20 border border-red-500/30 backdrop-blur-md">
-                    <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                    <span className="text-xs text-red-400 font-bold">{isRTL ? "مباشر" : "LIVE"}</span>
-                  </div>
-                  <div className="relative h-48 overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent z-10" />
-                    <Image src={auction.image} alt={auction.car} fill priority={index < 2} sizes="(max-width: 768px) 100vw, 33vw" className="object-cover transition-transform duration-700 group-hover:scale-110" />
-                  </div>
-                  <div className="p-5">
-                    <h3 className="text-xl font-bold text-white mb-4">{auction.car}</h3>
-                    <div className="flex items-center justify-between mb-4 p-3 bg-white/5 rounded-xl backdrop-blur-md">
-                      <div>
-                        <p className="text-xs text-white/50 mb-1">{txt.currentBid}</p>
-                        <p className="text-2xl font-bold text-[#c9a96e]">{formatPrice(auction.currentBid)}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-xs text-white/50 mb-1">{txt.endingSoon}</p>
-                        <p className="text-xl font-bold text-red-400 font-mono">{auction.endsIn}</p>
-                      </div>
-                    </div>
-                    <motion.button
-                      className="w-full py-3 backdrop-filter backdrop-blur-md bg-black/40 border border-[#c9a96e]/50 text-[#c9a96e] font-bold rounded-xl shadow-[0_0_15px_rgba(201,169,110,0.15)] hover:shadow-[0_0_30px_rgba(201,169,110,0.6)] hover:bg-[#c9a96e] hover:text-black transition-all relative overflow-hidden group"
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => router.push("/login")}
+          {/* New Ticker Layered Container */}
+          <div className="relative w-full overflow-hidden py-10">
+            {/* Gradient Mask for fading edges */}
+            <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#050505] to-transparent z-20 pointer-events-none" />
+            <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#050505] to-transparent z-20 pointer-events-none" />
+
+            {latestCars && latestCars.length > 0 ? (
+              <motion.div
+                className="flex gap-8 cursor-grab active:cursor-grabbing w-max px-8"
+                animate={{ x: isRTL ? ["0%", "50%"] : ["-50%", "0%"] }}
+                transition={{ duration: latestCars.length * 6, repeat: Infinity, ease: "linear" }}
+                whileHover={{ animationPlayState: "paused" }}
+              >
+                {/* Clone the array to make infinite scrolling seamless */}
+                {[...latestCars, ...latestCars, ...latestCars, ...latestCars].map((car, index) => {
+                  const makeName = typeof car.make === 'object' ? car.make?.name : car.make;
+                  return (
+                    <motion.div
+                      key={index}
+                      className="group relative w-[340px] h-[460px] rounded-[2rem] border border-white/10 bg-black/40 backdrop-blur-3xl overflow-hidden shadow-2xl hover:border-[#c9a96e]/50 transition-all duration-700 flex-shrink-0"
+                      onClick={() => router.push(isLoggedIn ? `/showroom/${car.id || (car as any)._id}` : '/login')}
+                      whileHover={{ y: -10 }}
                     >
-                      <span className="relative z-10">{txt.bidNow} ({auction.bids} {isRTL ? "مزايدة" : "bids"})</span>
-                    </motion.button>
-                  </div>
-                </div>
+                      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/40 to-black z-10 pointer-events-none" />
+
+                      <Image
+                        src={car.images && car.images.length > 0 ? car.images[0] : "/images/placeholder.jpg"}
+                        alt={car.title || car.name || "Car"}
+                        fill
+                        sizes="340px"
+                        className="object-cover transition-transform duration-1000 group-hover:scale-110 opacity-70 group-hover:opacity-100"
+                      />
+
+                      {/* Content Details */}
+                      <div className="absolute z-20 inset-0 flex flex-col justify-end p-8">
+                        <div className="translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                          <div className="flex items-center gap-2 mb-3">
+                            <span className="px-3 py-1 rounded-lg bg-white/10 border border-white/10 text-[10px] uppercase font-black tracking-widest text-[#c9a96e] backdrop-blur-md">
+                              {car.year || new Date().getFullYear()}
+                            </span>
+                            <span className="px-3 py-1 rounded-lg bg-white/10 border border-white/10 text-[10px] uppercase font-black tracking-widest text-white/70 backdrop-blur-md">
+                              {makeName || "AUTO"}
+                            </span>
+                          </div>
+                          <h3 className="text-2xl font-black text-white italic uppercase leading-tight mb-2 group-hover:text-[#c9a96e] transition-colors line-clamp-2">
+                            {car.title || car.name}
+                          </h3>
+                          <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-500 pt-4 border-t border-white/10 flex items-center justify-between">
+                            <div className="text-xl font-black text-[#c9a96e]">
+                              {formatPrice(Number(car.price || 0))}
+                            </div>
+                            <button className="w-10 h-10 rounded-full bg-[#c9a96e] flex items-center justify-center text-black hover:scale-110 transition-transform shadow-[0_0_15px_rgba(201,169,110,0.4)]">
+                              <ArrowUpRight className="w-5 h-5" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )
+                })}
               </motion.div>
-            ))}
+            ) : (
+              <div className="text-center py-20 text-white/30 italic uppercase tracking-[0.2em] font-black text-sm">
+                {isRTL ? "لا توجد سيارات متوفرة حالياً" : "NO CARS AVAILABLE CURRENTLY"}
+              </div>
+            )}
           </div>
 
+          <div className="flex justify-center mt-8 relative z-30 pointer-events-auto">
+            <button
+              onClick={() => router.push('/showroom')}
+              className="group flex items-center gap-3 px-8 py-4 rounded-2xl bg-white/[0.03] border border-white/10 hover:border-[#c9a96e]/40 hover:bg-[#c9a96e]/10 transition-all backdrop-blur-xl"
+            >
+              <span className="text-xs font-black uppercase tracking-[0.2em] text-white group-hover:text-[#c9a96e] transition-colors">
+                {isRTL ? "تصفح جميع السيارات" : "BROWSE ALL CARS"}
+              </span>
+              <ArrowUpRight className="w-4 h-4 text-white/40 group-hover:text-[#c9a96e] transition-colors" />
+            </button>
+          </div>
         </div>
       </section>
 

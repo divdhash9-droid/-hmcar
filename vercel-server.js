@@ -3,10 +3,13 @@
 /**
  * vercel-server.js
  * HM CAR - Vercel Serverless Entry Point
- * يتصل بـ MongoDB Atlas ويُشغّل تطبيق Express.
+ * يتصل بـ MongoDB Atlas ويُشغّل تطبيق Express مباشرة (بدون تعقيدات modules/app.js).
  */
 
 const mongoose = require('mongoose');
+const express = require('express');
+const cors = require('cors');
+const compression = require('compression');
 
 let cachedApp = null;
 let dbConnected = false;
@@ -20,6 +23,7 @@ async function connectDB() {
         throw new Error('Database connection string (MONGO_URI/MONGODB_URI) must be provided in production');
     }
 
+    console.log('[Vercel] Connecting to MongoDB...');
     await mongoose.connect(uri, {
         maxPoolSize: 5,
         serverSelectionTimeoutMS: 8000,
@@ -75,7 +79,7 @@ async function seedProductionAdmin() {
  * إضافة بيانات سيارات ومزادات حقيقية إذا كانت القاعدة فارغة
  */
 async function seedRealData() {
-    if (adminSeeded) return; // نستخدم نفس العلم لمنع التكرار في نفس الجلسة
+    if (adminSeeded) return;
     adminSeeded = true;
 
     try {
@@ -144,15 +148,13 @@ async function seedRealData() {
 }
 
 /**
- * تهيئة إعدادات الموقع الافتراضية (رقم الواتساب، معلومات الاتصال)
- * يعمل مرة واحدة فقط عند أول تشغيل
+ * تهيئة إعدادات الموقع الافتراضية
  */
 async function seedDefaultSettings() {
     try {
         const SiteSettings = require('./models/SiteSettings');
         const existing = await SiteSettings.findOne({ key: 'main' });
 
-        // إذا كان الرقم فارغاً أو لم توجد إعدادات بعد
         if (!existing || !existing.socialLinks?.whatsapp) {
             await SiteSettings.findOneAndUpdate(
                 { key: 'main' },
@@ -174,12 +176,92 @@ async function seedDefaultSettings() {
     }
 }
 
+/**
+ * بناء تطبيق Express مستقل لـ Vercel (بدون الاعتماد على modules/app.js)
+ * هذا يتجنب مشاكل التحميل مع socket.io وغيرها في بيئة serverless
+ */
 function buildApp() {
     if (cachedApp) return cachedApp;
-    const App = require('./modules/app');
-    const instance = new App();
-    cachedApp = instance.app;
-    return cachedApp;
+
+    console.log('[Vercel] Building Express app...');
+    const app = express();
+
+    // ── Middleware ──
+    app.use(cors({
+        origin: function (origin, callback) {
+            if (!origin) return callback(null, true);
+            if (origin.endsWith('.vercel.app') || origin.startsWith('http://localhost')) {
+                return callback(null, true);
+            }
+            const allowed = (process.env.ALLOWED_ORIGINS || '').split(',').map(o => o.trim());
+            callback(allowed.includes(origin) ? null : new Error('CORS blocked'), allowed.includes(origin));
+        },
+        credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+    }));
+
+    app.use(compression());
+    app.use(express.json({ limit: '10mb' }));
+    app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+    // ── Health Check ──
+    app.get('/health', (req, res) => {
+        res.json({ status: 'ok', timestamp: new Date(), engine: 'HM-CAR-V2-Vercel' });
+    });
+
+    // ── API الرئيسي ──
+    app.get('/', (req, res) => {
+        res.json({
+            message: 'مرحباً بك في واجهة برمجة تطبيقات HM CAR V2',
+            status: 'Online',
+            documentation: '/api/v2/docs'
+        });
+    });
+
+    // ── تحميل مسارات API v2 مباشرة ──
+    try {
+        const apiV2Router = require('./routes/api/v2/index');
+        app.use('/api/v2', apiV2Router);
+        app.use('/v2', apiV2Router);
+        app.use('/api', apiV2Router);
+        console.log('✅ API v2 routes loaded successfully');
+    } catch (error) {
+        console.error('❌ CRITICAL: Failed to load API v2 routes:', error.message);
+        console.error(error.stack);
+        // إضافة مسار طوارئ يوضح الخطأ
+        app.use('/api', (req, res) => {
+            res.status(500).json({
+                success: false,
+                message: 'فشل تحميل مسارات API',
+                error: error.message
+            });
+        });
+    }
+
+    // ── 404 Handler ──
+    app.use((req, res) => {
+        res.status(404).json({
+            success: false,
+            message: 'عذراً، المسار المطلوب غير موجود',
+            path: req.originalUrl,
+            code: 'NOT_FOUND'
+        });
+    });
+
+    // ── Error Handler ──
+    app.use((err, req, res, next) => {
+        console.error('⚠️ خطأ غير متوقع:', err);
+        res.status(500).json({
+            success: false,
+            message: 'حدث خطأ تقني داخلي في الخادم',
+            error: process.env.NODE_ENV === 'development' ? err.message : 'Internal Server Error'
+        });
+    });
+
+    cachedApp = app;
+    console.log('[Vercel] Express app built successfully');
+    return app;
 }
 
 // Vercel serverless handler
@@ -190,10 +272,11 @@ module.exports = async (req, res) => {
         return app(req, res);
     } catch (error) {
         console.error('❌ Fatal error:', error.message);
+        console.error(error.stack);
         return res.status(500).json({
             success: false,
             message: 'Server initialization failed',
-            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+            error: error.message
         });
     }
 };

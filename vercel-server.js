@@ -43,59 +43,63 @@ async function connectDB() {
 
 /**
  * يُنشئ حساب المشرف الرئيسي في Atlas إذا لم يكن موجوداً
+ * ⚠️ مهم: لا يُعدَّل أي بيانات موجودة - يحفظها كما هي
  */
 async function seedProductionAdmin() {
     try {
         const User = require('./models/User');
-        const adminEmail = 'admin@hmcar.com';
-        const masterAdminEmail = 'master@hmcar.com';
-        const adminPassword = 'HmCar@2026!';
 
-        // 1. Ensure admin@hmcar.com / username: admin
-        let admin = await User.findOne({ $or: [{ email: adminEmail }, { username: 'admin' }] });
-        if (!admin) {
-            admin = new User({
+        // ─── الأدمن الرئيسي: أنشئه فقط إذا لم يكن موجوداً ───
+        const adminExists = await User.findOne({
+            $or: [{ email: 'admin@hmcar.com' }, { username: 'admin' }]
+        });
+
+        if (!adminExists) {
+            // إنشاء أول مرة فقط - لن يُعاد إنشاؤه أبداً
+            const admin = new User({
                 name: 'HM Admin',
-                email: adminEmail,
+                email: 'admin@hmcar.com',
                 username: 'admin',
-                password: adminPassword,
+                password: 'HmCar@2026!',
                 role: 'super_admin',
                 status: 'active',
-                permissions: ['super_admin', 'manage_users', 'manage_settings', 'manage_cars']
+                permissions: ['super_admin', 'manage_users', 'manage_settings', 'manage_cars', 'manage_parts', 'manage_auctions', 'view_analytics', 'manage_content', 'manage_footer', 'manage_whatsapp', 'manage_concierge']
             });
             await admin.save();
-            console.log('👤 Admin created: admin@hmcar.com');
+            console.log('✅ [ONCE] Admin created: admin@hmcar.com');
         } else {
-            admin.password = adminPassword;
-            admin.status = 'active';
-            admin.role = 'super_admin';
-            admin.username = 'admin'; // Ensure username is correct
-            admin.email = adminEmail;   // Ensure email is correct
-            await admin.save();
-            console.log('👤 Admin refreshed: admin@hmcar.com');
+            // الأدمن موجود - لا تمسه! فقط تأكد أنه نشط
+            // لا تغيّر كلمة المرور أو الإيميل أو أي بيانات أخرى
+            if (adminExists.status === 'suspended') {
+                await User.updateOne(
+                    { _id: adminExists._id },
+                    { $set: { status: 'active' } }
+                );
+                console.log('✅ Admin status restored to active (was suspended)');
+            } else {
+                console.log('✅ Admin already exists - data preserved as-is');
+            }
         }
 
-        // 2. Ensure master_admin (Backup) - specifically by username
-        let master = await User.findOne({ username: 'master_admin' });
-        if (!master) {
-            master = new User({
+        // ─── أدمن احتياطي: أنشئه فقط إذا لم يكن موجوداً ───
+        const masterExists = await User.findOne({ username: 'master_admin' });
+
+        if (!masterExists) {
+            const master = new User({
                 name: 'Master Admin',
-                email: masterAdminEmail,
+                email: 'master@hmcar.com',
                 username: 'master_admin',
-                password: adminPassword,
+                password: 'HmCar@2026!',
                 role: 'super_admin',
                 status: 'active',
                 permissions: ['super_admin']
             });
             await master.save();
-            console.log('👤 Master Admin created: master_admin');
+            console.log('✅ [ONCE] Master Admin created: master_admin');
         } else {
-            master.password = adminPassword;
-            master.role = 'super_admin';
-            master.status = 'active';
-            await master.save();
-            console.log('👤 Master Admin refreshed: master_admin');
+            console.log('✅ Master Admin already exists - data preserved as-is');
         }
+
     } catch (e) {
         console.warn('⚠️ Admin seed warning:', e.message);
     }

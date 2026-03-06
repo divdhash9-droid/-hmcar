@@ -200,81 +200,147 @@ router.get('/:id', requireAuthAPI, requirePermissionAPI('manage_users'), async (
   }
 });
 
-// Create user (admin only)
+// إنشاء مستخدم جديد (الأدمن فقط)
 router.post('/', requireAuthAPI, requirePermissionAPI('manage_users'), async (req, res) => {
   try {
-    const { name, email, phone, username, password, role = 'buyer', permissions } = req.body;
-
-    // Validation
-    if (!name || !password) {
-      return res.status(400).json({
-        error: 'Validation Error',
-        message: 'Name and password are required'
-      });
-    }
-
-    if (!email && !phone && !username) {
-      return res.status(400).json({
-        error: 'Validation Error',
-        message: 'Email, phone or username is required'
-      });
-    }
-
-    // Check if user already exists
-    const existingUser = await User.findOne({
-      $or: [
-        ...(email ? [{ email }] : []),
-        ...(phone ? [{ phone }] : []),
-        ...(username ? [{ username }] : [])
-      ]
-    });
-
-    if (existingUser) {
-      return res.status(409).json({
-        error: 'Conflict',
-        message: 'User with this email, phone or username already exists'
-      });
-    }
-
-    // Create user
-    const user = new User({
+    const {
       name,
       email,
       phone,
       username,
       password,
-      role,
-      permissions: permissions || [],
-      status: 'active'
-    });
+      role = 'buyer',
+      permissions,
+      status = 'active',
+      createdVia = 'admin-created'
+    } = req.body;
 
+    // ─── التحقق من البيانات المطلوبة ───
+    if (!name || !name.trim()) {
+      return res.status(400).json({
+        success: false,
+        error: 'خطأ في البيانات',
+        message: 'الاسم الكامل مطلوب'
+      });
+    }
+
+    if (!password || password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        error: 'خطأ في البيانات',
+        message: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل'
+      });
+    }
+
+    // للأدمن: الإيميل مطلوب كمعرف للدخول
+    if (role === 'admin' || role === 'super_admin' || role === 'manager') {
+      if (!email || !email.trim()) {
+        return res.status(400).json({
+          success: false,
+          error: 'خطأ في البيانات',
+          message: 'البريد الإلكتروني مطلوب لحسابات المسؤولين'
+        });
+      }
+    } else {
+      // للعملاء: إيميل أو هاتف أو اسم مستخدم
+      if (!email && !phone && !username) {
+        return res.status(400).json({
+          success: false,
+          error: 'خطأ في البيانات',
+          message: 'يجب توفير البريد الإلكتروني أو رقم الهاتف'
+        });
+      }
+    }
+
+    // ─── التحقق من عدم تكرار البيانات ───
+    const orConditions = [];
+    if (email && email.trim()) orConditions.push({ email: email.trim().toLowerCase() });
+    if (phone && phone.trim()) orConditions.push({ phone: phone.trim() });
+    if (username && username.trim()) orConditions.push({ username: username.trim() });
+
+    if (orConditions.length > 0) {
+      const existingUser = await User.findOne({ $or: orConditions });
+      if (existingUser) {
+        const field = existingUser.email === email?.toLowerCase() ? 'البريد الإلكتروني'
+          : existingUser.phone === phone ? 'رقم الهاتف' : 'اسم المستخدم';
+        return res.status(409).json({
+          success: false,
+          error: 'تعارض في البيانات',
+          message: `${field} مستخدم بالفعل في النظام`
+        });
+      }
+    }
+
+    // ─── إنشاء المستخدم ───
+    const userData = {
+      name: name.trim(),
+      password,
+      role,
+      permissions: (role === 'admin' || role === 'super_admin' || role === 'manager')
+        ? (permissions || [])
+        : [],
+      status,
+      createdVia,
+      createdBy: req.user?.userId || null
+    };
+
+    // إضافة الحقول الاختيارية
+    if (email && email.trim()) userData.email = email.trim().toLowerCase();
+    if (phone && phone.trim()) userData.phone = phone.trim();
+    if (username && username.trim()) userData.username = username.trim();
+
+    const user = new User(userData);
     await user.save();
 
-    // Log user creation
-    await AuditLog.logUserAction(
-      req.user.userId,
-      'CREATE',
-      'User',
-      `Created new user: ${user.name}`,
-      {
-        targetId: user._id,
-        after: user.toObject(),
-        ipAddress: req.ip,
-        userAgent: req.get('User-Agent'),
-        sessionId: req.sessionID
-      }
-    );
+    // ─── تسجيل العملية في سجل التدقيق ───
+    try {
+      await AuditLog.logUserAction(
+        req.user?.userId,
+        'CREATE',
+        'User',
+        `أنشأ حساباً جديداً: ${user.name} (${user.role})`,
+        {
+          targetId: user._id,
+          after: {
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            permissions: user.permissions
+          },
+          ipAddress: req.ip,
+          userAgent: req.get('User-Agent')
+        }
+      );
+    } catch (auditErr) {
+      console.warn('⚠️ Audit log failed (non-critical):', auditErr.message);
+    }
+
+    // إرجاع البيانات بدون كلمة المرور
+    const userResponse = user.toObject();
+    delete userResponse.password;
 
     res.status(201).json({
       success: true,
-      data: user,
-      message: 'User created successfully'
+      data: { ...userResponse, id: user._id },
+      message: `✅ تم إنشاء حساب ${user.name} بنجاح`
     });
+
   } catch (error) {
-    console.error('Create user error:', error);
+    console.error('❌ Create user error:', error);
+    // خطأ تكرار المفتاح الفريد
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern || {})[0];
+      const fieldNames = { email: 'البريد الإلكتروني', phone: 'رقم الهاتف', username: 'اسم المستخدم' };
+      return res.status(409).json({
+        success: false,
+        error: 'تعارض في البيانات',
+        message: `${fieldNames[field] || field} مستخدم بالفعل في النظام`
+      });
+    }
     res.status(500).json({
-      error: 'Internal Server Error',
-      message: 'An error occurred while creating user'
+      success: false,
+      error: 'خطأ في الخادم',
+      message: 'حدث خطأ أثناء إنشاء الحساب'
     });
   }
 });

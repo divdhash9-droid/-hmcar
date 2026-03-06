@@ -41,6 +41,22 @@ interface User {
     permissions?: string[];
 }
 
+// نوع البيانات الخام من الـ API (قبل التحويل)
+interface RawUser {
+    _id?: string;
+    id?: string;
+    name: string;
+    email?: string;
+    username?: string;
+    phone?: string;
+    role: string;
+    status?: string;
+    createdAt: string;
+    boundDevices?: Device[];
+    isDeviceLocked?: boolean;
+    permissions?: string[];
+}
+
 export default function AdminUsersPage() {
     const { isRTL } = useLanguage();
     const [users, setUsers] = useState<User[]>([]);
@@ -64,8 +80,8 @@ export default function AdminUsersPage() {
             params.limit = 50;
             const res = await api.users.list(params);
             const list = Array.isArray(res?.data) ? res.data : [];
-            setUsers(list.map((u: Record<string, any>) => ({
-                id: u._id || u.id,
+            setUsers(list.map((u: RawUser) => ({
+                id: u._id || u.id || '',
                 name: u.name,
                 email: u.email,
                 username: u.username,
@@ -79,10 +95,10 @@ export default function AdminUsersPage() {
             })));
             setStats({
                 total: res?.pagination?.total || list.length,
-                buyers: list.filter((u: any) => u.role === 'buyer').length,
-                sellers: list.filter((u: any) => u.role === 'seller').length,
-                admins: list.filter((u: any) => u.role === 'admin' || u.role === 'super_admin').length,
-                active: list.filter((u: any) => (u.status || 'active') === 'active').length,
+                buyers: list.filter((u: RawUser) => u.role === 'buyer').length,
+                sellers: list.filter((u: RawUser) => u.role === 'seller').length,
+                admins: list.filter((u: RawUser) => u.role === 'admin' || u.role === 'super_admin').length,
+                active: list.filter((u: RawUser) => (u.status || 'active') === 'active').length,
             });
         } catch (err) {
             console.error('Failed to load users', err);
@@ -239,106 +255,274 @@ export default function AdminUsersPage() {
 }
 
 function AddUserModal({ onClose, onAdd, isRTL }: { onClose: () => void, onAdd: (u: User) => void, isRTL: boolean }) {
-    const [formData, setFormData] = useState({ name: '', email: '', username: '', phone: '', password: '', role: 'buyer', permissions: [] as string[] });
+    // حقول النموذج المطلوبة فقط: الاسم + الإيميل + كلمة المرور
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        password: '',
+        role: 'admin',
+        permissions: [] as string[]
+    });
     const [showPass, setShowPass] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
-    const togglePerm = (p: string) => {
+    // قائمة الصلاحيات الكاملة
+    const allPermissions = [
+        { id: 'manage_cars', label: '🚗 إدارة السيارات', desc: 'إضافة وتعديل وحذف السيارات' },
+        { id: 'manage_parts', label: '🔧 إدارة قطع الغيار', desc: 'إضافة وتعديل وحذف القطع' },
+        { id: 'manage_auctions', label: '🔨 إدارة المزادات', desc: 'إنشاء وإدارة المزادات' },
+        { id: 'manage_users', label: '👥 إدارة المستخدمين', desc: 'عرض وتعديل وحذف المستخدمين' },
+        { id: 'manage_settings', label: '⚙️ إعدادات النظام', desc: 'تغيير كلمات المرور والإعدادات' },
+        { id: 'manage_content', label: '📝 إدارة المحتوى', desc: 'الصفحة الرئيسية والمحتوى' },
+        { id: 'manage_footer', label: '🔗 إدارة الروابط', desc: 'روابط التواصل الاجتماعي' },
+        { id: 'manage_whatsapp', label: '💬 إدارة واتساب', desc: 'رقم واتساب التواصل' },
+        { id: 'manage_concierge', label: '🎯 إدارة الطلبات', desc: 'طلبات العملاء الخاصة' },
+        { id: 'view_analytics', label: '📊 عرض الإحصائيات', desc: 'تقارير وإحصائيات النظام' },
+        { id: 'manage_orders', label: '📦 إدارة الطلبيات', desc: 'متابعة وتحديث الطلبيات' },
+    ];
+
+    // تبديل صلاحية واحدة
+    const togglePerm = (id: string) => {
         setFormData(prev => ({
             ...prev,
-            permissions: prev.permissions.includes(p) ? prev.permissions.filter(x => x !== p) : [...prev.permissions, p]
+            permissions: prev.permissions.includes(id)
+                ? prev.permissions.filter(x => x !== id)
+                : [...prev.permissions, id]
+        }));
+    };
+
+    // تحديد / إلغاء تحديد الكل
+    const toggleAll = () => {
+        const allIds = allPermissions.map(p => p.id);
+        const allSelected = allIds.every(id => formData.permissions.includes(id));
+        setFormData(prev => ({
+            ...prev,
+            permissions: allSelected ? [] : allIds
         }));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setError('');
+
+        // تحقق بسيط
+        if (!formData.name.trim()) { setError(isRTL ? 'الاسم مطلوب' : 'Name is required'); return; }
+        if (!formData.email.trim()) { setError(isRTL ? 'الإيميل مطلوب' : 'Email is required'); return; }
+        if (!formData.password || formData.password.length < 6) { setError(isRTL ? 'كلمة المرور 6 أحرف على الأقل' : 'Password must be at least 6 chars'); return; }
+
         try {
-            const res = await api.users.create(formData);
+            setLoading(true);
+            const payload = {
+                name: formData.name.trim(),
+                email: formData.email.trim().toLowerCase(),
+                password: formData.password,
+                role: formData.role,
+                permissions: formData.role === 'admin' ? formData.permissions : [],
+                status: 'active',
+                createdVia: 'admin-created'
+            };
+            const res = await api.users.create(payload);
             if (res.success) {
                 onAdd(res.data);
+            } else {
+                setError(res.message || (isRTL ? 'فشل إنشاء الحساب' : 'Failed to create account'));
             }
-        } catch (err) {
-            console.error('Failed to create user', err);
-            alert(isRTL ? 'فشل إنشاء المستخدم' : 'Failed to create user');
+        } catch (err: unknown) {
+            const errMsg = err instanceof Error ? err.message : '';
+            setError(errMsg || (isRTL ? 'فشل إنشاء الحساب، تحقق أن الإيميل غير مستخدم' : 'Failed to create account'));
+        } finally {
+            setLoading(false);
         }
     };
 
-    const permissionsList = [
-        { id: 'manage_cars', label: isRTL ? 'إدارة السيارات' : 'Manage Cars' },
-        { id: 'manage_auctions', label: isRTL ? 'إدارة المزادات' : 'Manage Auctions' },
-        { id: 'manage_users', label: isRTL ? 'إدارة المستخدمين' : 'Manage Users' },
-        { id: 'manage_settings', label: isRTL ? 'إعدادات النظام' : 'System Settings' },
-        { id: 'manage_concierge', label: isRTL ? 'إدارة الكونسيرج' : 'Manage Concierge' },
-        { id: 'manage_parts', label: isRTL ? 'قطع الغيار' : 'Manage Parts' },
-        { id: 'view_analytics', label: isRTL ? 'عرض التحليلات' : 'View Analytics' },
-    ];
+    const allSelected = allPermissions.every(p => formData.permissions.includes(p.id));
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-blur-md">
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-black border border-white/10 p-8 rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto text-right">
-                <h2 className="text-2xl font-black uppercase italic mb-6 text-white">{isRTL ? 'إضافة مستخدم جديد' : 'ADD NEW USER'}</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+            <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="bg-[#0a0a0a] border border-white/10 p-0 rounded-3xl max-w-2xl w-full max-h-[92vh] overflow-hidden flex flex-col text-right"
+            >
+                {/* رأس النموذج */}
+                <div className="p-6 border-b border-white/10 bg-white/[0.02] flex items-center justify-between flex-row-reverse">
+                    <h2 className="text-xl font-black uppercase text-white">
+                        {isRTL ? '➕ إضافة مسؤول جديد' : 'ADD NEW ADMIN'}
+                    </h2>
+                    <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full text-white/60 hover:text-white transition-all">✕</button>
+                </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <label className="text-[9px] font-black text-white/40 uppercase tracking-widest">{isRTL ? 'الاسم بالكامل' : 'Full Name'}</label>
-                            <input required className="w-full bg-white/5 border border-white/10 p-3 rounded-lg text-white placeholder:text-white/20 text-right"
-                                value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} placeholder={isRTL ? "الاسم الثلاثي" : "Full Name"} />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-[9px] font-black text-white/40 uppercase tracking-widest">{isRTL ? 'اسم المستخدم' : 'Username'}</label>
-                            <input required className="w-full bg-white/5 border border-white/10 p-3 rounded-lg text-white placeholder:text-white/20 text-right"
-                                value={formData.username} onChange={e => setFormData({ ...formData, username: e.target.value })} placeholder="username" />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-[9px] font-black text-white/40 uppercase tracking-widest">{isRTL ? 'البريد الإلكتروني' : 'Email'}</label>
-                            <input type="email" className="w-full bg-white/5 border border-white/10 p-3 rounded-lg text-white placeholder:text-white/20 text-right"
-                                value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} placeholder="email@example.com" />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-[9px] font-black text-white/40 uppercase tracking-widest">{isRTL ? 'كلمة المرور' : 'Password'}</label>
-                            <div className="relative">
-                                <input required type={showPass ? "text" : "password"} className="w-full bg-white/5 border border-white/10 p-3 rounded-lg text-white placeholder:text-white/20 text-right pr-10"
-                                    value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} placeholder="••••••" />
-                                <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors">
-                                    {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                                </button>
+                <div className="overflow-y-auto flex-1 p-6">
+                    <form onSubmit={handleSubmit} className="space-y-5">
+
+                        {/* رسالة الخطأ */}
+                        {error && (
+                            <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm font-bold">
+                                ⚠️ {error}
+                            </div>
+                        )}
+
+                        {/* ── الحقول الأساسية الثلاثة فقط ── */}
+                        <div className="space-y-4">
+                            <h3 className="text-xs font-black text-white/40 uppercase tracking-widest border-b border-white/5 pb-2">
+                                {isRTL ? 'المعلومات الأساسية (مطلوبة)' : 'Required Information'}
+                            </h3>
+
+                            {/* الاسم الكامل */}
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-black text-white/50 uppercase tracking-widest block">
+                                    {isRTL ? 'الاسم الكامل *' : 'Full Name *'}
+                                </label>
+                                <input
+                                    required
+                                    type="text"
+                                    placeholder={isRTL ? 'مثال: محمد أحمد العمري' : 'e.g. John Smith'}
+                                    className="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white placeholder:text-white/20 text-right focus:border-[#c9a96e]/50 outline-none transition-all"
+                                    value={formData.name}
+                                    onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                />
+                            </div>
+
+                            {/* الإيميل */}
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-black text-white/50 uppercase tracking-widest block">
+                                    {isRTL ? 'البريد الإلكتروني (للدخول) *' : 'Email (for login) *'}
+                                </label>
+                                <input
+                                    required
+                                    type="email"
+                                    placeholder="admin@example.com"
+                                    className="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white placeholder:text-white/20 text-left focus:border-[#c9a96e]/50 outline-none transition-all"
+                                    value={formData.email}
+                                    onChange={e => setFormData({ ...formData, email: e.target.value })}
+                                />
+                            </div>
+
+                            {/* كلمة المرور */}
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-black text-white/50 uppercase tracking-widest block">
+                                    {isRTL ? 'كلمة المرور *' : 'Password *'}
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        required
+                                        type={showPass ? 'text' : 'password'}
+                                        placeholder="••••••••"
+                                        minLength={6}
+                                        className="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white placeholder:text-white/20 text-left focus:border-[#c9a96e]/50 outline-none transition-all pl-10"
+                                        value={formData.password}
+                                        onChange={e => setFormData({ ...formData, password: e.target.value })}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPass(!showPass)}
+                                        className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors"
+                                    >
+                                        {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* نوع الحساب */}
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-black text-white/50 uppercase tracking-widest block">
+                                    {isRTL ? 'نوع الحساب' : 'Account Type'}
+                                </label>
+                                <div className="relative">
+                                    <select
+                                        title={isRTL ? 'نوع الحساب' : 'Account Type'}
+                                        value={formData.role}
+                                        onChange={e => setFormData({ ...formData, role: e.target.value })}
+                                    >
+                                        <option value="admin" className="bg-zinc-900 text-white">{isRTL ? '🛡️ مسؤول (Admin)' : '🛡️ Admin'}</option>
+                                        <option value="buyer" className="bg-zinc-900 text-white">{isRTL ? '👤 عميل / مشتري' : '👤 Buyer / Client'}</option>
+                                    </select>
+                                    <ChevronDown className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none" />
+                                </div>
                             </div>
                         </div>
-                        <div className="space-y-2 col-span-2">
-                            <label htmlFor="role-select" className="text-[9px] font-black text-white/40 uppercase tracking-widest">{isRTL ? 'نوع الحساب (الدور)' : 'Role'}</label>
-                            <div className="relative">
-                                <select id="role-select" title="اختر الصلاحية" className="w-full bg-white/10 border border-white/10 p-3 rounded-lg text-white text-right appearance-none cursor-pointer focus:border-cinematic-neon-blue/40 outline-none transition-all"
-                                    value={formData.role} onChange={e => setFormData({ ...formData, role: e.target.value })}>
-                                    <option value="buyer" className="bg-zinc-900 text-white">{isRTL ? 'مشتري / عميل' : 'Buyer / Client'}</option>
-                                    <option value="admin" className="bg-zinc-900 text-white">{isRTL ? 'مسؤول / موظف' : 'Admin / Staff'}</option>
-                                    <option value="seller" className="bg-zinc-900 text-white">{isRTL ? 'بائع' : 'Seller'}</option>
-                                </select>
-                                <ChevronDown className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none" />
-                            </div>
-                        </div>
-                    </div>
 
-                    {formData.role === 'admin' && (
-                        <div className="space-y-4 border-t border-white/10 pt-6">
-                            <h3 className="text-sm font-bold text-cinematic-neon-red uppercase tracking-widest">{isRTL ? 'صلاحيات المسؤول' : 'Admin Permissions'}</h3>
-                            <div className="grid grid-cols-2 gap-3">
-                                {permissionsList.map(perm => (
-                                    <div key={perm.id} onClick={() => togglePerm(perm.id)}
-                                        className={cn("p-3 border rounded-lg cursor-pointer flex items-center gap-3 transition-all flex-row-reverse justify-between",
-                                            formData.permissions.includes(perm.id) ? "bg-cinematic-neon-red/20 border-cinematic-neon-red text-white" : "border-white/10 text-white/40 hover:border-white/30")}>
-                                        <span className="text-[10px] font-black uppercase tracking-widest">{perm.label}</span>
-                                        <div className={cn("w-3 h-3 rounded-sm border", formData.permissions.includes(perm.id) ? "bg-cinematic-neon-red border-cinematic-neon-red" : "border-white/40")} />
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
+                        {/* ── صلاحيات المسؤول (تظهر فقط إذا الدور admin) ── */}
+                        {formData.role === 'admin' && (
+                            <div className="space-y-3 border-t border-white/10 pt-5">
+                                <div className="flex items-center justify-between flex-row-reverse">
+                                    <h3 className="text-xs font-black text-[#c9a96e] uppercase tracking-widest flex items-center gap-2">
+                                        <Shield className="w-4 h-4" />
+                                        {isRTL ? 'صلاحيات الوصول' : 'Access Permissions'}
+                                    </h3>
+                                    {/* زر تحديد الكل / إلغاء الكل */}
+                                    <button
+                                        type="button"
+                                        onClick={toggleAll}
+                                        className={`text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-lg border transition-all ${allSelected
+                                            ? 'border-red-500/40 text-red-400 hover:bg-red-500/10'
+                                            : 'border-[#c9a96e]/40 text-[#c9a96e] hover:bg-[#c9a96e]/10'
+                                            }`}
+                                    >
+                                        {allSelected
+                                            ? (isRTL ? 'إلغاء الكل' : 'Deselect All')
+                                            : (isRTL ? 'تحديد الكل' : 'Select All')
+                                        }
+                                    </button>
+                                </div>
 
-                    <div className="flex gap-4 pt-4">
-                        <button type="submit" className="flex-1 py-4 bg-cinematic-neon-blue !text-black font-black uppercase tracking-widest rounded-xl hover:bg-white transition-all order-1">{isRTL ? 'إنشاء المستخدم' : 'Create User'}</button>
-                        <button type="button" onClick={onClose} className="flex-1 py-4 border border-white/10 hover:bg-white/5 text-white/60 font-black uppercase tracking-widest rounded-xl order-2">{isRTL ? 'إلغاء' : 'Cancel'}</button>
-                    </div>
-                </form>
+                                <div className="grid grid-cols-1 gap-2">
+                                    {allPermissions.map(perm => (
+                                        <div
+                                            key={perm.id}
+                                            onClick={() => togglePerm(perm.id)}
+                                            className={`p-3 border rounded-xl cursor-pointer flex items-center justify-between transition-all ${formData.permissions.includes(perm.id)
+                                                ? 'bg-[#c9a96e]/10 border-[#c9a96e]/60 text-white'
+                                                : 'border-white/5 text-white/40 hover:border-white/20 hover:text-white/70'
+                                                }`}
+                                        >
+                                            <div className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all ${formData.permissions.includes(perm.id)
+                                                ? 'bg-[#c9a96e] border-[#c9a96e]'
+                                                : 'border-white/30'
+                                                }`}>
+                                                {formData.permissions.includes(perm.id) && (
+                                                    <svg className="w-2.5 h-2.5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                )}
+                                            </div>
+                                            <div className="text-right flex-1 mr-3">
+                                                <div className="text-sm font-bold">{perm.label}</div>
+                                                <div className="text-[10px] opacity-60">{perm.desc}</div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <p className="text-[10px] text-white/30 text-center">
+                                    {isRTL
+                                        ? `تم تحديد ${formData.permissions.length} من ${allPermissions.length} صلاحية`
+                                        : `${formData.permissions.length} of ${allPermissions.length} permissions selected`
+                                    }
+                                </p>
+                            </div>
+                        )}
+
+                        {/* أزرار الإجراء */}
+                        <div className="flex gap-3 pt-2">
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="flex-1 py-4 bg-[#c9a96e] text-black font-black uppercase tracking-wider rounded-xl hover:bg-[#d4b57d] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {loading ? (isRTL ? '⏳ جاري الإنشاء...' : 'Creating...') : (isRTL ? '✅ إنشاء الحساب' : 'Create Account')}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={onClose}
+                                className="flex-1 py-4 border border-white/10 hover:bg-white/5 text-white/60 font-black uppercase tracking-wider rounded-xl transition-all"
+                            >
+                                {isRTL ? 'إلغاء' : 'Cancel'}
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </motion.div>
         </div>
     );

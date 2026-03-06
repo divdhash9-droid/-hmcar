@@ -1,8 +1,8 @@
 // [[ARABIC_HEADER]] هذا الملف (client-app/src/lib/api.ts) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
 
 const isBrowser = typeof window !== 'undefined';
-// استخدام مسار نسبي في المتصفح لتجنب مشاكل CORS والروابط القديمة
-const API_BASE_URL = isBrowser ? '' : (process.env.NEXT_PUBLIC_API_URL || 'https://car-auction-sand.vercel.app');
+// الأفضل استخدام الرابط الثابت في الإنتاج إذا كان العميل والارسال منفصلين
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || (isBrowser ? '' : 'https://car-auction-sand.vercel.app');
 
 export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
     const url = `${API_BASE_URL}${endpoint}`;

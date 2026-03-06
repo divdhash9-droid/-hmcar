@@ -300,7 +300,7 @@ router.put('/:id', requireAuthAPI, requirePermissionAPI('manage_users'), async (
     }
 
     const oldData = { ...user.toObject() };
-    const allowedUpdates = ['name', 'email', 'phone', 'username', 'role', 'status', 'permissions', 'boundDevices', 'isDeviceLocked'];
+    const allowedUpdates = ['name', 'email', 'phone', 'username', 'role', 'status', 'permissions', 'boundDevices', 'isDeviceLocked', 'password'];
     const updates = {};
 
     Object.keys(req.body).forEach(key => {

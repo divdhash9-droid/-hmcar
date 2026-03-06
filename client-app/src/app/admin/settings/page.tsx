@@ -379,7 +379,7 @@ export default function AdminSettings() {
                         {tabs.map((tab) => (
                             <button
                                 key={tab.id}
-                                onClick={() => setActiveTab(tab.id as TabId)}
+                                onClick={() => setActiveTab(tab.id as TabID)}
                                 className={cn(
                                     "flex-1 flex items-center justify-center gap-3 py-4 rounded-xl font-bold text-sm uppercase tracking-wider transition-all",
                                     activeTab === tab.id

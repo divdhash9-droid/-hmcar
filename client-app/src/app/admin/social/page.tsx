@@ -29,7 +29,7 @@ function AdminSocialSettings() {
   useEffect(() => {
     const fetchLinks = async () => {
       try {
-        const response = await api.settings.get();
+        const response = await api.settings.getAll();
         if (response.success && response.data.socialLinks) {
           const sl = response.data.socialLinks;
           const linksArray = Object.entries(sl)

@@ -95,7 +95,7 @@ export default function AdminSettings() {
         heroVideoUrl: '',
     });
 
-    interface Feature { icon: string; title: string; description: string; }
+    interface Feature { [key: string]: string; icon: string; title: string; desc: string; }
     const [features, setFeatures] = useState<Feature[]>([]);
 
     useEffect(() => {
@@ -647,8 +647,8 @@ export default function AdminSettings() {
                                             <div
                                                 key={field.key}
                                                 className={`flex items-center gap-3 p-4 rounded-2xl border transition-all ${hasValue
-                                                        ? 'bg-white/[0.04] border-white/15'
-                                                        : 'bg-white/[0.01] border-white/5 opacity-60'
+                                                    ? 'bg-white/[0.04] border-white/15'
+                                                    : 'bg-white/[0.01] border-white/5 opacity-60'
                                                     }`}
                                             >
                                                 {/* أيقونة المنصة */}
@@ -1086,7 +1086,7 @@ export default function AdminSettings() {
                                         {isRTL ? 'لماذا تختارنا' : 'Why Choose Us'}
                                     </h2>
                                     <button
-                                        onClick={() => setFeatures([...features, { icon: 'Star', title: '', description: '' }])}
+                                        onClick={() => setFeatures([...features, { icon: 'Star', title: '', desc: '' }])}
                                         className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
                                     >
                                         {isRTL ? '+ إضافة ميزة' : '+ ADD FEATURE'}
@@ -1135,10 +1135,10 @@ export default function AdminSettings() {
                                                     <label className="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-1 block">Description</label>
                                                     <input
                                                         type="text"
-                                                        value={feature.description}
+                                                        value={feature.desc}
                                                         onChange={(e) => {
                                                             const newFeatures = [...features];
-                                                            newFeatures[idx].description = e.target.value;
+                                                            newFeatures[idx].desc = e.target.value;
                                                             setFeatures(newFeatures);
                                                         }}
                                                         className="w-full bg-black/40 border border-white/10 rounded-lg py-3 px-4 text-xs text-white font-arabic"

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Sparkles, Shield,
   Truck, CreditCard, Award, Star, Zap, Globe,
@@ -13,7 +13,6 @@ import Navbar from "@/components/Navbar";
 import CinematicVideoBackground from "@/components/CinematicVideoBackground";
 import { useLanguage } from "@/lib/LanguageContext";
 import { getSocialIcon } from "@/lib/socialIcons";
-import SocialLinks from "@/components/SocialLinks";
 import { api } from "@/lib/api";
 
 import LandingShowcase from "@/components/LandingShowcase";
@@ -132,7 +131,6 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
   ];
 
   const [socialConfig, setSocialConfig] = useState<{ whatsapp?: string; links: { platform: string; url: string }[] }>({ whatsapp: "", links: [] });
-  const [showSocialBar, setShowSocialBar] = useState(false);
 
   useEffect(() => {
     // جلب روابط التواصل الاجتماعي من الإعدادات العامة
@@ -314,68 +312,78 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
         </div>
       </section>
 
-      {/* Bottom Social Dock - Centered Icons */}
-      <div className="fixed bottom-0 left-0 right-0 z-40">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-center justify-center gap-4 bg-black/50 border border-white/10 backdrop-blur-xl rounded-t-2xl px-4 py-3">
-            <div className="flex items-center gap-3">
-              <SocialLinks size="sm" showLabels />
+      {/* الشريط السفلي الثابت - أيقونات التواصل الديناميكية */}
+      {/* يظهر فقط إذا كان الأدمن قد أضاف روابط تواصل */}
+      {(socialConfig.whatsapp || socialConfig.links.length > 0) && (
+        <div className="fixed bottom-0 left-0 right-0 z-40">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="flex items-center justify-center gap-3 bg-black/70 border-t border-white/10 backdrop-blur-xl px-4 py-2">
+              {/* واتساب */}
+              {socialConfig.whatsapp && (
+                <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" title="WhatsApp">
+                  <motion.div whileHover={{ scale: 1.15, y: -3 }} whileTap={{ scale: 0.95 }}
+                    className="w-10 h-10 rounded-xl overflow-hidden border border-white/10 shadow-lg">
+                    {homeCustomIcons.whatsapp
+                      ? <img src={homeCustomIcons.whatsapp} alt="WhatsApp" className="w-full h-full object-cover" />
+                      : <div className="w-full h-full bg-green-600 flex items-center justify-center"><MessageCircle className="w-5 h-5 text-white" /></div>}
+                  </motion.div>
+                </a>
+              )}
+              {/* باقي روابط التواصل بصور حقيقية */}
+              {socialConfig.links.map((item, idx) => (
+                <a key={idx} href={item.url} target="_blank" rel="noopener noreferrer" title={item.platform}>
+                  <motion.div whileHover={{ scale: 1.15, y: -3 }} whileTap={{ scale: 0.95 }}
+                    className="w-10 h-10 rounded-xl overflow-hidden border border-white/10 bg-white/5 flex items-center justify-center shadow-lg">
+                    {homeCustomIcons[item.platform]
+                      ? <img src={homeCustomIcons[item.platform]} alt={item.platform} className="w-full h-full object-cover" />
+                      : (() => { const Icon = getSocialIcon(item.platform); return Icon ? <Icon className="w-5 h-5 text-white" /> : <LinkIcon className="w-5 h-5 text-white/50" />; })()}
+                  </motion.div>
+                </a>
+              ))}
             </div>
           </div>
         </div>
-      </div>
+      )}
 
-      {/* Social Icons Section */}
-      <section className="relative z-10 py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            className="flex items-center gap-3 mb-4"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <Globe className="w-5 h-5 text-[#c9a96e]" />
-            <button
-              onClick={() => setShowSocialBar(v => !v)}
-              className="group flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all"
-              aria-label={isRTL ? "تواصل معنا" : "Connect With Us"}
+      {/* ── قسم التواصل الاجتماعي - يظهر فقط إذا أضاف الأدمن روابط ── */}
+      {(socialConfig.whatsapp || socialConfig.links.length > 0) && (
+        <section className="relative z-10 py-8 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
+            <motion.div
+              className="flex items-center gap-3 mb-4"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
             >
-              <h3 className="text-lg font-bold text-white">{isRTL ? "تواصل معنا" : "Connect With Us"}</h3>
-              <span className="w-1.5 h-1.5 rounded-full bg-[#c9a96e] group-hover:bg-[#d4b57d]" />
-            </button>
-          </motion.div>
+              <Globe className="w-5 h-5 text-[#c9a96e]" />
+              <h3 className="text-lg font-bold text-white">{isRTL ? 'روابط التواصل الاجتماعي' : 'Social Media'}</h3>
+            </motion.div>
 
-          <AnimatePresence>
-            {showSocialBar && (
-              <motion.div
-                initial={{ opacity: 0, height: 0, y: -6, scale: 0.98 }}
-                animate={{ opacity: 1, height: "auto", y: 0, scale: 1 }}
-                exit={{ opacity: 0, height: 0, y: -6, scale: 0.98 }}
-                transition={{ duration: 0.35 }}
-                className="relative"
-              >
-                <div className="flex flex-wrap items-center gap-4 p-4 rounded-2xl bg-white/[0.04] border border-white/10 backdrop-blur-md">
-                  {socialConfig.whatsapp && (
-                    <Link href={whatsappUrl} target="_blank">
-                      <motion.div whileHover={{ scale: 1.1 }} className="w-12 h-12 rounded-full bg-black/40 border border-white/10 flex items-center justify-center shadow-lg transition-all hover:bg-cinematic-neon-green/20">
-                        {(() => { const Icon = getSocialIcon("whatsapp") as React.ComponentType<{ className?: string }>; return Icon ? <Icon className="w-6 h-6 text-cinematic-neon-green" /> : <MessageCircle className="w-6 h-6 text-cinematic-neon-green" /> })()}
-                      </motion.div>
-                    </Link>
-                  )}
-                  {socialConfig.links.map((link, idx) => (
-                    <Link key={idx} href={link.url} target="_blank">
-                      <motion.div whileHover={{ scale: 1.1 }} className="w-12 h-12 rounded-full bg-black/40 border border-white/10 flex items-center justify-center shadow-lg transition-all hover:bg-white/10">
-                        {(() => { const Icon = getSocialIcon(link.platform) as React.ComponentType<{ className?: string }>; return Icon ? <Icon className="w-6 h-6 text-white" /> : <LinkIcon className="w-6 h-6 text-white" /> })()}
-                      </motion.div>
-                    </Link>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </section>
+            {/* أيقونات التواصل - تظهر مباشرة بدون زر */}
+            <div className="flex flex-wrap items-center gap-4">
+              {socialConfig.whatsapp && (
+                <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" title="WhatsApp">
+                  <motion.div whileHover={{ scale: 1.1 }} className="w-12 h-12 rounded-2xl overflow-hidden border border-white/10 shadow-lg">
+                    {homeCustomIcons.whatsapp
+                      ? <img src={homeCustomIcons.whatsapp} alt="WhatsApp" className="w-full h-full object-cover" />
+                      : <div className="w-full h-full bg-green-600 flex items-center justify-center"><MessageCircle className="w-6 h-6 text-white" /></div>}
+                  </motion.div>
+                </a>
+              )}
+              {socialConfig.links.map((link, idx) => (
+                <a key={idx} href={link.url} target="_blank" rel="noopener noreferrer" title={link.platform}>
+                  <motion.div whileHover={{ scale: 1.1 }} className="w-12 h-12 rounded-2xl overflow-hidden border border-white/10 bg-white/5 flex items-center justify-center shadow-lg">
+                    {homeCustomIcons[link.platform]
+                      ? <img src={homeCustomIcons[link.platform]} alt={link.platform} className="w-full h-full object-cover" />
+                      : (() => { const Icon = getSocialIcon(link.platform); return Icon ? <Icon className="w-6 h-6 text-white" /> : <LinkIcon className="w-6 h-6 text-white" />; })()}
+                  </motion.div>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Live Auctions Section */}
       <section ref={liveRef} className="relative z-10 py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent via-[#c9a96e]/5 to-transparent">
@@ -442,7 +450,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
           </motion.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {currentFeatures.map((feature: any, index: number) => {
+            {currentFeatures.map((feature: { icon: string; title: string; titleEn?: string; desc: string; descEn?: string }, index: number) => {
               const Icon = lucideIcons[feature.icon] || Shield;
               return (
                 <motion.div key={index} className="group relative" initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: index * 0.1 }}>

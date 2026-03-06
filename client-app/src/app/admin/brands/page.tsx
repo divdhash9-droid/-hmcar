@@ -25,7 +25,8 @@ type Brand = {
   category: 'cars' | 'parts' | 'both';
 };
 
-export default function AdminBrandsPage() {
+// [[ARABIC_HEADER]] هذه الصفحة مسؤولة عن إدارة "الوكالات" (التي كانت تسمى سابقاً الماركات) - تسمح للأدمن بإضافة شعار واسم وتصنيف لكل وكالة.
+export default function AdminAgenciesPage() {
   const { isRTL } = useLanguage();
   const [brands, setBrands] = useState<Brand[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -107,7 +108,7 @@ export default function AdminBrandsPage() {
             <span className="text-[10px] font-black uppercase tracking-[0.5em] text-[#c9a96e] italic">Admin Control</span>
           </div>
           <h1 className="text-5xl md:text-7xl font-black tracking-tighter uppercase italic leading-[0.9]">
-            {isRTL ? 'إدارة' : 'MANAGE'} <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/20">{isRTL ? 'الوكالات' : 'BRANDS'}</span>
+            {isRTL ? 'إدارة' : 'MANAGE'} <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/20">{isRTL ? 'الوكالات' : 'AGENCIES'}</span>
           </h1>
         </header>
 
@@ -120,7 +121,7 @@ export default function AdminBrandsPage() {
                 <div className="flex items-center gap-3">
                   <Tag className="w-5 h-5 text-[#c9a96e]" />
                   <h2 className="text-xl font-black uppercase italic tracking-wider">
-                    {editingId ? (isRTL ? 'تعديل الوكالة' : 'EDIT BRAND') : (isRTL ? 'إضافة وكالة' : 'ADD BRAND')}
+                    {editingId ? (isRTL ? 'تعديل الوكالة' : 'EDIT AGENCY') : (isRTL ? 'إضافة وكالة' : 'ADD AGENCY')}
                   </h2>
                 </div>
                 {editingId && (
@@ -238,8 +239,8 @@ export default function AdminBrandsPage() {
                   {saving
                     ? (isRTL ? 'جاري الحفظ...' : 'Saving...')
                     : editingId
-                      ? (isRTL ? 'تحديث الوكالة' : 'UPDATE BRAND')
-                      : (isRTL ? 'إضافة وكالة جديدة' : 'ADD BRAND')}
+                      ? (isRTL ? 'تعديل الوكالة' : 'UPDATE AGENCY')
+                      : (isRTL ? 'إضافة وكالة جديدة' : 'ADD AGENCY')}
                 </motion.button>
               </div>
             </div>
@@ -249,10 +250,10 @@ export default function AdminBrandsPage() {
           <div className="lg:col-span-8">
             <div className="flex items-center justify-between mb-8 px-2">
               <h3 className="text-xl font-black uppercase italic tracking-widest">
-                {isRTL ? 'الوكالات المسجلة' : 'REGISTERED BRANDS'}
+                {isRTL ? 'الوكالات المسجلة' : 'REGISTERED AGENCIES'}
               </h3>
               <div className="text-[10px] font-bold text-white/20 uppercase tracking-widest">
-                {brands.length} {isRTL ? 'وكالة' : 'BRANDS'}
+                {brands.length} {isRTL ? 'وكالة' : 'AGENCIES'}
               </div>
             </div>
 
@@ -317,7 +318,7 @@ export default function AdminBrandsPage() {
               <div className="flex flex-col items-center justify-center py-32 opacity-20 italic">
                 <Tag className="w-16 h-16 mb-4" />
                 <p className="text-sm uppercase tracking-[0.5em]">
-                  {isRTL ? 'لا توجد وكالات - أضف أول وكالة' : 'NO BRANDS YET — ADD YOUR FIRST'}
+                  {isRTL ? 'لا توجد وكالات - أضف أول وكالة' : 'NO AGENCIES YET — ADD YOUR FIRST'}
                 </p>
               </div>
             )}

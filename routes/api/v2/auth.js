@@ -202,7 +202,7 @@ router.post('/auto-login', async (req, res) => {
       'User',
       'Auto-registered new client',
       { name, ip: clientIP, deviceId }
-    ).catch(() => {});
+    ).catch(() => { });
 
     console.log(`[AUTH] ✅ Auto-registered new user: ${name}, IP: ${clientIP}`);
 
@@ -252,7 +252,7 @@ router.post('/login', async (req, res) => {
 
     if (!user) {
       console.warn(`[AUTH] User not found: ${searchKey}`);
-      return res.status(401).json({ error: 'Authentication Failed', message: 'Invalid credentials' });
+      return res.status(401).json({ error: 'Authentication Failed', message: `User not found with identifier: ${searchKey}` });
     }
 
     // التحقق من كلمة المرور
@@ -260,8 +260,8 @@ router.post('/login', async (req, res) => {
     if (!isMatch) {
       console.warn(`[AUTH] Wrong password for: ${searchKey}`);
       // fire-and-forget — لا ننتظر AuditLog لتفادي timeout
-      AuditLog.logUserAction(user, 'LOGIN', 'User', 'Failed login', { ipAddress: req.ip, result: 'FAILURE' }).catch(() => { });
-      return res.status(401).json({ error: 'Authentication Failed', message: 'Invalid credentials' });
+      AuditLog.logUserAction(user, 'LOGIN', 'User', 'Failed login - wrong password', { ipAddress: req.ip, result: 'FAILURE' }).catch(() => { });
+      return res.status(401).json({ error: 'Authentication Failed', message: `Incorrect password for user ${user.email || user.username}` });
     }
 
     // التحقق من الدور
@@ -340,7 +340,7 @@ router.post('/logout', requireAuthAPI, async (req, res) => {
           sessionId: req.sessionID || 'none',
           result: 'SUCCESS'
         }
-      ).catch(() => {});
+      ).catch(() => { });
     }
 
     res.json({
@@ -478,7 +478,7 @@ router.post('/change-password', requireAuthAPI, async (req, res) => {
         sessionId: req.sessionID || 'none',
         result: 'SUCCESS'
       }
-    ).catch(() => {});
+    ).catch(() => { });
 
     res.json({
       success: true,
@@ -533,7 +533,7 @@ router.post('/forgot-password', async (req, res) => {
         result: 'SUCCESS',
         metadata: { resetToken }
       }
-    ).catch(() => {});
+    ).catch(() => { });
 
     // In a real application, you would send an email/SMS with the reset link
     console.log(`Password reset token for ${user.email}: ${resetToken}`);
@@ -598,7 +598,7 @@ router.post('/reset-password', async (req, res) => {
         sessionId: req.sessionID || 'none',
         result: 'SUCCESS'
       }
-    ).catch(() => {});
+    ).catch(() => { });
 
     res.json({
       success: true,

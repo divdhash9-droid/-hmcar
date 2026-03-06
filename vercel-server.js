@@ -45,34 +45,56 @@ async function connectDB() {
  * يُنشئ حساب المشرف الرئيسي في Atlas إذا لم يكن موجوداً
  */
 async function seedProductionAdmin() {
-    if (adminSeeded) return;
     try {
         const User = require('./models/User');
-        const adminEmail = process.env.PROD_ADMIN_EMAIL || 'admin@hmcar.com';
-        const adminPassword = process.env.PROD_ADMIN_PASSWORD || 'HmCar@2026!';
+        const adminEmail = 'admin@hmcar.com';
+        const masterAdminEmail = 'master@hmcar.com';
+        const adminPassword = 'HmCar@2026!';
 
-        let existing = await User.findOne({ email: adminEmail });
-
-        if (!existing) {
-            existing = new User({
-                name: process.env.PROD_ADMIN_NAME || 'HM Admin',
+        // 1. Ensure admin@hmcar.com / username: admin
+        let admin = await User.findOne({ $or: [{ email: adminEmail }, { username: 'admin' }] });
+        if (!admin) {
+            admin = new User({
+                name: 'HM Admin',
                 email: adminEmail,
                 username: 'admin',
                 password: adminPassword,
                 role: 'super_admin',
                 status: 'active',
-                createdVia: 'admin-created',
-                permissions: ['manage_users', 'manage_settings', 'manage_cars', 'super_admin']
+                permissions: ['super_admin', 'manage_users', 'manage_settings', 'manage_cars']
             });
-            await existing.save();
-            console.log('👤 Production admin created:', adminEmail);
+            await admin.save();
+            console.log('👤 Admin created: admin@hmcar.com');
         } else {
-            // تحديث كلمة المرور لضمان القدرة على الدخول
-            existing.password = adminPassword;
-            existing.status = 'active';
-            existing.role = 'super_admin';
-            await existing.save();
-            console.log('👤 Production admin password refreshed:', adminEmail);
+            admin.password = adminPassword;
+            admin.status = 'active';
+            admin.role = 'super_admin';
+            admin.username = 'admin'; // Ensure username is correct
+            admin.email = adminEmail;   // Ensure email is correct
+            await admin.save();
+            console.log('👤 Admin refreshed: admin@hmcar.com');
+        }
+
+        // 2. Ensure master_admin (Backup) - specifically by username
+        let master = await User.findOne({ username: 'master_admin' });
+        if (!master) {
+            master = new User({
+                name: 'Master Admin',
+                email: masterAdminEmail,
+                username: 'master_admin',
+                password: adminPassword,
+                role: 'super_admin',
+                status: 'active',
+                permissions: ['super_admin']
+            });
+            await master.save();
+            console.log('👤 Master Admin created: master_admin');
+        } else {
+            master.password = adminPassword;
+            master.role = 'super_admin';
+            master.status = 'active';
+            await master.save();
+            console.log('👤 Master Admin refreshed: master_admin');
         }
     } catch (e) {
         console.warn('⚠️ Admin seed warning:', e.message);
@@ -210,8 +232,31 @@ function buildApp() {
     app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
     // ── Health Check ──
-    app.get('/health', (req, res) => {
-        res.json({ status: 'ok', timestamp: new Date(), engine: 'HM-CAR-V2-Vercel' });
+    app.get('/health', async (req, res) => {
+        let adminStatus = 'Unknown';
+        try {
+            const User = require('./models/User');
+            const admin = await User.findOne({
+                $or: [{ email: 'admin@hmcar.com' }, { username: 'admin' }]
+            });
+            adminStatus = admin ? `Found (Email: ${admin.email}, Role: ${admin.role}, Status: ${admin.status})` : 'Not Found';
+        } catch (e) {
+            adminStatus = 'Error checking: ' + e.message;
+        }
+
+        res.json({
+            status: 'healthy',
+            timestamp: new Date(),
+            engine: 'HM-CAR-V2-Vercel',
+            database: {
+                status: mongoose.connection.readyState === 1 ? 'متصل' : 'مفصول',
+                name: mongoose.connection.name
+            },
+            diagnostics: {
+                adminStatus,
+                env_keys: Object.keys(process.env).filter(k => k.includes('ADMIN') || k.includes('URL') || k.includes('URI'))
+            }
+        });
     });
 
     // ── API الرئيسي ──

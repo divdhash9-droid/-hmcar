@@ -18,6 +18,7 @@ interface BrandRaw {
   logoUrl?: string;
   forCars?: boolean;
   forSpareParts?: boolean;
+  models?: string[];
 }
 
 type Brand = {
@@ -25,6 +26,7 @@ type Brand = {
   name: string;
   logo?: string;
   category: 'cars' | 'parts' | 'both';
+  models: string[];
 };
 
 // [[ARABIC_HEADER]] هذه الصفحة مسؤولة عن إدارة "الوكالات" (التي كانت تسمى سابقاً الماركات) - تسمح للأدمن بإضافة شعار واسم وتصنيف لكل وكالة.
@@ -35,6 +37,7 @@ export default function AdminAgenciesPage() {
   const [name, setName] = useState("");
   const [logo, setLogo] = useState("");
   const [category, setCategory] = useState<'cars' | 'parts' | 'both'>('both');
+  const [modelsText, setModelsText] = useState("");
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
 
@@ -53,6 +56,7 @@ export default function AdminAgenciesPage() {
           id: b._id,
           name: b.name,
           logo: b.logoUrl,
+          models: b.models || [],
           category: (b.forCars && b.forSpareParts) ? 'both' : (b.forCars ? 'cars' : 'parts'),
         } as Brand));
         setBrands(mapped);
@@ -66,7 +70,8 @@ export default function AdminAgenciesPage() {
     if (!name.trim()) return;
     setSaving(true);
     try {
-      const payload = { name: name.trim(), logoUrl: logo, category };
+      const modelsArray = modelsText.split(',').map(s => s.trim()).filter(Boolean);
+      const payload = { name: name.trim(), logoUrl: logo, category, models: modelsArray };
       if (editingId) {
         await api.brands.update(editingId, payload);
       } else {
@@ -79,7 +84,7 @@ export default function AdminAgenciesPage() {
 
   const resetForm = () => {
     setEditingId(null);
-    setName(""); setLogo(""); setCategory('both');
+    setName(""); setLogo(""); setCategory('both'); setModelsText("");
     setImageSrc(null); setShowCropper(false);
   };
 
@@ -88,6 +93,7 @@ export default function AdminAgenciesPage() {
     setName(b.name);
     setLogo(b.logo || "");
     setCategory(b.category);
+    setModelsText(b.models?.join(', ') || "");
   };
 
   const handleDelete = async (id: string) => {
@@ -289,10 +295,25 @@ export default function AdminAgenciesPage() {
                   />
                 </div>
 
-                {/* ── 3. التصنيف (3 خيارات) ── */}
+                {/* ── 3. الموديلات (اختياري) ── */}
                 <div>
                   <label className="block text-[9px] font-black uppercase tracking-[0.3em] text-white/40 mb-3">
-                    {isRTL ? '③ التصنيف' : '③ CATEGORY'}
+                    {isRTL ? '③ الموديلات التابعة (مفصول بفاصلة)' : '③ CAR MODELS (COMMA SEPARATED)'}
+                  </label>
+                  <input
+                    value={modelsText}
+                    onChange={(e) => setModelsText(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSave()}
+                    title={isRTL ? 'موديلات السيارات المتاحة' : 'Car Models'}
+                    placeholder={isRTL ? 'مثال: كامري, كورولا, يارس' : 'e.g. Camry, Corolla, Yaris'}
+                    className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-4 px-5 text-sm font-bold text-white focus:outline-none focus:border-[#c9a96e]/50 transition-all placeholder:text-white/20"
+                  />
+                </div>
+
+                {/* ── 4. التصنيف (3 خيارات) ── */}
+                <div>
+                  <label className="block text-[9px] font-black uppercase tracking-[0.3em] text-white/40 mb-3">
+                    {isRTL ? '④ التصنيف' : '④ CATEGORY'}
                   </label>
                   <div className="grid grid-cols-3 gap-3">
                     {categories.map((cat) => {

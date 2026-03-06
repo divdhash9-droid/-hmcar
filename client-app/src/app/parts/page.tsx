@@ -3,8 +3,8 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import {
-    ArrowUpRight, Cpu, Settings, Box, Search, Filter,
-    CheckCircle2, AlertCircle, Zap, Shield,
+    ArrowUpRight, Search, Filter,
+    AlertCircle, Zap, Shield,
     Layers, Truck, X, ChevronLeft, ChevronRight, CarFront, Gauge,
     Heart, ShoppingCart, MessageCircle
 } from "lucide-react";
@@ -59,11 +59,11 @@ export default function PartsPage() {
             try {
                 const res = await api.brands.list('parts');
                 if (res?.success && Array.isArray(res.brands)) {
-                    setAgencies(res.brands.map((b: any) => ({
+                    setAgencies(res.brands.map((b: { _id: string, name: string, logoUrl?: string, models?: string[] }) => ({
                         id: b._id,
                         name: b.name,
                         logo: b.logoUrl || '/images/placeholder.jpg',
-                        models: isRTL ? ['كامري', 'كورولا', 'لاند كروزر', 'K5', 'سوناتا'] : ['CAMRY', 'COROLLA', 'LAND CRUISER', 'K5', 'SONATA']
+                        models: Array.isArray(b.models) && b.models.length > 0 ? b.models : []
                     })));
                 }
             } catch (err) {
@@ -72,15 +72,6 @@ export default function PartsPage() {
         };
         fetchAgencies();
     }, [isRTL]);
-
-    const MOCK_PARTS: Part[] = [
-        {
-            id: '1', name: 'CERAMIC BRAKE KIT V2', brand: 'BREMBO', price: 15500,
-            img: 'https://images.unsplash.com/photo-1624552467554-ce1aa68cb952?q=80&w=1000',
-            condition: 'NEW', category: 'BRAKES', stock: 4, compatibility: ['Toyota Camry'], agency: 'TOYOTA', carModel: 'CAMRY', rareLevel: 4
-        },
-        // ... more parts can be added here
-    ];
 
     const handleAgencySelect = (agency: Agency) => {
         setSelectedAgency(agency);
@@ -97,11 +88,20 @@ export default function PartsPage() {
 
     const loadParts = async (agency: string, model: string) => {
         setLoading(true);
-        // Normally fetch from API based on agency and model
-        setTimeout(() => {
-            setParts(MOCK_PARTS.filter(p => p.agency === agency && (p.carModel === model || model === 'ALL')));
+        try {
+            const res = await api.parts.list({ q: agency });
+            if (res && res.parts) {
+                const fetchedParts = res.parts.filter((p: { brand?: string, carModel?: string }) => p.brand?.toLowerCase() === agency.toLowerCase() && (p.carModel?.toLowerCase() === model.toLowerCase() || model === 'ALL'));
+                setParts(fetchedParts);
+            } else {
+                setParts([]);
+            }
+        } catch (error) {
+            console.error("Failed to load parts", error);
+            setParts([]);
+        } finally {
             setLoading(false);
-        }, 800);
+        }
     };
 
     const resetToAgencies = () => {
@@ -281,38 +281,45 @@ export default function PartsPage() {
                         </motion.div>
                     )}
 
-                    {/* 2. MODELS LIST */}
                     {viewMode === 'MODELS' && (
                         <motion.div
                             key="models"
                             initial={{ opacity: 0, x: isRTL ? -30 : 30 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: isRTL ? 30 : -30 }}
-                            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                            className="w-full flex justify-center"
                         >
-                            {selectedAgency?.models.map((model, idx) => (
-                                <motion.div
-                                    key={model}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: idx * 0.05 }}
-                                    onClick={() => handleModelSelect(model)}
-                                    className="group relative cursor-pointer"
-                                >
-                                    <div className="glass-card bg-white/[0.02] border border-white/10 rounded-2xl p-6 flex items-center justify-between group-hover:border-accent-gold/40 transition-all duration-500">
-                                        <div className="flex items-center gap-5">
-                                            <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:bg-accent-gold/10 transition-all">
-                                                <CarFront className="w-5 h-5 text-white/20 group-hover:text-accent-gold transition-colors" />
+                            {selectedAgency?.models && selectedAgency.models.length > 0 ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl">
+                                    {selectedAgency?.models.map((model, idx) => (
+                                        <motion.div
+                                            key={model}
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: idx * 0.05 }}
+                                            onClick={() => handleModelSelect(model)}
+                                            className="group relative cursor-pointer"
+                                        >
+                                            <div className="glass-card bg-white/[0.02] border border-white/10 rounded-2xl p-6 flex items-center justify-between group-hover:border-accent-gold/40 transition-all duration-500">
+                                                <div className="flex items-center gap-5">
+                                                    <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:bg-accent-gold/10 transition-all">
+                                                        <CarFront className="w-5 h-5 text-white/20 group-hover:text-accent-gold transition-colors" />
+                                                    </div>
+                                                    <div>
+                                                        <h3 className="text-sm font-black uppercase tracking-widest">{model}</h3>
+                                                        <span className="text-[8px] text-white/20 font-bold uppercase tracking-widest">{selectedAgency.name} SERIES</span>
+                                                    </div>
+                                                </div>
+                                                <ArrowUpRight className="w-4 h-4 text-white/10 group-hover:text-accent-gold group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
                                             </div>
-                                            <div>
-                                                <h3 className="text-sm font-black uppercase tracking-widest">{model}</h3>
-                                                <span className="text-[8px] text-white/20 font-bold uppercase tracking-widest">{selectedAgency.name} SERIES</span>
-                                            </div>
-                                        </div>
-                                        <ArrowUpRight className="w-4 h-4 text-white/10 group-hover:text-accent-gold group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
-                                    </div>
-                                </motion.div>
-                            ))}
+                                        </motion.div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-20 text-white/40 italic uppercase tracking-[0.2em] font-black w-full text-xs">
+                                    {isRTL ? 'لم يتم إضافة موديلات تابعة لهذه الوكالة بعد.' : 'NO MODELS ASSOCIATED WITH THIS AGENCY YET.'}
+                                </div>
+                            )}
                         </motion.div>
                     )}
 
@@ -378,8 +385,8 @@ export default function PartsPage() {
                                                             );
                                                         }}
                                                         className={`absolute top-4 left-4 w-9 h-9 rounded-full flex items-center justify-center transition-all ${favoriteParts.includes(part.id)
-                                                                ? 'bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)]'
-                                                                : 'bg-black/60 backdrop-blur-md border border-white/20 hover:bg-red-500/20'
+                                                            ? 'bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)]'
+                                                            : 'bg-black/60 backdrop-blur-md border border-white/20 hover:bg-red-500/20'
                                                             }`}
                                                     >
                                                         <Heart className={`w-4 h-4 transition-all ${favoriteParts.includes(part.id) ? 'fill-white text-white scale-110' : 'text-white/70'

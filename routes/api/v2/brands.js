@@ -23,12 +23,13 @@ router.get('/', async (req, res) => {
 // Create brand (Admin only)
 router.post('/', requireAuthAPI, requirePermissionAPI('manage_brands'), async (req, res) => {
   try {
-    const { name, logoUrl, category, location, phone, whatsapp, description, description_ar } = req.body || {};
+    const { name, logoUrl, category, location, phone, whatsapp, description, description_ar, models } = req.body || {};
     const payload = {
       name,
       logoUrl: logoUrl || '',
       forCars: category === 'cars' || category === 'both',
       forSpareParts: category === 'parts' || category === 'both',
+      models: Array.isArray(models) ? models : [],
       location: location || '',
       phone: phone || '',
       whatsapp: whatsapp || '',
@@ -61,7 +62,7 @@ router.post('/', requireAuthAPI, requirePermissionAPI('manage_brands'), async (r
 // Update brand (Admin only)
 router.put('/:id', requireAuthAPI, requirePermissionAPI('manage_brands'), async (req, res) => {
   try {
-    const { name, logoUrl, category, location, phone, whatsapp, description, description_ar } = req.body || {};
+    const { name, logoUrl, category, location, phone, whatsapp, description, description_ar, models } = req.body || {};
     const oldBrand = await Brand.findById(req.params.id);
     const payload = {
       ...(name !== undefined ? { name } : {}),
@@ -71,6 +72,7 @@ router.put('/:id', requireAuthAPI, requirePermissionAPI('manage_brands'), async 
       ...(whatsapp !== undefined ? { whatsapp } : {}),
       ...(description !== undefined ? { description } : {}),
       ...(description_ar !== undefined ? { description_ar } : {}),
+      ...(models !== undefined ? { models: Array.isArray(models) ? models : [] } : {}),
       ...(category
         ? { forCars: category === 'cars' || category === 'both', forSpareParts: category === 'parts' || category === 'both' }
         : {}),

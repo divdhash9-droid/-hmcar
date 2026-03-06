@@ -36,7 +36,11 @@ router.get('/', async (req, res) => {
                 category: p.partType,
                 condition: p.condition || 'NEW',
                 img: p.images?.[0] || 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=1000&auto=format&fit=crop',
-                images: p.images || []
+                images: p.images || [],
+                carModel: p.carModel || '',
+                compatibility: [p.carModel || 'ALL Models'],
+                stock: p.stockQty || 1,
+                rareLevel: 3
             }))
         });
     } catch (error) {

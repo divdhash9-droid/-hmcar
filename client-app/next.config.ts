@@ -30,10 +30,14 @@ const nextConfig: NextConfig = {
     ];
   },
   async rewrites() {
+    // [[ARABIC_COMMENT]] في الإنتاج (Vercel): vercel.json يتولى توجيه /api/* لـ vercel-server.js
+    // [[ARABIC_COMMENT]] في التطوير المحلي فقط: نُوجه /api/* للـ Express على localhost:4002
+    if (process.env.NODE_ENV === 'production') {
+      return []; // [[ARABIC_COMMENT]] لا حاجة لـ rewrites في الإنتاج
+    }
     return [
       {
         source: "/api/:path*",
-        // In local development, forward API requests to the Express backend
         destination: process.env.NEXT_PUBLIC_API_URL
           ? `${process.env.NEXT_PUBLIC_API_URL}/api/:path*`
           : "http://localhost:4002/api/:path*",

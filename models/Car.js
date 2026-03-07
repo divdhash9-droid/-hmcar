@@ -18,10 +18,12 @@ const carSchema = new mongoose.Schema({
   year: Number,
   // تصنيف/فئة السيارة
   category: { type: String, default: 'sedan' }, // Changed to String for flexibility
-  // السعر (price قديم) + سعر بالريال/الدولار
+  // السعر (price قديم) + سعر بالريال/الدولار/الوون
   price: Number,
   priceSar: Number,
   priceUsd: Number,
+  priceKrw: Number,           // [[ARABIC_COMMENT]] السعر بالوون الكوري
+  displayCurrency: { type: String, enum: ['SAR', 'USD', 'KRW'], default: 'SAR' }, // [[ARABIC_COMMENT]] العملة المعروضة للسيارة
   mileage: Number,
   fuelType: { type: String, default: 'Petrol' },
   transmission: { type: String, default: 'Automatic' },

@@ -42,25 +42,27 @@ function SearchContent() {
                 else if (price === '100-300' || price === '100-500k') { minPrice = 100000; maxPrice = 500000; }
                 else if (price === '300+' || price === '500k+') { minPrice = 500000; }
 
+                // [[ARABIC_COMMENT]] api.cars.list يرجع { success, data: { cars, pagination } }
                 const carsRes = await api.cars.list({
                     page: 1,
                     limit: 100,
                     search: q,
-                    make: brand,
+                    make: brand || undefined,
                     minPrice: minPrice?.toString(),
                     maxPrice: maxPrice?.toString()
-                }).catch(() => ({ cars: [] })); // Fix: Ensure catch returns expected structure
+                }).catch(() => ({ data: { cars: [] } }));
 
+                // [[ARABIC_COMMENT]] api.parts.list يرجع { success, data: { parts } }
                 const partsRes = await api.parts.list({
                     page: 1,
                     limit: 100,
                     q: q,
                     category: brand !== '' ? brand : undefined
-                }).catch(() => ({ parts: [] })); // Fix: Ensure catch returns expected structure
+                }).catch(() => ({ data: { parts: [] } }));
 
-                // Access directly as the api wrapper returns response.data
-                const fetchedCars = carsRes.cars || [];
-                const fetchedParts = partsRes.parts || [];
+                // [[ARABIC_COMMENT]] استخراج البيانات من المستوى الصحيح
+                const fetchedCars = carsRes?.data?.cars || [];
+                const fetchedParts = partsRes?.data?.parts || [];
 
                 setCars(fetchedCars);
                 setParts(fetchedParts);
@@ -75,6 +77,7 @@ function SearchContent() {
 
         fetchData();
     }, [q, brand, price]);
+
 
     const handleConciergeRequest = () => {
         router.push('/concierge');

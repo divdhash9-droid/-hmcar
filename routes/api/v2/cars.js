@@ -95,6 +95,10 @@ router.get('/', async (req, res) => {
                     model: car.model,
                     year: car.year,
                     price: car.price || car.priceSar || 0,
+                    priceSar: car.priceSar || car.price || 0,
+                    priceUsd: car.priceUsd || 0,
+                    priceKrw: car.priceKrw || 0,           // [[ARABIC_COMMENT]] السعر بالوون الكوري
+                    displayCurrency: car.displayCurrency || 'SAR', // [[ARABIC_COMMENT]] العملة المفضلة للسيارة
                     images: car.images || [],
                     category: car.category,
                     isActive: car.isActive,
@@ -104,7 +108,9 @@ router.get('/', async (req, res) => {
                     fuelType: car.fuelType,
                     transmission: car.transmission,
                     mileage: car.mileage,
-                    description: car.description
+                    description: car.description,
+                    listingType: car.listingType,
+                    make: typeof car.make === 'object' ? car.make : { name: car.make }
                 })),
                 pagination: {
                     current: parseInt(page),

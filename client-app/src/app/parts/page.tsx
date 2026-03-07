@@ -3,11 +3,12 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import {
-    ArrowUpRight, Search, Filter,
-    AlertCircle, Zap, Shield,
-    Layers, Truck, X, ChevronLeft, ChevronRight, CarFront, Gauge,
+    ArrowUpRight, Search,
+    AlertCircle, Zap,
+    ChevronLeft, ChevronRight, CarFront,
     Heart, ShoppingCart, MessageCircle
 } from "lucide-react";
+
 import Navbar from "@/components/Navbar";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/LanguageContext";

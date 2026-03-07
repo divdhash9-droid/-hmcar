@@ -43,7 +43,10 @@ interface Agency {
 export default function PartsPage() {
     const { isRTL } = useLanguage();
     const { formatPrice, socialLinks } = useSettings();
+    // [[ARABIC_COMMENT]] رقم الواتساب - يستخدم رقم الأدمن أو الرقم الكوري الافتراضي
+    const WHATSAPP_NUMBER = (socialLinks?.whatsapp || '+821080880014').replace(/\D/g, '');
     const [favoriteParts, setFavoriteParts] = useState<string[]>([]);
+
     const [viewMode, setViewMode] = useState<'AGENCIES' | 'MODELS' | 'PARTS'>('AGENCIES');
     const [selectedAgency, setSelectedAgency] = useState<Agency | null>(null);
     const [selectedModel, setSelectedModel] = useState<string | null>(null);
@@ -426,17 +429,17 @@ export default function PartsPage() {
                                                         {/* 💬 شراء عبر WhatsApp */}
                                                         <a
                                                             href={(() => {
-                                                                const phone = (socialLinks?.whatsapp || '').replace(/[^0-9]/g, '');
                                                                 const msg = isRTL
                                                                     ? `🔧 *طلب شراء قطعة غيار*\n━━━━━━━━━━━━━━━━\n📌 *${part.name}*\n🏭 الماركة: ${part.brand}\n📦 الحالة: ${part.condition}\n🚗 متوافق مع: ${part.compatibility.join('، ')}\n━━━━━━━━━━━━━━━━\n💰 السعر: ${formatPrice(part.price)}\n━━━━━━━━━━━━━━━━\n\nأرجو التواصل للإتمام ✅`
                                                                     : `🔧 *Spare Part Purchase Request*\n━━━━━━━━━━━━━━━━\n📌 *${part.name}*\n🏭 Brand: ${part.brand}\n📦 Condition: ${part.condition}\n🚗 Compatible: ${part.compatibility.join(', ')}\n━━━━━━━━━━━━━━━━\n💰 Price: ${formatPrice(part.price)}\n━━━━━━━━━━━━━━━━\n\nPlease contact me ✅`;
-                                                                return phone ? `https://wa.me/${phone}?text=${encodeURIComponent(msg)}` : '#';
+                                                                return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
                                                             })()}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
                                                             title={isRTL ? 'شراء عبر واتساب' : 'Buy via WhatsApp'}
                                                             className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-green-600/20 border border-green-500/30 hover:bg-green-600 text-green-400 hover:text-white transition-all text-[10px] font-black uppercase tracking-wider"
                                                         >
+
                                                             <MessageCircle className="w-4 h-4" />
                                                             <span>{isRTL ? 'شراء' : 'Buy'}</span>
                                                         </a>

@@ -8,9 +8,9 @@ import { cookies } from "next/headers";
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,         // منع التكبير التلقائي على iOS
-  userScalable: false,     // منع التكبير اليدوي للحفاظ على التصميم
-  themeColor: "#000000",   // لون شريط المتصفح
+  maximumScale: 5,         // [[ARABIC_COMMENT]] اسمح بالتكبير - مهم للأجهزة الصغيرة
+  userScalable: true,      // [[ARABIC_COMMENT]] اسمح للمستخدم بالتكبير - أفضل لأجهزة iOS
+  themeColor: "#000000",   // [[ARABIC_COMMENT]] لون شريط المتصفح
   colorScheme: "dark",
 };
 

@@ -60,8 +60,13 @@ export default function ShowroomCarDetail() {
         api.settings.getPublic().then((res: any) => {
             if (res?.success && res.data?.socialLinks?.whatsapp) {
                 setWhatsapp(res.data.socialLinks.whatsapp);
+            } else {
+                // [[ARABIC_COMMENT]] استخدم الرقم الكوري الافتراضي إذا لم يُعيّن الأدمن رقماً
+                setWhatsapp('+821080880014');
             }
-        }).catch(() => { });
+        }).catch(() => {
+            setWhatsapp('+821080880014');
+        });
     }, []);
 
     // إرسال رسالة واتساب مع فاتورة السيارة
@@ -75,9 +80,11 @@ export default function ShowroomCarDetail() {
             ? `السلام عليكم،\n\n📋 *طلب شراء سيارة من المعرض*\n\n🚗 *معلومات السيارة:*\n• الاسم: ${car.title}\n• الماركة: ${carMake}\n• الموديل: ${car.model}\n• السنة: ${car.year}\n• اللون: ${car.color || 'غير محدد'}\n• المسافة: ${car.mileage ? car.mileage.toLocaleString() + ' كم' : 'غير محدد'}\n• نوع الوقود: ${car.fuelType || 'غير محدد'}\n• ناقل الحركة: ${car.transmission || 'غير محدد'}\n\n💰 *السعر: ${price}*\n\nأرجو التواصل معي للاستفسار عن هذه السيارة.`
             : `Hello,\n\n📋 *Car Purchase Request from Showroom*\n\n🚗 *Car Details:*\n• Name: ${car.title}\n• Make: ${carMake}\n• Model: ${car.model}\n• Year: ${car.year}\n• Color: ${car.color || 'N/A'}\n• Mileage: ${car.mileage ? car.mileage.toLocaleString() + ' km' : 'N/A'}\n• Fuel: ${car.fuelType || 'N/A'}\n• Transmission: ${car.transmission || 'N/A'}\n\n💰 *Price: ${price}*\n\nPlease contact me regarding this vehicle.`;
 
-        const phone = String(whatsapp || '').replace(/\D/g, '');
+        // [[ARABIC_COMMENT]] استخدم الرقم المحفوظ أو الافتراضي - دائماً يعمل
+        const phone = String(whatsapp || '+821080880014').replace(/\D/g, '');
         window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
     };
+
 
     // عرض شاشة التحميل
     if (loading) {

@@ -380,26 +380,27 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
       )}
 
       {/* ── AVAILABLE CARS CREATIVE TICKER ── */}
-      <section ref={liveRef} className="relative z-10 py-16 bg-gradient-to-b from-transparent via-[#c9a96e]/5 to-transparent overflow-hidden">
-        <div className="max-w-[100vw] mx-auto">
-          <motion.div className="text-center mb-16" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
-            <motion.div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full border border-[#c9a96e]/30 bg-[#c9a96e]/10 backdrop-blur-md mb-6 shadow-[0_0_20px_rgba(201,169,110,0.15)]" whileHover={{ scale: 1.05 }}>
-              <Sparkles className="w-5 h-5 text-[#c9a96e] animate-pulse" />
-              <span className="text-sm font-black text-[#c9a96e] tracking-[0.2em] uppercase">{isRTL ? "تشكيلة المعرض" : "SHOWROOM COLLECTION"}</span>
+      {/* [[ARABIC_COMMENT]] إخفاء القسم بالكامل إذا لم تكن هناك سيارات مضافة للمعرض */}
+      {latestCars && latestCars.length > 0 && (
+        <section ref={liveRef} className="relative z-10 py-16 bg-gradient-to-b from-transparent via-[#c9a96e]/5 to-transparent overflow-hidden">
+          <div className="max-w-[100vw] mx-auto">
+            <motion.div className="text-center mb-16" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
+              <motion.div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full border border-[#c9a96e]/30 bg-[#c9a96e]/10 backdrop-blur-md mb-6 shadow-[0_0_20px_rgba(201,169,110,0.15)]" whileHover={{ scale: 1.05 }}>
+                <Sparkles className="w-5 h-5 text-[#c9a96e] animate-pulse" />
+                <span className="text-sm font-black text-[#c9a96e] tracking-[0.2em] uppercase">{isRTL ? "تشكيلة المعرض" : "SHOWROOM COLLECTION"}</span>
+              </motion.div>
+              <h2 className="text-5xl md:text-6xl font-black text-white italic uppercase tracking-tighter mb-4" style={{ textShadow: "0 0 40px rgba(201,169,110,0.4)" }}>
+                {isRTL ? "سيارات متوفرة الآن" : "AVAILABLE CARS"}
+              </h2>
+              <p className="text-white/50 text-sm font-medium uppercase tracking-[0.1em]">{isRTL ? "اكتشف أحدث الموديلات المضافة إلى مستودعاتنا" : "DISCOVER THE LATEST MODELS ADDED TO OUR INVENTORY"}</p>
             </motion.div>
-            <h2 className="text-5xl md:text-6xl font-black text-white italic uppercase tracking-tighter mb-4" style={{ textShadow: "0 0 40px rgba(201,169,110,0.4)" }}>
-              {isRTL ? "سيارات متوفرة الآن" : "AVAILABLE CARS"}
-            </h2>
-            <p className="text-white/50 text-sm font-medium uppercase tracking-[0.1em]">{isRTL ? "اكتشف أحدث الموديلات المضافة إلى مستودعاتنا" : "DISCOVER THE LATEST MODELS ADDED TO OUR INVENTORY"}</p>
-          </motion.div>
 
-          {/* New Ticker Layered Container */}
-          <div className="relative w-full overflow-hidden py-10">
-            {/* Gradient Mask for fading edges */}
-            <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#050505] to-transparent z-20 pointer-events-none" />
-            <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#050505] to-transparent z-20 pointer-events-none" />
+            {/* New Ticker Layered Container */}
+            <div className="relative w-full overflow-hidden py-10">
+              {/* Gradient Mask for fading edges */}
+              <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#050505] to-transparent z-20 pointer-events-none" />
+              <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#050505] to-transparent z-20 pointer-events-none" />
 
-            {latestCars && latestCars.length > 0 ? (
               <motion.div
                 className="flex gap-8 cursor-grab active:cursor-grabbing w-max px-8"
                 animate={{ x: isRTL ? ["0%", "50%"] : ["-50%", "0%"] }}
@@ -454,26 +455,22 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
                   )
                 })}
               </motion.div>
-            ) : (
-              <div className="text-center py-20 text-white/30 italic uppercase tracking-[0.2em] font-black text-sm">
-                {isRTL ? "لا توجد سيارات متوفرة حالياً" : "NO CARS AVAILABLE CURRENTLY"}
-              </div>
-            )}
-          </div>
+            </div>
 
-          <div className="flex justify-center mt-8 relative z-30 pointer-events-auto">
-            <button
-              onClick={() => router.push('/showroom')}
-              className="group flex items-center gap-3 px-8 py-4 rounded-2xl bg-white/[0.03] border border-white/10 hover:border-[#c9a96e]/40 hover:bg-[#c9a96e]/10 transition-all backdrop-blur-xl"
-            >
-              <span className="text-xs font-black uppercase tracking-[0.2em] text-white group-hover:text-[#c9a96e] transition-colors">
-                {isRTL ? "تصفح جميع السيارات" : "BROWSE ALL CARS"}
-              </span>
-              <ArrowUpRight className="w-4 h-4 text-white/40 group-hover:text-[#c9a96e] transition-colors" />
-            </button>
+            <div className="flex justify-center mt-8 relative z-30 pointer-events-auto">
+              <button
+                onClick={() => router.push('/showroom')}
+                className="group flex items-center gap-3 px-8 py-4 rounded-2xl bg-white/[0.03] border border-white/10 hover:border-[#c9a96e]/40 hover:bg-[#c9a96e]/10 transition-all backdrop-blur-xl"
+              >
+                <span className="text-xs font-black uppercase tracking-[0.2em] text-white group-hover:text-[#c9a96e] transition-colors">
+                  {isRTL ? "تصفح جميع السيارات" : "BROWSE ALL CARS"}
+                </span>
+                <ArrowUpRight className="w-4 h-4 text-white/40 group-hover:text-[#c9a96e] transition-colors" />
+              </button>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Features Section - Dynamic from Settings */}
       <section className="relative z-10 py-12 px-4 sm:px-6 lg:px-8">

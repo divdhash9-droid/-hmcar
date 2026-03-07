@@ -18,7 +18,8 @@ router.get('/', async (req, res) => {
             minPrice,
             maxPrice,
             search,
-            status = 'active'
+            status = 'active',
+            listingType
         } = req.query;
 
         // بناء الفلتر
@@ -35,6 +36,7 @@ router.get('/', async (req, res) => {
 
         if (category) filter.category = category;
         if (make) filter.make = make;
+        if (listingType) filter.listingType = listingType;
 
         if (minPrice || maxPrice) {
             filter.$or = [

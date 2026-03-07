@@ -137,7 +137,7 @@ export default function ProductModal({ product, onClose, whatsappNumber }: Produ
         // [[ARABIC_COMMENT]] تسجيل الطلب في القاعدة قبل الانتقال للواتساب
         try {
             await api.orders.create({
-                buyerId: user?.id || null,
+                buyerId: user?._id || null,
                 items: [{
                     itemType: product.type === 'car' ? 'car' : 'sparePart',
                     refId: product.id,

@@ -47,9 +47,9 @@ function SearchContent() {
                     page: 1,
                     limit: 100,
                     search: q,
-                    make: brand || undefined,
-                    minPrice: minPrice?.toString(),
-                    maxPrice: maxPrice?.toString()
+                    make: brand || '',
+                    minPrice: minPrice?.toString() ?? '',
+                    maxPrice: maxPrice?.toString() ?? ''
                 }).catch(() => ({ data: { cars: [] } }));
 
                 // [[ARABIC_COMMENT]] api.parts.list يرجع { success, data: { parts } }
@@ -106,7 +106,7 @@ function SearchContent() {
 
                 {q && (
                     <div className="mb-20">
-                        <span className="text-6xl md:text-8xl font-black italic text-transparent bg-clip-text bg-gradient-to-b from-white to-white/10 tracking-tighter opacity-50">"{q.toUpperCase()}"</span>
+                        <span className="text-6xl md:text-8xl font-black italic text-transparent bg-clip-text bg-gradient-to-b from-white to-white/10 tracking-tighter opacity-50">&quot;{q.toUpperCase()}&quot;</span>
                     </div>
                 )}
 

@@ -1,18 +1,28 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 import ClientLayoutWrapper from "@/components/ClientLayoutWrapper";
 import { cookies } from "next/headers";
 
-// Fonts are temporarily disabled to ensure offline build success
-// import { Inter, Tajawal } from "next/font/google";
-// const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-inter" });
-// const tajawal = Tajawal({ subsets: ["arabic", "latin"], display: "swap", variable: "--font-tajawal", weight: ["300", "400", "500", "700", "800", "900"] });
+// [[ARABIC_COMMENT]] الـ Viewport للتحكم في مقياس الشاشة على الموبايل
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,         // منع التكبير التلقائي على iOS
+  userScalable: false,     // منع التكبير اليدوي للحفاظ على التصميم
+  themeColor: "#000000",   // لون شريط المتصفح
+  colorScheme: "dark",
+};
 
 export const metadata: Metadata = {
   title: "HM CAR | Premium Korean Auto Export",
   description: "The premier destination for luxury Korean car exports and rare components worldwide. Seoul to the world.",
   keywords: "car export, korean cars, luxury vehicles, spare parts, auto auction",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "HM CAR",
+  },
   openGraph: {
     title: "HM CAR | Premium Korean Auto Export",
     description: "Exporting cars & parts from Korea to the world",

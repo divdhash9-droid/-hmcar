@@ -335,7 +335,7 @@
 }
 
 /* ═══════════════════════════════════════════
-   MOBILE & RESPONSIVE FIXES (v4.1 ULTRA-COMPACT)
+   MOBILE & RESPONSIVE FIXES - شامل لجميع الأجهزة
    ═══════════════════════════════════════════ */
 
 /* Fix iOS Safari fixed background issue */
@@ -348,76 +348,206 @@
   }
 }
 
-/* Mobile Perfection (max-width: 767px) */
-@media (max-width: 767px) {
+/* منع الـ overflow الأفقي في كل الصفحات */
+html,
+body {
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  -webkit-text-size-adjust: 100%;
+  /* منع iOS من تكبير الخط تلقائياً */
+}
+
+/* تحسين الصور والفيديو */
+img,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ═══ الموبايل الصغير (max 480px) ═══ */
+@media (max-width: 480px) {
+
+  /* إخفاء الفيديو على الموبايل لتوفير الداتا */
   .video-bg {
     display: none !important;
   }
 
-  /* Optimized Backgrounds for Phones */
-  .video-bg-wrapper {
-    background-color: #050505;
-    background-size: 100% auto !important;
-    /* يحافظ على تناسق الصورة بدلاً من التكبير الرهيب */
-    background-position: center top !important;
-    /* يركز على أعلى الصورة (غالباً مكان السيارة أو الشعار) */
-    background-repeat: no-repeat;
+  /* تصغير عناوين الهيرو */
+  h1 {
+    font-size: clamp(1.6rem, 8vw, 2.2rem) !important;
+    line-height: 1.1 !important;
   }
 
-  /* Compact Buttons - صغيرة ولكن ظاهرة ومرتبة */
+  h2 {
+    font-size: clamp(1.2rem, 6vw, 1.6rem) !important;
+  }
+
+  h3 {
+    font-size: clamp(1rem, 5vw, 1.3rem) !important;
+  }
+
+  p,
+  li {
+    font-size: clamp(0.8rem, 3.5vw, 0.95rem) !important;
+  }
+
+  /* تصغير padding الصفحات */
+  .main-content,
+  main {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  /* البطاقات على الموبايل */
+  .glass-card {
+    padding: 1rem !important;
+    border-radius: 1.25rem !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  /* الأزرار */
+  .btn-luxury,
+  .btn-start-engine,
+  .btn-glow {
+    padding: 0.7rem 1rem !important;
+    min-height: 44px !important;
+    font-size: 10px !important;
+    letter-spacing: 0.04em !important;
+  }
+
+  /* جداول الأدمن - scroll أفقي */
+  table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* النماذج على الموبايل - عمود واحد دائماً */
+  form .grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* النماذج المنبثقة */
+  .admin-modal {
+    margin: 0.5rem !important;
+    border-radius: 1.5rem !important;
+    max-height: 95vh !important;
+  }
+}
+
+/* ═══ الموبايل العادي (max 767px) ═══ */
+@media (max-width: 767px) {
+
+  /* إخفاء الفيديو */
+  .video-bg {
+    display: none !important;
+  }
+
+  /* خلفية بديلة للموبايل */
+  .video-bg-wrapper {
+    background-color: #050505;
+  }
+
+  /* الأزرار */
   .btn-luxury,
   .btn-start-engine,
   .btn-glow {
     padding-top: 0.75rem !important;
     padding-bottom: 0.75rem !important;
-    min-height: 42px !important;
+    min-height: 44px !important;
     font-size: 11px !important;
     letter-spacing: 0.05em !important;
   }
 
-  /* Tidy Cards - ترتيب البطاقات لتقليل الفوضى */
+  /* البطاقات */
   .glass-card {
     padding: 1.25rem !important;
-    /* هوامش أقل لترك مساحة للمحتوى */
-    margin-left: 0.25rem;
-    margin-right: 0.25rem;
     border-radius: 1.5rem !important;
     overflow: hidden;
   }
 
-  /* Font Scaling */
-  h1 {
-    font-size: 2rem !important;
-    line-height: 1.1;
+  /* تدوير الشبكات إلى عمود واحد */
+  .responsive-grid-2 {
+    grid-template-columns: 1fr !important;
   }
 
-  h2 {
-    font-size: 1.5rem !important;
-  }
-
-  p {
-    font-size: 0.85rem !important;
-  }
-
-  /* Admin Header & Actions */
-  .admin-header-actions {
-    display: flex;
-    flex-direction: row !important;
-    /* العودة للصف الواحد إذا كانت العناصر صغيرة */
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  /* Admin tables scroll horizontally */
-  .admin-table-wrapper {
-    overflow-x: auto;
+  /* جدول الأدمن */
+  .admin-table-wrapper,
+  .overflow-x-auto {
+    overflow-x: auto !important;
     -webkit-overflow-scrolling: touch;
     border-radius: 1rem;
   }
+
+  /* الـ header actions */
+  .admin-header-actions {
+    flex-direction: column !important;
+    gap: 0.5rem;
+  }
+
+  /* تصغير الـ padding على الصفحات */
+  .pt-32 {
+    padding-top: 6rem !important;
+  }
+
+  .pt-28 {
+    padding-top: 5.5rem !important;
+  }
+
+  .pt-24 {
+    padding-top: 5rem !important;
+  }
+
+  .pb-24 {
+    padding-bottom: 4rem !important;
+  }
+
+  /* تصغير عناوين الصفحات الكبيرة */
+  .text-7xl,
+  .text-8xl {
+    font-size: 2.8rem !important;
+    line-height: 1.1 !important;
+  }
+
+  .text-6xl {
+    font-size: 2.4rem !important;
+    line-height: 1.1 !important;
+  }
+
+  .text-5xl {
+    font-size: 2rem !important;
+  }
+
+  .text-4xl {
+    font-size: 1.7rem !important;
+  }
+
+  /* الـ modal على الموبايل */
+  [class*="max-w-4xl"],
+  [class*="max-w-5xl"],
+  [class*="max-w-6xl"],
+  [class*="max-w-7xl"] {
+    max-width: 100% !important;
+  }
+
+  /* تصغير الصور المصغرة في الأدمن */
+  .car-thumbnail {
+    width: 48px !important;
+    height: 48px !important;
+  }
 }
 
-/* Tablet Tweaks */
+/* ═══ التابلت (768px - 1024px) ═══ */
 @media (min-width: 768px) and (max-width: 1024px) {
+
+  /* الشبكات - عمودين */
+  .tablet-grid-2 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* الأشرطة الجانبية */
   .admin-sidebar {
     width: 80px;
   }
@@ -425,24 +555,118 @@
   .admin-sidebar span {
     display: none;
   }
+
+  /* تصغير عناوين البطاقات */
+  .text-7xl,
+  .text-8xl {
+    font-size: 3.5rem !important;
+  }
+
+  .text-6xl {
+    font-size: 3rem !important;
+  }
 }
 
-/* Ensure images don't overflow on mobile */
-img,
-video {
-  max-width: 100%;
+/* ═══ تحسينات عامة على كل الأجهزة ═══ */
+
+/* [[ARABIC_COMMENT]] منع طولان النص خارج حدود عنصره */
+* {
+  min-width: 0;
 }
 
-/* Prevent horizontal scroll on all pages */
-html,
-body {
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
+/* [[ARABIC_COMMENT]] تحسين اللمس على الموبايل */
+button,
+a,
+[role="button"] {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
-/* RTL support improvements on mobile */
+/* [[ARABIC_COMMENT]] منع الضغط المزدوج على iOS */
+input,
+button,
+select,
+textarea {
+  -webkit-appearance: none;
+  border-radius: 0;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  opacity: 0.4;
+}
+
+/* [[ARABIC_COMMENT]] RTL: منع اختلال الاتجاه في الـ flex على الموبايل */
 @media (max-width: 767px) {
-  [dir="rtl"] .flex {
-    flex-wrap: wrap;
+  [dir="rtl"] .mobile-col {
+    flex-direction: column;
+  }
+}
+
+/* [[ARABIC_COMMENT]] تحسين الـ modal على الموبايل - يبدأ من الأسفل */
+@media (max-width: 640px) {
+  .modal-mobile-bottom {
+    align-items: flex-end !important;
+    padding: 0 !important;
+  }
+
+  .modal-mobile-bottom>div {
+    border-radius: 2rem 2rem 0 0 !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+  }
+}
+
+/* [[ARABIC_COMMENT]] شبكة الأسعار - 3 أعمدة على الكبير، عمود على الموبايل */
+@media (max-width: 640px) {
+  .price-grid-3 {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+}
+
+/* [[ARABIC_COMMENT]] تحسين ظهور الجداول الأدمن على الموبايل */
+@media (max-width: 767px) {
+
+  .admin-table th:nth-child(3),
+  .admin-table th:nth-child(4),
+  .admin-table td:nth-child(3),
+  .admin-table td:nth-child(4) {
+    display: none;
+  }
+}
+
+/* [[ARABIC_COMMENT]] التمرير السلس على كل الأجهزة */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-gold);
+}
+
+/* [[ARABIC_COMMENT]] إخفاء الـ scrollbar على الموبايل */
+@media (max-width: 767px) {
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  * {
+    scrollbar-width: none;
   }
 }

@@ -141,23 +141,29 @@ export default function Navbar() {
                             </Link>
                         )}
 
-                        <div className="flex items-center gap-2">
-                            <button
-                                onClick={() => setDisplayCurrency(displayCurrency === 'SAR' ? 'USD' : 'SAR')}
-                                className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all font-bold text-[10px]"
-                                title={isRTL ? "تغيير العملة" : "Change Currency"}
-                            >
-                                {displayCurrency}
-                            </button>
-
-                            <button
-                                onClick={toggleLanguage}
-                                className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all"
-                                title={isRTL ? "تغيير اللغة" : "Change Language"}
-                            >
-                                <Languages className="w-5 h-5 text-accent-gold" />
-                            </button>
-                        </div>
+                        {/* [[ARABIC_COMMENT]] زر تدوير العملة بين SAR → USD → KRW → SAR */}
+                        <button
+                            onClick={() => setDisplayCurrency(
+                                displayCurrency === 'SAR' ? 'USD' : displayCurrency === 'USD' ? 'KRW' : 'SAR'
+                            )}
+                            className={`w-10 h-10 rounded-xl bg-white/5 border flex items-center justify-center font-black text-[9px] transition-all ${displayCurrency === 'KRW'
+                                ? 'border-yellow-400/40 text-yellow-400'
+                                : displayCurrency === 'USD'
+                                    ? 'border-cinematic-neon-blue/40 text-cinematic-neon-blue'
+                                    : 'border-white/10 text-white/60 hover:text-white hover:bg-white/10'
+                                }`}
+                            title={isRTL ? "تغيير العملة" : "Change Currency"}
+                        >
+                            {displayCurrency === 'KRW' ? '₩' : displayCurrency === 'USD' ? '$' : 'ر.س'}
+                        </button>
+                        {/* [[ARABIC_COMMENT]] زر تغيير اللغة */}
+                        <button
+                            onClick={toggleLanguage}
+                            className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all"
+                            title={isRTL ? "تغيير اللغة" : "Change Language"}
+                        >
+                            <Languages className="w-5 h-5 text-accent-gold" />
+                        </button>
 
                         {/* Mobile Toggle */}
                         <button

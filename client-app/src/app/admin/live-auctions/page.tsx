@@ -20,6 +20,8 @@ export default function AdminLiveAuctions() {
         title: '',
         externalUrl: '',
         whatsappNumber: '',
+        auctionUsername: '', // [[ARABIC_COMMENT]] اسم المستخدم للمزاد الخارجي
+        auctionPassword: '', // [[ARABIC_COMMENT]] كلمة السر للمزاد الخارجي
         cars: [] as any[]
     });
 
@@ -79,7 +81,7 @@ export default function AdminLiveAuctions() {
     };
 
     const resetForm = () => {
-        setFormData({ title: '', externalUrl: '', whatsappNumber: '', cars: [] });
+        setFormData({ title: '', externalUrl: '', whatsappNumber: '', auctionUsername: '', auctionPassword: '', cars: [] });
         setEditingId(null);
     };
 
@@ -216,16 +218,25 @@ export default function AdminLiveAuctions() {
                             <div className="flex-1 overflow-y-auto p-8 space-y-8">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Session Title</label>
-                                        <input value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} className="w-full bg-white/5 border border-white/10 p-4 rounded-xl focus:outline-none focus:border-cinematic-neon-blue" placeholder="e.g. IAAI Live Monday" />
+                                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">{isRTL ? 'عنوان الجلسة' : 'Session Title'}</label>
+                                        <input value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} className="w-full bg-white/5 border border-white/10 p-4 rounded-xl focus:outline-none focus:border-cinematic-neon-blue" placeholder={isRTL ? 'مثال: جلسة الاثنين IAAI' : 'e.g. IAAI Live Monday'} />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">External Link (Iframe/URL)</label>
+                                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">{isRTL ? 'الرابط الخارجي (iframe/URL)' : 'External Link (Iframe/URL)'}</label>
                                         <input value={formData.externalUrl} onChange={e => setFormData({ ...formData, externalUrl: e.target.value })} className="w-full bg-white/5 border border-white/10 p-4 rounded-xl focus:outline-none focus:border-cinematic-neon-blue" placeholder="https://www.copart.com/..." />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">WhatsApp for this Auction</label>
+                                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">{isRTL ? 'واتساب هذا المزاد' : 'WhatsApp for this Auction'}</label>
                                         <input value={formData.whatsappNumber} onChange={e => setFormData({ ...formData, whatsappNumber: e.target.value })} className="w-full bg-white/5 border border-white/10 p-4 rounded-xl focus:outline-none focus:border-cinematic-neon-blue" placeholder="9665xxxxxxxx" />
+                                    </div>
+                                    {/* [[ARABIC_COMMENT]] بيانات دخول المزاد الخارجي */}
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">{isRTL ? 'اسم المستخدم (للمزاد الخارجي)' : 'Username (External Site)'}</label>
+                                        <input value={formData.auctionUsername} onChange={e => setFormData({ ...formData, auctionUsername: e.target.value })} className="w-full bg-white/5 border border-white/10 p-4 rounded-xl focus:outline-none focus:border-cinematic-neon-blue" placeholder={isRTL ? 'اسم المستخدم' : 'username'} />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">{isRTL ? 'كلمة السر (للمزاد الخارجي)' : 'Password (External Site)'}</label>
+                                        <input type="password" value={formData.auctionPassword} onChange={e => setFormData({ ...formData, auctionPassword: e.target.value })} className="w-full bg-white/5 border border-white/10 p-4 rounded-xl focus:outline-none focus:border-cinematic-neon-blue" placeholder="••••••••" />
                                     </div>
                                 </div>
 

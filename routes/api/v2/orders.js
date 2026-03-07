@@ -195,7 +195,7 @@ router.patch('/:id/status', requireAuthAPI, async (req, res) => {
     }
 });
 
-// DELETE /api/v2/orders/:id - حذف طلب (admin only)
+// DELETE /api/v2/orders/:id - حذف الطلب يعني تغيير حالته لـ cancelled (الأدمن يحذف = ملغاة للعميل)
 router.delete('/:id', requireAuthAPI, async (req, res) => {
     try {
         if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
@@ -205,7 +205,8 @@ router.delete('/:id', requireAuthAPI, async (req, res) => {
             });
         }
 
-        const order = await Order.findByIdAndDelete(req.params.id);
+        // [[ARABIC_COMMENT]] بدلاً من الحذف الفعلي، نغير الحالة لـ cancelled حتى يرى العميل "ملغي"
+        const order = await Order.findById(req.params.id);
         if (!order) {
             return res.status(404).json({
                 success: false,
@@ -213,12 +214,24 @@ router.delete('/:id', requireAuthAPI, async (req, res) => {
             });
         }
 
+        // [[ARABIC_COMMENT]] تسجيل سبب الإلغاء وتحديث الحالة
+        const oldStatus = order.status;
+        order.status = 'cancelled';
+        order.statusHistory.push({
+            from: oldStatus,
+            to: 'cancelled',
+            by: req.user.userId || req.user._id,
+            at: new Date()
+        });
+
+        await order.save();
+
         res.json({
             success: true,
-            message: 'Order deleted successfully'
+            message: 'Order cancelled successfully'
         });
     } catch (error) {
-        console.error('Delete order error:', error);
+        console.error('Cancel order error:', error);
         res.status(500).json({
             success: false,
             error: 'Internal Server Error'

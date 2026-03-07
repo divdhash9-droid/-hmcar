@@ -28,13 +28,7 @@ interface OrderDetail extends Order {
     notes?: string;
 }
 
-const MOCK_ORDERS: Order[] = [
-    { id: '1', orderNumber: 'ORD-A1B2C3D4', customer: { name: 'Ahmed Al-Rashid', email: 'ahmed@example.com' }, car: { title: 'MERCEDES-BENZ S-CLASS 2024', make: 'MERCEDES' }, totalAmount: 450000, status: 'confirmed', paymentStatus: 'paid', createdAt: new Date().toISOString() },
-    { id: '2', orderNumber: 'ORD-E5F6G7H8', customer: { name: 'Mohammed Al-Saud', email: 'mohammed@example.com' }, car: { title: 'BMW M5 COMPETITION 2023', make: 'BMW' }, totalAmount: 380000, status: 'pending', paymentStatus: 'pending', createdAt: new Date(Date.now() - 86400000).toISOString() },
-    { id: '3', orderNumber: 'ORD-I9J0K1L2', customer: { name: 'Khalid Al-Otaibi', email: 'khalid@example.com' }, car: { title: 'PORSCHE 911 TURBO S 2024', make: 'PORSCHE' }, totalAmount: 720000, status: 'completed', paymentStatus: 'paid', createdAt: new Date(Date.now() - 86400000 * 7).toISOString() },
-    { id: '4', orderNumber: 'ORD-M3N4O5P6', customer: { name: 'Faisal Al-Otaibi', email: 'faisal@example.com' }, car: { title: 'RANGE ROVER AUTOBIOGRAPHY 2024', make: 'LAND ROVER' }, totalAmount: 560000, status: 'pending', paymentStatus: 'pending', createdAt: new Date(Date.now() - 86400000 * 2).toISOString() },
-    { id: '5', orderNumber: 'ORD-Q7R8S9T0', customer: { name: 'Saad Al-Ghamdi', email: 'saad@example.com' }, car: { title: 'FERRARI ROMA 2023', make: 'FERRARI' }, totalAmount: 980000, status: 'cancelled', paymentStatus: 'refunded', createdAt: new Date(Date.now() - 86400000 * 14).toISOString() },
-];
+// [[ARABIC_COMMENT]] تم إزالة البيانات الوهمية - الطلبيات تُجلب من API الحقيقي
 
 export default function AdminOrdersPage() {
     const { isRTL } = useLanguage();
@@ -59,37 +53,37 @@ export default function AdminOrdersPage() {
     const loadOrders = async () => {
         setLoading(true);
         try {
+            // [[ARABIC_COMMENT]] جلب الطلبيات الحقيقية من الـ API
             const params: Record<string, string> = {};
             if (filter !== 'all') params.status = filter;
             const data = await api.orders.list(params);
             let list: Order[] = [];
-            if (data?.success && Array.isArray(data.orders)) {
-                list = data.orders;
-            } else {
-                // Fallback to mock data
-                list = filter === 'all' ? MOCK_ORDERS : MOCK_ORDERS.filter(o => o.status === filter);
+            if (data?.success && data?.data?.orders) {
+                // [[ARABIC_COMMENT]] الـ API يعيد { data: { orders: [...] } }
+                list = data.data.orders.map((o: any) => ({
+                    id: o.id || o._id,
+                    orderNumber: o.orderNumber || `ORD-${(o.id || o._id).toString().slice(-8).toUpperCase()}`,
+                    customer: { name: o.buyer?.name || '—', email: o.buyer?.email || '—' },
+                    car: { title: o.car?.title || '—', make: o.car?.make || '—' },
+                    totalAmount: o.totalAmount || 0,
+                    status: o.status,
+                    paymentStatus: o.paymentStatus || 'pending',
+                    createdAt: o.createdAt
+                }));
             }
             setOrders(list);
-            const all = filter === 'all' ? list : MOCK_ORDERS;
+            // [[ARABIC_COMMENT]] حساب الإحصائيات من البيانات الحقيقية
             setStats({
-                total: all.length,
-                pending: all.filter(o => o.status === 'pending').length,
-                confirmed: all.filter(o => o.status === 'confirmed').length,
-                completed: all.filter(o => o.status === 'completed').length,
-                cancelled: all.filter(o => o.status === 'cancelled').length,
-                revenue: all.filter(o => o.paymentStatus === 'paid').reduce((s, o) => s + o.totalAmount, 0),
+                total: list.length,
+                pending: list.filter(o => o.status === 'pending').length,
+                confirmed: list.filter(o => o.status === 'confirmed').length,
+                completed: list.filter(o => o.status === 'completed').length,
+                cancelled: list.filter(o => o.status === 'cancelled').length,
+                revenue: list.filter(o => o.paymentStatus === 'paid').reduce((s, o) => s + o.totalAmount, 0),
             });
         } catch {
-            const list = filter === 'all' ? MOCK_ORDERS : MOCK_ORDERS.filter(o => o.status === filter);
-            setOrders(list);
-            setStats({
-                total: MOCK_ORDERS.length,
-                pending: MOCK_ORDERS.filter(o => o.status === 'pending').length,
-                confirmed: MOCK_ORDERS.filter(o => o.status === 'confirmed').length,
-                completed: MOCK_ORDERS.filter(o => o.status === 'completed').length,
-                cancelled: MOCK_ORDERS.filter(o => o.status === 'cancelled').length,
-                revenue: MOCK_ORDERS.filter(o => o.paymentStatus === 'paid').reduce((s, o) => s + o.totalAmount, 0),
-            });
+            setOrders([]);
+            setStats({ total: 0, pending: 0, confirmed: 0, completed: 0, cancelled: 0, revenue: 0 });
         } finally {
             setLoading(false);
         }
@@ -110,14 +104,16 @@ export default function AdminOrdersPage() {
     };
 
     const deleteOrder = async (orderId: string) => {
-        if (!confirm(isRTL ? 'هل أنت متأكد من حذف هذا الطلب؟' : 'Are you sure you want to delete this order?')) return;
+        // [[ARABIC_COMMENT]] الأدمن يضغط حذف → الـ API يغير الحالة لـ cancelled → يظهر للعميل كـ "ملغي"
+        if (!confirm(isRTL ? 'هل تريد إلغاء هذا الطلب؟ سيظهر للعميل كـ "ملغي"' : 'Cancel this order? Client will see it as Cancelled.')) return;
         try {
             await api.orders.delete(orderId);
-            setOrders(prev => prev.filter(o => o.id !== orderId));
-            if (selectedOrder?.id === orderId) setSelectedOrder(null);
-            showToast(isRTL ? 'تم حذف الطلب بنجاح' : 'Order deleted successfully');
+            // [[ARABIC_COMMENT]] تحديث الحالة في القائمة المعروضة
+            setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: 'cancelled' } : o));
+            if (selectedOrder?.id === orderId) setSelectedOrder(prev => prev ? { ...prev, status: 'cancelled' } : null);
+            showToast(isRTL ? 'تم إلغاء الطلب - سيظهر للعميل كملغي' : 'Order cancelled - Client will see it as Cancelled');
         } catch {
-            showToast(isRTL ? 'فشل حذف الطلب' : 'Failed to delete order', 'error');
+            showToast(isRTL ? 'فشل إلغاء الطلب' : 'Failed to cancel order', 'error');
         }
     };
 

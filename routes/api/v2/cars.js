@@ -23,55 +23,64 @@ router.get('/', async (req, res) => {
         } = req.query;
 
         // بناء الفلتر
-        const filter = {};
+        const conditions = [];
 
         if (status === 'active') {
-            filter.isActive = true;
-            filter.isSold = false;
+            conditions.push({ isActive: true, isSold: false });
         } else if (status === 'sold') {
-            filter.isSold = true;
+            conditions.push({ isSold: true });
         } else if (status === 'inactive') {
-            filter.isActive = false;
+            conditions.push({ isActive: false });
         }
 
-        if (category) filter.category = category;
-        if (make) filter.make = make;
+        if (category) conditions.push({ category });
+        if (make) conditions.push({ make });
+
         if (listingType) {
             if (listingType === 'store') {
-                // [[ARABIC_COMMENT]] جلب سيارات المعرض: إما مصنّفة store أو تلك التي ليس لديها listingType (السيارات القديمة)
-                filter.$or = [
-                    { listingType: 'store' },
-                    { listingType: { $exists: false } },
-                    { listingType: null },
-                    { listingType: '' }
-                ];
+                conditions.push({
+                    $or: [
+                        { listingType: 'store' },
+                        { listingType: { $exists: false } },
+                        { listingType: null },
+                        { listingType: '' }
+                    ]
+                });
             } else {
-                filter.listingType = listingType;
+                conditions.push({ listingType });
             }
         }
 
         if (minPrice || maxPrice) {
-            filter.$or = [
-                { price: {} },
-                { priceSar: {} }
-            ];
+            const priceCond = { $or: [] };
             if (minPrice) {
-                filter.$or[0].price.$gte = Number(minPrice);
-                filter.$or[1].priceSar.$gte = Number(minPrice);
+                priceCond.$or.push({ price: { $gte: Number(minPrice) } });
+                priceCond.$or.push({ priceSar: { $gte: Number(minPrice) } });
             }
             if (maxPrice) {
-                filter.$or[0].price.$lte = Number(maxPrice);
-                filter.$or[1].priceSar.$lte = Number(maxPrice);
+                // [[ARABIC_COMMENT]] إذا كان هناك minPrice مسبقاً، نحتاج لإضافة $lte لشروط الـ $or الموجودة
+                if (priceCond.$or.length > 0) {
+                    priceCond.$or[0].price = { ...priceCond.$or[0].price, $lte: Number(maxPrice) };
+                    priceCond.$or[1].priceSar = { ...priceCond.$or[1].priceSar, $lte: Number(maxPrice) };
+                } else {
+                    priceCond.$or.push({ price: { $lte: Number(maxPrice) } });
+                    priceCond.$or.push({ priceSar: { $lte: Number(maxPrice) } });
+                }
             }
+            conditions.push(priceCond);
         }
 
         if (search) {
-            filter.$or = [
-                { title: { $regex: search, $options: 'i' } },
-                { make: { $regex: search, $options: 'i' } },
-                { model: { $regex: search, $options: 'i' } }
-            ];
+            conditions.push({
+                $or: [
+                    { title: { $regex: search, $options: 'i' } },
+                    { make: { $regex: search, $options: 'i' } },
+                    { model: { $regex: search, $options: 'i' } }
+                ]
+            });
         }
+
+        const filter = conditions.length > 0 ? { $and: conditions } : {};
 
         // Pagination
         const skip = (page - 1) * limit;

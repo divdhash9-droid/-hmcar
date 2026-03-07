@@ -72,8 +72,8 @@ router.post('/', requireAuthAPI, upload.single('image'), async (req, res) => {
                 use_filename: true,
                 unique_filename: true,
                 transformation: [
-                    { width: 1200, crop: "limit" },
-                    { quality: "auto", fetch_format: "auto" }
+                    { width: 1000, crop: "limit" },
+                    { quality: "60", fetch_format: "auto" } // [[ARABIC_COMMENT]] تقليل الجودة قليلاً وتسريع التحميل
                 ]
             });
             // cleanup local file

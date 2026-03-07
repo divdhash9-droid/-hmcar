@@ -208,8 +208,10 @@ export default function ProductModal({ product, onClose, whatsappNumber }: Produ
                                         src={images[activeImg]}
                                         alt={product.title}
                                         fill
+                                        sizes="(max-width: 640px) 100vw, 640px"
+                                        quality={75}
+                                        priority
                                         className="object-cover"
-                                        unoptimized
                                     />
                                     {/* [[ARABIC_COMMENT]] تدرج لوني في الأسفل لدمج الصورة مع المحتوى */}
                                     <div className="absolute inset-0 bg-gradient-to-t from-[#0c0c0c] via-transparent to-transparent" />
@@ -259,7 +261,7 @@ export default function ProductModal({ product, onClose, whatsappNumber }: Produ
                                                 onClick={() => setActiveImg(i)}
                                                 className={`relative w-10 h-10 shrink-0 rounded-lg overflow-hidden border-2 transition-all ${i === activeImg ? 'border-[#c9a96e]' : 'border-transparent opacity-50'}`}
                                             >
-                                                <Image src={img} alt="" fill className="object-cover" unoptimized />
+                                                <Image src={img} alt="" fill sizes="40px" quality={50} className="object-cover" />
                                             </button>
                                         ))}
                                     </div>

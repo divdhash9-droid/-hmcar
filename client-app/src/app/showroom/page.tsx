@@ -323,8 +323,10 @@ export default function Showroom() {
                                                                 src={car.images?.[0] || car.previewImage || ''}
                                                                 alt={car.title}
                                                                 fill
+                                                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                                                                quality={70}
+                                                                priority={i < 4}
                                                                 className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 grayscale-[30%] group-hover:grayscale-0 opacity-70 group-hover:opacity-100"
-                                                                unoptimized
                                                             />
                                                             <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
                                                             <div className="absolute top-4 right-4 z-20 flex items-center gap-2">

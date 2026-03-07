@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/LanguageContext";
 import { api } from "@/lib/api";
@@ -154,6 +155,7 @@ export default function AdminPartsPage() {
             condition: 'New',
             stockQty: 1
         });
+        setEditingPart(null); // [[ARABIC_COMMENT]] تصفير حالة التعديل لضمان عدم الكتابة على قطعة قديمة عند إضافة جديدة
     };
 
     return (
@@ -248,9 +250,13 @@ export default function AdminPartsPage() {
                                 className="glass-card bg-white/[0.01] border-white/5 overflow-hidden group hover:border-cinematic-neon-blue/30 transition-all"
                             >
                                 <div className="relative h-48 overflow-hidden">
-                                    <img
+                                    <Image
                                         src={part.img || part.images?.[0] || 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=1000&auto=format&fit=crop'}
                                         alt={part.name}
+                                        fill
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                        quality={70}
+                                        priority={i < 4}
                                         className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 transition-all duration-700"
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
@@ -346,7 +352,7 @@ export default function AdminPartsPage() {
                                         <div className="flex items-center gap-4">
                                             <div className="relative w-24 h-24 bg-white/5 border border-white/10 rounded-xl overflow-hidden flex items-center justify-center group">
                                                 {formData.images[0] ? (
-                                                    <img src={formData.images[0]} alt="Part" className="w-full h-full object-cover" />
+                                                    <Image src={formData.images[0]} alt="Part" fill sizes="96px" quality={50} className="object-cover" />
                                                 ) : (
                                                     <Upload className="w-8 h-8 text-white/20" />
                                                 )}

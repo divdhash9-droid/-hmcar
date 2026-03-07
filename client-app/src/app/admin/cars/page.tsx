@@ -184,6 +184,7 @@ export default function AdminCarsPage() {
             displayCurrency: 'SAR',
             listingType: 'store'
         });
+        setEditingCar(null); // [[ARABIC_COMMENT]] تصفير حالة التعديل لضمان عدم الكتابة على سيارة قديمة عند إضافة جديدة
     };
 
     // [[ARABIC_COMMENT]] دالة تحويل السعر تلقائياً بين SAR و USD و KRW
@@ -306,6 +307,9 @@ export default function AdminCarsPage() {
                                         src={car.images?.[0] || 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=1000&auto=format&fit=crop'}
                                         alt={car.title}
                                         fill
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                        quality={70}
+                                        priority={i < 3}
                                         className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110"
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />

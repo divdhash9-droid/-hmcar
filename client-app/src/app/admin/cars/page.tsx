@@ -140,9 +140,11 @@ export default function AdminCarsPage() {
         const sarPrice = car.price || 0;
         const usd = parseFloat((sarPrice / usdToSar).toFixed(2));
         const krw = Math.round(usd * usdToKrw);
+        // [[ARABIC_COMMENT]] make قد يكون object أو string - نستخرج الاسم منه
+        const makeValue = typeof car.make === 'object' ? (car.make?.name || '') : (car.make || '');
         setFormData({
             title: car.title,
-            make: car.make,
+            make: makeValue,
             model: car.model,
             year: car.year,
             price: sarPrice,
@@ -321,7 +323,7 @@ export default function AdminCarsPage() {
 
                                 <div className="p-8 space-y-6">
                                     <div>
-                                        <div className="text-[11px] font-black text-cinematic-neon-blue/80 uppercase tracking-[0.4em] mb-3 italic">{car.make}</div>
+                                        <div className="text-[11px] font-black text-cinematic-neon-blue/80 uppercase tracking-[0.4em] mb-3 italic">{typeof car.make === 'object' ? car.make?.name : car.make}</div>
                                         <h3 className="text-2xl font-black uppercase italic tracking-tighter line-clamp-1">{car.title}</h3>
                                     </div>
 

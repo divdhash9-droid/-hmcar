@@ -124,30 +124,45 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
     { name: isRTL ? "سعد القحطاني" : "Saad Al-Qahtani", role: isRTL ? "مدير شركة" : "Company Manager", text: isRTL ? "خدمة العملاء ممتازة والفريق محترف جداً في التعامل" : "Excellent customer service and very professional team", rating: 5 }
   ];
 
-  const [socialConfig, setSocialConfig] = useState<{ whatsapp?: string; links: { platform: string; url: string }[] }>({ whatsapp: "", links: [] });
+  // [[ARABIC_COMMENT]] روابط التواصل الافتراضية - تظهر دائماً حتى لو لم يُعيّن الأدمن روابط
+  const DEFAULT_WHATSAPP = '+821080880014'; // رقم الواتساب الكوري الرئيسي
+  const DEFAULT_SOCIAL_LINKS = [
+    { platform: 'instagram', url: 'https://instagram.com' },
+    { platform: 'tiktok', url: 'https://tiktok.com' },
+    { platform: 'snapchat', url: 'https://snapchat.com' },
+  ];
+
+  const [socialConfig, setSocialConfig] = useState<{ whatsapp?: string; links: { platform: string; url: string }[] }>({
+    whatsapp: DEFAULT_WHATSAPP,
+    links: DEFAULT_SOCIAL_LINKS
+  });
 
   useEffect(() => {
-    // جلب روابط التواصل الاجتماعي من الإعدادات العامة
+    // [[ARABIC_COMMENT]] جلب روابط التواصل الاجتماعي من الإعدادات العامة
     const fetchSocialLinks = async () => {
       try {
         const response = await api.settings.getPublic();
         if (response.success && response.data.socialLinks) {
           const sl = response.data.socialLinks;
           const linksArray = Object.entries(sl)
-            .filter(([k, v]) => k !== 'whatsapp' && v)
+            .filter(([k, v]) => k !== 'whatsapp' && v && String(v).startsWith('http'))
             .map(([k, v]) => ({ platform: k, url: v as string }));
 
           setSocialConfig({
-            whatsapp: sl.whatsapp || "",
-            links: linksArray
+            // [[ARABIC_COMMENT]] استخدم رقم الأدمن أو الافتراضي
+            whatsapp: sl.whatsapp || DEFAULT_WHATSAPP,
+            // [[ARABIC_COMMENT]] استخدم روابط الأدمن أو الافتراضية إذا لم يضف شيئاً
+            links: linksArray.length > 0 ? linksArray : DEFAULT_SOCIAL_LINKS
           });
         }
       } catch (err) {
         console.error("Failed to fetch social links", err);
+        // [[ARABIC_COMMENT]] احتفظ بالافتراضيات عند الخطأ
       }
     };
     fetchSocialLinks();
   }, []);
+
 
   // [[ARABIC_COMMENT]] أيقونات التواصل الاجتماعي - SVG مضمنة لضمان الظهور الصحيح دائماً
   const SocialSVGIcons: Record<string, React.FC<{ className?: string }>> = {

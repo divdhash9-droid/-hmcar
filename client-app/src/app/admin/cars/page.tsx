@@ -11,7 +11,8 @@ import {
     X,
     Upload,
     Save,
-    ChevronLeft
+    ChevronLeft,
+    CheckCircle2
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
@@ -107,6 +108,30 @@ export default function AdminCarsPage() {
             } catch (err) {
                 console.error('Failed to delete car', err);
             }
+        }
+    };
+
+    // [[ARABIC_COMMENT]] تعليم السيارة كـ "تم البيع" - تختفي من المعرض فوراً
+    const handleMarkSold = async (id: string, title: string) => {
+        const confirmed = confirm(isRTL
+            ? `هل تأكد أنه تم بيع: ${title}؟\nسيتم إخفاؤها من المعرض فوراً.`
+            : `Confirm sale of: ${title}?\nIt will be hidden from showroom immediately.`
+        );
+        if (!confirmed) return;
+
+        const soldPriceStr = prompt(isRTL ? 'أدخل سعر البيع الفعلي (اختياري):' : 'Enter actual sold price (optional):');
+        const soldPrice = soldPriceStr ? parseFloat(soldPriceStr) : undefined;
+
+        try {
+            await fetch(`/api/v2/cars/${id}/sold`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('hm_token')}` },
+                body: JSON.stringify({ soldPrice }),
+            });
+            loadData();
+            alert(isRTL ? '✅ تم تسجيل البيع بنجاح! السيارة الآن مخفية من المعرض.' : '✅ Sale recorded! Car is now hidden from showroom.');
+        } catch (err) {
+            console.error('Failed to mark as sold', err);
         }
     };
 
@@ -314,12 +339,13 @@ export default function AdminCarsPage() {
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-3 gap-2 pt-3">
+                                    <div className="grid grid-cols-4 gap-2 pt-3">
                                         <motion.button
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
                                             onClick={() => handleEdit(car)}
                                             className="btn-glow py-2 bg-cinematic-neon-blue/10 border border-cinematic-neon-blue/30 text-cinematic-neon-blue rounded-lg text-[10px] font-black uppercase flex items-center justify-center gap-1"
+                                            title={isRTL ? 'تعديل' : 'Edit'}
                                         >
                                             <Edit className="w-3 h-3" />
                                         </motion.button>
@@ -327,14 +353,28 @@ export default function AdminCarsPage() {
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
                                             className="btn-glow py-2 bg-white/5 border border-white/10 text-white/80 rounded-lg text-[10px] font-black uppercase flex items-center justify-center gap-1"
+                                            title={isRTL ? 'عرض' : 'View'}
                                         >
                                             <Eye className="w-3 h-3" />
                                         </motion.button>
+                                        {/* [[ARABIC_COMMENT]] زر "تم البيع" - يجعل السيارة مخفية من المعرض */}
+                                        {!car.isSold && (
+                                            <motion.button
+                                                whileHover={{ scale: 1.05 }}
+                                                whileTap={{ scale: 0.95 }}
+                                                onClick={() => handleMarkSold(car.id, car.title)}
+                                                className="btn-glow py-2 bg-green-500/10 border border-green-500/30 text-green-400 rounded-lg text-[10px] font-black uppercase flex items-center justify-center gap-1"
+                                                title={isRTL ? 'تم البيع' : 'Mark Sold'}
+                                            >
+                                                <CheckCircle2 className="w-3 h-3" />
+                                            </motion.button>
+                                        )}
                                         <motion.button
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
                                             onClick={() => handleDelete(car.id)}
                                             className="btn-glow py-2 bg-cinematic-neon-red/10 border border-cinematic-neon-red/30 text-cinematic-neon-red rounded-lg text-[10px] font-black uppercase flex items-center justify-center gap-1"
+                                            title={isRTL ? 'حذف' : 'Delete'}
                                         >
                                             <Trash2 className="w-3 h-3" />
                                         </motion.button>

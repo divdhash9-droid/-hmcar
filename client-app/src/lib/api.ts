@@ -134,16 +134,16 @@ export const api = {
         delete: (id: string) => fetchAPI(`/api/v2/users/${id}`, { method: 'DELETE' }),
     },
     cars: {
-        list: (params: any = {}) => {
-            const query = new URLSearchParams(params).toString();
+        list: (params: Record<string, string | number | boolean> = {}) => {
+            const query = new URLSearchParams(params as Record<string, string>).toString();
             return fetchAPI(`/api/v2/cars?${query}`);
         },
         getById: (id: string) => fetchAPI(`/api/v2/cars/${id}`),
-        create: (data: any) => fetchAPI('/api/v2/cars', {
+        create: (data: Record<string, unknown>) => fetchAPI('/api/v2/cars', {
             method: 'POST',
             body: JSON.stringify(data)
         }),
-        update: (id: string, data: any) => fetchAPI(`/api/v2/cars/${id}`, {
+        update: (id: string, data: Record<string, unknown>) => fetchAPI(`/api/v2/cars/${id}`, {
             method: 'PUT',
             body: JSON.stringify(data)
         }),
@@ -151,6 +151,11 @@ export const api = {
             method: 'DELETE'
         }),
         getStyles: () => fetchAPI('/api/v2/cars/makes'),
+        // [[ARABIC_COMMENT]] تعليم السيارة كـ "مباعة" - تختفي من المعرض فوراً
+        markSold: (id: string, soldPrice?: number) => fetchAPI(`/api/v2/cars/${id}/sold`, {
+            method: 'PATCH',
+            body: JSON.stringify({ soldPrice }),
+        }),
     },
     auctions: {
         list: (params: any = {}) => {

@@ -269,4 +269,53 @@ router.delete('/:id', requireAuthAPI, requirePermissionAPI('manage_cars'), async
     }
 });
 
+// [[ARABIC_COMMENT]] PATCH /api/v2/cars/:id/sold - تعليم السيارة كـ "تم البيع" (أدمن فقط)
+// [[ARABIC_COMMENT]] بعد التنفيذ: isSold=true + isActive=false → تختفي من المعرض فوراً
+router.patch('/:id/sold', requireAuthAPI, requirePermissionAPI('manage_cars'), async (req, res) => {
+    try {
+        const { soldPrice, buyerNote } = req.body;
+
+        const car = await Car.findByIdAndUpdate(
+            req.params.id,
+            {
+                isSold: true,
+                isActive: false,
+                soldAt: new Date(),
+                soldPrice: soldPrice || undefined,
+                buyerNote: buyerNote || undefined,
+            },
+            { new: true }
+        );
+
+        if (!car) {
+            return res.status(404).json({ success: false, error: 'Car not found' });
+        }
+
+        // [[ARABIC_COMMENT]] تسجيل في AuditLog للتقارير التلقائية
+        try {
+            await AuditLog.create({
+                action: 'SOLD',
+                targetModel: 'Car',
+                description: `تم بيع السيارة: ${car.title}`,
+                targetId: car._id,
+                after: { isSold: true, soldAt: car.soldAt, soldPrice: car.soldPrice },
+                ipAddress: req.ip,
+                userAgent: req.get('User-Agent'),
+                sessionId: req.sessionID || 'api'
+            });
+        } catch (logErr) {
+            console.error('AuditLog error:', logErr);
+        }
+
+        res.json({
+            success: true,
+            data: car,
+            message: 'تم تحديث السيارة كـ "مباعة" بنجاح'
+        });
+    } catch (error) {
+        console.error('Mark car as sold error:', error);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+});
+
 module.exports = router;

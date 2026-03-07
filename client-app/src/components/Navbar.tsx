@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     Menu, X, User, Languages, ArrowLeft, ArrowRight,
     Headphones, MessageCircle,
-    Car, Gavel, ShoppingBag, Settings
+    Car, Gavel, ShoppingBag, Settings, ShoppingCart
 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useLanguage } from '@/lib/LanguageContext';
@@ -18,7 +18,26 @@ import NotificationDropdown from './NotificationDropdown';
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
+    const [cartCount, setCartCount] = useState(0);
     const pathname = usePathname();
+
+    // [[ARABIC_COMMENT]] جلب عدد عناصر السلة من localStorage
+    useEffect(() => {
+        const updateCart = () => {
+            try {
+                const cart = JSON.parse(localStorage.getItem('hm_cart') || '[]');
+                setCartCount(Array.isArray(cart) ? cart.length : 0);
+            } catch { setCartCount(0); }
+        };
+        updateCart();
+        window.addEventListener('hm_cart_updated', updateCart);
+        window.addEventListener('storage', updateCart);
+        return () => {
+            window.removeEventListener('hm_cart_updated', updateCart);
+            window.removeEventListener('storage', updateCart);
+        };
+    }, []);
+
     const router = useRouter();
     const { user, isLoggedIn } = useAuth();
     const { isRTL, toggleLanguage } = useLanguage();
@@ -140,6 +159,16 @@ export default function Navbar() {
                                 </button>
                             </Link>
                         )}
+
+                        {/* [[ARABIC_COMMENT]] زر السلة مع عداد */}
+                        <Link href="/cart" className="relative w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all">
+                            <ShoppingCart className="w-4 h-4" />
+                            {cartCount > 0 && (
+                                <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] bg-[#c9a96e] text-black text-[9px] font-black rounded-full flex items-center justify-center px-1">
+                                    {cartCount > 9 ? '9+' : cartCount}
+                                </span>
+                            )}
+                        </Link>
 
                         {/* [[ARABIC_COMMENT]] زر تدوير العملة بين SAR → USD → KRW → SAR */}
                         <button

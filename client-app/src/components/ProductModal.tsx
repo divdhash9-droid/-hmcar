@@ -11,7 +11,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     X, Heart, ShoppingCart, MessageCircle,
     ChevronLeft, ChevronRight, Share2, Check,
-    Fuel, Gauge, Settings2, Calendar, Tag, Car as CarIcon
+    Fuel, Gauge, Settings2, Calendar, Tag, Car as CarIcon,
+    Copy
 } from 'lucide-react';
 import Image from 'next/image';
 import { useLanguage } from '@/lib/LanguageContext';
@@ -83,6 +84,7 @@ export default function ProductModal({ product, onClose, whatsappNumber }: Produ
     const [inCart, setInCart] = useState(false);
     const [addedToCart, setAddedToCart] = useState(false);
     const [copied, setCopied] = useState(false);
+    const [showShareMenu, setShowShareMenu] = useState(false);
     const { showToast } = useToast();
     const { user } = useAuth();
 
@@ -184,6 +186,42 @@ export default function ProductModal({ product, onClose, whatsappNumber }: Produ
         }).catch(() => { });
     }, [product, showToast, isRTL]);
 
+    // [[ARABIC_COMMENT]] مشاركة على سناب شات
+    const shareSnapchat = useCallback(() => {
+        if (!product) return;
+        const url = product.type === 'car'
+            ? `${window.location.origin}/showroom/${product.id}`
+            : `${window.location.origin}/parts?item=${product.id}`;
+        window.open(`https://www.snapchat.com/scan?attachmentUrl=${encodeURIComponent(url)}`, '_blank');
+        setShowShareMenu(false);
+    }, [product]);
+
+    // [[ARABIC_COMMENT]] مشاركة على تويتر/X
+    const shareTwitter = useCallback(() => {
+        if (!product) return;
+        const url = product.type === 'car'
+            ? `${window.location.origin}/showroom/${product.id}`
+            : `${window.location.origin}/parts?item=${product.id}`;
+        const text = isRTL
+            ? `🚗 شاهد هذا المنتج: ${product.title} - ${url}`
+            : `🚗 Check this out: ${product.title} - ${url}`;
+        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
+        setShowShareMenu(false);
+    }, [product, isRTL]);
+
+    // [[ARABIC_COMMENT]] مشاركة عبر واتساب
+    const shareWhatsapp = useCallback(() => {
+        if (!product) return;
+        const url = product.type === 'car'
+            ? `${window.location.origin}/showroom/${product.id}`
+            : `${window.location.origin}/parts?item=${product.id}`;
+        const text = isRTL
+            ? `🚗 شاهد هذا المنتج من HM CAR:\n${product.title}\n${url}`
+            : `🚗 Check this from HM CAR:\n${product.title}\n${url}`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+        setShowShareMenu(false);
+    }, [product, isRTL]);
+
     const images = product?.images?.filter(Boolean) || [];
     const displayPrice = product && formatPrice ? formatPrice(product.price, product.displayCurrency as 'SAR' | 'USD' | 'KRW' | undefined) : `${product?.price?.toLocaleString()} SAR`;
 
@@ -220,14 +258,37 @@ export default function ProductModal({ product, onClose, whatsappNumber }: Produ
                             <X className="w-4 h-4" />
                         </button>
 
-                        {/* [[ARABIC_COMMENT]] زر المشاركة */}
-                        <button
-                            onClick={shareProduct}
-                            className="absolute top-4 left-4 z-30 w-9 h-9 rounded-full bg-black/60 border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:bg-black/80 transition-all backdrop-blur-sm"
-                            aria-label="Share"
-                        >
-                            {copied ? <Check className="w-4 h-4 text-green-400" /> : <Share2 className="w-4 h-4" />}
-                        </button>
+                        {/* [[ARABIC_COMMENT]] زر المشاركة - يفتح قائمة خيارات */}
+                        <div className="absolute top-4 left-4 z-30">
+                            <button
+                                onClick={() => setShowShareMenu(p => !p)}
+                                className="w-9 h-9 rounded-full bg-black/60 border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:bg-black/80 transition-all backdrop-blur-sm"
+                                aria-label="Share"
+                            >
+                                {copied ? <Check className="w-4 h-4 text-green-400" /> : <Share2 className="w-4 h-4" />}
+                            </button>
+                            {/* قائمة المشاركة */}
+                            {showShareMenu && (
+                                <div className="absolute top-11 left-0 bg-[#111] border border-white/10 rounded-2xl p-2 shadow-2xl min-w-[170px] space-y-1 z-50 backdrop-blur-md">
+                                    <button onClick={shareWhatsapp} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-all text-left">
+                                        <span className="text-xl">💬</span>
+                                        <span className="text-[11px] font-black uppercase tracking-widest text-white/70">{isRTL ? 'واتساب' : 'WhatsApp'}</span>
+                                    </button>
+                                    <button onClick={shareSnapchat} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-all text-left">
+                                        <span className="text-xl">👻</span>
+                                        <span className="text-[11px] font-black uppercase tracking-widest text-white/70">{isRTL ? 'سناب شات' : 'Snapchat'}</span>
+                                    </button>
+                                    <button onClick={shareTwitter} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-all text-left">
+                                        <span className="text-xl">𝕏</span>
+                                        <span className="text-[11px] font-black uppercase tracking-widest text-white/70">{isRTL ? 'تويتر/X' : 'X / Twitter'}</span>
+                                    </button>
+                                    <button onClick={shareProduct} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-all text-left border-t border-white/5 mt-1 pt-3">
+                                        <Copy className="w-4 h-4 text-white/40" />
+                                        <span className="text-[11px] font-black uppercase tracking-widest text-white/70">{isRTL ? 'نسخ الرابط' : 'Copy Link'}</span>
+                                    </button>
+                                </div>
+                            )}
+                        </div>
 
                         {/* [[ARABIC_COMMENT]] قسم الصور */}
                         <div className="relative bg-black h-60 shrink-0">

@@ -71,13 +71,60 @@ router.get('/', async (req, res) => {
         }
 
         if (search) {
-            conditions.push({
-                $or: [
-                    { title: { $regex: search, $options: 'i' } },
-                    { make: { $regex: search, $options: 'i' } },
-                    { model: { $regex: search, $options: 'i' } }
-                ]
+            // [[ARABIC_COMMENT]] بحث ذكي - يدعم الأخطاء الإملائية والمصطلحات العربية والإنجليزية
+            const s = search.trim();
+
+            // [[ARABIC_COMMENT]] خريطة تحويل أسماء الماركات عربي → إنجليزي
+            const arabicBrandMap = {
+                'تويوتا': 'toyota', 'تيوتا': 'toyota', 'تتويوتا': 'toyota',
+                'نيسان': 'nissan', 'نيزان': 'nissan',
+                'هوندا': 'honda', 'حوندا': 'honda',
+                'مرسيدس': 'mercedes', 'مرسديس': 'mercedes', 'مرسيدز': 'mercedes',
+                'بي ام دبليو': 'bmw', 'بي ام': 'bmw', 'بمو': 'bmw',
+                'لكزس': 'lexus', 'لكسس': 'lexus',
+                'انفينيتي': 'infiniti', 'انفنتي': 'infiniti',
+                'كيا': 'kia', 'هيونداي': 'hyundai', 'هيونداى': 'hyundai',
+                'فورد': 'ford', 'شيفروليه': 'chevrolet', 'شيفروليت': 'chevrolet',
+                'بورش': 'porsche', 'بورشه': 'porsche',
+                'رنج روفر': 'range rover', 'لاند روفر': 'land rover',
+                'جيب': 'jeep', 'دودج': 'dodge', 'رام': 'ram',
+                'اودي': 'audi', 'أودي': 'audi', 'فولكسواجن': 'volkswagen',
+                'سوبارو': 'subaru', 'مازدا': 'mazda', 'ميتسوبيشي': 'mitsubishi',
+                'جيلي': 'geely', 'بي ام جي': 'byd', 'شانجان': 'changan',
+                'فيراري': 'ferrari', 'لامبورغيني': 'lamborghini', 'بنتلي': 'bentley',
+                'رولز رويس': 'rolls royce', 'ماكلارين': 'mclaren',
+            };
+
+            // [[ARABIC_COMMENT]] تحويل النص العربي إلى إنجليزي إن وُجد في الخريطة
+            const lowerS = s.toLowerCase();
+            const mappedSearchEn = arabicBrandMap[s] || arabicBrandMap[lowerS] || null;
+
+            // [[ARABIC_COMMENT]] تحقق من تشابه النص (ليفنشتاين بسيط) للسماح بالأخطاء الإملائية
+            const fuzzyTokens = s.split(/\s+/).filter(t => t.length > 1);
+
+            const searchConditions = [
+                { title: { $regex: s, $options: 'i' } },
+                { make: { $regex: s, $options: 'i' } },
+                { model: { $regex: s, $options: 'i' } },
+                { description: { $regex: s, $options: 'i' } },
+            ];
+
+            // [[ARABIC_COMMENT]] إضافة شروط اللغة الإنجليزية المقابلة للماركة العربية
+            if (mappedSearchEn) {
+                searchConditions.push({ make: { $regex: mappedSearchEn, $options: 'i' } });
+                searchConditions.push({ title: { $regex: mappedSearchEn, $options: 'i' } });
+            }
+
+            // [[ARABIC_COMMENT]] بحث على كل كلمة منفردة (fuzzy tokens)
+            fuzzyTokens.forEach(token => {
+                if (token !== s) {
+                    searchConditions.push({ make: { $regex: token, $options: 'i' } });
+                    searchConditions.push({ title: { $regex: token, $options: 'i' } });
+                    searchConditions.push({ model: { $regex: token, $options: 'i' } });
+                }
             });
+
+            conditions.push({ $or: searchConditions });
         }
 
         const filter = conditions.length > 0 ? { $and: conditions } : {};

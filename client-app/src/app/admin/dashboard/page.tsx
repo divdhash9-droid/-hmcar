@@ -23,7 +23,8 @@ import {
     TrendingUp,
     Mail,
     ChevronLeft,
-    Radio
+    Radio,
+    Database
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -31,6 +32,7 @@ import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/LanguageContext";
 import { usePathname, useRouter } from "next/navigation";
 import { api } from "@/lib/api";
+import { useToast } from "@/lib/ToastContext";
 import DashboardBackdrop from "@/components/DashboardBackdrop";
 import ParticleBackground from "@/components/ParticleBackground";
 import LiveNotificationsList from "@/components/LiveNotificationsList";
@@ -60,10 +62,39 @@ interface AuditLogEntry {
 
 export default function AdminDashboard() {
     const { t, lang, isRTL, toggleLanguage } = useLanguage();
+    const { showToast } = useToast();
     const [mounted, setMounted] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [backingUp, setBackingUp] = useState(false); // eslint-disable-line @typescript-eslint/no-unused-vars
     const pathname = usePathname();
     const router = useRouter();
+
+    // [[ARABIC_COMMENT]] تحميل النسخة الاحتياطية
+    const handleBackup = async () => {
+        setBackingUp(true);
+        try {
+            const token = localStorage.getItem('hm_token');
+            const res = await fetch('/api/v2/backup', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error('backup failed');
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `hm-car-backup-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            showToast(isRTL ? '✅ تم تحميل النسخة الاحتياطية بنجاح!' : '✅ Backup downloaded successfully!', 'success');
+        } catch {
+            showToast(isRTL ? '❌ فشل تحميل النسخة الاحتياطية' : '❌ Backup failed', 'error');
+        } finally {
+            setBackingUp(false);
+        }
+    };
 
     const handleLogout = async () => {
         try {
@@ -152,6 +183,7 @@ export default function AdminDashboard() {
         { icon: TrendingUp, label: isRTL ? 'التقارير' : 'REPORTS', href: '/admin/reports', accent: 'bg-green-400/20 text-green-400' },
         { icon: Tag, label: t('brands'), href: '/admin/brands', accent: 'bg-cinematic-neon-yellow/30 text-cinematic-neon-yellow shadow-[0_0_15px_rgba(252,238,10,0.3)]' },
         { icon: Settings, label: t('settings'), href: '/admin/settings', accent: 'bg-white/5 text-white/40' },
+        { icon: Database, label: isRTL ? 'نسخ احتياطي' : 'BACKUP', onClick: handleBackup, accent: 'bg-orange-400/20 text-orange-400', isButton: true },
     ];
 
     const sidebarItems = [
@@ -368,26 +400,44 @@ export default function AdminDashboard() {
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {quickActions.map((action, i) => (
-                                    <Link key={i} href={action.href}>
-                                        <motion.div
-                                            whileHover={{ scale: 1.05, y: -5 }}
-                                            whileTap={{ scale: 0.95 }}
-                                            className={cn(
-                                                "p-10 rounded-[2.5rem] border border-white/5 flex flex-col items-center gap-6 text-center group cursor-pointer transition-all relative",
-                                                "bg-white/[0.02] hover:bg-white/[0.05] hover:border-cinematic-neon-red/20 shadow-2xl"
-                                            )}
-                                        >
-                                            {action.id === 'contact' && stats?.newContacts && stats.newContacts > 0 && (
-                                                <div className="absolute top-6 right-6 w-8 h-8 bg-cinematic-neon-red rounded-full flex items-center justify-center text-[10px] font-black shadow-[0_0_15px_rgba(255,0,60,1)] animate-pulse">
-                                                    {stats.newContacts}
+                                    action.isButton ? (
+                                        <button key={i} onClick={action.onClick} className="w-full text-left">
+                                            <motion.div
+                                                whileHover={{ scale: 1.05, y: -5 }}
+                                                whileTap={{ scale: 0.95 }}
+                                                className={cn(
+                                                    "p-10 rounded-[2.5rem] border border-white/5 flex flex-col items-center gap-6 text-center group cursor-pointer transition-all relative",
+                                                    "bg-white/[0.02] hover:bg-white/[0.05] hover:border-orange-400/20 shadow-2xl"
+                                                )}
+                                            >
+                                                <div className={cn("p-5 rounded-2xl transition-all group-hover:scale-125 duration-500", action.accent)}>
+                                                    <action.icon className="w-8 h-8" />
                                                 </div>
-                                            )}
-                                            <div className={cn("p-5 rounded-2xl transition-all group-hover:scale-125 duration-500", action.accent)}>
-                                                <action.icon className="w-8 h-8" />
-                                            </div>
-                                            <span className="text-[9px] font-black uppercase tracking-[0.5em] leading-relaxed italic">{action.label}</span>
-                                        </motion.div>
-                                    </Link>
+                                                <span className="text-[9px] font-black uppercase tracking-[0.5em] leading-relaxed italic">{action.label}</span>
+                                            </motion.div>
+                                        </button>
+                                    ) : (
+                                        <Link key={i} href={action.href || '#'}>
+                                            <motion.div
+                                                whileHover={{ scale: 1.05, y: -5 }}
+                                                whileTap={{ scale: 0.95 }}
+                                                className={cn(
+                                                    "p-10 rounded-[2.5rem] border border-white/5 flex flex-col items-center gap-6 text-center group cursor-pointer transition-all relative",
+                                                    "bg-white/[0.02] hover:bg-white/[0.05] hover:border-cinematic-neon-red/20 shadow-2xl"
+                                                )}
+                                            >
+                                                {action.id === 'contact' && stats?.newContacts && stats.newContacts > 0 && (
+                                                    <div className="absolute top-6 right-6 w-8 h-8 bg-cinematic-neon-red rounded-full flex items-center justify-center text-[10px] font-black shadow-[0_0_15px_rgba(255,0,60,1)] animate-pulse">
+                                                        {stats.newContacts}
+                                                    </div>
+                                                )}
+                                                <div className={cn("p-5 rounded-2xl transition-all group-hover:scale-125 duration-500", action.accent)}>
+                                                    <action.icon className="w-8 h-8" />
+                                                </div>
+                                                <span className="text-[9px] font-black uppercase tracking-[0.5em] leading-relaxed italic">{action.label}</span>
+                                            </motion.div>
+                                        </Link>
+                                    )
                                 ))}
                             </div>
                         </div>

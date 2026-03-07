@@ -89,7 +89,8 @@ router.use('/favorites', require('./favorites'));        // المفضلة
 router.use('/bids', require('./bids'));                  // المزايدات
 router.use('/live-auctions', require('./live-auctions'));// المزادات المباشرة
 router.use('/smart-alerts', require('./smart-alerts')); // التنبيهات الذكية
-router.use('/security', require('./security'));         // قسم الأمان والأجهزة המחظورة
+router.use('/security', require('./security'));         // قسم الأمان والأجهزة المحظورة
+router.use('/backup', require('./backup'));             // [[ARABIC_COMMENT]] النسخ الاحتياطي التلقائي
 
 /**
  * معالج الأخطاء المركزي لمسارات API

@@ -12,6 +12,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSettings } from "@/lib/SettingsContext";
 import ProductModal, { type ProductModalData } from "@/components/ProductModal";
+import { SkeletonGrid } from "@/components/SkeletonCard";
 
 interface Agency {
     id: string;
@@ -296,11 +297,7 @@ export default function Showroom() {
                             >
                                 {/* ── CARS GRID ── */}
                                 {loading ? (
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                        {[1, 2, 3, 4].map((n) => (
-                                            <div key={n} className="h-[440px] rounded-2xl bg-white/[0.02] animate-pulse border border-white/5" />
-                                        ))}
-                                    </div>
+                                    <SkeletonGrid count={8} type="car" />
                                 ) : (
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                         <AnimatePresence mode="popLayout">

@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     Menu, X, User, Languages, ArrowLeft, ArrowRight,
     Headphones, MessageCircle,
-    Car, Gavel, ShoppingBag, Settings, ShoppingCart
+    Car, Gavel, ShoppingBag, Settings, ShoppingCart, Heart
 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useLanguage } from '@/lib/LanguageContext';
@@ -159,6 +159,11 @@ export default function Navbar() {
                                 </button>
                             </Link>
                         )}
+
+                        {/* [[ARABIC_COMMENT]] زر المفضلة */}
+                        <Link href="/favorites" className="relative w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-red-400 hover:border-red-500/30 hover:bg-red-500/10 transition-all" title={isRTL ? 'المفضلة' : 'Favorites'}>
+                            <Heart className="w-4 h-4" />
+                        </Link>
 
                         {/* [[ARABIC_COMMENT]] زر السلة مع عداد */}
                         <Link href="/cart" className="relative w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all">

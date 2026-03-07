@@ -3,10 +3,9 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import {
-    ArrowUpRight, Search,
+    Search,
     AlertCircle, Zap,
-    ChevronLeft, ChevronRight, CarFront,
-    Heart, ShoppingCart, MessageCircle
+    ChevronLeft, ChevronRight, CarFront, ArrowUpRight
 } from "lucide-react";
 
 import Navbar from "@/components/Navbar";
@@ -16,6 +15,7 @@ import { api } from "@/lib/api";
 import { useSettings } from "@/lib/SettingsContext";
 import Link from "next/link";
 import Image from "next/image";
+import ProductModal, { type ProductModalData } from "@/components/ProductModal";
 
 // --- Types ---
 interface Part {
@@ -45,7 +45,8 @@ export default function PartsPage() {
     const { formatPrice, socialLinks } = useSettings();
     // [[ARABIC_COMMENT]] رقم الواتساب - يستخدم رقم الأدمن أو الرقم الكوري الافتراضي
     const WHATSAPP_NUMBER = (socialLinks?.whatsapp || '+821080880014').replace(/\D/g, '');
-    const [favoriteParts, setFavoriteParts] = useState<string[]>([]);
+    // [[ARABIC_COMMENT]] حالة المودال - null = مغلق, بيانات = مفتوح
+    const [modalProduct, setModalProduct] = useState<ProductModalData | null>(null);
 
     const [viewMode, setViewMode] = useState<'AGENCIES' | 'MODELS' | 'PARTS'>('AGENCIES');
     const [selectedAgency, setSelectedAgency] = useState<Agency | null>(null);
@@ -127,336 +128,323 @@ export default function PartsPage() {
 
     const filteredAgencies = agencies.filter(a => a.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
+    // [[ARABIC_COMMENT]] فتح مودال القطعة مع تحويل بياناتها لصيغة ProductModalData
+    const openPartModal = (part: Part) => {
+        setModalProduct({
+            id: part.id,
+            type: 'part',
+            title: part.name,
+            images: [part.img].filter(Boolean),
+            price: part.price,
+            brand: part.brand || part.agency,
+            condition: part.condition,
+            compatibility: part.compatibility,
+            stock: part.stock,
+            description: undefined,
+        });
+    };
+
     return (
-        <div className={`relative min-h-screen bg-[#050505] text-white overflow-x-hidden ${isRTL ? 'font-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
-            <Navbar />
+        <>
+            {/* [[ARABIC_COMMENT]] مودال القطعة - Shein-style */}
+            <ProductModal
+                product={modalProduct}
+                onClose={() => setModalProduct(null)}
+                whatsappNumber={WHATSAPP_NUMBER}
+            />
+            <div className={`relative min-h-screen bg-[#050505] text-white overflow-x-hidden ${isRTL ? 'font-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
+                <Navbar />
 
-            {/* ── ADVANCED TECH BACKGROUND ── */}
-            <div className="fixed inset-0 -z-20">
-                <div
-                    className="absolute inset-0 bg-cover bg-center opacity-30 brightness-[0.4] contrast-125"
-                    style={{ backgroundImage: "url('/images/gata.jpg')" }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-b from-[#050505] via-transparent to-[#050505]" />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(0,240,255,0.05)_0%,_transparent_50%)]" />
-            </div>
-
-            {/* ── FLOATING PARTICLES ── */}
-            <div className="fixed inset-0 pointer-events-none z-0">
-                {[...Array(15)].map((_, i) => (
-                    <motion.div
-                        key={i}
-                        initial={{ opacity: 0, scale: 0 }}
-                        animate={{
-                            opacity: [0, 0.4, 0],
-                            scale: [0, 1, 0],
-                            x: [(i % 5) * 200 - 400, (i % 3) * 300 - 450, (i % 5) * 200 - 400],
-                            y: [(i % 4) * 200 - 400, (i % 2) * 400 - 400, (i % 4) * 200 - 400]
-                        }}
-                        transition={{
-                            duration: 15 + (i % 10),
-                            repeat: Infinity,
-                            delay: i * 0.5
-                        }}
-                        className="absolute top-1/2 left-1/2 w-1.5 h-1.5 bg-cinematic-neon-blue rounded-full blur-[3px]"
+                {/* ── ADVANCED TECH BACKGROUND ── */}
+                <div className="fixed inset-0 -z-20">
+                    <div
+                        className="absolute inset-0 bg-cover bg-center opacity-30 brightness-[0.4] contrast-125"
+                        style={{ backgroundImage: "url('/images/gata.jpg')" }}
                     />
-                ))}
-            </div>
+                    <div className="absolute inset-0 bg-gradient-to-b from-[#050505] via-transparent to-[#050505]" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(0,240,255,0.05)_0%,_transparent_50%)]" />
+                </div>
 
-            {/* ── BACK BUTTON ── */}
-            <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.5 }}
-                className={cn("fixed top-24 z-[60]", isRTL ? "right-12" : "left-12")}
-            >
-                <button
-                    onClick={viewMode === 'AGENCIES' ? () => window.location.href = '/client/dashboard' : (viewMode === 'MODELS' ? resetToAgencies : resetToModels)}
-                    className="group w-12 h-12 border border-white/10 rounded-2xl flex items-center justify-center bg-black/60 backdrop-blur-xl hover:border-accent-gold/50 hover:bg-accent-gold/10 transition-all duration-500 shadow-2xl"
-                    title={isRTL ? "عودة" : "Back"}
+                {/* ── FLOATING PARTICLES ── */}
+                <div className="fixed inset-0 pointer-events-none z-0">
+                    {[...Array(15)].map((_, i) => (
+                        <motion.div
+                            key={i}
+                            initial={{ opacity: 0, scale: 0 }}
+                            animate={{
+                                opacity: [0, 0.4, 0],
+                                scale: [0, 1, 0],
+                                x: [(i % 5) * 200 - 400, (i % 3) * 300 - 450, (i % 5) * 200 - 400],
+                                y: [(i % 4) * 200 - 400, (i % 2) * 400 - 400, (i % 4) * 200 - 400]
+                            }}
+                            transition={{
+                                duration: 15 + (i % 10),
+                                repeat: Infinity,
+                                delay: i * 0.5
+                            }}
+                            className="absolute top-1/2 left-1/2 w-1.5 h-1.5 bg-cinematic-neon-blue rounded-full blur-[3px]"
+                        />
+                    ))}
+                </div>
+
+                {/* ── BACK BUTTON ── */}
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.5 }}
+                    className={cn("fixed top-24 z-[60]", isRTL ? "right-12" : "left-12")}
                 >
-                    {isRTL ? <ChevronRight className="w-5 h-5 text-white/60 group-hover:text-accent-gold transition-colors" /> : <ChevronLeft className="w-5 h-5 text-white/60 group-hover:text-accent-gold transition-colors" />}
-                </button>
-            </motion.div>
-
-            <main className="relative z-10 pt-32 px-6 pb-20 max-w-[1400px] mx-auto min-h-screen flex flex-col">
-
-                {/* ── HEADER ── */}
-                <header className="text-center mb-16 space-y-4">
-                    <motion.span
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="inline-block px-4 py-1.5 rounded-full bg-accent-gold/10 border border-accent-gold/20 text-[10px] font-black tracking-[0.3em] uppercase text-accent-gold"
+                    <button
+                        onClick={viewMode === 'AGENCIES' ? () => window.location.href = '/client/dashboard' : (viewMode === 'MODELS' ? resetToAgencies : resetToModels)}
+                        className="group w-12 h-12 border border-white/10 rounded-2xl flex items-center justify-center bg-black/60 backdrop-blur-xl hover:border-accent-gold/50 hover:bg-accent-gold/10 transition-all duration-500 shadow-2xl"
+                        title={isRTL ? "عودة" : "Back"}
                     >
-                        {isRTL ? "مستودع المكونات الرقمي" : "DIGITAL COMPONENTS REGISTRY"}
-                    </motion.span>
-                    <motion.h1
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 }}
-                        className="text-4xl md:text-6xl font-black uppercase tracking-tighter"
-                    >
-                        {viewMode === 'AGENCIES' && (isRTL ? "اختر وكالة السيارة" : "SELECT AUTO AGENCY")}
-                        {viewMode === 'MODELS' && (isRTL ? `موديلات ${selectedAgency?.name}` : `${selectedAgency?.name} MODELS`)}
-                        {viewMode === 'PARTS' && (isRTL ? `قطع غيار ${selectedModel}` : `${selectedModel} SPARE PARTS`)}
-                    </motion.h1>
-                    <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.3 }}
-                        className="text-white/40 text-sm font-medium uppercase tracking-[0.2em]"
-                    >
-                        {viewMode === 'AGENCIES' && (isRTL ? "ابحث عن طريق شعار الشركة المصنعة" : "BROWSE BY MANUFACTURER LOGO")}
-                        {viewMode === 'MODELS' && (isRTL ? "حدد موديل السيارة المحدد لمتابعة التوافق" : "SPECIFY THE CAR MODEL TO ENSURE COMPATIBILITY")}
-                        {viewMode === 'PARTS' && (isRTL ? "اعثر وكافة المكونات المتاحة لهذا الموديل" : "DISCOVER ALL AVAILABLE COMPONENTS FOR THIS MODEL")}
-                    </motion.p>
-                </header>
+                        {isRTL ? <ChevronRight className="w-5 h-5 text-white/60 group-hover:text-accent-gold transition-colors" /> : <ChevronLeft className="w-5 h-5 text-white/60 group-hover:text-accent-gold transition-colors" />}
+                    </button>
+                </motion.div>
 
-                {/* ── SEARCH (Only for Agencies and Parts) ── */}
-                {(viewMode === 'AGENCIES' || viewMode === 'PARTS') && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.4 }}
-                        className="relative max-w-2xl mx-auto w-full mb-16"
-                    >
-                        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-accent-gold/5 blur-3xl rounded-full" />
-                        <div className="relative flex items-center bg-white/[0.03] backdrop-blur-2xl border border-white/10 rounded-2xl p-2 shadow-2xl overflow-hidden group">
-                            <div className="flex-1 flex items-center px-4 gap-4">
-                                <Search className="w-5 h-5 text-accent-gold group-hover:scale-110 transition-transform" />
-                                <input
-                                    type="text"
-                                    placeholder={viewMode === 'AGENCIES' ? (isRTL ? "ابحث عن شركة (تويوتا، كيا...)" : "Search Agency (Toyota, Kia...)") : (isRTL ? "اسم القطعة..." : "Part Name...")}
-                                    className="w-full bg-transparent border-none outline-none py-4 text-sm font-bold placeholder:text-white/20"
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                />
-                            </div>
-                        </div>
-                    </motion.div>
-                )}
+                <main className="relative z-10 pt-32 px-6 pb-20 max-w-[1400px] mx-auto min-h-screen flex flex-col">
 
-                {/* ── CONTENT VIEWS ── */}
-                <AnimatePresence mode="wait">
-
-                    {viewMode === 'AGENCIES' && (
-                        <motion.div
-                            key="agencies-tech"
-                            initial={{ opacity: 0, y: 30 }}
+                    {/* ── HEADER ── */}
+                    <header className="text-center mb-16 space-y-4">
+                        <motion.span
+                            initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 1.1, filter: "blur(20px)" }}
-                            className="max-w-6xl mx-auto py-16"
+                            className="inline-block px-4 py-1.5 rounded-full bg-accent-gold/10 border border-accent-gold/20 text-[10px] font-black tracking-[0.3em] uppercase text-accent-gold"
                         >
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-10 md:gap-14">
-                                {filteredAgencies.map((agency, idx) => (
-                                    <motion.div
-                                        key={agency.id}
-                                        initial={{ opacity: 0, y: 40 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: idx * 0.1, duration: 0.8, ease: "circOut" }}
-                                        onClick={() => handleAgencySelect(agency)}
-                                        className="group relative cursor-pointer"
-                                    >
-                                        <div className="aspect-[4/5] glass-card bg-white/[0.01] border border-white/5 rounded-[40px] p-8 flex flex-col items-center justify-between overflow-hidden group-hover:border-cinematic-neon-blue/40 transition-all duration-700">
-                                            {/* Tech Background Deco */}
-                                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120%] h-1 bg-gradient-to-r from-transparent via-cinematic-neon-blue/20 to-transparent" />
-                                            <div className="absolute bottom-10 left-0 w-full h-[1px] bg-white/[0.03]" />
-
-                                            {/* Capsule Shell */}
-                                            <div className="relative w-full aspect-square rounded-[30px] bg-white shadow-[0_10px_40px_rgba(0,0,0,0.5)] flex items-center justify-center p-6 group-hover:scale-105 transition-transform duration-700">
-                                                <div className="absolute inset-0 rounded-[30px] border border-black/5" />
-                                                <Image
-                                                    src={agency.logo}
-                                                    alt={agency.name}
-                                                    fill
-                                                    className="object-contain p-2"
-                                                />
-                                            </div>
-
-                                            <div className="text-center w-full z-10">
-                                                <div className="text-[10px] font-black uppercase tracking-[0.5em] text-cinematic-neon-blue mb-2 opacity-60 group-hover:opacity-100 transition-opacity">Select Agency</div>
-                                                <h3 className="text-2xl font-black italic uppercase tracking-tighter group-hover:text-cinematic-neon-blue transition-colors">
-                                                    {agency.name}
-                                                </h3>
-                                            </div>
-
-                                            {/* Animated Glow on Hover */}
-                                            <div className="absolute -inset-20 bg-cinematic-neon-blue/10 blur-[100px] opacity-0 group-hover:opacity-100 transition-opacity duration-1000 -z-10" />
-                                        </div>
-                                    </motion.div>
-                                ))}
-                            </div>
-                        </motion.div>
-                    )}
-
-                    {viewMode === 'MODELS' && (
-                        <motion.div
-                            key="models"
-                            initial={{ opacity: 0, x: isRTL ? -30 : 30 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: isRTL ? 30 : -30 }}
-                            className="w-full flex justify-center"
+                            {isRTL ? "مستودع المكونات الرقمي" : "DIGITAL COMPONENTS REGISTRY"}
+                        </motion.span>
+                        <motion.h1
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                            className="text-4xl md:text-6xl font-black uppercase tracking-tighter"
                         >
-                            {selectedAgency?.models && selectedAgency.models.length > 0 ? (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl">
-                                    {selectedAgency?.models.map((model, idx) => (
-                                        <motion.div
-                                            key={model}
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: idx * 0.05 }}
-                                            onClick={() => handleModelSelect(model)}
-                                            className="group relative cursor-pointer"
-                                        >
-                                            <div className="glass-card bg-white/[0.02] border border-white/10 rounded-2xl p-6 flex items-center justify-between group-hover:border-accent-gold/40 transition-all duration-500">
-                                                <div className="flex items-center gap-5">
-                                                    <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:bg-accent-gold/10 transition-all">
-                                                        <CarFront className="w-5 h-5 text-white/20 group-hover:text-accent-gold transition-colors" />
-                                                    </div>
-                                                    <div>
-                                                        <h3 className="text-sm font-black uppercase tracking-widest">{model}</h3>
-                                                        <span className="text-[8px] text-white/20 font-bold uppercase tracking-widest">{selectedAgency.name} SERIES</span>
-                                                    </div>
-                                                </div>
-                                                <ArrowUpRight className="w-4 h-4 text-white/10 group-hover:text-accent-gold group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
-                                            </div>
-                                        </motion.div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="text-center py-20 text-white/40 italic uppercase tracking-[0.2em] font-black w-full text-xs">
-                                    {isRTL ? 'لم يتم إضافة موديلات تابعة لهذه الوكالة بعد.' : 'NO MODELS ASSOCIATED WITH THIS AGENCY YET.'}
-                                </div>
-                            )}
-                        </motion.div>
-                    )}
-
-                    {/* 3. PARTS LIST */}
-                    {viewMode === 'PARTS' && (
-                        <motion.div
-                            key="parts"
+                            {viewMode === 'AGENCIES' && (isRTL ? "اختر وكالة السيارة" : "SELECT AUTO AGENCY")}
+                            {viewMode === 'MODELS' && (isRTL ? `موديلات ${selectedAgency?.name}` : `${selectedAgency?.name} MODELS`)}
+                            {viewMode === 'PARTS' && (isRTL ? `قطع غيار ${selectedModel}` : `${selectedModel} SPARE PARTS`)}
+                        </motion.h1>
+                        <motion.p
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            className="space-y-10"
+                            transition={{ delay: 0.3 }}
+                            className="text-white/40 text-sm font-medium uppercase tracking-[0.2em]"
                         >
-                            {loading ? (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                                    {[1, 2, 3, 4].map(i => (
-                                        <div key={i} className="aspect-[4/5] rounded-3xl bg-white/[0.02] border border-white/5 animate-pulse" />
-                                    ))}
+                            {viewMode === 'AGENCIES' && (isRTL ? "ابحث عن طريق شعار الشركة المصنعة" : "BROWSE BY MANUFACTURER LOGO")}
+                            {viewMode === 'MODELS' && (isRTL ? "حدد موديل السيارة المحدد لمتابعة التوافق" : "SPECIFY THE CAR MODEL TO ENSURE COMPATIBILITY")}
+                            {viewMode === 'PARTS' && (isRTL ? "اعثر وكافة المكونات المتاحة لهذا الموديل" : "DISCOVER ALL AVAILABLE COMPONENTS FOR THIS MODEL")}
+                        </motion.p>
+                    </header>
+
+                    {/* ── SEARCH (Only for Agencies and Parts) ── */}
+                    {(viewMode === 'AGENCIES' || viewMode === 'PARTS') && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.4 }}
+                            className="relative max-w-2xl mx-auto w-full mb-16"
+                        >
+                            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-accent-gold/5 blur-3xl rounded-full" />
+                            <div className="relative flex items-center bg-white/[0.03] backdrop-blur-2xl border border-white/10 rounded-2xl p-2 shadow-2xl overflow-hidden group">
+                                <div className="flex-1 flex items-center px-4 gap-4">
+                                    <Search className="w-5 h-5 text-accent-gold group-hover:scale-110 transition-transform" />
+                                    <input
+                                        type="text"
+                                        placeholder={viewMode === 'AGENCIES' ? (isRTL ? "ابحث عن شركة (تويوتا، كيا...)" : "Search Agency (Toyota, Kia...)") : (isRTL ? "اسم القطعة..." : "Part Name...")}
+                                        className="w-full bg-transparent border-none outline-none py-4 text-sm font-bold placeholder:text-white/20"
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                    />
                                 </div>
-                            ) : parts.length === 0 ? (
-                                <motion.div
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-[40px] p-16 text-center space-y-8"
-                                >
-                                    <div className="w-24 h-24 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-4">
-                                        <AlertCircle className="w-10 h-10 text-accent-gold/40" />
-                                    </div>
-                                    <h2 className="text-3xl font-black uppercase tracking-tight">{isRTL ? "القطعة المطلوبة غير متوفرة حالياً" : "REQUESTED COMPONENT NOT IN STOCK"}</h2>
-                                    <p className="text-white/40 max-w-xl mx-auto text-sm leading-relaxed">
-                                        {isRTL
-                                            ? "لا توجد قطع غيار مدرجة لهذا الموديل في مستودعاتنا العامة. يمكنك تقديم طلب بحث مخصص عبر شبكة خبرائنا وكلاء كيا/تويوتا."
-                                            : "No spare parts are currently listed for this model in our general inventory. You can submit a custom sourcing request via our expert network."
-                                        }
-                                    </p>
-                                    <Link href="/concierge">
-                                        <button className="btn-gold px-12 py-5 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] shadow-2xl shadow-accent-gold/20 flex items-center gap-3 mx-auto">
-                                            {isRTL ? "تقديم طلب بحث خاص" : "SUBMIT SOURCE REQUEST"}
-                                            <Zap className="w-4 h-4" />
-                                        </button>
-                                    </Link>
-                                </motion.div>
-                            ) : (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                                    {parts.map((part, idx) => (
+                            </div>
+                        </motion.div>
+                    )}
+
+                    {/* ── CONTENT VIEWS ── */}
+                    <AnimatePresence mode="wait">
+
+                        {viewMode === 'AGENCIES' && (
+                            <motion.div
+                                key="agencies-tech"
+                                initial={{ opacity: 0, y: 30 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 1.1, filter: "blur(20px)" }}
+                                className="max-w-6xl mx-auto py-16"
+                            >
+                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-10 md:gap-14">
+                                    {filteredAgencies.map((agency, idx) => (
                                         <motion.div
-                                            key={part.id}
-                                            initial={{ opacity: 0, y: 20 }}
+                                            key={agency.id}
+                                            initial={{ opacity: 0, y: 40 }}
                                             animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: idx * 0.05 }}
-                                            className="group relative"
+                                            transition={{ delay: idx * 0.1, duration: 0.8, ease: "circOut" }}
+                                            onClick={() => handleAgencySelect(agency)}
+                                            className="group relative cursor-pointer"
                                         >
-                                            <div className="glass-card bg-black/40 backdrop-blur-3xl border border-white/10 rounded-[32px] p-6 hover:border-accent-gold/40 transition-all duration-700">
-                                                <div className="relative aspect-square mb-6 rounded-2xl overflow-hidden bg-white/5 border border-white/5">
-                                                    <img src={part.img} alt={part.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                                                    <div className="absolute top-4 right-4 px-3 py-1 bg-black/60 backdrop-blur-md rounded-full border border-white/10 text-[7px] font-black uppercase tracking-widest">{part.condition}</div>
-                                                    {/* ❤️ زر المفضلة */}
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            setFavoriteParts(prev =>
-                                                                prev.includes(part.id)
-                                                                    ? prev.filter(id => id !== part.id)
-                                                                    : [...prev, part.id]
-                                                            );
-                                                        }}
-                                                        className={`absolute top-4 left-4 w-9 h-9 rounded-full flex items-center justify-center transition-all ${favoriteParts.includes(part.id)
-                                                            ? 'bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)]'
-                                                            : 'bg-black/60 backdrop-blur-md border border-white/20 hover:bg-red-500/20'
-                                                            }`}
-                                                    >
-                                                        <Heart className={`w-4 h-4 transition-all ${favoriteParts.includes(part.id) ? 'fill-white text-white scale-110' : 'text-white/70'
-                                                            }`} />
-                                                    </button>
+                                            <div className="aspect-[4/5] glass-card bg-white/[0.01] border border-white/5 rounded-[40px] p-8 flex flex-col items-center justify-between overflow-hidden group-hover:border-cinematic-neon-blue/40 transition-all duration-700">
+                                                {/* Tech Background Deco */}
+                                                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120%] h-1 bg-gradient-to-r from-transparent via-cinematic-neon-blue/20 to-transparent" />
+                                                <div className="absolute bottom-10 left-0 w-full h-[1px] bg-white/[0.03]" />
+
+                                                {/* Capsule Shell */}
+                                                <div className="relative w-full aspect-square rounded-[30px] bg-white shadow-[0_10px_40px_rgba(0,0,0,0.5)] flex items-center justify-center p-6 group-hover:scale-105 transition-transform duration-700">
+                                                    <div className="absolute inset-0 rounded-[30px] border border-black/5" />
+                                                    <Image
+                                                        src={agency.logo}
+                                                        alt={agency.name}
+                                                        fill
+                                                        className="object-contain p-2"
+                                                    />
                                                 </div>
-                                                <div className="space-y-4">
-                                                    <span className="text-[8px] font-black text-accent-gold uppercase tracking-[0.3em]">{part.brand}</span>
-                                                    <h3 className="text-lg font-black uppercase tracking-tight leading-tight min-h-[3rem] group-hover:text-accent-gold transition-colors">{part.name}</h3>
-                                                    <div className="text-xl font-black gradient-text-gold">{formatPrice(Number(part.price))}</div>
 
-                                                    {/* أزرار الإجراءات */}
-                                                    <div className="flex gap-2 pt-3 border-t border-white/10">
-                                                        {/* 🛒 أضف للسلة */}
-                                                        <button
-                                                            onClick={() => {
-                                                                const cart = JSON.parse(localStorage.getItem('hm_cart') || '[]');
-                                                                const exists = cart.find((item: { id: string }) => item.id === part.id);
-                                                                if (!exists) {
-                                                                    cart.push({ id: part.id, type: 'part', title: part.name, price: part.price, image: part.img });
-                                                                    localStorage.setItem('hm_cart', JSON.stringify(cart));
-                                                                }
-                                                                alert(isRTL ? `✅ تمت إضافة ${part.name} للسلة` : `✅ ${part.name} added to cart`);
-                                                            }}
-                                                            title={isRTL ? 'أضف للسلة' : 'Add to Cart'}
-                                                            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-[#c9a96e]/10 hover:border-[#c9a96e]/40 hover:text-[#c9a96e] text-white/70 transition-all text-[10px] font-black uppercase tracking-wider"
-                                                        >
-                                                            <ShoppingCart className="w-4 h-4" />
-                                                            <span>{isRTL ? 'السلة' : 'Cart'}</span>
-                                                        </button>
-
-                                                        {/* 💬 شراء عبر WhatsApp */}
-                                                        <a
-                                                            href={(() => {
-                                                                const msg = isRTL
-                                                                    ? `🔧 *طلب شراء قطعة غيار*\n━━━━━━━━━━━━━━━━\n📌 *${part.name}*\n🏭 الماركة: ${part.brand}\n📦 الحالة: ${part.condition}\n🚗 متوافق مع: ${part.compatibility.join('، ')}\n━━━━━━━━━━━━━━━━\n💰 السعر: ${formatPrice(part.price)}\n━━━━━━━━━━━━━━━━\n\nأرجو التواصل للإتمام ✅`
-                                                                    : `🔧 *Spare Part Purchase Request*\n━━━━━━━━━━━━━━━━\n📌 *${part.name}*\n🏭 Brand: ${part.brand}\n📦 Condition: ${part.condition}\n🚗 Compatible: ${part.compatibility.join(', ')}\n━━━━━━━━━━━━━━━━\n💰 Price: ${formatPrice(part.price)}\n━━━━━━━━━━━━━━━━\n\nPlease contact me ✅`;
-                                                                return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
-                                                            })()}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            title={isRTL ? 'شراء عبر واتساب' : 'Buy via WhatsApp'}
-                                                            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-green-600/20 border border-green-500/30 hover:bg-green-600 text-green-400 hover:text-white transition-all text-[10px] font-black uppercase tracking-wider"
-                                                        >
-
-                                                            <MessageCircle className="w-4 h-4" />
-                                                            <span>{isRTL ? 'شراء' : 'Buy'}</span>
-                                                        </a>
-                                                    </div>
+                                                <div className="text-center w-full z-10">
+                                                    <div className="text-[10px] font-black uppercase tracking-[0.5em] text-cinematic-neon-blue mb-2 opacity-60 group-hover:opacity-100 transition-opacity">Select Agency</div>
+                                                    <h3 className="text-2xl font-black italic uppercase tracking-tighter group-hover:text-cinematic-neon-blue transition-colors">
+                                                        {agency.name}
+                                                    </h3>
                                                 </div>
+
+                                                {/* Animated Glow on Hover */}
+                                                <div className="absolute -inset-20 bg-cinematic-neon-blue/10 blur-[100px] opacity-0 group-hover:opacity-100 transition-opacity duration-1000 -z-10" />
                                             </div>
                                         </motion.div>
                                     ))}
                                 </div>
-                            )}
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </main>
+                            </motion.div>
+                        )}
 
-            {/* STYLES */}
-            <style jsx global>{`
+                        {viewMode === 'MODELS' && (
+                            <motion.div
+                                key="models"
+                                initial={{ opacity: 0, x: isRTL ? -30 : 30 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: isRTL ? 30 : -30 }}
+                                className="w-full flex justify-center"
+                            >
+                                {selectedAgency?.models && selectedAgency.models.length > 0 ? (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl">
+                                        {selectedAgency?.models.map((model, idx) => (
+                                            <motion.div
+                                                key={model}
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ delay: idx * 0.05 }}
+                                                onClick={() => handleModelSelect(model)}
+                                                className="group relative cursor-pointer"
+                                            >
+                                                <div className="glass-card bg-white/[0.02] border border-white/10 rounded-2xl p-6 flex items-center justify-between group-hover:border-accent-gold/40 transition-all duration-500">
+                                                    <div className="flex items-center gap-5">
+                                                        <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:bg-accent-gold/10 transition-all">
+                                                            <CarFront className="w-5 h-5 text-white/20 group-hover:text-accent-gold transition-colors" />
+                                                        </div>
+                                                        <div>
+                                                            <h3 className="text-sm font-black uppercase tracking-widest">{model}</h3>
+                                                            <span className="text-[8px] text-white/20 font-bold uppercase tracking-widest">{selectedAgency.name} SERIES</span>
+                                                        </div>
+                                                    </div>
+                                                    <ArrowUpRight className="w-4 h-4 text-white/10 group-hover:text-accent-gold group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
+                                                </div>
+                                            </motion.div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-20 text-white/40 italic uppercase tracking-[0.2em] font-black w-full text-xs">
+                                        {isRTL ? 'لم يتم إضافة موديلات تابعة لهذه الوكالة بعد.' : 'NO MODELS ASSOCIATED WITH THIS AGENCY YET.'}
+                                    </div>
+                                )}
+                            </motion.div>
+                        )}
+
+                        {/* 3. PARTS LIST */}
+                        {viewMode === 'PARTS' && (
+                            <motion.div
+                                key="parts"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="space-y-10"
+                            >
+                                {loading ? (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                                        {[1, 2, 3, 4].map(i => (
+                                            <div key={i} className="aspect-[4/5] rounded-3xl bg-white/[0.02] border border-white/5 animate-pulse" />
+                                        ))}
+                                    </div>
+                                ) : parts.length === 0 ? (
+                                    <motion.div
+                                        initial={{ opacity: 0, scale: 0.9 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-[40px] p-16 text-center space-y-8"
+                                    >
+                                        <div className="w-24 h-24 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-4">
+                                            <AlertCircle className="w-10 h-10 text-accent-gold/40" />
+                                        </div>
+                                        <h2 className="text-3xl font-black uppercase tracking-tight">{isRTL ? "القطعة المطلوبة غير متوفرة حالياً" : "REQUESTED COMPONENT NOT IN STOCK"}</h2>
+                                        <p className="text-white/40 max-w-xl mx-auto text-sm leading-relaxed">
+                                            {isRTL
+                                                ? "لا توجد قطع غيار مدرجة لهذا الموديل في مستودعاتنا العامة. يمكنك تقديم طلب بحث مخصص عبر شبكة خبرائنا وكلاء كيا/تويوتا."
+                                                : "No spare parts are currently listed for this model in our general inventory. You can submit a custom sourcing request via our expert network."
+                                            }
+                                        </p>
+                                        <Link href="/concierge">
+                                            <button className="btn-gold px-12 py-5 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] shadow-2xl shadow-accent-gold/20 flex items-center gap-3 mx-auto">
+                                                {isRTL ? "تقديم طلب بحث خاص" : "SUBMIT SOURCE REQUEST"}
+                                                <Zap className="w-4 h-4" />
+                                            </button>
+                                        </Link>
+                                    </motion.div>
+                                ) : (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                                        {parts.map((part, idx) => (
+                                            <motion.div
+                                                key={part.id}
+                                                initial={{ opacity: 0, y: 20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ delay: idx * 0.05 }}
+                                                className="group relative cursor-pointer"
+                                                onClick={() => openPartModal(part)}
+                                            >
+                                                <div className="glass-card bg-black/40 backdrop-blur-3xl border border-white/10 rounded-[32px] p-6 hover:border-accent-gold/40 transition-all duration-700">
+                                                    <div className="relative aspect-square mb-6 rounded-2xl overflow-hidden bg-white/5 border border-white/5">
+                                                        <Image
+                                                            src={part.img || '/images/placeholder.jpg'}
+                                                            alt={part.name}
+                                                            fill
+                                                            className="object-cover group-hover:scale-110 transition-transform duration-700"
+                                                            unoptimized
+                                                        />
+                                                        <div className="absolute top-4 right-4 px-3 py-1 bg-black/60 backdrop-blur-md rounded-full border border-white/10 text-[7px] font-black uppercase tracking-widest">{part.condition}</div>
+                                                        {/* [[ARABIC_COMMENT]] overlay يظهر عند hover */}
+                                                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center">
+                                                            <span className="text-white text-[11px] font-black uppercase tracking-widest border border-white/40 px-4 py-2 rounded-full">
+                                                                {isRTL ? 'عرض التفاصيل' : 'VIEW DETAILS'}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-3">
+                                                        <span className="text-[8px] font-black text-accent-gold uppercase tracking-[0.3em]">{part.brand}</span>
+                                                        <h3 className="text-lg font-black uppercase tracking-tight leading-tight min-h-[3rem] group-hover:text-accent-gold transition-colors">{part.name}</h3>
+                                                        <div className="text-xl font-black gradient-text-gold">{formatPrice(Number(part.price))}</div>
+                                                        {part.stock !== undefined && (
+                                                            <div className={`text-[10px] font-black uppercase tracking-widest ${part.stock > 5 ? 'text-green-400' : part.stock > 0 ? 'text-yellow-400' : 'text-red-400'
+                                                                }`}>
+                                                                {part.stock > 0
+                                                                    ? (isRTL ? `متوفر: ${part.stock} قطعة` : `In Stock: ${part.stock}`)
+                                                                    : (isRTL ? 'غير متوفر' : 'Out of Stock')}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </motion.div>
+                                        ))}
+                                    </div>
+                                )}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </main>
+
+                {/* STYLES */}
+                <style jsx global>{`
                 .glass-card {
                     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
                     backdrop-filter: blur(15px);
@@ -464,6 +452,7 @@ export default function PartsPage() {
                 }
                 .font-display { font-family: 'Outfit', sans-serif; }
             `}</style>
-        </div>
+            </div>
+        </>
     );
 }

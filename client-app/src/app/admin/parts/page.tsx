@@ -13,7 +13,8 @@ import {
     X,
     Upload,
     Save,
-    ChevronLeft
+    ChevronLeft,
+    CheckCircle2
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
@@ -89,6 +90,37 @@ export default function AdminPartsPage() {
             } catch (err) {
                 console.error('Failed to delete part', err);
             }
+        }
+    };
+
+    // [[ARABIC_COMMENT]] تسجيل بيع قطعة - ينقص المخزون ويخفيها إذا نفد
+    const handleMarkSold = async (id: string, name: string, currentStock: number) => {
+        const confirmed = confirm(isRTL
+            ? `تأكيد بيع: ${name}؟\nالمخزون الحالي: ${currentStock} قطعة`
+            : `Confirm sale: ${name}?\nCurrent stock: ${currentStock}`
+        );
+        if (!confirmed) return;
+
+        const soldQtyStr = prompt(
+            isRTL ? `كم قطعة تم بيعها؟ (1-${currentStock})` : `How many units sold? (1-${currentStock})`,
+            '1'
+        );
+        const soldQty = soldQtyStr ? parseInt(soldQtyStr) : 1;
+
+        try {
+            const res = await fetch(`/api/v2/parts/${id}/sold`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('hm_token')}` },
+                body: JSON.stringify({ soldQty }),
+            });
+            const data = await res.json();
+            loadParts();
+            alert(isRTL
+                ? `✅ ${data.message || 'تم تسجيل البيع'}`
+                : `✅ ${data.message || 'Sale recorded!'}`
+            );
+        } catch (err) {
+            console.error('Failed to mark part as sold', err);
         }
     };
 
@@ -239,21 +271,34 @@ export default function AdminPartsPage() {
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-2 pt-3">
+                                    <div className="grid grid-cols-3 gap-2 pt-3">
                                         <motion.button
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
                                             onClick={() => handleEdit(part)}
                                             className="py-2 bg-cinematic-neon-blue/10 border border-cinematic-neon-blue/30 text-cinematic-neon-blue rounded-lg text-[10px] font-black uppercase flex items-center justify-center gap-1"
+                                            title={isRTL ? 'تعديل' : 'Edit'}
                                         >
                                             <Edit className="w-3 h-3" />
                                             {isRTL ? 'تعديل' : 'EDIT'}
+                                        </motion.button>
+                                        {/* [[ARABIC_COMMENT]] زر "تم البيع" - ينقص من المخزون */}
+                                        <motion.button
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
+                                            onClick={() => handleMarkSold(part.id, part.name, part.stock || 1)}
+                                            className="py-2 bg-green-500/10 border border-green-500/30 text-green-400 rounded-lg text-[10px] font-black uppercase flex items-center justify-center gap-1"
+                                            title={isRTL ? 'تم البيع' : 'Mark Sold'}
+                                        >
+                                            <CheckCircle2 className="w-3 h-3" />
+                                            {isRTL ? 'بيع' : 'SOLD'}
                                         </motion.button>
                                         <motion.button
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
                                             onClick={() => handleDelete(part.id)}
                                             className="py-2 bg-cinematic-neon-red/10 border border-cinematic-neon-red/30 text-cinematic-neon-red rounded-lg text-[10px] font-black uppercase flex items-center justify-center gap-1"
+                                            title={isRTL ? 'حذف' : 'Delete'}
                                         >
                                             <Trash2 className="w-3 h-3" />
                                             {isRTL ? 'حذف' : 'DELETE'}

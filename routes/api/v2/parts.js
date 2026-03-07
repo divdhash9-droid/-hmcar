@@ -154,4 +154,63 @@ router.delete('/:id', requireAuthAPI, async (req, res) => {
     }
 });
 
+// [[ARABIC_COMMENT]] PATCH /api/v2/parts/:id/sold - تسجيل بيع قطعة غيار
+// [[ARABIC_COMMENT]] المنطق: إذا stockQty > 1 → ينقص واحد، إذا = 1 → يُخفي القطعة (inStock=false)
+router.patch('/:id/sold', requireAuthAPI, async (req, res) => {
+    try {
+        const { soldQty = 1 } = req.body;
+
+        const part = await SparePart.findById(req.params.id);
+        if (!part) {
+            return res.status(404).json({ success: false, error: 'Part not found' });
+        }
+
+        const currentStock = part.stockQty || 1;
+        const newStock = Math.max(0, currentStock - soldQty);
+
+        const updates = {
+            stockQty: newStock,
+            inStock: newStock > 0,
+            // [[ARABIC_COMMENT]] إذا نفد المخزون تماماً، نُسجّل وقت البيع
+            ...(newStock === 0 ? { soldAt: new Date() } : {})
+        };
+
+        const updatedPart = await SparePart.findByIdAndUpdate(
+            req.params.id,
+            updates,
+            { new: true }
+        );
+
+        // [[ARABIC_COMMENT]] تسجيل في AuditLog للتقارير التلقائية
+        try {
+            const AuditLog = require('../../../models/AuditLog');
+            await AuditLog.create({
+                action: 'SOLD',
+                targetModel: 'SparePart',
+                description: `تم بيع ${soldQty} قطعة من: ${part.name} — المتبقي: ${newStock}`,
+                targetId: part._id,
+                after: { soldQty, newStock, soldAt: new Date() },
+                ipAddress: req.ip,
+                userAgent: req.get('User-Agent'),
+                sessionId: req.sessionID || 'api'
+            });
+        } catch (logErr) {
+            console.error('AuditLog error:', logErr);
+        }
+
+        res.json({
+            success: true,
+            data: updatedPart,
+            soldQty,
+            newStock,
+            message: newStock === 0
+                ? `تم بيع القطعة وتم إخفاؤها (نفد المخزون)`
+                : `تم بيع ${soldQty} قطعة. المتبقي في المخزون: ${newStock}`
+        });
+    } catch (error) {
+        console.error('Mark part as sold error:', error);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+});
+
 module.exports = router;

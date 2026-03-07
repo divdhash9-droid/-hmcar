@@ -201,7 +201,7 @@ export default function ProductModal({ product, onClose, whatsappNumber }: Produ
                         </button>
 
                         {/* [[ARABIC_COMMENT]] قسم الصور */}
-                        <div className="relative bg-black shrink-0" style={{ height: '240px' }}>
+                        <div className="relative bg-black h-60 shrink-0">
                             {images.length > 0 ? (
                                 <>
                                     <Image

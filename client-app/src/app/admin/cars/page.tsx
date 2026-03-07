@@ -11,8 +11,7 @@ import {
     X,
     Upload,
     Save,
-    ChevronLeft,
-    DollarSign
+    ChevronLeft
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
@@ -30,14 +29,16 @@ export default function AdminCarsPage() {
     const [showModal, setShowModal] = useState(false);
     const [editingCar, setEditingCar] = useState<any>(null);
     const [brands, setBrands] = useState<any[]>([]);
-    const [usdToSar, setUsdToSar] = useState(3.75); // Default USD to SAR conversion rate
+    const [usdToSar, setUsdToSar] = useState(3.75);   // [[ARABIC_COMMENT]] سعر صرف الدولار مقابل الريال
+    const [usdToKrw, setUsdToKrw] = useState(1350);  // [[ARABIC_COMMENT]] سعر صرف الدولار مقابل الوون الكوري
     const [formData, setFormData] = useState({
         title: '',
         make: '',
         model: '',
         year: new Date().getFullYear(),
-        price: 0, // SAR price
-        usdPrice: 0, // USD price for input
+        price: 0,          // [[ARABIC_COMMENT]] السعر الأساسي بالريال السعودي SAR
+        usdPrice: 0,       // [[ARABIC_COMMENT]] السعر بالدولار الأمريكي USD
+        krwPrice: 0,       // [[ARABIC_COMMENT]] السعر بالوون الكوري KRW
         category: 'sedan',
         images: [''],
         description: '',
@@ -69,6 +70,7 @@ export default function AdminCarsPage() {
             }
             if (settingsRes.success && settingsRes.data.currencySettings) {
                 setUsdToSar(settingsRes.data.currencySettings.usdToSar || 3.75);
+                setUsdToKrw(settingsRes.data.currencySettings.usdToKrw || 1350); // [[ARABIC_COMMENT]] جلب سعر صرف الوون الكوري
             }
             if (brandsRes.success) {
                 setBrands(brandsRes.brands || []);
@@ -110,12 +112,17 @@ export default function AdminCarsPage() {
 
     const handleEdit = (car: any) => {
         setEditingCar(car);
+        const sarPrice = car.price || 0;
+        const usd = parseFloat((sarPrice / usdToSar).toFixed(2));
+        const krw = Math.round(usd * usdToKrw);
         setFormData({
             title: car.title,
             make: car.make,
             model: car.model,
             year: car.year,
-            price: car.price,
+            price: sarPrice,
+            usdPrice: usd,
+            krwPrice: krw, // [[ARABIC_COMMENT]] حساب السعر بالوون عند التعديل
             category: car.category,
             images: car.images || [''],
             description: car.description || '',
@@ -124,9 +131,8 @@ export default function AdminCarsPage() {
             transmission: car.transmission || 'Automatic',
             color: car.color || '',
             isActive: car.isActive !== false,
-            usdPrice: parseFloat((car.price / usdToSar).toFixed(2)),
             displayCurrency: car.displayCurrency || 'SAR',
-            listingType: car.listingType || 'store' // [[ARABIC_COMMENT]] الحفاظ على نوع العرض أو تعيينه كمعرض افتراضياً
+            listingType: car.listingType || 'store'
         });
         setShowModal(true);
     };
@@ -138,6 +144,8 @@ export default function AdminCarsPage() {
             model: '',
             year: new Date().getFullYear(),
             price: 0,
+            usdPrice: 0,
+            krwPrice: 0, // [[ARABIC_COMMENT]] إعادة تعيين السعر بالوون
             category: 'sedan',
             images: [''],
             description: '',
@@ -146,10 +154,33 @@ export default function AdminCarsPage() {
             transmission: 'Automatic',
             color: '',
             isActive: true,
-            usdPrice: 0,
             displayCurrency: 'SAR',
-            listingType: 'store' // [[ARABIC_COMMENT]] إعادة تعيين النوع إلى معرض
+            listingType: 'store'
         });
+    };
+
+    // [[ARABIC_COMMENT]] دالة تحويل السعر تلقائياً بين SAR و USD و KRW
+    const handlePriceChange = (field: 'sar' | 'usd' | 'krw', rawValue: string) => {
+        const value = parseFloat(rawValue) || 0;
+        let sarPrice = 0;
+        let usdPrice = 0;
+        let krwPrice = 0;
+
+        if (field === 'sar') {
+            sarPrice = value;
+            usdPrice = parseFloat((sarPrice / usdToSar).toFixed(2));
+            krwPrice = Math.round(usdPrice * usdToKrw);
+        } else if (field === 'usd') {
+            usdPrice = value;
+            sarPrice = parseFloat((usdPrice * usdToSar).toFixed(2));
+            krwPrice = Math.round(usdPrice * usdToKrw);
+        } else if (field === 'krw') {
+            krwPrice = value;
+            usdPrice = parseFloat((krwPrice / usdToKrw).toFixed(2));
+            sarPrice = parseFloat((usdPrice * usdToSar).toFixed(2));
+        }
+
+        setFormData(prev => ({ ...prev, price: sarPrice, usdPrice, krwPrice }));
     };
 
     return (
@@ -461,39 +492,63 @@ export default function AdminCarsPage() {
                                         />
                                     </div>
 
-                                    {/* Tech Specs */}
-                                    <div>
-                                        <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/60 mb-2">
-                                            {isRTL ? 'السعر (دولار)' : 'PRICE (USD)'}
+                                    {/* [[ARABIC_COMMENT]] حقول الأسعار - تحويل تلقائي بين SAR و USD و KRW */}
+                                    <div className="col-span-2">
+                                        <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/60 mb-3">
+                                            {isRTL ? 'الأسعار (تحويل تلقائي بين العملات)' : 'PRICES (AUTO-CONVERT)'}
                                         </label>
-                                        <div className="relative">
-                                            <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
-                                            <input
-                                                type="number"
-                                                placeholder="0.00"
-                                                onChange={(e) => {
-                                                    const usd = parseFloat(e.target.value) || 0;
-                                                    setFormData({ ...formData, price: parseFloat((usd * usdToSar).toFixed(2)) });
-                                                }}
-                                                className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 pl-12 pr-4 text-sm font-bold text-white focus:outline-none focus:border-cinematic-neon-blue/40"
-                                            />
+                                        <div className="grid grid-cols-3 gap-3">
+                                            {/* السعر بالريال السعودي SAR */}
+                                            <div className="relative">
+                                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[11px] font-black text-green-400">ر.س</span>
+                                                <input
+                                                    type="number"
+                                                    placeholder="0"
+                                                    title={isRTL ? 'السعر بالريال السعودي' : 'Price in SAR'}
+                                                    value={formData.price || ''}
+                                                    onChange={(e) => handlePriceChange('sar', e.target.value)}
+                                                    className="w-full bg-white/[0.03] border border-green-400/30 rounded-xl py-3 pl-10 pr-3 text-sm font-bold text-green-400 focus:outline-none focus:border-green-400/60"
+                                                />
+                                                <div className="text-[9px] text-white/30 mt-1 text-center uppercase tracking-widest">SAR</div>
+                                            </div>
+                                            {/* السعر بالدولار USD */}
+                                            <div className="relative">
+                                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[11px] font-black text-cinematic-neon-blue">$</span>
+                                                <input
+                                                    type="number"
+                                                    placeholder="0.00"
+                                                    title={isRTL ? 'السعر بالدولار' : 'Price in USD'}
+                                                    value={formData.usdPrice || ''}
+                                                    onChange={(e) => handlePriceChange('usd', e.target.value)}
+                                                    className="w-full bg-white/[0.03] border border-cinematic-neon-blue/30 rounded-xl py-3 pl-10 pr-3 text-sm font-bold text-cinematic-neon-blue focus:outline-none focus:border-cinematic-neon-blue/60"
+                                                />
+                                                <div className="text-[9px] text-white/30 mt-1 text-center uppercase tracking-widest">USD</div>
+                                            </div>
+                                            {/* السعر بالوون الكوري KRW */}
+                                            <div className="relative">
+                                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[11px] font-black text-yellow-400">₩</span>
+                                                <input
+                                                    type="number"
+                                                    placeholder="0"
+                                                    title={isRTL ? 'السعر بالوون الكوري' : 'Price in KRW'}
+                                                    value={formData.krwPrice || ''}
+                                                    onChange={(e) => handlePriceChange('krw', e.target.value)}
+                                                    className="w-full bg-white/[0.03] border border-yellow-400/30 rounded-xl py-3 pl-10 pr-3 text-sm font-bold text-yellow-400 focus:outline-none focus:border-yellow-400/60"
+                                                />
+                                                <div className="text-[9px] text-white/30 mt-1 text-center uppercase tracking-widest">KRW</div>
+                                            </div>
+                                        </div>
+                                        {/* [[ARABIC_COMMENT]] عرض معدلات الصرف المستخدمة */}
+                                        <div className="mt-2 flex gap-4 text-[9px] text-white/20 uppercase tracking-widest">
+                                            <span>1 USD = {usdToSar} SAR</span>
+                                            <span>1 USD = {usdToKrw.toLocaleString()} KRW</span>
                                         </div>
                                     </div>
+
+                                    {/* عملة العرض */}
                                     <div>
                                         <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/60 mb-2">
-                                            {isRTL ? 'السعر (ريال سعودي)' : 'PRICE (SAR)'}
-                                        </label>
-                                        <input
-                                            type="number"
-                                            required
-                                            value={formData.price}
-                                            onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
-                                            className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 px-4 text-sm font-bold text-cinematic-neon-blue focus:outline-none focus:border-cinematic-neon-blue/40"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/60 mb-2">
-                                            {isRTL ? 'عملة العرض' : 'DISPLAY CURRENCY'}
+                                            {isRTL ? 'عملة العرض للعميل' : 'DISPLAY CURRENCY'}
                                         </label>
                                         <select
                                             title={isRTL ? "عملة العرض" : "Display Currency"}
@@ -501,8 +556,9 @@ export default function AdminCarsPage() {
                                             onChange={(e) => setFormData({ ...formData, displayCurrency: e.target.value })}
                                             className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 px-4 text-sm font-bold text-white focus:outline-none focus:border-cinematic-neon-blue/40"
                                         >
-                                            <option value="SAR">SAR (ريال سعودي)</option>
-                                            <option value="USD">USD (دولار أمريكي)</option>
+                                            <option value="SAR">🇸🇦 SAR - ريال سعودي</option>
+                                            <option value="USD">🇺🇸 USD - دولار أمريكي</option>
+                                            <option value="KRW">🇰🇷 KRW - وون كوري</option>
                                         </select>
                                     </div>
                                     <div>

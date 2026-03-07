@@ -392,53 +392,52 @@ export default function ClientDashboard() {
 
                     {/* Activity section removed per request */}
 
-                    <section className="mt-16 relative z-10">
-                        <div className={cn("flex items-center gap-4 mb-8", isRTL && "flex-row-reverse")}>
-                            <Car className="w-5 h-5 text-luxury-gold" />
-                            <h2 className="text-[13px] font-black uppercase tracking-[0.4em] text-white/60">
-                                {isRTL ? "توصيات لك" : "RECOMMENDED FOR YOU"}
-                            </h2>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                            {(dashboardData?.recommended || [
-                                { id: "c1", title: "Lexus LX600 2024", price: 620000, img: "https://images.unsplash.com/photo-1619767886558-efdc259b66a4?q=75&w=800" },
-                                { id: "c2", title: "Porsche 911 Turbo", price: 950000, img: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=75&w=800" },
-                                { id: "c3", title: "Range Rover Sport", price: 480000, img: "https://images.unsplash.com/photo-1520170359211-7ad475a968b6?q=75&w=800" },
-                            ]).map((car: { id?: string; title: string; price: number; img: string }, i: number) => (
-                                <Link key={car.id || i} href={`/showroom/${car.id || ""}`}>
-                                    <motion.div
-                                        whileHover={{ y: -10 }}
-                                        className="group relative rounded-[2rem] overflow-hidden border border-white/5 bg-white/[0.02] backdrop-blur-md"
-                                    >
-                                        <div className="h-64 overflow-hidden relative">
-                                            {/* HUD Overlay for Car */}
-                                            <div className="absolute inset-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
-                                                <div className="absolute top-4 left-4 w-10 h-10 border-l border-t border-accent-gold/40" />
-                                                <div className="absolute bottom-4 right-4 w-10 h-10 border-r border-b border-accent-gold/40" />
-                                            </div>
+                    {/* [[ARABIC_COMMENT]] عرض سيارات المعرض الحقيقية وإخفاء القسم إذا لم تكن هناك سيارات */}
+                    {dashboardData?.recentCars && dashboardData.recentCars.length > 0 && (
+                        <section className="mt-16 relative z-10">
+                            <div className={cn("flex items-center gap-4 mb-8", isRTL && "flex-row-reverse")}>
+                                <Car className="w-5 h-5 text-luxury-gold" />
+                                <h2 className="text-[13px] font-black uppercase tracking-[0.4em] text-white/60">
+                                    {isRTL ? "تشكيلة المعرض الموصى بها" : "RECOMMENDED SHOWROOM CARS"}
+                                </h2>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                {dashboardData.recentCars.map((car: { id?: string; title: string; price: number; image?: string; img?: string }, i: number) => (
+                                    <Link key={car.id || i} href={`/showroom/${car.id || ""}`}>
+                                        <motion.div
+                                            whileHover={{ y: -10 }}
+                                            className="group relative rounded-[2rem] overflow-hidden border border-white/5 bg-white/[0.02] backdrop-blur-md"
+                                        >
+                                            <div className="h-64 overflow-hidden relative">
+                                                {/* HUD Overlay for Car */}
+                                                <div className="absolute inset-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                                                    <div className="absolute top-4 left-4 w-10 h-10 border-l border-t border-accent-gold/40" />
+                                                    <div className="absolute bottom-4 right-4 w-10 h-10 border-r border-b border-accent-gold/40" />
+                                                </div>
 
-                                            <img
-                                                src={car.img}
-                                                alt={car.title}
-                                                className="w-full h-full object-cover grayscale brightness-75 transition-all duration-1000 group-hover:grayscale-0 group-hover:scale-110 group-hover:brightness-100"
-                                            />
-                                            <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80" />
-                                        </div>
-                                        <div className="p-8">
-                                            <div className="text-[11px] font-black text-accent-gold uppercase tracking-[0.2em] mb-2">{isRTL ? "موصى به" : "RECOMMENDED"}</div>
-                                            <div className="flex items-end justify-between gap-4">
-                                                <div className="text-2xl font-black uppercase tracking-tighter italic line-clamp-1 text-white">{car.title}</div>
-                                                <div className="text-lg font-black italic text-white/90 shrink-0">
-                                                    {Number(car.price).toLocaleString()}
-                                                    <span className="text-[10px] opacity-40 ml-2">SAR</span>
+                                                <img
+                                                    src={car.image || car.img || "/images/placeholder.jpg"}
+                                                    alt={car.title}
+                                                    className="w-full h-full object-cover grayscale brightness-75 transition-all duration-1000 group-hover:grayscale-0 group-hover:scale-110 group-hover:brightness-100"
+                                                />
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80" />
+                                            </div>
+                                            <div className="p-8">
+                                                <div className="text-[11px] font-black text-accent-gold uppercase tracking-[0.2em] mb-2">{isRTL ? "موصى به" : "RECOMMENDED"}</div>
+                                                <div className="flex items-end justify-between gap-4">
+                                                    <div className="text-2xl font-black uppercase tracking-tighter italic line-clamp-1 text-white">{car.title}</div>
+                                                    <div className="text-lg font-black italic text-white/90 shrink-0">
+                                                        {Number(car.price).toLocaleString()}
+                                                        <span className="text-[10px] opacity-40 ml-2">SAR</span>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </motion.div>
-                                </Link>
-                            ))}
-                        </div>
-                    </section>
+                                        </motion.div>
+                                    </Link>
+                                ))}
+                            </div>
+                        </section>
+                    )}
 
                     <section className="mt-16 relative z-10">
                         <div className={cn("flex items-center gap-4 mb-6", isRTL && "flex-row-reverse")}>

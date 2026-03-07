@@ -36,7 +36,17 @@ router.get('/', async (req, res) => {
 
         if (category) filter.category = category;
         if (make) filter.make = make;
-        if (listingType) filter.listingType = listingType;
+        if (listingType) {
+            if (listingType === 'store') {
+                filter.$or = filter.$or || [];
+                filter.$or.push({ listingType: 'store' });
+                filter.$or.push({ listingType: { $exists: false } });
+                filter.$or.push({ listingType: null });
+                filter.$or.push({ listingType: '' });
+            } else {
+                filter.listingType = listingType;
+            }
+        }
 
         if (minPrice || maxPrice) {
             filter.$or = [

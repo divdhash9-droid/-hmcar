@@ -5,11 +5,12 @@ import { useState, useEffect } from "react";
 import {
     Package, Clock, CheckCircle, Truck,
     CreditCard,
-    Phone, Mail, Download, AlertCircle, ChevronLeft, ChevronRight
+    Phone, Mail, AlertCircle, ChevronLeft, ChevronRight
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/LanguageContext";
+import { useSettings } from "@/lib/SettingsContext";
 import { api } from "@/lib/api";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -24,6 +25,7 @@ const STATUS_STEPS = [
 
 export default function OrderDetailPage() {
     const { isRTL } = useLanguage();
+    const { socialLinks } = useSettings(); // [[ARABIC_COMMENT]] جلب رقم واتساب الحقيقي
     const params = useParams();
     const orderId = params?.id as string;
 
@@ -46,36 +48,8 @@ export default function OrderDetailPage() {
                 throw new Error(res.error || 'Not found');
             }
         } catch {
-            // بيانات تجريبية
-            setOrder({
-                id: orderId,
-                orderNumber: `ORD-${orderId.slice(0, 8).toUpperCase()}`,
-                status: 'confirmed',
-                paymentStatus: 'paid',
-                totalAmount: 450000,
-                createdAt: new Date(Date.now() - 2 * 86400000).toISOString(),
-                updatedAt: new Date().toISOString(),
-                car: {
-                    title: 'MERCEDES-BENZ S-CLASS 2024',
-                    make: 'Mercedes-Benz',
-                    model: 'S-Class',
-                    year: 2024,
-                    color: 'Obsidian Black',
-                    vin: '1HGBH41JXMN109186',
-                    image: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=1200',
-                    price: 450000,
-                },
-                buyer: {
-                    name: 'Ahmed Al-Rashid',
-                    phone: '+966 50 123 4567',
-                    email: 'ahmed@example.com',
-                },
-                timeline: [
-                    { status: 'pending', date: new Date(Date.now() - 2 * 86400000).toISOString(), note: 'تم استلام الطلب' },
-                    { status: 'confirmed', date: new Date(Date.now() - 86400000).toISOString(), note: 'تم تأكيد الطلب من قبل الإدارة' },
-                ],
-                notes: 'الرجاء التواصل قبل التسليم لتحديد الموعد المناسب.',
-            });
+            // [[ARABIC_COMMENT]] الطلب غير موجود - لا نعرض بيانات وهمية
+            setOrder(null);
         } finally {
             setLoading(false);
         }
@@ -329,11 +303,22 @@ export default function OrderDetailPage() {
                             </div>
                         )}
 
-                        {/* Download Invoice */}
-                        <button className="w-full py-4 bg-white/5 border border-white/10 rounded-2xl text-[11px] font-black uppercase tracking-[0.3em] text-white/60 hover:text-white hover:bg-white/10 flex items-center justify-center gap-3 transition-all">
-                            <Download className="w-5 h-5" />
-                            {isRTL ? 'تنزيل الفاتورة' : 'DOWNLOAD INVOICE'}
-                        </button>
+                        {/* [[ARABIC_COMMENT]] زر التواصل عبر واتساب - يستخدم الرقم المحفوظ في الإعدادات */}
+                        <a
+                            href={`https://wa.me/${(socialLinks?.whatsapp || '966500000000').replace(/\D/g, '')}?text=${encodeURIComponent(
+                                `طلب رقم: ${order.orderNumber}\nالسيارة: ${order.car?.title || ''}\nالمبلغ: ${Number(order.totalAmount).toLocaleString()} SAR\n\nأرجو إرسال الفاتورة.`
+                            )}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            <motion.button
+                                whileHover={{ scale: 1.03 }}
+                                whileTap={{ scale: 0.97 }}
+                                className="w-full py-4 bg-green-500/10 border border-green-500/30 rounded-2xl text-[11px] font-black uppercase tracking-[0.3em] text-green-400 hover:bg-green-500/20 flex items-center justify-center gap-3 transition-all"
+                            >
+                                💬 {isRTL ? 'طلب الفاتورة عبر واتساب' : 'REQUEST INVOICE VIA WHATSAPP'}
+                            </motion.button>
+                        </a>
                     </motion.div>
 
                 </div>

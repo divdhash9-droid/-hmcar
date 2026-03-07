@@ -23,13 +23,16 @@ export default function Auctions() {
             setLoading(true);
             try {
                 if (activeTab === 'SHOWROOM') {
+                    // [[ARABIC_COMMENT]] جلب المزادات المباشرة اليدوية من قاعدة البيانات
                     const data = await api.liveAuctions.list();
                     if (data.success) setAuctions(data.data || []);
                 } else {
-                    const status = activeTab === 'LIVE' ? 'running' : 'scheduled';
+                    // [[ARABIC_COMMENT]] الحالات الصحيحة: 'live' للمباشر و 'upcoming' للقادم
+                    const status = activeTab === 'LIVE' ? 'live' : 'upcoming';
                     const data = await api.auctions.list({ status });
                     if (data.success) setAuctions(data.data || []);
                 }
+
             } catch (err) {
                 console.error("Failed to load data", err);
             } finally {

@@ -36,7 +36,7 @@ export default function OrdersPage() {
             if (response.success) {
                 setOrders(response.data.orders);
 
-                // حساب الإحصائيات
+                // [[ARABIC_COMMENT]] حساب الإحصائيات من الطلبات الحقيقية
                 const allOrders = response.data.orders;
                 setStats({
                     total: allOrders.length,
@@ -47,50 +47,15 @@ export default function OrdersPage() {
                 });
             }
         } catch (err) {
+            // [[ARABIC_COMMENT]] عند الخطأ: لا نعرض بيانات وهمية - نترك القائمة فارغة
             console.error('Failed to load orders', err);
-            // بيانات تجريبية في حالة الخطأ
-            const mockOrders = [
-                {
-                    id: '1',
-                    orderNumber: 'ORD-A1B2C3D4',
-                    car: {
-                        title: 'MERCEDES-BENZ S-CLASS 2024',
-                        make: 'MERCEDES',
-                        image: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=1000&auto=format&fit=crop',
-                        price: 450000
-                    },
-                    totalAmount: 450000,
-                    status: 'confirmed',
-                    paymentStatus: 'paid',
-                    createdAt: new Date().toISOString()
-                },
-                {
-                    id: '2',
-                    orderNumber: 'ORD-E5F6G7H8',
-                    car: {
-                        title: 'BMW M5 COMPETITION 2023',
-                        make: 'BMW',
-                        image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?q=80&w=1000&auto=format&fit=crop',
-                        price: 380000
-                    },
-                    totalAmount: 380000,
-                    status: 'pending',
-                    paymentStatus: 'pending',
-                    createdAt: new Date(Date.now() - 86400000).toISOString()
-                },
-            ];
-            setOrders(mockOrders);
-            setStats({
-                total: 2,
-                pending: 1,
-                confirmed: 1,
-                completed: 0,
-                cancelled: 0
-            });
+            setOrders([]);
+            setStats({ total: 0, pending: 0, confirmed: 0, completed: 0, cancelled: 0 });
         } finally {
             setLoading(false);
         }
     };
+
 
     const getStatusColor = (status: string) => {
         switch (status) {

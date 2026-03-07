@@ -29,9 +29,10 @@ interface CarData {
     images?: string[];
     price: number;
     make?: { name?: string } | string;
-    displayCurrency?: 'SAR' | 'USD';
+    displayCurrency?: 'SAR' | 'USD' | 'KRW'; // [[ARABIC_COMMENT]] إضافة KRW للعملة الكورية
     previewImage?: string;
 }
+
 
 export default function Showroom() {
     const { isRTL } = useLanguage();

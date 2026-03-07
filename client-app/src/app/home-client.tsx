@@ -593,15 +593,17 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
                   <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 10a7 7 0 0 1 14 0v4a4 4 0 0 1-4 4h-1v2h-2v-2h-1a4 4 0 0 1-4-4z"></path></svg>
                 </motion.div>
               </Link>
+              {/* [[ARABIC_COMMENT]] أيقونة الواتساب - تفتح محادثة مباشرة */}
               {socialConfig.whatsapp && (
-                <Link href="/social">
+                <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
                   <motion.div whileHover={{ scale: 1.1 }} className="w-10 h-10 rounded-lg overflow-hidden border border-white/10 transition-all">
                     <img src="/images/icons/whatsapp.jpg" alt="WhatsApp" className="w-full h-full object-cover" />
                   </motion.div>
-                </Link>
+                </a>
               )}
+              {/* [[ARABIC_COMMENT]] أيقونات التواصل الاجتماعي الأخرى - تفتح الرابط الحقيقي */}
               {socialConfig.links.slice(0, 3).map((item, idx) => (
-                <Link href="/social" key={idx}>
+                <a href={item.url} target="_blank" rel="noopener noreferrer" key={idx}>
                   <motion.div whileHover={{ scale: 1.1 }} className="w-10 h-10 rounded-lg overflow-hidden border border-white/10 bg-white/5 flex items-center justify-center transition-all">
                     {homeCustomIcons[item.platform] ? (
                       <img src={homeCustomIcons[item.platform]} alt={item.platform} className="w-full h-full object-cover" />
@@ -612,7 +614,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
                       })()
                     )}
                   </motion.div>
-                </Link>
+                </a>
               ))}
             </div>
           </div>

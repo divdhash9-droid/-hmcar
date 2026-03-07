@@ -46,7 +46,8 @@ export default function AdminCarsPage() {
         transmission: 'Automatic',
         color: '',
         isActive: true,
-        displayCurrency: 'SAR'
+        displayCurrency: 'SAR',
+        listingType: 'store' // [[ARABIC_COMMENT]] كل السيارات المضافة من هنا تكون في المعرض افتراضياً
     });
 
     useEffect(() => {
@@ -124,7 +125,8 @@ export default function AdminCarsPage() {
             color: car.color || '',
             isActive: car.isActive !== false,
             usdPrice: parseFloat((car.price / usdToSar).toFixed(2)),
-            displayCurrency: car.displayCurrency || 'SAR'
+            displayCurrency: car.displayCurrency || 'SAR',
+            listingType: car.listingType || 'store' // [[ARABIC_COMMENT]] الحفاظ على نوع العرض أو تعيينه كمعرض افتراضياً
         });
         setShowModal(true);
     };
@@ -145,7 +147,8 @@ export default function AdminCarsPage() {
             color: '',
             isActive: true,
             usdPrice: 0,
-            displayCurrency: 'SAR'
+            displayCurrency: 'SAR',
+            listingType: 'store' // [[ARABIC_COMMENT]] إعادة تعيين النوع إلى معرض
         });
     };
 
@@ -334,7 +337,7 @@ export default function AdminCarsPage() {
                                 <h2 className="text-2xl font-black uppercase italic tracking-tight">
                                     {editingCar ? (isRTL ? 'تعديل سيارة' : 'EDIT CAR') : (isRTL ? 'إضافة سيارة' : 'ADD CAR')}
                                 </h2>
-                                <button onClick={() => setShowModal(false)} className="p-2 hover:bg-white/5 rounded-lg transition-all">
+                                <button onClick={() => setShowModal(false)} aria-label={isRTL ? 'إغلاق' : 'Close'} className="p-2 hover:bg-white/5 rounded-lg transition-all">
                                     <X className="w-6 h-6" />
                                 </button>
                             </div>

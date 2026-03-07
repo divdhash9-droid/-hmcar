@@ -38,8 +38,13 @@ router.get('/', async (req, res) => {
         if (make) filter.make = make;
         if (listingType) {
             if (listingType === 'store') {
-                // [[ARABIC_COMMENT]] جلب سيارات المعرض بما فيها السيارات التي لا تملك قيمة listingType (التوافق مع القديم)
-                filter.listingType = { $in: ['store', null, undefined, ''] };
+                // [[ARABIC_COMMENT]] جلب سيارات المعرض: إما مصنّفة store أو تلك التي ليس لديها listingType (السيارات القديمة)
+                filter.$or = [
+                    { listingType: 'store' },
+                    { listingType: { $exists: false } },
+                    { listingType: null },
+                    { listingType: '' }
+                ];
             } else {
                 filter.listingType = listingType;
             }

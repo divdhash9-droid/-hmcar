@@ -31,6 +31,7 @@ export default function AdminPartsPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [editingPart, setEditingPart] = useState<any>(null);
+    const [submitting, setSubmitting] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
         brand: 'TOYOTA', // Representing the Agency
@@ -68,6 +69,8 @@ export default function AdminPartsPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (submitting) return;
+        setSubmitting(true);
         try {
             if (editingPart) {
                 await api.parts.update(editingPart.id, formData);
@@ -77,9 +80,11 @@ export default function AdminPartsPage() {
             setShowModal(false);
             setEditingPart(null);
             resetForm();
-            loadParts();
+            await loadParts();
         } catch (err) {
             console.error('Failed to save part', err);
+        } finally {
+            setSubmitting(false);
         }
     };
 
@@ -503,10 +508,18 @@ export default function AdminPartsPage() {
                                     </button>
                                     <button
                                         type="submit"
-                                        className="flex-1 py-4 bg-cinematic-neon-blue !text-black rounded-xl text-[11px] font-black uppercase tracking-[0.3em] shadow-[0_0_30px_rgba(0,240,255,0.3)] flex items-center justify-center gap-3"
+                                        disabled={submitting}
+                                        className={cn(
+                                            "flex-1 py-4 bg-cinematic-neon-blue !text-black rounded-xl text-[11px] font-black uppercase tracking-[0.3em] shadow-[0_0_30px_rgba(0,240,255,0.3)] flex items-center justify-center gap-3 transition-all",
+                                            submitting && "opacity-50 cursor-not-allowed scale-95"
+                                        )}
                                     >
-                                        <Save className="w-5 h-5" />
-                                        {isRTL ? 'حفظ' : 'SAVE'}
+                                        {submitting ? (
+                                            <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                                        ) : (
+                                            <Save className="w-5 h-5" />
+                                        )}
+                                        {submitting ? (isRTL ? 'جاري الحفظ...' : 'SAVING...') : (isRTL ? 'حفظ' : 'SAVE')}
                                     </button>
                                 </div>
                             </form>

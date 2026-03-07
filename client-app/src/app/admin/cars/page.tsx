@@ -29,6 +29,7 @@ export default function AdminCarsPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [editingCar, setEditingCar] = useState<any>(null);
+    const [submitting, setSubmitting] = useState(false);
     const [brands, setBrands] = useState<any[]>([]);
     const [usdToSar, setUsdToSar] = useState(3.75);   // [[ARABIC_COMMENT]] سعر صرف الدولار مقابل الريال
     const [usdToKrw, setUsdToKrw] = useState(1350);  // [[ARABIC_COMMENT]] سعر صرف الدولار مقابل الوون الكوري
@@ -85,6 +86,8 @@ export default function AdminCarsPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (submitting) return;
+        setSubmitting(true);
         try {
             if (editingCar) {
                 await api.cars.update(editingCar.id, formData);
@@ -94,9 +97,11 @@ export default function AdminCarsPage() {
             setShowModal(false);
             setEditingCar(null);
             resetForm();
-            loadData();
+            await loadData();
         } catch (err) {
             console.error('Failed to save car', err);
+        } finally {
+            setSubmitting(false);
         }
     };
 
@@ -713,10 +718,18 @@ export default function AdminCarsPage() {
                                     </button>
                                     <button
                                         type="submit"
-                                        className="flex-1 py-4 bg-cinematic-neon-blue !text-black rounded-xl text-[11px] font-black uppercase tracking-[0.3em] shadow-[0_0_30px_rgba(0,240,255,0.3)] flex items-center justify-center gap-3"
+                                        disabled={submitting}
+                                        className={cn(
+                                            "flex-1 py-4 bg-cinematic-neon-blue !text-black rounded-xl text-[11px] font-black uppercase tracking-[0.3em] shadow-[0_0_30px_rgba(0,240,255,0.3)] flex items-center justify-center gap-3 transition-all",
+                                            submitting && "opacity-50 cursor-not-allowed scale-95"
+                                        )}
                                     >
-                                        <Save className="w-5 h-5" />
-                                        {isRTL ? 'حفظ' : 'SAVE'}
+                                        {submitting ? (
+                                            <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                                        ) : (
+                                            <Save className="w-5 h-5" />
+                                        )}
+                                        {submitting ? (isRTL ? 'جاري الحفظ...' : 'SAVING...') : (isRTL ? 'حفظ' : 'SAVE')}
                                     </button>
                                 </div>
                             </form>

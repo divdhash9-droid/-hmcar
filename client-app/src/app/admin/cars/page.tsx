@@ -20,9 +20,11 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/LanguageContext";
 import { api } from "@/lib/api";
+import { useToast } from "@/lib/ToastContext";
 
 export default function AdminCarsPage() {
     const { t, isRTL } = useLanguage();
+    const { showToast } = useToast();
     const [cars, setCars] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('active');
@@ -96,10 +98,13 @@ export default function AdminCarsPage() {
             }
             setShowModal(false);
             setEditingCar(null);
+            setEditingCar(null);
             resetForm();
             await loadData();
+            showToast(isRTL ? '✅ تم حفظ البيانات بنجاح!' : '✅ Data saved successfully!', 'success');
         } catch (err) {
             console.error('Failed to save car', err);
+            showToast(isRTL ? '❌ فشل في حفظ البيانات' : '❌ Failed to save data', 'error');
         } finally {
             setSubmitting(false);
         }
@@ -110,8 +115,10 @@ export default function AdminCarsPage() {
             try {
                 await api.cars.delete(id);
                 loadData();
+                showToast(isRTL ? '🗑️ تم الحذف بنجاح' : '🗑️ Deleted successfully', 'success');
             } catch (err) {
                 console.error('Failed to delete car', err);
+                showToast(isRTL ? '❌ فشل في الحذف' : '❌ Failed to delete', 'error');
             }
         }
     };
@@ -134,9 +141,10 @@ export default function AdminCarsPage() {
                 body: JSON.stringify({ soldPrice }),
             });
             loadData();
-            alert(isRTL ? '✅ تم تسجيل البيع بنجاح! السيارة الآن مخفية من المعرض.' : '✅ Sale recorded! Car is now hidden from showroom.');
+            showToast(isRTL ? '✅ تم تسجيل البيع بنجاح!' : '✅ Sale recorded successfully!', 'success');
         } catch (err) {
             console.error('Failed to mark as sold', err);
+            showToast(isRTL ? '❌ فشل في تسجيل البيع' : '❌ Failed to record sale', 'error');
         }
     };
 

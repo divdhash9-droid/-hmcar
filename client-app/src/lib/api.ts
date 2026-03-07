@@ -206,6 +206,10 @@ export const api = {
             return fetchAPI(`/api/v2/orders?${query}`);
         },
         getById: (id: string) => fetchAPI(`/api/v2/orders/${id}`),
+        create: (data: any) => fetchAPI('/api/v2/orders', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        }),
         updateStatus: (id: string, status: string) => fetchAPI(`/api/v2/orders/${id}/status`, {
             method: 'PATCH',
             body: JSON.stringify({ status }),

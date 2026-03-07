@@ -16,6 +16,9 @@ import {
 import Image from 'next/image';
 import { useLanguage } from '@/lib/LanguageContext';
 import { useSettings } from '@/lib/SettingsContext';
+import { useToast } from '@/lib/ToastContext';
+import { api } from '@/lib/api';
+import { useAuth } from '@/lib/AuthContext';
 
 // [[ARABIC_COMMENT]] نوع المنتج - سيارة أو قطعة غيار
 export type ProductType = 'car' | 'part';
@@ -80,6 +83,8 @@ export default function ProductModal({ product, onClose, whatsappNumber }: Produ
     const [inCart, setInCart] = useState(false);
     const [addedToCart, setAddedToCart] = useState(false);
     const [copied, setCopied] = useState(false);
+    const { showToast } = useToast();
+    const { user } = useAuth();
 
     // [[ARABIC_COMMENT]] التحقق من حالة المفضلة والسلة عند فتح المنتج
     useEffect(() => {
@@ -119,14 +124,37 @@ export default function ProductModal({ product, onClose, whatsappNumber }: Produ
             cart.push(product);
             localStorage.setItem(CART_KEY, JSON.stringify(cart));
             dispatchCartUpdate();
+            showToast(isRTL ? 'تمت الإضافة إلى السلة' : 'Added to cart', 'success');
         }
         setInCart(true);
         setAddedToCart(true);
         setTimeout(() => setAddedToCart(false), 2000);
-    }, [product]);
+    }, [product, isRTL, showToast]);
 
-    const buyViaWhatsapp = useCallback(() => {
+    const buyViaWhatsapp = useCallback(async () => {
         if (!product) return;
+
+        // [[ARABIC_COMMENT]] تسجيل الطلب في القاعدة قبل الانتقال للواتساب
+        try {
+            await api.orders.create({
+                buyerId: user?.id || null,
+                items: [{
+                    itemType: product.type === 'car' ? 'car' : 'sparePart',
+                    refId: product.id,
+                    titleSnapshot: product.title,
+                    qty: 1,
+                    unitPriceSar: product.price
+                }],
+                pricing: {
+                    grandTotalSar: product.price
+                },
+                channel: 'whatsapp',
+                notes: `Clicked buy from ${product.type} modal`
+            });
+        } catch (err) {
+            console.error('Failed to log order:', err);
+        }
+
         const phone = (whatsappNumber || '+821080880014').replace(/\D/g, '');
         const price = formatPrice ? formatPrice(product.price, product.displayCurrency as 'SAR' | 'USD' | 'KRW' | undefined) : `${product.price?.toLocaleString()} SAR`;
 
@@ -142,7 +170,7 @@ export default function ProductModal({ product, onClose, whatsappNumber }: Produ
         }
 
         window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
-    }, [product, whatsappNumber, formatPrice, isRTL]);
+    }, [product, whatsappNumber, formatPrice, isRTL, user]);
 
     const shareProduct = useCallback(() => {
         if (!product) return;
@@ -151,9 +179,10 @@ export default function ProductModal({ product, onClose, whatsappNumber }: Produ
             : `${window.location.origin}/parts?item=${product.id}`;
         navigator.clipboard.writeText(url).then(() => {
             setCopied(true);
+            showToast(isRTL ? 'تم نسخ الرابط' : 'Link copied', 'success');
             setTimeout(() => setCopied(false), 2000);
         }).catch(() => { });
-    }, [product]);
+    }, [product, showToast, isRTL]);
 
     const images = product?.images?.filter(Boolean) || [];
     const displayPrice = product && formatPrice ? formatPrice(product.price, product.displayCurrency as 'SAR' | 'USD' | 'KRW' | undefined) : `${product?.price?.toLocaleString()} SAR`;

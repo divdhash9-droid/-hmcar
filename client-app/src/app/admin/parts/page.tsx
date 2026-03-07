@@ -22,9 +22,11 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/LanguageContext";
 import { api } from "@/lib/api";
+import { useToast } from "@/lib/ToastContext";
 
 export default function AdminPartsPage() {
     const { t, isRTL } = useLanguage();
+    const { showToast } = useToast();
     const [parts, setParts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all');
@@ -79,10 +81,13 @@ export default function AdminPartsPage() {
             }
             setShowModal(false);
             setEditingPart(null);
+            setEditingPart(null);
             resetForm();
             await loadParts();
+            showToast(isRTL ? '✅ تم حفظ البيانات بنجاح!' : '✅ Data saved successfully!', 'success');
         } catch (err) {
             console.error('Failed to save part', err);
+            showToast(isRTL ? '❌ فشل في حفظ البيانات' : '❌ Failed to save data', 'error');
         } finally {
             setSubmitting(false);
         }
@@ -93,8 +98,10 @@ export default function AdminPartsPage() {
             try {
                 await api.parts.delete(id);
                 loadParts();
+                showToast(isRTL ? '🗑️ تم الحذف بنجاح' : '🗑️ Deleted successfully', 'success');
             } catch (err) {
                 console.error('Failed to delete part', err);
+                showToast(isRTL ? '❌ فشل في الحذف' : '❌ Failed to delete', 'error');
             }
         }
     };
@@ -119,14 +126,12 @@ export default function AdminPartsPage() {
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('hm_token')}` },
                 body: JSON.stringify({ soldQty }),
             });
-            const data = await res.json();
+            await res.json();
             loadParts();
-            alert(isRTL
-                ? `✅ ${data.message || 'تم تسجيل البيع'}`
-                : `✅ ${data.message || 'Sale recorded!'}`
-            );
+            showToast(isRTL ? '✅ تم تسجيل البيع بنجاح!' : '✅ Sale recorded successfully!', 'success');
         } catch (err) {
             console.error('Failed to mark part as sold', err);
+            showToast(isRTL ? '❌ فشل في تسجيل البيع' : '❌ Failed to record sale', 'error');
         }
     };
 

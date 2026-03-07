@@ -14,6 +14,7 @@ import Navbar from '@/components/Navbar';
 import { useLanguage } from '@/lib/LanguageContext';
 import { useSettings } from '@/lib/SettingsContext';
 import { getCart, dispatchCartUpdate, CART_KEY, type ProductModalData } from '@/components/ProductModal';
+import { useToast } from '@/lib/ToastContext';
 
 const DEFAULT_WHATSAPP = '+821080880014';
 
@@ -23,6 +24,7 @@ export default function CartPage() {
     const [cart, setCart] = useState<ProductModalData[]>([]);
     const [copied, setCopied] = useState(false);
     const [sentToWhatsapp, setSentToWhatsapp] = useState(false);
+    const { showToast } = useToast();
 
     // [[ARABIC_COMMENT]] جلب السلة من localStorage
     useEffect(() => {
@@ -56,9 +58,10 @@ export default function CartPage() {
         const url = `${window.location.origin}/cart/share?items=${ids}`;
         navigator.clipboard.writeText(url).then(() => {
             setCopied(true);
+            showToast(isRTL ? 'تم نسخ رابط السلسلة' : 'Cart link copied', 'success');
             setTimeout(() => setCopied(false), 3000);
         }).catch(() => { });
-    }, [cart]);
+    }, [cart, showToast, isRTL]);
 
     // [[ARABIC_COMMENT]] إرسال السلة كاملة للأدمن عبر واتساب
     const sendCartToWhatsapp = useCallback(() => {

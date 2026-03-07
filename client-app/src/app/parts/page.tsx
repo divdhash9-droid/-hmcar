@@ -89,13 +89,17 @@ export default function PartsPage() {
     const loadParts = async (agency: string, model: string) => {
         setLoading(true);
         try {
-            const res = await api.parts.list({ q: agency });
-            if (res && res.parts) {
-                const fetchedParts = res.parts.filter((p: { brand?: string, carModel?: string }) => p.brand?.toLowerCase() === agency.toLowerCase() && (p.carModel?.toLowerCase() === model.toLowerCase() || model === 'ALL'));
-                setParts(fetchedParts);
-            } else {
-                setParts([]);
-            }
+            // [[ARABIC_COMMENT]] جلب قطع الغيار الخاصة بالوكالة المختارة
+            const res = await api.parts.list({ q: agency, limit: 200 });
+            // [[ARABIC_COMMENT]] الـ API يعيد البيانات في res.parts أو res.data.parts
+            const allParts = res?.parts || res?.data?.parts || [];
+            // [[ARABIC_COMMENT]] تصفية حسب اسم الوكالة والموديل المختار
+            const fetchedParts = allParts.filter((p: { brand?: string, carModel?: string }) => {
+                const brandMatch = p.brand?.toLowerCase() === agency.toLowerCase();
+                const modelMatch = model === 'ALL' || (p.carModel?.toLowerCase() === model.toLowerCase());
+                return brandMatch && modelMatch;
+            });
+            setParts(fetchedParts);
         } catch (error) {
             console.error("Failed to load parts", error);
             setParts([]);

@@ -73,9 +73,12 @@ export default function Showroom() {
         setViewMode('CARS');
         setLoading(true);
         try {
-            const data = await api.cars.list({ limit: 500 });
-            // Filter by agency name
-            const filtered = (data.cars || []).filter((c: CarData) => {
+            // [[ARABIC_COMMENT]] جلب سيارات المعرض فقط (store) ثم تصفيتها حسب اسم الوكالة
+            const res = await api.cars.list({ limit: 500, listingType: 'store' });
+            // [[ARABIC_COMMENT]] API يعيد البيانات في data.data.cars أو data.cars حسب الإصدار
+            const carsList = res?.data?.cars || res?.cars || [];
+            // [[ARABIC_COMMENT]] مقارنة اسم الوكالة مع حقل make في السيارة
+            const filtered = carsList.filter((c: CarData) => {
                 const carMake = typeof c.make === 'object' ? c.make?.name : c.make;
                 return String(carMake || '').trim().toLowerCase() === String(agency.name || '').trim().toLowerCase();
             });

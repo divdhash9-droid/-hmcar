@@ -8,16 +8,27 @@ const { requireAuthAPI } = require('../../../middleware/auth');
 // GET /api/v2/parts - قائمة قطع الغيار
 router.get('/', async (req, res) => {
     try {
-        const { category, q, limit = 20 } = req.query;
+        const { category, q, brand, carModel, limit = 20 } = req.query;
         const filter = {};
 
         if (category && category !== 'ALL') {
-            filter.partType = new RegExp(category, 'i'); // Simple check for now
+            filter.partType = new RegExp(category, 'i');
         }
 
+        // [[ARABIC_COMMENT]] دعم البحث بالاسم أو الوكالة أو صانع السيارة
         if (q) {
             const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
-            filter.$or = [{ name: re }, { partType: re }];
+            filter.$or = [{ name: re }, { partType: re }, { carMake: re }];
+        }
+
+        // [[ARABIC_COMMENT]] فلتر مباشر حسب وكالة السيارة (brand=toyota مثلاً)
+        if (brand) {
+            filter.carMake = new RegExp(brand.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+        }
+
+        // [[ARABIC_COMMENT]] فلتر مباشر حسب الموديل
+        if (carModel && carModel !== 'ALL') {
+            filter.carModel = new RegExp(carModel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
         }
 
         const parts = await SparePart.find(filter)

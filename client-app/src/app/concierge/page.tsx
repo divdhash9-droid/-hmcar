@@ -1,39 +1,264 @@
 'use client';
 
-import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
-import { Send, Car, Settings, CheckCircle, Shield, Briefcase, User, Phone, FileText } from "lucide-react";
-import Navbar from "@/components/Navbar";
-import { useLanguage } from "@/lib/LanguageContext";
-import { cn } from "@/lib/utils";
-import Link from "next/link";
-import ClientPageHeader from "@/components/ClientPageHeader";
+/**
+ * صفحة الطلبات الخاصة
+ * تتيح للعملاء تقديم طلب سيارة خاصة أو طلب قطعة غيار
+ * يُرسل الطلب عبر واتساب وإلى الأدمن في النظام
+ */
+
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
+import {
+    Send, Car, Settings, CheckCircle, Shield,
+    User, Phone, FileText, Upload, X, ChevronDown, Palette
+} from 'lucide-react';
+import Navbar from '@/components/Navbar';
+import { useLanguage } from '@/lib/LanguageContext';
+import { cn } from '@/lib/utils';
+import { api } from '@/lib/api';
+import ClientPageHeader from '@/components/ClientPageHeader';
+
+// ── قائمة الألوان ──
+const CAR_COLORS = [
+    { name: 'أبيض', nameEn: 'White', hex: '#FFFFFF' },
+    { name: 'أسود', nameEn: 'Black', hex: '#0A0A0A' },
+    { name: 'فضي', nameEn: 'Silver', hex: '#C0C0C0' },
+    { name: 'رمادي', nameEn: 'Gray', hex: '#6B7280' },
+    { name: 'أحمر', nameEn: 'Red', hex: '#DC2626' },
+    { name: 'أزرق', nameEn: 'Blue', hex: '#2563EB' },
+    { name: 'أزرق سماوي', nameEn: 'Sky Blue', hex: '#0EA5E9' },
+    { name: 'أخضر', nameEn: 'Green', hex: '#16A34A' },
+    { name: 'ذهبي', nameEn: 'Gold', hex: '#D97706' },
+    { name: 'بيج / شامبيني', nameEn: 'Beige/Champagne', hex: '#C9A96E' },
+    { name: 'بني', nameEn: 'Brown', hex: '#92400E' },
+    { name: 'برتقالي', nameEn: 'Orange', hex: '#EA580C' },
+    { name: 'بنفسجي', nameEn: 'Purple', hex: '#7C3AED' },
+    { name: 'أخضر زيتوني', nameEn: 'Olive', hex: '#4D7C0F' },
+    { name: 'وردي', nameEn: 'Pink', hex: '#EC4899' },
+    { name: 'أبيض لؤلؤي', nameEn: 'Pearl White', hex: '#F0F0F0' },
+];
+
+// ── قائمة السنوات ──
+const currentYear = new Date().getFullYear();
+const YEARS = Array.from({ length: currentYear - 1989 }, (_, i) => currentYear - i);
 
 export default function ConciergePage() {
-    const { t, isRTL } = useLanguage();
+    const { isRTL } = useLanguage();
     const [activeTab, setActiveTab] = useState<'car' | 'parts'>('car');
     const [whatsappNumber, setWhatsappNumber] = useState('+967781007805');
-    const [formData, setFormData] = useState({
-        name: '', phone: '', details: '', budget: '', brand: '', model: '', year: ''
+    const [submitted, setSubmitted] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [showColorPicker, setShowColorPicker] = useState(false);
+    const colorPickerRef = useRef<HTMLDivElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [partImagePreview, setPartImagePreview] = useState<string | null>(null);
+    const [partImageFile, setPartImageFile] = useState<File | null>(null);
+
+    // بيانات طلب السيارة
+    const [carForm, setCarForm] = useState({
+        name: '',
+        phone: '',
+        carName: '',
+        model: '',
+        color: '',
+        colorName: '',
+        year: '',
+        description: '',
     });
 
-    // جلب رقم الواتساب من الإعدادات العامة عند تحميل الصفحة
+    // بيانات طلب قطع الغيار
+    const [partsForm, setPartsForm] = useState({
+        name: '',
+        phone: '',
+        partName: '',
+        carName: '',
+        year: '',
+        description: '',
+    });
+
+    // جلب رقم الواتساب من الإعدادات
     useEffect(() => {
-        fetch('/api/v2/settings/public')
-            .then(r => r.json())
-            .then(res => {
-                if (res?.success && res?.data?.socialLinks?.whatsapp) {
-                    setWhatsappNumber(res.data.socialLinks.whatsapp);
-                }
-            }).catch(() => { });
+        api.settings.getPublic().then((res: any) => {
+            if (res?.success && res?.data?.socialLinks?.whatsapp) {
+                setWhatsappNumber(res.data.socialLinks.whatsapp);
+            }
+        }).catch(() => { });
     }, []);
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        const text = `New Request (${activeTab}):\nName: ${formData.name}\nPhone: ${formData.phone}\nDetails: ${formData.details}\nBudget: ${formData.budget}`;
-        const cleanNumber = whatsappNumber.replace(/[^0-9]/g, '');
-        window.open(`https://wa.me/${cleanNumber}?text=${encodeURIComponent(text)}`, '_blank');
+    // إغلاق منتقي اللون عند النقر خارجه
+    useEffect(() => {
+        const handler = (e: MouseEvent) => {
+            if (colorPickerRef.current && !colorPickerRef.current.contains(e.target as Node)) {
+                setShowColorPicker(false);
+            }
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, []);
+
+    // معاينة صورة قطعة الغيار
+    const handlePartImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setPartImageFile(file);
+        const reader = new FileReader();
+        reader.onload = (ev) => setPartImagePreview(ev.target?.result as string);
+        reader.readAsDataURL(file);
     };
+
+    // إرسال طلب السيارة
+    const handleCarSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        try {
+            // 1. إرسال للأدمن عبر API
+            await api.concierge.create({
+                type: 'car',
+                name: carForm.name,
+                phone: carForm.phone,
+                carName: carForm.carName,
+                model: carForm.model,
+                color: carForm.colorName || carForm.color,
+                year: carForm.year,
+                description: carForm.description,
+            });
+
+            // 2. إرسال عبر واتساب
+            const msg = [
+                `🚗 *طلب سيارة خاص - CARHM*`,
+                `━━━━━━━━━━━━━━`,
+                `👤 الاسم: ${carForm.name}`,
+                `📱 الهاتف: ${carForm.phone}`,
+                `🚗 اسم السيارة: ${carForm.carName}`,
+                `📋 الموديل: ${carForm.model}`,
+                `🎨 اللون: ${carForm.colorName || carForm.color}`,
+                `📅 السنة: ${carForm.year}`,
+                `📝 الوصف: ${carForm.description}`,
+            ].join('\n');
+            const cleanNumber = whatsappNumber.replace(/[^0-9]/g, '');
+            window.open(`https://wa.me/${cleanNumber}?text=${encodeURIComponent(msg)}`, '_blank');
+            setSubmitted(true);
+        } catch (err) {
+            console.error('Car request error:', err);
+            // حتى لو فشل API، نرسل واتساب
+            const msg = [
+                `🚗 *طلب سيارة خاص - CARHM*`,
+                `👤 الاسم: ${carForm.name}`,
+                `📱 الهاتف: ${carForm.phone}`,
+                `🚗 اسم السيارة: ${carForm.carName}`,
+                `📋 الموديل: ${carForm.model}`,
+                `🎨 اللون: ${carForm.colorName || carForm.color}`,
+                `📅 السنة: ${carForm.year}`,
+                `📝 الوصف: ${carForm.description}`,
+            ].join('\n');
+            const cleanNumber = whatsappNumber.replace(/[^0-9]/g, '');
+            window.open(`https://wa.me/${cleanNumber}?text=${encodeURIComponent(msg)}`, '_blank');
+            setSubmitted(true);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // إرسال طلب قطع الغيار
+    const handlePartsSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        try {
+            let imageUrl = '';
+            // رفع الصورة إن وجدت
+            if (partImageFile) {
+                try {
+                    const formData = new FormData();
+                    formData.append('image', partImageFile);
+                    const uploadRes = await api.upload.image(formData);
+                    if (uploadRes?.success) imageUrl = uploadRes.url;
+                } catch { /* تجاهل خطأ الرفع */ }
+            }
+
+            // 1. إرسال للأدمن
+            await api.concierge.create({
+                type: 'parts',
+                name: partsForm.name,
+                phone: partsForm.phone,
+                partName: partsForm.partName,
+                carName: partsForm.carName,
+                year: partsForm.year,
+                description: partsForm.description,
+                imageUrl,
+            });
+
+            // 2. واتساب
+            const msg = [
+                `🔧 *طلب قطعة غيار - CARHM*`,
+                `━━━━━━━━━━━━━━`,
+                `👤 الاسم: ${partsForm.name}`,
+                `📱 الهاتف: ${partsForm.phone}`,
+                `🔩 اسم القطعة: ${partsForm.partName}`,
+                `🚗 السيارة: ${partsForm.carName}`,
+                `📅 السنة: ${partsForm.year}`,
+                `📝 الوصف: ${partsForm.description}`,
+                imageUrl ? `🖼️ صورة القطعة: ${imageUrl}` : '',
+            ].filter(Boolean).join('\n');
+            const cleanNumber = whatsappNumber.replace(/[^0-9]/g, '');
+            window.open(`https://wa.me/${cleanNumber}?text=${encodeURIComponent(msg)}`, '_blank');
+            setSubmitted(true);
+        } catch (err) {
+            console.error('Parts request error:', err);
+            const msg = [
+                `🔧 *طلب قطعة غيار - CARHM*`,
+                `👤 الاسم: ${partsForm.name}`,
+                `📱 الهاتف: ${partsForm.phone}`,
+                `🔩 اسم القطعة: ${partsForm.partName}`,
+                `🚗 السيارة: ${partsForm.carName}`,
+                `📅 السنة: ${partsForm.year}`,
+                `📝 الوصف: ${partsForm.description}`,
+            ].join('\n');
+            const cleanNumber = whatsappNumber.replace(/[^0-9]/g, '');
+            window.open(`https://wa.me/${cleanNumber}?text=${encodeURIComponent(msg)}`, '_blank');
+            setSubmitted(true);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // مشترك بين كلا النموذجين
+    const inputClass = 'w-full bg-white/[0.04] border border-white/10 rounded-xl py-3.5 px-4 text-sm text-white placeholder:text-white/25 focus:outline-none focus:border-amber-500/50 focus:bg-white/[0.06] transition-all';
+    const labelClass = 'text-[9px] font-black uppercase tracking-[0.25em] text-white/30 mb-1.5 block';
+
+    // شاشة النجاح
+    if (submitted) return (
+        <div className={`min-h-screen bg-black text-white flex items-center justify-center ${isRTL ? 'font-arabic' : ''}`}>
+            <Navbar />
+            <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-center px-8 max-w-md"
+            >
+                <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.2, type: 'spring' }}
+                    className="w-24 h-24 bg-amber-500/10 border border-amber-500/30 rounded-full flex items-center justify-center mx-auto mb-8"
+                >
+                    <CheckCircle className="w-12 h-12 text-amber-500" />
+                </motion.div>
+                <h2 className="text-3xl font-black uppercase tracking-tighter mb-4">
+                    {isRTL ? 'تم إرسال طلبك!' : 'Request Sent!'}
+                </h2>
+                <p className="text-white/40 text-sm mb-8">
+                    {isRTL
+                        ? 'تم إرسال طلبك للفريق المختص وعبر الواتساب. سنتواصل معك قريباً.'
+                        : 'Your request has been sent to our team and via WhatsApp. We\'ll be in touch soon.'}
+                </p>
+                <button
+                    onClick={() => { setSubmitted(false); setPartImagePreview(null); setPartImageFile(null); }}
+                    className="px-8 py-4 bg-amber-500 text-black font-black uppercase tracking-wider rounded-xl hover:bg-amber-400 transition-all"
+                >
+                    {isRTL ? 'طلب جديد' : 'NEW REQUEST'}
+                </button>
+            </motion.div>
+        </div>
+    );
 
     return (
         <div className={`relative min-h-screen bg-black text-white overflow-x-hidden ${isRTL ? 'font-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
@@ -41,83 +266,66 @@ export default function ConciergePage() {
 
             <div className="pt-24 px-6 max-w-7xl mx-auto">
                 <ClientPageHeader
-                    title={isRTL ? "خدمة الكونسيرج" : "CONCIERGE SERVICE"}
-                    subtitle={isRTL ? "خدمة النخبة" : "ELITE SERVICE"}
-                    icon={Briefcase}
+                    title={isRTL ? 'طلبات خاصة' : 'SPECIAL REQUESTS'}
+                    subtitle={isRTL ? 'خدمة مخصصة لك' : 'PERSONALIZED SERVICE'}
+                    icon={Shield}
                 />
             </div>
 
             {/* ── VIDEO HERO ── */}
-            <div className="relative h-[40vh] md:h-[45vh] overflow-hidden mt-8 rounded-3xl mx-6 border border-white/5">
-                <video
-                    autoPlay loop muted playsInline
+            <div className="relative h-[35vh] overflow-hidden mt-8 rounded-3xl mx-6 border border-white/5">
+                <video autoPlay loop muted playsInline
                     className="absolute inset-0 w-full h-full object-cover"
-                    style={{ filter: 'brightness(0.3) contrast(1.2) saturate(1.1)' }}
-                >
+                    style={{ filter: 'brightness(0.25) contrast(1.2)' }}>
                     <source src="/videos/hero.mp4" type="video/mp4" />
                 </video>
                 <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black" />
-                <div className="video-grain" />
-
                 <div className="absolute inset-0 flex items-end z-10">
-                    <div className="max-w-7xl mx-auto w-full px-6 pb-16">
-                        <motion.div
-                            initial={{ opacity: 0, y: 30 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="flex flex-col md:flex-row items-start md:items-end justify-between gap-8"
-                        >
-                            <div>
-                                <span className="text-[9px] font-bold uppercase tracking-[0.5em] text-accent-gold/60 block mb-3">
-                                    {isRTL ? "خدمة النخبة" : "ELITE SERVICE"}
-                                </span>
-                                <h1 className="text-4xl md:text-5xl font-black tracking-[-0.04em] uppercase">
-                                    {isRTL ? "الكونسيرج" : "CONCIERGE"}
-                                </h1>
-                            </div>
-                        </motion.div>
+                    <div className="max-w-7xl mx-auto w-full px-8 pb-10">
+                        <span className="text-[9px] font-bold uppercase tracking-[0.5em] text-amber-500/70 block mb-2">
+                            {isRTL ? 'خدمة حصرية' : 'EXCLUSIVE SERVICE'}
+                        </span>
+                        <h1 className="text-4xl md:text-5xl font-black tracking-[-0.04em] uppercase">
+                            {isRTL ? 'طلبات خاصة' : 'SPECIAL REQUESTS'}
+                        </h1>
                     </div>
                 </div>
             </div>
 
             {/* ── AMBIENT ── */}
             <div className="fixed inset-0 pointer-events-none z-0">
-                <div className="bg-grid-overlay opacity-8" />
-                <div className="orb orb-gold w-[500px] h-[500px] top-[-200px] right-[-100px] animate-breathe opacity-20" />
-                <div className="orb orb-blue w-[400px] h-[400px] bottom-[-100px] left-[-100px] animate-breathe delay-1000 opacity-15" />
+                <div className="orb w-[500px] h-[500px] top-[-200px] right-[-100px] opacity-10 rounded-full"
+                    style={{ background: 'radial-gradient(circle, rgba(245,158,11,0.4), transparent)' }} />
             </div>
 
-            <main className="relative z-10 pt-12 pb-24 px-6 max-w-7xl mx-auto">
+            <main className="relative z-10 pt-10 pb-32 px-6 max-w-7xl mx-auto">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
 
                     {/* ── INFO PANEL ── */}
-                    <div className="lg:col-span-5 space-y-8">
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.2 }}
-                        >
-                            <div className="glass-card p-8 space-y-6">
-                                <h3 className="text-2xl font-black tracking-tight">
-                                    {isRTL ? "اصنع إرثك." : "Create Your Legacy."}
+                    <div className="lg:col-span-4 space-y-6">
+                        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}>
+                            <div className="p-7 bg-white/[0.02] border border-white/8 rounded-3xl space-y-5">
+                                <h3 className="text-xl font-black tracking-tight">
+                                    {isRTL ? 'اطلب ما تريد' : 'Request Anything'}
                                 </h3>
-                                <p className="text-sm text-white/45 leading-relaxed">
+                                <p className="text-sm text-white/40 leading-relaxed">
                                     {isRTL
-                                        ? "سواء كنت تبحث عن سيارة أحلامك النادرة أو قطع غيار حصرية، فريقنا المتخصص سيتولى المهمة بدقة واحترافية."
-                                        : "Whether sourcing a rare hypercar or exclusive components, our specialized team executes with precision and discretion."}
+                                        ? 'سواء كنت تبحث عن سيارة بمواصفات محددة أو قطعة غيار نادرة، فريقنا جاهز لمساعدتك.'
+                                        : 'Whether you need a specific car or a rare part, our team is ready to help.'}
                                 </p>
-                                <div className="space-y-4 pt-4">
+                                <div className="space-y-3 pt-2">
                                     {[
-                                        { icon: Car, title: isRTL ? 'توريد السيارات' : 'Vehicle Sourcing', desc: isRTL ? 'شبكة عالمية' : 'Global network access' },
-                                        { icon: Settings, title: isRTL ? 'قطع الغيار' : 'Parts Acquisition', desc: isRTL ? 'أصلية ومعدّلة' : 'OEM & Aftermarket elite' },
-                                        { icon: Shield, title: isRTL ? 'فحص معتمد' : 'Verified Inspection', desc: isRTL ? 'فحص شامل' : 'Comprehensive checks' },
-                                    ].map((item, i) => (
-                                        <div key={i} className="flex items-center gap-4 p-4 bg-white/[0.02] rounded-xl border border-white/5 hover:border-accent-gold/15 transition-all">
-                                            <div className="w-10 h-10 bg-accent-gold/10 rounded-lg flex items-center justify-center text-accent-gold shrink-0 border border-accent-gold/10">
+                                        { icon: Car, title: isRTL ? 'توريد السيارات' : 'Vehicle Sourcing', desc: isRTL ? 'بالمواصفات الدقيقة' : 'Exact specifications' },
+                                        { icon: Settings, title: isRTL ? 'قطع الغيار' : 'Parts & Accessories', desc: isRTL ? 'أصلية ومعدّلة' : 'OEM & Aftermarket' },
+                                        { icon: Shield, title: isRTL ? 'فحص معتمد' : 'Certified Inspection', desc: isRTL ? 'فحص شامل بكل التفاصيل' : 'Full detailed checks' },
+                                    ].map((item) => (
+                                        <div key={item.title} className="flex items-center gap-4 p-4 bg-white/[0.02] rounded-xl border border-white/5 hover:border-amber-500/20 transition-all">
+                                            <div className="w-10 h-10 bg-amber-500/10 rounded-lg flex items-center justify-center text-amber-500 shrink-0 border border-amber-500/15">
                                                 <item.icon className="w-4 h-4" />
                                             </div>
                                             <div>
-                                                <h4 className="text-sm font-bold uppercase tracking-tight">{item.title}</h4>
-                                                <p className="text-[10px] text-white/35 uppercase tracking-wider">{item.desc}</p>
+                                                <h4 className="text-sm font-bold">{item.title}</h4>
+                                                <p className="text-[10px] text-white/30 uppercase tracking-wider">{item.desc}</p>
                                             </div>
                                         </div>
                                     ))}
@@ -127,27 +335,25 @@ export default function ConciergePage() {
                     </div>
 
                     {/* ── FORM PANEL ── */}
-                    <div className="lg:col-span-7">
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.3 }}
-                        >
-                            <div className="obsidian-card p-8 md:p-10">
-                                {/* Tabs */}
-                                <div className="flex mb-10 p-1.5 bg-white/[0.03] rounded-xl border border-white/5 w-fit">
+                    <div className="lg:col-span-8">
+                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+                            <div className="bg-white/[0.02] border border-white/8 rounded-3xl p-8 md:p-10">
+
+                                {/* ── TABS ── */}
+                                <div className="flex mb-8 p-1.5 bg-black/40 rounded-2xl border border-white/8 gap-2">
                                     {[
-                                        { id: 'car', icon: Car, label: isRTL ? 'طلب سيارة' : 'VEHICLE' },
-                                        { id: 'parts', icon: Settings, label: isRTL ? 'قطع غيار' : 'PARTS' },
+                                        { id: 'car', icon: Car, label: isRTL ? 'طلب سيارة' : 'CAR REQUEST' },
+                                        { id: 'parts', icon: Settings, label: isRTL ? 'طلب قطع غيار' : 'PARTS REQUEST' },
                                     ].map((tab) => (
                                         <button
                                             key={tab.id}
-                                            onClick={() => setActiveTab(tab.id as any)}
+                                            type="button"
+                                            onClick={() => setActiveTab(tab.id as 'car' | 'parts')}
                                             className={cn(
-                                                "flex items-center gap-2.5 px-7 py-3 rounded-lg text-[10px] font-bold uppercase tracking-[0.15em] transition-all duration-300",
+                                                'flex-1 flex items-center justify-center gap-2.5 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] transition-all duration-300',
                                                 activeTab === tab.id
-                                                    ? "bg-accent-gold text-black shadow-[0_0_15px_var(--accent-gold-glow)]"
-                                                    : "text-white/30 hover:text-white/50"
+                                                    ? 'bg-amber-500 text-black shadow-[0_0_20px_rgba(245,158,11,0.3)]'
+                                                    : 'text-white/30 hover:text-white/60 hover:bg-white/5'
                                             )}
                                         >
                                             <tab.icon className="w-3.5 h-3.5" />
@@ -156,89 +362,376 @@ export default function ConciergePage() {
                                     ))}
                                 </div>
 
-                                <form onSubmit={handleSubmit} className="space-y-6">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                        <div className="space-y-2">
-                                            <label className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/25 px-1">
-                                                {isRTL ? "الاسم الكامل" : "FULL NAME"}
-                                            </label>
-                                            <div className="relative group">
-                                                <User className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/10 group-focus-within:text-white/30 transition-colors", isRTL ? "right-4" : "left-4")} />
-                                                <input
-                                                    type="text" required
-                                                    onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                                    className={cn("glass-input", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
-                                                    placeholder={isRTL ? "أدخل اسمك" : "Enter your name"}
-                                                />
+                                {/* ── نموذج طلب سيارة ── */}
+                                <AnimatePresence mode="wait">
+                                    {activeTab === 'car' && (
+                                        <motion.form
+                                            key="car"
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -10 }}
+                                            transition={{ duration: 0.25 }}
+                                            onSubmit={handleCarSubmit}
+                                            className="space-y-5"
+                                        >
+                                            {/* الاسم والهاتف */}
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className={labelClass}>{isRTL ? 'الاسم الكامل' : 'FULL NAME'}</label>
+                                                    <div className="relative">
+                                                        <User className={cn('absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20', isRTL ? 'right-3.5' : 'left-3.5')} />
+                                                        <input
+                                                            type="text" required
+                                                            value={carForm.name}
+                                                            onChange={e => setCarForm({ ...carForm, name: e.target.value })}
+                                                            placeholder={isRTL ? 'أدخل اسمك الكامل' : 'Enter your full name'}
+                                                            className={cn(inputClass, isRTL ? 'pr-10 pl-4' : 'pl-10 pr-4')}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <label className={labelClass}>{isRTL ? 'رقم الهاتف' : 'PHONE NUMBER'}</label>
+                                                    <div className="relative">
+                                                        <Phone className={cn('absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20', isRTL ? 'right-3.5' : 'left-3.5')} />
+                                                        <input
+                                                            type="tel" required
+                                                            value={carForm.phone}
+                                                            onChange={e => setCarForm({ ...carForm, phone: e.target.value })}
+                                                            placeholder="+966 ..."
+                                                            className={cn(inputClass, isRTL ? 'pr-10 pl-4' : 'pl-10 pr-4')}
+                                                        />
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/25 px-1">
-                                                {isRTL ? "الهاتف" : "PHONE"}
-                                            </label>
-                                            <div className="relative group">
-                                                <Phone className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/10 group-focus-within:text-white/30 transition-colors", isRTL ? "right-4" : "left-4")} />
-                                                <input
-                                                    type="tel" required
-                                                    onChange={e => setFormData({ ...formData, phone: e.target.value })}
-                                                    className={cn("glass-input", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
-                                                    placeholder="+966 ..."
-                                                />
+
+                                            {/* اسم السيارة والموديل */}
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className={labelClass}>{isRTL ? 'اسم السيارة (الماركة)' : 'CAR NAME / MAKE'}</label>
+                                                    <div className="relative">
+                                                        <Car className={cn('absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20', isRTL ? 'right-3.5' : 'left-3.5')} />
+                                                        <input
+                                                            type="text" required
+                                                            value={carForm.carName}
+                                                            onChange={e => setCarForm({ ...carForm, carName: e.target.value })}
+                                                            placeholder={isRTL ? 'مثال: مرسيدس، BMW، كيا' : 'e.g. Mercedes, BMW, KIA'}
+                                                            className={cn(inputClass, isRTL ? 'pr-10 pl-4' : 'pl-10 pr-4')}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <label className={labelClass}>{isRTL ? 'الموديل' : 'MODEL'}</label>
+                                                    <input
+                                                        type="text"
+                                                        value={carForm.model}
+                                                        onChange={e => setCarForm({ ...carForm, model: e.target.value })}
+                                                        placeholder={isRTL ? 'مثال: S-Class، X5، Sonata' : 'e.g. S-Class, X5, Sonata'}
+                                                        className={inputClass}
+                                                    />
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                        <div className="space-y-2">
-                                            <label className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/25 px-1">
-                                                {isRTL ? "الماركة" : "BRAND / MAKE"}
-                                            </label>
-                                            <input
-                                                type="text"
-                                                onChange={e => setFormData({ ...formData, brand: e.target.value })}
-                                                className="glass-input"
-                                                placeholder={isRTL ? "مثال: مرسيدس" : "e.g. MERCEDES"}
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/25 px-1">
-                                                {isRTL ? "الموديل / السنة" : "MODEL / YEAR"}
-                                            </label>
-                                            <input
-                                                type="text"
-                                                onChange={e => setFormData({ ...formData, model: e.target.value })}
-                                                className="glass-input"
-                                                placeholder={isRTL ? "مثال: S-CLASS 2024" : "e.g. S-CLASS 2024"}
-                                            />
-                                        </div>
-                                    </div>
+                                            {/* اللون والسنة */}
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                {/* منتقي اللون */}
+                                                <div>
+                                                    <label className={labelClass}>{isRTL ? 'اللون' : 'COLOR'}</label>
+                                                    <div className="relative" ref={colorPickerRef}>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setShowColorPicker(!showColorPicker)}
+                                                            className={cn(
+                                                                inputClass,
+                                                                'flex items-center gap-3 text-left cursor-pointer',
+                                                                !carForm.colorName && 'text-white/25'
+                                                            )}
+                                                        >
+                                                            {carForm.color ? (
+                                                                <>
+                                                                    <span
+                                                                        className="w-5 h-5 rounded-full border border-white/20 flex-shrink-0"
+                                                                        style={{ background: carForm.color }}
+                                                                    />
+                                                                    <span className="text-white text-sm">{carForm.colorName}</span>
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <Palette className="w-4 h-4 text-white/25" />
+                                                                    <span>{isRTL ? 'اختر اللون' : 'Pick a color'}</span>
+                                                                </>
+                                                            )}
+                                                            <ChevronDown className="w-4 h-4 text-white/30 mr-auto ml-auto" />
+                                                        </button>
 
-                                    <div className="space-y-2">
-                                        <label className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/25 px-1">
-                                            {isRTL ? "تفاصيل إضافية" : "SPECIFICATIONS"}
-                                        </label>
-                                        <div className="relative group">
-                                            <FileText className={cn("absolute top-5 w-4 h-4 text-white/10 group-focus-within:text-white/30 transition-colors", isRTL ? "right-4" : "left-4")} />
-                                            <textarea
-                                                rows={4}
-                                                onChange={e => setFormData({ ...formData, details: e.target.value })}
-                                                className={cn("glass-input resize-none", isRTL ? "pr-12 pl-4" : "pl-12 pr-4")}
-                                                placeholder={isRTL ? 'صف المواصفات المطلوبة...' : 'Describe specific features, colors, part numbers...'}
-                                            />
-                                        </div>
-                                    </div>
+                                                        {/* قائمة الألوان */}
+                                                        <AnimatePresence>
+                                                            {showColorPicker && (
+                                                                <motion.div
+                                                                    initial={{ opacity: 0, y: 8 }}
+                                                                    animate={{ opacity: 1, y: 0 }}
+                                                                    exit={{ opacity: 0, y: 8 }}
+                                                                    className="absolute z-50 top-full mt-2 left-0 right-0 bg-[#111] border border-white/10 rounded-2xl p-4 shadow-2xl max-h-64 overflow-y-auto"
+                                                                >
+                                                                    <div className="grid grid-cols-2 gap-2">
+                                                                        {CAR_COLORS.map((c) => (
+                                                                            <button
+                                                                                key={c.hex}
+                                                                                type="button"
+                                                                                onClick={() => {
+                                                                                    setCarForm({ ...carForm, color: c.hex, colorName: isRTL ? c.name : c.nameEn });
+                                                                                    setShowColorPicker(false);
+                                                                                }}
+                                                                                className={cn(
+                                                                                    'flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/5 transition-all text-left',
+                                                                                    carForm.color === c.hex && 'bg-white/10 border border-amber-500/30'
+                                                                                )}
+                                                                            >
+                                                                                <span
+                                                                                    className="w-6 h-6 rounded-full border border-white/20 flex-shrink-0"
+                                                                                    style={{ background: c.hex }}
+                                                                                />
+                                                                                <span className="text-xs text-white/70">
+                                                                                    {isRTL ? c.name : c.nameEn}
+                                                                                </span>
+                                                                            </button>
+                                                                        ))}
+                                                                    </div>
+                                                                </motion.div>
+                                                            )}
+                                                        </AnimatePresence>
+                                                    </div>
+                                                </div>
 
-                                    <button
-                                        type="submit"
-                                        className="w-full btn-luxury py-5 rounded-xl group mt-4"
-                                    >
-                                        <span>{isRTL ? 'إرسال الطلب' : 'SUBMIT REQUEST'}</span>
-                                        <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                                    </button>
-                                </form>
+                                                {/* السنة */}
+                                                <div>
+                                                    <label className={labelClass}>{isRTL ? 'السنة' : 'YEAR'}</label>
+                                                    <div className="relative">
+                                                        <select
+                                                            value={carForm.year}
+                                                            onChange={e => setCarForm({ ...carForm, year: e.target.value })}
+                                                            title={isRTL ? 'السنة' : 'Year'}
+                                                            className={cn(inputClass, 'appearance-none cursor-pointer')}
+                                                        >
+                                                            <option value="" className="bg-black">{isRTL ? '-- اختر السنة --' : '-- Select Year --'}</option>
+                                                            {YEARS.map(y => (
+                                                                <option key={y} value={y} className="bg-black">{y}</option>
+                                                            ))}
+                                                        </select>
+                                                        <ChevronDown className={cn('absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 pointer-events-none', isRTL ? 'left-3.5' : 'right-3.5')} />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* الوصف العام */}
+                                            <div>
+                                                <label className={labelClass}>{isRTL ? 'وصف عام / المواصفات المطلوبة' : 'GENERAL DESCRIPTION / SPECS'}</label>
+                                                <div className="relative">
+                                                    <FileText className={cn('absolute top-4 w-4 h-4 text-white/20', isRTL ? 'right-3.5' : 'left-3.5')} />
+                                                    <textarea
+                                                        rows={4}
+                                                        value={carForm.description}
+                                                        onChange={e => setCarForm({ ...carForm, description: e.target.value })}
+                                                        placeholder={isRTL ? 'صف المواصفات المطلوبة: المحرك، الإضافات، ناقل الحركة، أي تفاصيل أخرى...' : 'Describe specs: engine, options, transmission, any other details...'}
+                                                        className={cn(inputClass, 'resize-none', isRTL ? 'pr-10 pl-4' : 'pl-10 pr-4')}
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            {/* زر الإرسال */}
+                                            <motion.button
+                                                type="submit"
+                                                disabled={loading}
+                                                whileHover={{ scale: 1.02 }}
+                                                whileTap={{ scale: 0.98 }}
+                                                className="w-full py-4 bg-amber-500 hover:bg-amber-400 text-black font-black uppercase tracking-[0.15em] rounded-2xl flex items-center justify-center gap-3 shadow-[0_0_30px_rgba(245,158,11,0.3)] hover:shadow-[0_0_50px_rgba(245,158,11,0.5)] transition-all disabled:opacity-60"
+                                            >
+                                                {loading ? (
+                                                    <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+                                                        className="w-5 h-5 border-2 border-black border-t-transparent rounded-full" />
+                                                ) : (
+                                                    <>
+                                                        <Send className="w-4 h-4" />
+                                                        {isRTL ? 'إرسال طلب السيارة' : 'SEND CAR REQUEST'}
+                                                    </>
+                                                )}
+                                            </motion.button>
+                                        </motion.form>
+                                    )}
+
+                                    {/* ── نموذج طلب قطع الغيار ── */}
+                                    {activeTab === 'parts' && (
+                                        <motion.form
+                                            key="parts"
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -10 }}
+                                            transition={{ duration: 0.25 }}
+                                            onSubmit={handlePartsSubmit}
+                                            className="space-y-5"
+                                        >
+                                            {/* الاسم والهاتف */}
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className={labelClass}>{isRTL ? 'الاسم الكامل' : 'FULL NAME'}</label>
+                                                    <div className="relative">
+                                                        <User className={cn('absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20', isRTL ? 'right-3.5' : 'left-3.5')} />
+                                                        <input
+                                                            type="text" required
+                                                            value={partsForm.name}
+                                                            onChange={e => setPartsForm({ ...partsForm, name: e.target.value })}
+                                                            placeholder={isRTL ? 'أدخل اسمك الكامل' : 'Enter your full name'}
+                                                            className={cn(inputClass, isRTL ? 'pr-10 pl-4' : 'pl-10 pr-4')}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <label className={labelClass}>{isRTL ? 'رقم الهاتف' : 'PHONE NUMBER'}</label>
+                                                    <div className="relative">
+                                                        <Phone className={cn('absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20', isRTL ? 'right-3.5' : 'left-3.5')} />
+                                                        <input
+                                                            type="tel" required
+                                                            value={partsForm.phone}
+                                                            onChange={e => setPartsForm({ ...partsForm, phone: e.target.value })}
+                                                            placeholder="+966 ..."
+                                                            className={cn(inputClass, isRTL ? 'pr-10 pl-4' : 'pl-10 pr-4')}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* اسم القطعة واسم السيارة */}
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className={labelClass}>{isRTL ? 'اسم القطعة' : 'PART NAME'}</label>
+                                                    <div className="relative">
+                                                        <Settings className={cn('absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20', isRTL ? 'right-3.5' : 'left-3.5')} />
+                                                        <input
+                                                            type="text" required
+                                                            value={partsForm.partName}
+                                                            onChange={e => setPartsForm({ ...partsForm, partName: e.target.value })}
+                                                            placeholder={isRTL ? 'مثال: فلتر زيت، كاميرا خلفية' : 'e.g. Oil filter, Rear camera'}
+                                                            className={cn(inputClass, isRTL ? 'pr-10 pl-4' : 'pl-10 pr-4')}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <label className={labelClass}>{isRTL ? 'اسم السيارة' : 'CAR NAME'}</label>
+                                                    <div className="relative">
+                                                        <Car className={cn('absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20', isRTL ? 'right-3.5' : 'left-3.5')} />
+                                                        <input
+                                                            type="text"
+                                                            value={partsForm.carName}
+                                                            onChange={e => setPartsForm({ ...partsForm, carName: e.target.value })}
+                                                            placeholder={isRTL ? 'مثال: كيا سونيتا 2020' : 'e.g. KIA Sonata 2020'}
+                                                            className={cn(inputClass, isRTL ? 'pr-10 pl-4' : 'pl-10 pr-4')}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* السنة */}
+                                            <div>
+                                                <label className={labelClass}>{isRTL ? 'سنة السيارة' : 'CAR YEAR'}</label>
+                                                <div className="relative">
+                                                    <select
+                                                        value={partsForm.year}
+                                                        onChange={e => setPartsForm({ ...partsForm, year: e.target.value })}
+                                                        title={isRTL ? 'سنة السيارة' : 'Car Year'}
+                                                        className={cn(inputClass, 'appearance-none cursor-pointer')}
+                                                    >
+                                                        <option value="" className="bg-black">{isRTL ? '-- اختر سنة السيارة --' : '-- Select Car Year --'}</option>
+                                                        {YEARS.map(y => (
+                                                            <option key={y} value={y} className="bg-black">{y}</option>
+                                                        ))}
+                                                    </select>
+                                                    <ChevronDown className={cn('absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 pointer-events-none', isRTL ? 'left-3.5' : 'right-3.5')} />
+                                                </div>
+                                            </div>
+
+                                            {/* وصف القطعة */}
+                                            <div>
+                                                <label className={labelClass}>{isRTL ? 'وصف القطعة / تفاصيل إضافية' : 'PART DESCRIPTION'}</label>
+                                                <div className="relative">
+                                                    <FileText className={cn('absolute top-4 w-4 h-4 text-white/20', isRTL ? 'right-3.5' : 'left-3.5')} />
+                                                    <textarea
+                                                        rows={3}
+                                                        value={partsForm.description}
+                                                        onChange={e => setPartsForm({ ...partsForm, description: e.target.value })}
+                                                        placeholder={isRTL ? 'صف القطعة بشكل دقيق: رقم القطعة، الإصدار، أي تفاصيل مهمة...' : 'Part number, version, any important details...'}
+                                                        className={cn(inputClass, 'resize-none', isRTL ? 'pr-10 pl-4' : 'pl-10 pr-4')}
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            {/* رفع صورة القطعة */}
+                                            <div>
+                                                <label className={labelClass}>{isRTL ? 'صورة القطعة (اختياري)' : 'PART IMAGE (OPTIONAL)'}</label>
+                                                <div
+                                                    className={cn(
+                                                        'relative flex flex-col items-center justify-center gap-3 p-6 border-2 border-dashed rounded-2xl cursor-pointer transition-all',
+                                                        partImagePreview
+                                                            ? 'border-amber-500/40 bg-amber-500/5'
+                                                            : 'border-white/10 bg-white/[0.02] hover:border-white/20 hover:bg-white/[0.04]'
+                                                    )}
+                                                    onClick={() => fileInputRef.current?.click()}
+                                                >
+                                                    <input
+                                                        ref={fileInputRef}
+                                                        type="file"
+                                                        accept="image/*"
+                                                        className="hidden"
+                                                        title={isRTL ? 'رفع صورة القطعة' : 'Upload part image'}
+                                                        onChange={handlePartImageChange}
+                                                    />
+                                                    {partImagePreview ? (
+                                                        <div className="relative w-full">
+                                                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                            <img src={partImagePreview} alt="part" className="w-full max-h-48 object-contain rounded-xl" />
+                                                            <button
+                                                                type="button"
+                                                                onClick={e => { e.stopPropagation(); setPartImagePreview(null); setPartImageFile(null); }}
+                                                                className="absolute top-2 right-2 w-7 h-7 bg-black/60 rounded-full flex items-center justify-center hover:bg-red-500/80 transition-all"
+                                                            >
+                                                                <X className="w-3 h-3 text-white" />
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <>
+                                                            <Upload className="w-8 h-8 text-white/20" />
+                                                            <span className="text-xs text-white/30 text-center">
+                                                                {isRTL ? 'اضغط لرفع صورة للقطعة' : 'Click to upload a part image'}
+                                                            </span>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {/* زر الإرسال */}
+                                            <motion.button
+                                                type="submit"
+                                                disabled={loading}
+                                                whileHover={{ scale: 1.02 }}
+                                                whileTap={{ scale: 0.98 }}
+                                                className="w-full py-4 bg-amber-500 hover:bg-amber-400 text-black font-black uppercase tracking-[0.15em] rounded-2xl flex items-center justify-center gap-3 shadow-[0_0_30px_rgba(245,158,11,0.3)] hover:shadow-[0_0_50px_rgba(245,158,11,0.5)] transition-all disabled:opacity-60"
+                                            >
+                                                {loading ? (
+                                                    <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+                                                        className="w-5 h-5 border-2 border-black border-t-transparent rounded-full" />
+                                                ) : (
+                                                    <>
+                                                        <Send className="w-4 h-4" />
+                                                        {isRTL ? 'إرسال طلب القطعة' : 'SEND PARTS REQUEST'}
+                                                    </>
+                                                )}
+                                            </motion.button>
+                                        </motion.form>
+                                    )}
+                                </AnimatePresence>
+
                             </div>
                         </motion.div>
                     </div>
+
                 </div>
             </main>
         </div>

@@ -420,4 +420,24 @@ export const api = {
                 body: JSON.stringify(data),
             }),
     },
+    // ── الطلبات الخاصة (Concierge) ──
+    concierge: {
+        // إرسال طلب جديد (سيارة أو قطع غيار)
+        create: (data: Record<string, unknown>) => fetchAPI('/api/v2/concierge', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        }),
+        // جلب جميع الطلبات (للأدمن)
+        list: (params: Record<string, string | number> = {}) => {
+            const query = new URLSearchParams(params as Record<string, string>).toString();
+            return fetchAPI(`/api/v2/concierge?${query}`);
+        },
+        // تحديث حالة طلب
+        updateStatus: (id: string, status: string) => fetchAPI(`/api/v2/concierge/${id}/status`, {
+            method: 'PATCH',
+            body: JSON.stringify({ status }),
+        }),
+        // حذف طلب
+        delete: (id: string) => fetchAPI(`/api/v2/concierge/${id}`, { method: 'DELETE' }),
+    },
 };

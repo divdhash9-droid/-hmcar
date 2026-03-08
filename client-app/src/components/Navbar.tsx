@@ -58,7 +58,7 @@ export default function Navbar() {
         { href: '/auctions', label: isRTL ? 'المزادات' : 'AUCTIONS', icon: Gavel },
         { href: '/parts', label: isRTL ? 'القطع' : 'PARTS', icon: ShoppingBag },
         { href: '/loan-calculator', label: isRTL ? 'حاسبة التمويل' : 'CALCULATOR', icon: Calculator },
-        { href: '/concierge', label: isRTL ? 'الكونسيرج' : 'CONCIERGE', icon: Settings },
+        { href: '/concierge', label: isRTL ? 'طلبات خاصة' : 'REQUESTS', icon: Settings },
         { href: '/support', label: isRTL ? 'الدعم' : 'SUPPORT', icon: Headphones },
         { href: '/contact', label: isRTL ? 'تواصل' : 'CONTACT', icon: MessageCircle },
     ];

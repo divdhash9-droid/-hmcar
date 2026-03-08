@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Menu, X, User, Languages, ArrowLeft, ArrowRight,
-    Headphones, MessageCircle,
+    Headphones, MessageCircle, Search,
     Car, Gavel, ShoppingBag, Settings, ShoppingCart, Heart, Calculator
 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
@@ -19,6 +19,9 @@ export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [cartCount, setCartCount] = useState(0);
+    const [searchOpen, setSearchOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const searchRef = useRef<HTMLInputElement>(null);
     const pathname = usePathname();
 
     // [[ARABIC_COMMENT]] جلب عدد عناصر السلة من localStorage
@@ -160,6 +163,41 @@ export default function Navbar() {
                                 </button>
                             </Link>
                         )}
+
+                        {/* زر البحث */}
+                        <div className="relative">
+                            <button
+                                onClick={() => { setSearchOpen(o => !o); setTimeout(() => searchRef.current?.focus(), 100); }}
+                                className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all"
+                                title={isRTL ? 'بحث' : 'Search'}
+                            >
+                                <Search className="w-4 h-4" />
+                            </button>
+                            <AnimatePresence>
+                                {searchOpen && (
+                                    <motion.form
+                                        initial={{ opacity: 0, scale: 0.9, y: -10 }}
+                                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                                        exit={{ opacity: 0, scale: 0.9, y: -10 }}
+                                        onSubmit={(e) => { e.preventDefault(); if (searchQuery.trim()) { router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`); setSearchOpen(false); setSearchQuery(''); } }}
+                                        className="absolute top-12 right-0 z-50 bg-[#0a0a0a] border border-white/10 rounded-2xl p-2 flex gap-2 shadow-[0_20px_60px_rgba(0,0,0,0.8)] min-w-[260px]"
+                                        dir={isRTL ? 'rtl' : 'ltr'}
+                                    >
+                                        <input
+                                            ref={searchRef}
+                                            type="text"
+                                            value={searchQuery}
+                                            onChange={e => setSearchQuery(e.target.value)}
+                                            placeholder={isRTL ? 'ابحث عن سيارة أو قطعة...' : 'Search cars or parts...'}
+                                            className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-white/30 outline-none focus:border-white/30 transition-all"
+                                        />
+                                        <button type="submit" className="px-4 py-2.5 bg-white/10 hover:bg-white/20 border border-white/10 text-white rounded-xl transition-all">
+                                            <Search className="w-4 h-4" />
+                                        </button>
+                                    </motion.form>
+                                )}
+                            </AnimatePresence>
+                        </div>
 
                         {/* [[ARABIC_COMMENT]] زر المفضلة */}
                         <Link href="/favorites" className="relative w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-red-400 hover:border-red-500/30 hover:bg-red-500/10 transition-all" title={isRTL ? 'المفضلة' : 'Favorites'}>

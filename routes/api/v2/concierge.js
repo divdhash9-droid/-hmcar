@@ -3,28 +3,61 @@
 const express = require('express');
 const router = express.Router();
 const ConciergeRequest = require('../../../models/ConciergeRequest');
+const Notification = require('../../../models/Notification');
+const User = require('../../../models/User');
 const { requireAuthAPI, requireAdmin } = require('../../../middleware/auth');
+
+// ── GET /api/v2/concierge/stats ── إحصائيات الطلبات (الأدمن)
+router.get('/stats', requireAuthAPI, requireAdmin, async (req, res) => {
+    try {
+        const [total, newCount, inProgress, completed, cancelled, byCar, byParts] = await Promise.all([
+            ConciergeRequest.countDocuments(),
+            ConciergeRequest.countDocuments({ status: 'new' }),
+            ConciergeRequest.countDocuments({ status: 'in_progress' }),
+            ConciergeRequest.countDocuments({ status: 'completed' }),
+            ConciergeRequest.countDocuments({ status: 'cancelled' }),
+            ConciergeRequest.countDocuments({ type: 'car' }),
+            ConciergeRequest.countDocuments({ type: 'parts' }),
+        ]);
+
+        // أحدث 5 طلبات
+        const recent = await ConciergeRequest.find()
+            .sort({ createdAt: -1 })
+            .limit(5)
+            .lean();
+
+        res.json({
+            success: true,
+            data: {
+                total, new: newCount, in_progress: inProgress,
+                completed, cancelled,
+                byType: { car: byCar, parts: byParts },
+                recent
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'فشل في جلب الإحصائيات' });
+    }
+});
 
 // ── POST /api/v2/concierge ── إرسال طلب جديد (متاح للجميع)
 router.post('/', async (req, res) => {
     try {
         const {
             type, name, phone,
-            // طلب سيارة
             carName, model, color, colorName, year,
-            // طلب قطع
             partName, imageUrl,
-            // مشترك
             description
         } = req.body;
 
         if (!name || !phone || !type) {
             return res.status(400).json({
                 success: false,
-                message: ' الاسم والهاتف ونوع الطلب مطلوبة'
+                message: 'الاسم والهاتف ونوع الطلب مطلوبة'
             });
         }
 
+        // حفظ الطلب
         const request = await ConciergeRequest.create({
             type, name, phone,
             carName, model, color, colorName, year,
@@ -33,10 +66,46 @@ router.post('/', async (req, res) => {
             status: 'new'
         });
 
+        // ── إشعار الأدمن ──
+        // جلب جميع المستخدمين الأدمن
+        try {
+            const admins = await User.find({ role: { $in: ['admin', 'superadmin'] } }).select('_id').lean();
+            if (admins.length > 0) {
+                const typeLabel = type === 'car' ? 'طلب سيارة' : 'طلب قطعة غيار';
+                const notifTitle = `🔔 ${typeLabel} جديد من ${name}`;
+                const notifMsg = type === 'car'
+                    ? `${name} يطلب: ${carName || ''}${model ? ` ${model}` : ''}${colorName ? ` - ${colorName}` : ''}${year ? ` (${year})` : ''} | هاتف: ${phone}`
+                    : `${name} يطلب قطعة: ${partName || ''} | السيارة: ${carName || ''} ${year || ''} | هاتف: ${phone}`;
+
+                const notifications = admins.map(admin => ({
+                    user: admin._id,
+                    title: notifTitle,
+                    message: notifMsg,
+                    type: 'info',
+                    link: '/admin/concierge',
+                    status: 'new',
+                    read: false
+                }));
+                await Notification.insertMany(notifications);
+            }
+        } catch (notifErr) {
+            console.error('Failed to create admin notifications:', notifErr);
+            // لا نوقف الرد بسبب فشل الإشعار
+        }
+
+        // ── رسالة تأكيد للعميل عبر واتساب ──
+        const confirmText = type === 'car'
+            ? `✅ *تأكيد طلبك - CARHM*\n\nمرحباً ${name}،\nتم استلام طلب السيارة بنجاح!\n🚗 السيارة: ${carName || ''} ${model || ''}\n🎨 اللون: ${colorName || ''}\n📅 السنة: ${year || ''}\n\nسيتواصل معك فريقنا قريباً ✨`
+            : `✅ *تأكيد طلبك - CARHM*\n\nمرحباً ${name}،\nتم استلام طلب القطعة بنجاح!\n🔧 القطعة: ${partName || ''}\n🚗 السيارة: ${carName || ''} ${year || ''}\n\nسيتواصل معك فريقنا قريباً ✨`;
+
         res.status(201).json({
             success: true,
             message: 'تم إرسال طلبك بنجاح. سيتواصل معك فريقنا قريبًا.',
-            data: { id: request._id }
+            data: {
+                id: request._id,
+                confirmWhatsApp: confirmText,  // للواجهة لإرساله للعميل
+                clientPhone: phone
+            }
         });
 
     } catch (error) {
@@ -47,6 +116,7 @@ router.post('/', async (req, res) => {
         });
     }
 });
+
 
 // ── GET /api/v2/concierge ── جلب كل الطلبات (الأدمن فقط)
 router.get('/', requireAuthAPI, requireAdmin, async (req, res) => {

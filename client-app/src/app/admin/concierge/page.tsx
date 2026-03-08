@@ -53,6 +53,10 @@ export default function AdminConcierge() {
     const [selectedRequest, setSelectedRequest] = useState<ConciergeRequest | null>(null);
     const [updatingId, setUpdatingId] = useState<string | null>(null);
     const [stats, setStats] = useState({ total: 0, new: 0, in_progress: 0, completed: 0, cancelled: 0 });
+    const [detailedStats, setDetailedStats] = useState<{
+        byType?: { car: number; parts: number };
+        recent?: ConciergeRequest[];
+    } | null>(null);
 
     const loadRequests = useCallback(async () => {
         try {
@@ -60,11 +64,13 @@ export default function AdminConcierge() {
             const params: Record<string, string> = {};
             if (filterType !== 'all') params.type = filterType;
             if (filterStatus !== 'all') params.status = filterStatus;
-            const res = await api.concierge.list(params);
+            const [res, statsRes] = await Promise.all([
+                api.concierge.list(params),
+                api.concierge.stats(),
+            ]);
             if (res?.success) {
                 const data: ConciergeRequest[] = res.data.requests || [];
                 setRequests(data);
-                // حساب الإحصائيات
                 setStats({
                     total: res.data.total || data.length,
                     new: data.filter(r => r.status === 'new').length,
@@ -72,6 +78,9 @@ export default function AdminConcierge() {
                     completed: data.filter(r => r.status === 'completed').length,
                     cancelled: data.filter(r => r.status === 'cancelled').length,
                 });
+            }
+            if (statsRes?.success) {
+                setDetailedStats(statsRes.data);
             }
         } catch (err) {
             console.error('Failed to load requests:', err);
@@ -172,6 +181,86 @@ export default function AdminConcierge() {
                         </button>
                     ))}
                 </div>
+
+                {/* Detailed Stats Banner */}
+                {detailedStats && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"
+                    >
+                        {/* توزيع النوع */}
+                        <div className="bg-white/[0.02] border border-white/8 rounded-2xl p-5">
+                            <div className="text-[9px] font-black uppercase tracking-widest text-white/30 mb-4">
+                                {isRTL ? 'توزيع الطلبات حسب النوع' : 'Requests By Type'}
+                            </div>
+                            <div className="flex gap-6 items-center">
+                                <div className="flex-1">
+                                    <div className="flex justify-between text-xs mb-1.5">
+                                        <span className="flex items-center gap-1.5 text-blue-400">
+                                            <Car className="w-3 h-3" />
+                                            {isRTL ? 'سيارات' : 'Cars'}
+                                        </span>
+                                        <span className="font-black text-blue-400">{detailedStats.byType?.car || 0}</span>
+                                    </div>
+                                    <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                                        <div
+                                            className="h-full bg-blue-500 rounded-full transition-all duration-700"
+                                            style={{ width: `${stats.total ? Math.round(((detailedStats.byType?.car || 0) / stats.total) * 100) : 0}%` }}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="flex-1">
+                                    <div className="flex justify-between text-xs mb-1.5">
+                                        <span className="flex items-center gap-1.5 text-orange-400">
+                                            <Settings className="w-3 h-3" />
+                                            {isRTL ? 'قطع غيار' : 'Parts'}
+                                        </span>
+                                        <span className="font-black text-orange-400">{detailedStats.byType?.parts || 0}</span>
+                                    </div>
+                                    <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                                        <div
+                                            className="h-full bg-orange-500 rounded-full transition-all duration-700"
+                                            style={{ width: `${stats.total ? Math.round(((detailedStats.byType?.parts || 0) / stats.total) * 100) : 0}%` }}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* أحدث الطلبات */}
+                        <div className="bg-white/[0.02] border border-white/8 rounded-2xl p-5">
+                            <div className="text-[9px] font-black uppercase tracking-widest text-white/30 mb-3">
+                                {isRTL ? 'أحدث الطلبات' : 'Latest Requests'}
+                            </div>
+                            <div className="space-y-2">
+                                {(detailedStats.recent || []).slice(0, 4).map(r => (
+                                    <div key={r._id} className="flex items-center justify-between gap-2">
+                                        <div className="flex items-center gap-2 min-w-0">
+                                            <div className={cn(
+                                                'w-5 h-5 rounded-md flex-shrink-0 flex items-center justify-center',
+                                                r.type === 'car' ? 'bg-blue-500/15 text-blue-400' : 'bg-orange-500/15 text-orange-400'
+                                            )}>
+                                                {r.type === 'car' ? <Car className="w-3 h-3" /> : <Settings className="w-3 h-3" />}
+                                            </div>
+                                            <span className="text-xs text-white/60 truncate font-medium">{r.name}</span>
+                                        </div>
+                                        <span className={cn(
+                                            'text-[9px] font-black uppercase px-2 py-0.5 rounded-md border flex-shrink-0',
+                                            STATUS_CONFIG[r.status]?.bg,
+                                            STATUS_CONFIG[r.status]?.color
+                                        )}>
+                                            {isRTL ? STATUS_CONFIG[r.status]?.label : STATUS_CONFIG[r.status]?.labelEn}
+                                        </span>
+                                    </div>
+                                ))}
+                                {(!detailedStats.recent || detailedStats.recent.length === 0) && (
+                                    <p className="text-xs text-white/20 text-center py-2">{isRTL ? 'لا توجد طلبات' : 'No requests yet'}</p>
+                                )}
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
 
                 {/* Filters */}
                 <div className="flex flex-wrap gap-3 mb-6">

@@ -432,6 +432,8 @@ export const api = {
             const query = new URLSearchParams(params as Record<string, string>).toString();
             return fetchAPI(`/api/v2/concierge?${query}`);
         },
+        // إحصائيات الطلبات الخاصة
+        stats: () => fetchAPI('/api/v2/concierge/stats'),
         // تحديث حالة طلب
         updateStatus: (id: string, status: string) => fetchAPI(`/api/v2/concierge/${id}/status`, {
             method: 'PATCH',

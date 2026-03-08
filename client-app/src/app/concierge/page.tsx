@@ -111,20 +111,21 @@ export default function ConciergePage() {
         e.preventDefault();
         setLoading(true);
         try {
-            // 1. إرسال للأدمن عبر API
-            await api.concierge.create({
+            // 1. إرسال للأدمن عبر API (يُنشئ إشعار أدمن تلقائياً)
+            const res = await api.concierge.create({
                 type: 'car',
                 name: carForm.name,
                 phone: carForm.phone,
                 carName: carForm.carName,
                 model: carForm.model,
-                color: carForm.colorName || carForm.color,
+                color: carForm.color,
+                colorName: carForm.colorName,
                 year: carForm.year,
                 description: carForm.description,
             });
 
-            // 2. إرسال عبر واتساب
-            const msg = [
+            // 2. رسالة الأدمن عبر واتساب
+            const adminMsg = [
                 `🚗 *طلب سيارة خاص - CARHM*`,
                 `━━━━━━━━━━━━━━`,
                 `👤 الاسم: ${carForm.name}`,
@@ -135,13 +136,23 @@ export default function ConciergePage() {
                 `📅 السنة: ${carForm.year}`,
                 `📝 الوصف: ${carForm.description}`,
             ].join('\n');
-            const cleanNumber = whatsappNumber.replace(/[^0-9]/g, '');
-            window.open(`https://wa.me/${cleanNumber}?text=${encodeURIComponent(msg)}`, '_blank');
+            const cleanAdminNum = whatsappNumber.replace(/[^0-9]/g, '');
+            window.open(`https://wa.me/${cleanAdminNum}?text=${encodeURIComponent(adminMsg)}`, '_blank');
+
+            // 3. رسالة تأكيد للعميل عبر واتساب (تفتح بعد ثانية)
+            const confirmText = res?.data?.confirmWhatsApp;
+            const clientPhone = carForm.phone.replace(/[^0-9]/g, '');
+            if (confirmText && clientPhone.length >= 9) {
+                setTimeout(() => {
+                    window.open(`https://wa.me/${clientPhone}?text=${encodeURIComponent(confirmText)}`, '_blank');
+                }, 1200);
+            }
+
             setSubmitted(true);
         } catch (err) {
             console.error('Car request error:', err);
-            // حتى لو فشل API، نرسل واتساب
-            const msg = [
+            // حتى لو فشل API، نرسل واتساب للأدمن
+            const adminMsg = [
                 `🚗 *طلب سيارة خاص - CARHM*`,
                 `👤 الاسم: ${carForm.name}`,
                 `📱 الهاتف: ${carForm.phone}`,
@@ -152,7 +163,7 @@ export default function ConciergePage() {
                 `📝 الوصف: ${carForm.description}`,
             ].join('\n');
             const cleanNumber = whatsappNumber.replace(/[^0-9]/g, '');
-            window.open(`https://wa.me/${cleanNumber}?text=${encodeURIComponent(msg)}`, '_blank');
+            window.open(`https://wa.me/${cleanNumber}?text=${encodeURIComponent(adminMsg)}`, '_blank');
             setSubmitted(true);
         } finally {
             setLoading(false);
@@ -175,8 +186,8 @@ export default function ConciergePage() {
                 } catch { /* تجاهل خطأ الرفع */ }
             }
 
-            // 1. إرسال للأدمن
-            await api.concierge.create({
+            // 1. إرسال للأدمن (يُنشئ إشعار أدمن تلقائياً)
+            const res = await api.concierge.create({
                 type: 'parts',
                 name: partsForm.name,
                 phone: partsForm.phone,
@@ -187,8 +198,8 @@ export default function ConciergePage() {
                 imageUrl,
             });
 
-            // 2. واتساب
-            const msg = [
+            // 2. واتساب للأدمن
+            const adminMsg = [
                 `🔧 *طلب قطعة غيار - CARHM*`,
                 `━━━━━━━━━━━━━━`,
                 `👤 الاسم: ${partsForm.name}`,
@@ -199,12 +210,22 @@ export default function ConciergePage() {
                 `📝 الوصف: ${partsForm.description}`,
                 imageUrl ? `🖼️ صورة القطعة: ${imageUrl}` : '',
             ].filter(Boolean).join('\n');
-            const cleanNumber = whatsappNumber.replace(/[^0-9]/g, '');
-            window.open(`https://wa.me/${cleanNumber}?text=${encodeURIComponent(msg)}`, '_blank');
+            const cleanAdminNum = whatsappNumber.replace(/[^0-9]/g, '');
+            window.open(`https://wa.me/${cleanAdminNum}?text=${encodeURIComponent(adminMsg)}`, '_blank');
+
+            // 3. رسالة تأكيد للعميل (بعد ثانية)
+            const confirmText = res?.data?.confirmWhatsApp;
+            const clientPhone = partsForm.phone.replace(/[^0-9]/g, '');
+            if (confirmText && clientPhone.length >= 9) {
+                setTimeout(() => {
+                    window.open(`https://wa.me/${clientPhone}?text=${encodeURIComponent(confirmText)}`, '_blank');
+                }, 1200);
+            }
+
             setSubmitted(true);
         } catch (err) {
             console.error('Parts request error:', err);
-            const msg = [
+            const adminMsg = [
                 `🔧 *طلب قطعة غيار - CARHM*`,
                 `👤 الاسم: ${partsForm.name}`,
                 `📱 الهاتف: ${partsForm.phone}`,
@@ -214,7 +235,7 @@ export default function ConciergePage() {
                 `📝 الوصف: ${partsForm.description}`,
             ].join('\n');
             const cleanNumber = whatsappNumber.replace(/[^0-9]/g, '');
-            window.open(`https://wa.me/${cleanNumber}?text=${encodeURIComponent(msg)}`, '_blank');
+            window.open(`https://wa.me/${cleanNumber}?text=${encodeURIComponent(adminMsg)}`, '_blank');
             setSubmitted(true);
         } finally {
             setLoading(false);

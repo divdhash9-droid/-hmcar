@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 /**
- * Next.js Middleware - نظام حماية المسارات
- * يعمل قبل تحميل الصفحة لمنع الوصول غير المصرح به
+ * proxy.ts - نظام حماية المسارات لـ HM CAR
+ * يعمل كـ Edge Middleware قبل تحميل أي صفحة
  */
 
 // المسارات المحمية التي تتطلب تسجيل دخول
@@ -20,7 +20,7 @@ const PROTECTED_CLIENT_ROUTES = [
 const PROTECTED_ADMIN_ROUTES = ['/admin'];
 const AUTH_ROUTES = ['/login', '/register'];
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
     // قراءة التوكن من الـ cookies
@@ -46,11 +46,10 @@ export function middleware(request: NextRequest) {
         }
     }
 
-    // ── 3. إذا كان مسجلاً دخول وحاول فتح /login أو /register ──
-    //    نحوّله لصفحته المناسبة بدلاً من إظهار صفحة الدخول
+    // ── 3. إذا كان مسجلاً ويحاول فتح /login أو /register ──
+    //    نحوله لصفحته بدلاً من إظهار صفحة الدخول
     const isAuthRoute = AUTH_ROUTES.some(r => pathname === r);
     if (isAuthRoute && isAuthenticated) {
-        // نتحقق من الدور من الـ cookie
         const userRole = request.cookies.get('hm_user_role')?.value;
         if (userRole === 'admin' || userRole === 'super_admin' || userRole === 'manager') {
             return NextResponse.redirect(new URL('/admin/dashboard', request.url));
@@ -58,7 +57,7 @@ export function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/client/dashboard', request.url));
     }
 
-    // إضافة Headers أمنية
+    // إضافة Headers أمنية لكل الاستجابات
     const response = NextResponse.next();
     response.headers.set('X-Frame-Options', 'SAMEORIGIN');
     response.headers.set('X-Content-Type-Options', 'nosniff');

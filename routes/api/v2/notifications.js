@@ -18,12 +18,16 @@ router.get('/', requireAuthAPI, async (req, res) => {
 // تعيين الإشعارات كمقروءة
 router.post('/read', requireAuthAPI, async (req, res) => {
   try {
-    await UserNotification.updateMany({ user: req.user.userId, isRead: false }, { $set: { isRead: true } });
+    await UserNotification.updateMany(
+      { user: req.user.userId, read: false },
+      { $set: { read: true, readAt: new Date() } }
+    );
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 });
+
 
 // إنشاء إشعار يدوي (للاختبار)
 router.post('/send', requireAuthAPI, async (req, res) => {

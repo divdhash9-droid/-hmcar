@@ -161,16 +161,16 @@ async function seedRealData() {
         const porsche = createdCars.find(c => c.model === '911');
         if (porsche) {
             await Auction.create({
-                carId: porsche._id,
-                startPrice: 850000,
+                car: porsche._id,           // الحقل الصحيح هو 'car' وليس 'carId'
+                startingPrice: 850000,       // الحقل الصحيح هو 'startingPrice' وليس 'startPrice'
                 currentPrice: 850000,
-                minIncrement: 5000,
-                startTime: new Date(),
-                endTime: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-                status: 'active',
-                title: 'Premium Auction: Porsche 911 Turbo S'
+                startsAt: new Date(),        // الحقل الصحيح هو 'startsAt' وليس 'startTime'
+                endsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 'endsAt' وليس 'endTime'
+                status: 'running',           // القيم الصحيحة: 'scheduled', 'running', 'ended'
+                currency: 'SAR'
             });
         }
+
         console.log('✅ Real data seeding complete.');
     } catch (e) {
         console.warn('⚠️ Data seed warning:', e.message);

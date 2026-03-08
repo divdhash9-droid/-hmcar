@@ -3,237 +3,329 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useCallback } from "react";
 import {
-    Users,
-    Shield,
-    Search,
-    ChevronLeft,
-    Plus,
-    Eye,
-    EyeOff,
-    ChevronDown
+    Users, Shield, Search, ChevronLeft, Plus, Eye, EyeOff,
+    ChevronDown, Check, X, Car, Settings, Gavel, ShoppingCart,
+    BarChart2, MessageSquare, FileText, Bell, Link2, Phone, Layers,
+    Briefcase, Star, Trash2, RefreshCw
 } from "lucide-react";
-import Navbar from "@/components/Navbar";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/LanguageContext";
 import { api } from "@/lib/api";
-import Link from "next/link";
+import NextLink from "next/link";
+import { useToast } from "@/lib/ToastContext";
 
-interface Device {
-    deviceId: string;
-    browser: string;
-    os: string;
-    ip: string;
-    lastUsedAt: string;
-    isActive: boolean;
-}
-
+// ── واجهات البيانات ──
+interface Device { deviceId: string; browser: string; os: string; ip: string; lastUsedAt: string; isActive: boolean; }
 interface User {
-    id: string;
-    name: string;
-    email?: string;
-    username?: string;
-    phone?: string;
-    role: string;
-    isActive: boolean;
-    createdAt: string;
-    boundDevices?: Device[];
-    isDeviceLocked?: boolean;
-    permissions?: string[];
+    id: string; name: string; email?: string; username?: string; phone?: string;
+    role: string; isActive: boolean; createdAt: string;
+    boundDevices?: Device[]; isDeviceLocked?: boolean; permissions?: string[];
 }
-
-// نوع البيانات الخام من الـ API (قبل التحويل)
 interface RawUser {
-    _id?: string;
-    id?: string;
-    name: string;
-    email?: string;
-    username?: string;
-    phone?: string;
-    role: string;
-    status?: string;
-    createdAt: string;
-    boundDevices?: Device[];
-    isDeviceLocked?: boolean;
-    permissions?: string[];
+    _id?: string; id?: string; name: string; email?: string; username?: string; phone?: string;
+    role: string; status?: string; createdAt: string; boundDevices?: Device[];
+    isDeviceLocked?: boolean; permissions?: string[];
 }
 
+// ── قائمة الصلاحيات الكاملة للنظام ──
+const ALL_SYSTEM_PERMISSIONS = [
+    { id: 'manage_cars', icon: Car, label: 'إدارة السيارات', desc: 'إضافة وتعديل وحذف السيارات', color: 'blue' },
+    { id: 'manage_parts', icon: Layers, label: 'إدارة قطع الغيار', desc: 'إضافة وتعديل وحذف القطع', color: 'orange' },
+    { id: 'manage_auctions', icon: Gavel, label: 'إدارة المزادات', desc: 'إنشاء وإدارة المزادات المباشرة', color: 'red' },
+    { id: 'manage_orders', icon: ShoppingCart, label: 'إدارة الطلبيات', desc: 'متابعة وتحديث الطلبيات', color: 'green' },
+    { id: 'manage_users', icon: Users, label: 'إدارة المستخدمين', desc: 'عرض وتعديل وحذف المستخدمين', color: 'purple' },
+    { id: 'manage_concierge', icon: Briefcase, label: 'إدارة الطلبات الخاصة', desc: 'طلبات سيارات وقطع الغيار', color: 'amber' },
+    { id: 'manage_settings', icon: Settings, label: 'إعدادات النظام', desc: 'تغيير إعدادات وكلمات المرور', color: 'gray' },
+    { id: 'manage_content', icon: FileText, label: 'إدارة المحتوى', desc: 'الصفحة الرئيسية والمحتوى العام', color: 'teal' },
+    { id: 'manage_footer', icon: Link2, label: 'روابط التواصل', desc: 'روابط التواصل الاجتماعي والفوتر', color: 'cyan' },
+    { id: 'manage_whatsapp', icon: Phone, label: 'إدارة واتساب', desc: 'رقم واتساب التواصل مع العملاء', color: 'green' },
+    { id: 'view_analytics', icon: BarChart2, label: 'عرض الإحصائيات', desc: 'تقارير وإحصائيات النظام', color: 'yellow' },
+    { id: 'manage_messages', icon: MessageSquare, label: 'إدارة المحادثات', desc: 'الرد على رسائل ومحادثات العملاء', color: 'indigo' },
+    { id: 'manage_brands', icon: Star, label: 'إدارة الوكالات', desc: 'إضافة وتعديل وكالات السيارات', color: 'pink' },
+    { id: 'manage_notifications', icon: Bell, label: 'إدارة الإشعارات', desc: 'إرسال وإدارة إشعارات المستخدمين', color: 'violet' },
+];
+
+const COLOR_MAP: Record<string, { bg: string; border: string; text: string; check: string }> = {
+    blue: { bg: 'bg-blue-500/10', border: 'border-blue-500/40', text: 'text-blue-400', check: 'bg-blue-500' },
+    orange: { bg: 'bg-orange-500/10', border: 'border-orange-500/40', text: 'text-orange-400', check: 'bg-orange-500' },
+    red: { bg: 'bg-red-500/10', border: 'border-red-500/40', text: 'text-red-400', check: 'bg-red-500' },
+    green: { bg: 'bg-green-500/10', border: 'border-green-500/40', text: 'text-green-400', check: 'bg-green-500' },
+    purple: { bg: 'bg-purple-500/10', border: 'border-purple-500/40', text: 'text-purple-400', check: 'bg-purple-500' },
+    amber: { bg: 'bg-amber-500/10', border: 'border-amber-500/40', text: 'text-amber-400', check: 'bg-amber-500' },
+    gray: { bg: 'bg-white/5', border: 'border-white/20', text: 'text-white/60', check: 'bg-white/80' },
+    teal: { bg: 'bg-teal-500/10', border: 'border-teal-500/40', text: 'text-teal-400', check: 'bg-teal-500' },
+    cyan: { bg: 'bg-cyan-500/10', border: 'border-cyan-500/40', text: 'text-cyan-400', check: 'bg-cyan-500' },
+    yellow: { bg: 'bg-yellow-500/10', border: 'border-yellow-500/40', text: 'text-yellow-400', check: 'bg-yellow-500' },
+    indigo: { bg: 'bg-indigo-500/10', border: 'border-indigo-500/40', text: 'text-indigo-400', check: 'bg-indigo-500' },
+    pink: { bg: 'bg-pink-500/10', border: 'border-pink-500/40', text: 'text-pink-400', check: 'bg-pink-500' },
+    violet: { bg: 'bg-violet-500/10', border: 'border-violet-500/40', text: 'text-violet-400', check: 'bg-violet-500' },
+};
+
+// ── مكوّن الصلاحيات المشترك ──
+function PermissionsGrid({ permissions, onChange }: { permissions: string[]; onChange: (p: string[]) => void }) {
+    const togglePerm = (id: string) => {
+        onChange(permissions.includes(id) ? permissions.filter(x => x !== id) : [...permissions, id]);
+    };
+    const allSelected = ALL_SYSTEM_PERMISSIONS.every(p => permissions.includes(p.id));
+    return (
+        <div className="space-y-3">
+            <div className="flex items-center justify-between">
+                <span className="text-[9px] font-black uppercase text-white/30 tracking-widest">
+                    {permissions.length} / {ALL_SYSTEM_PERMISSIONS.length} صلاحية محددة
+                </span>
+                <div className="flex gap-2">
+                    <button type="button" onClick={() => onChange(ALL_SYSTEM_PERMISSIONS.map(p => p.id))}
+                        className="text-[9px] font-black uppercase px-3 py-1.5 rounded-lg border border-green-500/30 text-green-400 hover:bg-green-500/10 transition-all">
+                        تحديد الكل
+                    </button>
+                    <button type="button" onClick={() => onChange([])}
+                        className="text-[9px] font-black uppercase px-3 py-1.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-all">
+                        إلغاء الكل
+                    </button>
+                </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {ALL_SYSTEM_PERMISSIONS.map(perm => {
+                    const isSelected = permissions.includes(perm.id);
+                    const colors = COLOR_MAP[perm.color] || COLOR_MAP.gray;
+                    const Icon = perm.icon;
+                    return (
+                        <button
+                            type="button"
+                            key={perm.id}
+                            onClick={() => togglePerm(perm.id)}
+                            className={cn(
+                                'flex items-center gap-3 p-3 rounded-xl border text-right transition-all',
+                                isSelected ? `${colors.bg} ${colors.border}` : 'border-white/5 bg-white/[0.02] hover:border-white/15'
+                            )}
+                        >
+                            <div className={cn(
+                                'w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-all',
+                                isSelected ? `${colors.check} border-transparent` : 'border-white/25 bg-transparent'
+                            )}>
+                                {isSelected && <Check className="w-3 h-3 text-black font-black" />}
+                            </div>
+                            <div className={cn('flex-shrink-0', isSelected ? colors.text : 'text-white/30')}>
+                                <Icon className="w-4 h-4" />
+                            </div>
+                            <div className="flex-1 min-w-0 text-right">
+                                <div className={cn('text-xs font-black', isSelected ? 'text-white' : 'text-white/50')}>{perm.label}</div>
+                                <div className="text-[9px] text-white/25 truncate">{perm.desc}</div>
+                            </div>
+                        </button>
+                    );
+                })}
+            </div>
+            {!allSelected && permissions.length === 0 && (
+                <p className="text-[10px] text-amber-400/70 text-center py-2">
+                    ⚠️ لم يتم تحديد أي صلاحية - لن يتمكن من إدارة أي شيء
+                </p>
+            )}
+        </div>
+    );
+}
+
+// ── الصفحة الرئيسية ──
 export default function AdminUsersPage() {
     const { isRTL } = useLanguage();
+    const { showToast } = useToast();
     const [users, setUsers] = useState<User[]>([]);
     const [filter, setFilter] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
-    const [stats, setStats] = useState({
-        total: 0,
-        buyers: 0,
-        sellers: 0,
-        admins: 0,
-        active: 0
-    });
+    const [loading, setLoading] = useState(true);
+    const [stats, setStats] = useState({ total: 0, buyers: 0, sellers: 0, admins: 0, active: 0 });
     const [showAddModal, setShowAddModal] = useState(false);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
     const loadUsers = useCallback(async () => {
         try {
+            setLoading(true);
             const params: Record<string, string | number> = {};
             if (filter !== 'all') params.role = filter;
             if (searchTerm) params.search = searchTerm;
-            params.limit = 50;
+            params.limit = 100;
             const res = await api.users.list(params);
             const list = Array.isArray(res?.data) ? res.data : [];
             setUsers(list.map((u: RawUser) => ({
                 id: u._id || u.id || '',
-                name: u.name,
-                email: u.email,
-                username: u.username,
-                phone: u.phone,
+                name: u.name, email: u.email, username: u.username, phone: u.phone,
                 role: u.role,
                 isActive: (u.status || 'active') === 'active',
                 createdAt: u.createdAt,
-                boundDevices: u.boundDevices,
-                isDeviceLocked: u.isDeviceLocked,
+                boundDevices: u.boundDevices, isDeviceLocked: u.isDeviceLocked,
                 permissions: u.permissions
             })));
             setStats({
                 total: res?.pagination?.total || list.length,
                 buyers: list.filter((u: RawUser) => u.role === 'buyer').length,
                 sellers: list.filter((u: RawUser) => u.role === 'seller').length,
-                admins: list.filter((u: RawUser) => u.role === 'admin' || u.role === 'super_admin').length,
+                admins: list.filter((u: RawUser) => ['admin', 'super_admin', 'manager'].includes(u.role)).length,
                 active: list.filter((u: RawUser) => (u.status || 'active') === 'active').length,
             });
         } catch (err) {
             console.error('Failed to load users', err);
+            showToast('فشل تحميل المستخدمين', 'error');
+        } finally {
+            setLoading(false);
         }
-    }, [filter, searchTerm]);
+    }, [filter, searchTerm, showToast]);
 
-    useEffect(() => {
-        let isMounted = true;
-        const fetch = async () => {
-            if (isMounted) await loadUsers();
-        };
-        fetch();
-        return () => { isMounted = false; };
-    }, [loadUsers]);
+    useEffect(() => { loadUsers(); }, [loadUsers]);
+
+    const getRoleLabel = (role: string) => {
+        const map: Record<string, string> = { admin: 'مسؤول', super_admin: 'مسؤول عام', manager: 'مدير', buyer: 'عميل', seller: 'بائع' };
+        return map[role] || role;
+    };
+    const getRoleColor = (role: string) => {
+        if (['admin', 'super_admin', 'manager'].includes(role)) return 'bg-red-500/10 border-red-500/30 text-red-400';
+        if (role === 'seller') return 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400';
+        return 'bg-blue-500/10 border-blue-500/30 text-blue-400';
+    };
 
     return (
-        <div className="relative min-h-screen bg-black text-white font-sans overflow-hidden text-right rtl">
-            <Navbar />
-
+        <div className="relative min-h-screen bg-black text-white overflow-x-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
+            {/* Background */}
             <div className="fixed inset-0 pointer-events-none z-0">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-cinematic-neon-blue/5 via-black to-black opacity-40" />
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(0,240,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(0,240,255,0.02)_1px,transparent_1px)] bg-[size:100px_100px] opacity-20" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-blue-500/5 via-black to-black" />
+                <div className="absolute inset-0 bg-[linear-gradient(rgba(0,240,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(0,240,255,0.02)_1px,transparent_1px)] bg-[size:60px_60px]" />
             </div>
 
-            <main className="relative z-10 pt-32 pb-24 px-6 max-w-7xl mx-auto">
-                <header className="mb-16">
-                    <Link href="/admin/dashboard" className="inline-flex items-center gap-3 mb-8 px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-white/70 hover:text-white hover:bg-white/10 transition-all group w-fit">
-                        <ChevronLeft className={cn("w-5 h-5 transition-transform group-hover:-translate-x-1", isRTL && "rotate-180 group-hover:translate-x-1")} />
-                        <span className="text-[11px] font-black uppercase tracking-[0.2em]">{isRTL ? 'العودة للرئيسية' : 'BACK TO DASHBOARD'}</span>
-                    </Link>
-
-                    <div className="flex items-center gap-5 mb-8 justify-end">
-                        <span className="text-[11px] font-black uppercase tracking-[0.5em] text-cinematic-neon-blue italic">إدارة المستخدمين</span>
-                        <div className="h-[3px] w-16 bg-cinematic-neon-blue shadow-[0_0_15px_rgba(0,240,255,1)]" />
-                    </div>
-                    <h1 className="text-6xl md:text-8xl font-black tracking-tighter uppercase italic leading-[0.85] mb-6">
-                        {isRTL ? 'إدارة' : 'MANAGE'} <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/20">{isRTL ? 'المستخدمين' : 'USERS'}</span>
-                    </h1>
-                </header>
-
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-6 mb-16">
-                    {[
-                        { label: isRTL ? 'الكل' : 'TOTAL', value: stats.total, key: 'all', color: 'text-white' },
-                        { label: isRTL ? 'مشترين' : 'BUYERS', value: stats.buyers, key: 'buyer', color: 'text-cinematic-neon-blue' },
-                        { label: isRTL ? 'بائعين' : 'SELLERS', value: stats.sellers, key: 'seller', color: 'text-cinematic-neon-yellow' },
-                        { label: isRTL ? 'مسؤولين' : 'ADMINS', value: stats.admins, key: 'admin', color: 'text-cinematic-neon-red' },
-                        { label: isRTL ? 'نشط' : 'ACTIVE', value: stats.active, key: 'active', color: 'text-green-400' },
-                    ].map((stat) => (
-                        <motion.button
-                            key={stat.key}
-                            onClick={() => setFilter(stat.key)}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className={cn(
-                                "glass-card p-8 bg-white/[0.01] border-white/5 text-center transition-all",
-                                filter === stat.key && "border-cinematic-neon-blue/40 bg-cinematic-neon-blue/5 shadow-[0_0_30px_rgba(0,240,255,0.1)]"
-                            )}
+            <main className="relative z-10 pt-8 pb-16 px-4 sm:px-6 max-w-7xl mx-auto">
+                {/* Header */}
+                <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+                    <NextLink href="/admin/dashboard"
+                        className="flex items-center gap-2 px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white/50 hover:text-white hover:bg-white/10 transition-all text-xs font-black uppercase tracking-wider">
+                        <ChevronLeft className={cn('w-4 h-4', isRTL && 'rotate-180')} />
+                        {isRTL ? 'العودة' : 'Back'}
+                    </NextLink>
+                    <div className="flex items-center gap-3">
+                        <button onClick={loadUsers} className="p-2.5 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all">
+                            <RefreshCw className={cn('w-4 h-4 text-white/50', loading && 'animate-spin')} />
+                        </button>
+                        <button
+                            onClick={() => setShowAddModal(true)}
+                            className="flex items-center gap-2 px-5 py-2.5 bg-blue-500 text-white font-black uppercase tracking-wider rounded-xl hover:bg-blue-400 transition-all text-xs shadow-[0_0_20px_rgba(59,130,246,0.3)]"
                         >
-                            <div className={cn("text-4xl font-black tracking-tighter mb-3", stat.color)}>{stat.value}</div>
-                            <div className="text-[11px] font-black uppercase tracking-[0.3em] text-white/60">{stat.label}</div>
-                        </motion.button>
+                            <Plus className="w-4 h-4" />
+                            {isRTL ? 'إضافة مسؤول' : 'Add Admin'}
+                        </button>
+                    </div>
+                </div>
+
+                <div className="mb-6">
+                    <div className="flex items-center gap-2 mb-1">
+                        <div className="h-[2px] w-8 bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,1)]" />
+                        <span className="text-[9px] font-black uppercase tracking-[0.5em] text-blue-400">Admin Panel</span>
+                    </div>
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter uppercase italic">
+                        {isRTL ? 'إدارة المستخدمين' : 'USER MANAGEMENT'}
+                    </h1>
+                </div>
+
+                {/* Stats */}
+                <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-6">
+                    {[
+                        { label: 'الكل', value: stats.total, key: 'all', color: 'text-white' },
+                        { label: 'عملاء', value: stats.buyers, key: 'buyer', color: 'text-blue-400' },
+                        { label: 'بائعين', value: stats.sellers, key: 'seller', color: 'text-yellow-400' },
+                        { label: 'مسؤولين', value: stats.admins, key: 'admin', color: 'text-red-400' },
+                        { label: 'نشطون', value: stats.active, key: 'active', color: 'text-green-400' },
+                    ].map(s => (
+                        <button key={s.key} onClick={() => setFilter(s.key)}
+                            className={cn(
+                                'p-3 sm:p-4 rounded-2xl border text-center transition-all',
+                                filter === s.key ? 'bg-blue-500/10 border-blue-500/30' : 'bg-white/[0.02] border-white/5 hover:border-white/10'
+                            )}>
+                            <div className={cn('text-2xl sm:text-3xl font-black tracking-tighter', s.color)}>{s.value}</div>
+                            <div className="text-[9px] font-black uppercase tracking-wider text-white/40 mt-0.5">{s.label}</div>
+                        </button>
                     ))}
                 </div>
 
-                <div className="flex justify-start mb-8">
-                    <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => setShowAddModal(true)}
-                        className="flex items-center gap-3 px-8 py-4 bg-cinematic-neon-blue text-black font-black uppercase tracking-wider rounded-xl shadow-[0_0_30px_rgba(0,240,255,0.3)] hover:shadow-[0_0_50px_rgba(0,240,255,0.5)] transition-all"
-                    >
-                        <Plus className="w-5 h-5" />
-                        {isRTL ? 'إضافة مستخدم جديد' : 'ADD NEW USER'}
-                    </motion.button>
-                </div>
-
-                <div className="mb-8 relative">
-                    <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20" />
-                    <input
-                        type="text"
-                        placeholder={isRTL ? 'البحث عن مستخدم (الاسم، البريد، الهاتف)...' : 'SEARCH USERS...'}
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-4 pr-12 pl-4 text-sm font-bold text-white placeholder:text-white/20 focus:outline-none focus:border-cinematic-neon-blue/40 transition-all text-right"
+                {/* Search */}
+                <div className="relative mb-6">
+                    <Search className={cn('absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/25', isRTL ? 'right-4' : 'left-4')} />
+                    <input type="text" placeholder={isRTL ? 'البحث (الاسم، الإيميل، الهاتف)...' : 'Search users...'}
+                        value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
+                        className={cn('w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-blue-500/40 transition-all', isRTL ? 'pr-11 pl-4 text-right' : 'pl-11 pr-4')}
                     />
                 </div>
 
-                <div className="glass-card bg-white/[0.01] border-white/5 overflow-hidden">
+                {/* Users Table - Desktop */}
+                <div className="hidden md:block bg-white/[0.01] border border-white/5 rounded-2xl overflow-hidden">
                     <table className="w-full">
                         <thead>
-                            <tr className="border-b border-white/5">
-                                <th className="text-right p-6 text-[10px] font-black uppercase tracking-[0.3em] text-white/60">{isRTL ? 'المستخدم' : 'USER'}</th>
-                                <th className="text-right p-6 text-[10px] font-black uppercase tracking-[0.3em] text-white/60">{isRTL ? 'الدور' : 'ROLE'}</th>
-                                <th className="text-right p-6 text-[10px] font-black uppercase tracking-[0.3em] text-white/60">{isRTL ? 'الحالة' : 'STATUS'}</th>
-                                <th className="text-right p-6 text-[10px] font-black uppercase tracking-[0.3em] text-white/60">{isRTL ? 'الإجراءات' : 'ACTIONS'}</th>
+                            <tr className="border-b border-white/5 bg-white/[0.02]">
+                                <th className="p-5 text-right text-[9px] font-black uppercase tracking-widest text-white/40">المستخدم</th>
+                                <th className="p-5 text-right text-[9px] font-black uppercase tracking-widest text-white/40">الدور</th>
+                                <th className="p-5 text-right text-[9px] font-black uppercase tracking-widest text-white/40">الصلاحيات</th>
+                                <th className="p-5 text-right text-[9px] font-black uppercase tracking-widest text-white/40">الحالة</th>
+                                <th className="p-5 text-right text-[9px] font-black uppercase tracking-widest text-white/40">إجراء</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {users.map((user) => (
-                                <motion.tr
-                                    key={user.id}
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    className="border-b border-white/5 hover:bg-white/[0.02] transition-all cursor-pointer"
-                                    onClick={() => setSelectedUser(user)}
-                                >
-                                    <td className="p-6 text-right">
-                                        <div className="flex items-center gap-4 justify-start flex-row-reverse">
-                                            <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center">
-                                                <Users className="w-4 h-4 text-white/40" />
+                            {loading ? (
+                                [...Array(5)].map((_, i) => (
+                                    <tr key={i} className="border-b border-white/5">
+                                        {[1, 2, 3, 4, 5].map(k => <td key={k} className="p-5"><div className="h-4 bg-white/5 rounded animate-pulse" /></td>)}
+                                    </tr>
+                                ))
+                            ) : users.length === 0 ? (
+                                <tr><td colSpan={5} className="p-12 text-center text-white/20 text-sm">لا توجد مستخدمون</td></tr>
+                            ) : users.map(user => (
+                                <motion.tr key={user.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                                    className="border-b border-white/[0.04] hover:bg-white/[0.02] transition-all cursor-pointer"
+                                    onClick={() => setSelectedUser(user)}>
+                                    <td className="p-5">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
+                                                <Users className="w-4 h-4 text-white/30" />
                                             </div>
                                             <div>
                                                 <div className="text-sm font-bold text-white">{user.name}</div>
-                                                <div className="text-[10px] text-white/40">{user.email || user.username || user.phone}</div>
+                                                <div className="text-[10px] text-white/30">{user.email || user.username || user.phone || '—'}</div>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="p-6 text-right">
-                                        <span className={cn(
-                                            "px-3 py-1 rounded border text-[9px] font-black uppercase tracking-widest",
-                                            user.role === 'admin' ? "bg-cinematic-neon-red/10 border-cinematic-neon-red/30 text-cinematic-neon-red" :
-                                                user.role === 'seller' ? "bg-cinematic-neon-yellow/10 border-cinematic-neon-yellow/30 text-cinematic-neon-yellow" :
-                                                    "bg-cinematic-neon-blue/10 border-cinematic-neon-blue/30 text-cinematic-neon-blue"
-                                        )}>
-                                            {isRTL ? (user.role === 'admin' ? 'مسؤول' : user.role === 'seller' ? 'بائع' : 'مشتري') : user.role.toUpperCase()}
+                                    <td className="p-5">
+                                        <span className={cn('px-2.5 py-1 rounded-lg border text-[9px] font-black uppercase tracking-wider', getRoleColor(user.role))}>
+                                            {getRoleLabel(user.role)}
                                         </span>
                                     </td>
-                                    <td className="p-6 text-right">
-                                        <span className={cn("text-[9px] font-black uppercase tracking-widest", user.isActive ? "text-green-400" : "text-red-400")}>
-                                            {isRTL ? (user.isActive ? "نشط" : "غير نشط") : (user.isActive ? "ACTIVE" : "INACTIVE")}
+                                    <td className="p-5">
+                                        {['admin', 'super_admin', 'manager'].includes(user.role) ? (
+                                            <div className="flex items-center gap-1.5 flex-wrap">
+                                                <span className="text-xs text-white/40 font-bold">{user.permissions?.length || 0}</span>
+                                                <span className="text-[9px] text-white/25">صلاحية</span>
+                                                {(user.permissions?.length || 0) > 0 && (
+                                                    <div className="flex gap-1 flex-wrap">
+                                                        {(user.permissions || []).slice(0, 3).map(p => {
+                                                            const pData = ALL_SYSTEM_PERMISSIONS.find(x => x.id === p);
+                                                            const Icon = pData?.icon;
+                                                            const c = COLOR_MAP[pData?.color || 'gray'];
+                                                            return Icon ? (
+                                                                <div key={p} className={cn('w-5 h-5 rounded-md flex items-center justify-center', c?.bg)} title={pData?.label}>
+                                                                    <Icon className={cn('w-3 h-3', c?.text)} />
+                                                                </div>
+                                                            ) : null;
+                                                        })}
+                                                        {(user.permissions?.length || 0) > 3 && (
+                                                            <span className="text-[9px] text-white/30">+{(user.permissions?.length || 0) - 3}</span>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ) : <span className="text-[9px] text-white/20">—</span>}
+                                    </td>
+                                    <td className="p-5">
+                                        <span className={cn('flex items-center gap-1.5 text-[9px] font-black uppercase', user.isActive ? 'text-green-400' : 'text-red-400')}>
+                                            <span className={cn('w-1.5 h-1.5 rounded-full', user.isActive ? 'bg-green-400' : 'bg-red-400')} />
+                                            {user.isActive ? 'نشط' : 'معطل'}
                                         </span>
                                     </td>
-                                    <td className="p-6 text-right">
-                                        <button className="text-[9px] font-black uppercase tracking-widest text-white/40 hover:text-white border border-white/10 px-4 py-2 rounded hover:bg-white/5 transition-all">
-                                            {isRTL ? 'إدارة' : 'MANAGE'}
+                                    <td className="p-5">
+                                        <button className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-[9px] font-black uppercase text-white/50 hover:text-white hover:bg-white/10 transition-all">
+                                            إدارة
                                         </button>
                                     </td>
                                 </motion.tr>
@@ -242,78 +334,100 @@ export default function AdminUsersPage() {
                     </table>
                 </div>
 
-                <AnimatePresence>
-                    {showAddModal && <AddUserModal onClose={() => setShowAddModal(false)} onAdd={(u: User) => { setUsers([...users, u]); setShowAddModal(false); }} isRTL={isRTL} />}
-                    {selectedUser && <UserDetailModal user={selectedUser} onClose={() => setSelectedUser(null)} onUpdate={(updated: User) => {
-                        setUsers(users.map((u: User) => u.id === updated.id ? updated : u));
-                        setSelectedUser(null);
-                    }} isRTL={isRTL} />}
-                </AnimatePresence>
+                {/* Users Cards - Mobile */}
+                <div className="md:hidden space-y-3">
+                    {loading ? (
+                        [...Array(4)].map((_, i) => <div key={i} className="h-24 rounded-2xl bg-white/[0.02] animate-pulse border border-white/5" />)
+                    ) : users.map(user => (
+                        <motion.div key={user.id} onClick={() => setSelectedUser(user)} initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                            className="bg-white/[0.02] border border-white/8 rounded-2xl p-4 cursor-pointer hover:border-blue-500/20 transition-all">
+                            <div className="flex items-center justify-between gap-3 mb-3">
+                                <div className="flex items-center gap-3 min-w-0">
+                                    <div className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
+                                        <Users className="w-4 h-4 text-white/30" />
+                                    </div>
+                                    <div className="min-w-0">
+                                        <div className="text-sm font-black text-white truncate">{user.name}</div>
+                                        <div className="text-[10px] text-white/30 truncate">{user.email || user.phone || '—'}</div>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2 flex-shrink-0">
+                                    <span className={cn('px-2 py-1 rounded-lg border text-[8px] font-black uppercase', getRoleColor(user.role))}>{getRoleLabel(user.role)}</span>
+                                    <span className={cn('w-2 h-2 rounded-full flex-shrink-0', user.isActive ? 'bg-green-400' : 'bg-red-400')} />
+                                </div>
+                            </div>
+                            {['admin', 'super_admin', 'manager'].includes(user.role) && (
+                                <div className="flex items-center gap-2 flex-wrap">
+                                    <span className="text-[9px] text-white/25 uppercase">{user.permissions?.length || 0} صلاحية</span>
+                                    <div className="flex gap-1">
+                                        {(user.permissions || []).slice(0, 5).map(p => {
+                                            const pData = ALL_SYSTEM_PERMISSIONS.find(x => x.id === p);
+                                            const Icon = pData?.icon;
+                                            const c = COLOR_MAP[pData?.color || 'gray'];
+                                            return Icon ? (
+                                                <div key={p} className={cn('w-4 h-4 rounded flex items-center justify-center', c?.bg)} title={pData?.label}>
+                                                    <Icon className={cn('w-2.5 h-2.5', c?.text)} />
+                                                </div>
+                                            ) : null;
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+                        </motion.div>
+                    ))}
+                    {!loading && users.length === 0 && (
+                        <div className="text-center py-16 text-white/20 text-sm">لا توجد مستخدمون</div>
+                    )}
+                </div>
             </main>
+
+            <AnimatePresence>
+                {showAddModal && (
+                    <AddUserModal
+                        onClose={() => setShowAddModal(false)}
+                        onAdd={(u: User) => { setUsers(prev => [u, ...prev]); setShowAddModal(false); showToast('✅ تم إنشاء الحساب بنجاح', 'success'); }}
+                        isRTL={isRTL}
+                    />
+                )}
+                {selectedUser && (
+                    <UserDetailModal
+                        user={selectedUser}
+                        onClose={() => setSelectedUser(null)}
+                        onUpdate={(updated: User) => {
+                            setUsers(prev => prev.map(u => u.id === updated.id ? updated : u));
+                            setSelectedUser(null);
+                            showToast('✅ تم حفظ التغييرات', 'success');
+                        }}
+                        onDelete={(id: string) => {
+                            setUsers(prev => prev.filter(u => u.id !== id));
+                            setSelectedUser(null);
+                            showToast('🗑️ تم حذف المستخدم', 'success');
+                        }}
+                        isRTL={isRTL}
+                    />
+                )}
+            </AnimatePresence>
         </div>
     );
 }
 
-function AddUserModal({ onClose, onAdd, isRTL }: { onClose: () => void, onAdd: (u: User) => void, isRTL: boolean }) {
-    // حقول النموذج المطلوبة فقط: الاسم + الإيميل + كلمة المرور
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        password: '',
-        role: 'admin',
-        permissions: [] as string[]
-    });
+// ── Modal إضافة مستخدم ──
+function AddUserModal({ onClose, onAdd, isRTL }: { onClose: () => void; onAdd: (u: User) => void; isRTL: boolean }) {
+    const [formData, setFormData] = useState({ name: '', email: '', password: '', role: 'admin', permissions: [] as string[] });
     const [showPass, setShowPass] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-    // قائمة الصلاحيات الكاملة
-    const allPermissions = [
-        { id: 'manage_cars', label: '🚗 إدارة السيارات', desc: 'إضافة وتعديل وحذف السيارات' },
-        { id: 'manage_parts', label: '🔧 إدارة قطع الغيار', desc: 'إضافة وتعديل وحذف القطع' },
-        { id: 'manage_auctions', label: '🔨 إدارة المزادات', desc: 'إنشاء وإدارة المزادات' },
-        { id: 'manage_users', label: '👥 إدارة المستخدمين', desc: 'عرض وتعديل وحذف المستخدمين' },
-        { id: 'manage_settings', label: '⚙️ إعدادات النظام', desc: 'تغيير كلمات المرور والإعدادات' },
-        { id: 'manage_content', label: '📝 إدارة المحتوى', desc: 'الصفحة الرئيسية والمحتوى' },
-        { id: 'manage_footer', label: '🔗 إدارة الروابط', desc: 'روابط التواصل الاجتماعي' },
-        { id: 'manage_whatsapp', label: '💬 إدارة واتساب', desc: 'رقم واتساب التواصل' },
-        { id: 'manage_concierge', label: '🎯 إدارة الطلبات', desc: 'طلبات العملاء الخاصة' },
-        { id: 'view_analytics', label: '📊 عرض الإحصائيات', desc: 'تقارير وإحصائيات النظام' },
-        { id: 'manage_orders', label: '📦 إدارة الطلبيات', desc: 'متابعة وتحديث الطلبيات' },
-    ];
-
-    // تبديل صلاحية واحدة
-    const togglePerm = (id: string) => {
-        setFormData(prev => ({
-            ...prev,
-            permissions: prev.permissions.includes(id)
-                ? prev.permissions.filter(x => x !== id)
-                : [...prev.permissions, id]
-        }));
-    };
-
-    // تحديد / إلغاء تحديد الكل
-    const toggleAll = () => {
-        const allIds = allPermissions.map(p => p.id);
-        const allSelected = allIds.every(id => formData.permissions.includes(id));
-        setFormData(prev => ({
-            ...prev,
-            permissions: allSelected ? [] : allIds
-        }));
-    };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
-
-        // تحقق بسيط
-        if (!formData.name.trim()) { setError(isRTL ? 'الاسم مطلوب' : 'Name is required'); return; }
-        if (!formData.email.trim()) { setError(isRTL ? 'الإيميل مطلوب' : 'Email is required'); return; }
-        if (!formData.password || formData.password.length < 6) { setError(isRTL ? 'كلمة المرور 6 أحرف على الأقل' : 'Password must be at least 6 chars'); return; }
-
+        if (!formData.name.trim()) { setError('الاسم مطلوب'); return; }
+        if (!formData.email.trim()) { setError('البريد الإلكتروني مطلوب'); return; }
+        if (!formData.password || formData.password.length < 6) { setError('كلمة المرور 6 أحرف على الأقل'); return; }
+        if (formData.role === 'admin' && formData.permissions.length === 0) { setError('يجب تحديد صلاحية واحدة على الأقل'); return; }
         try {
             setLoading(true);
-            const payload = {
+            const res = await api.users.create({
                 name: formData.name.trim(),
                 email: formData.email.trim().toLowerCase(),
                 password: formData.password,
@@ -321,204 +435,107 @@ function AddUserModal({ onClose, onAdd, isRTL }: { onClose: () => void, onAdd: (
                 permissions: formData.role === 'admin' ? formData.permissions : [],
                 status: 'active',
                 createdVia: 'admin-created'
-            };
-            const res = await api.users.create(payload);
-            if (res.success) {
-                onAdd(res.data);
-            } else {
-                setError(res.message || (isRTL ? 'فشل إنشاء الحساب' : 'Failed to create account'));
-            }
+            });
+            if (res.success) { onAdd(res.data); }
+            else { setError(res.message || 'فشل إنشاء الحساب'); }
         } catch (err: unknown) {
-            const errMsg = err instanceof Error ? err.message : '';
-            setError(errMsg || (isRTL ? 'فشل إنشاء الحساب، تحقق أن الإيميل غير مستخدم' : 'Failed to create account'));
-        } finally {
-            setLoading(false);
-        }
+            setError(err instanceof Error ? err.message : 'فشل إنشاء الحساب');
+        } finally { setLoading(false); }
     };
 
-    const allSelected = allPermissions.every(p => formData.permissions.includes(p.id));
-
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-            <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                className="bg-[#0a0a0a] border border-white/10 p-0 rounded-3xl max-w-2xl w-full max-h-[92vh] overflow-hidden flex flex-col text-right"
-            >
-                {/* رأس النموذج */}
-                <div className="p-6 border-b border-white/10 bg-white/[0.02] flex items-center justify-between flex-row-reverse">
-                    <h2 className="text-xl font-black uppercase text-white">
-                        {isRTL ? '➕ إضافة مسؤول جديد' : 'ADD NEW ADMIN'}
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/90 backdrop-blur-md" dir={isRTL ? 'rtl' : 'ltr'}>
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+                className="bg-[#080808] border border-white/10 rounded-3xl w-full max-w-xl max-h-[95vh] flex flex-col overflow-hidden">
+                {/* Header */}
+                <div className="flex items-center justify-between p-5 border-b border-white/8 flex-shrink-0">
+                    <h2 className="text-lg font-black uppercase text-white flex items-center gap-2">
+                        <Plus className="w-5 h-5 text-blue-400" />
+                        {isRTL ? 'إضافة مسؤول جديد' : 'Add New Admin'}
                     </h2>
-                    <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full text-white/60 hover:text-white transition-all">✕</button>
+                    <button onClick={onClose} title="إغلاق" className="w-8 h-8 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center hover:bg-white/10 transition-all">
+                        <X className="w-4 h-4 text-white/50" />
+                    </button>
                 </div>
 
-                <div className="overflow-y-auto flex-1 p-6">
+                {/* Body */}
+                <div className="overflow-y-auto flex-1 p-5">
                     <form onSubmit={handleSubmit} className="space-y-5">
-
-                        {/* رسالة الخطأ */}
                         {error && (
-                            <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm font-bold">
+                            <div className="p-3.5 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm font-bold">
                                 ⚠️ {error}
                             </div>
                         )}
 
-                        {/* ── الحقول الأساسية الثلاثة فقط ── */}
-                        <div className="space-y-4">
-                            <h3 className="text-xs font-black text-white/40 uppercase tracking-widest border-b border-white/5 pb-2">
-                                {isRTL ? 'المعلومات الأساسية (مطلوبة)' : 'Required Information'}
-                            </h3>
-
-                            {/* الاسم الكامل */}
-                            <div className="space-y-1">
-                                <label className="text-[10px] font-black text-white/50 uppercase tracking-widest block">
-                                    {isRTL ? 'الاسم الكامل *' : 'Full Name *'}
-                                </label>
-                                <input
-                                    required
-                                    type="text"
-                                    placeholder={isRTL ? 'مثال: محمد أحمد العمري' : 'e.g. John Smith'}
-                                    className="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white placeholder:text-white/20 text-right focus:border-[#c9a96e]/50 outline-none transition-all"
-                                    value={formData.name}
-                                    onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                />
-                            </div>
-
-                            {/* الإيميل */}
-                            <div className="space-y-1">
-                                <label className="text-[10px] font-black text-white/50 uppercase tracking-widest block">
-                                    {isRTL ? 'البريد الإلكتروني (للدخول) *' : 'Email (for login) *'}
-                                </label>
-                                <input
-                                    required
-                                    type="email"
-                                    placeholder="admin@example.com"
-                                    className="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white placeholder:text-white/20 text-left focus:border-[#c9a96e]/50 outline-none transition-all"
-                                    value={formData.email}
-                                    onChange={e => setFormData({ ...formData, email: e.target.value })}
-                                />
-                            </div>
-
-                            {/* كلمة المرور */}
-                            <div className="space-y-1">
-                                <label className="text-[10px] font-black text-white/50 uppercase tracking-widest block">
-                                    {isRTL ? 'كلمة المرور *' : 'Password *'}
-                                </label>
-                                <div className="relative">
-                                    <input
-                                        required
-                                        type={showPass ? 'text' : 'password'}
-                                        placeholder="••••••••"
-                                        minLength={6}
-                                        className="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white placeholder:text-white/20 text-left focus:border-[#c9a96e]/50 outline-none transition-all pl-10"
-                                        value={formData.password}
-                                        onChange={e => setFormData({ ...formData, password: e.target.value })}
+                        {/* الحقول الأساسية */}
+                        <div className="space-y-3">
+                            <h3 className="text-[9px] font-black uppercase tracking-widest text-white/30 border-b border-white/5 pb-2">المعلومات الأساسية</h3>
+                            {[
+                                { key: 'name', label: 'الاسم الكامل *', placeholder: 'مثال: محمد العمري', type: 'text' },
+                                { key: 'email', label: 'البريد الإلكتروني *', placeholder: 'admin@example.com', type: 'email' },
+                            ].map(field => (
+                                <div key={field.key}>
+                                    <label className="text-[9px] font-black text-white/40 uppercase tracking-widest block mb-1.5">{field.label}</label>
+                                    <input required type={field.type} placeholder={field.placeholder}
+                                        className="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white text-sm placeholder:text-white/20 focus:border-blue-500/50 outline-none transition-all"
+                                        value={formData[field.key as 'name' | 'email']}
+                                        onChange={e => setFormData({ ...formData, [field.key]: e.target.value })}
                                     />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPass(!showPass)}
-                                        className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors"
-                                    >
+                                </div>
+                            ))}
+                            {/* كلمة المرور */}
+                            <div>
+                                <label className="text-[9px] font-black text-white/40 uppercase tracking-widest block mb-1.5">كلمة المرور *</label>
+                                <div className="relative">
+                                    <input required type={showPass ? 'text' : 'password'} placeholder="••••••••" minLength={6}
+                                        className="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white placeholder:text-white/20 focus:border-blue-500/50 outline-none transition-all pr-10"
+                                        value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })}
+                                    />
+                                    <button type="button" onClick={() => setShowPass(!showPass)}
+                                        className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors">
                                         {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                     </button>
                                 </div>
                             </div>
-
-                            {/* نوع الحساب */}
-                            <div className="space-y-1">
-                                <label className="text-[10px] font-black text-white/50 uppercase tracking-widest block">
-                                    {isRTL ? 'نوع الحساب' : 'Account Type'}
-                                </label>
+                            {/* الدور */}
+                            <div>
+                                <label className="text-[9px] font-black text-white/40 uppercase tracking-widest block mb-1.5">نوع الحساب</label>
                                 <div className="relative">
-                                    <select
-                                        title={isRTL ? 'نوع الحساب' : 'Account Type'}
-                                        value={formData.role}
-                                        onChange={e => setFormData({ ...formData, role: e.target.value })}
-                                    >
-                                        <option value="admin" className="bg-zinc-900 text-white">{isRTL ? '🛡️ مسؤول (Admin)' : '🛡️ Admin'}</option>
-                                        <option value="buyer" className="bg-zinc-900 text-white">{isRTL ? '👤 عميل / مشتري' : '👤 Buyer / Client'}</option>
+                                    <select value={formData.role} onChange={e => setFormData({ ...formData, role: e.target.value })}
+                                        title="نوع الحساب"
+                                        className="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white focus:border-blue-500/50 outline-none transition-all appearance-none cursor-pointer">
+                                        <option value="admin" className="bg-zinc-900">🛡️ مسؤول (Admin)</option>
+                                        <option value="manager" className="bg-zinc-900">👔 مدير (Manager)</option>
+                                        <option value="buyer" className="bg-zinc-900">👤 عميل</option>
                                     </select>
                                     <ChevronDown className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none" />
                                 </div>
                             </div>
                         </div>
 
-                        {/* ── صلاحيات المسؤول (تظهر فقط إذا الدور admin) ── */}
-                        {formData.role === 'admin' && (
-                            <div className="space-y-3 border-t border-white/10 pt-5">
-                                <div className="flex items-center justify-between flex-row-reverse">
-                                    <h3 className="text-xs font-black text-[#c9a96e] uppercase tracking-widest flex items-center gap-2">
-                                        <Shield className="w-4 h-4" />
-                                        {isRTL ? 'صلاحيات الوصول' : 'Access Permissions'}
-                                    </h3>
-                                    {/* زر تحديد الكل / إلغاء الكل */}
-                                    <button
-                                        type="button"
-                                        onClick={toggleAll}
-                                        className={`text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-lg border transition-all ${allSelected
-                                            ? 'border-red-500/40 text-red-400 hover:bg-red-500/10'
-                                            : 'border-[#c9a96e]/40 text-[#c9a96e] hover:bg-[#c9a96e]/10'
-                                            }`}
-                                    >
-                                        {allSelected
-                                            ? (isRTL ? 'إلغاء الكل' : 'Deselect All')
-                                            : (isRTL ? 'تحديد الكل' : 'Select All')
-                                        }
-                                    </button>
+                        {/* الصلاحيات */}
+                        {['admin', 'manager'].includes(formData.role) && (
+                            <div className="space-y-3 border-t border-white/8 pt-5">
+                                <div className="flex items-center gap-2">
+                                    <Shield className="w-4 h-4 text-blue-400" />
+                                    <h3 className="text-[9px] font-black uppercase tracking-widest text-blue-400">صلاحيات النظام الكاملة</h3>
                                 </div>
-
-                                <div className="grid grid-cols-1 gap-2">
-                                    {allPermissions.map(perm => (
-                                        <div
-                                            key={perm.id}
-                                            onClick={() => togglePerm(perm.id)}
-                                            className={`p-3 border rounded-xl cursor-pointer flex items-center justify-between transition-all ${formData.permissions.includes(perm.id)
-                                                ? 'bg-[#c9a96e]/10 border-[#c9a96e]/60 text-white'
-                                                : 'border-white/5 text-white/40 hover:border-white/20 hover:text-white/70'
-                                                }`}
-                                        >
-                                            <div className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all ${formData.permissions.includes(perm.id)
-                                                ? 'bg-[#c9a96e] border-[#c9a96e]'
-                                                : 'border-white/30'
-                                                }`}>
-                                                {formData.permissions.includes(perm.id) && (
-                                                    <svg className="w-2.5 h-2.5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                                    </svg>
-                                                )}
-                                            </div>
-                                            <div className="text-right flex-1 mr-3">
-                                                <div className="text-sm font-bold">{perm.label}</div>
-                                                <div className="text-[10px] opacity-60">{perm.desc}</div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-
-                                <p className="text-[10px] text-white/30 text-center">
-                                    {isRTL
-                                        ? `تم تحديد ${formData.permissions.length} من ${allPermissions.length} صلاحية`
-                                        : `${formData.permissions.length} of ${allPermissions.length} permissions selected`
-                                    }
-                                </p>
+                                <PermissionsGrid
+                                    permissions={formData.permissions}
+                                    onChange={p => setFormData({ ...formData, permissions: p })}
+                                />
                             </div>
                         )}
 
-                        {/* أزرار الإجراء */}
+                        {/* أزرار */}
                         <div className="flex gap-3 pt-2">
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className="flex-1 py-4 bg-[#c9a96e] text-black font-black uppercase tracking-wider rounded-xl hover:bg-[#d4b57d] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {loading ? (isRTL ? '⏳ جاري الإنشاء...' : 'Creating...') : (isRTL ? '✅ إنشاء الحساب' : 'Create Account')}
+                            <button type="submit" disabled={loading}
+                                className="flex-1 py-3.5 bg-blue-500 text-white font-black uppercase tracking-wider rounded-xl hover:bg-blue-400 transition-all disabled:opacity-50 text-sm shadow-[0_0_20px_rgba(59,130,246,0.3)]">
+                                {loading ? '⏳ جاري الإنشاء...' : '✅ إنشاء الحساب'}
                             </button>
-                            <button
-                                type="button"
-                                onClick={onClose}
-                                className="flex-1 py-4 border border-white/10 hover:bg-white/5 text-white/60 font-black uppercase tracking-wider rounded-xl transition-all"
-                            >
-                                {isRTL ? 'إلغاء' : 'Cancel'}
+                            <button type="button" onClick={onClose}
+                                className="flex-1 py-3.5 border border-white/10 text-white/50 font-black uppercase tracking-wider rounded-xl hover:bg-white/5 transition-all text-sm">
+                                إلغاء
                             </button>
                         </div>
                     </form>
@@ -528,202 +545,184 @@ function AddUserModal({ onClose, onAdd, isRTL }: { onClose: () => void, onAdd: (
     );
 }
 
-function UserDetailModal({ user, onClose, onUpdate, isRTL }: { user: User, onClose: () => void, onUpdate: (u: User) => void, isRTL: boolean }) {
+// ── Modal تفاصيل وتعديل المستخدم ──
+function UserDetailModal({ user, onClose, onUpdate, onDelete, isRTL }: {
+    user: User; onClose: () => void; onUpdate: (u: User) => void; onDelete: (id: string) => void; isRTL: boolean;
+}) {
     const [editData, setEditData] = useState({
-        name: user.name,
-        email: user.email || '',
-        username: user.username || '',
-        phone: user.phone || '',
-        password: '',
-        role: user.role,
-        isActive: user.isActive
+        name: user.name, email: user.email || '', username: user.username || '',
+        phone: user.phone || '', password: '', role: user.role, isActive: user.isActive
     });
+    const [permissions, setPermissions] = useState<string[]>(user.permissions || []);
     const [devices, setDevices] = useState<Device[]>(user.boundDevices || []);
     const [isDeviceLocked, setIsDeviceLocked] = useState(user.isDeviceLocked ?? true);
-    const [permissions, setPermissions] = useState(user.permissions || []);
     const [loading, setLoading] = useState(false);
     const [showPass, setShowPass] = useState(false);
-
-    const toggleDevice = (id: string) => {
-        setDevices(devices.map((d: Device) => d.deviceId === id ? { ...d, isActive: !d.isActive } : d));
-    };
-
-    const togglePermission = (perm: string) => {
-        setPermissions(permissions.includes(perm) ? permissions.filter((p: string) => p !== perm) : [...permissions, perm]);
-    };
+    const [activeTab, setActiveTab] = useState<'info' | 'perms' | 'devices'>('info');
 
     const handleSave = async () => {
         try {
             setLoading(true);
-            const updatePayload: any = {
-                ...editData,
-                boundDevices: devices,
-                isDeviceLocked,
-                permissions,
-                status: editData.isActive ? 'active' : 'inactive'
+            const payload: Record<string, unknown> = {
+                name: editData.name, email: editData.email, username: editData.username,
+                phone: editData.phone, role: editData.role,
+                status: editData.isActive ? 'active' : 'suspended',
+                permissions: ['admin', 'manager'].includes(editData.role) ? permissions : [],
+                boundDevices: devices, isDeviceLocked,
             };
-            if (!editData.password) delete updatePayload.password;
-
-            const res = await api.users.update(user.id, updatePayload);
-            if (res.success) {
-                onUpdate(res.data);
-            }
-        } catch (err) {
-            console.error('Failed to update user', err);
-            alert(isRTL ? 'فشل تحديث المستخدم' : 'Failed to update user');
-        } finally {
-            setLoading(false);
-        }
+            if (editData.password) payload.password = editData.password;
+            const res = await api.users.update(user.id, payload);
+            if (res.success) { onUpdate({ ...user, ...res.data, id: user.id }); }
+        } catch { alert('فشل تحديث المستخدم'); }
+        finally { setLoading(false); }
     };
 
-    const permissionsList = [
-        { id: 'manage_cars', label: isRTL ? 'السيارات' : 'Cars' },
-        { id: 'manage_auctions', label: isRTL ? 'المزادات' : 'Auctions' },
-        { id: 'manage_users', label: isRTL ? 'المستخدمين' : 'Users' },
-        { id: 'manage_settings', label: isRTL ? 'الإعدادات' : 'Settings' },
-        { id: 'manage_concierge', label: isRTL ? 'الكونسيرج' : 'Concierge' },
-        { id: 'manage_parts', label: isRTL ? 'قطع الغيار' : 'Parts' },
-        { id: 'view_analytics', label: isRTL ? 'التحليلات' : 'Analytics' },
+    const handleDelete = async () => {
+        if (!confirm(`حذف "${user.name}"? لا يمكن التراجع.`)) return;
+        try {
+            await api.users.delete(user.id);
+            onDelete(user.id);
+        } catch { alert('فشل الحذف'); }
+    };
+
+    const tabs = [
+        { id: 'info', label: 'المعلومات' },
+        ...(['admin', 'manager'].includes(editData.role) ? [{ id: 'perms', label: `الصلاحيات (${permissions.length})` }] : []),
+        ...(editData.role === 'buyer' ? [{ id: 'devices', label: 'الأجهزة' }] : []),
     ];
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/90 backdrop-blur-xl">
-            <motion.div initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="bg-black border border-white/10 p-0 rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col text-right">
-                <div className="p-8 border-b border-white/10 flex justify-between items-start bg-white/[0.02] flex-row-reverse">
-                    <div className="text-right">
-                        <h2 className="text-3xl font-black uppercase italic text-white mb-2">{editData.name}</h2>
-                        <div className="flex gap-3 justify-end items-center">
-                            <span className="text-white/40 text-xs">{editData.email || editData.username || editData.phone}</span>
-                            <span className="px-2 py-1 bg-white/10 rounded text-[9px] font-bold uppercase tracking-widest">
-                                {isRTL ? (editData.role === 'admin' ? 'مسؤول' : editData.role === 'seller' ? 'بائع' : 'مشتري') : editData.role}
-                            </span>
-                        </div>
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/90 backdrop-blur-md" dir={isRTL ? 'rtl' : 'ltr'}>
+            <motion.div initial={{ y: 60, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
+                className="bg-[#080808] border border-white/10 rounded-t-3xl sm:rounded-3xl w-full sm:max-w-2xl max-h-[95vh] flex flex-col overflow-hidden">
+                {/* Header */}
+                <div className="flex items-center justify-between p-5 border-b border-white/8 flex-shrink-0">
+                    <div>
+                        <div className="text-lg font-black text-white">{user.name}</div>
+                        <div className="text-[10px] text-white/30">{user.email || user.phone || '—'}</div>
                     </div>
-                    <button onClick={onClose} aria-label="Close" title="إغلاق" className="p-2 hover:bg-white/10 rounded-full"><ChevronLeft className="w-6 h-6 rotate-180" /></button>
+                    <div className="flex items-center gap-2">
+                        <button onClick={handleDelete} title="حذف" className="w-8 h-8 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl flex items-center justify-center hover:bg-red-500/20 transition-all">
+                            <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                        <button onClick={onClose} title="إغلاق" className="w-8 h-8 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center hover:bg-white/10 transition-all">
+                            <X className="w-4 h-4 text-white/50" />
+                        </button>
+                    </div>
                 </div>
 
-                <div className="p-8 overflow-y-auto space-y-8 flex-1">
+                {/* Tabs */}
+                <div className="flex border-b border-white/8 flex-shrink-0">
+                    {tabs.map(tab => (
+                        <button key={tab.id} onClick={() => setActiveTab(tab.id as typeof activeTab)}
+                            className={cn('flex-1 py-3 text-[10px] font-black uppercase tracking-wider transition-all',
+                                activeTab === tab.id ? 'text-blue-400 border-b-2 border-blue-500' : 'text-white/30 hover:text-white/60')}>
+                            {tab.label}
+                        </button>
+                    ))}
+                </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Body */}
+                <div className="overflow-y-auto flex-1 p-5">
+                    {/* Tab: المعلومات */}
+                    {activeTab === 'info' && (
                         <div className="space-y-4">
-                            <h3 className="text-sm font-bold text-white/40 uppercase tracking-widest">{isRTL ? 'المعلومات الأساسية' : 'Basic Info'}</h3>
-                            <div className="space-y-3">
-                                <div>
-                                    <label className="text-[9px] font-black text-white/40 uppercase mb-1 block">{isRTL ? 'الاسم' : 'Name'}</label>
-                                    <input title={isRTL ? 'الاسم' : 'Name'} placeholder={isRTL ? 'الاسم' : 'Name'} className="w-full bg-white/5 border border-white/10 p-3 rounded-lg text-white text-right"
-                                        value={editData.name} onChange={e => setEditData({ ...editData, name: e.target.value })} />
+                            {[
+                                { key: 'name', label: 'الاسم', placeholder: 'الاسم الكامل' },
+                                { key: 'email', label: 'البريد الإلكتروني', placeholder: 'email@...' },
+                                { key: 'username', label: 'اسم المستخدم', placeholder: 'username' },
+                                { key: 'phone', label: 'رقم الهاتف', placeholder: '+966...' },
+                            ].map(f => (
+                                <div key={f.key}>
+                                    <label className="text-[9px] font-black text-white/30 uppercase tracking-widest block mb-1.5">{f.label}</label>
+                                    <input type="text" placeholder={f.placeholder}
+                                        className="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white text-sm placeholder:text-white/20 focus:border-blue-500/40 outline-none transition-all"
+                                        value={editData[f.key as keyof typeof editData] as string}
+                                        onChange={e => setEditData({ ...editData, [f.key]: e.target.value })} />
                                 </div>
-                                <div>
-                                    <label className="text-[9px] font-black text-white/40 uppercase mb-1 block">{isRTL ? 'اسم المستخدم' : 'Username'}</label>
-                                    <input title={isRTL ? 'اسم المستخدم' : 'Username'} placeholder={isRTL ? 'اسم المستخدم' : 'Username'} className="w-full bg-white/5 border border-white/10 p-3 rounded-lg text-white text-right"
-                                        value={editData.username} onChange={e => setEditData({ ...editData, username: e.target.value })} />
+                            ))}
+                            {/* الدور */}
+                            <div>
+                                <label className="text-[9px] font-black text-white/30 uppercase tracking-widest block mb-1.5">الدور</label>
+                                <div className="relative">
+                                    <select value={editData.role} onChange={e => setEditData({ ...editData, role: e.target.value })} title="الدور"
+                                        className="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white focus:border-blue-500/40 outline-none transition-all appearance-none cursor-pointer">
+                                        <option value="admin" className="bg-zinc-900">🛡️ مسؤول</option>
+                                        <option value="manager" className="bg-zinc-900">👔 مدير</option>
+                                        <option value="buyer" className="bg-zinc-900">👤 عميل</option>
+                                        <option value="seller" className="bg-zinc-900">💼 بائع</option>
+                                    </select>
+                                    <ChevronDown className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none" />
                                 </div>
-                                <div>
-                                    <label className="text-[9px] font-black text-white/40 uppercase mb-1 block">{isRTL ? 'البريد الإلكتروني' : 'Email'}</label>
-                                    <input title={isRTL ? 'البريد الإلكتروني' : 'Email'} placeholder={isRTL ? 'البريد الإلكتروني' : 'Email'} className="w-full bg-white/5 border border-white/10 p-3 rounded-lg text-white text-right"
-                                        value={editData.email} onChange={e => setEditData({ ...editData, email: e.target.value })} />
+                            </div>
+                            {/* كلمة المرور */}
+                            <div>
+                                <label className="text-[9px] font-black text-white/30 uppercase tracking-widest block mb-1.5">كلمة مرور جديدة (اتركها فارغة للإبقاء)</label>
+                                <div className="relative">
+                                    <input type={showPass ? 'text' : 'password'} placeholder="••••••"
+                                        className="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white placeholder:text-white/20 focus:border-blue-500/40 outline-none transition-all pr-10"
+                                        value={editData.password} onChange={e => setEditData({ ...editData, password: e.target.value })} />
+                                    <button type="button" onClick={() => setShowPass(!showPass)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors">
+                                        {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                    </button>
                                 </div>
-                                <div>
-                                    <label className="text-[9px] font-black text-white/40 uppercase mb-1 block">{isRTL ? 'رقم الهاتف' : 'Phone'}</label>
-                                    <input title={isRTL ? 'رقم الهاتف' : 'Phone'} placeholder={isRTL ? 'رقم الهاتف' : 'Phone'} className="w-full bg-white/5 border border-white/10 p-3 rounded-lg text-white text-right"
-                                        value={editData.phone} onChange={e => setEditData({ ...editData, phone: e.target.value })} />
+                            </div>
+                            {/* حالة الحساب */}
+                            <div className="flex items-center justify-between bg-white/[0.02] border border-white/8 p-4 rounded-xl">
+                                <span className="text-sm font-bold text-white">حالة الحساب</span>
+                                <div onClick={() => setEditData({ ...editData, isActive: !editData.isActive })}
+                                    className={cn('w-12 h-6 rounded-full relative cursor-pointer transition-colors', editData.isActive ? 'bg-green-500' : 'bg-white/10')}>
+                                    <div className={cn('absolute top-1 w-4 h-4 bg-white rounded-full transition-all shadow', editData.isActive ? 'right-1' : 'right-7')} />
                                 </div>
-                                <div>
-                                    <label className="text-[9px] font-black text-white/40 uppercase mb-1 block">{isRTL ? 'نوع الحساب (الدور)' : 'Role'}</label>
-                                    <div className="relative">
-                                        <select title={isRTL ? 'نوع الحساب' : 'Role'} className="w-full bg-white/10 border border-white/10 p-3 rounded-lg text-white text-right appearance-none cursor-pointer focus:border-cinematic-neon-blue/40 outline-none transition-all"
-                                            value={editData.role} onChange={e => setEditData({ ...editData, role: e.target.value })}>
-                                            <option value="buyer" className="bg-zinc-900 text-white">{isRTL ? 'مشتري / عميل' : 'Buyer / Client'}</option>
-                                            <option value="admin" className="bg-zinc-900 text-white">{isRTL ? 'مسؤول / موظف' : 'Admin / Staff'}</option>
-                                            <option value="seller" className="bg-zinc-900 text-white">{isRTL ? 'بائع' : 'Seller'}</option>
-                                        </select>
-                                        <ChevronDown className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none" />
-                                    </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Tab: الصلاحيات */}
+                    {activeTab === 'perms' && (
+                        <PermissionsGrid permissions={permissions} onChange={setPermissions} />
+                    )}
+
+                    {/* Tab: الأجهزة */}
+                    {activeTab === 'devices' && (
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between bg-white/[0.02] border border-white/8 p-4 rounded-xl">
+                                <span className="text-sm font-bold text-white">قفل على الأجهزة المرتبطة</span>
+                                <div onClick={() => setIsDeviceLocked(!isDeviceLocked)}
+                                    className={cn('w-12 h-6 rounded-full relative cursor-pointer transition-colors', isDeviceLocked ? 'bg-blue-500' : 'bg-white/10')}>
+                                    <div className={cn('absolute top-1 w-4 h-4 bg-white rounded-full transition-all shadow', isDeviceLocked ? 'right-1' : 'right-7')} />
                                 </div>
-                                <div>
-                                    <label className="text-[9px] font-black text-white/40 uppercase mb-1 block">{isRTL ? 'كلمة مرور جديدة (اتركها فارغة لعدم التغيير)' : 'Reset Password'}</label>
-                                    <div className="relative">
-                                        <input type={showPass ? "text" : "password"} placeholder="••••••" className="w-full bg-white/5 border border-white/10 p-3 rounded-lg text-white text-right pr-10"
-                                            value={editData.password} onChange={e => setEditData({ ...editData, password: e.target.value })} />
-                                        <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors">
-                                            {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </div>
+                            <div className="space-y-2">
+                                {devices.map(dev => (
+                                    <div key={dev.deviceId} className="flex items-center justify-between gap-3 bg-white/[0.02] border border-white/8 p-4 rounded-xl">
+                                        <div>
+                                            <div className="text-sm font-bold text-white">{dev.browser} على {dev.os}</div>
+                                            <div className="text-[10px] text-white/30 font-mono">IP: {dev.ip}</div>
+                                        </div>
+                                        <button onClick={() => setDevices(d => d.map(x => x.deviceId === dev.deviceId ? { ...x, isActive: !x.isActive } : x))}
+                                            className={cn('px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-wider transition-all',
+                                                dev.isActive ? 'bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20' : 'bg-green-500/10 text-green-400 border border-green-500/20 hover:bg-green-500/20')}>
+                                            {dev.isActive ? 'حظر' : 'رفع الحظر'}
                                         </button>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="space-y-6">
-                            <h3 className="text-sm font-bold text-white/40 uppercase tracking-widest">{isRTL ? 'الحالة والأمان' : 'Status & Security'}</h3>
-                            <div className="flex justify-between items-center bg-white/5 p-4 rounded-xl flex-row-reverse">
-                                <span className="text-sm font-bold text-white">{isRTL ? 'حالة الحساب' : 'Account Status'}</span>
-                                <div onClick={() => setEditData({ ...editData, isActive: !editData.isActive })} className={cn("w-14 h-7 rounded-full relative cursor-pointer transition-colors", editData.isActive ? "bg-green-500" : "bg-red-500/20")}>
-                                    <div className={cn("absolute top-1 w-5 h-5 bg-white rounded-full transition-all shadow-lg", editData.isActive ? "right-1" : "right-8")} />
-                                </div>
-                            </div>
-
-                            {editData.role === 'buyer' && (
-                                <div className="space-y-4">
-                                    <div className="flex justify-between items-center flex-row-reverse border-t border-white/5 pt-4">
-                                        <h3 className="text-sm font-bold text-cinematic-neon-blue uppercase tracking-widest flex items-center gap-2 flex-row-reverse">
-                                            <Shield className="w-4 h-4" /> {isRTL ? 'أمان الأجهزة' : 'Device Security'}
-                                        </h3>
-                                        <div className="flex items-center gap-3 flex-row-reverse">
-                                            <span className="text-[10px] font-bold text-white/40 uppercase">{isRTL ? 'قفل على الأجهزة المرتبطة' : 'Lock to Devices'}</span>
-                                            <div onClick={() => setIsDeviceLocked(!isDeviceLocked)} className={cn("w-10 h-5 rounded-full relative cursor-pointer transition-colors", isDeviceLocked ? "bg-cinematic-neon-blue" : "bg-white/10")}>
-                                                <div className={cn("absolute top-1 w-3 h-3 bg-black rounded-full transition-all", isDeviceLocked ? "right-1" : "right-6")} />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
-                                        {devices.map((dev) => (
-                                            <div key={dev.deviceId} className="p-4 border-b border-white/5 last:border-0 flex justify-between items-center hover:bg-white/5 transition-colors flex-row-reverse">
-                                                <div className="text-right">
-                                                    <div className="text-sm font-bold text-white mb-1">{dev.browser} {isRTL ? 'على' : 'on'} {dev.os}</div>
-                                                    <div className="text-[10px] text-white/40 font-mono">IP: {dev.ip}</div>
-                                                </div>
-                                                <div className="flex items-center gap-4 flex-row-reverse">
-                                                    <span className={cn("text-[8px] font-black uppercase tracking-widest", dev.isActive ? "text-green-500" : "text-red-500")}>
-                                                        {isRTL ? (dev.isActive ? 'موثوق' : 'محظور') : (dev.isActive ? "Trusted" : "Blocked")}
-                                                    </span>
-                                                    <button onClick={() => toggleDevice(dev.deviceId)} className={cn("px-3 py-1 rounded text-[9px] font-bold uppercase tracking-widest transition-all", dev.isActive ? "bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white" : "bg-green-500/10 text-green-500 hover:bg-green-500 hover:text-white")}>
-                                                        {isRTL ? (dev.isActive ? 'حظر' : 'إلغاء') : (dev.isActive ? "Block" : "Unblock")}
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        ))}
-                                        {devices.length === 0 && <div className="p-8 text-center text-white/20 text-xs uppercase tracking-widest">{isRTL ? 'لا توجد أجهزة مربوطة' : 'No devices bound'}</div>}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    {editData.role === 'admin' && (
-                        <div className="space-y-4 border-t border-white/10 pt-8">
-                            <h3 className="text-sm font-bold text-cinematic-neon-red uppercase tracking-widest flex items-center gap-2 justify-end">
-                                <Shield className="w-4 h-4" /> {isRTL ? 'صلاحيات الوصول والتحكم' : 'Access Control'}
-                            </h3>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                {permissionsList.map(perm => (
-                                    <div key={perm.id} onClick={() => togglePermission(perm.id)}
-                                        className={cn("p-4 border rounded-xl cursor-pointer transition-all text-center",
-                                            permissions.includes(perm.id) ? "bg-cinematic-neon-red/10 border-cinematic-neon-red text-white shadow-[0_0_10px_rgba(255,0,60,0.1)]" : "bg-white/5 border-white/5 text-white/40 hover:bg-white/10")}>
-                                        <div className="text-[10px] font-black uppercase tracking-widest mb-1">{perm.label}</div>
-                                        <div className="text-[9px] opacity-60">{isRTL ? 'وصول شامل' : 'Full Access'}</div>
-                                    </div>
                                 ))}
+                                {devices.length === 0 && <p className="text-center text-white/20 text-sm py-8">لا توجد أجهزة مربوطة</p>}
                             </div>
                         </div>
                     )}
                 </div>
 
-                <div className="p-6 border-t border-white/10 bg-white/[0.02] flex justify-end gap-4 flex-row-reverse">
-                    <button onClick={handleSave} disabled={loading} className="px-12 py-4 rounded-xl bg-white text-black font-black uppercase tracking-widest hover:bg-cinematic-neon-blue transition-colors disabled:opacity-50">
-                        {loading ? (isRTL ? 'جاري الحفظ...' : 'Saving...') : (isRTL ? 'حفظ جميع التغييرات' : 'Save All Changes')}
+                {/* Footer */}
+                <div className="flex gap-3 p-5 border-t border-white/8 flex-shrink-0">
+                    <button onClick={handleSave} disabled={loading}
+                        className="flex-1 py-3.5 bg-blue-500 text-white font-black uppercase tracking-wider rounded-xl hover:bg-blue-400 transition-all disabled:opacity-50 text-sm shadow-[0_0_20px_rgba(59,130,246,0.3)]">
+                        {loading ? '⏳ جاري الحفظ...' : '✅ حفظ التغييرات'}
                     </button>
-                    <button onClick={onClose} className="px-8 py-4 rounded-xl border border-white/10 text-white/60 font-black uppercase tracking-widest hover:bg-white/5">
-                        {isRTL ? 'إلغاء' : 'Cancel'}
+                    <button onClick={onClose}
+                        className="px-6 py-3.5 border border-white/10 text-white/50 font-black uppercase tracking-wider rounded-xl hover:bg-white/5 transition-all text-sm">
+                        إلغاء
                     </button>
                 </div>
             </motion.div>

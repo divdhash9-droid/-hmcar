@@ -670,3 +670,254 @@ html {
     scrollbar-width: none;
   }
 }
+
+/* ═══════════════════════════════════════════════════════
+   COMPREHENSIVE RESPONSIVE DESIGN SYSTEM
+   نظام استجابة شامل لجميع الأجهزة
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Safe area للجوال (الشق والـ notch) ── */
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+
+/* ── Modals تفتح من الأسفل على الموبايل الصغير ── */
+@media (max-width: 640px) {
+
+  /* Modal يبدأ من أسفل الشاشة */
+  .fixed.inset-0.flex.items-center {
+    align-items: flex-end !important;
+    padding: 0 !important;
+  }
+
+  /* الـ modal نفسه */
+  .fixed.inset-0.flex.items-center>div>div,
+  .fixed.inset-0.flex.items-center>div>.motion-div {
+    border-radius: 1.5rem 1.5rem 0 0 !important;
+    max-height: 92vh !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Padding أسفل الـ modal بسبب iPhone home bar */
+  .modal-footer-safe {
+    padding-bottom: max(1.25rem, env(safe-area-inset-bottom)) !important;
+  }
+}
+
+/* ── جدول الأدمن - scroll أفقي ناعم ── */
+.admin-table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+/* ── نص كبير يتناسب مع الشاشة ── */
+.hero-title {
+  font-size: clamp(1.8rem, 5vw, 5rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+/* ── الـ grid يكون عمودين على التابلت وعمود على الموبايل ── */
+@media (max-width: 640px) {
+  .sm\:grid-cols-2 {
+    grid-template-columns: repeat(1, 1fr) !important;
+  }
+
+  .sm\:grid-cols-3 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .sm\:grid-cols-4 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .sm\:grid-cols-5 {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+/* ── الـ Padding على صفحات الأدمن ── */
+@media (max-width: 640px) {
+  .admin-page-padding {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .admin-header-spacing {
+    padding-top: 1.5rem;
+  }
+}
+
+/* ── عناصر اللمس - حجم مناسب ── */
+@media (max-width: 767px) {
+
+  button:not([data-no-touch]),
+  a:not([data-no-touch]),
+  [role="button"]:not([data-no-touch]),
+  select,
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* استثناء الأزرار الصغيرة مثل أيقونات الحذب */
+  .icon-btn-sm {
+    min-height: 32px !important;
+    min-width: 32px !important;
+  }
+}
+
+/* ── الـ stats grid على الموبايل ── */
+@media (max-width: 480px) {
+  .stats-grid-5 {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+
+  .stats-grid-5> :last-child:nth-child(5) {
+    grid-column: span 3;
+  }
+}
+
+/* ── الـ flex buttons تكون column على الموبايل ── */
+@media (max-width: 480px) {
+  .mobile-stack {
+    flex-direction: column !important;
+    width: 100%;
+  }
+
+  .mobile-stack>* {
+    width: 100%;
+  }
+}
+
+/* ── الجداول على الصفحات ── */
+@media (max-width: 767px) {
+
+  /* صفحات الأدمن - الجدول يختفي ويظهر بدله بطاقات */
+  .desktop-table {
+    display: none !important;
+  }
+
+  .mobile-cards {
+    display: block !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .desktop-table {
+    display: block !important;
+  }
+
+  .mobile-cards {
+    display: none !important;
+  }
+}
+
+/* ── منع الـ overflow خارج الـ viewport ── */
+.overflow-safe {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* ── تعديل حجم النصوص للموبايل ── */
+@media (max-width: 480px) {
+  .text-responsive-xl {
+    font-size: clamp(1.4rem, 7vw, 2rem) !important;
+  }
+
+  .text-responsive-lg {
+    font-size: clamp(1.1rem, 5vw, 1.5rem) !important;
+  }
+
+  .text-responsive-base {
+    font-size: clamp(0.8rem, 3.5vw, 1rem) !important;
+  }
+}
+
+/* ── إصلاح الـ select elements على iOS ── */
+select {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  background-image: none;
+  cursor: pointer;
+}
+
+/* ── إصلاح الـ input على iOS - منع التكبير التلقائي ── */
+@media (max-width: 767px) {
+
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="search"],
+  select,
+  textarea {
+    font-size: 16px !important;
+    /* iOS يكبر الشاشة إذا كان الخط أقل من 16px */
+  }
+}
+
+/* ── RTL Responsive تحسينات ── */
+[dir="rtl"] .rtl-flip {
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .rtl-text-left {
+  text-align: right !important;
+}
+
+/* ── Animation تعطيل على الأجهزة الضعيفة ── */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── تحسين إحصائيات الأدمن على الموبايل ── */
+@media (max-width: 640px) {
+  .admin-stat-card {
+    padding: 0.75rem !important;
+  }
+
+  .admin-stat-number {
+    font-size: 1.5rem !important;
+  }
+
+  .admin-stat-label {
+    font-size: 0.6rem !important;
+  }
+}
+
+/* ── حل مشكلة البطاقات تتجاوز الشاشة ── */
+@media (max-width: 767px) {
+
+  .glass-card,
+  .rounded-2xl,
+  .rounded-3xl {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+}
+
+/* ── Navbar height compensation ── */
+.navbar-offset {
+  padding-top: calc(4.5rem + env(safe-area-inset-top));
+}
+
+@media (max-width: 767px) {
+  .navbar-offset {
+    padding-top: calc(3.5rem + env(safe-area-inset-top));
+  }
+}

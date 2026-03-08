@@ -2,41 +2,21 @@
 
 import { motion } from "framer-motion";
 import {
-    Activity,
-    PlusCircle,
-    Car,
-    Layers,
-    Gavel,
-    Users,
-    Bell,
-    ShoppingCart,
-    Settings,
-    Shield,
-    Search,
-    LogOut,
-    Menu,
-    X,
-    FileText,
-    Share2,
-    MessageCircle,
-    Tag,
-    TrendingUp,
-    Mail,
-    ChevronLeft,
-    Radio,
-    Database,
-    Briefcase
+    Activity, PlusCircle, Car, Layers, Gavel, Users, Bell, ShoppingCart,
+    Settings, Search, FileText, MessageCircle, Tag, TrendingUp,
+    Mail, ChevronLeft, Radio, Database, Briefcase
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/LanguageContext";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import { useToast } from "@/lib/ToastContext";
 import DashboardBackdrop from "@/components/DashboardBackdrop";
 import ParticleBackground from "@/components/ParticleBackground";
 import LiveNotificationsList from "@/components/LiveNotificationsList";
+
 
 interface DashboardStats {
     totalCars?: number;
@@ -62,12 +42,10 @@ interface AuditLogEntry {
 }
 
 export default function AdminDashboard() {
-    const { t, lang, isRTL, toggleLanguage } = useLanguage();
+    const { t, isRTL } = useLanguage();
     const { showToast } = useToast();
     const [mounted, setMounted] = useState(false);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [backingUp, setBackingUp] = useState(false); // eslint-disable-line @typescript-eslint/no-unused-vars
-    const pathname = usePathname();
     const router = useRouter();
 
     // [[ARABIC_COMMENT]] تحميل النسخة الاحتياطية
@@ -97,20 +75,6 @@ export default function AdminDashboard() {
         }
     };
 
-    const handleLogout = async () => {
-        try {
-            await api.auth.logout();
-        } catch (err) {
-            console.error("Logout failed on server", err);
-        } finally {
-            if (typeof window !== 'undefined') {
-                localStorage.removeItem('hm_token');
-                localStorage.removeItem('hm_user_role');
-                localStorage.removeItem('hm_user_name');
-            }
-            router.push('/login');
-        }
-    };
 
     useEffect(() => {
         setMounted(true);
@@ -188,25 +152,6 @@ export default function AdminDashboard() {
         { icon: Database, label: isRTL ? 'نسخ احتياطي' : 'BACKUP', onClick: handleBackup, accent: 'bg-orange-400/20 text-orange-400', isButton: true },
     ];
 
-    const sidebarItems = [
-        { id: 'overview', icon: Activity, label: isRTL ? 'المركزية' : 'MAINFRAME', href: '/admin/dashboard' },
-        { id: 'inventory', icon: Car, label: isRTL ? 'المخزون' : 'INVENTORY', href: '/admin/cars' },
-        { id: 'live-showroom', icon: Radio, label: isRTL ? 'المعرض المباشر' : 'LIVE SHOW', href: '/admin/live-auctions' },
-        { id: 'parts', icon: Layers, label: isRTL ? 'قطع الغيار' : 'PARTS', href: '/admin/parts' },
-        { id: 'auctions', icon: Gavel, label: isRTL ? 'المزادات' : 'AUCTIONS', href: '/admin/auctions' },
-        { id: 'brands', icon: Tag, label: t('brands'), href: '/admin/brands' },
-        { id: 'orders', icon: ShoppingCart, label: isRTL ? 'الطلبات' : 'ORDERS', href: '/admin/orders' },
-        { id: 'concierge', icon: Briefcase, label: isRTL ? 'الطلبات الخاصة' : 'SPECIAL REQS', href: '/admin/concierge' },
-        { id: 'users', icon: Users, label: isRTL ? 'المستخدمون' : 'DIRECTORY', href: '/admin/users' },
-        { id: 'contact', icon: Mail, label: isRTL ? 'الاستفسارات' : 'INQUIRIES', href: '/admin/contact' },
-        { id: 'messages', icon: MessageCircle, label: isRTL ? 'المحادثات' : 'CHATS', href: '/admin/messages' },
-        { id: 'reports', icon: TrendingUp, label: isRTL ? 'التقارير' : 'REPORTS', href: '/admin/reports' },
-        { id: 'notifications', icon: Bell, label: isRTL ? 'الإشعارات' : 'ALERTS', href: '/admin/notifications' },
-        { id: 'social', icon: Share2, label: t('social'), href: '/admin/social' },
-        { id: 'security', icon: Shield, label: isRTL ? 'الأمان والحظر' : 'SECURITY', href: '/admin/security' },
-        { id: 'settings', icon: Settings, label: isRTL ? 'الإعدادات' : 'SETTINGS', href: '/admin/settings' },
-    ];
-
     if (!mounted) return null;
 
     const getActivityIcon = (target: string) => {
@@ -247,63 +192,8 @@ export default function AdminDashboard() {
             <DashboardBackdrop />
             <ParticleBackground />
 
-            {/* --- ADMIN SIDEBAR --- */}
-            <aside className={cn(
-                "fixed top-0 bottom-0 z-[100] transition-all duration-500 bg-black/40 border-white/5 backdrop-blur-3xl flex flex-col items-center py-10 justify-between",
-                isRTL ? "right-0 border-l" : "left-0 border-r",
-                isSidebarOpen ? "w-64" : "w-0 lg:w-40 overflow-hidden lg:overflow-visible shadow-2xl"
-            )}>
-                <Link href="/" className="mb-10">
-                    <div className="w-16 h-16 rounded-full border-2 border-cinematic-neon-red flex items-center justify-center shadow-[0_0_20px_rgba(255,0,60,0.3)] shrink-0 group hover:rotate-12 transition-all">
-                        <span className="text-3xl font-black italic text-cinematic-neon-red tracking-tighter">HM</span>
-                    </div>
-                </Link>
-
-                <div className="flex-1 flex flex-col gap-6 w-full px-4 overflow-y-auto scrollbar-hide">
-                    {sidebarItems.map((item) => (
-                        <Link href={item.href} key={item.id}>
-                            <button
-                                onClick={() => setIsSidebarOpen(false)}
-                                className={cn(
-                                    "flex flex-col items-center gap-3 group transition-all w-full py-4 rounded-2xl relative",
-                                    pathname === item.href ? "text-cinematic-neon-red bg-white/5 shadow-inner" : "text-white/20 hover:text-white hover:bg-white/[0.02]"
-                                )}
-                            >
-                                <item.icon className={cn("w-10 h-10 lg:w-11 lg:h-11 shrink-0 transition-transform group-hover:scale-110", pathname === item.href && "drop-shadow-[0_0_15px_rgba(255,0,60,1)]")} />
-                                <span className="text-[12px] lg:text-[13px] font-black uppercase tracking-[0.1em] lg:tracking-[0.12em] text-center leading-tight">{item.label}</span>
-                                {pathname === item.href && <motion.div layoutId="activeInd" className="absolute left-0 top-0 bottom-0 w-[3px] bg-cinematic-neon-red" />}
-                            </button>
-                        </Link>
-                    ))}
-                </div>
-
-                <div className="flex flex-col gap-12 w-full items-center pb-8">
-                    <button onClick={toggleLanguage} className="text-white/20 hover:text-white transition-colors p-4 uppercase text-[14px] font-black border border-white/5 bg-white/5 rounded-lg active:scale-95">
-                        {lang}
-                    </button>
-                    <button onClick={handleLogout} className="btn-glow-red flex items-center gap-4 px-8 py-4 rounded-xl border border-white/10 text-white/80 hover:text-white transition-all">
-                        <LogOut className="w-7 h-7 text-cinematic-neon-red" />
-                        <span className="text-[13px] font-black uppercase tracking-[0.2em]">{isRTL ? "تسجيل الخروج" : "LOG OUT"}</span>
-                    </button>
-                </div>
-            </aside>
-
-            {/* --- MOBILE ADMIN HEADER --- */}
-            <div className="lg:hidden fixed top-0 left-0 right-0 z-[90] bg-black/80 backdrop-blur-3xl border-b border-cinematic-neon-red/10 px-6 py-5 flex justify-between items-center">
-                <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 rounded-full bg-cinematic-neon-red shadow-[0_0_10px_rgba(255,0,60,0.8)]" />
-                    <div className="text-xl font-black italic tracking-tighter uppercase shrink-0">ADMIN <span className="text-cinematic-neon-red">ROOT</span></div>
-                </div>
-                <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2 text-white">
-                    {isSidebarOpen ? <X /> : <Menu />}
-                </button>
-            </div>
-
-            {/* --- MAIN MAIN BATTLESTATION --- */}
-            <main className={cn(
-                "min-h-screen relative z-10 py-28 lg:py-12 px-6 sm:px-12 lg:px-20 transition-all duration-500",
-                isRTL ? "lg:pr-48" : "lg:pl-48"
-            )}>
+            {/* --- MAIN CONTENT (AdminNavbar sidebar is provided by layout.tsx) --- */}
+            <main className="min-h-screen relative z-10 py-20 lg:py-10 px-6 sm:px-10 lg:px-16">
 
                 {/* Header HUD */}
                 <header className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-10 mb-20 border-b border-white/5 pb-16">

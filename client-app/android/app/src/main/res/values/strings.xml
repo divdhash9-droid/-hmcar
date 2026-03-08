@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">HM CAR</string>
+    <string name="title_activity_main">HM CAR</string>
+    <string name="package_name">com.hmcar.app</string>
+    <string name="custom_url_scheme">com.hmcar.app</string>
+</resources>

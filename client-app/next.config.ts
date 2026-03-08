@@ -3,7 +3,16 @@
 
 import type { NextConfig } from "next";
 
+// [[ARABIC_COMMENT]] وضع البناء: 'mobile' لنسخة Capacitor، أو فارغ للموقع العادي
+const isMobileBuild = process.env.BUILD_TARGET === 'mobile';
+
 const nextConfig: NextConfig = {
+  // [[ARABIC_COMMENT]] Static Export للموبايل فقط - Capacitor يحتاج ملفات ثابتة
+  ...(isMobileBuild ? {
+    output: 'export',
+    trailingSlash: true,        // [[ARABIC_COMMENT]] مطلوب لـ Capacitor
+    images: { unoptimized: true }, // [[ARABIC_COMMENT]] بدون تحسين صور في الوضع الثابت
+  } : {}),
   // ─────────────────────────────────────────────
   // [[ARABIC_COMMENT]] إعدادات الصور
   // ─────────────────────────────────────────────

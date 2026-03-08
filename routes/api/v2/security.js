@@ -5,7 +5,7 @@ const router = express.Router();
 const DeviceFingerprint = require('../../../models/DeviceFingerprint');
 const { requireAuthAPI, requireAdmin } = require('../../../middleware/auth');
 
-// جلب كل الأجهزة والمستخدمين المرتبطين (سواء محظور أو سليم)
+// جلب كل الأجهزة والمستخدمين المرتبطين (بدون تكرار)
 router.get('/devices', requireAuthAPI, requireAdmin, async (req, res) => {
     try {
         const search = req.query.search || '';
@@ -19,17 +19,42 @@ router.get('/devices', requireAuthAPI, requireAdmin, async (req, res) => {
             ];
         }
 
-        const devices = await DeviceFingerprint.find(query).sort({ updatedAt: -1 });
+        const allDevices = await DeviceFingerprint.find(query).sort({ updatedAt: -1 });
+
+        // ── إزالة التكرار: نحتفظ بآخر سجل لكل (ip + linkedUsername) ──
+        const seen = new Map();
+        for (const device of allDevices) {
+            const key = `${device.ip}___${(device.linkedUsername || '').toLowerCase()}`;
+            if (!seen.has(key)) {
+                seen.set(key, device);
+            } else {
+                // إذا الجهاز الجديد محظور والقديم غير محظور - نحتفظ بالمحظور
+                const existing = seen.get(key);
+                if (device.banned && !existing.banned) {
+                    seen.set(key, device);
+                }
+            }
+        }
+
+        const devices = Array.from(seen.values())
+            .sort((a, b) => {
+                // المحظورون أولاً ثم المُستثنون ثم الباقون
+                if (a.banned !== b.banned) return a.banned ? -1 : 1;
+                if (a.exemptFromSecurity !== b.exemptFromSecurity) return a.exemptFromSecurity ? -1 : 1;
+                return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+            });
 
         res.json({
             success: true,
-            devices
+            devices,
+            total: devices.length
         });
     } catch (error) {
         console.error('Error fetching devices:', error);
         res.status(500).json({ success: false, error: 'حدث خطأ داخلي' });
     }
 });
+
 
 // تفعيل/تعطيل استثناء المستدخم من قيود الدخول المتعدد
 router.post('/toggle-exempt/:id', requireAuthAPI, requireAdmin, async (req, res) => {

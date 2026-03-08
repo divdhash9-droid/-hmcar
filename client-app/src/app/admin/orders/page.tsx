@@ -3,8 +3,8 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import {
-    TrendingUp, ChevronLeft, X, AlertCircle, RefreshCcw, Trash2, Printer,
-    ShoppingCart, Clock, CheckCircle, XCircle, Eye, Package, MessageCircle
+    TrendingUp, ChevronLeft, X,
+    ShoppingCart, Clock, CheckCircle, Eye, Package, MessageCircle
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Link from 'next/link';
@@ -222,24 +222,32 @@ export default function AdminOrdersPage() {
                                         <div className="text-3xl font-black text-blue-400 italic">{(selectedOrder.pricing?.grandTotalSar || 0).toLocaleString()} <span className="text-sm not-italic opacity-50 uppercase">SAR</span></div>
                                     </div>
                                     <div className={cn("px-5 py-2 rounded-full border text-[10px] font-black uppercase tracking-widest", getStatusBg(selectedOrder.status), getStatusColor(selectedOrder.status))}>
-                                        {selectedOrder.status}
+                                        {isRTL
+                                            ? { pending: 'قيد الانتظار', confirmed: 'مؤكد', completed: 'مكتمل', cancelled: 'ملغي' }[selectedOrder.status] || selectedOrder.status
+                                            : selectedOrder.status
+                                        }
                                     </div>
                                 </div>
 
                                 {/* Actions */}
                                 <div className="flex flex-wrap gap-3 pt-4">
                                     <div className="w-full text-[9px] font-black uppercase tracking-[0.4em] text-white/20 mb-1">{isRTL ? 'تعديل حالة المعاملة' : 'PROTOCOL OVERRIDE'}</div>
-                                    {(['pending', 'confirmed', 'completed', 'cancelled'] as const).map(s => (
+                                    {([
+                                        { key: 'pending', ar: 'قيد الانتظار', en: 'PENDING' },
+                                        { key: 'confirmed', ar: 'مؤكد', en: 'CONFIRMED' },
+                                        { key: 'completed', ar: 'مكتمل', en: 'COMPLETED' },
+                                        { key: 'cancelled', ar: 'ملغي', en: 'CANCELLED' },
+                                    ] as const).map(s => (
                                         <button
-                                            key={s}
-                                            disabled={selectedOrder.status === s || updatingId === selectedOrder.id}
-                                            onClick={() => updateStatus(selectedOrder.id, s)}
+                                            key={s.key}
+                                            disabled={selectedOrder.status === s.key || updatingId === selectedOrder.id}
+                                            onClick={() => updateStatus(selectedOrder.id, s.key)}
                                             className={cn(
                                                 "flex-1 py-3 px-4 rounded-xl border text-[10px] font-black uppercase tracking-widest transition-all disabled:opacity-30 active:scale-95",
-                                                selectedOrder.status === s ? getStatusBg(s) + ' ' + getStatusColor(s) : "bg-white/5 border-white/10 text-white/40 hover:bg-white/10 hover:text-white"
+                                                selectedOrder.status === s.key ? getStatusBg(s.key) + ' ' + getStatusColor(s.key) : "bg-white/5 border-white/10 text-white/40 hover:bg-white/10 hover:text-white"
                                             )}
                                         >
-                                            {updatingId === selectedOrder.id ? '...' : s}
+                                            {updatingId === selectedOrder.id ? '...' : (isRTL ? s.ar : s.en)}
                                         </button>
                                     ))}
                                     <button onClick={() => deleteOrder(selectedOrder.id)} className="w-full py-4 bg-red-500/10 border border-red-500/20 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] text-red-400 hover:bg-red-500 hover:text-white transition-all mt-4">
@@ -270,9 +278,14 @@ export default function AdminOrdersPage() {
                             </h1>
                         </div>
                         <div className="flex items-center gap-4 bg-white/5 border border-white/10 rounded-2xl p-2 h-fit">
-                            {(['all', 'pending', 'confirmed', 'completed'] as const).map(f => (
-                                <button key={f} onClick={() => setFilter(f)} className={cn("px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all", filter === f ? "bg-blue-500 text-white shadow-[0_0_20px_rgba(59,130,246,0.5)]" : "text-white/40 hover:text-white hover:bg-white/5")}>
-                                    {f === 'all' ? (isRTL ? 'الكل' : 'ALL') : f}
+                            {([
+                                { key: 'all', ar: 'الكل', en: 'ALL' },
+                                { key: 'pending', ar: 'قيد الانتظار', en: 'PENDING' },
+                                { key: 'confirmed', ar: 'مؤكد', en: 'CONFIRMED' },
+                                { key: 'completed', ar: 'مكتمل', en: 'COMPLETED' },
+                            ] as const).map(f => (
+                                <button key={f.key} onClick={() => setFilter(f.key)} className={cn("px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all", filter === f.key ? "bg-blue-500 text-white shadow-[0_0_20px_rgba(59,130,246,0.5)]" : "text-white/40 hover:text-white hover:bg-white/5")}>
+                                    {isRTL ? f.ar : f.en}
                                 </button>
                             ))}
                         </div>
@@ -336,7 +349,10 @@ export default function AdminOrdersPage() {
                                             </td>
                                             <td className="p-8">
                                                 <span className={cn("px-3 py-1 rounded-full border text-[9px] font-black uppercase tracking-widest", getStatusBg(order.status), getStatusColor(order.status))}>
-                                                    {order.status}
+                                                    {isRTL
+                                                        ? { pending: 'قيد الانتظار', confirmed: 'مؤكد', completed: 'مكتمل', cancelled: 'ملغي' }[order.status] || order.status
+                                                        : order.status
+                                                    }
                                                 </span>
                                             </td>
                                             <td className="p-8 text-right">

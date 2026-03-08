@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     Menu, X, User, Languages, ArrowLeft, ArrowRight,
     Headphones, MessageCircle, Search,
-    Car, Gavel, ShoppingBag, Settings, ShoppingCart, Heart, Calculator
+    Car, Gavel, ShoppingBag, Settings, ShoppingCart, Heart
 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useLanguage } from '@/lib/LanguageContext';
@@ -55,14 +55,15 @@ export default function Navbar() {
     }, []);
 
     useEffect(() => {
-        if (isOpen) setIsOpen(false);
-    }, [pathname, isOpen]);
+        // تأخير الإغلاق لتجنب cascading renders
+        const timer = setTimeout(() => { if (isOpen) setIsOpen(false); }, 0);
+        return () => clearTimeout(timer);
+    }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const navLinks = [
         { href: '/showroom', label: isRTL ? 'المعرض' : 'SHOWROOM', icon: Car },
         { href: '/auctions', label: isRTL ? 'المزادات' : 'AUCTIONS', icon: Gavel },
         { href: '/parts', label: isRTL ? 'القطع' : 'PARTS', icon: ShoppingBag },
-        { href: '/loan-calculator', label: isRTL ? 'حاسبة التمويل' : 'CALCULATOR', icon: Calculator },
         { href: '/concierge', label: isRTL ? 'طلبات خاصة' : 'REQUESTS', icon: Settings },
         { href: '/support', label: isRTL ? 'الدعم' : 'SUPPORT', icon: Headphones },
         { href: '/contact', label: isRTL ? 'تواصل' : 'CONTACT', icon: MessageCircle },

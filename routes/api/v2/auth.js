@@ -197,16 +197,12 @@ router.post('/auto-login', async (req, res) => {
         { expiresIn: '7d' }
       );
 
-      if (!fingerprint) {
-        await DeviceFingerprint.create({
-          ip: clientIP,
-          deviceId: deviceId || '',
-          linkedUsername: name.trim()
-        });
-      } else {
-        fingerprint.failedAttempts = 0;
-        await fingerprint.save();
-      }
+      // استخدام upsert لمنع التكرار - تحديث الموجود أو إنشاء جديد
+      await DeviceFingerprint.findOneAndUpdate(
+        { ip: clientIP },
+        { $set: { linkedUsername: name.trim(), deviceId: deviceId || '', failedAttempts: 0 } },
+        { upsert: true, new: true }
+      );
 
       console.log(`[AUTH] ✅ Auto-login successful for existing user: ${name}`);
 
@@ -246,14 +242,12 @@ router.post('/auto-login', async (req, res) => {
       { expiresIn: '7d' }
     );
 
-    // ربط الجهاز بحساب العميل الجديد
-    if (!fingerprint) {
-      await DeviceFingerprint.create({
-        ip: clientIP,
-        deviceId: deviceId || '',
-        linkedUsername: name.trim()
-      });
-    }
+    // ربط الجهاز بحساب العميل الجديد (upsert - لا تكرار)
+    await DeviceFingerprint.findOneAndUpdate(
+      { ip: clientIP },
+      { $set: { linkedUsername: name.trim(), deviceId: deviceId || '', failedAttempts: 0 } },
+      { upsert: true, new: true }
+    );
 
     // Log the registration
     await AuditLog.logUserAction(
@@ -380,16 +374,12 @@ router.post('/login', async (req, res) => {
     AuditLog.logUserAction(user, 'LOGIN', 'User', 'Successful login', { ipAddress: req.ip, result: 'SUCCESS' }).catch(() => { });
 
     if (role === 'buyer') {
-      if (!fingerprint) {
-        await DeviceFingerprint.create({
-          ip: clientIP,
-          deviceId: deviceId || '',
-          linkedUsername: searchKey
-        });
-      } else {
-        fingerprint.failedAttempts = 0;
-        await fingerprint.save();
-      }
+      // upsert لمنع التكرار - تحديث السجل الموجود بدلاً من إنشاء جديد
+      await DeviceFingerprint.findOneAndUpdate(
+        { ip: clientIP },
+        { $set: { linkedUsername: searchKey, deviceId: deviceId || '', failedAttempts: 0 } },
+        { upsert: true, new: true }
+      );
     }
 
     console.log(`[AUTH] ✅ Login success: ${user.email} (${user.role})`);

@@ -16,8 +16,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
         { url: `${baseUrl}/login`, lastModified: now, changeFrequency: 'yearly', priority: 0.5 },
         { url: `${baseUrl}/register`, lastModified: now, changeFrequency: 'yearly', priority: 0.5 },
         { url: `${baseUrl}/search`, lastModified: now, changeFrequency: 'daily', priority: 0.7 },
-        { url: `${baseUrl}/loan-calculator`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
     ];
+
 
     return staticPages;
 }

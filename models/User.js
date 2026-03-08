@@ -25,17 +25,21 @@ const userSchema = new mongoose.Schema({
   permissions: [{
     type: String,
     enum: [
-      'manage_users',        // إدارة المستخدمين
-      'manage_settings',     // إدارة الإعدادات
-      'manage_footer',       // إدارة الشريط السفلي
-      'manage_whatsapp',     // إدارة رقم الواتساب
-      'manage_cars',         // إدارة السيارات
-      'manage_parts',        // إدارة قطع الغيار
-      'manage_auctions',     // إدارة المزادات
-      'manage_concierge',    // إدارة طلبات الكونسيرج
-      'view_analytics',      // عرض التحليلات
-      'manage_content',      // إدارة المحتوى
-      'super_admin'          // صلاحيات كاملة
+      'manage_users',          // إدارة المستخدمين
+      'manage_settings',       // إدارة الإعدادات
+      'manage_footer',         // إدارة الشريط السفلي
+      'manage_whatsapp',       // إدارة رقم الواتساب
+      'manage_cars',           // إدارة السيارات
+      'manage_parts',          // إدارة قطع الغيار
+      'manage_auctions',       // إدارة المزادات
+      'manage_concierge',      // إدارة طلبات الخاصة
+      'manage_orders',         // إدارة الطلبيات
+      'manage_brands',         // إدارة الوكالات
+      'manage_messages',       // إدارة المحادثات
+      'manage_notifications',  // إدارة الإشعارات
+      'view_analytics',        // عرض التحليلات
+      'manage_content',        // إدارة المحتوى
+      'super_admin'            // صلاحيات كاملة (legacy)
     ]
   }],
   // معرف المشرف الذي أنشأ هذا المستخدم (للتتبع)

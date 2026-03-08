@@ -133,7 +133,7 @@ export default function LandingShowcase({ isRTL, latestCars = [] }: LandingShowc
                     </h1>
                 </div>
                 <p className="text-lg md:text-2xl text-white/40 font-light tracking-[0.3em] uppercase max-w-2xl mx-auto px-6">
-                    {homeContent.heroSubtitle || (isRTL ? "بوابة النخبة لتصدير السيارات الكورية" : "Elite Korean Automotive Gateway")}
+                    {homeContent.heroSubtitle || (isRTL ? "تصدير السيارات وقطع الغيار من كوريا إلى جميع دول العالم" : "Exporting Cars & Spare Parts from Korea to the World")}
                 </p>
 
                 {/* ── LOGIN BUTTON ── */}

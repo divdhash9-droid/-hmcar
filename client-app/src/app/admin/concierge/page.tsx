@@ -9,7 +9,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Briefcase, Car, Settings, Phone, User, Calendar,
-    Palette, FileText, Image, Clock, CheckCircle, XCircle,
+    Palette, FileText, ImageIcon, Clock, CheckCircle, XCircle,
     Loader, Trash2, ArrowLeft, Filter, RefreshCw, Eye, X
 } from 'lucide-react';
 import Link from 'next/link';
@@ -401,7 +401,7 @@ export default function AdminConcierge() {
                                 {selectedRequest.type === 'parts' && selectedRequest.imageUrl && (
                                     <div className="p-3 bg-white/[0.02] rounded-xl border border-white/5">
                                         <div className="text-[9px] font-black uppercase tracking-wider text-white/30 mb-2 flex items-center gap-1.5">
-                                            <Image alt="" className="w-3.5 h-3.5" />
+                                            <ImageIcon className="w-3.5 h-3.5" />
                                             {isRTL ? 'صورة القطعة' : 'Part Image'}
                                         </div>
                                         {/* eslint-disable-next-line @next/next/no-img-element */}

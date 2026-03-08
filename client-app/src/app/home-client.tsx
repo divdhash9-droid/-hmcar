@@ -616,6 +616,76 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
         </div>
       </section>
 
+      {/* ════════════════════════════════════════
+          قسم تثبيت التطبيق — دائماً ظاهر
+      ════════════════════════════════════════ */}
+      {!isInstalled && (
+        <section className="relative z-10 py-12 px-4 sm:px-6 lg:px-8" dir={isRTL ? 'rtl' : 'ltr'}>
+          <div className="max-w-2xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7 }}
+              className="relative overflow-hidden rounded-3xl border border-[#c9a96e]/30 bg-gradient-to-br from-[#c9a96e]/10 via-[#0a0a0a] to-[#c9a96e]/5 p-8 text-center shadow-[0_0_60px_rgba(201,169,110,0.1)]"
+            >
+              {/* هالة الضوء */}
+              <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-60 h-60 bg-[#c9a96e]/20 rounded-full blur-3xl pointer-events-none" />
+
+              {/* أيقونة التطبيق */}
+              <motion.div
+                animate={{ y: [0, -8, 0] }}
+                transition={{ duration: 3, repeat: Infinity }}
+                className="w-20 h-20 rounded-3xl bg-gradient-to-br from-[#c9a96e] to-[#7a5c2e] flex items-center justify-center mx-auto mb-5 shadow-[0_0_30px_rgba(201,169,110,0.4)] relative z-10"
+              >
+                <span className="text-4xl">🚗</span>
+              </motion.div>
+
+              <h2 className="text-2xl font-black text-white mb-2 relative z-10">
+                {isRTL ? '📲 حمّل تطبيق HM CAR' : '📲 Download HM CAR App'}
+              </h2>
+              <p className="text-white/50 text-sm mb-6 relative z-10">
+                {isRTL
+                  ? 'ثبّت التطبيق على هاتفك وتابع المزادات والسيارات في أي وقت'
+                  : 'Install the app and follow auctions & cars anytime'}
+              </p>
+
+              {/* زر التثبيت */}
+              <div className="relative z-10 flex flex-col items-center gap-3">
+                {deferredInstall ? (
+                  /* Android: زر تثبيت مباشر */
+                  <motion.button
+                    onClick={handleInstallPWA}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-[#c9a96e] to-[#e8c97a] text-black font-black text-base shadow-[0_0_30px_rgba(201,169,110,0.5)] hover:shadow-[0_0_50px_rgba(201,169,110,0.7)] transition-all"
+                  >
+                    <Smartphone className="w-5 h-5" />
+                    {isRTL ? 'تثبيت التطبيق الآن' : 'Install App Now'}
+                  </motion.button>
+                ) : (
+                  /* iOS / متصفحات أخرى: تعليمات */
+                  <div className="space-y-3 w-full max-w-xs">
+                    <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.04] border border-white/10">
+                      <span className="text-xl">⬆️</span>
+                      <p className="text-white/70 text-sm text-right">{isRTL ? 'اضغط زر المشاركة في المتصفح' : 'Tap the Share button in browser'}</p>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.04] border border-white/10">
+                      <span className="text-xl">➕</span>
+                      <p className="text-white/70 text-sm text-right">{isRTL ? 'اختر "إضافة إلى الشاشة الرئيسية"' : 'Choose "Add to Home Screen"'}</p>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 rounded-xl bg-[#c9a96e]/10 border border-[#c9a96e]/20">
+                      <span className="text-xl">✅</span>
+                      <p className="text-[#c9a96e] text-sm font-bold text-right">{isRTL ? 'استمتع بتجربة التطبيق!' : 'Enjoy the app experience!'}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        </section>
+      )}
+
 
 
       {false && (

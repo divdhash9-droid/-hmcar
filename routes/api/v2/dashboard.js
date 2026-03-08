@@ -59,7 +59,7 @@ router.get('/client', requireAuthAPI, async (req, res) => {
                     myFavorites
                 },
                 recentCars: recentCars.map(car => ({
-                    id: car._id,
+                    id: car._id.toString(), // [[ARABIC_COMMENT]] تحويل ObjectId إلى string لضمان صحة الروابط
                     title: car.title,
                     make: car.make,
                     model: car.model,

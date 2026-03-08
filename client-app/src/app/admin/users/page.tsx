@@ -560,21 +560,39 @@ function UserDetailModal({ user, onClose, onUpdate, onDelete, isRTL }: {
     const [showPass, setShowPass] = useState(false);
     const [activeTab, setActiveTab] = useState<'info' | 'perms' | 'devices'>('info');
 
+    const [saveError, setSaveError] = useState('');
+
     const handleSave = async () => {
         try {
             setLoading(true);
+            setSaveError('');
+
+            // ── مهم: لا نُرسل الحقول الفارغة لتجنب تعارض الـ unique indexes ──
             const payload: Record<string, unknown> = {
-                name: editData.name, email: editData.email, username: editData.username,
-                phone: editData.phone, role: editData.role,
+                name: editData.name.trim(),
+                role: editData.role,
                 status: editData.isActive ? 'active' : 'suspended',
-                permissions: ['admin', 'manager'].includes(editData.role) ? permissions : [],
-                boundDevices: devices, isDeviceLocked,
+                permissions: ['admin', 'manager', 'super_admin'].includes(editData.role) ? permissions : [],
+                boundDevices: devices,
+                isDeviceLocked,
             };
-            if (editData.password) payload.password = editData.password;
+
+            // فقط أضف الحقل إذا كان غير فارغ
+            if (editData.email.trim()) payload.email = editData.email.trim().toLowerCase();
+            if (editData.username.trim()) payload.username = editData.username.trim();
+            if (editData.phone.trim()) payload.phone = editData.phone.trim();
+            if (editData.password.trim()) payload.password = editData.password;
+
             const res = await api.users.update(user.id, payload);
-            if (res.success) { onUpdate({ ...user, ...res.data, id: user.id }); }
-        } catch { alert('فشل تحديث المستخدم'); }
-        finally { setLoading(false); }
+            if (res.success) {
+                onUpdate({ ...user, ...res.data, id: user.id });
+            } else {
+                setSaveError(res.message || 'فشل تحديث المستخدم');
+            }
+        } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : 'فشل تحديث المستخدم';
+            setSaveError(msg);
+        } finally { setLoading(false); }
     };
 
     const handleDelete = async () => {
@@ -715,15 +733,22 @@ function UserDetailModal({ user, onClose, onUpdate, onDelete, isRTL }: {
                 </div>
 
                 {/* Footer */}
-                <div className="flex gap-3 p-5 border-t border-white/8 flex-shrink-0">
-                    <button onClick={handleSave} disabled={loading}
-                        className="flex-1 py-3.5 bg-blue-500 text-white font-black uppercase tracking-wider rounded-xl hover:bg-blue-400 transition-all disabled:opacity-50 text-sm shadow-[0_0_20px_rgba(59,130,246,0.3)]">
-                        {loading ? '⏳ جاري الحفظ...' : '✅ حفظ التغييرات'}
-                    </button>
-                    <button onClick={onClose}
-                        className="px-6 py-3.5 border border-white/10 text-white/50 font-black uppercase tracking-wider rounded-xl hover:bg-white/5 transition-all text-sm">
-                        إلغاء
-                    </button>
+                <div className="p-5 border-t border-white/8 flex-shrink-0 space-y-3">
+                    {saveError && (
+                        <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm font-bold">
+                            ⚠️ {saveError}
+                        </div>
+                    )}
+                    <div className="flex gap-3">
+                        <button onClick={handleSave} disabled={loading}
+                            className="flex-1 py-3.5 bg-blue-500 text-white font-black uppercase tracking-wider rounded-xl hover:bg-blue-400 transition-all disabled:opacity-50 text-sm shadow-[0_0_20px_rgba(59,130,246,0.3)]">
+                            {loading ? '⏳ جاري الحفظ...' : '✅ حفظ التغييرات'}
+                        </button>
+                        <button onClick={onClose}
+                            className="px-6 py-3.5 border border-white/10 text-white/50 font-black uppercase tracking-wider rounded-xl hover:bg-white/5 transition-all text-sm">
+                            إلغاء
+                        </button>
+                    </div>
                 </div>
             </motion.div>
         </div>

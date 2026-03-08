@@ -25,7 +25,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "client-app/$1"
+      "dest": "/client-app/$1"
     }
   ],
   "env": {

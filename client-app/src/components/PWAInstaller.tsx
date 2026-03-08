@@ -1,49 +1,56 @@
 'use client';
 
 /**
- * [[ARABIC_COMMENT]] مكوّن تسجيل Service Worker للـ PWA
- * [[ARABIC_COMMENT]] يتم تشغيله تلقائياً عند تحميل الصفحة
- * [[ARABIC_COMMENT]] يُمكّن ميزة "إضافة إلى الشاشة الرئيسية" على الجوال
+ * مكوّن تثبيت PWA
+ * يظهر بانر "أضف إلى الشاشة الرئيسية" مرة واحدة فقط
+ * بعد الضغط على "لاحقاً" لا يظهر لمدة 7 أيام
+ * بعد التثبيت لا يظهر إطلاقاً
  */
 
 import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const DISMISSED_KEY = 'pwa_dismissed_until';
+const INSTALLED_KEY = 'pwa_installed';
+const DISMISS_DAYS = 7; // أيام قبل الإظهار مجدداً
 
 export default function PWAInstaller() {
     const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
     const [showBanner, setShowBanner] = useState(false);
 
     useEffect(() => {
-        // [[ARABIC_COMMENT]] تسجيل Service Worker
+        // ── تسجيل Service Worker ──
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker
                     .register('/sw.js', { scope: '/' })
-                    .then((registration) => {
-                        console.log('[HM CAR PWA] Service Worker مُسجَّل بنجاح:', registration.scope);
-                    })
-                    .catch((error) => {
-                        console.error('[HM CAR PWA] فشل تسجيل Service Worker:', error);
-                    });
+                    .then(reg => console.log('[HM CAR PWA] SW registered:', reg.scope))
+                    .catch(err => console.error('[HM CAR PWA] SW failed:', err));
             });
         }
 
-        // [[ARABIC_COMMENT]] التقاط حدث التثبيت قبل ظهوره
+        // ── التحقق: هل تم التثبيت أو الرفض مسبقاً؟ ──
+        const isInstalled = localStorage.getItem(INSTALLED_KEY);
+        const dismissedUntil = localStorage.getItem(DISMISSED_KEY);
+
+        if (isInstalled) return; // مثبت → لا تظهر أبداً
+
+        if (dismissedUntil) {
+            const dismissedTime = parseInt(dismissedUntil, 10);
+            if (Date.now() < dismissedTime) return; // في فترة الرفض → لا تظهر
+        }
+
+        // ── التقاط حدث التثبيت ──
         const handleBeforeInstall = (e: Event) => {
             e.preventDefault();
             setDeferredPrompt(e);
-            // [[ARABIC_COMMENT]] إظهار البانر بعد 3 ثوانٍ إذا لم يكن مثبتاً
-            const alreadyInstalled = localStorage.getItem('pwa_installed');
-            if (!alreadyInstalled) {
-                setTimeout(() => setShowBanner(true), 3000);
-            }
+            // أظهر البانر بعد 4 ثوانٍ
+            setTimeout(() => setShowBanner(true), 4000);
         };
 
         window.addEventListener('beforeinstallprompt', handleBeforeInstall);
-
-        // [[ARABIC_COMMENT]] تسجيل حدث اكتمال التثبيت
         window.addEventListener('appinstalled', () => {
-            console.log('[HM CAR PWA] تم تثبيت التطبيق بنجاح!');
-            localStorage.setItem('pwa_installed', '1');
+            localStorage.setItem(INSTALLED_KEY, '1');
             setShowBanner(false);
         });
 
@@ -52,61 +59,67 @@ export default function PWAInstaller() {
         };
     }, []);
 
-    // [[ARABIC_COMMENT]] تشغيل مربع حوار التثبيت عند ضغط المستخدم
+    // ── زر التثبيت ──
     const handleInstall = async () => {
         if (!deferredPrompt) return;
         deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
         if (outcome === 'accepted') {
-            localStorage.setItem('pwa_installed', '1');
+            localStorage.setItem(INSTALLED_KEY, '1');
         }
         setDeferredPrompt(null);
         setShowBanner(false);
     };
 
-    if (!showBanner) return null;
+    // ── زر لاحقاً: يحفظ الرفض لـ 7 أيام ──
+    const handleDismiss = () => {
+        const until = Date.now() + DISMISS_DAYS * 24 * 60 * 60 * 1000;
+        localStorage.setItem(DISMISSED_KEY, String(until));
+        setShowBanner(false);
+    };
 
     return (
-        // [[ARABIC_COMMENT]] بانر التثبيت - يظهر في الأسفل على الجوال
-        <div
-            className="fixed bottom-20 left-4 right-4 z-[9999] bg-black/95 border border-white/10 rounded-3xl p-4 shadow-2xl backdrop-blur-md flex items-center gap-4"
-            style={{ animation: 'slideUp 0.4s ease-out' }}
-        >
-            {/* أيقونة التطبيق */}
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#c9a96e] to-[#a07848] flex items-center justify-center shrink-0 text-2xl font-black text-black shadow-lg">
-                🚗
-            </div>
-
-            {/* النص */}
-            <div className="flex-1 min-w-0">
-                <div className="text-[12px] font-black text-white uppercase tracking-wider">HM CAR</div>
-                <div className="text-[10px] text-white/50 leading-snug mt-0.5">
-                    أضف التطبيق إلى شاشتك الرئيسية
-                </div>
-            </div>
-
-            {/* أزرار */}
-            <div className="flex flex-col gap-2 shrink-0">
-                <button
-                    onClick={handleInstall}
-                    className="px-4 py-2 bg-[#c9a96e] text-black text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-[#e0bc7e] transition-all"
+        <AnimatePresence>
+            {showBanner && (
+                <motion.div
+                    initial={{ y: 120, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: 120, opacity: 0 }}
+                    transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                    className="fixed bottom-6 left-4 right-4 z-[9999] bg-[#0a0a0a] border border-white/10 rounded-3xl p-4 shadow-[0_20px_60px_rgba(0,0,0,0.8)] backdrop-blur-md flex items-center gap-4"
                 >
-                    تثبيت
-                </button>
-                <button
-                    onClick={() => setShowBanner(false)}
-                    className="px-4 py-2 bg-white/5 text-white/50 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-white/10 transition-all"
-                >
-                    لاحقاً
-                </button>
-            </div>
+                    {/* أيقونة التطبيق */}
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#c9a96e] to-[#7a5c2e] flex items-center justify-center shrink-0 shadow-[0_0_20px_rgba(201,169,110,0.3)]">
+                        <span className="text-2xl">🚗</span>
+                    </div>
 
-            <style jsx>{`
-                @keyframes slideUp {
-                    from { transform: translateY(100%); opacity: 0; }
-                    to { transform: translateY(0); opacity: 1; }
-                }
-            `}</style>
-        </div>
+                    {/* النص */}
+                    <div className="flex-1 min-w-0">
+                        <div className="text-[13px] font-black text-white tracking-wider">HM CAR</div>
+                        <div className="text-[11px] text-white/50 leading-snug mt-0.5">
+                            أضف التطبيق إلى شاشتك الرئيسية
+                        </div>
+                    </div>
+
+                    {/* الأزرار */}
+                    <div className="flex flex-col gap-2 shrink-0">
+                        <button
+                            onClick={handleInstall}
+                            title="تثبيت التطبيق"
+                            className="px-4 py-2 bg-[#c9a96e] text-black text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-[#e0bc7e] transition-all"
+                        >
+                            تثبيت
+                        </button>
+                        <button
+                            onClick={handleDismiss}
+                            title="لاحقاً"
+                            className="px-4 py-2 bg-white/5 text-white/50 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-white/10 transition-all"
+                        >
+                            لاحقاً
+                        </button>
+                    </div>
+                </motion.div>
+            )}
+        </AnimatePresence>
     );
 }

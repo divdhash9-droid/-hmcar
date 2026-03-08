@@ -14,8 +14,10 @@ import { useLanguage } from '@/lib/LanguageContext';
 import { useSettings } from '@/lib/SettingsContext';
 import { cn } from '@/lib/utils';
 import NotificationDropdown from './NotificationDropdown';
+import { useStandalone } from '@/lib/useStandalone';
 
 export default function Navbar() {
+    const isStandalone = useStandalone();
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [cartCount, setCartCount] = useState(0);
@@ -67,6 +69,9 @@ export default function Navbar() {
     ];
 
     const isActive = (href: string) => pathname === href;
+
+    // في وضع التطبيق المثبت، لا نعرض الـ Navbar - BottomTabBar يتولى التنقل
+    if (isStandalone) return null;
 
     return (
         <>

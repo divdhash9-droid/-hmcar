@@ -3,6 +3,7 @@ import "./globals.css";
 import { Providers } from "@/components/Providers";
 import ClientLayoutWrapper from "@/components/ClientLayoutWrapper";
 import PWAInstaller from "@/components/PWAInstaller";
+import AppShell from "@/components/AppShell";
 import { cookies } from "next/headers";
 
 // [[ARABIC_COMMENT]] الـ Viewport للتحكم في مقياس الشاشة على الموبايل
@@ -87,10 +88,12 @@ export default async function RootLayout({
       </head>
       <body className="antialiased selection:bg-white/20 selection:text-white" style={{ fontFamily: "system-ui, sans-serif" }}>
         <Providers>
-          <ClientLayoutWrapper>
-            {children}
-          </ClientLayoutWrapper>
-          {/* [[ARABIC_COMMENT]] مكوّن تثبيت PWA - يظهر بانر التثبيت على الجوال */}
+          <AppShell>
+            <ClientLayoutWrapper>
+              {children}
+            </ClientLayoutWrapper>
+          </AppShell>
+          {/* مكوّن تثبيت PWA - يظهر بانر التثبيت على الجوال */}
           <PWAInstaller />
         </Providers>
       </body>

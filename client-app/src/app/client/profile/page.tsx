@@ -1,151 +1,185 @@
 'use client';
 
 import { motion } from "framer-motion";
-import { User, Mail, Shield, Bell, CreditCard, ChevronLeft, Save, LogOut } from "lucide-react";
-import Link from "next/link";
+import { User, Mail, Shield, Save, Phone, MapPin } from "lucide-react";
 import { useLanguage } from "@/lib/LanguageContext";
+import { useAuth } from "@/lib/AuthContext";
 import { cn } from "@/lib/utils";
 
 export default function Profile() {
-    const { t, isRTL, toggleLanguage, lang } = useLanguage();
+    const { isRTL } = useLanguage();
+    const { user } = useAuth();
+
+    const userName = user?.name || (isRTL ? 'العميل' : 'Guest');
+    const userEmail = user?.email || '';
 
     return (
-        <div className="relative min-h-screen bg-black text-white font-sans overflow-hidden">
+        <div className={cn("min-h-full", isRTL && "rtl")}>
+            <div className="px-5 lg:px-8 pt-6 lg:pt-8 pb-8 max-w-2xl mx-auto lg:mx-0">
 
-            {/* Background HUD */}
-            <div className="fixed inset-0 pointer-events-none opacity-20 z-0">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-cinematic-neon-blue/5 via-black to-black opacity-40" />
-            </div>
+                {/* Header */}
+                <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-7">
+                    <p className="text-[11px] text-white/25 font-bold uppercase tracking-[0.3em] mb-1">
+                        {isRTL ? 'بيانات الحساب' : 'Account Details'}
+                    </p>
+                    <h1 className="text-2xl lg:text-3xl font-bold text-white">
+                        {isRTL ? 'الملف الشخصي' : 'Profile'}
+                    </h1>
+                </motion.div>
 
-            <main className="relative z-10 pt-32 pb-24 px-6 max-w-5xl mx-auto">
-
-                {/* Header HUD */}
-                <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-10 mb-16 border-b border-white/5 pb-10">
-                    <div className="space-y-4">
-                        <div className="flex items-center gap-3">
-                            <Link href="/dashboard" className="p-2 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all">
-                                <ChevronLeft className={cn("w-5 h-5", isRTL && "rotate-180")} />
-                            </Link>
-                            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-white/30 italic">User Central / Account Vault</span>
+                {/* Avatar */}
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.05 }}
+                    className="mb-6"
+                >
+                    <div className={cn("flex items-center gap-4 p-5 rounded-2xl bg-white/[0.03] border border-white/[0.06]", isRTL && "flex-row-reverse")}>
+                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#c9a96e]/30 to-[#c9a96e]/10 flex items-center justify-center text-[#c9a96e] font-black text-2xl shrink-0">
+                            {userName.charAt(0).toUpperCase()}
                         </div>
-                        <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-none">{isRTL ? "إعدادات الحساب" : "ACCOUNT VAULT"}</h1>
+                        <div className={isRTL ? "text-right" : ""}>
+                            <div className="text-[17px] font-bold text-white">{userName}</div>
+                            <div className="text-[12px] text-[#c9a96e]/60 font-semibold mt-0.5">
+                                {isRTL ? 'عضو نشط' : 'Active Member'}
+                            </div>
+                            {userEmail && (
+                                <div className="text-[12px] text-white/35 mt-1">{userEmail}</div>
+                            )}
+                        </div>
                     </div>
+                </motion.div>
 
-                    <div className="flex items-center gap-6">
-                        <button
-                            onClick={toggleLanguage}
-                            className="px-6 py-2.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest hover:border-white/30 transition-all"
-                        >
-                            {lang}
-                        </button>
-                        <button className="px-6 py-2.5 rounded-full bg-cinematic-neon-red/10 border border-cinematic-neon-red/40 text-[10px] font-black uppercase tracking-widest text-cinematic-neon-red hover:bg-cinematic-neon-red hover:text-white transition-all">
-                            {t('logout')}
-                        </button>
-                    </div>
-                </header>
-
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-
-                    {/* Sidebar Navigation */}
-                    <div className="space-y-4">
-                        {[
-                            { label: isRTL ? "البيانات الشخصية" : "IDENTITY", icon: User, active: true },
-                            { label: isRTL ? "الأمان والخصوصية" : "SECURITY", icon: Shield },
-                            { label: isRTL ? "التنبيهات" : "ALERTS", icon: Bell },
-                        ].map((item, i) => (
-                            <button
-                                key={i}
-                                className={cn(
-                                    "w-full p-6 rounded-2xl border flex items-center gap-5 transition-all group",
-                                    item.active ? "bg-white/5 border-cinematic-neon-blue/40 text-white" : "bg-transparent border-white/5 text-white/30 hover:bg-white/[0.02]"
-                                )}
-                            >
-                                <item.icon className={cn("w-5 h-5", item.active ? "text-cinematic-neon-blue" : "text-white/20")} />
-                                <span className="text-[11px] font-black uppercase tracking-[0.4em] italic">{item.label}</span>
-                            </button>
-                        ))}
-                    </div>
-
-                    {/* Content Area */}
-                    <div className="lg:col-span-2 space-y-12">
-                        <div className="glass-card p-10 md:p-14 bg-white/[0.01] border-white/5 space-y-10">
-
-                            <div className="flex items-center gap-8 pb-10 border-b border-white/5">
-                                <div className="w-24 h-24 rounded-full bg-cinematic-neon-blue/10 border border-cinematic-neon-blue/20 flex items-center justify-center relative group cursor-pointer">
-                                    <User className="w-10 h-10 text-cinematic-neon-blue" />
-                                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-full flex items-center justify-center text-[8px] font-black uppercase tracking-widest">{isRTL ? "تغيير" : "CHANGE"}</div>
-                                </div>
-                                <div className="space-y-1">
-                                    <div className="text-2xl font-black italic uppercase tracking-tighter">عبدالله الشهري</div>
-                                    <div className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">USER_ID: #HM-9920-ALX</div>
+                {/* Form */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                >
+                    <div className="rounded-2xl border border-white/[0.06] overflow-hidden mb-4">
+                        <div className={cn('flex items-center gap-3 px-5 py-4 bg-white/[0.02] border-b border-white/[0.05]', isRTL && 'flex-row-reverse')}>
+                            <User className="w-4 h-4 text-[#c9a96e]/70" strokeWidth={1.8} />
+                            <span className="text-[12px] font-bold text-white/50 uppercase tracking-[0.25em]">
+                                {isRTL ? 'البيانات الشخصية' : 'Personal Info'}
+                            </span>
+                        </div>
+                        <form className="p-5 space-y-4">
+                            {/* الاسم */}
+                            <div>
+                                <label className="block text-[11px] font-semibold text-white/40 mb-2">
+                                    {isRTL ? 'الاسم الكامل' : 'Full Name'}
+                                </label>
+                                <div className="relative">
+                                    <User
+                                        className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-3.5" : "left-3.5")}
+                                        strokeWidth={1.5}
+                                    />
+                                    <input
+                                        type="text"
+                                        defaultValue={userName}
+                                        className={cn(
+                                            "w-full bg-white/[0.03] border border-white/[0.08] rounded-xl py-3.5 text-[14px] text-white focus:outline-none focus:border-[#c9a96e]/40 transition-all placeholder:text-white/20",
+                                            isRTL ? "pr-10 pl-4" : "pl-10 pr-4"
+                                        )}
+                                    />
                                 </div>
                             </div>
 
-                            <form className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div className="space-y-3">
-                                    <label className="text-[9px] font-black text-white/30 uppercase tracking-[0.4em] ml-2">{t('fullName')}</label>
-                                    <input
-                                        type="text"
-                                        defaultValue="عبدالله الشهري"
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-6 text-sm text-white focus:outline-none focus:border-cinematic-neon-blue transition-all"
+                            {/* البريد */}
+                            <div>
+                                <label className="block text-[11px] font-semibold text-white/40 mb-2">
+                                    {isRTL ? 'البريد الإلكتروني' : 'Email'}
+                                </label>
+                                <div className="relative">
+                                    <Mail
+                                        className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-3.5" : "left-3.5")}
+                                        strokeWidth={1.5}
                                     />
-                                </div>
-                                <div className="space-y-3">
-                                    <label className="text-[9px] font-black text-white/30 uppercase tracking-[0.4em] ml-2">{t('email')}</label>
                                     <input
                                         type="email"
-                                        defaultValue="abdullah@hmcar.sa"
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-6 text-sm text-white/60 focus:outline-none focus:border-cinematic-neon-blue transition-all"
+                                        defaultValue={userEmail}
+                                        className={cn(
+                                            "w-full bg-white/[0.03] border border-white/[0.08] rounded-xl py-3.5 text-[14px] text-white/60 focus:outline-none focus:border-[#c9a96e]/40 transition-all placeholder:text-white/20",
+                                            isRTL ? "pr-10 pl-4" : "pl-10 pr-4"
+                                        )}
                                     />
                                 </div>
-                                <div className="space-y-3">
-                                    <label className="text-[9px] font-black text-white/30 uppercase tracking-[0.4em] ml-2">{isRTL ? "رقم الجوال" : "PHONE NUMBER"}</label>
+                            </div>
+
+                            {/* الجوال */}
+                            <div>
+                                <label className="block text-[11px] font-semibold text-white/40 mb-2">
+                                    {isRTL ? 'رقم الجوال' : 'Phone Number'}
+                                </label>
+                                <div className="relative">
+                                    <Phone
+                                        className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-3.5" : "left-3.5")}
+                                        strokeWidth={1.5}
+                                    />
                                     <input
-                                        type="text"
-                                        defaultValue="+966 50 123 4567"
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-6 text-sm text-white focus:outline-none focus:border-cinematic-neon-blue transition-all"
+                                        type="tel"
+                                        placeholder="+966 5X XXX XXXX"
+                                        className={cn(
+                                            "w-full bg-white/[0.03] border border-white/[0.08] rounded-xl py-3.5 text-[14px] text-white focus:outline-none focus:border-[#c9a96e]/40 transition-all placeholder:text-white/20",
+                                            isRTL ? "pr-10 pl-4" : "pl-10 pr-4"
+                                        )}
                                     />
                                 </div>
-                                <div className="space-y-3">
-                                    <label className="text-[9px] font-black text-white/30 uppercase tracking-[0.4em] ml-2">{isRTL ? "المنطقة" : "REGION"}</label>
-                                    <select className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-6 text-sm text-white/60 focus:outline-none focus:border-cinematic-neon-blue transition-all appearance-none">
+                            </div>
+
+                            {/* المنطقة */}
+                            <div>
+                                <label className="block text-[11px] font-semibold text-white/40 mb-2">
+                                    {isRTL ? 'المنطقة' : 'Region'}
+                                </label>
+                                <div className="relative">
+                                    <MapPin
+                                        className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-3.5" : "left-3.5")}
+                                        strokeWidth={1.5}
+                                    />
+                                    <select
+                                        aria-label={isRTL ? 'المنطقة' : 'Region'}
+                                        className={cn(
+                                            "w-full bg-[#0c0c0f] border border-white/[0.08] rounded-xl py-3.5 text-[14px] text-white/60 focus:outline-none focus:border-[#c9a96e]/40 transition-all appearance-none",
+                                            isRTL ? "pr-10 pl-4" : "pl-10 pr-4"
+                                        )}
+                                    >
                                         <option>Riyadh, KSA</option>
+                                        <option>Jeddah, KSA</option>
                                         <option>Dubai, UAE</option>
                                         <option>London, UK</option>
                                     </select>
                                 </div>
+                            </div>
 
-                                <div className="md:col-span-2 pt-6">
-                                    <motion.button
-                                        whileHover={{ scale: 1.02 }}
-                                        whileTap={{ scale: 0.98 }}
-                                        className="w-full py-5 bg-white text-black font-black uppercase text-[10px] tracking-[0.5em] rounded-2xl flex items-center justify-center gap-4 hover:bg-cinematic-neon-blue hover:text-white transition-all shadow-2xl"
-                                    >
-                                        <Save className="w-4 h-4" />
-                                        {isRTL ? "حفظ التغييرات" : "SYNC IDENTITY"}
-                                    </motion.button>
-                                </div>
-                            </form>
-                        </div>
+                            {/* زر الحفظ */}
+                            <button
+                                type="submit"
+                                className="w-full py-4 rounded-2xl bg-[#c9a96e] text-black font-bold text-[14px] transition-all hover:bg-[#d4b57a] active:scale-[0.98] flex items-center justify-center gap-2.5"
+                            >
+                                <Save className="w-4 h-4" strokeWidth={2} />
+                                {isRTL ? 'حفظ التغييرات' : 'Save Changes'}
+                            </button>
+                        </form>
+                    </div>
 
-                        {/* Security Badge */}
-                        <div className="glass-card p-10 bg-gradient-to-r from-cinematic-neon-blue/10 to-transparent border border-cinematic-neon-blue/20 flex items-center gap-10">
-                            <Shield className="w-12 h-12 text-cinematic-neon-blue shrink-0 animate-pulse" />
-                            <div className="space-y-2">
-                                <h3 className="text-base font-black italic uppercase tracking-tighter">{isRTL ? "نظام حماية البيانات النشط" : "ACTIVE VAULT PROTECTION"}</h3>
-                                <p className="text-[9px] text-white/30 uppercase leading-relaxed font-bold tracking-[0.2em]">{isRTL ? "يتم تشفير جميع بياناتك الشخصية بواسطة AES-256 ولا يتم مشاركتها مع أطراف خارجية." : "Your data is secured under military AES-256 standards with zero third-party disclosure."}</p>
+                    {/* Security Badge */}
+                    <div className={cn(
+                        "flex items-center gap-3.5 p-4 rounded-2xl bg-[#c9a96e]/[0.05] border border-[#c9a96e]/15",
+                        isRTL && "flex-row-reverse"
+                    )}>
+                        <Shield className="w-5 h-5 text-[#c9a96e]/60 shrink-0" strokeWidth={1.8} />
+                        <div className={isRTL ? "text-right" : ""}>
+                            <div className="text-[12px] font-bold text-white/60">
+                                {isRTL ? 'بياناتك محمية' : 'Your data is protected'}
+                            </div>
+                            <div className="text-[11px] text-white/30 mt-0.5">
+                                {isRTL ? 'تشفير AES-256 - لا مشاركة مع أطراف خارجية' : 'AES-256 encryption · No third-party sharing'}
                             </div>
                         </div>
                     </div>
-                </div>
-
-            </main>
-
-            {/* --- FOOTER HUD --- */}
-            <footer className="max-w-5xl mx-auto px-6 py-20 border-t border-white/5 opacity-20 flex justify-between items-center text-[7px] font-black uppercase tracking-[0.8em]">
-                <div>HM VAULT UI v2.4.0</div>
-                <div>© 2026 RIYADH HEAD OFFICE</div>
-            </footer>
+                </motion.div>
+            </div>
         </div>
     );
 }

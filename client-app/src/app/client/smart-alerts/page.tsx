@@ -7,7 +7,7 @@ import {
     Zap, Target, Check, X, AlertCircle, ToggleLeft, ToggleRight,
     Car, Filter, SlidersHorizontal, Sparkles, Clock, TrendingUp
 } from 'lucide-react';
-import Navbar from '@/components/Navbar';
+// Navbar مُزال - يتم التنقل عبر client/layout.tsx
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/lib/LanguageContext';
 import { api } from '@/lib/api';
@@ -627,18 +627,16 @@ export default function SmartAlertsPage() {
     };
 
     return (
-        <div className="relative min-h-screen bg-black text-white font-sans overflow-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
-            <Navbar />
+        <div className="relative min-h-screen text-white font-sans" dir={isRTL ? 'rtl' : 'ltr'}>
 
             {/* Background */}
             <div className="fixed inset-0 pointer-events-none">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(0,240,255,0.06),_transparent_60%)]" />
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(0,240,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(0,240,255,0.01)_1px,transparent_1px)] bg-[size:80px_80px]" />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(0,240,255,0.04),_transparent_60%)]" />
                 <div className="absolute top-1/3 right-1/4 w-96 h-96 rounded-full bg-violet-500/5 blur-3xl" />
                 <div className="absolute bottom-1/3 left-1/4 w-96 h-96 rounded-full bg-cyan-500/5 blur-3xl" />
             </div>
 
-            <main className="relative z-10 pt-32 pb-24 px-6 max-w-5xl mx-auto">
+            <main className="relative z-10 pt-6 pb-8 px-5 lg:px-8 max-w-4xl">
 
                 {/* Back */}
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="mb-10">

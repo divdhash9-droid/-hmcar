@@ -78,7 +78,7 @@ export default function ClientDashboard() {
             icon: Car,
             label: isRTL ? 'تصفح السيارات' : 'BROWSE CARS',
             subtitle: isRTL ? 'ابحث عن السيارة المناسبة' : 'Find your perfect ride',
-            href: '/cars',
+            href: '/showroom',
             color: 'text-cinematic-neon-blue',
             bg: 'bg-cinematic-neon-blue/10',
             glow: 'shadow-[0_0_30px_rgba(0,240,255,0.2)]'
@@ -403,7 +403,7 @@ export default function ClientDashboard() {
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                                 {dashboardData.recentCars.map((car: { id?: string; title: string; price: number; image?: string; img?: string }, i: number) => (
-                                    <Link key={car.id || i} href={`/cars/${car.id || ""}`}>
+                                    <Link key={car.id || i} href={`/showroom/${car.id || ""}`}>
                                         <motion.div
                                             whileHover={{ y: -10 }}
                                             className="group relative rounded-[2rem] overflow-hidden border border-white/5 bg-white/[0.02] backdrop-blur-md"

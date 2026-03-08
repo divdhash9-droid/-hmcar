@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import {
   Sparkles, Shield,
   Truck, CreditCard, Award, Star, Zap, Globe,
-  MessageCircle, Smartphone, Download, Link as LinkIcon, ArrowUpRight
+  MessageCircle, Smartphone, Download, Link as LinkIcon, ArrowUpRight, RefreshCw
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -50,6 +50,36 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
   const liveRef = useRef<HTMLDivElement>(null);
   const [videoHeight, setVideoHeight] = useState<string>("55vh");
   const [activeDock, setActiveDock] = useState<"reviews" | "app" | null>(null);
+  const [deferredInstall, setDeferredInstall] = useState<any>(null);
+  const [isInstalled, setIsInstalled] = useState(false);
+  const [showUpdateBanner, setShowUpdateBanner] = useState(false);
+
+  // التقاط حدث التثبيت PWA
+  useEffect(() => {
+    const installed = localStorage.getItem('pwa_installed');
+    if (installed) setIsInstalled(true);
+    const handler = (e: Event) => { e.preventDefault(); setDeferredInstall(e); };
+    window.addEventListener('beforeinstallprompt', handler);
+    window.addEventListener('appinstalled', () => { setIsInstalled(true); localStorage.setItem('pwa_installed', '1'); });
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  // استماع لتحديثات Service Worker الجديدة
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.addEventListener('message', (e) => {
+        if (e.data?.type === 'SW_UPDATED') setShowUpdateBanner(true);
+      });
+    }
+  }, []);
+
+  const handleInstallPWA = async () => {
+    if (!deferredInstall) return;
+    deferredInstall.prompt();
+    const { outcome } = await deferredInstall.userChoice;
+    if (outcome === 'accepted') { setIsInstalled(true); localStorage.setItem('pwa_installed', '1'); }
+    setDeferredInstall(null);
+  };
   const router = useRouter();
 
   // تتبع دخول العميل وإبلاغ الأدمن في الوقت الحقيقي
@@ -326,15 +356,30 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
                   <h2 className="text-3xl md:text-4xl font-bold text-white font-display" style={{ textShadow: "0 0 30px rgba(201,169,110,0.3)" }}>{txt.downloadTitle}</h2>
                   <p className="text-white/60">{txt.downloadSubtitle}</p>
                 </motion.div>
-                <div className="flex flex-wrap gap-4 justify-center">
-                  <motion.button className="flex items-center gap-3 px-6 py-3 bg-white text-black rounded-xl font-bold hover:bg-[#c9a96e] transition-all" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
-                    <Download className="w-5 h-5" />
-                    {txt.appStore}
-                  </motion.button>
-                  <motion.button className="flex items-center gap-3 px-6 py-3 border border-white/30 text-white rounded-xl font-bold hover:bg-white/10 transition-all" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
-                    <Download className="w-5 h-5" />
-                    {txt.playStore}
-                  </motion.button>
+                <div className="flex justify-center">
+                  {isInstalled ? (
+                    <div className="flex items-center gap-3 px-8 py-4 rounded-2xl bg-green-500/10 border border-green-500/30 text-green-400 font-black uppercase tracking-widest text-sm">
+                      ✓ {isRTL ? 'التطبيق مُثبَّت بالفعل' : 'APP ALREADY INSTALLED'}
+                    </div>
+                  ) : deferredInstall ? (
+                    <motion.button
+                      onClick={handleInstallPWA}
+                      className="flex items-center gap-3 px-10 py-5 rounded-2xl bg-gradient-to-r from-[#c9a96e] to-[#e8c97a] text-black font-black uppercase tracking-widest text-sm shadow-[0_0_40px_rgba(201,169,110,0.4)] hover:shadow-[0_0_60px_rgba(201,169,110,0.6)] transition-all"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.97 }}
+                    >
+                      <Smartphone className="w-5 h-5" />
+                      {isRTL ? 'تثبيت التطبيق' : 'INSTALL APP'}
+                    </motion.button>
+                  ) : (
+                    <div className="text-center">
+                      <p className="text-white/40 text-sm mb-4">{isRTL ? 'لتثبيت التطبيق: اضغط على زر المشاركة ثم "إضافة إلى الشاشة الرئيسية"' : 'To install: tap Share then "Add to Home Screen"'}</p>
+                      <div className="flex items-center gap-3 px-8 py-4 rounded-2xl bg-white/5 border border-white/10 text-white/50 font-black uppercase tracking-widest text-sm">
+                        <Smartphone className="w-5 h-5" />
+                        {isRTL ? 'متوفر للتثبيت' : 'AVAILABLE TO INSTALL'}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -698,6 +743,36 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
           </div>
         </div>
       </footer>
+
+      {/* ── بانر التحديث التلقائي ── */}
+      {showUpdateBanner && (
+        <motion.div
+          initial={{ y: -80, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="fixed top-0 left-0 right-0 z-[9999] bg-[#c9a96e] text-black px-4 py-3 flex items-center justify-between shadow-[0_4px_20px_rgba(201,169,110,0.5)]"
+        >
+          <div className="flex items-center gap-3">
+            <RefreshCw className="w-4 h-4 animate-spin" />
+            <span className="text-sm font-black uppercase tracking-wider">
+              {isRTL ? '🎉 تحديث جديد متوفر!' : '🎉 New update available!'}
+            </span>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-1.5 bg-black text-[#c9a96e] text-xs font-black uppercase tracking-widest rounded-lg hover:bg-black/80 transition-all"
+            >
+              {isRTL ? 'تحديث الآن' : 'UPDATE NOW'}
+            </button>
+            <button
+              onClick={() => setShowUpdateBanner(false)}
+              className="text-black/60 hover:text-black text-xs font-black"
+            >
+              ✕
+            </button>
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 }

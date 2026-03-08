@@ -24,8 +24,11 @@
       "dest": "vercel-server.js"
     },
     {
+      "handle": "filesystem"
+    },
+    {
       "src": "/(.*)",
-      "dest": "/client-app/$1"
+      "dest": "client-app/$1"
     }
   ],
   "env": {

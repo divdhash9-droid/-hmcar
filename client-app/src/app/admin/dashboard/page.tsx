@@ -24,7 +24,8 @@ import {
     Mail,
     ChevronLeft,
     Radio,
-    Database
+    Database,
+    Briefcase
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -179,6 +180,7 @@ export default function AdminDashboard() {
         { icon: ShoppingCart, label: isRTL ? 'الطلبات' : 'ORDERS', href: '/admin/orders', accent: 'bg-white/10 text-white' },
         { icon: Users, label: isRTL ? 'إدارة الأعضاء' : 'MEMBER DIR', href: '/admin/users', accent: 'bg-white/10 text-white' },
         { id: 'contact', icon: Mail, label: isRTL ? 'استفسارات الموقع' : 'INQUIRIES', href: '/admin/contact', accent: 'bg-cinematic-neon-red/20 text-cinematic-neon-red' },
+        { icon: Briefcase, label: isRTL ? 'الطلبات الخاصة' : 'SPECIAL REQS', href: '/admin/concierge', accent: 'bg-amber-500/20 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.2)]' },
         { icon: MessageCircle, label: isRTL ? 'المحادثات المباشرة' : 'DIRECT CHATS', href: '/admin/messages', accent: 'bg-cinematic-neon-blue/20 text-cinematic-neon-blue shadow-[0_0_15px_rgba(0,240,255,0.3)]' },
         { icon: TrendingUp, label: isRTL ? 'التقارير' : 'REPORTS', href: '/admin/reports', accent: 'bg-green-400/20 text-green-400' },
         { icon: Tag, label: t('brands'), href: '/admin/brands', accent: 'bg-cinematic-neon-yellow/30 text-cinematic-neon-yellow shadow-[0_0_15px_rgba(252,238,10,0.3)]' },
@@ -194,6 +196,7 @@ export default function AdminDashboard() {
         { id: 'auctions', icon: Gavel, label: isRTL ? 'المزادات' : 'AUCTIONS', href: '/admin/auctions' },
         { id: 'brands', icon: Tag, label: t('brands'), href: '/admin/brands' },
         { id: 'orders', icon: ShoppingCart, label: isRTL ? 'الطلبات' : 'ORDERS', href: '/admin/orders' },
+        { id: 'concierge', icon: Briefcase, label: isRTL ? 'الطلبات الخاصة' : 'SPECIAL REQS', href: '/admin/concierge' },
         { id: 'users', icon: Users, label: isRTL ? 'المستخدمون' : 'DIRECTORY', href: '/admin/users' },
         { id: 'contact', icon: Mail, label: isRTL ? 'الاستفسارات' : 'INQUIRIES', href: '/admin/contact' },
         { id: 'messages', icon: MessageCircle, label: isRTL ? 'المحادثات' : 'CHATS', href: '/admin/messages' },

@@ -256,14 +256,16 @@ export default function OrdersPage() {
                                                             {isRTL ? 'عرض' : 'VIEW'}
                                                         </motion.button>
                                                     </Link>
-                                                    <motion.button
-                                                        whileHover={{ scale: 1.05 }}
-                                                        whileTap={{ scale: 0.95 }}
-                                                        className="w-full py-3 bg-white/5 border border-white/10 text-white/60 rounded-xl text-[10px] font-black uppercase tracking-wide flex items-center justify-center gap-2 hover:bg-white/10 transition-all"
-                                                    >
-                                                        <Download className="w-4 h-4" />
-                                                        {isRTL ? 'فاتورة' : 'INVOICE'}
-                                                    </motion.button>
+                                                    <Link href={`/orders/${order.id}/invoice`}>
+                                                        <motion.button
+                                                            whileHover={{ scale: 1.05 }}
+                                                            whileTap={{ scale: 0.95 }}
+                                                            className="w-full py-3 bg-white/5 border border-white/10 text-white/60 rounded-xl text-[10px] font-black uppercase tracking-wide flex items-center justify-center gap-2 hover:bg-yellow-500/10 hover:border-yellow-500/30 hover:text-yellow-400 transition-all"
+                                                        >
+                                                            <Download className="w-4 h-4" />
+                                                            {isRTL ? 'فاتورة' : 'INVOICE'}
+                                                        </motion.button>
+                                                    </Link>
                                                 </div>
                                             </div>
 

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 import ClientLayoutWrapper from "@/components/ClientLayoutWrapper";
+import PWAInstaller from "@/components/PWAInstaller";
 import { cookies } from "next/headers";
 
 // [[ARABIC_COMMENT]] الـ Viewport للتحكم في مقياس الشاشة على الموبايل
@@ -16,8 +17,9 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: "HM CAR | Premium Korean Auto Export",
-  description: "The premier destination for luxury Korean car exports and rare components worldwide. Seoul to the world.",
-  keywords: "car export, korean cars, luxury vehicles, spare parts, auto auction",
+  description: "منصة اتش ام كار - المحطة الأولى لتصدير السيارات الفاخرة وقطع الغيار الأصلية من كوريا الجنوبية.",
+  keywords: "car export, korean cars, luxury vehicles, spare parts, auto auction, سيارات كورية, قطع غيار, مزاد سيارات",
+  manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -25,9 +27,20 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "HM CAR | Premium Korean Auto Export",
-    description: "Exporting cars & parts from Korea to the world",
+    description: "تصدير السيارات الفاخرة وقطع الغيار من كوريا إلى العالم",
     type: "website",
+    siteName: "HM CAR",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "HM CAR",
+    description: "منصة اتش ام كار للسيارات الفاخرة",
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+    "msapplication-TileColor": "#000000",
+    "msapplication-config": "/browserconfig.xml"
+  }
 };
 
 export default async function RootLayout({
@@ -42,12 +55,25 @@ export default async function RootLayout({
 
   return (
     <html lang={lang} dir={dir}>
-      <head />
+      <head>
+        {/* [[ARABIC_COMMENT]] إيقونات Apple للـ PWA على iOS */}
+        <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192x192.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-96x96.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-72x72.png" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="HM CAR" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="msapplication-TileColor" content="#000000" />
+        <meta name="format-detection" content="telephone=no" />
+      </head>
       <body className="antialiased selection:bg-white/20 selection:text-white" style={{ fontFamily: "system-ui, sans-serif" }}>
         <Providers>
           <ClientLayoutWrapper>
             {children}
           </ClientLayoutWrapper>
+          {/* [[ARABIC_COMMENT]] مكوّن تثبيت PWA - يظهر بانر التثبيت على الجوال */}
+          <PWAInstaller />
         </Providers>
       </body>
     </html>

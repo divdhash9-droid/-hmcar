@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     Menu, X, User, Languages, ArrowLeft, ArrowRight,
     Headphones, MessageCircle,
-    Car, Gavel, ShoppingBag, Settings, ShoppingCart, Heart
+    Car, Gavel, ShoppingBag, Settings, ShoppingCart, Heart, Calculator
 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useLanguage } from '@/lib/LanguageContext';
@@ -57,6 +57,7 @@ export default function Navbar() {
         { href: '/showroom', label: isRTL ? 'المعرض' : 'SHOWROOM', icon: Car },
         { href: '/auctions', label: isRTL ? 'المزادات' : 'AUCTIONS', icon: Gavel },
         { href: '/parts', label: isRTL ? 'القطع' : 'PARTS', icon: ShoppingBag },
+        { href: '/loan-calculator', label: isRTL ? 'حاسبة التمويل' : 'CALCULATOR', icon: Calculator },
         { href: '/concierge', label: isRTL ? 'الكونسيرج' : 'CONCIERGE', icon: Settings },
         { href: '/support', label: isRTL ? 'الدعم' : 'SUPPORT', icon: Headphones },
         { href: '/contact', label: isRTL ? 'تواصل' : 'CONTACT', icon: MessageCircle },

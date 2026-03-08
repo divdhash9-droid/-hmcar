@@ -119,11 +119,13 @@ export default function Login() {
                 // حفظ التوكن وبيانات المستخدم
                 localStorage.setItem('hm_token', response.token);
                 localStorage.setItem('hm_user', JSON.stringify(response.user));
-                // حفظ الدور منفصلاً لأن dashboard يقرأها بشكل منفصل
                 const savedRole = response.user?.role || 'buyer';
                 localStorage.setItem('hm_user_role', savedRole);
-                // حفظ في Cookie للـ middleware
-                document.cookie = `hm_token=${response.token}; path=/; max-age=86400; SameSite=Lax`;
+
+                // حفظ في Cookie للـ middleware - مهم جداً للتوجيه الصحيح
+                const maxAge = rememberMe ? 604800 : 86400; // أسبوع أو يوم
+                document.cookie = `hm_token=${response.token}; path=/; max-age=${maxAge}; SameSite=Lax`;
+                document.cookie = `hm_user_role=${savedRole}; path=/; max-age=${maxAge}; SameSite=Lax`;
 
                 if (response.isNewUser) {
                     setSuccessMessage(isRTL ? 'تم إنشاء حسابك بنجاح! جاري الدخول...' : 'Account created! Logging in...');
@@ -133,12 +135,18 @@ export default function Login() {
 
                 setTimeout(() => {
                     const userRole = response.user.role || 'buyer';
-                    if (userRole === 'admin' || userRole === 'super_admin' || userRole === 'manager') {
+                    // التحقق من وجود redirect param
+                    const params = new URLSearchParams(window.location.search);
+                    const redirectTo = params.get('redirect');
+                    if (redirectTo && redirectTo.startsWith('/')) {
+                        window.location.href = redirectTo;
+                    } else if (userRole === 'admin' || userRole === 'super_admin' || userRole === 'manager') {
                         window.location.href = "/admin/dashboard";
                     } else {
                         window.location.href = "/client/dashboard";
                     }
                 }, 800);
+
             } else {
                 setError(response.error || (isRTL ? 'فشل تسجيل الدخول' : 'Login failed'));
                 setLoading(false);

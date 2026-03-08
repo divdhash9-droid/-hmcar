@@ -71,6 +71,10 @@ export default function Navbar() {
 
     const isActive = (href: string) => pathname === href;
 
+    // ── لا يظهر Navbar في صفحات الأدمن - AdminNavbar يتولى التنقل هناك ──
+    if (pathname?.startsWith('/admin')) return null;
+
+
     // في وضع التطبيق المثبت، لا نعرض الـ Navbar - BottomTabBar يتولى التنقل
     if (isStandalone) return null;
 

@@ -9,7 +9,7 @@ const { requireAuthAPI, requirePermissionAPI } = require('../../../middleware/au
 
 // [[ARABIC_COMMENT]] جلب جميع النماذج للنسخ الاحتياطي
 const Car = require('../../../models/Car');
-const Part = require('../../../models/Part');
+const SparePart = require('../../../models/SparePart'); // [[ARABIC_COMMENT]] الاسم الصحيح للنموذج هو SparePart وليس Part
 
 // [[ARABIC_COMMENT]] POST /api/v2/backup - إنشاء نسخة احتياطية يدوية (أدمن فقط)
 router.post('/', requireAuthAPI, requirePermissionAPI('manage_cars'), async (req, res) => {
@@ -19,7 +19,7 @@ router.post('/', requireAuthAPI, requirePermissionAPI('manage_cars'), async (req
         // [[ARABIC_COMMENT]] جلب جميع البيانات
         const [cars, parts] = await Promise.all([
             Car.find({}).lean(),
-            Part.find({}).lean(),
+            SparePart.find({}).lean(),
         ]);
 
         // [[ARABIC_COMMENT]] بناء ملف النسخة الاحتياطية
@@ -59,7 +59,7 @@ router.get('/status', requireAuthAPI, requirePermissionAPI('manage_cars'), async
     try {
         const [carCount, partCount] = await Promise.all([
             Car.countDocuments(),
-            Part.countDocuments(),
+            SparePart.countDocuments(),
         ]);
 
         res.json({

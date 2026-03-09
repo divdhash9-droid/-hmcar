@@ -55,6 +55,16 @@ export const api = {
         getById: (id: string) => request<any>(`/v2/cars/${id}`),
     },
 
+    auctions: {
+        getAll: (params?: Record<string, string>) => {
+            const query = params ? '?' + new URLSearchParams(params).toString() : '';
+            return request<any>(`/v2/auctions${query}`);
+        },
+        getById: (id: string) => request<any>(`/v2/auctions/${id}`),
+        placeBid: (id: string, amount: number) =>
+            request<any>(`/v2/auctions/${id}/bid`, { method: 'POST', body: JSON.stringify({ amount }) }),
+    },
+
     orders: {
         getMyOrders: () => request<any>('/v2/orders/my'),
     },
@@ -78,5 +88,6 @@ export const api = {
     profile: {
         update: (data: any) =>
             request<any>('/v2/user/profile', { method: 'PUT', body: JSON.stringify(data) }),
+        get: () => request<any>('/v2/auth/me'),
     },
 };

@@ -921,3 +921,736 @@ select {
     padding-top: calc(3.5rem + env(safe-area-inset-top));
   }
 }
+
+/* ════════════════════════════════════════════════════════════════
+   ✈️  COCKPIT ADMIN DESIGN SYSTEM — HM CAR
+   ════════════════════════════════════════════════════════════════ */
+
+/* ── CSS Variables ── */
+:root {
+  --cockpit-orange: #F97316;
+  --cockpit-orange-dim: rgba(249, 115, 22, 0.15);
+  --cockpit-orange-glow: rgba(249, 115, 22, 0.4);
+  --cockpit-bg: #070711;
+  --cockpit-surface: rgba(255, 255, 255, 0.025);
+  --cockpit-border: rgba(249, 115, 22, 0.12);
+  --cockpit-border-hover: rgba(249, 115, 22, 0.35);
+  --cockpit-text-muted: rgba(255, 255, 255, 0.3);
+}
+
+/* ── Cockpit Font for Numbers ── */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap');
+
+.cockpit-num {
+  font-family: 'Orbitron', 'JetBrains Mono', monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.05em;
+}
+
+.cockpit-mono {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  letter-spacing: 0.03em;
+}
+
+/* ── Cards ── */
+.ck-card {
+  background: linear-gradient(135deg,
+      rgba(249, 115, 22, 0.04) 0%,
+      rgba(255, 255, 255, 0.015) 50%,
+      rgba(249, 115, 22, 0.02) 100%);
+  border: 1px solid var(--cockpit-border);
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.ck-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(249, 115, 22, 0.4), transparent);
+}
+
+.ck-card:hover {
+  border-color: var(--cockpit-border-hover);
+  box-shadow:
+    0 0 40px rgba(249, 115, 22, 0.06),
+    inset 0 0 40px rgba(249, 115, 22, 0.02);
+}
+
+/* ── Stat Cards ── */
+.ck-stat {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(249, 115, 22, 0.1);
+  border-radius: 20px;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.ck-stat::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--cockpit-orange), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.ck-stat:hover::after {
+  opacity: 1;
+}
+
+.ck-stat:hover {
+  border-color: rgba(249, 115, 22, 0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(249, 115, 22, 0.1);
+}
+
+.ck-stat-num {
+  font-family: 'Orbitron', 'JetBrains Mono', monospace;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-shadow: 0 0 30px rgba(249, 115, 22, 0.3);
+}
+
+/* ── Buttons ── */
+.ck-btn-primary {
+  background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 0.65rem 1.4rem;
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s ease;
+  box-shadow: 0 0 20px rgba(249, 115, 22, 0.3);
+}
+
+.ck-btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), transparent);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.ck-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 35px rgba(249, 115, 22, 0.5);
+}
+
+.ck-btn-primary:hover::before {
+  opacity: 1;
+}
+
+.ck-btn-primary:active {
+  transform: translateY(0) scale(0.97);
+}
+
+.ck-btn-ghost {
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 0.65rem 1.4rem;
+  font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.ck-btn-ghost:hover {
+  background: rgba(249, 115, 22, 0.08);
+  border-color: rgba(249, 115, 22, 0.3);
+  color: #F97316;
+}
+
+.ck-btn-danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: rgba(239, 68, 68, 0.8);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ck-btn-danger:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #ef4444;
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
+}
+
+/* ── Inputs ── */
+.ck-input {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  color: #fff;
+  padding: 0.7rem 1rem;
+  font-size: 0.875rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+}
+
+.ck-input::placeholder {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.ck-input:focus {
+  outline: none;
+  border-color: rgba(249, 115, 22, 0.4);
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.08), 0 0 15px rgba(249, 115, 22, 0.1);
+}
+
+.ck-select {
+  background: rgba(10, 10, 20, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  color: #fff;
+  padding: 0.7rem 1rem;
+  font-size: 0.875rem;
+  transition: border-color 0.2s;
+  width: 100%;
+  cursor: pointer;
+}
+
+.ck-select:focus {
+  outline: none;
+  border-color: rgba(249, 115, 22, 0.4);
+}
+
+/* ── Tables ── */
+.ck-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ck-table th {
+  background: rgba(249, 115, 22, 0.05);
+  color: rgba(249, 115, 22, 0.8);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding: 0.85rem 1rem;
+  text-align: right;
+  border-bottom: 1px solid rgba(249, 115, 22, 0.12);
+}
+
+.ck-table td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.875rem;
+  transition: background 0.15s;
+}
+
+.ck-table tr:hover td {
+  background: rgba(249, 115, 22, 0.04);
+}
+
+/* ── Status Badges ── */
+.ck-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ck-badge-active {
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.ck-badge-pending {
+  background: rgba(249, 115, 22, 0.1);
+  color: #F97316;
+  border: 1px solid rgba(249, 115, 22, 0.2);
+}
+
+.ck-badge-inactive {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ck-badge-danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.ck-badge-info {
+  background: rgba(59, 130, 246, 0.1);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+/* Live dot on badge */
+.ck-badge-live::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: ck-pulse 1.5s infinite;
+}
+
+/* ── Section Headers ── */
+.ck-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.ck-section-title::before {
+  content: '';
+  display: block;
+  width: 3px;
+  height: 18px;
+  background: var(--cockpit-orange);
+  border-radius: 2px;
+  box-shadow: 0 0 10px var(--cockpit-orange-glow);
+}
+
+/* ── Page Header HUD ── */
+.ck-page-header {
+  position: relative;
+  padding: 2rem 0 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.ck-page-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(249, 115, 22, 0.4), transparent 60%);
+}
+
+.ck-page-title {
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  background: linear-gradient(135deg, #fff 0%, rgba(255, 255, 255, 0.6) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.ck-page-subtitle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: rgba(249, 115, 22, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  margin-top: 0.4rem;
+}
+
+/* ── Breadcrumb ── */
+.ck-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.7rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: rgba(255, 255, 255, 0.25);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+}
+
+.ck-breadcrumb a:hover {
+  color: rgba(249, 115, 22, 0.8);
+}
+
+.ck-breadcrumb-sep {
+  color: rgba(249, 115, 22, 0.3);
+}
+
+/* ── Radar/Loading Spinner ── */
+.ck-radar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid rgba(249, 115, 22, 0.15);
+  border-top-color: var(--cockpit-orange);
+  animation: ck-spin 0.8s linear infinite;
+  position: relative;
+}
+
+.ck-radar::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  border: 1px solid rgba(249, 115, 22, 0.1);
+  border-top-color: rgba(249, 115, 22, 0.4);
+  animation: ck-spin 1.2s linear infinite reverse;
+}
+
+/* ── Modal ── */
+.ck-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(7, 7, 17, 0.85);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+
+.ck-modal {
+  background: linear-gradient(135deg, rgba(15, 15, 30, 0.98), rgba(10, 10, 20, 0.99));
+  border: 1px solid rgba(249, 115, 22, 0.2);
+  border-radius: 24px;
+  max-width: 640px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow:
+    0 0 80px rgba(249, 115, 22, 0.08),
+    0 40px 80px rgba(0, 0, 0, 0.8);
+}
+
+.ck-modal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--cockpit-orange), transparent);
+  border-radius: 24px 24px 0 0;
+}
+
+/* ── Filter Tabs ── */
+.ck-tab-group {
+  display: flex;
+  gap: 0.35rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 0.3rem;
+}
+
+.ck-tab {
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  background: transparent;
+}
+
+.ck-tab:hover {
+  color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.ck-tab-active {
+  background: rgba(249, 115, 22, 0.15);
+  color: #F97316;
+  box-shadow: 0 0 15px rgba(249, 115, 22, 0.15);
+}
+
+/* ── Gauge / Progress ── */
+.ck-gauge-track {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.ck-gauge-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #EA580C, #F97316, #FB923C);
+  position: relative;
+  transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ck-gauge-fill::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 12px;
+  background: rgba(255, 255, 255, 0.4);
+  filter: blur(4px);
+  border-radius: 50%;
+}
+
+/* ── Cockpit Orange Glow Text ── */
+.ck-glow-text {
+  color: var(--cockpit-orange);
+  text-shadow: 0 0 15px var(--cockpit-orange-glow);
+}
+
+/* ── Empty State ── */
+.ck-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  color: rgba(255, 255, 255, 0.15);
+  text-align: center;
+  gap: 1rem;
+}
+
+.ck-empty-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(249, 115, 22, 0.06);
+  border: 1px solid rgba(249, 115, 22, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(249, 115, 22, 0.3);
+}
+
+/* ── Scan Line (decorative) ── */
+.ck-scanline {
+  position: relative;
+  overflow: hidden;
+}
+
+.ck-scanline::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(249, 115, 22, 0.3), transparent);
+  animation: ck-scan 4s linear infinite;
+}
+
+/* ── Hover Card Effect ── */
+.ck-hover-lift {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.ck-hover-lift:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 16px 50px rgba(249, 115, 22, 0.1);
+}
+
+/* ── Ripple Button ── */
+.ck-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.ck-ripple::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(249, 115, 22, 0.3);
+  width: 0;
+  height: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: ck-ripple 0.5s ease-out;
+}
+
+.ck-ripple:active::after {
+  animation: ck-ripple 0.4s ease-out;
+}
+
+/* ── Keyframes ── */
+@keyframes ck-pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
+}
+
+@keyframes ck-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ck-scan {
+  0% {
+    top: 0%;
+  }
+
+  100% {
+    top: 100%;
+  }
+}
+
+@keyframes ck-ripple {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 0.8;
+  }
+
+  100% {
+    width: 200%;
+    height: 200%;
+    opacity: 0;
+    padding-bottom: 200%;
+  }
+}
+
+@keyframes ck-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ck-counter {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.ck-fade-up {
+  animation: ck-fade-up 0.45s ease forwards;
+}
+
+/* Stagger delay helpers */
+.ck-delay-1 {
+  animation-delay: 0.05s;
+}
+
+.ck-delay-2 {
+  animation-delay: 0.1s;
+}
+
+.ck-delay-3 {
+  animation-delay: 0.15s;
+}
+
+.ck-delay-4 {
+  animation-delay: 0.2s;
+}
+
+/* ── Scrollbar (admin dark) ── */
+.ck-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.ck-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ck-scroll::-webkit-scrollbar-thumb {
+  background: rgba(249, 115, 22, 0.2);
+  border-radius: 4px;
+}
+
+.ck-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(249, 115, 22, 0.4);
+}
+
+/* ── Cockpit tooltip ── */
+[data-cockpit-tip] {
+  position: relative;
+}
+
+[data-cockpit-tip]::after {
+  content: attr(data-cockpit-tip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 15, 30, 0.95);
+  border: 1px solid rgba(249, 115, 22, 0.2);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.65rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 8px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.2s;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.05em;
+}
+
+[data-cockpit-tip]:hover::after {
+  opacity: 1;
+}
+
+/* ════════════════════════════════════════════════════════════════ */

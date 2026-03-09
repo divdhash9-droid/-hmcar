@@ -98,19 +98,27 @@ const nextConfig: NextConfig = {
   // [[ARABIC_COMMENT]] إعادة توجيه الطلبات
   // ─────────────────────────────────────────────
   async rewrites() {
-    // [[ARABIC_COMMENT]] في الإنتاج: vercel.json يتولى توجيه /api/* لـ vercel-server.js
-    if (process.env.NODE_ENV === 'production') {
-      return [];
+    // [[ARABIC_COMMENT]] إذا وُجد NEXT_PUBLIC_API_URL يُطبَّق proxy في كل البيئات
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    if (apiUrl) {
+      return [
+        {
+          source: "/api/:path*",
+          destination: `${apiUrl}/api/:path*`,
+        },
+      ];
     }
-    // [[ARABIC_COMMENT]] في التطوير المحلي: توجيه إلى Express على localhost:4002
-    return [
-      {
-        source: "/api/:path*",
-        destination: process.env.NEXT_PUBLIC_API_URL
-          ? `${process.env.NEXT_PUBLIC_API_URL}/api/:path*`
-          : "http://localhost:4002/api/:path*",
-      },
-    ];
+    // [[ARABIC_COMMENT]] في التطوير المحلي بدون NEXT_PUBLIC_API_URL: توجيه إلى Express على localhost:4002
+    if (process.env.NODE_ENV !== 'production') {
+      return [
+        {
+          source: "/api/:path*",
+          destination: "http://localhost:4002/api/:path*",
+        },
+      ];
+    }
+    // [[ARABIC_COMMENT]] في الإنتاج من الجذر: vercel.json يتولى التوجيه
+    return [];
   },
 
   // ─────────────────────────────────────────────

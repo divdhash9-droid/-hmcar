@@ -3,10 +3,10 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import {
-    TrendingUp, ChevronLeft, X,
+    TrendingUp, X,
     ShoppingCart, Clock, CheckCircle, Eye, Package, MessageCircle
 } from 'lucide-react';
-import Navbar from '@/components/Navbar';
+
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/lib/LanguageContext';
@@ -103,7 +103,7 @@ export default function AdminOrdersPage() {
             setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
             if (selectedOrder?.id === orderId) setSelectedOrder(prev => prev ? { ...prev, status: newStatus } : null);
             showToast(isRTL ? 'تم تحديث حالة الطلب بنجاح' : 'Order status updated successfully', 'success');
-        } catch (err) {
+        } catch {
             showToast(isRTL ? 'فشل تحديث الحالة' : 'Failed to update status', 'error');
         } finally {
             setUpdatingId(null);
@@ -117,141 +117,156 @@ export default function AdminOrdersPage() {
             setOrders(prev => prev.filter(o => o.id !== orderId));
             if (selectedOrder?.id === orderId) setSelectedOrder(null);
             showToast(isRTL ? 'تم إلغاء الطلب نهائياً' : 'Order was successfully cancelled', 'success');
-        } catch (err) {
+        } catch {
             showToast(isRTL ? 'فشل إلغاء الطلب' : 'Failed to cancel order', 'error');
         }
     };
 
-    const getStatusColor = (s: string) => {
+    const getStatusBadge = (s: string) => {
         switch (s) {
-            case 'pending': return 'text-yellow-400';
-            case 'confirmed': return 'text-blue-400';
-            case 'completed': return 'text-green-400';
-            case 'cancelled': return 'text-red-400';
-            default: return 'text-white/40';
+            case 'pending': return 'ck-badge ck-badge-pending';
+            case 'confirmed': return 'ck-badge ck-badge-info';
+            case 'completed': return 'ck-badge ck-badge-active';
+            case 'cancelled': return 'ck-badge ck-badge-danger';
+            default: return 'ck-badge ck-badge-inactive';
         }
     };
 
-    const getStatusBg = (s: string) => {
-        switch (s) {
-            case 'pending': return 'bg-yellow-400/10 border-yellow-400/20';
-            case 'confirmed': return 'bg-blue-400/10 border-blue-400/20';
-            case 'completed': return 'bg-green-400/10 border-green-400/20';
-            case 'cancelled': return 'bg-red-400/10 border-red-400/20';
-            default: return 'bg-white/5 border-white/10';
-        }
+    const statusLabel = (s: string) => {
+        if (isRTL) return { pending: 'انتظار', confirmed: 'مؤكد', completed: 'مكتمل', cancelled: 'ملغي' }[s] || s;
+        return s.toUpperCase();
     };
 
     return (
-        <div className="relative min-h-screen bg-black text-white selection:bg-blue-500/30">
-            <Navbar />
+        <div className="relative min-h-screen text-white" dir={isRTL ? 'rtl' : 'ltr'}>
 
-            {/* Modal Detail */}
+            {/* ── Order Detail Modal ── */}
             <AnimatePresence>
                 {selectedOrder && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto"
-                        onClick={e => e.target === e.currentTarget && setSelectedOrder(null)}
-                    >
-                        <motion.div
-                            initial={{ scale: 0.95, y: 20 }}
-                            animate={{ scale: 1, y: 0 }}
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[200] flex items-center justify-center p-4 overflow-y-auto"
+                        style={{ background: 'rgba(7,7,17,0.9)', backdropFilter: 'blur(16px)' }}
+                        onClick={e => e.target === e.currentTarget && setSelectedOrder(null)}>
+                        <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }}
                             exit={{ scale: 0.95, y: 20 }}
-                            className="w-full max-w-2xl bg-[#0a0a0a] border border-white/10 rounded-[2.5rem] overflow-hidden shadow-[0_0_50px_rgba(0,0,0,1)] relative"
-                        >
-                            <div className="p-8 border-b border-white/5 flex items-center justify-between bg-gradient-to-r from-blue-500/5 to-transparent">
+                            className="ck-modal w-full max-w-2xl my-auto">
+
+                            {/* Modal Header */}
+                            <div className="p-6 border-b border-white/5 flex items-center justify-between">
                                 <div>
-                                    <div className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] mb-1">{isRTL ? 'سجل الطلب' : 'ORDER LOG'}</div>
-                                    <h2 className="text-2xl font-black text-white uppercase italic tracking-tighter">#{selectedOrder.orderNumber}</h2>
+                                    <p className="cockpit-mono text-[9px] text-orange-500/50 uppercase tracking-[0.3em] mb-1">
+                                        {isRTL ? 'سجل الطلب' : 'ORDER LOG'}
+                                    </p>
+                                    <h2 className="cockpit-num text-2xl font-black text-orange-400">
+                                        #{selectedOrder.orderNumber}
+                                    </h2>
                                 </div>
-                                <button onClick={() => setSelectedOrder(null)} className="p-3 rounded-full bg-white/5 hover:bg-white/10 transition-all group">
-                                    <X className="w-6 h-6 text-white/30 group-hover:text-white" />
+                                <button onClick={() => setSelectedOrder(null)}
+                                    className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
+                                    <X className="w-5 h-5 text-white/40" />
                                 </button>
                             </div>
 
-                            <div className="p-8 space-y-8">
-                                {/* Buyer Info */}
-                                <div className="grid grid-cols-2 gap-8">
-                                    <div className="space-y-1">
-                                        <div className="text-[9px] font-black uppercase tracking-[0.4em] text-white/30">{isRTL ? 'المشتري' : 'BUYER'}</div>
-                                        <div className="text-sm font-bold">{selectedOrder.buyer.name}</div>
-                                        <div className="text-xs text-white/50">{selectedOrder.buyer.email}</div>
-                                        {selectedOrder.buyer.phone && <div className="text-xs text-blue-400">{selectedOrder.buyer.phone}</div>}
+                            <div className="p-6 space-y-6">
+                                {/* Buyer + Channel */}
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="ck-card p-4 space-y-1">
+                                        <p className="cockpit-mono text-[9px] text-orange-500/50 uppercase tracking-[0.2em]">
+                                            {isRTL ? 'المشتري' : 'BUYER'}
+                                        </p>
+                                        <p className="text-sm font-bold">{selectedOrder.buyer.name}</p>
+                                        <p className="cockpit-mono text-[10px] text-white/40">{selectedOrder.buyer.email}</p>
+                                        {selectedOrder.buyer.phone && (
+                                            <p className="cockpit-mono text-[10px] text-orange-400">{selectedOrder.buyer.phone}</p>
+                                        )}
                                     </div>
-                                    <div className="space-y-1">
-                                        <div className="text-[9px] font-black uppercase tracking-[0.4em] text-white/30">{isRTL ? 'القناة والتاريخ' : 'CHANNEL & DATE'}</div>
-                                        <div className="flex items-center gap-2 text-xs font-bold uppercase truncate">
-                                            {selectedOrder.channel === 'whatsapp' ? <MessageCircle size={14} className="text-green-400" /> : <ShoppingCart size={14} className="text-blue-400" />}
+                                    <div className="ck-card p-4 space-y-1">
+                                        <p className="cockpit-mono text-[9px] text-orange-500/50 uppercase tracking-[0.2em]">
+                                            {isRTL ? 'القناة والتاريخ' : 'CHANNEL'}
+                                        </p>
+                                        <div className="flex items-center gap-2 text-xs font-bold uppercase">
+                                            {selectedOrder.channel === 'whatsapp'
+                                                ? <MessageCircle size={14} className="text-green-400" />
+                                                : <ShoppingCart size={14} className="text-orange-400" />}
                                             {selectedOrder.channel}
                                         </div>
-                                        <div className="text-xs text-white/50">{new Date(selectedOrder.createdAt).toLocaleString()}</div>
+                                        <p className="cockpit-mono text-[10px] text-white/40">
+                                            {new Date(selectedOrder.createdAt).toLocaleString()}
+                                        </p>
                                     </div>
                                 </div>
 
-                                {/* Items List */}
-                                <div className="space-y-4">
-                                    <div className="text-[9px] font-black uppercase tracking-[0.4em] text-white/30">{isRTL ? 'محتويات السلة' : 'INVENTORY ITEMS'}</div>
-                                    <div className="space-y-2 border border-white/5 rounded-2xl overflow-hidden">
+                                {/* Items */}
+                                <div>
+                                    <p className="ck-section-title mb-3">{isRTL ? 'محتويات الطلب' : 'ORDER ITEMS'}</p>
+                                    <div className="space-y-2 ck-card overflow-hidden">
                                         {selectedOrder.items.map((item, idx) => (
-                                            <div key={idx} className="flex items-center justify-between p-4 bg-white/[0.02] border-b border-white/5 last:border-0 hover:bg-white/[0.04] transition-all">
+                                            <div key={idx} className="flex items-center justify-between p-4 border-b border-white/5 last:border-0 hover:bg-orange-500/5 transition-all">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="p-2 rounded-lg bg-white/5 border border-white/5 text-white/30">
-                                                        {item.itemType === 'car' ? <CarIcon size={16} /> : <Package size={16} />}
+                                                    <div className="p-2 rounded-lg bg-orange-500/10 border border-orange-500/15 text-orange-400">
+                                                        {item.itemType === 'car' ? <CarIcon className="w-3.5 h-3.5" /> : <Package className="w-3.5 h-3.5" />}
+
                                                     </div>
                                                     <div>
-                                                        <div className="text-xs font-black uppercase tracking-wide">{item.titleSnapshot}</div>
-                                                        <div className="text-[9px] text-white/30">{item.itemType === 'car' ? (isRTL ? 'مركبة' : 'Vehicle') : (isRTL ? 'قطعة غيار' : 'Spare Part')}</div>
+                                                        <p className="text-xs font-bold">{item.titleSnapshot}</p>
+                                                        <p className="cockpit-mono text-[9px] text-white/30">
+                                                            {item.itemType === 'car' ? (isRTL ? 'مركبة' : 'Vehicle') : (isRTL ? 'قطعة غيار' : 'Spare Part')}
+                                                        </p>
                                                     </div>
                                                 </div>
                                                 <div className="text-right">
-                                                    <div className="text-xs font-black text-blue-400">{item.unitPriceSar?.toLocaleString()} SAR</div>
-                                                    <div className="text-[9px] text-white/30">Qty: {item.qty}</div>
+                                                    <p className="cockpit-num text-sm font-black text-orange-400">{item.unitPriceSar?.toLocaleString()}</p>
+                                                    <p className="cockpit-mono text-[9px] text-white/30">SAR × {item.qty}</p>
                                                 </div>
                                             </div>
                                         ))}
                                     </div>
                                 </div>
 
-                                {/* Total Summary */}
-                                <div className="p-6 bg-white/[0.03] border border-white/5 rounded-3xl flex justify-between items-center shadow-inner">
+                                {/* Total */}
+                                <div className="ck-card p-5 flex justify-between items-center">
                                     <div>
-                                        <div className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] mb-1">{isRTL ? 'المجموع النهائي' : 'GRAND TOTAL'}</div>
-                                        <div className="text-3xl font-black text-blue-400 italic">{(selectedOrder.pricing?.grandTotalSar || 0).toLocaleString()} <span className="text-sm not-italic opacity-50 uppercase">SAR</span></div>
+                                        <p className="cockpit-mono text-[9px] text-orange-500/50 uppercase tracking-[0.2em] mb-1">
+                                            {isRTL ? 'المجموع النهائي' : 'GRAND TOTAL'}
+                                        </p>
+                                        <p className="cockpit-num text-3xl font-black text-white">
+                                            {(selectedOrder.pricing?.grandTotalSar || 0).toLocaleString()}
+                                            <span className="text-sm text-white/30 ms-2">SAR</span>
+                                        </p>
                                     </div>
-                                    <div className={cn("px-5 py-2 rounded-full border text-[10px] font-black uppercase tracking-widest", getStatusBg(selectedOrder.status), getStatusColor(selectedOrder.status))}>
-                                        {isRTL
-                                            ? { pending: 'قيد الانتظار', confirmed: 'مؤكد', completed: 'مكتمل', cancelled: 'ملغي' }[selectedOrder.status] || selectedOrder.status
-                                            : selectedOrder.status
-                                        }
-                                    </div>
+                                    <span className={cn(getStatusBadge(selectedOrder.status), 'ck-badge-live')}>
+                                        {statusLabel(selectedOrder.status)}
+                                    </span>
                                 </div>
 
                                 {/* Actions */}
-                                <div className="flex flex-wrap gap-3 pt-4">
-                                    <div className="w-full text-[9px] font-black uppercase tracking-[0.4em] text-white/20 mb-1">{isRTL ? 'تعديل حالة المعاملة' : 'PROTOCOL OVERRIDE'}</div>
-                                    {([
-                                        { key: 'pending', ar: 'قيد الانتظار', en: 'PENDING' },
-                                        { key: 'confirmed', ar: 'مؤكد', en: 'CONFIRMED' },
-                                        { key: 'completed', ar: 'مكتمل', en: 'COMPLETED' },
-                                        { key: 'cancelled', ar: 'ملغي', en: 'CANCELLED' },
-                                    ] as const).map(s => (
-                                        <button
-                                            key={s.key}
-                                            disabled={selectedOrder.status === s.key || updatingId === selectedOrder.id}
-                                            onClick={() => updateStatus(selectedOrder.id, s.key)}
-                                            className={cn(
-                                                "flex-1 py-3 px-4 rounded-xl border text-[10px] font-black uppercase tracking-widest transition-all disabled:opacity-30 active:scale-95",
-                                                selectedOrder.status === s.key ? getStatusBg(s.key) + ' ' + getStatusColor(s.key) : "bg-white/5 border-white/10 text-white/40 hover:bg-white/10 hover:text-white"
-                                            )}
-                                        >
-                                            {updatingId === selectedOrder.id ? '...' : (isRTL ? s.ar : s.en)}
-                                        </button>
-                                    ))}
-                                    <button onClick={() => deleteOrder(selectedOrder.id)} className="w-full py-4 bg-red-500/10 border border-red-500/20 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] text-red-400 hover:bg-red-500 hover:text-white transition-all mt-4">
-                                        {isRTL ? 'حذف السجل نهائياً' : 'PURGE RECORD'}
+                                <div>
+                                    <p className="cockpit-mono text-[9px] text-white/20 uppercase tracking-[0.3em] mb-3">
+                                        {isRTL ? 'تعديل الحالة' : 'PROTOCOL OVERRIDE'}
+                                    </p>
+                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                        {([
+                                            { key: 'pending', ar: 'انتظار', en: 'PENDING' },
+                                            { key: 'confirmed', ar: 'مؤكد', en: 'CONFIRM' },
+                                            { key: 'completed', ar: 'مكتمل', en: 'COMPLETE' },
+                                            { key: 'cancelled', ar: 'إلغاء', en: 'CANCEL' },
+                                        ] as const).map(s => (
+                                            <button key={s.key}
+                                                disabled={selectedOrder.status === s.key || updatingId === selectedOrder.id}
+                                                onClick={() => updateStatus(selectedOrder.id, s.key)}
+                                                className={cn(
+                                                    'py-2.5 px-3 rounded-xl text-[9px] font-black uppercase tracking-wider transition-all disabled:opacity-30 active:scale-95',
+                                                    selectedOrder.status === s.key
+                                                        ? getStatusBadge(s.key)
+                                                        : 'ck-btn-ghost'
+                                                )}>
+                                                {updatingId === selectedOrder.id ? '...' : (isRTL ? s.ar : s.en)}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <button onClick={() => deleteOrder(selectedOrder.id)}
+                                        className="ck-btn-danger w-full py-3 mt-3 rounded-xl text-center">
+                                        {isRTL ? '🗑️ حذف الطلب نهائياً' : '🗑️ PURGE RECORD'}
                                     </button>
                                 </div>
                             </div>
@@ -260,150 +275,164 @@ export default function AdminOrdersPage() {
                 )}
             </AnimatePresence>
 
-            <main className="relative z-10 pt-32 pb-24 px-6 max-w-7xl mx-auto">
-                <header className="mb-16">
-                    <Link href="/admin/dashboard" className="inline-flex items-center gap-2 mb-8 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white/50 hover:text-white transition-all group">
-                        <ChevronLeft className={cn("w-4 h-4 transition-transform group-hover:-translate-x-1", isRTL && "rotate-180")} />
-                        <span className="text-[10px] font-black uppercase tracking-widest">{isRTL ? 'الرجوع للداشبورد' : 'BACK TO SYSTEM'}</span>
-                    </Link>
+            {/* ── Main Content ── */}
+            <main className="relative z-10 pt-6 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
 
-                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+                {/* HUD Header */}
+                <div className="ck-page-header">
+                    <nav className="ck-breadcrumb">
+                        <Link href="/admin/dashboard" className="hover:text-orange-400/80 transition-colors">HM-CTRL</Link>
+                        <span className="ck-breadcrumb-sep">›</span>
+                        <span className="text-orange-400/70">{isRTL ? 'الطلبات' : 'ORDERS'}</span>
+                    </nav>
+                    <div className="flex items-end justify-between gap-4 flex-wrap">
                         <div>
-                            <div className="flex items-center gap-4 mb-4">
-                                <div className="h-[2px] w-12 bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,1)]" />
-                                <span className="text-[10px] font-black uppercase tracking-[0.5em] text-blue-400 italic">Financial Core</span>
-                            </div>
-                            <h1 className="text-6xl md:text-8xl font-black tracking-tighter uppercase italic leading-[0.8] mb-4">
-                                {isRTL ? 'طلبات' : 'ORDER'} <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/10">{isRTL ? 'العملاء' : 'QUEUES'}</span>
-                            </h1>
+                            <p className="cockpit-mono text-[10px] text-orange-500/50 tracking-[0.25em] uppercase mb-1">
+                                AIR TRAFFIC CONTROL — ORDER QUEUE
+                            </p>
+                            <h1 className="ck-page-title">{isRTL ? 'طلبات العملاء' : 'ORDER CTRL'}</h1>
                         </div>
-                        <div className="flex items-center gap-4 bg-white/5 border border-white/10 rounded-2xl p-2 h-fit">
+                        {/* Filter tabs */}
+                        <div className="ck-tab-group flex-wrap">
                             {([
                                 { key: 'all', ar: 'الكل', en: 'ALL' },
-                                { key: 'pending', ar: 'قيد الانتظار', en: 'PENDING' },
-                                { key: 'confirmed', ar: 'مؤكد', en: 'CONFIRMED' },
-                                { key: 'completed', ar: 'مكتمل', en: 'COMPLETED' },
+                                { key: 'pending', ar: 'انتظار', en: 'QUEUE' },
+                                { key: 'confirmed', ar: 'مؤكد', en: 'ACTIVE' },
+                                { key: 'completed', ar: 'مكتمل', en: 'DONE' },
                             ] as const).map(f => (
-                                <button key={f.key} onClick={() => setFilter(f.key)} className={cn("px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all", filter === f.key ? "bg-blue-500 text-white shadow-[0_0_20px_rgba(59,130,246,0.5)]" : "text-white/40 hover:text-white hover:bg-white/5")}>
+                                <button key={f.key} onClick={() => setFilter(f.key)}
+                                    className={cn('ck-tab', filter === f.key && 'ck-tab-active')}>
                                     {isRTL ? f.ar : f.en}
                                 </button>
                             ))}
                         </div>
                     </div>
-                </header>
+                </div>
 
-                {/* Table Layout */}
-                <div className="glass-card bg-white/[0.01] border-white/5 overflow-hidden rounded-[2.5rem] shadow-2xl">
+                {/* Stats HUD */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 mb-8">
+                    {[
+                        { label: isRTL ? 'الكل' : 'TOTAL', val: stats.total, color: 'text-white' },
+                        { label: isRTL ? 'انتظار' : 'QUEUE', val: stats.pending, color: 'text-amber-400' },
+                        { label: isRTL ? 'مؤكد' : 'ACTIVE', val: stats.confirmed, color: 'text-blue-400' },
+                        { label: isRTL ? 'مكتمل' : 'DONE', val: stats.completed, color: 'text-green-400' },
+                        { label: isRTL ? 'ملغي' : 'ABORT', val: stats.cancelled, color: 'text-red-400' },
+                        { label: isRTL ? 'إيرادات' : 'REVENUE', val: `${(stats.revenue / 1000).toFixed(0)}K`, color: 'text-orange-400' },
+                    ].map((s, i) => (
+                        <div key={i} className={cn('ck-stat text-center ck-fade-up', `ck-delay-${Math.min(i + 1, 4)}`)}>
+                            <div className={cn('ck-stat-num text-2xl', s.color)}>{s.val}</div>
+                            <div className="cockpit-mono text-[8px] text-white/30 uppercase tracking-widest mt-1">{s.label}</div>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Orders Table */}
+                <div className="ck-card overflow-hidden">
                     <div className="overflow-x-auto">
-                        <table className="w-full text-left">
+                        <table className="ck-table">
                             <thead>
-                                <tr className="border-b border-white/5 bg-white/[0.02]">
-                                    <th className="p-8 text-[10px] font-black uppercase tracking-[0.3em] text-white/40">{isRTL ? 'مرجع الطلب' : 'REFERENCE'}</th>
-                                    <th className="p-8 text-[10px] font-black uppercase tracking-[0.3em] text-white/40">{isRTL ? 'العميل' : 'CLIENT'}</th>
-                                    <th className="p-8 text-[10px] font-black uppercase tracking-[0.3em] text-white/40 font-center">{isRTL ? 'المنتجات' : 'ITEMS'}</th>
-                                    <th className="p-8 text-[10px] font-black uppercase tracking-[0.3em] text-white/40">{isRTL ? 'المبلغ الإجمالي' : 'AMOUNT'}</th>
-                                    <th className="p-8 text-[10px] font-black uppercase tracking-[0.3em] text-white/40">{isRTL ? 'الحالة' : 'STATUS'}</th>
-                                    <th className="p-8 text-[10px] font-black uppercase tracking-[0.3em] text-white/40">{isRTL ? 'إجراء' : 'OPS'}</th>
+                                <tr>
+                                    <th>{isRTL ? 'مرجع' : 'REF'}</th>
+                                    <th>{isRTL ? 'العميل' : 'CLIENT'}</th>
+                                    <th>{isRTL ? 'المنتجات' : 'ITEMS'}</th>
+                                    <th>{isRTL ? 'المبلغ' : 'AMOUNT'}</th>
+                                    <th>{isRTL ? 'الحالة' : 'STATUS'}</th>
+                                    <th>{isRTL ? 'إجراء' : 'OPS'}</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-white/5">
+                            <tbody>
                                 {loading ? (
                                     Array.from({ length: 5 }).map((_, i) => (
-                                        <tr key={i} className="animate-pulse"><td colSpan={6} className="p-10"><div className="h-4 bg-white/5 rounded w-full" /></td></tr>
+                                        <tr key={i}><td colSpan={6}><div className="h-10 bg-white/5 rounded animate-pulse" /></td></tr>
                                     ))
                                 ) : orders.length === 0 ? (
-                                    <tr><td colSpan={6} className="p-24 text-center text-white/20 italic tracking-widest font-black uppercase">{isRTL ? 'لا توجد بيانات متاحة' : 'ZERO RECORDS FOUND'}</td></tr>
-                                ) : (
-                                    orders.map((order, idx) => (
-                                        <motion.tr
-                                            key={order.id}
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: idx * 0.05 }}
-                                            className="hover:bg-white/[0.03] transition-all cursor-pointer group"
-                                            onClick={() => setSelectedOrder(order)}
-                                        >
-                                            <td className="p-8">
-                                                <div className="text-sm font-black text-blue-400 italic">#{order.orderNumber}</div>
-                                                <div className="text-[9px] text-white/30 uppercase tracking-widest mt-1 flex items-center gap-2">
-                                                    {order.channel === 'whatsapp' ? <MessageCircle size={10} /> : <ShoppingCart size={10} />}
-                                                    {new Date(order.createdAt).toLocaleDateString()}
-                                                </div>
-                                            </td>
-                                            <td className="p-8">
-                                                <div className="text-sm font-bold text-white/90">{order.buyer.name}</div>
-                                                <div className="text-[10px] text-white/40 truncate max-w-[150px]">{order.buyer.email}</div>
-                                            </td>
-                                            <td className="p-8">
-                                                <div className="flex flex-wrap gap-1">
-                                                    {order.items.slice(0, 2).map((item, i) => (
-                                                        <span key={i} className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[8px] font-black text-white/40 uppercase whitespace-nowrap">
-                                                            {item.titleSnapshot.slice(0, 10)}...
-                                                        </span>
-                                                    ))}
-                                                    {order.items.length > 2 && <span className="text-[8px] text-white/20">+{order.items.length - 2} more</span>}
-                                                </div>
-                                            </td>
-                                            <td className="p-8">
-                                                <div className="text-lg font-black text-white italic">{(order.pricing?.grandTotalSar || 0).toLocaleString()} <span className="text-[10px] text-white/40 opacity-50 uppercase not-italic">SAR</span></div>
-                                            </td>
-                                            <td className="p-8">
-                                                <span className={cn("px-3 py-1 rounded-full border text-[9px] font-black uppercase tracking-widest", getStatusBg(order.status), getStatusColor(order.status))}>
-                                                    {isRTL
-                                                        ? { pending: 'قيد الانتظار', confirmed: 'مؤكد', completed: 'مكتمل', cancelled: 'ملغي' }[order.status] || order.status
-                                                        : order.status
-                                                    }
-                                                </span>
-                                            </td>
-                                            <td className="p-8 text-right">
-                                                <button className="p-3 rounded-full bg-blue-500/5 border border-blue-500/20 text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-all duration-500">
-                                                    <Eye size={18} />
-                                                </button>
-                                            </td>
-                                        </motion.tr>
-                                    ))
-                                )}
+                                    <tr><td colSpan={6}>
+                                        <div className="ck-empty">
+                                            <div className="ck-empty-icon"><ShoppingCart className="w-6 h-6" /></div>
+                                            <p className="cockpit-mono text-sm">{isRTL ? 'لا توجد طلبات' : 'QUEUE EMPTY'}</p>
+                                        </div>
+                                    </td></tr>
+                                ) : orders.map((order, idx) => (
+                                    <motion.tr key={order.id}
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: idx * 0.04 }}
+                                        className="cursor-pointer group"
+                                        onClick={() => setSelectedOrder(order)}>
+                                        <td>
+                                            <p className="cockpit-num text-sm font-black text-orange-400">#{order.orderNumber}</p>
+                                            <p className="cockpit-mono text-[9px] text-white/30 mt-0.5 flex items-center gap-1">
+                                                {order.channel === 'whatsapp'
+                                                    ? <MessageCircle size={9} className="text-green-400" />
+                                                    : <ShoppingCart size={9} className="text-orange-400" />}
+                                                {new Date(order.createdAt).toLocaleDateString()}
+                                            </p>
+                                        </td>
+                                        <td>
+                                            <p className="text-sm font-bold">{order.buyer.name}</p>
+                                            <p className="cockpit-mono text-[9px] text-white/30 truncate max-w-[140px]">{order.buyer.email}</p>
+                                        </td>
+                                        <td>
+                                            <div className="flex flex-wrap gap-1">
+                                                {order.items.slice(0, 2).map((item, i) => (
+                                                    <span key={i} className="ck-badge ck-badge-inactive text-[8px]">
+                                                        {item.titleSnapshot.slice(0, 12)}
+                                                    </span>
+                                                ))}
+                                                {order.items.length > 2 && (
+                                                    <span className="cockpit-mono text-[8px] text-white/20">+{order.items.length - 2}</span>
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <p className="cockpit-num text-base font-black text-white">
+                                                {(order.pricing?.grandTotalSar || 0).toLocaleString()}
+                                            </p>
+                                            <p className="cockpit-mono text-[9px] text-white/30">SAR</p>
+                                        </td>
+                                        <td>
+                                            <span className={cn(getStatusBadge(order.status), 'ck-badge-live')}>
+                                                {statusLabel(order.status)}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <button className="w-8 h-8 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 group-hover:bg-orange-500 group-hover:text-white transition-all flex items-center justify-center">
+                                                <Eye size={14} />
+                                            </button>
+                                        </td>
+                                    </motion.tr>
+                                ))}
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                {/* Footer HUD Stat */}
-                <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-6">
-                    <div className="p-6 rounded-3xl bg-white/[0.02] border border-white/5 flex items-center justify-between">
-                        <div>
-                            <div className="text-[9px] font-black text-white/30 uppercase mb-1">{isRTL ? 'إجمالي الإيرادات المؤكدة' : 'VERIFIED REVENUE'}</div>
-                            <div className="text-2xl font-black text-green-400 italic">{stats.revenue.toLocaleString()} SAR</div>
+                {/* Bottom KPIs */}
+                <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {[
+                        { label: isRTL ? 'إجمالي الإيرادات' : 'VERIFIED REVENUE', val: `${stats.revenue.toLocaleString()} SAR`, icon: TrendingUp, color: 'text-green-400', iconColor: 'text-green-400/20' },
+                        { label: isRTL ? 'قيد المعالجة' : 'LIVE QUEUE', val: String(stats.pending + stats.confirmed), icon: Clock, color: 'text-blue-400', iconColor: 'text-blue-400/20' },
+                        { label: isRTL ? 'كفاءة النظام' : 'SYSTEM HEALTH', val: '99.9%', icon: CheckCircle, color: 'text-orange-400', iconColor: 'text-orange-400/10' },
+                    ].map((kpi, i) => (
+                        <div key={i} className="ck-card p-5 flex items-center justify-between ck-hover-lift">
+                            <div>
+                                <p className="cockpit-mono text-[9px] text-white/30 uppercase tracking-widest mb-1">{kpi.label}</p>
+                                <p className={cn('cockpit-num text-2xl font-black', kpi.color)}>{kpi.val}</p>
+                            </div>
+                            <kpi.icon className={cn('w-10 h-10', kpi.iconColor)} />
                         </div>
-                        <TrendingUp className="text-green-400/20 w-10 h-10" />
-                    </div>
-                    <div className="p-6 rounded-3xl bg-white/[0.02] border border-white/5 flex items-center justify-between">
-                        <div>
-                            <div className="text-[9px] font-black text-white/30 uppercase mb-1">{isRTL ? 'طلبات قيد المعالجة' : 'LIVE QUEUE'}</div>
-                            <div className="text-2xl font-black text-blue-400 italic">{stats.pending + stats.confirmed}</div>
-                        </div>
-                        <Clock className="text-blue-400/20 w-10 h-10" />
-                    </div>
-                    <div className="p-6 rounded-3xl bg-white/[0.02] border border-white/5 flex items-center justify-between">
-                        <div>
-                            <div className="text-[9px] font-black text-white/30 uppercase mb-1">{isRTL ? 'كفاءة النظام' : 'SYSTEM HEALTH'}</div>
-                            <div className="text-2xl font-black text-white italic">99.9%</div>
-                        </div>
-                        <CheckCircle className="text-white/10 w-10 h-10" />
-                    </div>
+                    ))}
                 </div>
             </main>
         </div>
     );
 }
 
-function CarIcon(props: any) {
+function CarIcon(props: React.SVGProps<SVGSVGElement>) {
     return (
         <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" />
-            <circle cx="7" cy="17" r="2" />
-            <path d="M9 17h6" />
-            <circle cx="17" cy="17" r="2" />
+            <circle cx="7" cy="17" r="2" /><path d="M9 17h6" /><circle cx="17" cy="17" r="2" />
         </svg>
-    )
+    );
 }

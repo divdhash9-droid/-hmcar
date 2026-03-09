@@ -1,20 +1,11 @@
-'use client';
+﻿'use client';
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useCallback } from "react";
 import {
-    Mail,
-    Search,
-    ChevronLeft,
-    Trash2,
-    CheckCircle,
-    Clock,
-    User,
-    Phone,
-    MessageSquare,
-    X,
+    Mail, Search, Trash2, CheckCircle,
+    Clock, User, Phone, MessageSquare, X,
 } from "lucide-react";
-import Navbar from "@/components/Navbar";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/LanguageContext";
@@ -72,7 +63,7 @@ export default function AdminContactPage() {
     };
 
     const handleDelete = async (id: string) => {
-        if (confirm(isRTL ? 'هل أنت متأكد من حذف هذه الرسالة؟' : 'Are you sure you want to delete this message?')) {
+        if (confirm(isRTL ? 'Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ Ù…Ù† Ø­Ø°Ù Ù‡Ø°Ù‡ Ø§Ù„Ø±Ø³Ø§Ù„Ø©ØŸ' : 'Are you sure you want to delete this message?')) {
             try {
                 await api.contact.delete(id);
                 if (selectedMsg?._id === id) setSelectedMsg(null);
@@ -83,204 +74,157 @@ export default function AdminContactPage() {
         }
     };
 
-    const getStatusColor = (status: string) => {
+    const getStatusBadge = (status: string) => {
         switch (status) {
-            case 'new': return 'bg-cinematic-neon-red text-white shadow-[0_0_10px_rgba(255,0,60,0.5)]';
-            case 'read': return 'bg-cinematic-neon-blue text-white shadow-[0_0_10px_rgba(0,240,255,0.5)]';
-            case 'replied': return 'bg-green-400 text-black font-bold';
-            default: return 'bg-white/10 text-white/40';
+            case 'new': return 'ck-badge ck-badge-danger';
+            case 'read': return 'ck-badge ck-badge-active';
+            case 'replied': return 'ck-badge' + ' bg-green-500/15 text-green-400 border-green-500/20';
+            default: return 'ck-badge';
         }
     };
 
     return (
-        <div className="relative min-h-screen bg-black text-white font-sans overflow-hidden">
-            <Navbar />
+        <div className="relative min-h-screen text-white font-sans" dir={isRTL ? 'rtl' : 'ltr'}>
 
-            {/* Background */}
-            <div className="fixed inset-0 pointer-events-none z-0">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-cinematic-neon-blue/5 via-black to-black opacity-40" />
-            </div>
+            <main className="relative z-10 pt-6 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
 
-            <main className="relative z-10 pt-32 pb-24 px-6 max-w-7xl mx-auto">
-
-                <header className="mb-16">
-                    <Link href="/admin/dashboard" className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-all group w-fit">
-                        <ChevronLeft className={`w-4 h-4 transition-transform group-hover:-translate-x-1 ${isRTL ? 'rotate-180 group-hover:translate-x-1' : ''}`} />
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em]">{isRTL ? 'العودة للرئيسية' : 'BACK TO DASHBOARD'}</span>
-                    </Link>
-
-                    <div className="flex items-center gap-4 mb-6">
-                        <div className="h-[2px] w-12 bg-cinematic-neon-blue shadow-[0_0_10px_rgba(0,240,255,1)]" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.5em] text-cinematic-neon-blue italic">Website Inquiries</span>
+                {/* HUD Header */}
+                <div className="ck-page-header">
+                    <nav className="ck-breadcrumb">
+                        <Link href="/admin/dashboard" className="hover:text-orange-400/80 transition-colors">HM-CTRL</Link>
+                        <span className="ck-breadcrumb-sep">â€º</span>
+                        <span className="text-orange-400/70">{isRTL ? 'Ø±Ø³Ø§Ø¦Ù„ Ø§Ù„Ù…ÙˆÙ‚Ø¹' : 'CONTACT'}</span>
+                    </nav>
+                    <div className="flex items-end justify-between gap-4">
+                        <div>
+                            <p className="cockpit-mono text-[10px] text-orange-500/50 tracking-[0.25em] uppercase mb-1">WEBSITE INQUIRIES</p>
+                            <h1 className="ck-page-title">{isRTL ? 'Ø±Ø³Ø§Ø¦Ù„ Ø§Ù„Ù…ÙˆÙ‚Ø¹' : 'CONTACT INQUIRIES'}</h1>
+                        </div>
                     </div>
-
-                    <h1 className="text-6xl md:text-8xl font-black tracking-tighter uppercase italic leading-[0.85] mb-6">
-                        {isRTL ? 'رسائل' : 'CONTACT'} <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/20">{isRTL ? 'الموقع' : 'INQUIRIES'}</span>
-                    </h1>
-                </header>
+                </div>
 
                 {/* Filters */}
-                <div className="flex flex-col md:flex-row gap-8 mb-16">
+                <div className="flex flex-col md:flex-row gap-4 mb-8">
                     <div className="flex-1 relative">
-                        <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-white/20" />
-                        <input
-                            type="text"
-                            placeholder={isRTL ? 'بحث عن طريق الاسم أو البريد...' : 'SEARCH BY NAME OR EMAIL...'}
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-5 pl-16 pr-6 text-base font-bold text-white placeholder:text-white/20 focus:outline-none focus:border-cinematic-neon-blue/40 transition-all"
-                        />
+                        <Search className={cn('absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-orange-500/30', isRTL ? 'right-3' : 'left-3')} />
+                        <input type="text"
+                            placeholder={isRTL ? 'Ø¨Ø­Ø« Ø¹Ù† Ø·Ø±ÙŠÙ‚ Ø§Ù„Ø§Ø³Ù… Ø£Ùˆ Ø§Ù„Ø¨Ø±ÙŠØ¯...' : 'Search by name or email...'}
+                            value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
+                            className={cn('ck-input', isRTL ? 'pr-8 pl-4' : 'pl-8 pr-4')} />
                     </div>
-                    <div className="flex gap-4">
+                    <div className="ck-tab-group">
                         {['new', 'read', 'replied', 'all'].map((s) => (
-                            <button
-                                key={s}
-                                onClick={() => setFilter(s)}
-                                className={cn(
-                                    "px-8 py-4 rounded-xl text-[12px] font-black uppercase tracking-[0.3em] transition-colors select-none",
-                                    filter === s
-                                        ? "bg-cinematic-neon-blue text-white shadow-[0_0_35px_rgba(0,240,255,0.45)] ring-2 ring-cinematic-neon-blue"
-                                        : "bg-white/[0.14] text-white hover:bg-white/[0.18] ring-1 ring-white/10"
-                                )}
-                            >
-                                {isRTL ? (s === 'new' ? 'جديد' : s === 'read' ? 'مقروء' : s === 'replied' ? 'تم الرد' : 'الكل') : s.toUpperCase()}
+                            <button key={s} onClick={() => setFilter(s)}
+                                className={cn('ck-tab', filter === s && 'ck-tab-active')}>
+                                {isRTL ? (s === 'new' ? 'Ø¬Ø¯ÙŠØ¯' : s === 'read' ? 'Ù…Ù‚Ø±ÙˆØ¡' : s === 'replied' ? 'ØªÙ… Ø§Ù„Ø±Ø¯' : 'Ø§Ù„ÙƒÙ„') : s.toUpperCase()}
                             </button>
                         ))}
                     </div>
                 </div>
 
-                {/* Messages List Table-like Desktop, Card-like Mobile */}
+                {/* Messages List */}
                 {loading ? (
-                    <div className="text-center py-32">
-                        <div className="text-white text-2xl font-black uppercase tracking-widest animate-pulse">Establishing Connection...</div>
+                    <div className="space-y-3">
+                        {Array.from({ length: 4 }).map((_, i) => (
+                            <div key={i} className="h-20 rounded-2xl bg-white/[0.02] animate-pulse border border-orange-500/10" />
+                        ))}
                     </div>
                 ) : messages.length === 0 ? (
-                    <div className="text-center py-32 bg-white/[0.02] rounded-3xl border border-white/5">
-                        <Mail className="w-16 h-16 text-white/10 mx-auto mb-6" />
-                        <p className="text-white/40 uppercase tracking-widest font-black">{isRTL ? 'لا توجد رسائل' : 'NO MESSAGES FOUND'}</p>
+                    <div className="ck-empty py-24">
+                        <div className="ck-empty-icon"><Mail className="w-8 h-8" /></div>
+                        <p className="cockpit-mono">{isRTL ? 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø±Ø³Ø§Ø¦Ù„' : 'NO MESSAGES FOUND'}</p>
                     </div>
                 ) : (
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                         {messages.map((item, i) => (
-                            <motion.div
-                                key={item._id}
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
+                            <motion.div key={item._id}
+                                initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: i * 0.05 }}
-                                onClick={() => {
-                                    setSelectedMsg(item);
-                                    if (item.status === 'new') handleUpdateStatus(item._id, 'read');
-                                }}
+                                onClick={() => { setSelectedMsg(item); if (item.status === 'new') handleUpdateStatus(item._id, 'read'); }}
                                 className={cn(
-                                    "p-6 rounded-2xl border transition-all cursor-pointer flex flex-col md:flex-row items-start md:items-center justify-between gap-6",
-                                    item.status === 'new' ? "bg-white/[0.05] border-cinematic-neon-blue/40" : "bg-white/[0.01] border-white/5 hover:bg-white/[0.03]"
-                                )}
-                            >
-                                <div className="flex items-center gap-6 flex-1 min-w-0">
-                                    <div className={cn("w-12 h-12 rounded-full flex items-center justify-center shrink-0", getStatusColor(item.status))}>
-                                        <Mail className="w-6 h-6" />
+                                    'ck-card p-4 cursor-pointer flex flex-col md:flex-row items-start md:items-center justify-between gap-4',
+                                    item.status === 'new' && 'border-orange-500/25'
+                                )}>
+                                <div className="flex items-center gap-4 flex-1 min-w-0">
+                                    <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/15 flex items-center justify-center shrink-0">
+                                        <Mail className="w-4 h-4 text-orange-400/60" />
                                     </div>
                                     <div className="min-w-0">
-                                        <h3 className="text-lg font-black uppercase italic tracking-tighter truncate">{item.name}</h3>
-                                        <div className="flex items-center gap-4 text-[10px] text-white/30 uppercase font-black mt-1">
-                                            <span className="flex items-center gap-1"><User className="w-3 h-3" /> {item.email}</span>
-                                            {item.phone && <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {item.phone}</span>}
-                                            <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {new Date(item.createdAt).toLocaleString()}</span>
+                                        <h3 className="text-sm font-bold truncate">{item.name}</h3>
+                                        <div className="flex items-center gap-3 cockpit-mono text-[9px] text-white/30 mt-0.5">
+                                            <span className="flex items-center gap-1"><User className="w-3 h-3" />{item.email}</span>
+                                            {item.phone && <span className="flex items-center gap-1"><Phone className="w-3 h-3" />{item.phone}</span>}
+                                            <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{new Date(item.createdAt).toLocaleDateString()}</span>
                                         </div>
                                     </div>
                                 </div>
-
                                 <div className="flex items-center gap-3">
-                                    <div className="text-[10px] font-black uppercase tracking-widest px-4 py-2 bg-white/5 rounded-lg border border-white/10 whitespace-nowrap">
-                                        {item.subject}
-                                    </div>
-                                    <button
-                                        onClick={(e) => { e.stopPropagation(); handleDelete(item._id); }}
-                                        className="p-3 bg-cinematic-neon-red/10 text-cinematic-neon-red border border-cinematic-neon-red/30 rounded-xl hover:bg-cinematic-neon-red hover:text-white transition-all shadow-[0_0_15px_rgba(255,0,60,0.2)]"
-                                    >
-                                        <Trash2 className="w-5 h-5" />
+                                    <span className={getStatusBadge(item.status)}>
+                                        {isRTL ? (item.status === 'new' ? 'Ø¬Ø¯ÙŠØ¯' : item.status === 'read' ? 'Ù…Ù‚Ø±ÙˆØ¡' : 'ØªÙ… Ø§Ù„Ø±Ø¯') : item.status.toUpperCase()}
+                                    </span>
+                                    <span className="cockpit-mono text-[9px] text-white/30 px-2 py-1 bg-white/5 rounded-lg border border-white/5 truncate max-w-[120px]">{item.subject}</span>
+                                    <button onClick={(e) => { e.stopPropagation(); handleDelete(item._id); }}
+                                        className="w-8 h-8 flex items-center justify-center rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500 hover:text-white transition-all">
+                                        <Trash2 className="w-3.5 h-3.5" />
                                     </button>
                                 </div>
                             </motion.div>
                         ))}
                     </div>
                 )}
-
             </main>
 
             {/* Modal Detail */}
             <AnimatePresence>
                 {selectedMsg && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-black/90 backdrop-blur-md z-[100] flex items-center justify-center p-6"
-                        onClick={() => setSelectedMsg(null)}
-                    >
-                        <motion.div
-                            initial={{ scale: 0.9, y: 20 }}
-                            animate={{ scale: 1, y: 0 }}
-                            exit={{ scale: 0.9, y: 20 }}
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                        className="ck-modal-backdrop" onClick={() => setSelectedMsg(null)}>
+                        <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
                             onClick={(e) => e.stopPropagation()}
-                            className="glass-card bg-black/60 border-white/10 p-10 max-w-3xl w-full max-h-[90vh] overflow-y-auto relative"
-                        >
-                            <button onClick={() => setSelectedMsg(null)} className="absolute top-8 right-8 p-3 hover:bg-white/5 rounded-full transition-all">
-                                <X className="w-6 h-6" />
+                            className="ck-modal max-w-2xl w-full max-h-[90vh] overflow-y-auto relative">
+
+                            <button onClick={() => setSelectedMsg(null)}
+                                className="absolute top-5 end-5 w-8 h-8 flex items-center justify-center rounded-xl bg-white/5 hover:bg-white/10 transition-all">
+                                <X className="w-4 h-4" />
                             </button>
 
-                            <div className="flex items-center gap-6 mb-10">
-                                <div className={cn("w-16 h-16 rounded-full flex items-center justify-center", getStatusColor(selectedMsg.status))}>
-                                    <User className="w-8 h-8" />
+                            <div className="flex items-center gap-4 mb-6">
+                                <div className="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/15 flex items-center justify-center">
+                                    <User className="w-6 h-6 text-orange-400/60" />
                                 </div>
                                 <div>
-                                    <div className="text-[10px] font-black text-cinematic-neon-blue uppercase tracking-[0.4em] mb-2">{selectedMsg.subject}</div>
-                                    <h2 className="text-3xl font-black uppercase italic tracking-tighter">{selectedMsg.name}</h2>
-                                    <p className="text-white/40 text-xs font-bold mt-1">{selectedMsg.email} {selectedMsg.phone && `| ${selectedMsg.phone}`}</p>
+                                    <p className="cockpit-mono text-[9px] text-orange-400/70 uppercase mb-0.5">{selectedMsg.subject}</p>
+                                    <h2 className="text-lg font-bold">{selectedMsg.name}</h2>
+                                    <p className="cockpit-mono text-[10px] text-white/30">{selectedMsg.email}{selectedMsg.phone && ` Â· ${selectedMsg.phone}`}</p>
                                 </div>
                             </div>
 
-                            <div className="space-y-8">
-                                <div className="p-8 bg-white/[0.03] border border-white/5 rounded-[2rem] relative overflow-hidden">
-                                    <MessageSquare className="absolute -top-4 -right-4 w-24 h-24 text-white/[0.02]" />
-                                    <p className="text-lg leading-relaxed text-white/80 relative z-10 whitespace-pre-wrap">
-                                        {selectedMsg.message}
-                                    </p>
-                                </div>
+                            <div className="p-5 bg-white/[0.03] border border-white/5 rounded-2xl relative overflow-hidden mb-6">
+                                <MessageSquare className="absolute -top-3 -end-3 w-20 h-20 text-white/[0.02]" />
+                                <p className="text-sm leading-relaxed text-white/70 whitespace-pre-wrap">{selectedMsg.message}</p>
+                            </div>
 
-                                <div className="flex flex-wrap gap-4 items-center justify-between pt-6 border-t border-white/5">
-                                    <div className="flex gap-4">
-                                        <button
-                                            onClick={() => handleUpdateStatus(selectedMsg._id, 'replied')}
-                                            className="px-8 py-4 bg-green-400 !text-black rounded-xl text-[11px] font-black uppercase tracking-[0.2em] flex items-center gap-3 shadow-[0_0_20px_rgba(74,222,128,0.3)]"
-                                        >
-                                            <CheckCircle className="w-5 h-5" />
-                                            {isRTL ? 'تحديد كتم الرد' : 'MARK AS REPLIED'}
-                                        </button>
-                                        <a
-                                            href={`mailto:${selectedMsg.email}?subject=Re: ${selectedMsg.subject}`}
-                                            className="px-8 py-4 bg-white/5 border border-white/10 text-white rounded-xl text-[11px] font-black uppercase tracking-[0.2em] flex items-center gap-3 hover:bg-white/10 transition-all"
-                                        >
-                                            <Mail className="w-5 h-5" />
-                                            {isRTL ? 'رد عبر البريد' : 'REPLY VIA EMAIL'}
-                                        </a>
-                                    </div>
-                                    <div className="text-[10px] text-white/20 uppercase font-black">
-                                        {new Date(selectedMsg.createdAt).toLocaleString()}
-                                    </div>
+                            <div className="flex flex-wrap gap-3 pt-4 border-t border-orange-500/10 items-center justify-between">
+                                <div className="flex gap-3">
+                                    <button onClick={() => handleUpdateStatus(selectedMsg._id, 'replied')}
+                                        className="ck-btn-primary flex items-center gap-2">
+                                        <CheckCircle className="w-4 h-4" />
+                                        {isRTL ? 'ØªØ­Ø¯ÙŠØ¯ ÙƒØªÙ… Ø§Ù„Ø±Ø¯' : 'MARK AS REPLIED'}
+                                    </button>
+                                    <a href={`mailto:${selectedMsg.email}?subject=Re: ${selectedMsg.subject}`}
+                                        className="ck-btn-ghost flex items-center gap-2">
+                                        <Mail className="w-3.5 h-3.5" />
+                                        {isRTL ? 'Ø±Ø¯ Ø¹Ø¨Ø± Ø§Ù„Ø¨Ø±ÙŠØ¯' : 'REPLY VIA EMAIL'}
+                                    </a>
                                 </div>
+                                <span className="cockpit-mono text-[9px] text-white/20">
+                                    {new Date(selectedMsg.createdAt).toLocaleString()}
+                                </span>
                             </div>
                         </motion.div>
                     </motion.div>
                 )}
             </AnimatePresence>
-
-            <style jsx global>{`
-                .glass-card {
-                    backdrop-filter: blur(20px);
-                    -webkit-backdrop-filter: blur(20px);
-                }
-            `}</style>
         </div>
     );
 }

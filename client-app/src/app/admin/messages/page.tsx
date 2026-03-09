@@ -3,11 +3,10 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    MessageCircle, Send, Search, ChevronLeft,
+    MessageCircle, Send, Search,
     User, CheckCheck, Circle, RefreshCcw, X
 } from 'lucide-react';
 import Link from 'next/link';
-import Navbar from '@/components/Navbar';
 import { useLanguage } from '@/lib/LanguageContext';
 import { cn } from '@/lib/utils';
 import { api } from '@/lib/api';
@@ -151,99 +150,84 @@ export default function AdminMessagesPage() {
     );
 
     return (
-        <div className="min-h-screen bg-black text-white overflow-hidden">
-            <Navbar />
+        <div className="min-h-screen text-white overflow-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
 
-            {/* Background */}
-            <div className="fixed inset-0 pointer-events-none">
-                <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cinematic-neon-blue/5 blur-[120px] rounded-full" />
-                <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cinematic-neon-red/5 blur-[120px] rounded-full" />
-            </div>
+            <main className="relative z-10 pt-6 pb-4 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto h-screen flex flex-col">
 
-            <main className="relative z-10 pt-28 pb-10 px-4 md:px-6 max-w-7xl mx-auto h-screen">
-                {/* Back + Header */}
-                <div className="mb-6">
-                    <Link href="/admin/dashboard" className="inline-flex items-center gap-2 text-white/40 hover:text-white transition-colors group mb-4">
-                        <ChevronLeft className={cn("w-4 h-4 transition-transform group-hover:-translate-x-1", isRTL && "rotate-180 group-hover:translate-x-1")} />
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em]">{isRTL ? 'العودة للرئيسية' : 'BACK TO DASHBOARD'}</span>
-                    </Link>
-                    <div className="flex items-center gap-4">
-                        <div className="h-[2px] w-8 bg-cinematic-neon-blue shadow-[0_0_10px_rgba(0,240,255,1)]" />
-                        <h1 className="text-2xl md:text-4xl font-black uppercase tracking-tight">
-                            {isRTL ? 'رسائل العملاء' : 'CUSTOMER MESSAGES'}
-                        </h1>
+                {/* HUD Header */}
+                <div className="ck-page-header pb-4 mb-4">
+                    <nav className="ck-breadcrumb">
+                        <Link href="/admin/dashboard" className="hover:text-orange-400/80 transition-colors">HM-CTRL</Link>
+                        <span className="ck-breadcrumb-sep">›</span>
+                        <span className="text-orange-400/70">{isRTL ? 'رسائل العملاء' : 'MESSAGES'}</span>
+                    </nav>
+                    <div className="flex items-center justify-between gap-4">
+                        <h1 className="ck-page-title text-2xl md:text-3xl">{isRTL ? 'رسائل العملاء' : 'CUSTOMER COMMS'}</h1>
                         {conversations.some(c => c.unreadCount > 0) && (
-                            <span className="px-3 py-1 bg-cinematic-neon-red text-black text-[10px] font-black rounded-full shadow-[0_0_15px_rgba(255,0,60,0.5)]">
-                                {conversations.reduce((sum, c) => sum + c.unreadCount, 0)} NEW
+                            <span className="ck-badge ck-badge-danger ck-badge-live">
+                                {conversations.reduce((sum, c) => sum + c.unreadCount, 0)} {isRTL ? 'جديد' : 'NEW'}
                             </span>
                         )}
                     </div>
                 </div>
 
                 {/* Main Chat Layout */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-[calc(100vh-220px)]">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1 min-h-0">
 
                     {/* LEFT: Conversations List */}
                     <div className={cn(
-                        "md:col-span-1 flex flex-col gap-3 bg-white/[0.02] border border-white/5 rounded-2xl overflow-hidden",
-                        selectedConv ? "hidden md:flex" : "flex"
+                        'md:col-span-1 flex flex-col ck-card overflow-hidden',
+                        selectedConv ? 'hidden md:flex' : 'flex'
                     )}>
                         {/* Search */}
-                        <div className="p-4 border-b border-white/5">
+                        <div className="p-4 border-b border-orange-500/10">
                             <div className="relative">
-                                <Search className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-3" : "left-3")} />
-                                <input
-                                    value={search}
-                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
+                                <Search className={cn('absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-orange-500/30', isRTL ? 'right-3' : 'left-3')} />
+                                <input value={search} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
                                     placeholder={isRTL ? 'بحث في المحادثات...' : 'Search conversations...'}
-                                    className={cn(
-                                        "w-full bg-white/5 border border-white/10 rounded-xl py-3 text-[11px] font-bold text-white/60 placeholder-white/20 focus:outline-none focus:border-cinematic-neon-blue/40 transition-all",
-                                        isRTL ? "pr-9 pl-4 text-right" : "pl-9 pr-4"
-                                    )}
-                                />
+                                    className={cn('ck-input text-xs py-2', isRTL ? 'pr-8 pl-3' : 'pl-8 pr-3')} />
                             </div>
                         </div>
 
                         {/* Conversations */}
-                        <div className="flex-1 overflow-y-auto space-y-1 p-2">
+                        <div className="flex-1 overflow-y-auto space-y-1 p-2 ck-scroll">
                             {loading ? (
                                 Array.from({ length: 4 }).map((_, i) => (
-                                    <div key={i} className="p-4 rounded-xl bg-white/5 animate-pulse h-20" />
+                                    <div key={i} className="p-4 rounded-xl bg-white/5 animate-pulse h-16" />
                                 ))
                             ) : filtered.length === 0 ? (
-                                <div className="text-center py-12 text-white/20 text-[11px] uppercase tracking-widest font-black">
-                                    {isRTL ? 'لا توجد محادثات' : 'No conversations'}
+                                <div className="ck-empty py-8">
+                                    <div className="ck-empty-icon"><MessageCircle className="w-6 h-6" /></div>
+                                    <p className="cockpit-mono text-[10px]">{isRTL ? 'لا توجد محادثات' : 'NO CONVERSATIONS'}</p>
                                 </div>
                             ) : (
                                 filtered.map((conv: Conversation) => (
-                                    <motion.button
-                                        key={conv.userId}
-                                        whileHover={{ x: isRTL ? -4 : 4 }}
+                                    <motion.button key={conv.userId}
+                                        whileHover={{ x: isRTL ? -2 : 2 }}
                                         onClick={() => loadMessages(conv)}
                                         className={cn(
-                                            "w-full p-4 rounded-xl text-left transition-all border",
+                                            'w-full p-3 rounded-xl text-start transition-all border',
                                             selectedConv?.userId === conv.userId
-                                                ? "bg-cinematic-neon-blue/10 border-cinematic-neon-blue/30"
-                                                : "bg-white/[0.02] border-white/5 hover:bg-white/5 hover:border-white/10"
-                                        )}
-                                    >
+                                                ? 'bg-orange-500/10 border-orange-500/25'
+                                                : 'bg-white/[0.02] border-white/5 hover:bg-white/5 hover:border-orange-500/10'
+                                        )}>
                                         <div className="flex items-start gap-3">
-                                            <div className="w-10 h-10 rounded-full bg-white/10 border border-white/10 flex items-center justify-center shrink-0 relative">
-                                                <User className="w-5 h-5 text-white/40" />
+                                            <div className="w-9 h-9 rounded-xl bg-orange-500/10 border border-orange-500/15 flex items-center justify-center shrink-0 relative">
+                                                <User className="w-4 h-4 text-orange-400/60" />
                                                 {conv.unreadCount > 0 && (
-                                                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-cinematic-neon-red rounded-full text-[8px] font-black flex items-center justify-center shadow-[0_0_8px_rgba(255,0,60,0.8)]">
+                                                    <span className="absolute -top-1 -end-1 w-4 h-4 bg-red-500 rounded-full cockpit-mono text-[8px] font-black flex items-center justify-center">
                                                         {conv.unreadCount}
                                                     </span>
                                                 )}
                                             </div>
-                                            <div className="flex-1 min-w-0 text-left">
-                                                <div className="flex items-center justify-between gap-2 mb-1">
-                                                    <span className={cn("text-[11px] font-black uppercase tracking-wider truncate", conv.unreadCount > 0 ? "text-white" : "text-white/60")}>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center justify-between gap-2 mb-0.5">
+                                                    <span className={cn('text-[11px] font-bold truncate', conv.unreadCount > 0 ? 'text-white' : 'text-white/60')}>
                                                         {conv.userName}
                                                     </span>
-                                                    <span className="text-[9px] text-white/30 shrink-0">{formatTime(conv.lastMessageAt)}</span>
+                                                    <span className="cockpit-mono text-[9px] text-white/25 shrink-0">{formatTime(conv.lastMessageAt)}</span>
                                                 </div>
-                                                <p className={cn("text-[10px] truncate", conv.unreadCount > 0 ? "text-white/70" : "text-white/30")}>
+                                                <p className={cn('text-[10px] truncate', conv.unreadCount > 0 ? 'text-white/60' : 'text-white/25')}>
                                                     {conv.lastMessage}
                                                 </p>
                                             </div>
@@ -254,8 +238,9 @@ export default function AdminMessagesPage() {
                         </div>
 
                         {/* Refresh */}
-                        <div className="p-3 border-t border-white/5">
-                            <button onClick={loadConversations} className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all text-[10px] font-black uppercase text-white/40 hover:text-white">
+                        <div className="p-3 border-t border-orange-500/10">
+                            <button onClick={loadConversations}
+                                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-white/5 hover:bg-orange-500/10 hover:border-orange-500/20 border border-white/5 transition-all cockpit-mono text-[9px] font-bold uppercase text-white/35 hover:text-orange-400">
                                 <RefreshCcw className="w-3 h-3" />
                                 {isRTL ? 'تحديث' : 'REFRESH'}
                             </button>
@@ -264,71 +249,69 @@ export default function AdminMessagesPage() {
 
                     {/* RIGHT: Chat Window */}
                     <div className={cn(
-                        "md:col-span-2 flex flex-col bg-white/[0.02] border border-white/5 rounded-2xl overflow-hidden",
-                        !selectedConv ? "hidden md:flex" : "flex"
+                        'md:col-span-2 flex flex-col ck-card overflow-hidden min-h-0',
+                        !selectedConv ? 'hidden md:flex' : 'flex'
                     )}>
                         {!selectedConv ? (
-                            <div className="flex-1 flex flex-col items-center justify-center gap-4 text-white/20">
-                                <MessageCircle className="w-16 h-16" />
-                                <p className="text-[11px] font-black uppercase tracking-[0.3em]">
+                            <div className="flex-1 flex flex-col items-center justify-center gap-4">
+                                <div className="ck-empty-icon w-16 h-16">
+                                    <MessageCircle className="w-8 h-8" />
+                                </div>
+                                <p className="cockpit-mono text-[11px] text-white/20">
                                     {isRTL ? 'اختر محادثة للبدء' : 'SELECT A CONVERSATION'}
                                 </p>
                             </div>
                         ) : (
                             <>
                                 {/* Chat Header */}
-                                <div className="p-5 border-b border-white/5 flex items-center gap-4">
-                                    <button aria-label="Go back" onClick={() => setSelectedConv(null)} className="md:hidden p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-all">
-                                        <ChevronLeft className={cn("w-4 h-4", isRTL && "rotate-180")} />
+                                <div className="p-4 border-b border-orange-500/10 flex items-center gap-3">
+                                    <button aria-label="Go back" onClick={() => setSelectedConv(null)}
+                                        className="md:hidden w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 transition-all flex items-center justify-center">
+                                        <X className="w-4 h-4" />
                                     </button>
-                                    <div className="w-10 h-10 rounded-full bg-white/10 border border-white/10 flex items-center justify-center">
-                                        <User className="w-5 h-5 text-white/40" />
+                                    <div className="w-9 h-9 rounded-xl bg-orange-500/10 border border-orange-500/15 flex items-center justify-center">
+                                        <User className="w-4 h-4 text-orange-400/60" />
                                     </div>
                                     <div>
-                                        <div className="text-[12px] font-black uppercase tracking-wider text-white">{selectedConv.userName}</div>
-                                        <div className="flex items-center gap-1.5 mt-0.5">
-                                            <Circle className="w-2 h-2 fill-green-400 text-green-400" />
-                                            <span className="text-[9px] text-green-400 uppercase tracking-widest font-bold">{isRTL ? 'متصل' : 'ONLINE'}</span>
+                                        <p className="text-sm font-bold text-white">{selectedConv.userName}</p>
+                                        <div className="flex items-center gap-1.5">
+                                            <Circle className="w-1.5 h-1.5 fill-green-400 text-green-400" />
+                                            <span className="cockpit-mono text-[9px] text-green-400 uppercase">{isRTL ? 'متصل' : 'ONLINE'}</span>
                                         </div>
                                     </div>
-                                    <button aria-label="Close conversation" onClick={() => setSelectedConv(null)} className="ml-auto p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-all text-white/40 hover:text-white">
+                                    <button aria-label="Close conversation" onClick={() => setSelectedConv(null)}
+                                        className="ms-auto w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 transition-all text-white/40 hover:text-white flex items-center justify-center">
                                         <X className="w-4 h-4" />
                                     </button>
                                 </div>
 
                                 {/* Messages */}
-                                <div className="flex-1 overflow-y-auto p-5 space-y-4">
+                                <div className="flex-1 overflow-y-auto p-4 space-y-3 ck-scroll">
                                     <AnimatePresence initial={false}>
                                         {messages.map((msg: Message) => {
                                             const isMe = msg.isFromMe;
                                             return (
-                                                <motion.div
-                                                    key={msg.id}
-                                                    initial={{ opacity: 0, y: 10 }}
+                                                <motion.div key={msg.id}
+                                                    initial={{ opacity: 0, y: 8 }}
                                                     animate={{ opacity: 1, y: 0 }}
                                                     exit={{ opacity: 0 }}
-                                                    className={cn("flex gap-3", isMe ? "flex-row-reverse" : "flex-row")}
-                                                >
+                                                    className={cn('flex gap-3', isMe ? 'flex-row-reverse' : 'flex-row')}>
                                                     <div className={cn(
-                                                        "w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black uppercase",
-                                                        isMe
-                                                            ? "bg-accent-gold/20 border border-accent-gold/30 text-accent-gold"
-                                                            : "bg-white/10 border border-white/10 text-white/40"
+                                                        'w-7 h-7 rounded-xl flex items-center justify-center shrink-0 cockpit-mono text-[9px] font-black',
+                                                        isMe ? 'bg-orange-500/20 border border-orange-500/30 text-orange-400' : 'bg-white/8 border border-white/10 text-white/40'
                                                     )}>
                                                         {isMe ? 'A' : (selectedConv?.userName?.[0] || 'U')}
                                                     </div>
-                                                    <div className={cn("max-w-[70%] space-y-1", isMe ? "items-end" : "items-start", "flex flex-col")}>
+                                                    <div className={cn('max-w-[70%] flex flex-col', isMe ? 'items-end' : 'items-start')}>
                                                         <div className={cn(
-                                                            "px-4 py-3 rounded-2xl text-[12px] leading-relaxed",
+                                                            'px-4 py-2.5 rounded-2xl text-[12px] leading-relaxed',
                                                             isMe
-                                                                ? "bg-cinematic-neon-red/20 border border-cinematic-neon-red/20 text-white rounded-tr-none"
-                                                                : "bg-white/5 border border-white/10 text-white/80 rounded-tl-none"
-                                                        )}>
-                                                            {msg.content}
-                                                        </div>
-                                                        <div className={cn("flex items-center gap-1", isMe ? "flex-row-reverse" : "flex-row")}>
-                                                            <span className="text-[9px] text-white/20">{formatTime(msg.createdAt)}</span>
-                                                            {isMe && <CheckCheck className={cn("w-3 h-3", msg.read ? "text-cinematic-neon-blue" : "text-white/20")} />}
+                                                                ? 'bg-orange-500/15 border border-orange-500/20 text-white rounded-te-none'
+                                                                : 'bg-white/5 border border-white/8 text-white/80 rounded-ts-none'
+                                                        )}>{msg.content}</div>
+                                                        <div className={cn('flex items-center gap-1 mt-1', isMe ? 'flex-row-reverse' : 'flex-row')}>
+                                                            <span className="cockpit-mono text-[9px] text-white/20">{formatTime(msg.createdAt)}</span>
+                                                            {isMe && <CheckCheck className={cn('w-3 h-3', msg.read ? 'text-orange-400' : 'text-white/20')} />}
                                                         </div>
                                                     </div>
                                                 </motion.div>
@@ -339,27 +322,17 @@ export default function AdminMessagesPage() {
                                 </div>
 
                                 {/* Send Message */}
-                                <div className="p-4 border-t border-white/5">
+                                <div className="p-4 border-t border-orange-500/10">
                                     <div className="flex items-center gap-3">
-                                        <input
-                                            type="text"
-                                            value={newMessage}
+                                        <input type="text" value={newMessage}
                                             onChange={e => setNewMessage(e.target.value)}
                                             onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
                                             placeholder={isRTL ? 'اكتب رسالة...' : 'Type a message...'}
-                                            className={cn(
-                                                "flex-1 bg-white/5 border border-white/10 focus:border-cinematic-neon-blue/40 rounded-xl px-4 py-3 text-[12px] text-white placeholder-white/20 focus:outline-none transition-all",
-                                                isRTL ? "text-right" : "text-left"
-                                            )}
-                                        />
-                                        <motion.button
-                                            whileHover={{ scale: 1.05 }}
-                                            whileTap={{ scale: 0.95 }}
-                                            onClick={sendMessage}
-                                            disabled={!newMessage.trim() || sending}
-                                            className="p-3.5 bg-cinematic-neon-blue !text-black rounded-xl disabled:opacity-30 hover:shadow-[0_0_20px_rgba(0,240,255,0.4)] transition-all"
-                                        >
-                                            <Send className={cn("w-4 h-4", isRTL && "rotate-180")} />
+                                            className="flex-1 ck-input text-[12px] py-2.5" />
+                                        <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                                            onClick={sendMessage} disabled={!newMessage.trim() || sending}
+                                            className="ck-btn-primary p-3 disabled:opacity-30">
+                                            <Send className={cn('w-4 h-4', isRTL && 'rotate-180')} />
                                         </motion.button>
                                     </div>
                                 </div>

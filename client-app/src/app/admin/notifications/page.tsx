@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import {
     Bell, AlertCircle, CheckCircle2, Clock, Shield,
-    Trash2, ChevronLeft, RefreshCcw, Terminal,
+    Trash2, RefreshCcw, Terminal,
     ShoppingCart, Users, Gavel, type LucideIcon
 } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
@@ -23,13 +23,13 @@ interface Notification {
 }
 
 const TYPE_CONFIG: Record<string, { icon: LucideIcon; color: string; bg: string }> = {
-    CRITICAL: { icon: Shield, color: 'text-cinematic-neon-red', bg: 'bg-cinematic-neon-red/10' },
-    TRANSACTION: { icon: CheckCircle2, color: 'text-cinematic-neon-blue', bg: 'bg-cinematic-neon-blue/10' },
-    SYSTEM: { icon: Clock, color: 'text-white/40', bg: 'bg-white/5' },
-    WARNING: { icon: AlertCircle, color: 'text-cinematic-neon-yellow', bg: 'bg-cinematic-neon-yellow/10' },
-    ORDER: { icon: ShoppingCart, color: 'text-green-400', bg: 'bg-green-400/10' },
-    USER: { icon: Users, color: 'text-purple-400', bg: 'bg-purple-400/10' },
-    AUCTION: { icon: Gavel, color: 'text-orange-400', bg: 'bg-orange-400/10' },
+    CRITICAL: { icon: Shield, color: 'text-red-400', bg: 'bg-red-500/10 border-red-500/20' },
+    TRANSACTION: { icon: CheckCircle2, color: 'text-orange-400', bg: 'bg-orange-500/10 border-orange-500/20' },
+    SYSTEM: { icon: Clock, color: 'text-white/40', bg: 'bg-white/5 border-white/10' },
+    WARNING: { icon: AlertCircle, color: 'text-yellow-400', bg: 'bg-yellow-500/10 border-yellow-500/20' },
+    ORDER: { icon: ShoppingCart, color: 'text-green-400', bg: 'bg-green-500/10 border-green-500/20' },
+    USER: { icon: Users, color: 'text-purple-400', bg: 'bg-purple-500/10 border-purple-500/20' },
+    AUCTION: { icon: Gavel, color: 'text-orange-400', bg: 'bg-orange-500/10 border-orange-500/20' },
 };
 
 const MOCK_NOTIFICATIONS: Notification[] = [
@@ -132,184 +132,120 @@ export default function AdminNotifications() {
         : notifications.filter(n => n.type === filter);
 
     return (
-        <div className="relative min-h-screen bg-black text-white font-sans overflow-hidden">
+        <div className="relative min-h-screen text-white font-sans overflow-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
+            <main className="relative z-10 pt-6 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
 
-            {/* Background grid */}
-            <div className="fixed inset-0 pointer-events-none opacity-5">
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:80px_80px]" />
-            </div>
-            <div className="fixed top-1/4 right-1/4 w-[500px] h-[500px] bg-cinematic-neon-red/3 blur-[150px] rounded-full pointer-events-none" />
-
-            <main className="relative z-10 p-6 md:p-12 lg:p-20">
-
-                {/* Header */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-12">
-                    <div className="space-y-4">
-                        <Link href="/admin/dashboard" className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white/70 hover:text-white hover:bg-white/10 transition-all group">
-                            <ChevronLeft className={cn("w-4 h-4 transition-transform group-hover:-translate-x-1", isRTL && "rotate-180 group-hover:translate-x-1")} />
-                            <span className="text-[10px] font-black uppercase tracking-[0.2em]">{isRTL ? 'العودة للرئيسية' : 'BACK TO DASHBOARD'}</span>
-                        </Link>
-                        <div className="flex items-center gap-4">
-                            <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-none">
-                                {isRTL ? 'الإشعارات' : 'ALERTS'}
-                                <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/20"> {isRTL ? 'والتنبيهات' : '& NOTIFICATIONS'}</span>
-                            </h1>
-                            {unreadCount > 0 && (
-                                <span className="px-3 py-1 bg-cinematic-neon-red text-black text-[11px] font-black rounded-full shadow-[0_0_15px_rgba(255,0,60,0.6)] animate-pulse shrink-0">
-                                    {unreadCount}
-                                </span>
-                            )}
+                {/* HUD Header */}
+                <div className="ck-page-header">
+                    <nav className="ck-breadcrumb">
+                        <Link href="/admin/dashboard" className="hover:text-orange-400/80 transition-colors">HM-CTRL</Link>
+                        <span className="ck-breadcrumb-sep">›</span>
+                        <span className="text-orange-400/70">{isRTL ? 'الإشعارات' : 'ALERTS'}</span>
+                    </nav>
+                    <div className="flex items-end justify-between gap-4 flex-wrap">
+                        <div>
+                            <div className="flex items-center gap-2 mb-1">
+                                <p className="cockpit-mono text-[10px] text-orange-500/50 tracking-[0.25em] uppercase">NOTIFICATION CENTER</p>
+                                {unreadCount > 0 && <span className="ck-badge ck-badge-danger ck-badge-live">{unreadCount}</span>}
+                            </div>
+                            <h1 className="ck-page-title">{isRTL ? 'الإشعارات' : 'ALERTS HUB'}</h1>
+                            <div className="flex items-center gap-2 mt-1 cockpit-mono text-[9px] text-white/30 uppercase">
+                                <Terminal className="w-3 h-3" />
+                                {isRTL ? `${notifications.length} إشعار · ${unreadCount} غير مقروء` : `${notifications.length} alerts · ${unreadCount} unread`}
+                            </div>
                         </div>
-                        <div className="flex items-center gap-2 text-[10px] text-white/30 uppercase tracking-widest font-bold">
-                            <Terminal className="w-3 h-3" />
-                            {isRTL ? `${notifications.length} إشعار · ${unreadCount} غير مقروء` : `${notifications.length} alerts · ${unreadCount} unread`}
+                        <div className="flex gap-2">
+                            <button onClick={markAllRead} className="ck-btn-ghost flex items-center gap-2 text-[9px]">
+                                <CheckCircle2 className="w-3.5 h-3.5" />{isRTL ? 'تعليم الكل' : 'MARK ALL'}
+                            </button>
+                            <button onClick={() => loadNotifications(true)} disabled={refreshing}
+                                className="ck-btn-ghost flex items-center gap-2 text-[9px] disabled:opacity-40">
+                                <RefreshCcw className={cn('w-3.5 h-3.5', refreshing && 'animate-spin')} />{isRTL ? 'تحديث' : 'REFRESH'}
+                            </button>
+                            <button onClick={clearAll} className="flex items-center gap-2 px-4 py-2 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl text-[9px] font-bold uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all">
+                                <Trash2 className="w-3.5 h-3.5" />{isRTL ? 'مسح الكل' : 'CLEAR ALL'}
+                            </button>
                         </div>
-                    </div>
-
-                    <div className="flex gap-3">
-                        <button
-                            onClick={markAllRead}
-                            className="flex items-center gap-2 px-5 py-3 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all text-white/60 hover:text-white"
-                        >
-                            <CheckCircle2 className="w-4 h-4" />
-                            {isRTL ? 'تعليم الكل مقروء' : 'MARK ALL READ'}
-                        </button>
-                        <button
-                            onClick={() => loadNotifications(true)}
-                            disabled={refreshing}
-                            className="flex items-center gap-2 px-5 py-3 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all text-white/60 hover:text-white disabled:opacity-40"
-                        >
-                            <RefreshCcw className={cn("w-4 h-4", refreshing && "animate-spin")} />
-                            {isRTL ? 'تحديث' : 'REFRESH'}
-                        </button>
-                        <button
-                            onClick={clearAll}
-                            className="flex items-center gap-2 px-5 py-3 bg-cinematic-neon-red/10 border border-cinematic-neon-red/40 text-cinematic-neon-red rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-cinematic-neon-red hover:text-white transition-all"
-                        >
-                            <Trash2 className="w-4 h-4" />
-                            {isRTL ? 'مسح الكل' : 'CLEAR ALL'}
-                        </button>
                     </div>
                 </div>
 
                 {/* Filter Tabs */}
-                <div className="flex flex-wrap bg-white/5 p-2 rounded-2xl border border-white/5 w-fit mb-10 gap-1 overflow-x-auto max-w-full">
+                <div className="ck-tab-group flex-wrap mb-8">
                     {Object.keys(FILTER_LABELS).map((key) => {
                         const count = key === 'ALL' ? notifications.length : notifications.filter(n => n.type === key).length;
                         return (
-                            <button
-                                key={key}
-                                onClick={() => setFilter(key)}
-                                className={cn(
-                                    "px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2",
-                                    filter === key ? "bg-white text-black shadow-xl" : "text-white/40 hover:text-white"
-                                )}
-                            >
+                            <button key={key} onClick={() => setFilter(key)}
+                                className={cn('ck-tab flex items-center gap-1.5', filter === key && 'ck-tab-active')}>
                                 {isRTL ? FILTER_LABELS[key].ar : FILTER_LABELS[key].en}
-                                {count > 0 && (
-                                    <span className={cn("text-[8px] px-1.5 py-0.5 rounded-full font-black",
-                                        filter === key ? "bg-black/20 text-black" : "bg-white/10 text-white/50"
-                                    )}>{count}</span>
-                                )}
+                                {count > 0 && <span className="cockpit-mono text-[8px] px-1 py-0.5 rounded bg-orange-500/10">{count}</span>}
                             </button>
                         );
                     })}
                 </div>
 
                 {/* Notification Feed */}
-                <div className="space-y-4">
+                <div className="space-y-3">
                     {loading ? (
                         Array.from({ length: 5 }).map((_, i) => (
-                            <div key={i} className="h-28 rounded-2xl bg-white/5 animate-pulse border border-white/5" />
+                            <div key={i} className="h-24 rounded-2xl bg-white/[0.02] animate-pulse border border-orange-500/10" />
                         ))
                     ) : filtered.length === 0 ? (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="flex flex-col items-center justify-center py-24 gap-4 text-white/20"
-                        >
-                            <Bell className="w-16 h-16" />
-                            <p className="text-[12px] font-black uppercase tracking-[0.4em]">
-                                {isRTL ? 'لا توجد إشعارات' : 'NO ALERTS FOUND'}
-                            </p>
-                        </motion.div>
+                        <div className="ck-empty py-24">
+                            <div className="ck-empty-icon"><Bell className="w-8 h-8" /></div>
+                            <p className="cockpit-mono">{isRTL ? 'لا توجد إشعارات' : 'NO ALERTS FOUND'}</p>
+                        </div>
                     ) : (
                         <AnimatePresence mode="popLayout">
                             {filtered.map((notif, i) => {
                                 const cfg = TYPE_CONFIG[notif.type] ?? TYPE_CONFIG['SYSTEM'];
                                 const Icon = cfg.icon;
                                 return (
-                                    <motion.div
-                                        key={notif.id}
-                                        layout
+                                    <motion.div key={notif.id} layout
                                         initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
                                         animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, scale: 0.95, height: 0 }}
+                                        exit={{ opacity: 0, scale: 0.95 }}
                                         transition={{ delay: i * 0.04 }}
                                         className={cn(
-                                            "p-6 md:p-8 rounded-2xl border flex flex-col md:flex-row items-start md:items-center gap-6 group relative transition-all hover:bg-white/[0.03]",
-                                            notif.isRead
-                                                ? "bg-white/[0.01] border-white/5"
-                                                : "bg-white/[0.03] border-white/10"
-                                        )}
-                                    >
-                                        {/* Unread indicator */}
+                                            'ck-card p-5 flex flex-col md:flex-row items-start md:items-center gap-5 group relative',
+                                            !notif.isRead && 'border-orange-500/20'
+                                        )}>
+
                                         {!notif.isRead && (
-                                            <div className="absolute top-4 right-4 md:top-6 md:right-6 w-2 h-2 rounded-full bg-cinematic-neon-red shadow-[0_0_8px_rgba(255,0,60,0.8)]" />
+                                            <div className="absolute top-4 end-4 w-2 h-2 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.8)]" />
                                         )}
 
-                                        {/* Icon */}
-                                        <div className={cn(
-                                            "w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 border border-white/5 transition-all group-hover:scale-110",
-                                            cfg.bg
-                                        )}>
-                                            <Icon size={28} className={cfg.color} />
+                                        <div className={cn('w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border', cfg.bg)}>
+                                            <Icon size={24} className={cfg.color} />
                                         </div>
 
-                                        {/* Content */}
                                         <div className="flex-1 min-w-0">
-                                            <div className="flex flex-wrap items-center gap-3 mb-2">
-                                                <span className={cn("text-[9px] font-black px-2.5 py-1 rounded-lg uppercase tracking-widest bg-white/5 border border-white/5", cfg.color)}>
+                                            <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                                                <span className={cn('cockpit-mono text-[9px] px-2 py-0.5 rounded-lg uppercase tracking-widest bg-white/5 border border-white/5', cfg.color)}>
                                                     {isRTL ? FILTER_LABELS[notif.type]?.ar || notif.type : notif.type}
                                                 </span>
-                                                <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em] italic">
+                                                <span className="cockpit-mono text-[9px] text-white/20">
                                                     {notif.time.includes('T') ? timeAgo(notif.time, isRTL) : notif.time}
                                                 </span>
-                                                <span className={cn(
-                                                    "text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-widest",
-                                                    notif.status === 'BLOCKED' ? 'text-cinematic-neon-red bg-cinematic-neon-red/10' :
+                                                <span className={cn('cockpit-mono text-[8px] px-1.5 py-0.5 rounded uppercase tracking-widest',
+                                                    notif.status === 'BLOCKED' ? 'text-red-400 bg-red-400/10' :
                                                         notif.status === 'CLEARED' || notif.status === 'SUCCESS' || notif.status === 'VERIFIED' ? 'text-green-400 bg-green-400/10' :
-                                                            notif.status === 'MONITORING' || notif.status === 'ACTIVE' || notif.status === 'LIVE' ? 'text-cinematic-neon-yellow bg-cinematic-neon-yellow/10' :
+                                                            notif.status === 'MONITORING' || notif.status === 'ACTIVE' || notif.status === 'LIVE' ? 'text-yellow-400 bg-yellow-400/10' :
                                                                 'text-white/30 bg-white/5'
-                                                )}>
-                                                    {notif.status}
-                                                </span>
+                                                )}>{notif.status}</span>
                                             </div>
-                                            <h3 className={cn(
-                                                "text-base md:text-lg font-black uppercase tracking-tight mb-1 transition-all",
-                                                notif.isRead ? "text-white/60" : "text-white"
-                                            )}>
+                                            <h3 className={cn('text-sm font-bold uppercase tracking-tight mb-0.5', notif.isRead ? 'text-white/50' : 'text-white')}>
                                                 {notif.title}
                                             </h3>
-                                            <p className="text-[11px] text-white/40 leading-relaxed font-bold">
-                                                {notif.content}
-                                            </p>
+                                            <p className="cockpit-mono text-[10px] text-white/35 leading-relaxed">{notif.content}</p>
                                         </div>
 
-                                        {/* Actions */}
                                         <div className="flex gap-2 shrink-0 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                                             {!notif.isRead && (
-                                                <button
-                                                    onClick={() => markRead(notif.id)}
-                                                    className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all text-white/60"
-                                                >
-                                                    {isRTL ? 'قرأت' : 'READ'}
-                                                </button>
+                                                <button onClick={() => markRead(notif.id)}
+                                                    className="px-3 py-1.5 ck-btn-ghost text-[9px]">{isRTL ? 'قرأت' : 'READ'}</button>
                                             )}
-                                            <button
-                                                onClick={() => dismiss(notif.id)}
-                                                className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-cinematic-neon-red hover:text-white hover:border-cinematic-neon-red transition-all text-white/40"
-                                            >
+                                            <button onClick={() => dismiss(notif.id)}
+                                                className="px-3 py-1.5 bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500 hover:text-white rounded-xl text-[9px] font-bold uppercase tracking-widest transition-all">
                                                 {isRTL ? 'حذف' : 'DISMISS'}
                                             </button>
                                         </div>
@@ -321,15 +257,12 @@ export default function AdminNotifications() {
                 </div>
 
                 {/* Footer */}
-                <footer className="mt-20 pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 opacity-30 text-[9px] font-black uppercase tracking-[0.6em]">
-                    <div className="flex flex-wrap gap-8 justify-center">
-                        <div>Uptime: 2,481.42H</div>
-                        <div>Buffer: 512MB</div>
-                        <div>Latency: <span className="text-cinematic-neon-blue">0.4ms</span></div>
+                <footer className="mt-16 pt-8 border-t border-orange-500/10 flex flex-wrap justify-between items-center gap-4 opacity-30 cockpit-mono text-[9px] uppercase tracking-[0.4em]">
+                    <div className="flex flex-wrap gap-6">
+                        <span>Uptime: 2,481H</span><span>Latency: 0.4ms</span><span>Buffer: 512MB</span>
                     </div>
-                    <div className="flex gap-8">
-                        <span>Secure Mainframe v4.4</span>
-                        <span className="text-cinematic-neon-red italic">Encrypted Only</span>
+                    <div className="flex gap-6">
+                        <span>HM-CTRL v4.0</span><span className="text-orange-400">COCKPIT SECURE</span>
                     </div>
                 </footer>
 

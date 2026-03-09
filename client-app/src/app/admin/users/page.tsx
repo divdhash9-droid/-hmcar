@@ -183,150 +183,122 @@ export default function AdminUsersPage() {
     };
 
     return (
-        <div className="relative min-h-screen bg-black text-white overflow-x-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
-            {/* Background */}
-            <div className="fixed inset-0 pointer-events-none z-0">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-blue-500/5 via-black to-black" />
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(0,240,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(0,240,255,0.02)_1px,transparent_1px)] bg-[size:60px_60px]" />
-            </div>
+        <div className="relative min-h-screen text-white overflow-x-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
+            <main className="relative z-10 pt-6 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
 
-            <main className="relative z-10 pt-8 pb-16 px-4 sm:px-6 max-w-7xl mx-auto">
-                {/* Header */}
-                <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-                    <NextLink href="/admin/dashboard"
-                        className="flex items-center gap-2 px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white/50 hover:text-white hover:bg-white/10 transition-all text-xs font-black uppercase tracking-wider">
-                        <ChevronLeft className={cn('w-4 h-4', isRTL && 'rotate-180')} />
-                        {isRTL ? 'العودة' : 'Back'}
-                    </NextLink>
-                    <div className="flex items-center gap-3">
-                        <button onClick={loadUsers} className="p-2.5 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all">
-                            <RefreshCw className={cn('w-4 h-4 text-white/50', loading && 'animate-spin')} />
-                        </button>
-                        <button
-                            onClick={() => setShowAddModal(true)}
-                            className="flex items-center gap-2 px-5 py-2.5 bg-blue-500 text-white font-black uppercase tracking-wider rounded-xl hover:bg-blue-400 transition-all text-xs shadow-[0_0_20px_rgba(59,130,246,0.3)]"
-                        >
-                            <Plus className="w-4 h-4" />
-                            {isRTL ? 'إضافة مسؤول' : 'Add Admin'}
-                        </button>
+                {/* ── HUD Header ── */}
+                <div className="ck-page-header">
+                    <nav className="ck-breadcrumb">
+                        <NextLink href="/admin/dashboard" className="hover:text-orange-400/80 transition-colors">HM-CTRL</NextLink>
+                        <span className="ck-breadcrumb-sep">›</span>
+                        <span className="text-orange-400/70">{isRTL ? 'الأعضاء' : 'USERS'}</span>
+                    </nav>
+                    <div className="flex items-end justify-between gap-4 flex-wrap">
+                        <div>
+                            <p className="cockpit-mono text-[10px] text-orange-500/50 tracking-[0.25em] uppercase mb-1">USER MANAGEMENT SYSTEM</p>
+                            <h1 className="ck-page-title">{isRTL ? 'إدارة الأعضاء' : 'USER CTRL'}</h1>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <button onClick={loadUsers} className="ck-btn-ghost flex items-center gap-2" data-cockpit-tip={isRTL ? 'تحديث' : 'Refresh'}>
+                                <RefreshCw className={cn('w-3.5 h-3.5', loading && 'animate-spin')} />
+                                <span className="hidden sm:inline">{isRTL ? 'تحديث' : 'REFRESH'}</span>
+                            </button>
+                            <button onClick={() => setShowAddModal(true)} className="ck-btn-primary flex items-center gap-2">
+                                <Plus className="w-3.5 h-3.5" />
+                                {isRTL ? 'إضافة مسؤول' : 'ADD ADMIN'}
+                            </button>
+                        </div>
                     </div>
-                </div>
-
-                <div className="mb-6">
-                    <div className="flex items-center gap-2 mb-1">
-                        <div className="h-[2px] w-8 bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,1)]" />
-                        <span className="text-[9px] font-black uppercase tracking-[0.5em] text-blue-400">Admin Panel</span>
-                    </div>
-                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter uppercase italic">
-                        {isRTL ? 'إدارة المستخدمين' : 'USER MANAGEMENT'}
-                    </h1>
                 </div>
 
                 {/* Stats */}
                 <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-6">
                     {[
-                        { label: 'الكل', value: stats.total, key: 'all', color: 'text-white' },
-                        { label: 'عملاء', value: stats.buyers, key: 'buyer', color: 'text-blue-400' },
-                        { label: 'بائعين', value: stats.sellers, key: 'seller', color: 'text-yellow-400' },
-                        { label: 'مسؤولين', value: stats.admins, key: 'admin', color: 'text-red-400' },
-                        { label: 'نشطون', value: stats.active, key: 'active', color: 'text-green-400' },
-                    ].map(s => (
+                        { label: isRTL ? 'الكل' : 'ALL', value: stats.total, key: 'all', colorClass: 'text-white' },
+                        { label: isRTL ? 'عملاء' : 'CLIENTS', value: stats.buyers, key: 'buyer', colorClass: 'text-blue-400' },
+                        { label: isRTL ? 'بائعين' : 'SELLERS', value: stats.sellers, key: 'seller', colorClass: 'text-amber-400' },
+                        { label: isRTL ? 'مسؤولين' : 'ADMINS', value: stats.admins, key: 'admin', colorClass: 'text-orange-400' },
+                        { label: isRTL ? 'نشطون' : 'ACTIVE', value: stats.active, key: 'active', colorClass: 'text-green-400' },
+                    ].map((s, i) => (
                         <button key={s.key} onClick={() => setFilter(s.key)}
                             className={cn(
-                                'p-3 sm:p-4 rounded-2xl border text-center transition-all',
-                                filter === s.key ? 'bg-blue-500/10 border-blue-500/30' : 'bg-white/[0.02] border-white/5 hover:border-white/10'
+                                'ck-stat text-center ck-fade-up transition-all',
+                                `ck-delay-${Math.min(i + 1, 4)}`,
+                                filter === s.key && 'border-orange-500/40 shadow-[0_0_20px_rgba(249,115,22,0.1)]'
                             )}>
-                            <div className={cn('text-2xl sm:text-3xl font-black tracking-tighter', s.color)}>{s.value}</div>
-                            <div className="text-[9px] font-black uppercase tracking-wider text-white/40 mt-0.5">{s.label}</div>
+                            <div className={cn('ck-stat-num', s.colorClass)}>{s.value}</div>
+                            <div className="cockpit-mono text-[8px] text-white/30 uppercase tracking-widest mt-1">{s.label}</div>
                         </button>
                     ))}
                 </div>
 
                 {/* Search */}
                 <div className="relative mb-6">
-                    <Search className={cn('absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/25', isRTL ? 'right-4' : 'left-4')} />
-                    <input type="text" placeholder={isRTL ? 'البحث (الاسم، الإيميل، الهاتف)...' : 'Search users...'}
+                    <Search className={cn('absolute top-1/2 -translate-y-1/2 w-4 h-4 text-orange-500/30', isRTL ? 'right-4' : 'left-4')} />
+                    <input type="text" placeholder={isRTL ? 'البحث عن عضو...' : 'Search members...'}
                         value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
-                        className={cn('w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-blue-500/40 transition-all', isRTL ? 'pr-11 pl-4 text-right' : 'pl-11 pr-4')}
+                        className={cn('ck-input', isRTL ? 'pr-11 pl-4 text-right' : 'pl-11 pr-4')}
                     />
                 </div>
 
-                {/* Users Table - Desktop */}
-                <div className="hidden md:block bg-white/[0.01] border border-white/5 rounded-2xl overflow-hidden">
-                    <table className="w-full">
+                {/* Users Table */}
+                <div className="ck-card hidden md:block overflow-hidden">
+                    <table className="ck-table">
                         <thead>
-                            <tr className="border-b border-white/5 bg-white/[0.02]">
-                                <th className="p-5 text-right text-[9px] font-black uppercase tracking-widest text-white/40">المستخدم</th>
-                                <th className="p-5 text-right text-[9px] font-black uppercase tracking-widest text-white/40">الدور</th>
-                                <th className="p-5 text-right text-[9px] font-black uppercase tracking-widest text-white/40">الصلاحيات</th>
-                                <th className="p-5 text-right text-[9px] font-black uppercase tracking-widest text-white/40">الحالة</th>
-                                <th className="p-5 text-right text-[9px] font-black uppercase tracking-widest text-white/40">إجراء</th>
+                            <tr>
+                                <th>{isRTL ? 'العضو' : 'MEMBER'}</th>
+                                <th>{isRTL ? 'الدور' : 'ROLE'}</th>
+                                <th>{isRTL ? 'الصلاحيات' : 'PERMS'}</th>
+                                <th>{isRTL ? 'الحالة' : 'STATUS'}</th>
+                                <th>{isRTL ? 'إجراء' : 'ACTION'}</th>
                             </tr>
                         </thead>
                         <tbody>
                             {loading ? (
                                 [...Array(5)].map((_, i) => (
-                                    <tr key={i} className="border-b border-white/5">
-                                        {[1, 2, 3, 4, 5].map(k => <td key={k} className="p-5"><div className="h-4 bg-white/5 rounded animate-pulse" /></td>)}
+                                    <tr key={i}>
+                                        {[1, 2, 3, 4, 5].map(k => <td key={k}><div className="h-4 bg-white/5 rounded animate-pulse" /></td>)}
                                     </tr>
                                 ))
                             ) : users.length === 0 ? (
-                                <tr><td colSpan={5} className="p-12 text-center text-white/20 text-sm">لا توجد مستخدمون</td></tr>
+                                <tr><td colSpan={5}>
+                                    <div className="ck-empty">
+                                        <div className="ck-empty-icon"><Users className="w-6 h-6" /></div>
+                                        <p className="cockpit-mono text-sm">{isRTL ? 'لا توجد بيانات' : 'NO RECORDS'}</p>
+                                    </div>
+                                </td></tr>
                             ) : users.map(user => (
                                 <motion.tr key={user.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                                    className="border-b border-white/[0.04] hover:bg-white/[0.02] transition-all cursor-pointer"
-                                    onClick={() => setSelectedUser(user)}>
-                                    <td className="p-5">
+                                    className="cursor-pointer" onClick={() => setSelectedUser(user)}>
+                                    <td>
                                         <div className="flex items-center gap-3">
-                                            <div className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
-                                                <Users className="w-4 h-4 text-white/30" />
+                                            <div className="w-9 h-9 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center shrink-0">
+                                                <Users className="w-4 h-4 text-orange-400/50" />
                                             </div>
                                             <div>
                                                 <div className="text-sm font-bold text-white">{user.name}</div>
-                                                <div className="text-[10px] text-white/30">{user.email || user.username || user.phone || '—'}</div>
+                                                <div className="cockpit-mono text-[10px] text-white/30">{user.email || user.username || user.phone || '—'}</div>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="p-5">
-                                        <span className={cn('px-2.5 py-1 rounded-lg border text-[9px] font-black uppercase tracking-wider', getRoleColor(user.role))}>
-                                            {getRoleLabel(user.role)}
-                                        </span>
+                                    <td>
+                                        <span className={cn('ck-badge', getRoleColor(user.role))}>{getRoleLabel(user.role)}</span>
                                     </td>
-                                    <td className="p-5">
+                                    <td>
                                         {['admin', 'super_admin', 'manager'].includes(user.role) ? (
-                                            <div className="flex items-center gap-1.5 flex-wrap">
-                                                <span className="text-xs text-white/40 font-bold">{user.permissions?.length || 0}</span>
-                                                <span className="text-[9px] text-white/25">صلاحية</span>
-                                                {(user.permissions?.length || 0) > 0 && (
-                                                    <div className="flex gap-1 flex-wrap">
-                                                        {(user.permissions || []).slice(0, 3).map(p => {
-                                                            const pData = ALL_SYSTEM_PERMISSIONS.find(x => x.id === p);
-                                                            const Icon = pData?.icon;
-                                                            const c = COLOR_MAP[pData?.color || 'gray'];
-                                                            return Icon ? (
-                                                                <div key={p} className={cn('w-5 h-5 rounded-md flex items-center justify-center', c?.bg)} title={pData?.label}>
-                                                                    <Icon className={cn('w-3 h-3', c?.text)} />
-                                                                </div>
-                                                            ) : null;
-                                                        })}
-                                                        {(user.permissions?.length || 0) > 3 && (
-                                                            <span className="text-[9px] text-white/30">+{(user.permissions?.length || 0) - 3}</span>
-                                                        )}
-                                                    </div>
-                                                )}
+                                            <div className="flex items-center gap-1.5">
+                                                <span className="ck-badge ck-badge-info cockpit-mono">{user.permissions?.length || 0}</span>
+                                                <span className="text-[9px] text-white/25">{isRTL ? 'صلاحية' : 'perms'}</span>
                                             </div>
-                                        ) : <span className="text-[9px] text-white/20">—</span>}
+                                        ) : <span className="text-white/20">—</span>}
                                     </td>
-                                    <td className="p-5">
-                                        <span className={cn('flex items-center gap-1.5 text-[9px] font-black uppercase', user.isActive ? 'text-green-400' : 'text-red-400')}>
-                                            <span className={cn('w-1.5 h-1.5 rounded-full', user.isActive ? 'bg-green-400' : 'bg-red-400')} />
-                                            {user.isActive ? 'نشط' : 'معطل'}
+                                    <td>
+                                        <span className={cn('ck-badge ck-badge-live', user.isActive ? 'ck-badge-active' : 'ck-badge-danger')}>
+                                            {user.isActive ? (isRTL ? 'نشط' : 'ACTIVE') : (isRTL ? 'معطل' : 'OFF')}
                                         </span>
                                     </td>
-                                    <td className="p-5">
-                                        <button className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-[9px] font-black uppercase text-white/50 hover:text-white hover:bg-white/10 transition-all">
-                                            إدارة
-                                        </button>
+                                    <td>
+                                        <button className="ck-btn-ghost text-xs">{isRTL ? 'إدارة' : 'MANAGE'}</button>
                                     </td>
                                 </motion.tr>
                             ))}
@@ -334,49 +306,34 @@ export default function AdminUsersPage() {
                     </table>
                 </div>
 
-                {/* Users Cards - Mobile */}
+                {/* Mobile Cards */}
                 <div className="md:hidden space-y-3">
                     {loading ? (
-                        [...Array(4)].map((_, i) => <div key={i} className="h-24 rounded-2xl bg-white/[0.02] animate-pulse border border-white/5" />)
+                        [...Array(4)].map((_, i) => <div key={i} className="h-24 rounded-2xl bg-white/[0.02] animate-pulse border border-orange-500/10" />)
                     ) : users.map(user => (
                         <motion.div key={user.id} onClick={() => setSelectedUser(user)} initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                            className="bg-white/[0.02] border border-white/8 rounded-2xl p-4 cursor-pointer hover:border-blue-500/20 transition-all">
-                            <div className="flex items-center justify-between gap-3 mb-3">
+                            className="ck-card p-4 cursor-pointer ck-hover-lift">
+                            <div className="flex items-center justify-between gap-3 mb-2">
                                 <div className="flex items-center gap-3 min-w-0">
-                                    <div className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
-                                        <Users className="w-4 h-4 text-white/30" />
+                                    <div className="w-9 h-9 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center shrink-0">
+                                        <Users className="w-4 h-4 text-orange-400/50" />
                                     </div>
                                     <div className="min-w-0">
-                                        <div className="text-sm font-black text-white truncate">{user.name}</div>
-                                        <div className="text-[10px] text-white/30 truncate">{user.email || user.phone || '—'}</div>
+                                        <div className="text-sm font-bold text-white truncate">{user.name}</div>
+                                        <div className="cockpit-mono text-[10px] text-white/30 truncate">{user.email || user.phone || '—'}</div>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-2 flex-shrink-0">
-                                    <span className={cn('px-2 py-1 rounded-lg border text-[8px] font-black uppercase', getRoleColor(user.role))}>{getRoleLabel(user.role)}</span>
-                                    <span className={cn('w-2 h-2 rounded-full flex-shrink-0', user.isActive ? 'bg-green-400' : 'bg-red-400')} />
+                                <div className="flex items-center gap-1.5 shrink-0">
+                                    <span className={cn('ck-badge text-[8px]', getRoleColor(user.role))}>{getRoleLabel(user.role)}</span>
+                                    <span className={cn('w-2 h-2 rounded-full', user.isActive ? 'bg-green-400 shadow-[0_0_5px_#22c55e]' : 'bg-red-400')} />
                                 </div>
                             </div>
-                            {['admin', 'super_admin', 'manager'].includes(user.role) && (
-                                <div className="flex items-center gap-2 flex-wrap">
-                                    <span className="text-[9px] text-white/25 uppercase">{user.permissions?.length || 0} صلاحية</span>
-                                    <div className="flex gap-1">
-                                        {(user.permissions || []).slice(0, 5).map(p => {
-                                            const pData = ALL_SYSTEM_PERMISSIONS.find(x => x.id === p);
-                                            const Icon = pData?.icon;
-                                            const c = COLOR_MAP[pData?.color || 'gray'];
-                                            return Icon ? (
-                                                <div key={p} className={cn('w-4 h-4 rounded flex items-center justify-center', c?.bg)} title={pData?.label}>
-                                                    <Icon className={cn('w-2.5 h-2.5', c?.text)} />
-                                                </div>
-                                            ) : null;
-                                        })}
-                                    </div>
-                                </div>
-                            )}
                         </motion.div>
                     ))}
                     {!loading && users.length === 0 && (
-                        <div className="text-center py-16 text-white/20 text-sm">لا توجد مستخدمون</div>
+                        <div className="ck-empty"><div className="ck-empty-icon"><Users className="w-6 h-6" /></div>
+                            <p className="cockpit-mono">{isRTL ? 'لا توجد بيانات' : 'NO RECORDS'}</p>
+                        </div>
                     )}
                 </div>
             </main>
@@ -401,7 +358,7 @@ export default function AdminUsersPage() {
                         onDelete={(id: string) => {
                             setUsers(prev => prev.filter(u => u.id !== id));
                             setSelectedUser(null);
-                            showToast('🗑️ تم حذف المستخدم', 'success');
+                            showToast('🗑️ تم حذف العضو', 'success');
                         }}
                         isRTL={isRTL}
                     />

@@ -4,11 +4,10 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
     TrendingUp, DollarSign, Car, Gavel, ShoppingCart,
-    Users, ChevronLeft, BarChart3, ArrowUpRight, ArrowDownRight,
+    Users, BarChart3, ArrowUpRight, ArrowDownRight,
     Download, type LucideIcon
 } from 'lucide-react';
 import Link from 'next/link';
-import Navbar from '@/components/Navbar';
 import { useLanguage } from '@/lib/LanguageContext';
 import { cn } from '@/lib/utils';
 import { api } from '@/lib/api';
@@ -75,8 +74,8 @@ export default function AdminReportsPage() {
                     sub: isRTL ? 'طلبات مكتملة' : 'Completed',
                     trend: 8.3,
                     icon: ShoppingCart,
-                    color: 'text-cinematic-neon-blue',
-                    bgColor: 'bg-cinematic-neon-blue/10 border-cinematic-neon-blue/20',
+                    color: 'text-orange-400',
+                    bgColor: 'bg-orange-400/10 border-orange-400/20',
                 },
                 {
                     label: isRTL ? 'السيارات المباعة' : 'CARS SOLD',
@@ -84,8 +83,8 @@ export default function AdminReportsPage() {
                     sub: isRTL ? 'من إجمالي المخزون' : 'From inventory',
                     trend: -3.1,
                     icon: Car,
-                    color: 'text-cinematic-neon-yellow',
-                    bgColor: 'bg-cinematic-neon-yellow/10 border-cinematic-neon-yellow/20',
+                    color: 'text-yellow-400',
+                    bgColor: 'bg-yellow-400/10 border-yellow-400/20',
                 },
                 {
                     label: isRTL ? 'المزادات الجارية' : 'RUNNING AUCTIONS',
@@ -93,8 +92,8 @@ export default function AdminReportsPage() {
                     sub: isRTL ? 'بانتظار المزايدات' : 'Awaiting bids',
                     trend: 22.0,
                     icon: Gavel,
-                    color: 'text-cinematic-neon-red',
-                    bgColor: 'bg-cinematic-neon-red/10 border-cinematic-neon-red/20',
+                    color: 'text-red-400',
+                    bgColor: 'bg-red-400/10 border-red-400/20',
                 },
                 {
                     label: isRTL ? 'العملاء الجدد' : 'NEW CLIENTS',
@@ -147,8 +146,8 @@ export default function AdminReportsPage() {
             // Default placeholder stats on error
             setStats([
                 { label: isRTL ? 'إجمالي الإيرادات' : 'TOTAL REVENUE', value: '2,450,000 SAR', sub: isRTL ? 'هذا الشهر' : 'This period', trend: 12.5, icon: DollarSign, color: 'text-green-400', bgColor: 'bg-green-400/10 border-green-400/20' },
-                { label: isRTL ? 'إجمالي الطلبات' : 'TOTAL ORDERS', value: 48, sub: isRTL ? 'طلبات مكتملة' : 'Completed', trend: 8.3, icon: ShoppingCart, color: 'text-cinematic-neon-blue', bgColor: 'bg-cinematic-neon-blue/10 border-cinematic-neon-blue/20' },
-                { label: isRTL ? 'السيارات المباعة' : 'CARS SOLD', value: 32, sub: isRTL ? 'من المخزون' : 'From inventory', trend: -3.1, icon: Car, color: 'text-cinematic-neon-yellow', bgColor: 'bg-cinematic-neon-yellow/10 border-cinematic-neon-yellow/20' },
+                { label: isRTL ? 'إجمالي الطلبات' : 'TOTAL ORDERS', value: 48, sub: isRTL ? 'طلبات مكتملة' : 'Completed', trend: 8.3, icon: ShoppingCart, color: 'text-orange-400', bgColor: 'bg-orange-400/10 border-orange-400/20' },
+                { label: isRTL ? 'السيارات المباعة' : 'CARS SOLD', value: 32, sub: isRTL ? 'من المخزون' : 'From inventory', trend: -3.1, icon: Car, color: 'text-yellow-400', bgColor: 'bg-yellow-400/10 border-yellow-400/20' },
             ]);
         }
 
@@ -214,78 +213,58 @@ export default function AdminReportsPage() {
     };
 
     return (
-        <div className="min-h-screen bg-black text-white">
-            <Navbar />
-
-            <div className="fixed inset-0 pointer-events-none">
-                <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-green-400/3 blur-[150px] rounded-full" />
-                <div className="absolute bottom-0 left-1/4 w-[400px] h-[400px] bg-cinematic-neon-blue/3 blur-[120px] rounded-full" />
-            </div>
-
-            <main className="relative z-10 pt-32 pb-24 px-6 max-w-7xl mx-auto">
-                {/* Header */}
-                <header className="mb-16">
-                    <Link href="/admin/dashboard" className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white/70 hover:text-white hover:bg-white/10 transition-all group w-fit">
-                        <ChevronLeft className={cn("w-4 h-4 transition-transform group-hover:-translate-x-1", isRTL && "rotate-180 group-hover:translate-x-1")} />
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em]">{isRTL ? 'العودة للرئيسية' : 'BACK TO DASHBOARD'}</span>
-                    </Link>
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="min-h-screen text-white" dir={isRTL ? 'rtl' : 'ltr'}>
+            <main className="relative z-10 pt-6 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+                {/* HUD Header */}
+                <div className="ck-page-header">
+                    <nav className="ck-breadcrumb">
+                        <Link href="/admin/dashboard" className="hover:text-orange-400/80 transition-colors">HM-CTRL</Link>
+                        <span className="ck-breadcrumb-sep">›</span>
+                        <span className="text-orange-400/70">{isRTL ? 'التقارير' : 'REPORTS'}</span>
+                    </nav>
+                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 flex-wrap">
                         <div>
-                            <div className="flex items-center gap-4 mb-4">
-                                <div className="h-[2px] w-12 bg-green-400 shadow-[0_0_10px_rgba(74,222,128,1)]" />
-                                <span className="text-[10px] font-black uppercase tracking-[0.5em] text-green-400 italic">Analytics</span>
-                            </div>
-                            <h1 className="text-5xl md:text-7xl font-black tracking-tighter uppercase italic leading-[0.9]">
-                                {isRTL ? 'التقارير' : 'REPORTS'} <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/20">{isRTL ? 'والإحصائيات' : '& ANALYTICS'}</span>
-                            </h1>
+                            <p className="cockpit-mono text-[10px] text-orange-500/50 tracking-[0.25em] uppercase mb-1">ANALYTICS &amp; INTELLIGENCE</p>
+                            <h1 className="ck-page-title">{isRTL ? 'التقارير والإحصائيات' : 'REPORTS & ANALYTICS'}</h1>
                         </div>
                         <div className="flex items-center gap-3">
-                            {/* Period Toggle */}
-                            <div className="flex bg-white/5 border border-white/10 rounded-xl p-1 gap-1">
+                            <div className="ck-tab-group">
                                 {(['week', 'month', 'year'] as const).map(p => (
-                                    <button key={p} onClick={() => setPeriod(p)} className={cn(
-                                        "px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
-                                        period === p ? "bg-green-400 !text-black" : "text-white/40 hover:text-white"
-                                    )}>
+                                    <button key={p} onClick={() => setPeriod(p)} className={cn('ck-tab', period === p && 'ck-tab-active')}>
                                         {p === 'week' ? (isRTL ? 'أسبوع' : 'WEEK') : p === 'month' ? (isRTL ? 'شهر' : 'MONTH') : (isRTL ? 'سنة' : 'YEAR')}
                                     </button>
                                 ))}
                             </div>
-                            <button onClick={exportToCSV} className="flex items-center gap-2 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-white hover:bg-white/10 hover:border-white/30 transition-all">
-                                <Download className="w-4 h-4" />
-                                {isRTL ? 'تصدير CSV' : 'EXPORT CSV'}
+                            <button onClick={exportToCSV} className="ck-btn-ghost flex items-center gap-2">
+                                <Download className="w-3.5 h-3.5" />{isRTL ? 'تصدير' : 'EXPORT'}
                             </button>
                         </div>
                     </div>
-                </header>
+                </div>
 
                 {/* Stats Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 mb-12">
+                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4 mb-10">
                     {loading ? (
                         Array.from({ length: 6 }).map((_, i) => (
-                            <div key={i} className="h-36 rounded-2xl bg-white/5 animate-pulse border border-white/5" />
+                            <div key={i} className="h-28 rounded-2xl bg-white/[0.02] animate-pulse border border-orange-500/10" />
                         ))
                     ) : (
                         stats.map((stat, i) => (
-                            <motion.div
-                                key={i}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
+                            <motion.div key={i}
+                                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: i * 0.07 }}
-                                className={cn("p-6 rounded-2xl border", stat.bgColor, "relative overflow-hidden group")}
-                            >
-                                <div className="flex items-start justify-between mb-4">
-                                    <div className={cn("p-3 rounded-xl bg-black/30", stat.color)}>
-                                        <stat.icon size={20} />
+                                className="ck-stat">
+                                <div className="flex items-start justify-between mb-3">
+                                    <div className={cn('p-2 rounded-xl bg-black/30', stat.color)}>
+                                        <stat.icon size={16} />
                                     </div>
-                                    <div className={cn("flex items-center gap-1 text-[10px] font-black", stat.trend >= 0 ? "text-green-400" : "text-cinematic-neon-red")}>
+                                    <div className={cn('flex items-center gap-0.5 cockpit-mono text-[9px]', stat.trend >= 0 ? 'text-green-400' : 'text-red-400')}>
                                         {stat.trend >= 0 ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
                                         {Math.abs(stat.trend)}%
                                     </div>
                                 </div>
-                                <div className={cn("text-3xl font-black tracking-tighter mb-1", stat.color)}>{stat.value}</div>
-                                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">{stat.label}</div>
-                                <div className="text-[9px] text-white/30 uppercase tracking-widest mt-0.5">{stat.sub}</div>
+                                <div className={cn('cockpit-num text-xl font-black mb-0.5', stat.color)}>{stat.value}</div>
+                                <div className="cockpit-mono text-[8px] text-white/40 uppercase tracking-[0.15em]">{stat.label}</div>
                             </motion.div>
                         ))
                     )}
@@ -293,94 +272,79 @@ export default function AdminReportsPage() {
 
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                     {/* Revenue Chart */}
-                    <div className="xl:col-span-2 bg-white/[0.02] border border-white/5 rounded-2xl p-8">
-                        <div className="flex items-center justify-between mb-8">
+                    <div className="xl:col-span-2 ck-card p-6">
+                        <div className="flex items-center justify-between mb-6">
                             <div>
-                                <div className="text-[11px] font-black uppercase tracking-[0.5em] text-white/40 mb-1">{isRTL ? 'الإيرادات الشهرية' : 'MONTHLY REVENUE'}</div>
-                                <div className="text-3xl font-black tracking-tighter text-green-400">
-                                    {chartData.reduce((sum, d) => sum + d.revenue, 0).toLocaleString()} SAR
+                                <p className="cockpit-mono text-[9px] text-orange-500/50 uppercase tracking-[0.2em] mb-1">{isRTL ? 'الإيرادات الشهرية' : 'MONTHLY REVENUE'}</p>
+                                <div className="cockpit-num text-2xl font-black text-orange-400">
+                                    {chartData.reduce((sum, d) => sum + d.revenue, 0).toLocaleString()} <span className="text-sm">SAR</span>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-4 text-[9px] font-black uppercase tracking-widest text-white/30">
-                                <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-green-400" />{isRTL ? 'إيرادات' : 'REVENUE'}</div>
-                                <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-cinematic-neon-blue" />{isRTL ? 'طلبات' : 'ORDERS'}</div>
-                            </div>
                         </div>
-                        {/* Bar Chart */}
-                        <div className="h-48 flex items-end gap-3">
+                        <div className="h-48 flex items-end gap-2">
                             {chartData.map((d, i) => (
-                                <div key={i} className="flex-1 flex flex-col items-center gap-2">
+                                <div key={i} className="flex-1 flex flex-col items-center gap-1">
                                     <motion.div
                                         initial={{ height: 0 }}
                                         animate={{ height: `${(d.revenue / maxRevenue) * 100}%` }}
                                         transition={{ duration: 1, delay: i * 0.1, ease: 'easeOut' }}
-                                        className="w-full bg-gradient-to-t from-green-400/40 to-green-400/80 rounded-t-lg relative group cursor-pointer hover:from-green-400/60 hover:to-green-400 transition-all"
+                                        className="w-full bg-gradient-to-t from-orange-500/30 to-orange-500/80 rounded-t-lg relative group cursor-pointer hover:from-orange-500/50 hover:to-orange-400 transition-all"
                                     >
-                                        <div className="absolute -top-9 left-1/2 -translate-x-1/2 bg-black border border-white/10 rounded-lg px-2 py-1 text-[9px] font-black whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all z-10">
+                                        <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-[#070711] border border-orange-500/20 rounded-lg px-2 py-0.5 cockpit-mono text-[8px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all z-10">
                                             {(d.revenue / 1000).toFixed(0)}K
                                         </div>
                                     </motion.div>
-                                    <span className="text-[9px] text-white/30 font-bold uppercase">{d.month}</span>
+                                    <span className="cockpit-mono text-[8px] text-white/30">{d.month}</span>
                                 </div>
                             ))}
                         </div>
                     </div>
 
                     {/* Top Cars */}
-                    <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-8">
-                        <div className="text-[11px] font-black uppercase tracking-[0.5em] text-white/40 mb-6 flex items-center gap-3">
-                            <TrendingUp className="w-4 h-4 text-cinematic-neon-red" />
+                    <div className="ck-card p-6">
+                        <div className="cockpit-mono text-[9px] text-orange-500/50 uppercase tracking-[0.2em] mb-5 flex items-center gap-2">
+                            <TrendingUp className="w-3.5 h-3.5 text-orange-400" />
                             {isRTL ? 'أعلى السيارات مبيعاً' : 'TOP SELLING CARS'}
                         </div>
                         <div className="space-y-4">
                             {topCars.map((car, i) => (
-                                <motion.div
-                                    key={i}
+                                <motion.div key={i}
                                     initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     transition={{ delay: i * 0.1 }}
-                                    className="flex items-center gap-4"
-                                >
+                                    className="flex items-center gap-3">
                                     <div className={cn(
-                                        "w-8 h-8 rounded-xl flex items-center justify-center text-[11px] font-black shrink-0",
-                                        i === 0 ? "bg-yellow-400/20 text-yellow-400 border border-yellow-400/30" :
-                                            i === 1 ? "bg-white/10 text-white/60 border border-white/10" :
-                                                i === 2 ? "bg-orange-400/10 text-orange-400 border border-orange-400/20" :
-                                                    "bg-white/5 text-white/30 border border-white/5"
-                                    )}>
-                                        {i + 1}
-                                    </div>
+                                        'w-7 h-7 rounded-xl flex items-center justify-center cockpit-mono text-[10px] font-black shrink-0',
+                                        i === 0 ? 'bg-yellow-400/20 text-yellow-400 border border-yellow-400/30' :
+                                            i === 1 ? 'bg-white/10 text-white/60 border border-white/10' :
+                                                i === 2 ? 'bg-orange-400/10 text-orange-400 border border-orange-400/20' :
+                                                    'bg-white/5 text-white/30 border border-white/5'
+                                    )}>{i + 1}</div>
                                     <div className="flex-1 min-w-0">
-                                        <div className="text-[10px] font-black text-white/80 uppercase tracking-wide truncate mb-1">{car.name}</div>
-                                        <div className="flex items-center gap-3">
+                                        <div className="cockpit-mono text-[9px] text-white/70 uppercase tracking-wide truncate mb-1">{car.name}</div>
+                                        <div className="flex items-center gap-2">
                                             <div className="flex-1 h-1 bg-white/5 rounded-full overflow-hidden">
                                                 <motion.div
                                                     initial={{ width: 0 }}
                                                     animate={{ width: `${(car.sales / topCars[0].sales) * 100}%` }}
                                                     transition={{ duration: 1, delay: i * 0.1 }}
-                                                    className="h-full bg-gradient-to-r from-cinematic-neon-red to-cinematic-neon-red/60 rounded-full"
+                                                    className="h-full bg-gradient-to-r from-orange-500 to-orange-400/60 rounded-full"
                                                 />
                                             </div>
-                                            <span className="text-[9px] text-white/30 font-bold shrink-0">{car.sales}</span>
+                                            <span className="cockpit-mono text-[9px] text-white/30 shrink-0">{car.sales}</span>
                                         </div>
                                     </div>
                                 </motion.div>
                             ))}
                         </div>
-
-                        {/* Summary */}
-                        <div className="mt-8 pt-6 border-t border-white/5 space-y-3">
+                        <div className="mt-6 pt-4 border-t border-orange-500/10 space-y-2">
                             <div className="flex justify-between items-center">
-                                <span className="text-[9px] text-white/30 uppercase tracking-widest font-bold">{isRTL ? 'إجمالي الإيرادات' : 'TOTAL REVENUE'}</span>
-                                <span className="text-[11px] font-black text-green-400">
-                                    {topCars.reduce((s, c) => s + c.revenue, 0).toLocaleString()} SAR
-                                </span>
+                                <span className="cockpit-mono text-[9px] text-white/30 uppercase">{isRTL ? 'إجمالي الإيرادات' : 'TOTAL REVENUE'}</span>
+                                <span className="cockpit-num text-[11px] text-orange-400">{topCars.reduce((s, c) => s + c.revenue, 0).toLocaleString()} SAR</span>
                             </div>
                             <div className="flex justify-between items-center">
-                                <span className="text-[9px] text-white/30 uppercase tracking-widest font-bold">{isRTL ? 'إجمالي المبيعات' : 'TOTAL UNITS'}</span>
-                                <span className="text-[11px] font-black text-cinematic-neon-blue">
-                                    {topCars.reduce((s, c) => s + c.sales, 0)} {isRTL ? 'سيارة' : 'Cars'}
-                                </span>
+                                <span className="cockpit-mono text-[9px] text-white/30 uppercase">{isRTL ? 'إجمالي المبيعات' : 'TOTAL UNITS'}</span>
+                                <span className="cockpit-num text-[11px] text-green-400">{topCars.reduce((s, c) => s + c.sales, 0)} {isRTL ? 'سيارة' : 'Cars'}</span>
                             </div>
                         </div>
                     </div>
@@ -390,21 +354,18 @@ export default function AdminReportsPage() {
                 <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
                     {[
                         { label: isRTL ? 'معدل التحويل' : 'CONVERSION RATE', value: '68%', icon: TrendingUp, color: 'text-green-400' },
-                        { label: isRTL ? 'متوسط قيمة الطلب' : 'AVG ORDER VALUE', value: '51K SAR', icon: DollarSign, color: 'text-cinematic-neon-blue' },
-                        { label: isRTL ? 'معدل الاسترداد' : 'RETURN RATE', value: '2.1%', icon: ArrowDownRight, color: 'text-cinematic-neon-red' },
+                        { label: isRTL ? 'متوسط قيمة الطلب' : 'AVG ORDER VALUE', value: '51K SAR', icon: DollarSign, color: 'text-orange-400' },
+                        { label: isRTL ? 'معدل الاسترداد' : 'RETURN RATE', value: '2.1%', icon: ArrowDownRight, color: 'text-red-400' },
                         { label: isRTL ? 'رضا العملاء' : 'CLIENT SATISFACTION', value: '96%', icon: Users, color: 'text-purple-400' },
                     ].map((item, i) => (
-                        <motion.div
-                            key={i}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
+                        <motion.div key={i}
+                            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.5 + i * 0.07 }}
-                            className="bg-white/[0.02] border border-white/5 rounded-2xl p-5 flex items-center gap-4"
-                        >
-                            <item.icon className={cn("w-5 h-5 shrink-0", item.color)} />
+                            className="ck-card p-4 flex items-center gap-3">
+                            <item.icon className={cn('w-5 h-5 shrink-0', item.color)} />
                             <div>
-                                <div className={cn("text-xl font-black tracking-tight", item.color)}>{item.value}</div>
-                                <div className="text-[8px] text-white/30 uppercase tracking-widest font-bold leading-tight mt-0.5">{item.label}</div>
+                                <div className={cn('cockpit-num text-lg font-black', item.color)}>{item.value}</div>
+                                <div className="cockpit-mono text-[8px] text-white/30 uppercase tracking-widest mt-0.5">{item.label}</div>
                             </div>
                         </motion.div>
                     ))}

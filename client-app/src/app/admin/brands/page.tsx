@@ -1,8 +1,9 @@
 ﻿'use client';
 
+/* صفحة إدارة الوكالات (الماركات) - لوحة الأدمن */
+
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import Navbar from "@/components/Navbar";
 import { useLanguage } from "@/lib/LanguageContext";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -140,9 +141,9 @@ export default function AdminAgenciesPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-black text-white">
-      <Navbar />
-      <main className="relative z-10 pt-32 pb-24 px-6 max-w-7xl mx-auto">
+    <div className="relative min-h-screen text-white">
+      {/* لا نستخدم Navbar هنا لأن AdminLayout يوفر AdminNavbar تلقائياً */}
+      <main className="relative z-10 pt-6 pb-24 px-6 max-w-7xl mx-auto">
 
         {/* Header */}
         <header className="mb-12">

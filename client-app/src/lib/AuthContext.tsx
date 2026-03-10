@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, createContext, useContext, ReactNode } from 'react';
+import { useEffect, useState, createContext, useContext, ReactNode, useCallback } from 'react';
 
 interface User {
     _id: string;
@@ -37,11 +37,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const isLoggedIn = !!user;
     const isAdmin = user?.role === 'admin' || user?.role === 'super_admin' || user?.role === 'manager';
 
-    useEffect(() => {
-        checkExistingLogin();
+    const clearCookies = useCallback(() => {
+        if (typeof document !== 'undefined') {
+            document.cookie = 'hm_token=; path=/; max-age=0; SameSite=Lax';
+            document.cookie = 'hm_user_role=; path=/; max-age=0; SameSite=Lax';
+        }
     }, []);
 
-    function checkExistingLogin() {
+    const clearAuth = useCallback(() => {
+        localStorage.removeItem('hm_token');
+        localStorage.removeItem('hm_user');
+        localStorage.removeItem('hm_user_role');
+        clearCookies();
+        setUser(null);
+    }, [clearCookies]);
+
+    const checkExistingLogin = useCallback(() => {
         setIsLoading(true);
         try {
             if (typeof window === 'undefined') {
@@ -75,22 +86,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } finally {
             setIsLoading(false);
         }
-    }
+    }, [clearAuth, clearCookies]);
 
-    function clearCookies() {
-        if (typeof document !== 'undefined') {
-            document.cookie = 'hm_token=; path=/; max-age=0; SameSite=Lax';
-            document.cookie = 'hm_user_role=; path=/; max-age=0; SameSite=Lax';
-        }
-    }
-
-    function clearAuth() {
-        localStorage.removeItem('hm_token');
-        localStorage.removeItem('hm_user');
-        localStorage.removeItem('hm_user_role');
-        clearCookies();
-        setUser(null);
-    }
+    useEffect(() => {
+        checkExistingLogin();
+    }, [checkExistingLogin]);
 
     function refreshUser() {
         checkExistingLogin();
@@ -100,7 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         clearAuth();
         // إعادة توجيه للصفحة الرئيسية بعد الخروج
         if (typeof window !== 'undefined') {
-            window.location.href = '/';
+            window.location.href = '/login';
         }
     }
 

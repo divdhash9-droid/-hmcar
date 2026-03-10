@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const deviceFingerprintSchema = new mongoose.Schema({
     ip: { type: String, required: true, index: true },
     deviceId: { type: String, default: '' },
-    linkedUsername: { type: String, required: true }, // الاسم أو الرقم الذي تم الدخول به بنجاح لأول مرة
+    linkedUsername: { type: String, default: '' }, // الاسم أو الرقم الذي تم الدخول به بنجاح لأول مرة
     banned: { type: Boolean, default: false },
     banCode: { type: String, default: '' },
     failedAttempts: { type: Number, default: 0 },

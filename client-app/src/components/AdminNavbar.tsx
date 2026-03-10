@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Activity, Car, Gavel, Users, ShoppingCart, Settings, Shield,
@@ -10,6 +10,7 @@ import {
     Tag, Briefcase, Mail, Menu, X, Languages, Database
 } from 'lucide-react';
 import { useLanguage } from '@/lib/LanguageContext';
+import { useAuth } from '@/lib/AuthContext';
 import { api } from '@/lib/api';
 import { cn } from '@/lib/utils';
 
@@ -200,7 +201,7 @@ function buildNavItems(isRTL: boolean): NavItem[] {
         { id: 'users', icon: Users, label: isRTL ? 'الأعضاء' : 'USERS', href: '/admin/users' },
         { id: 'messages', icon: MessageCircle, label: isRTL ? 'المحادثات' : 'CHATS', href: '/admin/messages' },
         { id: 'contact', icon: Mail, label: isRTL ? 'استفسارات' : 'INQUIRIES', href: '/admin/contact' },
-        { id: 'brands', icon: Tag, label: isRTL ? 'الوكالات' : 'BRANDS', href: '/admin/brands' },
+        { id: 'brands', icon: Tag, label: isRTL ? 'الوكالات' : 'AGENCIES', href: '/admin/brands' },
         { id: 'reports', icon: TrendingUp, label: isRTL ? 'التقارير' : 'REPORTS', href: '/admin/reports' },
         { id: 'notifications', icon: Bell, label: isRTL ? 'الإشعارات' : 'ALERTS', href: '/admin/notifications' },
         { id: 'social', icon: Share2, label: isRTL ? 'التواصل' : 'SOCIAL', href: '/admin/social' },
@@ -212,7 +213,7 @@ function buildNavItems(isRTL: boolean): NavItem[] {
 // ── Main Export ────────────────────────────────────────────────
 export default function AdminNavbar() {
     const { isRTL, lang, toggleLanguage } = useLanguage();
-    const router = useRouter();
+    const { logout } = useAuth();
     const pathname = usePathname();
     const [mobileOpen, setMobileOpen] = useState(false);
     const [time, setTime] = useState('--:--:--');
@@ -233,10 +234,7 @@ export default function AdminNavbar() {
 
     const handleLogout = async () => {
         try { await api.auth.logout(); } catch { /* ignore */ }
-        localStorage.removeItem('hm_token');
-        localStorage.removeItem('hm_user_role');
-        localStorage.removeItem('hm_user_name');
-        router.push('/login');
+        logout(); // استخدام دالة الخروج من AuthContext لمسح كافة البيانات والتوجيه
     };
 
     const handleBackup = async () => {

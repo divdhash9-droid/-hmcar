@@ -51,7 +51,7 @@ router.get('/devices', requireAuthAPI, requireAdmin, async (req, res) => {
         });
     } catch (error) {
         console.error('Error fetching devices:', error);
-        res.status(500).json({ success: false, error: 'حدث خطأ داخلي' });
+        res.status(500).json({ success: false, message: 'حدث خطأ داخلي' });
     }
 });
 
@@ -80,7 +80,7 @@ router.post('/toggle-exempt/:id', requireAuthAPI, requireAdmin, async (req, res)
         res.json({ success: true, message: device.exemptFromSecurity ? 'تم إعفاء الجهاز من القيود' : 'تم تفعيل القيود على الجهاز', exemptFromSecurity: device.exemptFromSecurity });
     } catch (error) {
         console.error('Error toggling device exemption:', error);
-        res.status(500).json({ success: false, error: 'حدث خطأ داخلي' });
+        res.status(500).json({ success: false, message: 'حدث خطأ داخلي' });
     }
 });
 
@@ -110,7 +110,7 @@ router.post('/toggle-ban/:id', requireAuthAPI, requireAdmin, async (req, res) =>
         res.json({ success: true, message: device.banned ? 'تم حظر الجهاز بنجاح' : 'تم فك الحظر بنجاح', banned: device.banned });
     } catch (error) {
         console.error('Error toggling device ban:', error);
-        res.status(500).json({ success: false, error: 'حدث خطأ أثاء معالجة الحظر' });
+        res.status(500).json({ success: false, message: 'حدث خطأ أثاء معالجة الحظر' });
     }
 });
 

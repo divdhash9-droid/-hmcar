@@ -126,31 +126,35 @@ export default function Navbar() {
                         )}
                     </div>
 
-                    {/* التنفيذ الشرطي: إخفاء القائمة في الصفحة الرئيسية كما طلب المستخدم */}
-                    {pathname !== '/' && (
-                        <div className="hidden lg:flex items-center gap-2 bg-white/[0.03] border border-white/5 rounded-2xl p-1.5 backdrop-blur-xl">
-                            {navLinks.map((link) => (
-                                <Link
-                                    key={link.href}
-                                    href={link.href}
-                                    className={cn(
-                                        "px-6 py-2.5 rounded-xl text-[12px] font-black uppercase tracking-[0.1em] transition-all relative group",
-                                        isActive(link.href)
-                                            ? "text-white bg-white/5 border border-white/10 shadow-[0_0_20px_rgba(255,255,255,0.05)]"
-                                            : "text-white/30 hover:text-white/60 hover:bg-white/[0.02]"
-                                    )}
-                                >
-                                    {link.label}
-                                    {isActive(link.href) && (
-                                        <motion.div
-                                            layoutId="nav-active"
-                                            className="absolute -bottom-1 left-6 right-6 h-[1px] bg-white opacity-40"
-                                        />
-                                    )}
-                                </Link>
-                            ))}
-                        </div>
-                    )}
+                    {/* ── التنقل الرئيسي ── */}
+                    <div className="hidden lg:flex items-center gap-2 bg-white/[0.03] border border-white/5 rounded-2xl p-1.5 backdrop-blur-xl">
+                        {navLinks.map((link) => (
+                            <Link
+                                key={link.href}
+                                href={link.href}
+                                className={cn(
+                                    "px-6 py-2.5 rounded-xl text-[12px] font-black uppercase tracking-[0.1em] transition-all relative group",
+                                    isActive(link.href)
+                                        ? "text-white bg-white/5 border border-white/10 shadow-[0_0_20px_rgba(255,255,255,0.05)]"
+                                        : "text-white/30 hover:text-white/60 hover:bg-white/[0.02]"
+                                )}
+                            >
+                                {link.label}
+                                {link.href === '/showroom' && (
+                                    <span className="absolute -top-1 -right-1 flex h-2 w-2">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cinematic-neon-red opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-cinematic-neon-red"></span>
+                                    </span>
+                                )}
+                                {isActive(link.href) && (
+                                    <motion.div
+                                        layoutId="nav-active"
+                                        className="absolute -bottom-1 left-6 right-6 h-[1px] bg-white opacity-40"
+                                    />
+                                )}
+                            </Link>
+                        ))}
+                    </div>
 
                     {/* Right Actions */}
                     <div className="flex items-center gap-2">

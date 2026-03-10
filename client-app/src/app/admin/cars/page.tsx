@@ -106,7 +106,7 @@ export default function AdminCarsPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [filter, searchTerm]);
 
-    // ── جلب السيارات والإعدادات والماركات من الـ API ──
+    // ── جلب السيارات والإعدادات والوكالات من الـ API ──
     const loadData = async () => {
         setLoading(true);
         try {

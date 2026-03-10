@@ -108,7 +108,7 @@ export default function AdminDashboard() {
         { icon: MessageCircle, label: isRTL ? 'المحادثات' : 'MESSAGES', href: '/admin/messages', color: '#60a5fa' },
         { icon: BarChart2, label: isRTL ? 'التقارير' : 'REPORTS', href: '/admin/reports', color: '#34d399' },
         { icon: Shield, label: isRTL ? 'الأمان' : 'SECURITY', href: '/admin/security', color: '#ef4444' },
-        { icon: Tag, label: isRTL ? 'الوكالات' : 'BRANDS', href: '/admin/brands', color: '#fbbf24' },
+        { icon: Tag, label: isRTL ? 'الوكالات' : 'AGENCIES', href: '/admin/brands', color: '#fbbf24' },
         { icon: Settings, label: isRTL ? 'الإعدادات' : 'SETTINGS', href: '/admin/settings', color: '#9ca3af' },
         { icon: Database, label: isRTL ? 'نسخ احتياطي' : 'BACKUP', isButton: true, onClick: handleBackup, color: '#f97316' },
     ];

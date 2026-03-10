@@ -14,8 +14,9 @@ import {
     Car, MessageCircle, Search,
     ChevronLeft, ChevronRight, RefreshCw,
     MapPin, Gauge, Fuel, Settings2, Sparkles,
-    ExternalLink, X
+    ExternalLink, X, ArrowLeft
 } from 'lucide-react';
+import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/lib/LanguageContext';
@@ -378,6 +379,13 @@ export default function ShowroomPage() {
                 </div>
 
                 <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 pt-32 pb-32">
+                    {/* زر الرجوع */}
+                    <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="mb-8">
+                        <Link href="/" className="inline-flex items-center gap-2 text-white/40 hover:text-blue-400 transition-colors group">
+                            <ArrowLeft className={cn("w-4 h-4 transition-transform group-hover:-translate-x-1", isRTL && "rotate-180 group-hover:translate-x-1")} />
+                            <span className="text-[10px] font-black uppercase tracking-[0.2em]">{isRTL ? "العودة للرئيسية" : "BACK TO HOME"}</span>
+                        </Link>
+                    </motion.div>
 
                     {/* ── لوحة معلومات الاتصال المباشر (Creative Addition) ── */}
                     <motion.div

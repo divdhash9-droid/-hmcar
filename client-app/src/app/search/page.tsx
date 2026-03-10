@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Search, AlertCircle, ArrowRight, ShoppingBag, Sparkles } from 'lucide-react';
+import { Mail, Search, Gavel, Cog, Info, User, LogOut, Menu, X, Tag, AlertCircle, ArrowRight, ShoppingBag, Sparkles } from "lucide-react";
 import Link from 'next/link';
 import ClientPageHeader from '@/components/ClientPageHeader';
 import Navbar from '@/components/Navbar';
@@ -29,6 +29,7 @@ function SearchContent() {
 
     const [cars, setCars] = useState<any[]>([]);
     const [parts, setParts] = useState<any[]>([]);
+    const [brands, setBrands] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [hasResults, setHasResults] = useState(false);
 
@@ -36,6 +37,10 @@ function SearchContent() {
         const fetchData = async () => {
             setLoading(true);
             try {
+                // Fetch brands for the filter bar
+                const brandsRes = await api.brands.list().catch(() => ({ brands: [] }));
+                setBrands(brandsRes?.brands || []);
+
                 let minPrice = undefined;
                 let maxPrice = undefined;
                 if (price === '0-100' || price === '0-100k') { maxPrice = 100000; }
@@ -96,13 +101,49 @@ function SearchContent() {
 
                 <ClientPageHeader
                     title={q || brand ? (
-                        <span className="flex flex-col md:flex-row md:gap-3">RESULT <span className="text-luxury-gold">STREAM</span></span>
+                        <span className="flex flex-col md:flex-row md:gap-3">{isRTL ? "نتائج" : "RESULT"} <span className="text-luxury-gold">{isRTL ? "البحث" : "STREAM"}</span></span>
                     ) : (
-                        <span className="flex flex-col md:flex-row md:gap-3">GLOBAL <span className="text-luxury-gold">INVENTORY</span></span>
+                        <span className="flex flex-col md:flex-row md:gap-3">{isRTL ? "المخزون" : "GLOBAL"} <span className="text-luxury-gold">{isRTL ? "الشامل" : "INVENTORY"}</span></span>
                     )}
-                    subtitle={loading ? "SCANNING MATRIX..." : `${cars.length + parts.length} IDENTIFIED ASSETS`}
+                    subtitle={loading ? (isRTL ? "جاري المسح..." : "SCANNING MATRIX...") : `${cars.length + parts.length} ${isRTL ? "أصل متاح" : "IDENTIFIED ASSETS"}`}
                     icon={Search}
                 />
+
+                {/* Agencies / Brands Filter Bar */}
+                {brands.length > 0 && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mb-16 pb-8 border-b border-white/5 scrollbar-hide overflow-x-auto flex gap-6 items-center px-2"
+                    >
+                        <Link
+                            href="/search"
+                            className={cn(
+                                "shrink-0 px-6 py-3 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all",
+                                !brand ? "bg-luxury-gold text-black border-luxury-gold shadow-[0_0_20px_rgba(197,160,89,0.3)]" : "bg-white/5 border-white/10 text-white/40 hover:text-white"
+                            )}
+                        >
+                            {isRTL ? "الكل" : "ALL"}
+                        </Link>
+                        {brands.map((b, i) => (
+                            <Link
+                                key={i}
+                                href={`/search?brand=${b.name}${q ? `&q=${q}` : ''}`}
+                                className={cn(
+                                    "shrink-0 flex items-center gap-3 px-5 py-3 rounded-2xl border transition-all group",
+                                    brand === b.name
+                                        ? "bg-luxury-gold/10 border-luxury-gold text-luxury-gold shadow-[0_0_20px_rgba(197,160,89,0.1)]"
+                                        : "bg-white/[0.02] border-white/5 text-white/30 hover:border-white/20 hover:text-white"
+                                )}
+                            >
+                                {b.logoUrl ? (
+                                    <img src={b.logoUrl} alt={b.name} className={cn("w-5 h-5 object-contain", brand === b.name ? "grayscale-0" : "grayscale")} />
+                                ) : <Tag className="w-3 h-3" />}
+                                <span className="text-[10px] font-black uppercase tracking-widest">{b.name}</span>
+                            </Link>
+                        ))}
+                    </motion.div>
+                )}
 
                 {q && (
                     <div className="mb-20">
@@ -188,7 +229,7 @@ function SearchContent() {
                                             transition={{ delay: i * 0.1 }}
                                             className="group obsidian-card obsidian-card-hover"
                                         >
-                                            <Link href={`/showroom/${car.id}`}>
+                                            <Link href={`/cars/${car.id || car._id}`}>
                                                 <div className="relative h-72 overflow-hidden rounded-t-[2.5rem] bg-black">
                                                     <img src={car.images?.[0] || 'https://images.unsplash.com/photo-1592194996308-7b43878e84a6?q=80&w=1000'} alt={car.title} className="w-full h-full object-cover grayscale transition-all duration-[1.5s] group-hover:grayscale-0 group-hover:scale-110 opacity-70 group-hover:opacity-100" />
                                                     <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90" />
@@ -199,7 +240,7 @@ function SearchContent() {
                                                 </div>
                                                 <div className="p-8 space-y-8 bg-gradient-to-b from-[#0a0a0a] to-[#111]">
                                                     <div className="space-y-3">
-                                                        <span className="text-[8px] font-black text-luxury-gold/50 tracking-[0.4em] uppercase italic">{car.make}</span>
+                                                        <span className="text-[8px] font-black text-luxury-gold/50 tracking-[0.4em] uppercase italic">{typeof car.make === 'object' ? car.make?.name : car.make}</span>
                                                         <h3 className="text-2xl font-black tracking-tighter uppercase italic line-clamp-2 min-h-[4rem] group-hover:text-luxury-gold transition-colors">{car.title}</h3>
                                                     </div>
                                                     <div className="flex items-center justify-between pt-6 border-t border-white/5">

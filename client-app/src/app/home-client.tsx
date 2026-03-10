@@ -7,7 +7,7 @@ import {
   MessageCircle, Smartphone, Download, Link as LinkIcon, ArrowUpRight,
   ArrowRight, RefreshCw, Car, Play, Check, ChevronLeft, ChevronRight,
   Quote, Phone, Instagram, Facebook, Youtube, Send, Linkedin,
-  Mail, Search, Gavel, Cog, Info, User, LogOut, Menu, X
+  Mail, Search, Gavel, Cog, Info, User, LogOut, Menu, X, Tag
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -59,6 +59,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
     return false;
   });
   const [showUpdateBanner, setShowUpdateBanner] = useState(false);
+  const [brands, setBrands] = useState<any[]>([]);
 
   // التقاط حدث التثبيت PWA
   useEffect(() => {
@@ -198,6 +199,19 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
       }
     };
     fetchSocialLinks();
+  }, []);
+
+  // [[ARABIC_COMMENT]] جلب الوكالات المتاحة
+  useEffect(() => {
+    const fetchBrands = async () => {
+      try {
+        const res = await api.brands.list();
+        setBrands(res?.brands || []);
+      } catch (err) {
+        console.error("Failed to fetch brands", err);
+      }
+    };
+    fetchBrands();
   }, []);
 
 
@@ -505,7 +519,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
             <motion.div className="text-center mb-16" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
               <motion.div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full border border-[#c9a96e]/30 bg-[#c9a96e]/10 backdrop-blur-md mb-6 shadow-[0_0_20px_rgba(201,169,110,0.15)]" whileHover={{ scale: 1.05 }}>
                 <Sparkles className="w-5 h-5 text-[#c9a96e] animate-pulse" />
-                <span className="text-sm font-black text-[#c9a96e] tracking-[0.2em] uppercase">{isRTL ? "المخزون الحصري" : "EXCLUSIVE INVENTORY"}</span>
+                <span className="text-sm text-[#c9a96e] font-black tracking-widest uppercase">{isRTL ? "المعرض المباشر" : "SHOWROOM"}</span>
               </motion.div>
               <h2 className="text-5xl md:text-6xl font-black text-white italic uppercase tracking-tighter mb-4" style={{ textShadow: "0 0 40px rgba(201,169,110,0.4)" }}>
                 {isRTL ? "سيارات متوفرة محلياً" : "LOCAL INVENTORY"}
@@ -532,7 +546,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
                     <motion.div
                       key={index}
                       className="group relative w-[340px] h-[460px] rounded-[2rem] border border-white/10 bg-black/40 backdrop-blur-3xl overflow-hidden shadow-2xl hover:border-[#c9a96e]/50 transition-all duration-700 flex-shrink-0"
-                      onClick={() => router.push(isLoggedIn ? `/showroom/${car.id || (car as any)._id}` : '/login')}
+                      onClick={() => router.push(isLoggedIn ? `/cars/${car.id || (car as any)._id}` : '/login')}
                       whileHover={{ y: -10 }}
                     >
                       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/40 to-black z-10 pointer-events-none" />
@@ -575,26 +589,32 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
               </motion.div>
             </div>
 
-            <div className="flex flex-col sm:flex-row justify-center mt-8 gap-4 relative z-30 pointer-events-auto">
+            <div className="flex flex-col sm:flex-row justify-center mt-12 gap-5 relative z-30 pointer-events-auto">
               <button
                 onClick={() => router.push('/search')}
-                className="group flex items-center gap-3 px-8 py-4 rounded-2xl bg-white/[0.03] border border-white/10 hover:border-[#c9a96e]/40 hover:bg-[#c9a96e]/10 transition-all backdrop-blur-xl"
+                className="group flex flex-col items-center gap-2 px-10 py-5 rounded-[2rem] bg-white/[0.03] border border-white/10 hover:border-[#c9a96e]/40 hover:bg-[#c9a96e]/10 transition-all backdrop-blur-xl shadow-2xl"
               >
-                <span className="text-xs font-black uppercase tracking-[0.2em] text-white group-hover:text-[#c9a96e] transition-colors">
-                  {isRTL ? "تصفح المخزون الكامل" : "BROWSE FULL INVENTORY"}
-                </span>
-                <ArrowUpRight className="w-4 h-4 text-white/40 group-hover:text-[#c9a96e] transition-colors" />
+                <div className="flex items-center gap-3">
+                  <span className="text-xs font-black uppercase tracking-[0.2em] text-white group-hover:text-[#c9a96e] transition-colors">
+                    {isRTL ? "تصفح السيارات" : "BROWSE CARS"}
+                  </span>
+                  <ArrowUpRight className="w-4 h-4 text-white/40 group-hover:text-[#c9a96e] transition-colors" />
+                </div>
+                <span className="text-[8px] text-white/20 font-bold uppercase tracking-widest">{isRTL ? "سيارات متوفرة وجاهزة" : "AVAILABLE & READY VEHICLES"}</span>
               </button>
 
               <button
                 onClick={() => router.push('/showroom')}
-                className="group flex items-center gap-3 px-8 py-4 rounded-2xl bg-[#c9a96e]/10 border border-[#c9a96e]/20 hover:bg-[#c9a96e]/20 hover:border-[#c9a96e]/40 transition-all backdrop-blur-xl"
+                className="group flex flex-col items-center gap-2 px-10 py-5 rounded-[2rem] bg-[#c9a96e]/10 border border-[#c9a96e]/20 hover:bg-[#c9a96e]/20 hover:border-[#c9a96e]/40 transition-all backdrop-blur-xl shadow-2xl"
               >
-                <Car className="w-4 h-4 text-[#c9a96e]" />
-                <span className="text-xs font-black uppercase tracking-[0.2em] text-[#c9a96e]">
-                  {isRTL ? "المعرض الكوري المباشر" : "LIVE KOREAN SHOWROOM"}
-                </span>
-                <ArrowRight className={cn("w-4 h-4 text-[#c9a96e]", isRTL && "rotate-180")} />
+                <div className="flex items-center gap-3">
+                  <Car className="w-4 h-4 text-[#c9a96e]" />
+                  <span className="text-xs font-black uppercase tracking-[0.2em] text-[#c9a96e]">
+                    {isRTL ? "المعرض المباشر" : "SHOWROOM"}
+                  </span>
+                  <ArrowRight className={cn("w-4 h-4 text-[#c9a96e]", isRTL && "rotate-180")} />
+                </div>
+                <span className="text-[8px] text-[#c9a96e]/40 font-bold uppercase tracking-widest">{isRTL ? "اطلب سيارتك مباشرة من كوريا" : "ORDER DIRECTLY FROM KOREA"}</span>
               </button>
             </div>
           </div>
@@ -775,6 +795,51 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
                 </div>
               </div>
             </motion.div>
+          </div>
+        </section>
+      )}
+
+      {/* [[ARABIC_COMMENT]] قسم الوكالات المعتمدة */}
+      {brands.length > 0 && (
+        <section className="relative z-10 py-16 px-4 sm:px-6 lg:px-8 border-t border-white/5 bg-gradient-to-b from-black via-[#c9a96e]/5 to-black">
+          <div className="max-w-7xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <div className="flex items-center gap-4 justify-center mb-4">
+                <div className="h-[1px] w-12 bg-[#c9a96e]/30" />
+                <h3 className="text-xl font-black uppercase tracking-[0.3em] text-[#c9a96e] italic">
+                  {isRTL ? "الوكالات المعتمدة" : "OFFICIAL AGENCIES"}
+                </h3>
+                <div className="h-[1px] w-12 bg-[#c9a96e]/30" />
+              </div>
+              <p className="text-white/40 text-xs font-bold uppercase tracking-widest italic">{isRTL ? "نحن وكلاء معتمدون لأكبر الماركات العالمية" : "CERTIFIED AGENTS FOR PREMIER GLOBAL BRANDS"}</p>
+            </motion.div>
+
+            <div className="flex flex-wrap justify-center gap-8 md:gap-16">
+              {brands.map((brand, idx) => (
+                <motion.div
+                  key={idx}
+                  whileHover={{ scale: 1.1, y: -5 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="group cursor-pointer flex flex-col items-center gap-4"
+                  onClick={() => router.push(`/search?brand=${brand.name}`)}
+                >
+                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-3xl bg-white/[0.02] border border-white/10 p-5 flex items-center justify-center group-hover:bg-[#c9a96e]/10 group-hover:border-[#c9a96e]/40 shadow-2xl transition-all duration-500 relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    {brand.logoUrl ? (
+                      <img src={brand.logoUrl} alt={brand.name} className="w-full h-full object-contain grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700" />
+                    ) : (
+                      <Tag className="w-10 h-10 text-white/10 group-hover:text-[#c9a96e]" />
+                    )}
+                  </div>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-white/20 group-hover:text-white transition-colors">{brand.name}</span>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </section>
       )}

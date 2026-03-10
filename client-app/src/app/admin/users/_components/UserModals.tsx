@@ -351,7 +351,8 @@ export function UserDetailModal({ user, onClose, onUpdate, onDelete, isRTL }: {
         phone: user.phone || '',
         password: '',
         role: user.role,
-        isActive: user.isActive
+        isActive: user.isActive,
+        isBanned: (user as any).isBanned ?? false
     });
     const [permissions, setPermissions] = useState<string[]>(user.permissions || []);
     const [devices, setDevices] = useState<Device[]>(user.boundDevices || []);
@@ -399,6 +400,13 @@ export function UserDetailModal({ user, onClose, onUpdate, onDelete, isRTL }: {
 
             const res = await api.users.update(user.id, payload);
 
+            // Handle banning separately if it changed
+            if (editData.isBanned !== (user as any).isBanned) {
+                await api.users.ban(user.id, editData.isBanned).catch(err => {
+                    console.error("Ban update failed", err);
+                });
+            }
+
             if (res.success) {
                 setSaveSuccess('✅ تم حفظ التغييرات بنجاح');
                 // دمج البيانات المحدثة مع بيانات المستخدم الأصلية
@@ -410,10 +418,11 @@ export function UserDetailModal({ user, onClose, onUpdate, onDelete, isRTL }: {
                     phone: editData.phone || user.phone,
                     role: editData.role,
                     isActive: editData.isActive,
+                    isBanned: editData.isBanned,
                     permissions: isAdminRole ? permissions : [],
                     boundDevices: devices,
                     isDeviceLocked,
-                };
+                } as User;
                 setTimeout(() => onUpdate(updatedUser), 800);
             } else {
                 setSaveError(res.message || 'فشل تحديث البيانات');
@@ -576,6 +585,22 @@ export function UserDetailModal({ user, onClose, onUpdate, onDelete, isRTL }: {
                                         editData.isActive ? 'right-1' : 'right-7')} />
                                 </div>
                             </div>
+
+                            {/* Ban Status */}
+                            <div className="flex items-center justify-between bg-white/[0.02] border border-red-500/20 p-4 rounded-xl">
+                                <div>
+                                    <div className="text-sm font-bold text-red-400">{isRTL ? "حظر شامل للحساب" : "Global Account Ban"}</div>
+                                    <div className="text-[10px] text-white/30 mt-0.5">
+                                        {editData.isBanned ? (isRTL ? "🚫 المستخدم محظور تماماً من النظام" : "🚫 User is completely banned from system") : (isRTL ? "✅ المستخدم غير محظور" : "✅ User is not banned")}
+                                    </div>
+                                </div>
+                                <div onClick={() => setEditData(p => ({ ...p, isBanned: !p.isBanned }))}
+                                    className={cn('w-12 h-6 rounded-full relative cursor-pointer transition-all duration-300',
+                                        editData.isBanned ? 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.4)]' : 'bg-white/10')}>
+                                    <div className={cn('absolute top-1 w-4 h-4 bg-white rounded-full transition-all shadow',
+                                        editData.isBanned ? 'right-1' : 'right-7')} />
+                                </div>
+                            </div>
                         </div>
                     )}
 
@@ -607,6 +632,17 @@ export function UserDetailModal({ user, onClose, onUpdate, onDelete, isRTL }: {
                                         isDeviceLocked ? 'right-1' : 'right-7')} />
                                 </div>
                             </div>
+
+                            <button
+                                onClick={() => {
+                                    setDevices([]);
+                                    setIsDeviceLocked(false);
+                                    setSaveSuccess(isRTL ? "✅ تم تصفير الأجهزة وفتح المتصفح" : "✅ Devices reset & lock disabled");
+                                }}
+                                className="w-full py-3 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-red-500/20 transition-all mb-4"
+                            >
+                                {isRTL ? "تصفير ارتباط الأجهزة وفتح القفل" : "RESET DEVICE BINDING & UNLOCK"}
+                            </button>
 
                             {/* قائمة الأجهزة */}
                             <div className="space-y-2">

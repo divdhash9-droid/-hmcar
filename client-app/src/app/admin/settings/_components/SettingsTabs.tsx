@@ -12,6 +12,7 @@
  * 6. FeaturesTab  - قسم "لماذا تختارنا"
  */
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
     Save, Globe, MessageCircle, Instagram, Youtube, Facebook, Camera,
@@ -220,6 +221,7 @@ export function CurrencyTab({ currencySettings, loading, isRTL, onSave, onSilent
                             {isRTL ? 'سعر صرف الدولار (1 USD = ? SAR)' : 'USD Exchange Rate (1 USD = ? SAR)'}
                         </label>
                         <input type="number" step="0.01" value={currencySettings.usdToSar}
+                            title={isRTL ? 'سعر صرف الدولار مقابل الريال' : 'USD to SAR Exchange Rate'}
                             onChange={e => onCurrencyChange({ ...currencySettings, usdToSar: parseFloat(e.target.value) || 0 })}
                             onBlur={onSilentSave}
                             className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40" />
@@ -244,6 +246,7 @@ export function CurrencyTab({ currencySettings, loading, isRTL, onSave, onSilent
                             {isRTL ? 'سعر صرف الدولار مقابل الوون الكوري (1 USD = ? KRW)' : 'USD to KRW Exchange Rate (1 USD = ? KRW)'}
                         </label>
                         <input type="number" step="1" value={currencySettings.usdToKrw}
+                            title={isRTL ? 'سعر صرف الدولار مقابل الوون الكوري' : 'USD to KRW Exchange Rate'}
                             onChange={e => onCurrencyChange({ ...currencySettings, usdToKrw: parseFloat(e.target.value) || 0 })}
                             onBlur={onSilentSave}
                             className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40" />
@@ -457,3 +460,115 @@ function SaveButton({ loading, isRTL, label, onClick, white = false }: {
         </motion.button>
     );
 }
+
+// ════════════════════════════════════════════════════
+// تبويب المعرض الكوري - إعدادات رابط Encar
+// ════════════════════════════════════════════════════
+export function ShowroomTab({ isRTL }: { isRTL: boolean }) {
+    const [encarUrl, setEncarUrl] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [fetching, setFetching] = useState(true);
+    const [status, setStatus] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
+
+    // جلب الرابط الحالي عند فتح التبويب
+    useEffect(() => {
+        api.showroom.getSettings()
+            .then(res => { if (res.success) setEncarUrl(res.data?.encarUrl || ''); })
+            .catch(() => { })
+            .finally(() => setFetching(false));
+    }, []);
+
+    const handleSave = async () => {
+        setStatus(null);
+        if (!encarUrl.trim() || !encarUrl.includes('encar.com')) {
+            setStatus({ type: 'error', msg: 'يجب أن يكون الرابط من موقع car.encar.com' });
+            return;
+        }
+        try {
+            setLoading(true);
+            const res = await api.showroom.updateSettings({ encarUrl: encarUrl.trim() });
+            if (res.success) setStatus({ type: 'success', msg: '✅ تم حفظ الرابط بنجاح وسيظهر في المعرض فوراً' });
+            else setStatus({ type: 'error', msg: res.message || 'فشل الحفظ' });
+        } catch { setStatus({ type: 'error', msg: 'فشل الاتصال بالخادم' }); }
+        finally { setLoading(false); }
+    };
+
+    if (fetching) return (
+        <div className="flex items-center justify-center py-20">
+            <div className="w-8 h-8 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" />
+        </div>
+    );
+
+    return (
+        <div className="space-y-6 max-w-2xl">
+            {/* العنوان */}
+            <div className="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-5">
+                <div className="flex items-center gap-3 mb-2">
+                    <div className="w-8 h-8 bg-blue-500/20 rounded-xl flex items-center justify-center">
+                        <Globe className="w-4 h-4 text-blue-400" />
+                    </div>
+                    <h3 className="text-base font-black text-white">إعدادات المعرض الكوري</h3>
+                </div>
+                <p className="text-xs text-white/40 leading-relaxed">
+                    انسخ رابط البحث من موقع <span className="text-blue-400 font-bold">car.encar.com</span> والصقه هنا.
+                    سيقوم النظام تلقائياً بجلب السيارات وعرضها مترجمة للعربية في صفحة المعرض.
+                </p>
+            </div>
+
+            {/* الرابط الحالي */}
+            <div>
+                <label className="text-[9px] font-black text-white/40 uppercase tracking-widest block mb-2">
+                    رابط البحث من Encar.com
+                </label>
+                <div className="relative">
+                    <Globe className="absolute right-3 top-3.5 w-4 h-4 text-white/25" />
+                    <textarea
+                        value={encarUrl}
+                        onChange={e => setEncarUrl(e.target.value)}
+                        placeholder="https://car.encar.com/list/car?page=1&search=..."
+                        rows={3}
+                        dir="ltr"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl p-3 pr-9 text-white text-xs placeholder:text-white/20 focus:border-blue-500/50 outline-none transition-all resize-none font-mono"
+                    />
+                </div>
+                <p className="text-[9px] text-white/25 mt-1.5">
+                    💡 افتح Encar.com → ابحث بأي فلتر تريده → انسخ الرابط من المتصفح والصقه هنا
+                </p>
+            </div>
+
+            {/* معاينة الرابط */}
+            {encarUrl && (
+                <a href={encarUrl} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-blue-400 text-xs hover:underline">
+                    <Shield className="w-3 h-3" />
+                    معاينة الرابط في Encar.com ←
+                </a>
+            )}
+
+            {/* رسالة الحالة */}
+            {status && (
+                <div className={`p-3.5 rounded-xl text-xs font-bold border ${status.type === 'success'
+                    ? 'bg-green-500/10 border-green-500/30 text-green-400'
+                    : 'bg-red-500/10 border-red-500/30 text-red-400'}`}>
+                    {status.msg}
+                </div>
+            )}
+
+            {/* زر الحفظ */}
+            <SaveButton loading={loading} isRTL={isRTL} label="حفظ رابط المعرض" onClick={handleSave} />
+
+            {/* معلومات تعليمية */}
+            <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4 space-y-2">
+                <h4 className="text-[10px] font-black text-white/40 uppercase tracking-widest">كيفية الاستخدام</h4>
+                <ol className="list-decimal list-inside space-y-1.5 text-xs text-white/30">
+                    <li>افتح <span className="text-blue-400">car.encar.com</span> في متصفحك</li>
+                    <li>استخدم الفلاتر لتحديد نوع السيارات التي تريد عرضها</li>
+                    <li>انسخ الرابط الكامل من شريط العنوان</li>
+                    <li>الصقه في الحقل أعلاه واضغط حفظ</li>
+                    <li>سيُعرض المعرض تلقائياً بالبيانات الجديدة</li>
+                </ol>
+            </div>
+        </div>
+    );
+}
+

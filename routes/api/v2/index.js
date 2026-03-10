@@ -92,6 +92,7 @@ router.use('/smart-alerts', require('./smart-alerts')); // التنبيهات ا
 router.use('/security', require('./security'));         // قسم الأمان والأجهزة المحظورة
 router.use('/backup', require('./backup'));             // [[ARABIC_COMMENT]] النسخ الاحتياطي التلقائي
 router.use('/concierge', require('./concierge'));       // الطلبات الخاصة (طلب سيارة / قطع غيار)
+router.use('/showroom', require('./showroom'));          // المعرض الكوري (Encar)
 
 /**
  * معالج الأخطاء المركزي لمسارات API

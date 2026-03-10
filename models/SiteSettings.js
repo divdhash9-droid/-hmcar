@@ -58,6 +58,11 @@ const siteSettingsSchema = new mongoose.Schema({
         heroVideoUrl: String,
     },
 
+    // إعدادات المعرض الكوري
+    showroomSettings: {
+        encarUrl: { type: String, default: '' }, // رابط البحث من Encar.com
+    },
+
     // آخر تحديث
     updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 

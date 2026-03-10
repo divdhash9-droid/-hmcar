@@ -442,4 +442,16 @@ export const api = {
         // حذف طلب
         delete: (id: string) => fetchAPI(`/api/v2/concierge/${id}`, { method: 'DELETE' }),
     },
+    // ── المعرض الكوري (Encar) ──
+    showroom: {
+        // جلب سيارات المعرض (الصفحة رقم page)
+        getCars: (page = 1) => fetchAPI(`/api/v2/showroom/cars?page=${page}`),
+        // جلب إعدادات المعرض (للأدمن)
+        getSettings: () => fetchAPI('/api/v2/showroom/settings'),
+        // تحديث رابط Encar (للأدمن)
+        updateSettings: (data: { encarUrl: string }) => fetchAPI('/api/v2/showroom/settings', {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        }),
+    },
 };

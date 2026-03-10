@@ -28,10 +28,10 @@ import { api } from '@/lib/api';
 
 // ── المكونات المقسمة ──
 import ProfileTab from './_components/ProfileTab';
-import { SocialTab, ContactTab, CurrencyTab, SiteTab, HomeTab, FeaturesTab } from './_components/SettingsTabs';
+import { SocialTab, ContactTab, CurrencyTab, SiteTab, HomeTab, FeaturesTab, ShowroomTab } from './_components/SettingsTabs';
 
 // ── أنواع التبويبات ──
-type TabID = 'profile' | 'security' | 'social' | 'contact' | 'currency' | 'site' | 'home' | 'features';
+type TabID = 'profile' | 'security' | 'social' | 'contact' | 'currency' | 'site' | 'home' | 'features' | 'showroom';
 
 // ── أنواع البيانات ──
 interface SocialLinks { whatsapp: string; instagram: string; twitter: string; facebook: string; youtube: string; tiktok: string; snapchat: string; telegram: string; linkedin: string; }
@@ -209,6 +209,7 @@ export default function AdminSettings() {
         { id: 'contact', label: isRTL ? 'معلومات الاتصال' : 'Contact Info', icon: Phone },
         { id: 'currency', label: isRTL ? 'إعدادات العملة' : 'Currency', icon: DollarSign },
         { id: 'features', label: isRTL ? 'لماذا تختارنا' : 'Features', icon: Shield },
+        { id: 'showroom', label: isRTL ? 'المعرض الكوري' : 'Korean Showroom', icon: Globe },
     ];
 
     return (
@@ -348,6 +349,11 @@ export default function AdminSettings() {
                             onSave={handleSaveFeatures}
                             onFeaturesChange={setFeatures}
                         />
+                    )}
+
+                    {/* ─── تبويب المعرض الكوري ─── */}
+                    {activeTab === 'showroom' && (
+                        <ShowroomTab isRTL={isRTL} />
                     )}
 
                 </div>

@@ -19,18 +19,18 @@ import ProductModal, { type ProductModalData } from "@/components/ProductModal";
 
 // --- Types ---
 interface Part {
-    id: string;
+    id?: string;
+    _id: string;
     name: string;
     brand: string;
+    model: string;
     price: number;
-    img: string;
+    images?: string[];
+    img?: string;
     condition: 'NEW' | 'USED' | 'REFURBISHED';
     category: string;
-    stock: number;
+    stockQty: number;
     compatibility: string[];
-    rareLevel: 1 | 2 | 3 | 4 | 5;
-    agency: string; // The brand like TOYOTA, KIA
-    carModel: string; // The specific model like CAMRY, K5
 }
 
 interface Agency {
@@ -131,15 +131,15 @@ export default function PartsPage() {
     // [[ARABIC_COMMENT]] فتح مودال القطعة مع تحويل بياناتها لصيغة ProductModalData
     const openPartModal = (part: Part) => {
         setModalProduct({
-            id: part.id,
+            id: part._id,
             type: 'part',
             title: part.name,
-            images: [part.img].filter(Boolean),
+            images: (part.images || [part.img]).filter((img): img is string => !!img),
             price: part.price,
-            brand: part.brand || part.agency,
+            brand: part.brand,
             condition: part.condition,
             compatibility: part.compatibility,
-            stock: part.stock,
+            stock: part.stockQty,
             description: undefined,
         });
     };
@@ -424,11 +424,11 @@ export default function PartsPage() {
                                                         <span className="text-[8px] font-black text-accent-gold uppercase tracking-[0.3em]">{part.brand}</span>
                                                         <h3 className="text-lg font-black uppercase tracking-tight leading-tight min-h-[3rem] group-hover:text-accent-gold transition-colors">{part.name}</h3>
                                                         <div className="text-xl font-black gradient-text-gold">{formatPrice(Number(part.price))}</div>
-                                                        {part.stock !== undefined && (
-                                                            <div className={`text-[10px] font-black uppercase tracking-widest ${part.stock > 5 ? 'text-green-400' : part.stock > 0 ? 'text-yellow-400' : 'text-red-400'
+                                                        {part.stockQty !== undefined && (
+                                                            <div className={`text-[10px] font-black uppercase tracking-widest ${part.stockQty > 5 ? 'text-green-400' : part.stockQty > 0 ? 'text-yellow-400' : 'text-red-400'
                                                                 }`}>
-                                                                {part.stock > 0
-                                                                    ? (isRTL ? `متوفر: ${part.stock} قطعة` : `In Stock: ${part.stock}`)
+                                                                {part.stockQty > 0
+                                                                    ? (isRTL ? `متوفر: ${part.stockQty} قطعة` : `In Stock: ${part.stockQty}`)
                                                                     : (isRTL ? 'غير متوفر' : 'Out of Stock')}
                                                             </div>
                                                         )}

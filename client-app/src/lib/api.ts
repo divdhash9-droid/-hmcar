@@ -195,6 +195,12 @@ export const api = {
         delete: (id: string) => fetchAPI(`/api/v2/parts/${id}`, {
             method: 'DELETE',
         }),
+        scrape: () => fetchAPI('/api/v2/parts/scrape', {
+            method: 'POST'
+        }),
+        toggleStock: (id: string) => fetchAPI(`/api/v2/parts/${id}/toggle-stock`, {
+            method: 'PATCH'
+        }),
     },
     dashboard: {
         getClientData: () => fetchAPI('/api/v2/dashboard/client'),

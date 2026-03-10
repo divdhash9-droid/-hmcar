@@ -11,7 +11,10 @@ import {
     X,
     Upload,
     Save,
-    CheckCircle2
+    CheckCircle2,
+    RefreshCcw,
+    Eye,
+    EyeOff
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -30,6 +33,7 @@ export default function AdminPartsPage() {
     const [showModal, setShowModal] = useState(false);
     const [editingPart, setEditingPart] = useState<any>(null);
     const [submitting, setSubmitting] = useState(false);
+    const [scraping, setScraping] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
         brand: 'TOYOTA', // Representing the Agency
@@ -76,8 +80,6 @@ export default function AdminPartsPage() {
                 await api.parts.create(formData);
             }
             setShowModal(false);
-            setEditingPart(null);
-            setEditingPart(null);
             resetForm();
             await loadParts();
             showToast(isRTL ? '✅ تم حفظ البيانات بنجاح!' : '✅ Data saved successfully!', 'success');
@@ -131,6 +133,19 @@ export default function AdminPartsPage() {
         }
     };
 
+    const handleToggleVisibility = async (id: string) => {
+        try {
+            const res = await api.parts.toggleStock(id);
+            if (res.success) {
+                showToast(isRTL ? res.message : res.message, 'success');
+                loadParts();
+            }
+        } catch (err) {
+            console.error('Failed to toggle visibility', err);
+            showToast(isRTL ? '❌ فشل تغيير حالة الظهور' : '❌ Failed to toggle visibility', 'error');
+        }
+    };
+
     const handleEdit = (part: any) => {
         setEditingPart(part);
         setFormData({
@@ -146,6 +161,23 @@ export default function AdminPartsPage() {
             stockQty: part.stockQty || 1
         });
         setShowModal(true);
+    };
+
+    const handleScrape = async () => {
+        if (!confirm(isRTL ? 'هل تريد جاري جلب البيانات من المصدر الخارجي؟ قد يستغرق هذا وقتاً.' : 'Do you want to scrape data from external source? This may take some time.')) return;
+        setScraping(true);
+        try {
+            const res = await api.parts.scrape();
+            if (res.success) {
+                showToast(isRTL ? `✅ اكتمل الجلب: ${res.stats.brandsCreated} وكالات و ${res.stats.partsCreated} قطع.` : `✅ Scrape complete: ${res.stats.brandsCreated} brands and ${res.stats.partsCreated} parts.`, 'success');
+                loadParts();
+            }
+        } catch (err) {
+            console.error('Scraping failed', err);
+            showToast(isRTL ? '❌ فشل جلب البيانات' : '❌ Scraping failed', 'error');
+        } finally {
+            setScraping(false);
+        }
     };
 
     const resetForm = () => {
@@ -182,13 +214,23 @@ export default function AdminPartsPage() {
                             <p className="cockpit-mono text-[10px] text-orange-500/50 tracking-[0.25em] uppercase mb-1">PARTS INVENTORY CONTROL</p>
                             <h1 className="ck-page-title">{isRTL ? 'قطع الغيار' : 'PARTS CTRL'}</h1>
                         </div>
-                        <motion.button
-                            whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
-                            onClick={() => { resetForm(); setShowModal(true); }}
-                            className="ck-btn-primary flex items-center gap-2">
-                            <Plus className="w-4 h-4" />
-                            {isRTL ? 'إضافة قطعة' : 'ADD PART'}
-                        </motion.button>
+                        <div className="flex gap-3">
+                            <motion.button
+                                whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
+                                onClick={handleScrape}
+                                disabled={scraping}
+                                className="ck-btn-ghost flex items-center gap-2 border-orange-500/20 text-orange-400">
+                                {scraping ? <div className="ck-radar w-4 h-4" /> : <RefreshCcw className="w-4 h-4" />}
+                                {isRTL ? 'جلب من المصدر' : 'SCRAPE SOURCE'}
+                            </motion.button>
+                            <motion.button
+                                whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
+                                onClick={() => { resetForm(); setShowModal(true); }}
+                                className="ck-btn-primary flex items-center gap-2">
+                                <Plus className="w-4 h-4" />
+                                {isRTL ? 'إضافة قطعة' : 'ADD PART'}
+                            </motion.button>
+                        </div>
                     </div>
                 </div>
 
@@ -267,6 +309,14 @@ export default function AdminPartsPage() {
                                             <p className="cockpit-num text-lg font-black text-orange-400">{Number(part.price || 0).toLocaleString()}</p>
                                         </div>
                                         <div className="flex gap-1">
+                                            <button onClick={() => handleToggleVisibility(part.id)} title={part.inStock ? (isRTL ? 'إخفاء' : 'Hide') : (isRTL ? 'إظهار' : 'Show')}
+                                                className={cn("w-8 h-8 rounded-xl border flex items-center justify-center transition-all",
+                                                    part.inStock
+                                                        ? "bg-orange-500/10 border-orange-500/20 text-orange-400 hover:bg-orange-500 hover:text-white"
+                                                        : "bg-white/5 border-white/10 text-white/30 hover:bg-white/20 hover:text-white"
+                                                )}>
+                                                {part.inStock ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                                            </button>
                                             <button onClick={() => handleEdit(part)} title={isRTL ? 'تعديل' : 'Edit'}
                                                 className="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-500 hover:text-white transition-all flex items-center justify-center">
                                                 <Edit className="w-3.5 h-3.5" />

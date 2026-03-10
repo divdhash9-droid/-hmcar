@@ -153,11 +153,16 @@ function translateCar(car) {
     // سعر السيارة بالوون (الوحدة: 만원 = 10,000 وون)
     const priceKrw = (car.Price || 0) * 10000;
 
-    // رابط الصورة من Encar CDN
-    const photoId = car.Photo?.매물사진?.[0]?.PicFileNo || '';
-    const imageUrl = photoId
-        ? `https://ci.encar.com/cars_new_img/${photoId.substring(0, 4)}/${photoId}_001.jpg`
-        : null;
+    // [[ARABIC_COMMENT]] تصحيح منطق جلب الصور بناءً على هيكل استجابة Encar الجديد
+    let imageUrl = null;
+    if (typeof car.Photo === 'string' && car.Photo.length > 0) {
+        // إذا كان رابطاً مباشراً أو مساراً يبدأ بـ /carpicture
+        imageUrl = car.Photo.startsWith('http') ? car.Photo : `https://ci.encar.com/carpicture${car.Photo}`;
+    } else if (car.Photo?.매물사진?.[0]?.PicFileNo) {
+        // هيكل بديل/قديم
+        const photoId = car.Photo.매물사진[0].PicFileNo;
+        imageUrl = `https://ci.encar.com/carpicture/carpicture${photoId.substring(0, 2)}/pic${photoId.substring(0, 4)}/${photoId}_001.jpg`;
+    }
 
     return {
         id: car.Id?.toString() || '',

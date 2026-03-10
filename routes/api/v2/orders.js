@@ -68,6 +68,28 @@ router.post('/', async (req, res) => {
 
         await newOrder.save();
 
+        // [[ARABIC_COMMENT]] إرسال إشعار لكافة المشرفين عند وجود طلب جديد
+        try {
+            const User = require('../../../models/User');
+            const Notification = require('../../../models/Notification');
+
+            const admins = await User.find({ role: { $in: ['admin', 'super_admin'] } }).select('_id');
+            const notifications = admins.map(admin => ({
+                user: admin._id,
+                title: 'طلب شراء جديد',
+                message: `وصل طلب جديد برقم ${orderNumber} لـ ${items[0]?.titleSnapshot}`,
+                type: 'info',
+                link: `/admin/orders/${newOrder._id}`,
+                status: 'new'
+            }));
+
+            if (notifications.length > 0) {
+                await Notification.insertMany(notifications);
+            }
+        } catch (notifyErr) {
+            console.error('Failed to create admin notifications:', notifyErr);
+        }
+
         res.status(201).json({
             success: true,
             message: 'Order created successfully',

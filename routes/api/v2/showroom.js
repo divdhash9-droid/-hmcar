@@ -62,13 +62,25 @@ function convertEncarUrlToApi(encarUrl) {
 
         let query = '(And.Hidden.N._.CarType.A.)';
         if (searchParam) {
-            const parsed = JSON.parse(decodeURIComponent(searchParam));
-            if (parsed.action) query = parsed.action;
+            try {
+                const decoded = decodeURIComponent(searchParam);
+                const parsed = JSON.parse(decoded);
+                if (parsed.action) query = parsed.action;
+            } catch (e) {
+                console.warn('[Showroom] Failed to parse search param JSON:', e.message);
+                // Try to extract action if it's a simple string or malformed JSON
+                if (typeof searchParam === 'string' && searchParam.includes('action')) {
+                    const match = searchParam.match(/action%22%3A%22([^%]+)%22/);
+                    if (match) query = decodeURIComponent(match[1]);
+                }
+            }
         }
 
         // بناء رابط API الحقيقي
+        // نستخدم ترتيب المعاملات الذي يفضله موقع Encar المحمول
         return `https://api.encar.com/search/car/list/general?count=true&q=${encodeURIComponent(query)}&sr=|MobileModifiedDate|${offset}|20&inav=(Manufacturer._.ModelGroup._.Model._.Fuel._.Year._.Mileage._.Price._.Transmission._.Region._.ServiceMark.)`;
-    } catch {
+    } catch (err) {
+        console.error('[Showroom] URL Conversion error:', err.message);
         // رابط افتراضي في حالة الخطأ
         return 'https://api.encar.com/search/car/list/general?count=true&q=(And.Hidden.N._.CarType.A.)&sr=|MobileModifiedDate|0|20';
     }
@@ -79,19 +91,48 @@ function fetchExternal(url) {
     return new Promise((resolve, reject) => {
         const options = {
             headers: {
-                'Accept': 'application/json',
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                'Referer': 'https://car.encar.com',
-            }
+                'Accept': 'application/json, text/plain, */*',
+                'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+                'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1',
+                'Referer': 'https://m.encar.com/',
+                'Origin': 'https://m.encar.com',
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache',
+            },
+            timeout: 10000 // 10 seconds timeout
         };
-        https.get(url, options, (res) => {
+
+        const req = https.get(url, options, (res) => {
+            const { statusCode } = res;
+
+            if (statusCode !== 200) {
+                res.resume(); // consume response data to free up memory
+                return reject(new Error(`Encar API request failed with status ${statusCode}`));
+            }
+
             let data = '';
             res.on('data', chunk => data += chunk);
             res.on('end', () => {
-                try { resolve(JSON.parse(data)); }
-                catch { reject(new Error('Invalid JSON from Encar API')); }
+                try {
+                    const parsed = JSON.parse(data);
+                    resolve(parsed);
+                }
+                catch (e) {
+                    console.error('[Showroom] JSON Parse Error. Raw data starts with:', data.substring(0, 100));
+                    reject(new Error('Invalid response format from Encar API'));
+                }
             });
-        }).on('error', reject);
+        });
+
+        req.on('error', (err) => {
+            console.error('[Showroom] HTTPS Error:', err.message);
+            reject(err);
+        });
+
+        req.on('timeout', () => {
+            req.destroy();
+            reject(new Error('Request to Encar timed out'));
+        });
     });
 }
 

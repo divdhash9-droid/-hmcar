@@ -139,6 +139,7 @@ export const translations: Translations = {
     brandCars: { AR: "معرض السيارات", EN: "Car Showroom", KR: "차량 전시장" },
     brandParts: { AR: "قطع الغيار", EN: "Spare Parts", KR: "예비 부품" },
     brandBoth: { AR: "كلاهما", EN: "Both", KR: "둘 다" },
+    browseCars: { AR: "تصفح السيارات", EN: "BROWSE CARS", KR: "차량 둘러보기" },
 
     // Admin Car Management
     carManagement: { AR: "إدارة السيارات", EN: "CAR MANAGEMENT", KR: "차량 관리" },

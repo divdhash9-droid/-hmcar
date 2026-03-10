@@ -62,6 +62,7 @@ export default function Navbar() {
 
     const navLinks = [
         { href: '/showroom', label: isRTL ? 'المعرض' : 'SHOWROOM', icon: Car },
+        { href: '/search', label: isRTL ? 'تصفح السيارات' : 'BROWSE', icon: Search },
         { href: '/auctions', label: isRTL ? 'المزادات' : 'AUCTIONS', icon: Gavel },
         { href: '/parts', label: isRTL ? 'القطع' : 'PARTS', icon: ShoppingBag },
         { href: '/concierge', label: isRTL ? 'طلبات خاصة' : 'REQUESTS', icon: Settings },

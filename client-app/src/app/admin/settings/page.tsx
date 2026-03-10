@@ -18,7 +18,8 @@
  */
 
 import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { ArrowLeft, User, Globe, Phone, DollarSign, Camera, LayoutDashboard, Shield } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -42,9 +43,25 @@ interface HomeContent { heroTitle: string; heroSubtitle: string; heroVideoUrl: s
 interface Feature { icon: string; title: string; desc: string;[key: string]: string; }
 
 export default function AdminSettings() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-black text-white flex items-center justify-center font-black uppercase tracking-[0.5em] italic animate-pulse">Synchronizing Matrix...</div>}>
+            <AdminSettingsContent />
+        </Suspense>
+    );
+}
+
+function AdminSettingsContent() {
     const { isRTL } = useLanguage();
     const { user, refreshUser } = useAuth();
+    const searchParams = useSearchParams();
+    const tabParam = searchParams.get('tab') as TabID;
     const [activeTab, setActiveTab] = useState<TabID>('profile');
+
+    useEffect(() => {
+        if (tabParam && ['profile', 'security', 'social', 'contact', 'currency', 'site', 'home', 'features', 'showroom'].includes(tabParam)) {
+            setActiveTab(tabParam);
+        }
+    }, [tabParam]);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
 

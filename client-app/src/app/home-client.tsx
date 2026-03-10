@@ -3,9 +3,11 @@
 import React, { useRef, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
-  Sparkles, Shield,
-  Truck, CreditCard, Award, Star, Zap, Globe,
-  MessageCircle, Smartphone, Download, Link as LinkIcon, ArrowUpRight, RefreshCw
+  Sparkles, Shield, Truck, CreditCard, Award, Star, Zap, Globe,
+  MessageCircle, Smartphone, Download, Link as LinkIcon, ArrowUpRight,
+  ArrowRight, RefreshCw, Car, Play, Check, ChevronLeft, ChevronRight,
+  Quote, Phone, Instagram, Facebook, Youtube, Send, Linkedin,
+  Mail, Search, Gavel, Cog, Info, User, LogOut, Menu, X
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -20,6 +22,7 @@ import { useRouter } from "next/navigation";
 import { useSocket } from "@/lib/SocketContext";
 import { useAuth } from "@/lib/AuthContext";
 import { useSettings } from "@/lib/SettingsContext";
+import { cn } from "@/lib/utils";
 
 export type CarType = {
   id?: string;
@@ -51,13 +54,14 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
   const [videoHeight, setVideoHeight] = useState<string>("55vh");
   const [activeDock, setActiveDock] = useState<"reviews" | "app" | null>(null);
   const [deferredInstall, setDeferredInstall] = useState<any>(null);
-  const [isInstalled, setIsInstalled] = useState(false);
+  const [isInstalled, setIsInstalled] = useState(() => {
+    if (typeof window !== 'undefined') return !!localStorage.getItem('pwa_installed');
+    return false;
+  });
   const [showUpdateBanner, setShowUpdateBanner] = useState(false);
 
   // التقاط حدث التثبيت PWA
   useEffect(() => {
-    const installed = localStorage.getItem('pwa_installed');
-    if (installed) setIsInstalled(true);
     const handler = (e: Event) => { e.preventDefault(); setDeferredInstall(e); };
     window.addEventListener('beforeinstallprompt', handler);
     window.addEventListener('appinstalled', () => { setIsInstalled(true); localStorage.setItem('pwa_installed', '1'); });
@@ -134,7 +138,10 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
 
   // خريطة لتنسيق الأيقونات من مسمياتها في قاعدة البيانات
   const lucideIcons: Record<string, any> = {
-    Shield, Truck, CreditCard, Award, Zap, Globe, Star, Smartphone, MessageCircle, Heart: Sparkles
+    Shield, Truck, CreditCard, Award, Zap, Globe, Star, Smartphone, MessageCircle, Heart: Sparkles,
+    ArrowUpRight, ArrowRight, Play, Check, ChevronLeft, ChevronRight, Quote, Phone, Instagram,
+    Facebook, Youtube, Send, Linkedin, Mail, Search, Gavel, Cog, Info, User, LogOut,
+    Menu, X, Car, Sparkles
   };
 
   const currentFeatures = features.length > 0 ? features : [
@@ -498,10 +505,10 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
             <motion.div className="text-center mb-16" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
               <motion.div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full border border-[#c9a96e]/30 bg-[#c9a96e]/10 backdrop-blur-md mb-6 shadow-[0_0_20px_rgba(201,169,110,0.15)]" whileHover={{ scale: 1.05 }}>
                 <Sparkles className="w-5 h-5 text-[#c9a96e] animate-pulse" />
-                <span className="text-sm font-black text-[#c9a96e] tracking-[0.2em] uppercase">{isRTL ? "تشكيلة المعرض" : "SHOWROOM COLLECTION"}</span>
+                <span className="text-sm font-black text-[#c9a96e] tracking-[0.2em] uppercase">{isRTL ? "المخزون الحصري" : "EXCLUSIVE INVENTORY"}</span>
               </motion.div>
               <h2 className="text-5xl md:text-6xl font-black text-white italic uppercase tracking-tighter mb-4" style={{ textShadow: "0 0 40px rgba(201,169,110,0.4)" }}>
-                {isRTL ? "سيارات متوفرة الآن" : "AVAILABLE CARS"}
+                {isRTL ? "سيارات متوفرة محلياً" : "LOCAL INVENTORY"}
               </h2>
               <p className="text-white/50 text-sm font-medium uppercase tracking-[0.1em]">{isRTL ? "اكتشف أحدث الموديلات المضافة إلى مستودعاتنا" : "DISCOVER THE LATEST MODELS ADDED TO OUR INVENTORY"}</p>
             </motion.div>
@@ -568,15 +575,26 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
               </motion.div>
             </div>
 
-            <div className="flex justify-center mt-8 relative z-30 pointer-events-auto">
+            <div className="flex flex-col sm:flex-row justify-center mt-8 gap-4 relative z-30 pointer-events-auto">
               <button
-                onClick={() => router.push('/showroom')}
+                onClick={() => router.push('/search')}
                 className="group flex items-center gap-3 px-8 py-4 rounded-2xl bg-white/[0.03] border border-white/10 hover:border-[#c9a96e]/40 hover:bg-[#c9a96e]/10 transition-all backdrop-blur-xl"
               >
                 <span className="text-xs font-black uppercase tracking-[0.2em] text-white group-hover:text-[#c9a96e] transition-colors">
-                  {isRTL ? "تصفح جميع السيارات" : "BROWSE ALL CARS"}
+                  {isRTL ? "تصفح المخزون الكامل" : "BROWSE FULL INVENTORY"}
                 </span>
                 <ArrowUpRight className="w-4 h-4 text-white/40 group-hover:text-[#c9a96e] transition-colors" />
+              </button>
+
+              <button
+                onClick={() => router.push('/showroom')}
+                className="group flex items-center gap-3 px-8 py-4 rounded-2xl bg-[#c9a96e]/10 border border-[#c9a96e]/20 hover:bg-[#c9a96e]/20 hover:border-[#c9a96e]/40 transition-all backdrop-blur-xl"
+              >
+                <Car className="w-4 h-4 text-[#c9a96e]" />
+                <span className="text-xs font-black uppercase tracking-[0.2em] text-[#c9a96e]">
+                  {isRTL ? "المعرض الكوري المباشر" : "LIVE KOREAN SHOWROOM"}
+                </span>
+                <ArrowRight className={cn("w-4 h-4 text-[#c9a96e]", isRTL && "rotate-180")} />
               </button>
             </div>
           </div>

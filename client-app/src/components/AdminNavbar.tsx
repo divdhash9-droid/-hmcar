@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Activity, Car, Gavel, Users, ShoppingCart, Settings, Shield,
-    LogOut, Radio, Layers, TrendingUp, Bell, Share2, MessageCircle,
+    LogOut, Radio, Layers, TrendingUp, Bell, Share2, MessageCircle, Sparkles,
     Tag, Briefcase, Mail, Menu, X, Languages, Database, RefreshCcw
 } from 'lucide-react';
 import { useLanguage } from '@/lib/LanguageContext';
@@ -217,6 +217,7 @@ function buildNavItems(isRTL: boolean): NavItem[] {
         { id: 'notifications', icon: Bell, label: isRTL ? 'الإشعارات' : 'ALERTS', href: '/admin/notifications' },
         { id: 'social', icon: Share2, label: isRTL ? 'التواصل' : 'SOCIAL', href: '/admin/social' },
         { id: 'security', icon: Shield, label: isRTL ? 'الأمان' : 'SECURITY', href: '/admin/security' },
+        { id: 'showroom', icon: Sparkles, label: isRTL ? 'المعرض' : 'SHOWROOM', href: '/admin/settings?tab=showroom' },
         { id: 'settings', icon: Settings, label: isRTL ? 'الإعدادات' : 'SETTINGS', href: '/admin/settings' },
     ];
 }

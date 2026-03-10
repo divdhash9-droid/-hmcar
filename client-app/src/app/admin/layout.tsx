@@ -1,15 +1,14 @@
-import type { Metadata } from 'next';
-import AdminNavbar from '@/components/AdminNavbar';
+'use client';
 
-export const metadata: Metadata = {
-    title: 'HM CAR — Admin Cockpit',
-    description: 'HM CAR Admin Control Panel',
-    robots: 'noindex, nofollow',
-};
+import AdminNavbar from '@/components/AdminNavbar';
+import { useLanguage } from '@/lib/LanguageContext';
+import { cn } from '@/lib/utils';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+    const { isRTL } = useLanguage();
+
     return (
-        <div className="relative min-h-screen text-white bg-[#070711]">
+        <div className="relative min-h-screen text-white bg-[#070711]" dir={isRTL ? 'rtl' : 'ltr'}>
 
             {/* Cockpit background grid */}
             <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.025] bg-[linear-gradient(rgba(249,115,22,1)_1px,transparent_1px),linear-gradient(90deg,rgba(249,115,22,1)_1px,transparent_1px)] bg-[size:60px_60px]" />
@@ -21,7 +20,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <AdminNavbar />
 
             {/* Page content offset by AdminNavbar (72px) */}
-            <div className="relative z-10 lg:pl-[72px] pt-[52px] lg:pt-0" dir="inherit">
+            <div className={cn(
+                "relative z-10 pt-[52px] lg:pt-0 transition-all duration-300",
+                isRTL ? "lg:pr-[72px] lg:pl-0" : "lg:pl-[72px] lg:pr-0"
+            )}>
                 {children}
             </div>
         </div>

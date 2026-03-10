@@ -64,9 +64,16 @@ export default function SecurityPage() {
                 method: 'POST', headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
-            if (data.success) fetchDevices(true);
-            else alert(data.message || 'Error');
-        } catch { alert('Error processing request'); }
+            if (data.success) {
+                fetchDevices(true);
+            } else {
+                console.error('[Ban Toggle Error]:', data);
+                alert(data.message || (isRTL ? 'فشلت العملية' : 'Process failed'));
+            }
+        } catch (err) {
+            console.error('[Ban Toggle Fetch Catch]:', err);
+            alert(isRTL ? 'خطأ في معالجة الطلب' : 'Error processing request');
+        }
     };
 
     const toggleExempt = async (id: string, currentlyExempt: boolean) => {
@@ -79,9 +86,16 @@ export default function SecurityPage() {
                 method: 'POST', headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
-            if (data.success) fetchDevices(true);
-            else alert(data.message || 'Error');
-        } catch { alert('Error processing request'); }
+            if (data.success) {
+                fetchDevices(true);
+            } else {
+                console.error('[Exempt Toggle Error]:', data);
+                alert(data.message || (isRTL ? 'فشلت العملية' : 'Process failed'));
+            }
+        } catch (err) {
+            console.error('[Exempt Toggle Fetch Catch]:', err);
+            alert(isRTL ? 'خطأ في معالجة الطلب' : 'Error processing request');
+        }
     };
 
     // Filter logic

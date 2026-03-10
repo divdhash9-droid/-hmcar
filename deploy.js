@@ -49,7 +49,7 @@ function updateSWVersion() {
     }
     const timestamp = Date.now().toString(36); // مثل: "lv1q5s8"
     let content = fs.readFileSync(swPath, 'utf-8');
-    content = content.replace(/'__SW_VERSION__'/, `'${timestamp}'`);
+    content = content.replace(/const SW_VERSION = '.*';/, `const SW_VERSION = '${timestamp}';`);
     fs.writeFileSync(swPath, content);
     log.ok(`تم تحديث إصدار Service Worker إلى: ${timestamp}`);
 }

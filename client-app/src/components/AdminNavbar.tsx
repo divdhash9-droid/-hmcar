@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     Activity, Car, Gavel, Users, ShoppingCart, Settings, Shield,
     LogOut, Radio, Layers, TrendingUp, Bell, Share2, MessageCircle,
-    Tag, Briefcase, Mail, Menu, X, Languages, Database
+    Tag, Briefcase, Mail, Menu, X, Languages, Database, RefreshCcw
 } from 'lucide-react';
 import { useLanguage } from '@/lib/LanguageContext';
 import { useAuth } from '@/lib/AuthContext';
@@ -35,6 +35,7 @@ interface SidebarProps {
     toggleLanguage: () => void;
     onLogout: () => void;
     onBackup: () => void;
+    onRefresh: () => void;
     onClose?: () => void;
 }
 
@@ -65,7 +66,7 @@ function LiveDot({ colorClass = 'bg-green-400' }: { colorClass?: string }) {
 // ── Sidebar Content — declared at module level (not inside render) ──
 function SidebarInner({
     items, pathname, isRTL, lang, time, dateStr, ping,
-    toggleLanguage, onLogout, onBackup, onClose
+    toggleLanguage, onLogout, onBackup, onRefresh, onClose
 }: SidebarProps) {
     return (
         <div className="flex flex-col h-full">
@@ -174,6 +175,16 @@ function SidebarInner({
                     <span className="font-mono text-[7px] font-bold uppercase tracking-widest">{isRTL ? 'نسخة' : 'BCKP'}</span>
                 </button>
 
+                {/* Refresh Fix */}
+                <button
+                    onClick={onRefresh}
+                    className="w-full flex items-center justify-center gap-1 py-1.5 rounded-lg bg-blue-500/[0.08] border border-blue-500/20 text-blue-400/50 hover:text-blue-400 hover:bg-blue-500/15 hover:border-blue-500/40 transition-all font-mono"
+                    title={isRTL ? 'إصلاح التنسيق وتحديث' : 'Fix UI & Refresh'}
+                >
+                    <RefreshCcw className="w-3 h-3" />
+                    <span className="font-mono text-[7px] font-bold uppercase tracking-widest">{isRTL ? 'تحديث' : 'SYNC'}</span>
+                </button>
+
                 {/* Logout */}
                 <button
                     onClick={onLogout}
@@ -258,9 +269,28 @@ export default function AdminNavbar() {
     };
 
     const items = buildNavItems(isRTL);
+    const handleForceRefresh = () => {
+        if (confirm(isRTL ? 'سيتم مسح الذاكرة المؤقتة للتطبيق وتحديث الصفحة لإصلاح التنسيق. هل أنت متأكد؟' : 'Clear cache and fix UI layout? This will perform a hard refresh.')) {
+            // Unregister service worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(registrations => {
+                    for (const registration of registrations) registration.unregister();
+                });
+            }
+            // Clear caches
+            if ('caches' in window) {
+                caches.keys().then(names => {
+                    for (const name of names) caches.delete(name);
+                });
+            }
+            // Reload page
+            window.location.reload();
+        }
+    };
+
     const sidebarProps: SidebarProps = {
         items, pathname, isRTL, lang, time, dateStr, ping,
-        toggleLanguage, onLogout: handleLogout, onBackup: handleBackup,
+        toggleLanguage, onLogout: handleLogout, onBackup: handleBackup, onRefresh: handleForceRefresh,
     };
 
     return (

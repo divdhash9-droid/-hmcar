@@ -143,7 +143,7 @@ router.post('/auto-login', async (req, res) => {
         });
       }
 
-      if (fingerprint.linkedUsername.toLowerCase() !== name.trim().toLowerCase()) {
+      if (fingerprint.linkedUsername && fingerprint.linkedUsername.toLowerCase() !== name.trim().toLowerCase()) {
         fingerprint.failedAttempts += 1;
         if (fingerprint.failedAttempts >= 2) {
           fingerprint.banned = true;
@@ -302,7 +302,7 @@ router.post('/login', async (req, res) => {
         if (fingerprint.banned) {
           return res.status(403).json({ banned: true, banCode: fingerprint.banCode, message: 'تم حظرك. لمراسلة الإدارة استخدم الرمز بالأسفل.' });
         }
-        if (fingerprint.linkedUsername.toLowerCase() !== searchKey.toLowerCase()) {
+        if (fingerprint.linkedUsername && fingerprint.linkedUsername.toLowerCase() !== searchKey.toLowerCase()) {
           fingerprint.failedAttempts += 1;
           if (fingerprint.failedAttempts >= 2) {
             fingerprint.banned = true;

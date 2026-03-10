@@ -2,7 +2,6 @@
 
 import AdminNavbar from '@/components/AdminNavbar';
 import { useLanguage } from '@/lib/LanguageContext';
-import { cn } from '@/lib/utils';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     const { isRTL } = useLanguage();
@@ -20,10 +19,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <AdminNavbar />
 
             {/* Page content offset by AdminNavbar (72px) */}
-            <div className={cn(
-                "relative z-10 pt-[52px] lg:pt-0 transition-all duration-300",
-                isRTL ? "lg:pr-[72px] lg:pl-0" : "lg:pl-[72px] lg:pr-0"
-            )}>
+            {/* lg:ps-[72px] (padding-inline-start) handles both RTL and LTR automatically */}
+            <div className="relative z-10 pt-[52px] lg:pt-0 lg:ps-[72px] transition-all duration-300 overflow-hidden">
                 {children}
             </div>
         </div>

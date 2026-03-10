@@ -93,21 +93,26 @@ function fetchExternal(url) {
             headers: {
                 'Accept': 'application/json, text/plain, */*',
                 'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
-                'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1',
-                'Referer': 'https://m.encar.com/',
-                'Origin': 'https://m.encar.com',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Referer': 'https://www.encar.com/',
+                'Origin': 'https://www.encar.com',
                 'Cache-Control': 'no-cache',
                 'Pragma': 'no-cache',
             },
-            timeout: 10000 // 10 seconds timeout
+            timeout: 15000 // 15 seconds timeout
         };
 
         const req = https.get(url, options, (res) => {
             const { statusCode } = res;
 
+            if (statusCode >= 300 && statusCode < 400 && res.headers.location) {
+                console.log(`[Showroom] Redirect detected: ${statusCode} -> ${res.headers.location}`);
+                return fetchExternal(res.headers.location).then(resolve).catch(reject);
+            }
+
             if (statusCode !== 200) {
-                res.resume(); // consume response data to free up memory
-                return reject(new Error(`Encar API request failed with status ${statusCode}`));
+                res.resume();
+                return reject(new Error(`Encar API returned status ${statusCode}`));
             }
 
             let data = '';
@@ -118,20 +123,24 @@ function fetchExternal(url) {
                     resolve(parsed);
                 }
                 catch (e) {
-                    console.error('[Showroom] JSON Parse Error. Raw data starts with:', data.substring(0, 100));
-                    reject(new Error('Invalid response format from Encar API'));
+                    console.error('[Showroom] JSON Parse Error. Data length:', data.length);
+                    if (data.includes('Access Denied') || data.includes('Cloudflare')) {
+                        reject(new Error('Bot protection detected (WAF/Cloudflare)'));
+                    } else {
+                        reject(new Error('Invalid JSON response from Encar'));
+                    }
                 }
             });
         });
 
         req.on('error', (err) => {
-            console.error('[Showroom] HTTPS Error:', err.message);
-            reject(err);
+            console.error('[Showroom] Network Error:', err.message);
+            reject(new Error(`Network Error: ${err.message}`));
         });
 
         req.on('timeout', () => {
             req.destroy();
-            reject(new Error('Request to Encar timed out'));
+            reject(new Error('Encar API request timed out (15s)'));
         });
     });
 }
@@ -224,8 +233,11 @@ router.get('/cars', async (req, res) => {
         console.error('❌ Showroom fetch error:', error.message);
         res.status(500).json({
             success: false,
-            message: 'فشل جلب سيارات المعرض الكوري',
-            error: error.message,
+            message: `فشل جلب سيارات المعرض: ${error.message}`,
+            debug: {
+                error: error.message,
+                timestamp: new Date().toISOString()
+            }
         });
     }
 });

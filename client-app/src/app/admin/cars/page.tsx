@@ -158,8 +158,9 @@ export default function AdminCarsPage() {
     const handleEdit = (car: Car) => {
         setEditingCar(car);
         const sarPrice = car.price || 0;
-        const usd = parseFloat((sarPrice / usdToSar).toFixed(2));
-        const krw = Math.round(usd * usdToKrw);
+        // Use existing priceUsd/priceKrw if available, otherwise calculate
+        const usd = car.usdPrice ?? (((car as any).priceUsd) || parseFloat((sarPrice / usdToSar).toFixed(2)));
+        const krw = car.krwPrice ?? (((car as any).priceKrw) || Math.round((usd * usdToKrw)));
         // make قد يكون object أو string
         const makeValue = typeof car.make === 'object' ? (car.make?.name || '') : (car.make || '');
         setFormData({
@@ -186,10 +187,17 @@ export default function AdminCarsPage() {
         if (submitting) return;
         setSubmitting(true);
         try {
+            // Map USD and KRW fields to match the model schema exactly
+            const submitData = {
+                ...formData,
+                priceUsd: formData.usdPrice,
+                priceKrw: formData.krwPrice
+            };
+
             if (editingCar) {
-                await api.cars.update(editingCar.id, formData);
+                await api.cars.update(editingCar.id, submitData);
             } else {
-                await api.cars.create(formData);
+                await api.cars.create(submitData);
             }
             setShowModal(false);
             resetForm();

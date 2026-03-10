@@ -487,8 +487,20 @@ export function ShowroomTab({ isRTL }: { isRTL: boolean }) {
         try {
             setLoading(true);
             const res = await api.showroom.updateSettings({ encarUrl: encarUrl.trim() });
-            if (res.success) setStatus({ type: 'success', msg: '✅ تم حفظ الرابط بنجاح وسيظهر في المعرض فوراً' });
+            if (res.success) setStatus({ type: 'success', msg: '✅ تم حفظ الرابط بنجاح' });
             else setStatus({ type: 'error', msg: res.message || 'فشل الحفظ' });
+        } catch { setStatus({ type: 'error', msg: 'فشل الاتصال بالخادم' }); }
+        finally { setLoading(false); }
+    };
+
+    const handleScrape = async () => {
+        setStatus(null);
+        try {
+            setLoading(true);
+            setStatus({ type: 'success', msg: '⏳ جاري جلب السيارات من الرابط... قد يستغرق هذا دقيقة.' });
+            const res = await api.showroom.scrape();
+            if (res.success) setStatus({ type: 'success', msg: res.message });
+            else setStatus({ type: 'error', msg: res.message || 'فشل جلب السيارات' });
         } catch { setStatus({ type: 'error', msg: 'فشل الاتصال بالخادم' }); }
         finally { setLoading(false); }
     };
@@ -510,8 +522,7 @@ export function ShowroomTab({ isRTL }: { isRTL: boolean }) {
                     <h3 className="text-base font-black text-white">إعدادات المعرض الكوري</h3>
                 </div>
                 <p className="text-xs text-white/40 leading-relaxed">
-                    انسخ رابط البحث من موقع <span className="text-blue-400 font-bold">car.encar.com</span> والصقه هنا.
-                    سيقوم النظام تلقائياً بجلب السيارات وعرضها مترجمة للعربية في صفحة المعرض.
+                    انسخ رابط البحث من موقع <span className="text-blue-400 font-bold">car.encar.com</span> والصقه هنا ثم اضغط على &quot;استيراد السيارات&quot; لحفظ الدفعة الأولى.
                 </p>
             </div>
 
@@ -554,21 +565,34 @@ export function ShowroomTab({ isRTL }: { isRTL: boolean }) {
                 </div>
             )}
 
-            {/* زر الحفظ */}
-            <SaveButton loading={loading} isRTL={isRTL} label="حفظ رابط المعرض" onClick={handleSave} />
+            {/* أزرار الحفظ والاستيراد */}
+            <div className="flex gap-4">
+                <div className="flex-1">
+                    <SaveButton loading={loading} isRTL={isRTL} label="حفظ الرابط" onClick={handleSave} />
+                </div>
+                <div className="flex-1">
+                    <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                        onClick={handleScrape} disabled={loading || !encarUrl}
+                        className="w-full py-5 bg-blue-500 text-white shadow-[0_0_30px_rgba(59,130,246,0.3)] font-black uppercase tracking-wider rounded-xl flex items-center justify-center gap-3 transition-all disabled:opacity-50">
+                        <UploadIcon />
+                        {loading ? 'جاري الاستيراد...' : 'استيراد السيارات'}
+                    </motion.button>
+                </div>
+            </div>
 
             {/* معلومات تعليمية */}
             <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4 space-y-2">
-                <h4 className="text-[10px] font-black text-white/40 uppercase tracking-widest">كيفية الاستخدام</h4>
+                <h4 className="text-[10px] font-black text-white/40 uppercase tracking-widest">ملاحظة</h4>
                 <ol className="list-decimal list-inside space-y-1.5 text-xs text-white/30">
-                    <li>افتح <span className="text-blue-400">car.encar.com</span> في متصفحك</li>
-                    <li>استخدم الفلاتر لتحديد نوع السيارات التي تريد عرضها</li>
-                    <li>انسخ الرابط الكامل من شريط العنوان</li>
-                    <li>الصقه في الحقل أعلاه واضغط حفظ</li>
-                    <li>سيُعرض المعرض تلقائياً بالبيانات الجديدة</li>
+                    <li>زر <b>استيراد السيارات</b> سيقوم باستيراد أول 60 سيارة من المعرض وحفظها محلياً.</li>
+                    <li>بعد الاستيراد، ستظهر السيارات في قسم &quot;إدارة السيارات&quot; حيث يمكنك تعديل سعرها وإخفاؤها أو إظهارها.</li>
                 </ol>
             </div>
         </div>
     );
+}
+
+function UploadIcon() {
+    return <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" x2="12" y1="3" y2="15"></line></svg>;
 }
 

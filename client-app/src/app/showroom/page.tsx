@@ -318,10 +318,41 @@ export default function ShowroomPage() {
     }, [page, refreshKey, fetchCars]);
 
     // ─────────────────────────────────
-    // فتح واتساب مع بيانات السيارة
+    // فتح واتساب مع بيانات السيارة وتسجيل الطلب
     // ─────────────────────────────────
-    const openWhatsApp = (car: KoreanCar) => {
+    const openWhatsApp = async (car: KoreanCar) => {
         const sarPrice = (car.priceKrw * 0.00027).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+        try {
+            // Get user from localStorage if exists
+            let buyerId = null;
+            if (typeof window !== 'undefined') {
+                const userJson = localStorage.getItem('hm_user');
+                if (userJson) {
+                    try { buyerId = JSON.parse(userJson)._id; } catch (e) { }
+                }
+            }
+
+            // Record order in database
+            await api.orders.create({
+                buyerId: buyerId,
+                items: [{
+                    itemType: 'car',
+                    refId: car.id,
+                    titleSnapshot: car.title,
+                    qty: 1,
+                    unitPriceSar: parseInt(sarPrice.replace(/,/g, ''))
+                }],
+                pricing: {
+                    grandTotalSar: parseInt(sarPrice.replace(/,/g, ''))
+                },
+                channel: 'whatsapp',
+                notes: `Client requested showroom car: ${car.encarUrl}`
+            });
+        } catch (err) {
+            console.error('Failed to log showroom order:', err);
+        }
+
         const msg = [
             `🏁 *HM CAR | طلب سيارة من المعرض*`,
             `──────────────────`,
@@ -335,7 +366,7 @@ export default function ShowroomPage() {
             `🇸🇦 *تقديراً:* ${sarPrice} ريال سعودي`,
             `🔗 *رابط إنكار:* ${car.encarUrl}`,
             `──────────────────`,
-            `رغبت في الاستفسار عن تفاصيل الشحن والجمارك لهذه السيارة.`,
+            `رغبت في الاستفسار عن الشراء وتفاصيل الشحن للتصنيع الكوري لهذه السيارة.`
         ].join('\n');
 
         const url = `https://wa.me/${whatsappNum}?text=${encodeURIComponent(msg)}`;

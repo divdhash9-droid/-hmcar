@@ -4,6 +4,7 @@ const express = require('express');
 const router = express.Router();
 const https = require('https');
 const SiteSettings = require('../../../models/SiteSettings');
+const Car = require('../../../models/Car');
 const { requireAuthAPI, requireAdmin } = require('../../../middleware/auth');
 
 // ─────────────────────────────────────────────────────────
@@ -197,44 +198,131 @@ function translateCar(car) {
  * يستخدم الرابط المحفوظ في الإعدادات
  */
 router.get('/cars', async (req, res) => {
-    let apiUrl = '';
     try {
         const page = parseInt(req.query.page || '1');
+        const limit = 20;
+        const skip = (page - 1) * limit;
 
-        // جلب رابط Encar من إعدادات الموقع
+        const [cars, total] = await Promise.all([
+            Car.find({ listingType: 'showroom', isActive: true, isSold: false }).sort({ createdAt: -1 }).skip(skip).limit(limit),
+            Car.countDocuments({ listingType: 'showroom', isActive: true, isSold: false })
+        ]);
+
         const settings = await SiteSettings.getSettings();
-        const showroomUrl = settings?.showroomSettings?.encarUrl ||
-            'https://car.encar.com/list/car?page=1&search=%7B%22type%22%3A%22car%22%2C%22action%22%3A%22(And.Hidden.N._.CarType.A.)%22%2C%22sort%22%3A%22MobileModifiedDate%22%7D';
+        const showroomUrl = settings?.showroomSettings?.encarUrl || '';
 
-        // تحويل رابط الصفحة إلى رابط API مع الصفحة المطلوبة
-        const urlWithPage = showroomUrl.replace(/page=\d+/, `page=${page}`);
-        apiUrl = convertEncarUrlToApi(urlWithPage, page);
-
-        console.log(`[Showroom] Fetching from: ${apiUrl}`);
-
-        // جلب البيانات من Encar
-        const data = await fetchExternal(apiUrl);
-        const results = (data.SearchResults || []).map(translateCar);
+        const formattedCars = cars.map(car => ({
+            id: car._id.toString(),
+            manufacturer: car.make || '',
+            manufacturerAr: car.make || '',
+            model: car.model || '',
+            badge: '',
+            title: car.title || '',
+            titleKr: car.title || '',
+            year: car.year || 0,
+            mileage: car.mileage || 0,
+            priceKrw: car.priceKrw || 0,
+            fuel: car.fuelType || '',
+            fuelAr: car.fuelType || '',
+            transmission: car.transmission || '',
+            transmissionAr: car.transmission || '',
+            region: '',
+            regionAr: '',
+            imageUrl: car.images && car.images[0] ? car.images[0] : null,
+            encarUrl: car.externalUrl || '',
+            isInspected: true,
+        }));
 
         res.json({
             success: true,
-            data: results,
-            total: data.Count || results.length,
-            page: page,
-            totalPages: Math.ceil((data.Count || results.length) / 20),
+            data: formattedCars,
+            total,
+            page,
+            totalPages: Math.ceil(total / limit),
             encarUrl: showroomUrl,
         });
 
     } catch (error) {
         console.error('❌ Showroom Error:', error.message);
-        res.status(500).json({
-            success: false,
-            message: `فشل جلب سيارات المعرض: ${error.message}`,
-            debug: {
-                apiUrl: apiUrl || 'not constructed',
-                error: error.message
+        res.status(500).json({ success: false, message: 'فشل جلب سيارات المعرض' });
+    }
+});
+
+/**
+ * POST /api/v2/showroom/scrape
+ * جلب السيارات من Encar وحفظها في قاعدة البيانات المحلية (للأدمن فقط)
+ */
+router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
+    let apiUrl = '';
+    try {
+        const settings = await SiteSettings.getSettings();
+        const showroomUrl = settings?.showroomSettings?.encarUrl || '';
+        if (!showroomUrl) {
+            return res.status(400).json({ success: false, message: 'لا يوجد رابط معرض محفوظ في الإعدادات.' });
+        }
+
+        // Only scrape first 3 pages (up to 60 cars) per call to prevent timeout
+        let totalCreated = 0;
+        let totalUpdated = 0;
+        for (let page = 1; page <= 3; page++) {
+            const urlWithPage = showroomUrl.replace(/page=\d+/, `page=${page}`);
+            apiUrl = convertEncarUrlToApi(urlWithPage, page);
+
+            let data;
+            try {
+                data = await fetchExternal(apiUrl);
+            } catch (err) {
+                console.warn(`[Showroom Scrape] Failed on page ${page}: ${err.message}`);
+                break;
             }
-        });
+
+            const results = (data.SearchResults || []).map(translateCar);
+
+            for (const item of results) {
+                if (!item.encarUrl) continue;
+                // Check if car exists
+                const existingCar = await Car.findOne({ externalUrl: item.encarUrl });
+                if (!existingCar) {
+                    await Car.create({
+                        title: item.title,
+                        make: item.manufacturerAr,
+                        model: item.model,
+                        year: item.year,
+                        mileage: item.mileage,
+                        price: 0,
+                        priceSar: Math.round(item.priceKrw * 0.0028),
+                        priceKrw: item.priceKrw,
+                        fuelType: item.fuelAr,
+                        transmission: item.transmissionAr,
+                        color: '',
+                        category: 'sedan',
+                        listingType: 'showroom',
+                        externalUrl: item.encarUrl,
+                        images: item.imageUrl ? [item.imageUrl] : [],
+                        isActive: true,
+                        isSold: false,
+                        displayCurrency: 'KRW'
+                    });
+                    totalCreated++;
+                } else {
+                    existingCar.priceKrw = item.priceKrw;
+                    existingCar.priceSar = Math.round(item.priceKrw * 0.0028);
+                    if (item.imageUrl && existingCar.images.length === 0) {
+                        existingCar.images.push(item.imageUrl);
+                    }
+                    await existingCar.save();
+                    totalUpdated++;
+                }
+            }
+
+            // Stop if there are no more results on this page
+            if (results.length < 20) break;
+        }
+
+        res.json({ success: true, message: `✅ اكتمل الجلب: أُضيفت ${totalCreated} وحُدّثت ${totalUpdated} سيارة بالمخزون.` });
+    } catch (error) {
+        console.error('❌ Showroom Scrape Error:', error.message);
+        res.status(500).json({ success: false, message: `فشل جلب البيانات وحفظها: ${error.message}` });
     }
 });
 

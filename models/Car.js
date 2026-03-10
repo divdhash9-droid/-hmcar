@@ -8,7 +8,7 @@ const carSchema = new mongoose.Schema({
   seller: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
   title: { type: String, required: true }, // مثال: Toyota Corolla 2018
   // نوع العرض: متجر أو سيارة مزاد
-  listingType: { type: String, enum: ['store', 'auction'], default: 'store' },
+  listingType: { type: String, enum: ['store', 'auction', 'showroom'], default: 'store' },
   // رابط خارجي (يستخدم لسيارات المزاد الخارجية)
   externalUrl: { type: String, default: '' },
   // بيانات المركبة

@@ -459,5 +459,8 @@ export const api = {
             method: 'PUT',
             body: JSON.stringify(data),
         }),
+        scrape: () => fetchAPI('/api/v2/showroom/scrape', {
+            method: 'POST'
+        }),
     },
 };

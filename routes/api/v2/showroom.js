@@ -81,7 +81,8 @@ function convertEncarUrlToApi(encarUrl, page = 1) {
             }
         }
 
-        // Simpler API call without the heavy 'inav' parameter to avoid 400 errors
+        // Simpler API call to avoid 400 errors. 
+        // Using common mobile endpoint pattern
         return `https://api.encar.com/search/car/list/general?count=true&q=${encodeURIComponent(query)}&sr=|MobileModifiedDate|${offset}|20`;
     } catch (err) {
         console.warn('[Showroom] Invalid encarUrl provided:', encarUrl);
@@ -96,13 +97,13 @@ function fetchExternal(url) {
             headers: {
                 'Accept': 'application/json, text/plain, */*',
                 'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                'Referer': 'https://www.encar.com/',
-                'Origin': 'https://www.encar.com',
+                'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1',
+                'Referer': 'https://m.encar.com/',
+                'Origin': 'https://m.encar.com',
+                'X-Requested-With': 'XMLHttpRequest',
                 'Cache-Control': 'no-cache',
-                'Pragma': 'no-cache',
             },
-            timeout: 15000 // 15 seconds timeout
+            timeout: 15000
         };
 
         const req = https.get(url, options, (res) => {
@@ -239,6 +240,7 @@ router.get('/cars', async (req, res) => {
             message: `فشل جلب سيارات المعرض: ${error.message}`,
             debug: {
                 error: error.message,
+                apiUrl: apiUrl || 'unknown',
                 timestamp: new Date().toISOString()
             }
         });

@@ -53,70 +53,68 @@ const TRANSLATIONS = {
 /** تحويل رابط Encar.com إلى رابط API */
 function convertEncarUrlToApi(encarUrl, page = 1) {
     const offset = (page - 1) * 20;
-    const defaultApiUrl = `https://api.encar.com/search/car/list/general?count=true&q=(And.Hidden.N._.CarType.A.)&sr=|MobileModifiedDate|${offset}|20`;
+    const defaultApiUrl = `https://api.encar.com/search/car/list/general?count=true&q=(And.CarType.A.)&sr=|MobileModifiedDate|${offset}|20`;
 
-    if (!encarUrl || encarUrl.trim() === '') {
+    if (!encarUrl || typeof encarUrl !== 'string' || encarUrl.trim() === '') {
         return defaultApiUrl;
     }
 
     try {
         const url = new URL(encarUrl);
         const searchParam = url.searchParams.get('search');
-        let query = '(And.Hidden.N._.CarType.A.)';
+        let query = '(And.CarType.A.)';
 
         if (searchParam) {
             try {
-                // Handle different formats of search param
-                if (searchParam.startsWith('{')) {
-                    const parsed = JSON.parse(decodeURIComponent(searchParam));
+                // Handle JSON format in search param
+                if (searchParam.includes('{')) {
+                    const decoded = decodeURIComponent(searchParam);
+                    const parsed = JSON.parse(decoded);
                     if (parsed.action) query = parsed.action;
                 } else {
-                    // It might be the query string itself
-                    query = decodeURIComponent(searchParam);
+                    // Try decoding twice if it looks like encoded query
+                    query = decodeURIComponent(decodeURIComponent(searchParam));
                 }
             } catch (pErr) {
-                console.warn('[Showroom] Failed to parse search param JSON:', pErr.message);
-                // Try treating it as raw query if it looks like one
-                if (searchParam.includes('And.')) query = searchParam;
+                // If it looks like an Encar query, use it as is
+                if (searchParam.includes('And.')) {
+                    query = decodeURIComponent(searchParam);
+                }
             }
         }
 
-        // Simpler API call to avoid 400 errors. 
-        // Using common mobile endpoint pattern
+        // Clean query: remove some problematic filters if they exist
+        query = query.replace('Hidden.N._.', '');
+
         return `https://api.encar.com/search/car/list/general?count=true&q=${encodeURIComponent(query)}&sr=|MobileModifiedDate|${offset}|20`;
     } catch (err) {
-        console.warn('[Showroom] Invalid encarUrl provided:', encarUrl);
         return defaultApiUrl;
     }
 }
 
-/** جلب بيانات من URL خارجي */
-function fetchExternal(url) {
+function fetchExternal(url, redirectCount = 0) {
+    if (redirectCount > 3) return Promise.reject(new Error('Too many redirects'));
+
     return new Promise((resolve, reject) => {
         const options = {
             headers: {
-                'Accept': 'application/json, text/plain, */*',
-                'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
-                'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1',
-                'Referer': 'https://m.encar.com/',
-                'Origin': 'https://m.encar.com',
-                'X-Requested-With': 'XMLHttpRequest',
+                'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+                'Accept': 'application/json',
                 'Cache-Control': 'no-cache',
             },
-            timeout: 15000
+            timeout: 10000
         };
 
         const req = https.get(url, options, (res) => {
             const { statusCode } = res;
 
             if (statusCode >= 300 && statusCode < 400 && res.headers.location) {
-                console.log(`[Showroom] Redirect detected: ${statusCode} -> ${res.headers.location}`);
-                return fetchExternal(res.headers.location).then(resolve).catch(reject);
+                return fetchExternal(res.headers.location, redirectCount + 1).then(resolve).catch(reject);
             }
 
             if (statusCode !== 200) {
                 res.resume();
-                return reject(new Error(`Encar API returned status ${statusCode}`));
+                return reject(new Error(`Status ${statusCode}`));
             }
 
             let data = '';
@@ -125,27 +123,14 @@ function fetchExternal(url) {
                 try {
                     const parsed = JSON.parse(data);
                     resolve(parsed);
-                }
-                catch (e) {
-                    console.error('[Showroom] JSON Parse Error. Data length:', data.length);
-                    if (data.includes('Access Denied') || data.includes('Cloudflare')) {
-                        reject(new Error('Bot protection detected (WAF/Cloudflare)'));
-                    } else {
-                        reject(new Error('Invalid JSON response from Encar'));
-                    }
+                } catch (e) {
+                    reject(new Error('JSON Parse Error'));
                 }
             });
         });
 
-        req.on('error', (err) => {
-            console.error('[Showroom] Network Error:', err.message);
-            reject(new Error(`Network Error: ${err.message}`));
-        });
-
-        req.on('timeout', () => {
-            req.destroy();
-            reject(new Error('Encar API request timed out (15s)'));
-        });
+        req.on('error', (err) => reject(new Error(`Network: ${err.message}`)));
+        req.on('timeout', () => { req.destroy(); reject(new Error('Timeout')); });
     });
 }
 
@@ -205,6 +190,7 @@ function translateCar(car) {
  * يستخدم الرابط المحفوظ في الإعدادات
  */
 router.get('/cars', async (req, res) => {
+    let apiUrl = '';
     try {
         const page = parseInt(req.query.page || '1');
 
@@ -215,13 +201,12 @@ router.get('/cars', async (req, res) => {
 
         // تحويل رابط الصفحة إلى رابط API مع الصفحة المطلوبة
         const urlWithPage = showroomUrl.replace(/page=\d+/, `page=${page}`);
-        const apiUrl = convertEncarUrlToApi(urlWithPage);
+        apiUrl = convertEncarUrlToApi(urlWithPage, page);
 
         console.log(`[Showroom] Fetching from: ${apiUrl}`);
 
         // جلب البيانات من Encar
         const data = await fetchExternal(apiUrl);
-
         const results = (data.SearchResults || []).map(translateCar);
 
         res.json({
@@ -230,18 +215,17 @@ router.get('/cars', async (req, res) => {
             total: data.Count || results.length,
             page: page,
             totalPages: Math.ceil((data.Count || results.length) / 20),
-            encarUrl: showroomUrl, // الرابط الأصلي للمرجع
+            encarUrl: showroomUrl,
         });
 
     } catch (error) {
-        console.error('❌ Showroom fetch error:', error.message);
+        console.error('❌ Showroom Error:', error.message);
         res.status(500).json({
             success: false,
             message: `فشل جلب سيارات المعرض: ${error.message}`,
             debug: {
-                error: error.message,
-                apiUrl: apiUrl || 'unknown',
-                timestamp: new Date().toISOString()
+                apiUrl: apiUrl || 'not constructed',
+                error: error.message
             }
         });
     }

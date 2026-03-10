@@ -52,8 +52,11 @@ const TRANSLATIONS = {
 
 /** تحويل رابط Encar.com إلى رابط API */
 function convertEncarUrlToApi(encarUrl, page = 1) {
-    const offset = (page - 1) * 20;
-    const defaultApiUrl = `https://api.encar.com/search/car/list/general?count=true&q=(And.CarType.A.)&sr=|MobileModifiedDate|${offset}|20`;
+    const pageSize = 20;
+    const offset = (page - 1) * pageSize;
+
+    // Verified working format from m.encar.com
+    const defaultApiUrl = `https://api.encar.com/search/car/list/mobile?count=true&q=(And.Hidden.N._.(C.CarType.Y.))&sr=|MobileModifiedDate|${offset}|${pageSize}`;
 
     if (!encarUrl || typeof encarUrl !== 'string' || encarUrl.trim() === '') {
         return defaultApiUrl;
@@ -62,31 +65,30 @@ function convertEncarUrlToApi(encarUrl, page = 1) {
     try {
         const url = new URL(encarUrl);
         const searchParam = url.searchParams.get('search');
-        let query = '(And.CarType.A.)';
+        let query = '(C.CarType.Y)'; // Base car filter
 
         if (searchParam) {
             try {
-                // Handle JSON format in search param
                 if (searchParam.includes('{')) {
                     const decoded = decodeURIComponent(searchParam);
                     const parsed = JSON.parse(decoded);
-                    if (parsed.action) query = parsed.action;
+                    if (parsed.action) {
+                        query = parsed.action;
+                        // Remove outer And if it exists to wrap it in our own
+                        query = query.replace(/^\(And\./, '').replace(/\)$/, '');
+                    }
                 } else {
-                    // Try decoding twice if it looks like encoded query
                     query = decodeURIComponent(decodeURIComponent(searchParam));
                 }
             } catch (pErr) {
-                // If it looks like an Encar query, use it as is
-                if (searchParam.includes('And.')) {
-                    query = decodeURIComponent(searchParam);
-                }
+                if (searchParam.includes('And.')) query = decodeURIComponent(searchParam);
             }
         }
 
-        // Clean query: remove some problematic filters if they exist
-        query = query.replace('Hidden.N._.', '');
+        // Wrap in the format observed on the mobile site
+        const finalQuery = `(And.Hidden.N._.(${query}))`;
 
-        return `https://api.encar.com/search/car/list/general?count=true&q=${encodeURIComponent(query)}&sr=|MobileModifiedDate|${offset}|20`;
+        return `https://api.encar.com/search/car/list/mobile?count=true&q=${encodeURIComponent(finalQuery)}&sr=|MobileModifiedDate|${offset}|${pageSize}`;
     } catch (err) {
         return defaultApiUrl;
     }

@@ -51,38 +51,41 @@ const TRANSLATIONS = {
 // ─────────────────────────────────────────────────────────
 
 /** تحويل رابط Encar.com إلى رابط API */
-function convertEncarUrlToApi(encarUrl) {
+function convertEncarUrlToApi(encarUrl, page = 1) {
+    const offset = (page - 1) * 20;
+    const defaultApiUrl = `https://api.encar.com/search/car/list/general?count=true&q=(And.Hidden.N._.CarType.A.)&sr=|MobileModifiedDate|${offset}|20`;
+
+    if (!encarUrl || encarUrl.trim() === '') {
+        return defaultApiUrl;
+    }
+
     try {
         const url = new URL(encarUrl);
-
-        // استخراج معامل search
         const searchParam = url.searchParams.get('search');
-        const page = parseInt(url.searchParams.get('page') || '1');
-        const offset = (page - 1) * 20;
-
         let query = '(And.Hidden.N._.CarType.A.)';
+
         if (searchParam) {
             try {
-                const decoded = decodeURIComponent(searchParam);
-                const parsed = JSON.parse(decoded);
-                if (parsed.action) query = parsed.action;
-            } catch (e) {
-                console.warn('[Showroom] Failed to parse search param JSON:', e.message);
-                // Try to extract action if it's a simple string or malformed JSON
-                if (typeof searchParam === 'string' && searchParam.includes('action')) {
-                    const match = searchParam.match(/action%22%3A%22([^%]+)%22/);
-                    if (match) query = decodeURIComponent(match[1]);
+                // Handle different formats of search param
+                if (searchParam.startsWith('{')) {
+                    const parsed = JSON.parse(decodeURIComponent(searchParam));
+                    if (parsed.action) query = parsed.action;
+                } else {
+                    // It might be the query string itself
+                    query = decodeURIComponent(searchParam);
                 }
+            } catch (pErr) {
+                console.warn('[Showroom] Failed to parse search param JSON:', pErr.message);
+                // Try treating it as raw query if it looks like one
+                if (searchParam.includes('And.')) query = searchParam;
             }
         }
 
-        // بناء رابط API الحقيقي
-        // نستخدم ترتيب المعاملات الذي يفضله موقع Encar المحمول
-        return `https://api.encar.com/search/car/list/general?count=true&q=${encodeURIComponent(query)}&sr=|MobileModifiedDate|${offset}|20&inav=(Manufacturer._.ModelGroup._.Model._.Fuel._.Year._.Mileage._.Price._.Transmission._.Region._.ServiceMark.)`;
+        // Simpler API call without the heavy 'inav' parameter to avoid 400 errors
+        return `https://api.encar.com/search/car/list/general?count=true&q=${encodeURIComponent(query)}&sr=|MobileModifiedDate|${offset}|20`;
     } catch (err) {
-        console.error('[Showroom] URL Conversion error:', err.message);
-        // رابط افتراضي في حالة الخطأ
-        return 'https://api.encar.com/search/car/list/general?count=true&q=(And.Hidden.N._.CarType.A.)&sr=|MobileModifiedDate|0|20';
+        console.warn('[Showroom] Invalid encarUrl provided:', encarUrl);
+        return defaultApiUrl;
     }
 }
 

@@ -8,7 +8,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { apiRateLimiter } = require('../../middleware/securityEnhanced');
+const { apiRateLimiter } = require('../../../middleware/securityEnhanced');
 
 /**
  * إعداد طبقة تقييد الطلبات (Rate Limiter)

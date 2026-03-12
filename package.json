@@ -104,6 +104,6 @@
     "supertest": "^6.3.3"
   },
   "engines": {
-    "node": "24.x"
+    "node": "22.x"
   }
 }

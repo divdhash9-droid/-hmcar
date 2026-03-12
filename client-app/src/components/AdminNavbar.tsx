@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Activity, Car, Gavel, Users, ShoppingCart, Settings, Shield,
@@ -27,6 +27,7 @@ interface NavItem {
 interface SidebarProps {
     items: NavItem[];
     pathname: string | null;
+    queryString: string;
     isRTL: boolean;
     lang: string;
     time: string;
@@ -65,7 +66,7 @@ function LiveDot({ colorClass = 'bg-green-400' }: { colorClass?: string }) {
 
 // ── Sidebar Content — declared at module level (not inside render) ──
 function SidebarInner({
-    items, pathname, isRTL, lang, time, dateStr, ping,
+    items, pathname, queryString, isRTL, lang, time, dateStr, ping,
     toggleLanguage, onLogout, onBackup, onRefresh, onClose
 }: SidebarProps) {
     return (
@@ -94,8 +95,16 @@ function SidebarInner({
             {/* Nav Items */}
             <nav className="flex-1 flex flex-col items-center gap-0.5 py-3 px-2 overflow-y-auto scrollbar-hide">
                 {items.map((item) => {
-                    const isActive = pathname === item.href ||
-                        (item.href !== '/admin/dashboard' && !!pathname?.startsWith(item.href));
+                    const [itemPath, itemQuery = ''] = item.href.split('?');
+                    const pathMatch = pathname === itemPath ||
+                        (itemPath !== '/admin/dashboard' && !!pathname?.startsWith(itemPath));
+                    let queryMatch = true;
+                    if (itemQuery) {
+                        const required = new URLSearchParams(itemQuery);
+                        const current = new URLSearchParams(queryString);
+                        queryMatch = Array.from(required.entries()).every(([k, v]) => current.get(k) === v);
+                    }
+                    const isActive = pathMatch && queryMatch;
                     const Icon = item.icon as IconComponent;
                     return (
                         <Link
@@ -203,7 +212,8 @@ function SidebarInner({
 function buildNavItems(isRTL: boolean): NavItem[] {
     return [
         { id: 'dashboard', icon: Activity, label: isRTL ? 'المركزية' : 'MAINFRAME', href: '/admin/dashboard' },
-        { id: 'cars', icon: Car, label: isRTL ? 'المخزون' : 'INVENTORY', href: '/admin/cars' },
+        { id: 'cars', icon: Car, label: isRTL ? 'مخزون HM' : 'HM STOCK', href: '/admin/cars?source=hm_local' },
+        { id: 'korean-cars', icon: Sparkles, label: isRTL ? 'المعرض الكوري' : 'KOREAN STOCK', href: '/admin/cars?source=korean_import' },
         { id: 'live-auctions', icon: Radio, label: isRTL ? 'المباشر' : 'LIVE', href: '/admin/live-auctions' },
         { id: 'auctions', icon: Gavel, label: isRTL ? 'المزادات' : 'AUCTIONS', href: '/admin/auctions' },
         { id: 'parts', icon: Layers, label: isRTL ? 'القطع' : 'PARTS', href: '/admin/parts' },
@@ -216,6 +226,7 @@ function buildNavItems(isRTL: boolean): NavItem[] {
         { id: 'notifications', icon: Bell, label: isRTL ? 'الإشعارات' : 'ALERTS', href: '/admin/notifications' },
         { id: 'social', icon: Share2, label: isRTL ? 'التواصل' : 'SOCIAL', href: '/admin/social' },
         { id: 'security', icon: Shield, label: isRTL ? 'الأمان' : 'SECURITY', href: '/admin/security' },
+        { id: 'brands', icon: Tag, label: isRTL ? 'الوكالات' : 'AGENCIES', href: '/admin/brands' },
         { id: 'showroom', icon: Sparkles, label: isRTL ? 'المعرض' : 'SHOWROOM', href: '/admin/settings?tab=showroom' },
         { id: 'settings', icon: Settings, label: isRTL ? 'الإعدادات' : 'SETTINGS', href: '/admin/settings' },
     ];
@@ -226,6 +237,7 @@ export default function AdminNavbar() {
     const { isRTL, lang, toggleLanguage } = useLanguage();
     const { logout } = useAuth();
     const pathname = usePathname();
+    const searchParams = useSearchParams();
     const [mobileOpen, setMobileOpen] = useState(false);
     const [time, setTime] = useState('--:--:--');
     const [dateStr, setDateStr] = useState('');
@@ -289,7 +301,7 @@ export default function AdminNavbar() {
     };
 
     const sidebarProps: SidebarProps = {
-        items, pathname, isRTL, lang, time, dateStr, ping,
+        items, pathname, queryString: searchParams?.toString() || '', isRTL, lang, time, dateStr, ping,
         toggleLanguage, onLogout: handleLogout, onBackup: handleBackup, onRefresh: handleForceRefresh,
     };
 

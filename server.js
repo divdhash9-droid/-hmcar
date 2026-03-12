@@ -32,4 +32,8 @@ async function startServer() {
 }
 
 // البدء الفعلي للتطبيق
-startServer();
+if (require.main === module) {
+  startServer();
+}
+
+module.exports = { startServer };

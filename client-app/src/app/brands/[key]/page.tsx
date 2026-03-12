@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar';
 import { useLanguage } from '@/lib/LanguageContext';
+import { useSettings } from '@/lib/SettingsContext';
 import { api } from '@/lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
@@ -10,6 +11,7 @@ import { ArrowRight } from 'lucide-react';
 
 export default function BrandDetail({ params }: { params: { key: string } }) {
   const { isRTL } = useLanguage();
+  const { formatPrice } = useSettings();
   const [brand, setBrand] = useState<any>(null);
   const [cars, setCars] = useState<any[]>([]);
   const [parts, setParts] = useState<any[]>([]);
@@ -88,7 +90,7 @@ export default function BrandDetail({ params }: { params: { key: string } }) {
                             <div className="text-[9px] font-black text-white/50 uppercase tracking-[0.3em] mb-1">{car.make}</div>
                             <h3 className="text-lg font-black line-clamp-1">{car.title}</h3>
                             <div className="text-xl font-black text-[#c9a96e] italic mt-3">
-                              {Number(car.price || 0).toLocaleString()} <span className="text-xs">SAR</span>
+                              {formatPrice(Number(car.price || car.priceSar || 0))}
                             </div>
                           </div>
                         </div>

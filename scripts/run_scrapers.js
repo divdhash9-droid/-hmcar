@@ -1,9 +1,16 @@
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 async function main() {
-    const jwtSecret = process.env.JWT_SECRET || '5a7c12c08ba86c78b6fafda82c4bf621122a6c98aa331c6bedb0bd7b7d7cba22dcdd78d57ac6833b03b41918e3280117';
-    const baseUrl = 'https://car-auction-sand.vercel.app';
+    const jwtSecret = process.env.JWT_SECRET;
+    const baseUrl = process.env.BASE_URL || 'https://car-auction-sand.vercel.app';
+
+    if (!jwtSecret) {
+        throw new Error('Missing JWT_SECRET environment variable.');
+    }
 
     // Generate an admin token valid for a long time
     const token = jwt.sign(

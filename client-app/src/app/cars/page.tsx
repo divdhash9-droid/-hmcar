@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { Suspense, useEffect, useState, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -14,6 +14,7 @@ import Navbar from '@/components/Navbar';
 import { api } from '@/lib/api';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/lib/LanguageContext';
+import { useSettings } from '@/lib/SettingsContext';
 import Image from 'next/image';
 
 const rawText = (value: string) => value;
@@ -26,6 +27,8 @@ interface CarModel {
     make: string | { name: string };
     year: number;
     price: number;
+    priceSar?: number;
+    priceUsd?: number;
     mileage: number;
     fuel: string;
     images: string[];
@@ -48,6 +51,7 @@ export default function CarsBrowserPage() {
 function CarsContent() {
     const searchParams = useSearchParams();
     const { isRTL } = useLanguage();
+    const { formatPrice } = useSettings();
 
     const [cars, setCars] = useState<CarModel[]>([]);
     const [brands, setBrands] = useState<BrandModel[]>([]);
@@ -304,7 +308,7 @@ function CarsContent() {
                                                 <div>
                                                     <span className="text-[8px] font-black text-white/20 tracking-widest uppercase block mb-1">{rawText('MARKET VALUE')}</span>
                                                     <div className="text-2xl font-black italic gold-glow leading-none">
-                                                        {Number(car.price).toLocaleString()} <span className="text-[10px] not-italic text-white/40 ml-1">{rawText('SAR')}</span>
+                                                          {formatPrice(Number(car.price || car.priceSar || 0))}
                                                     </div>
                                                 </div>
                                                 <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center group-hover:bg-luxury-gold group-hover:text-black group-hover:border-luxury-gold transition-all duration-500">

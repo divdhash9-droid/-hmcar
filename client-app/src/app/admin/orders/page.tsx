@@ -12,6 +12,8 @@ import { cn } from '@/lib/utils';
 import { useLanguage } from '@/lib/LanguageContext';
 import { api } from '@/lib/api';
 import { useToast } from '@/lib/ToastContext';
+import { useSettings } from '@/lib/SettingsContext';
+import { formatAmountWithSnapshot, getOrderGrandTotalSar, getOrderItemUnitSar, resolveOrderSnapshot } from '@/lib/orderCurrency';
 
 const FILTER_ALL = 'all';
 const STATUS_PENDING = 'pending';
@@ -48,6 +50,11 @@ interface Order {
         totalPriceSar: number;
         taxSar: number;
         grandTotalSar: number;
+        exchangeSnapshot?: {
+            usdToSar?: number;
+            usdToKrw?: number;
+            activeCurrency?: 'SAR' | 'USD' | 'KRW';
+        };
     };
     status: string;
     paymentStatus: string;
@@ -58,6 +65,7 @@ interface Order {
 export default function AdminOrdersPage() {
     const { isRTL } = useLanguage();
     const { showToast } = useToast();
+    const { displayCurrency, currency } = useSettings();
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState(FILTER_ALL);
@@ -69,6 +77,16 @@ export default function AdminOrdersPage() {
         loadOrders();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [filter]);
+
+    const getOrderAmountInDisplayCurrency = (order: Order) => {
+        const grandTotalSar = getOrderGrandTotalSar(order);
+        const snapshot = resolveOrderSnapshot(order, currency);
+        const usdValue = grandTotalSar / Number(snapshot.usdToSar || 1);
+
+        if (displayCurrency === 'USD') return usdValue;
+        if (displayCurrency === 'KRW') return usdValue * Number(snapshot.usdToKrw || 0);
+        return grandTotalSar;
+    };
 
     const loadOrders = async () => {
         setLoading(true);
@@ -103,7 +121,9 @@ export default function AdminOrdersPage() {
                 confirmed: list.filter(o => o.status === STATUS_CONFIRMED).length,
                 completed: list.filter(o => o.status === STATUS_COMPLETED).length,
                 cancelled: list.filter(o => o.status === STATUS_CANCELLED).length,
-                revenue: list.filter(o => o.paymentStatus === 'paid').reduce((s, o) => s + (o.pricing?.grandTotalSar || 0), 0),
+                revenue: list
+                    .filter(o => o.paymentStatus === 'paid')
+                    .reduce((s, o) => s + getOrderAmountInDisplayCurrency(o), 0),
             });
         } catch (err) {
             console.error('Failed to load orders', err);
@@ -233,8 +253,15 @@ export default function AdminOrdersPage() {
                                                     </div>
                                                 </div>
                                                 <div className="text-right">
-                                                    <p className="cockpit-num text-sm font-black text-orange-400">{item.unitPriceSar?.toLocaleString()}</p>
-                                                    <p className="cockpit-mono text-[9px] text-white/30">{rawText('SAR x')} {item.qty}</p>
+                                                    <p className="cockpit-num text-sm font-black text-orange-400">
+                                                        {formatAmountWithSnapshot(
+                                                            getOrderItemUnitSar(item, selectedOrder, currency),
+                                                            displayCurrency,
+                                                            selectedOrder,
+                                                            currency
+                                                        )}
+                                                    </p>
+                                                    <p className="cockpit-mono text-[9px] text-white/30">{rawText('x')} {item.qty}</p>
                                                 </div>
                                             </div>
                                         ))}
@@ -248,8 +275,12 @@ export default function AdminOrdersPage() {
                                             {isRTL ? rawText('المجموع النهائي') : rawText('GRAND TOTAL')}
                                         </p>
                                         <p className="cockpit-num text-3xl font-black text-white">
-                                            {(selectedOrder.pricing?.grandTotalSar || 0).toLocaleString()}
-                                            <span className="text-sm text-white/30 ms-2">{rawText('SAR')}</span>
+                                            {formatAmountWithSnapshot(
+                                                getOrderGrandTotalSar(selectedOrder),
+                                                displayCurrency,
+                                                selectedOrder,
+                                                currency
+                                            )}
                                         </p>
                                     </div>
                                     <span className={cn(getStatusBadge(selectedOrder.status), 'ck-badge-live')}>
@@ -404,9 +435,13 @@ export default function AdminOrdersPage() {
                                         </td>
                                         <td>
                                             <p className="cockpit-num text-base font-black text-white">
-                                                {(order.pricing?.grandTotalSar || 0).toLocaleString()}
+                                                {formatAmountWithSnapshot(
+                                                    getOrderGrandTotalSar(order),
+                                                    displayCurrency,
+                                                    order,
+                                                    currency
+                                                )}
                                             </p>
-                                            <p className="cockpit-mono text-[9px] text-white/30">{rawText('SAR')}</p>
                                         </td>
                                         <td>
                                             <span className={cn(getStatusBadge(order.status), 'ck-badge-live')}>
@@ -428,7 +463,7 @@ export default function AdminOrdersPage() {
                 {/* Bottom KPIs */}
                 <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
                     {[
-                        { label: isRTL ? rawText('إجمالي الإيرادات') : rawText('VERIFIED REVENUE'), val: `${stats.revenue.toLocaleString()} SAR`, icon: TrendingUp, color: CLASS_TEXT_GREEN_400, iconColor: CLASS_TEXT_GREEN_400_20 },
+                        { label: isRTL ? rawText('إجمالي الإيرادات') : rawText('VERIFIED REVENUE'), val: `${displayCurrency === 'USD' ? '$' : displayCurrency === 'KRW' ? '₩' : 'ر.س'} ${stats.revenue.toLocaleString()}`, icon: TrendingUp, color: CLASS_TEXT_GREEN_400, iconColor: CLASS_TEXT_GREEN_400_20 },
                         { label: isRTL ? rawText('قيد المعالجة') : rawText('LIVE QUEUE'), val: String(stats.pending + stats.confirmed), icon: Clock, color: CLASS_TEXT_BLUE_400, iconColor: CLASS_TEXT_BLUE_400_20 },
                         { label: isRTL ? rawText('كفاءة النظام') : rawText('SYSTEM HEALTH'), val: rawText('99.9%'), icon: CheckCircle, color: CLASS_TEXT_ORANGE_400, iconColor: CLASS_TEXT_ORANGE_400_10 },
                     ].map((kpi, i) => (

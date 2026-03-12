@@ -11,6 +11,10 @@ const carSchema = new mongoose.Schema({
   listingType: { type: String, enum: ['store', 'auction', 'showroom'], default: 'store' },
   // رابط خارجي (يستخدم لسيارات المزاد الخارجية)
   externalUrl: { type: String, default: '' },
+  // مصدر السيارة لتطبيق الفصل التام بين مخزون HM المحلي والمعرض الكوري
+  source: { type: String, enum: ['hm_local', 'korean_import'], default: 'hm_local', index: true },
+  // الوكالة/البراند المرتبطة بالسيارة المحلية (اختياري)
+  agency: { type: mongoose.Schema.Types.ObjectId, ref: 'Brand', default: null },
   // بيانات المركبة
   make: String,
   makeLogoUrl: String,
@@ -19,6 +23,7 @@ const carSchema = new mongoose.Schema({
   // تصنيف/فئة السيارة
   category: { type: String, default: 'sedan' }, // Changed to String for flexibility
   // السعر (price قديم) + سعر بالريال/الدولار/الوون
+  basePriceUsd: Number,
   price: Number,
   priceSar: Number,
   priceUsd: Number,
@@ -60,6 +65,14 @@ carSchema.post('save', function (doc) {
 
 // تخزين حالة isNew قبل الحفظ
 carSchema.pre('save', function (next) {
+  // [[ARABIC_COMMENT]] ضمان التوافق: توحيد source مع listingType للبيانات القديمة والجديدة
+  if (!this.source) {
+    this.source = this.listingType === 'showroom' ? 'korean_import' : 'hm_local';
+  }
+  if (!this.listingType) {
+    this.listingType = this.source === 'korean_import' ? 'showroom' : 'store';
+  }
+
   this.wasNew = this.isNew;
   next();
 });

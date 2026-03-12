@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 /* صفحة إدارة الوكالات (الماركات) - لوحة الأدمن */
 
@@ -28,6 +28,8 @@ type Brand = {
   logo?: string;
   category: 'cars' | 'parts' | 'both';
   models: string[];
+  targetShowroom: 'hm_local' | 'korean_import' | 'both';
+  isActive: boolean;
 };
 
 // [[ARABIC_HEADER]] هذه الصفحة مسؤولة عن إدارة "الوكالات" (التي كانت تسمى سابقاً الماركات) - تسمح للأدمن بإضافة شعار واسم وتصنيف لكل وكالة.
@@ -38,6 +40,8 @@ export default function AdminAgenciesPage() {
   const [name, setName] = useState("");
   const [logo, setLogo] = useState("");
   const [category, setCategory] = useState<'cars' | 'parts' | 'both'>('cars');
+  const [targetShowroom, setTargetShowroom] = useState<'hm_local' | 'korean_import' | 'both'>('hm_local');
+  const [isActive, setIsActive] = useState(true);
   const [modelsText, setModelsText] = useState("");
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -59,6 +63,8 @@ export default function AdminAgenciesPage() {
           logo: b.logoUrl,
           models: b.models || [],
           category: (b.forCars && b.forSpareParts) ? 'both' : (b.forCars ? 'cars' : 'parts'),
+          targetShowroom: (b as any).targetShowroom || 'hm_local',
+          isActive: (b as any).isActive !== false
         } as Brand));
         setBrands(mapped);
       }
@@ -72,7 +78,14 @@ export default function AdminAgenciesPage() {
     setSaving(true);
     try {
       const modelsArray = modelsText.split(',').map(s => s.trim()).filter(Boolean);
-      const payload = { name: name.trim(), logoUrl: logo, category, models: modelsArray };
+      const payload = { 
+        name: name.trim(), 
+        logoUrl: logo, 
+        category, 
+        models: modelsArray,
+        targetShowroom,
+        isActive
+      };
       if (editingId) {
         await api.brands.update(editingId, payload);
       } else {
@@ -86,6 +99,7 @@ export default function AdminAgenciesPage() {
   const resetForm = () => {
     setEditingId(null);
     setName(""); setLogo(""); setCategory('cars'); setModelsText("");
+    setTargetShowroom('hm_local'); setIsActive(true);
     setImageSrc(null); setShowCropper(false);
   };
 
@@ -94,6 +108,8 @@ export default function AdminAgenciesPage() {
     setName(b.name);
     setLogo(b.logo || "");
     setCategory(b.category);
+    setTargetShowroom(b.targetShowroom);
+    setIsActive(b.isActive);
     setModelsText(b.models?.join(', ') || "");
   };
 
@@ -309,35 +325,51 @@ export default function AdminAgenciesPage() {
                   />
                 </div>
 
-                {/* ── 4. التصنيف (3 خيارات) ── */}
+                {/* ── 4. المعرض المستهدف ── */}
                 <div>
                   <label className="block text-[9px] font-black uppercase tracking-[0.3em] text-white/40 mb-3">
-                    {isRTL ? '④ التصنيف' : '④ CATEGORY'}
+                    {isRTL ? '④ المعرض المستهدف' : '④ TARGET SHOWROOM'}
                   </label>
-                  <p className="text-[10px] text-orange-400/80 mb-3">
-                    {isRTL ? 'وكالات قطع الغيار تُدار تلقائياً عبر الاستيراد الخارجي من صفحة قطع الغيار.' : 'Spare-part agencies are managed automatically via external import from Admin Parts.'}
-                  </p>
-                  <div className="grid grid-cols-3 gap-3">
-                    {categories.map((cat) => {
-                      const Icon = cat.icon;
-                      const isActive = category === cat.id;
-                      return (
-                        <button
-                          key={cat.id}
-                          onClick={() => setCategory(cat.id as 'cars' | 'parts' | 'both')}
-                          className={cn(
-                            "flex flex-col items-center gap-2 py-4 rounded-xl text-[10px] font-black uppercase tracking-tighter transition-all border",
-                            isActive
-                              ? "bg-[#c9a96e] text-black border-[#c9a96e] shadow-[0_0_20px_rgba(201,169,110,0.3)]"
-                              : "bg-white/5 text-white/50 border-white/10 hover:bg-white/10 hover:text-white"
-                          )}
-                        >
-                          <Icon className={cn("w-5 h-5", isActive ? "text-black" : cat.color)} />
-                          <span>{isRTL ? cat.labelAr : cat.labelEn}</span>
-                        </button>
-                      );
-                    })}
+                  <div className="flex gap-2 p-1 bg-white/5 rounded-xl border border-white/10">
+                    {(['hm_local', 'korean_import', 'both'] as const).map((source) => (
+                      <button
+                        key={source}
+                        onClick={() => setTargetShowroom(source)}
+                        className={cn(
+                          "flex-1 py-2 text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all",
+                          targetShowroom === source
+                            ? "bg-[#c9a96e] text-black shadow-lg"
+                            : "text-white/40 hover:text-white/70"
+                        )}
+                      >
+                        {isRTL 
+                          ? (source === 'hm_local' ? 'محلي' : source === 'korean_import' ? 'كوري' : 'الكل')
+                          : source.split('_')[0]}
+                      </button>
+                    ))}
                   </div>
+                </div>
+
+                {/* ── 5. حالة التفعيل ── */}
+                <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10">
+                  <div className="flex items-center gap-3">
+                    <div className={cn("w-2 h-2 rounded-full", isActive ? "bg-green-500 animate-pulse" : "bg-red-500")} />
+                    <span className="text-[10px] font-bold uppercase tracking-widest">
+                      {isRTL ? 'حالة التفعيل' : 'ACTIVE STATUS'}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setIsActive(!isActive)}
+                    className={cn(
+                      "relative w-10 h-5 rounded-full transition-colors",
+                      isActive ? "bg-green-500/50" : "bg-red-500/50"
+                    )}
+                  >
+                    <motion.div
+                      animate={{ x: isActive ? (isRTL ? -20 : 20) : 0 }}
+                      className="absolute top-1 left-1 w-3 h-3 bg-white rounded-full shadow-lg"
+                    />
+                  </button>
                 </div>
 
                 {/* ── زر الحفظ ── */}

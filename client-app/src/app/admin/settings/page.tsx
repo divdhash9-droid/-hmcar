@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 /**
  * صفحة الإعدادات - لوحة تحكم HM CAR
@@ -37,7 +37,7 @@ type TabID = 'profile' | 'security' | 'social' | 'contact' | 'currency' | 'site'
 // ── أنواع البيانات ──
 interface SocialLinks { whatsapp: string; instagram: string; twitter: string; facebook: string; youtube: string; tiktok: string; snapchat: string; telegram: string; linkedin: string; }
 interface ContactInfo { phone: string; email: string; address: string; workingHours: string; }
-interface CurrencySettings { usdToSar: number; usdToKrw: number; activeCurrency: string; }
+interface CurrencySettings { usdToSar: number; usdToKrw: number; activeCurrency: string; partsMultiplier: number; auctionMultiplier: number; }
 interface SiteInfo { siteName: string; siteDescription: string; logoUrl: string; faviconUrl: string; }
 interface HomeContent { heroTitle: string; heroSubtitle: string; heroVideoUrl: string; }
 interface Feature { icon: string; title: string; desc: string;[key: string]: string; }
@@ -74,7 +74,7 @@ function AdminSettingsContent() {
     // ── بيانات التبويبات الأخرى ──
     const [socialLinks, setSocialLinks] = useState<SocialLinks>({ whatsapp: '', instagram: '', twitter: '', facebook: '', youtube: '', tiktok: '', snapchat: '', telegram: '', linkedin: '' });
     const [contactInfo, setContactInfo] = useState<ContactInfo>({ phone: '', email: '', address: '', workingHours: '' });
-    const [currencySettings, setCurrencySettings] = useState<CurrencySettings>({ usdToSar: 3.75, usdToKrw: 1300, activeCurrency: 'SAR' });
+    const [currencySettings, setCurrencySettings] = useState<CurrencySettings>({ usdToSar: 3.75, usdToKrw: 1300, activeCurrency: 'SAR', partsMultiplier: 1.15, auctionMultiplier: 1.1 });
     const [siteInfo, setSiteInfo] = useState<SiteInfo>({ siteName: 'HM CAR', siteDescription: '', logoUrl: '', faviconUrl: '' });
     const [homeContent, setHomeContent] = useState<HomeContent>({ heroTitle: '', heroSubtitle: '', heroVideoUrl: '' });
     const [features, setFeatures] = useState<Feature[]>([]);

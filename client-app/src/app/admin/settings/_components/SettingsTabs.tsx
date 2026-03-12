@@ -27,7 +27,7 @@ const rawText = (value: string) => value;
 // ── أنواع البيانات ──
 interface SocialLinks { whatsapp: string; instagram: string; twitter: string; facebook: string; youtube: string; tiktok: string; snapchat: string; telegram: string; linkedin: string; }
 interface ContactInfo { phone: string; email: string; address: string; workingHours: string; }
-interface CurrencySettings { usdToSar: number; usdToKrw: number; activeCurrency: string; }
+interface CurrencySettings { usdToSar: number; usdToKrw: number; activeCurrency: string; partsMultiplier: number; auctionMultiplier: number; }
 interface SiteInfo { siteName: string; siteDescription: string; logoUrl: string; faviconUrl: string; }
 interface HomeContent { heroTitle: string; heroSubtitle: string; heroVideoUrl: string; }
 interface Feature { icon: string; title: string; desc: string;[key: string]: string; }
@@ -244,7 +244,7 @@ export function CurrencyTab({ currencySettings, loading, isRTL, onSave, onSilent
                         </select>
                     </div>
                     {/* سعر صرف الدولار مقابل الوون الكوري */}
-                    <div className="md:col-span-2">
+                    <div>
                         <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">
                             {isRTL ? rawText('سعر صرف الدولار مقابل الوون الكوري (1 USD = ? KRW)') : rawText('USD to KRW Exchange Rate (1 USD = ? KRW)')}
                         </label>
@@ -253,6 +253,30 @@ export function CurrencyTab({ currencySettings, loading, isRTL, onSave, onSilent
                             onChange={e => onCurrencyChange({ ...currencySettings, usdToKrw: parseFloat(e.target.value) || 0 })}
                             onBlur={onSilentSave}
                             className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40" />
+                    </div>
+                    {/* معامل ضرب أسعار قطع الغيار */}
+                    <div>
+                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">
+                            {isRTL ? rawText('معامل السعر (قطع الغيار)') : rawText('Parts Multiplier')}
+                        </label>
+                        <input type="number" step="0.01" value={currencySettings.partsMultiplier || 1.15}
+                            title={isRTL ? 'معامل ضرب أسعار قطع الغيار' : 'Parts Price Multiplier'}
+                            onChange={e => onCurrencyChange({ ...currencySettings, partsMultiplier: parseFloat(e.target.value) || 1 })}
+                            onBlur={onSilentSave}
+                            className="w-full bg-white/5 border border-[#c9a96e]/20 rounded-xl py-4 px-4 text-sm text-[#c9a96e] focus:outline-none focus:border-[#c9a96e]/40" />
+                        <span className="text-[8px] text-white/20 mt-1 block tracking-wider uppercase"> {isRTL ? 'يضرب في السعر الأساسي للقطع' : 'MULTIPLIER FOR PARTS BASE PRICE'} </span>
+                    </div>
+                    {/* معامل ضرب أسعار المزادات */}
+                    <div className="md:col-span-2">
+                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">
+                            {isRTL ? rawText('معامل السعر (المزادات)') : rawText('Auction Multiplier')}
+                        </label>
+                        <input type="number" step="0.01" value={currencySettings.auctionMultiplier || 1.1}
+                            title={isRTL ? 'معامل ضرب أسعار المزادات' : 'Auction Price Multiplier'}
+                            onChange={e => onCurrencyChange({ ...currencySettings, auctionMultiplier: parseFloat(e.target.value) || 1 })}
+                            onBlur={onSilentSave}
+                            className="w-full bg-white/5 border border-cinematic-neon-blue/20 rounded-xl py-4 px-4 text-sm text-cinematic-neon-blue focus:outline-none focus:border-cinematic-neon-blue/40" />
+                        <span className="text-[8px] text-white/20 mt-1 block tracking-wider uppercase"> {isRTL ? 'يضاف كنسبة أو يضرب في سعر المزاد' : 'MULTIPLIER FOR AUCTION FINAL PRICES'} </span>
                     </div>
                 </div>
             </div>

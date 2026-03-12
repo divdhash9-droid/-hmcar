@@ -26,21 +26,21 @@ NODE_ENV=production
 PORT=4000
 
 # MongoDB Atlas (نفس رابط قاعدة البيانات الحالية)
-MONGO_URI=mongodb+srv://divdhash9_db_user:PhLpv8iHIKx1Lki0@cluster0.tirfqnb.mongodb.net/car-auction?retryWrites=true&w=majority&appName=Cluster0
+MONGO_URI=your_mongodb_connection_string
 
 # مفاتيح أمان قوية (تم توليدها تلقائياً)
 SESSION_SECRET=${newSessionSecret}
 JWT_SECRET=${newJwtSecret}
 
 # Cloudinary (نفس الإعدادات الحالية)
-CLOUDINARY_CLOUD_NAME=dndy0luqc
-CLOUDINARY_API_KEY=972165144124738
-CLOUDINARY_API_SECRET=MhvHGsOgAtuURenr_H9cMUOBpx4
+CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
 
 # البريد الإلكتروني
 EMAIL_SERVICE=gmail
-EMAIL_USER=divdhash9@gmail.com
-EMAIL_PASS=nakdvllltbaxwbpd
+EMAIL_USER=your_email_address
+EMAIL_PASS=your_email_app_password
 
 # رابط الموقع - سيكون متاحاً بعد النشر على Railway
 BASE_URL=https://YOUR-APP-NAME.railway.app

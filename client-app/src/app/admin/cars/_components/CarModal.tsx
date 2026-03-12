@@ -32,6 +32,8 @@ interface FormData {
     isActive: boolean;
     displayCurrency: string;
     listingType: string;
+    source: 'hm_local' | 'korean_import';
+    agency: string;
 }
 
 // ── خصائص المكوّن ──
@@ -167,7 +169,13 @@ export default function CarModal({
                                 {/* ── حقل الماركة ── */}
                                 <div>
                                     <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/60 mb-2">{isRTL ? 'الماركة' : 'BRAND'}</label>
-                                    <select value={formData.make} onChange={e => update('make', e.target.value)}
+                                    <select value={formData.make} 
+                                        onChange={e => {
+                                            const val = e.target.value;
+                                            update('make', val);
+                                            // If selecting a brand that exists in agencies, maybe auto-link? 
+                                            // But usually we do it via Agency select.
+                                        }}
                                         className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 px-4 text-sm font-bold text-white focus:outline-none focus:border-cinematic-neon-blue/40">
                                         <option value="">{isRTL ? 'اختر الماركة' : 'Select Brand'}</option>
                                         {brands.map(b => <option key={b._id} value={b.name}>{b.name}</option>)}
@@ -177,6 +185,28 @@ export default function CarModal({
                                         )}
                                     </select>
                                 </div>
+
+                                {/* ── حقل الوكالة (اختياري للمحلي) ── */}
+                                {formData.source === 'hm_local' && (
+                                    <div className="col-span-2">
+                                        <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/60 mb-2">{isRTL ? 'الوكالة المعتمدة (اختياري)' : 'OFFICIAL AGENCY (OPTIONAL)'}</label>
+                                        <select 
+                                            value={formData.agency} 
+                                            onChange={e => {
+                                                const agencyId = e.target.value;
+                                                const selectedAgency = brands.find(b => b._id === agencyId);
+                                                onFormChange({
+                                                    ...formData,
+                                                    agency: agencyId,
+                                                    make: selectedAgency ? selectedAgency.name : formData.make
+                                                });
+                                            }}
+                                            className="w-full bg-white/[0.03] border border-[#c9a96e]/30 rounded-xl py-3 px-4 text-sm font-bold text-[#c9a96e] focus:outline-none focus:border-[#c9a96e]/60">
+                                            <option value="">{isRTL ? 'بدون وكالة (يدوي)' : 'None (Manual)'}</option>
+                                            {brands.map(b => <option key={b._id} value={b._id}>{b.name}</option>)}
+                                        </select>
+                                    </div>
+                                )}
 
                                 {/* ── حقل الموديل ── */}
                                 <div>

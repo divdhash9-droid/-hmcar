@@ -106,11 +106,15 @@ export const api = {
     },
     analytics: {
         // ملخص إحصائي للداشبورد
-        getSummary: () => fetchAPI('/api/v2/analytics'),
+        // [[ARABIC_COMMENT]] period اختياري لدعم الفلاتر الزمنية من الواجهة
+        getSummary: (period?: 'all' | 'week' | 'month' | 'year') =>
+            fetchAPI(`/api/v2/analytics${period ? `?period=${period}` : ''}`),
         // أحدث الأنشطة
         getActivities: (limit = 10) => fetchAPI(`/api/v2/analytics/activities?limit=${limit}`),
         // إحصائيات تفصيلية
-        getDetailed: () => fetchAPI('/api/v2/analytics/detailed'),
+        // [[ARABIC_COMMENT]] يرجع الرسم الشهري + أفضل المبيعات وفق period
+        getDetailed: (period?: 'all' | 'week' | 'month' | 'year') =>
+            fetchAPI(`/api/v2/analytics/detailed${period ? `?period=${period}` : ''}`),
     },
     users: {
         list: (params: Record<string, string | number | boolean> = {}) => {
@@ -237,9 +241,13 @@ export const api = {
     },
 
     brands: {
-        list: (category?: 'cars' | 'parts') => {
-            const q = category ? `?category=${category}` : '';
-            return fetchAPI(`/api/v2/brands${q}`);
+        list: (category?: 'cars' | 'parts', options?: { targetShowroom?: 'hm_local' | 'korean_import'; includeInactive?: boolean }) => {
+            const params = new URLSearchParams();
+            if (category) params.set('category', category);
+            if (options?.targetShowroom) params.set('targetShowroom', options.targetShowroom);
+            if (options?.includeInactive) params.set('includeInactive', 'true');
+            const query = params.toString();
+            return fetchAPI(`/api/v2/brands${query ? `?${query}` : ''}`);
         },
         create: (data: { name: string; logoUrl?: string; category: 'cars' | 'parts' | 'both' }) =>
             fetchAPI('/api/v2/brands', {

@@ -44,6 +44,8 @@ interface KoreanCar {
     year: number;
     mileage: number;
     priceKrw: number;
+    priceUsd?: number;
+    priceSar?: number;
     fuel: string;
     fuelAr: string;
     transmission: string;
@@ -65,21 +67,17 @@ function resolveCarImage(car: KoreanCar): string | null {
 }
 
 // ─── تنسيق الأرقام ───
-function formatKrw(amount: number): string {
-    if (amount >= 100000000) return `${(amount / 100000000).toFixed(1)} مليار ₩`;
-    if (amount >= 10000) return `${(amount / 10000).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',')} 만`;
-    return `${amount.toLocaleString()} ₩`;
-}
 function formatMileage(km: number): string {
     if (km >= 10000) return `${(km / 10000).toFixed(1)} 만km`;
     return `${km.toLocaleString()} km`;
 }
 
 // ─── كارد السيارة ───
-function CarCard({ car, onContact, onViewDetails }: {
+function CarCard({ car, onContact, onViewDetails, priceText }: {
     car: KoreanCar;
     onContact: (car: KoreanCar) => void;
     onViewDetails: (car: KoreanCar) => void;
+    priceText: string;
 }) {
     const [imgErr, setImgErr] = useState(false);
     const carImage = resolveCarImage(car);
@@ -148,10 +146,7 @@ function CarCard({ car, onContact, onViewDetails }: {
 
                     <div className="bg-white/3 border border-white/5 rounded-xl p-3 mt-auto">
                         <div className="text-[9px] text-white/30 uppercase tracking-widest mb-1">{rawText('السعر')}</div>
-                        <div className="text-xl font-black text-white">{formatKrw(car.priceKrw)}</div>
-                        <div className="text-[9px] text-white/25 mt-0.5">
-                            {rawText('≈')} {(car.priceKrw * 0.00027).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',')} {rawText('ر.س تقريباً')}
-                        </div>
+                        <div className="text-xl font-black text-white">{priceText}</div>
                     </div>
                 </div>
             </div>
@@ -178,11 +173,12 @@ function CarCard({ car, onContact, onViewDetails }: {
 }
 
 // ─── مودال تفاصيل السيارة ───
-function CarModal({ car, onClose, onContact, isRTL }: {
+function CarModal({ car, onClose, onContact, isRTL, priceText }: {
     car: KoreanCar;
     onClose: () => void;
     onContact: () => void;
     isRTL: boolean;
+    priceText: string;
 }) {
     const [imgErr, setImgErr] = useState(false);
     const carImage = resolveCarImage(car);
@@ -265,8 +261,7 @@ function CarModal({ car, onClose, onContact, isRTL }: {
                     {/* السعر */}
                     <div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-xl">
                         <div className="text-[9px] text-blue-400 uppercase tracking-widest">{rawText('السعر')}</div>
-                        <div className="text-3xl font-black text-white mt-1">{formatKrw(car.priceKrw)}</div>
-                        <div className="text-xs text-white/40 mt-1">{rawText('≈')} {(car.priceKrw * 0.00027).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',')} {rawText('ريال سعودي تقريباً')}</div>
+                        <div className="text-3xl font-black text-white mt-1">{priceText}</div>
                     </div>
 
                     {/* الأزرار */}
@@ -291,7 +286,7 @@ function CarModal({ car, onClose, onContact, isRTL }: {
 export default function ShowroomPage() {
     const { isRTL } = useLanguage();
     const router = useRouter();
-    const { socialLinks } = useSettings();
+    const { socialLinks, currency, formatPriceFromUsd } = useSettings();
 
     // ─ حالة البيانات ─
     const [cars, setCars] = useState<KoreanCar[]>([]);
@@ -310,9 +305,6 @@ export default function ShowroomPage() {
     const [selectedCar, setSelectedCar] = useState<KoreanCar | null>(null);
     const [refreshKey, setRefreshKey] = useState(0);
     const [ping, setPing] = useState(48);
-
-    // رقم واتساب الأدمن
-    const whatsappNum = (socialLinks?.whatsapp || '').replace(/\D/g, '');
 
     // ─────────────────────────────────
     // جلب السيارات من الـ Backend
@@ -376,13 +368,21 @@ export default function ShowroomPage() {
     // فتح واتساب مع بيانات السيارة وتسجيل طلب لدى الأدمن
     // إذا كانت بيانات العميل ناقصة نوجهه لصفحة الطلبات الخاصة مع تعبئة أولية.
     // ─────────────────────────────────
+    const getBaseUsd = (car: KoreanCar) => {
+        const asAny = car as any;
+        if (Number(asAny.priceUsd) > 0) return Number(asAny.priceUsd);
+        if (Number(car.priceKrw) > 0) return Number(car.priceKrw) / Number(currency.usdToKrw || 1);
+        if (Number(asAny.priceSar) > 0) return Number(asAny.priceSar) / Number(currency.usdToSar || 1);
+        return 0;
+    };
+
     const openWhatsApp = async (car: KoreanCar) => {
         // [[ARABIC_COMMENT]] تسجيل حدث التحويل في Google Analytics
         ReactGA.event({
             category: 'Conversion',
             action: 'Showroom_WhatsApp_Click',
             label: car.title,
-            value: Number(car.priceKrw * 0.00027) // القيمة التقريبية ريال سعودي
+            value: Number(getBaseUsd(car) * Number(currency.usdToSar || 0))
         });
 
         try {
@@ -401,14 +401,14 @@ export default function ShowroomPage() {
             }
 
             if (!buyerName || !buyerPhone) {
-                const sarPrice = (car.priceKrw * 0.00027).toFixed(0);
+                const displayPrice = formatPriceFromUsd(getBaseUsd(car));
                 const qp = new URLSearchParams({
                     source: 'korean_showroom',
                     contactPreference,
                     carName: car.manufacturerAr || car.manufacturer || '',
                     model: car.model || '',
                     year: String(car.year || ''),
-                    description: `طلب من المعرض الكوري: ${car.title} | السعر التقريبي SAR ${sarPrice}`,
+                    description: `طلب من المعرض الكوري: ${car.title} | السعر: ${displayPrice}`,
                     externalUrl: car.encarUrl || '',
                 });
                 window.location.href = `/concierge?${qp.toString()}`;
@@ -425,7 +425,7 @@ export default function ShowroomPage() {
                 source: 'korean_showroom',
                 contactPreference,
                 externalUrl: car.encarUrl,
-                description: `طلب من المعرض الكوري: ${car.title} | تواصل مفضل: ${contactPreference} | Encar: ${car.encarUrl}`,
+                description: `طلب من المعرض الكوري: ${car.title} | السعر: ${formatPriceFromUsd(getBaseUsd(car))} | تواصل مفضل: ${contactPreference} | Encar: ${car.encarUrl}`,
             });
         } catch (err) {
             console.error('Failed to log showroom concierge request:', err);
@@ -451,7 +451,7 @@ export default function ShowroomPage() {
         return matchSearch && matchYear;
     }).sort((a, b) => {
         if (sortBy === 'mileage_low') return Number(a.mileage || 0) - Number(b.mileage || 0);
-        if (sortBy === 'price_high') return Number(b.priceKrw || 0) - Number(a.priceKrw || 0);
+        if (sortBy === 'price_high') return getBaseUsd(b) - getBaseUsd(a);
         return Number(b.year || 0) - Number(a.year || 0);
     });
 
@@ -478,6 +478,7 @@ export default function ShowroomPage() {
                     <CarModal
                         car={selectedCar}
                         isRTL={isRTL}
+                        priceText={formatPriceFromUsd(getBaseUsd(selectedCar))}
                         onClose={() => setSelectedCar(null)}
                         onContact={() => openWhatsApp(selectedCar)}
                     />
@@ -686,6 +687,7 @@ export default function ShowroomPage() {
                                     >
                                         <CarCard
                                             car={car}
+                                            priceText={formatPriceFromUsd(getBaseUsd(car))}
                                             onContact={openWhatsApp}
                                             onViewDetails={setSelectedCar}
                                         />

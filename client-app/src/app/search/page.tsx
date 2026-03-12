@@ -10,6 +10,7 @@ import Navbar from '@/components/Navbar';
 import { api } from '@/lib/api';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/lib/LanguageContext';
+import { useSettings } from '@/lib/SettingsContext';
 
 export default function SearchPage() {
     return (
@@ -26,6 +27,7 @@ function SearchContent() {
     const price = searchParams.get('price') || '';
     const router = useRouter();
     const { isRTL } = useLanguage();
+    const { formatPrice } = useSettings();
 
     const [cars, setCars] = useState<any[]>([]);
     const [parts, setParts] = useState<any[]>([]);
@@ -244,7 +246,7 @@ function SearchContent() {
                                                         <h3 className="text-2xl font-black tracking-tighter uppercase italic line-clamp-2 min-h-[4rem] group-hover:text-luxury-gold transition-colors">{car.title}</h3>
                                                     </div>
                                                     <div className="flex items-center justify-between pt-6 border-t border-white/5">
-                                                        <span className="text-xl font-black italic gold-glow">{Number(car.price).toLocaleString()} <span className="text-[10px] font-bold tracking-normal text-white/40 ml-1 italic not-italic">SAR</span></span>
+                                                        <span className="text-xl font-black italic gold-glow">{formatPrice ? formatPrice(Number(car.price || 0)) : `${Number(car.price || 0).toLocaleString()} SAR`}</span>
                                                         <div className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center group-hover:bg-luxury-gold group-hover:text-black group-hover:border-luxury-gold transition-all">
                                                             <ArrowRight className={cn("w-4 h-4 transition-transform group-hover:-rotate-45", isRTL && "rotate-180")} />
                                                         </div>
@@ -289,7 +291,7 @@ function SearchContent() {
                                                     <span className="text-[8px] font-black uppercase text-cinematic-neon-yellow tracking-widest block">{part.condition}</span>
                                                     <h3 className="text-lg font-black uppercase italic line-clamp-1 group-hover:text-luxury-gold transition-colors">{part.name}</h3>
                                                     <div className="pt-4 border-t border-white/5 flex justify-between items-center">
-                                                        <span className="text-lg font-black italic gold-glow">{Number(part.price).toLocaleString()} <span className="text-[9px] tracking-normal opacity-40 italic">SAR</span></span>
+                                                        <span className="text-lg font-black italic gold-glow">{formatPrice ? formatPrice(Number(part.price || 0)) : `${Number(part.price || 0).toLocaleString()} SAR`}</span>
                                                         <ShoppingBag className="w-4 h-4 text-white/20 group-hover:text-white transition-colors" />
                                                     </div>
                                                 </div>

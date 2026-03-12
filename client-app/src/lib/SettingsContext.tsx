@@ -54,6 +54,7 @@ interface SettingsContextType {
     displayCurrency: 'SAR' | 'USD' | 'KRW';
     setDisplayCurrency: (c: 'SAR' | 'USD' | 'KRW') => void;
     formatPrice: (priceInSar: number, forcedCurrency?: 'SAR' | 'USD' | 'KRW') => string;
+    formatPriceFromUsd: (priceInUsd: number, forcedCurrency?: 'SAR' | 'USD' | 'KRW') => string;
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
@@ -101,24 +102,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem('displayCurrency', c);
     };
 
-    /**
-     * تنسيق السعر بناءً على العملة المختارة
-     * السعر الأساسي في المتغير هو "ريال سعودي"
-     */
-    const formatPrice = (priceInSar: number, forcedCurrency?: 'SAR' | 'USD' | 'KRW') => {
-        const activeCurr = forcedCurrency || displayCurrency;
-        let finalPrice = priceInSar;
-
-        // التحويل من الريال إلى الدولار أولاً ثم العملة المطلوبة إذا لزم الأمر
-        const priceInUsd = priceInSar / currency.usdToSar;
-
-        if (activeCurr === 'USD') {
-            finalPrice = priceInUsd;
-        } else if (activeCurr === 'KRW') {
-            finalPrice = priceInUsd * currency.usdToKrw;
-        }
-
-        // استخدام التنسيق المناسب حسب العملة
+    const formatByCurrency = (amount: number, activeCurr: 'SAR' | 'USD' | 'KRW') => {
         let locale = 'ar-SA';
         if (activeCurr === 'USD') locale = 'en-US';
         if (activeCurr === 'KRW') locale = 'ko-KR';
@@ -128,9 +112,8 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
             maximumFractionDigits: activeCurr === 'USD' ? 2 : 0,
         });
 
-        const formattedNumber = formatter.format(finalPrice);
+        const formattedNumber = formatter.format(amount);
 
-        // رموز العملات
         const symbols: Record<string, string> = {
             'SAR': 'ر.س',
             'USD': '$',
@@ -138,6 +121,42 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
         };
 
         return `${symbols[activeCurr]} ${formattedNumber}`;
+    };
+
+    /**
+     * تنسيق السعر بناءً على العملة المختارة
+     * السعر الأساسي في المتغير هو "ريال سعودي"
+     */
+    const formatPrice = (priceInSar: number, forcedCurrency?: 'SAR' | 'USD' | 'KRW') => {
+        const activeCurr = forcedCurrency || displayCurrency;
+        const safeSar = Number(priceInSar || 0);
+        const priceInUsd = safeSar / Number(currency.usdToSar || 1);
+
+        let finalPrice = safeSar;
+        if (activeCurr === 'USD') {
+            finalPrice = priceInUsd;
+        } else if (activeCurr === 'KRW') {
+            finalPrice = priceInUsd * Number(currency.usdToKrw || 0);
+        }
+
+        return formatByCurrency(finalPrice, activeCurr);
+    };
+
+    /**
+     * تنسيق السعر عندما يكون السعر الأساسي بالدولار
+     */
+    const formatPriceFromUsd = (priceInUsd: number, forcedCurrency?: 'SAR' | 'USD' | 'KRW') => {
+        const activeCurr = forcedCurrency || displayCurrency;
+        const safeUsd = Number(priceInUsd || 0);
+
+        let finalPrice = safeUsd;
+        if (activeCurr === 'SAR') {
+            finalPrice = safeUsd * Number(currency.usdToSar || 0);
+        } else if (activeCurr === 'KRW') {
+            finalPrice = safeUsd * Number(currency.usdToKrw || 0);
+        }
+
+        return formatByCurrency(finalPrice, activeCurr);
     };
 
     return (
@@ -151,7 +170,8 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
             refreshSettings,
             displayCurrency,
             setDisplayCurrency: handleSetDisplayCurrency,
-            formatPrice
+            formatPrice,
+            formatPriceFromUsd
         }}>
             {children}
         </SettingsContext.Provider>

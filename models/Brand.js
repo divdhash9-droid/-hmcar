@@ -16,6 +16,8 @@ const brandSchema = new mongoose.Schema({
   // Models belonging to this brand
   models: { type: [String], default: [] },
   // Agency Profile Info (for cars)
+  targetShowroom: { type: String, enum: ['hm_local', 'korean_import', 'both'], default: 'hm_local' },
+  isActive: { type: Boolean, default: true },
   location: { type: String, default: '' },
   phone: { type: String, default: '' },
   whatsapp: { type: String, default: '' },

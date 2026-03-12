@@ -204,6 +204,3 @@ class NotificationService {
 }
 
 module.exports = NotificationService;
-
-
-module.exports = NotificationService;

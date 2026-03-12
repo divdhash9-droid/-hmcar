@@ -8,15 +8,24 @@ const User = require('../../models/User');
 describe('User Model Tests', () => {
   let mongoServer;
 
-  before(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const mongoUri = mongoServer.getUri();
-    await mongoose.connect(mongoUri);
+  before(async function() {
+    try {
+      mongoServer = await MongoMemoryServer.create();
+      const mongoUri = mongoServer.getUri();
+      await mongoose.connect(mongoUri);
+    } catch (error) {
+      console.warn('Skipping suite: MongoMemoryServer unavailable on this machine.', error.message);
+      this.skip();
+    }
   });
 
   after(async () => {
-    await mongoose.disconnect();
-    await mongoServer.stop();
+    if (mongoose.connection.readyState !== 0) {
+      await mongoose.disconnect();
+    }
+    if (mongoServer) {
+      await mongoServer.stop();
+    }
   });
 
   afterEach(async () => {

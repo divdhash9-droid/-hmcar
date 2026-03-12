@@ -20,11 +20,16 @@ import { useLanguage } from '@/lib/LanguageContext';
 import { useSettings } from '@/lib/SettingsContext';
 import { cn } from '@/lib/utils';
 
+const toFiniteNumber = (value: unknown): number | null => {
+    const num = Number(value);
+    return Number.isFinite(num) ? num : null;
+};
+
 export default function ShowroomCarDetail() {
     const { id } = useParams();
     const router = useRouter();
     const { isRTL } = useLanguage();
-    const { formatPrice } = useSettings();
+    const { formatPrice, formatPriceFromUsd, currency } = useSettings();
 
     // حالة البيانات
     const [car, setCar] = useState<any>(null);
@@ -73,7 +78,10 @@ export default function ShowroomCarDetail() {
     const handleWhatsappPurchase = () => {
         if (!car) return;
         const carMake = typeof car.make === 'object' ? car.make?.name : car.make;
-        const price = formatPrice ? formatPrice(Number(car.price || 0)) : `${Number(car.price || 0).toLocaleString()} SAR`;
+        const baseUsd = getBaseUsd(car);
+        const price = formatPriceFromUsd
+            ? formatPriceFromUsd(baseUsd)
+            : (formatPrice ? formatPrice(Number(car.priceSar || car.price || 0)) : `${Number(car.priceSar || car.price || 0).toLocaleString()} SAR`);
 
         // [[ARABIC_COMMENT]] بناء رسالة الواتساب مع كل تفاصيل السيارة
         const msg = isRTL
@@ -120,9 +128,28 @@ export default function ShowroomCarDetail() {
         );
     }
 
+    const getBaseUsd = (payload: any) => {
+        const baseUsd = toFiniteNumber(payload?.basePriceUsd);
+        if (baseUsd && baseUsd > 0) return baseUsd;
+
+        const priceUsd = toFiniteNumber(payload?.priceUsd);
+        if (priceUsd && priceUsd > 0) return priceUsd;
+
+        const priceSar = toFiniteNumber(payload?.priceSar ?? payload?.price);
+        if (priceSar && priceSar > 0) return priceSar / Number(currency.usdToSar || 1);
+
+        const priceKrw = toFiniteNumber(payload?.priceKrw);
+        if (priceKrw && priceKrw > 0) return priceKrw / Number(currency.usdToKrw || 1);
+
+        return 0;
+    };
+
     const carMake = typeof car.make === 'object' ? car.make?.name : car.make;
     const images = car.images?.filter(Boolean) || [];
-    const displayPrice = formatPrice ? formatPrice(Number(car.price || 0)) : `${Number(car.price || 0).toLocaleString()} SAR`;
+    const baseUsd = getBaseUsd(car);
+    const displayPrice = formatPriceFromUsd
+        ? formatPriceFromUsd(baseUsd)
+        : (formatPrice ? formatPrice(Number(car.priceSar || car.price || 0)) : `${Number(car.priceSar || car.price || 0).toLocaleString()} SAR`);
 
     const specs = [
         { icon: Calendar, label: isRTL ? 'السنة' : 'YEAR', value: car.year },

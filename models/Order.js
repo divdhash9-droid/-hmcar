@@ -47,7 +47,13 @@ const orderSchema = new mongoose.Schema({
     shippingSar: { type: Number, default: 0 },
     shippingUsd: { type: Number, default: 0 },
     grandTotalSar: { type: Number, default: 0 },
-    grandTotalUsd: { type: Number, default: 0 }
+    grandTotalUsd: { type: Number, default: 0 },
+    exchangeSnapshot: {
+      usdToSar: { type: Number, default: 3.75 },
+      usdToKrw: { type: Number, default: 1350 },
+      activeCurrency: { type: String, enum: ['SAR', 'USD', 'KRW'], default: 'SAR' },
+      capturedAt: { type: Date, default: Date.now }
+    }
   },
   // تاريخ تغيير الحالة
   statusHistory: { type: [orderStatusHistorySchema], default: [] },

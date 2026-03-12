@@ -8,7 +8,9 @@ const { requireAuthAPI, requireAdmin } = require('../../../middleware/auth');
 // GET /api/v2/analytics - ملخص إحصائي (admin فقط)
 router.get('/', requireAuthAPI, requireAdmin, async (req, res) => {
   try {
-    const stats = await AnalyticsService.getSummary();
+    // [[ARABIC_COMMENT]] period اختياري: all | week | month | year
+    const period = String(req.query.period || 'all');
+    const stats = await AnalyticsService.getSummary(period);
     res.json({ success: true, stats });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -28,7 +30,9 @@ router.get('/activities', requireAuthAPI, requireAdmin, async (req, res) => {
 // GET /api/v2/analytics/detailed - إحصائيات تفصيلية للتقارير
 router.get('/detailed', requireAuthAPI, requireAdmin, async (req, res) => {
   try {
-    const detailed = await AnalyticsService.getMonthlyStats();
+    // [[ARABIC_COMMENT]] period يحدد نافذة البيانات في الرسم/أفضل المبيعات
+    const period = String(req.query.period || 'all');
+    const detailed = await AnalyticsService.getMonthlyStats(period);
     res.json({ success: true, detailed });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

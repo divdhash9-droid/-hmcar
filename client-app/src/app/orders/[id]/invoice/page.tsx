@@ -10,12 +10,15 @@ import { useParams, useRouter } from 'next/navigation';
 import { Printer, Download, ArrowLeft, CheckCircle, Car, Calendar, Hash, User, Phone, MapPin } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useLanguage } from '@/lib/LanguageContext';
+import { useSettings } from '@/lib/SettingsContext';
 import { motion } from 'framer-motion';
+import { formatAmountWithSnapshot, getOrderGrandTotalSar } from '@/lib/orderCurrency';
 
 export default function InvoicePage() {
     const { id } = useParams();
     const router = useRouter();
     const { isRTL } = useLanguage();
+    const { displayCurrency, currency } = useSettings();
     const [order, setOrder] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -217,8 +220,12 @@ export default function InvoicePage() {
                                 <td className="py-6 text-center text-sm font-bold text-gray-600">1</td>
                                 <td className="py-6 text-right">
                                     <div className="text-xl font-black text-gray-900">
-                                        {Number(order?.totalAmount || 0).toLocaleString()}
-                                        <span className="text-sm font-bold text-gray-400 ml-1">SAR</span>
+                                        {formatAmountWithSnapshot(
+                                            getOrderGrandTotalSar(order),
+                                            displayCurrency,
+                                            order,
+                                            currency
+                                        )}
                                     </div>
                                 </td>
                             </tr>
@@ -230,7 +237,7 @@ export default function InvoicePage() {
                         <div className="w-72 space-y-3">
                             <div className="flex justify-between text-sm text-gray-500">
                                 <span>{isRTL ? 'المجموع الجزئي' : 'Subtotal'}</span>
-                                <span className="font-bold">{Number(order?.totalAmount || 0).toLocaleString()} SAR</span>
+                                <span className="font-bold">{formatAmountWithSnapshot(getOrderGrandTotalSar(order), displayCurrency, order, currency)}</span>
                             </div>
                             <div className="flex justify-between text-sm text-gray-500">
                                 <span>{isRTL ? 'الضريبة' : 'Tax'}</span>
@@ -238,7 +245,7 @@ export default function InvoicePage() {
                             </div>
                             <div className="border-t-2 border-black pt-3 flex justify-between text-lg font-black text-black">
                                 <span>{isRTL ? 'الإجمالي' : 'TOTAL'}</span>
-                                <span>{Number(order?.totalAmount || 0).toLocaleString()} SAR</span>
+                                <span>{formatAmountWithSnapshot(getOrderGrandTotalSar(order), displayCurrency, order, currency)}</span>
                             </div>
                         </div>
                     </div>

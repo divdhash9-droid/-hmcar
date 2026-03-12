@@ -14,6 +14,7 @@ import { useSettings } from "@/lib/SettingsContext";
 import { api } from "@/lib/api";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { formatAmountWithSnapshot, getOrderGrandTotalSar } from "@/lib/orderCurrency";
 
 const STATUS_STEPS = [
     { key: 'pending', labelAr: 'قيد الانتظار', labelEn: 'Pending', icon: Clock },
@@ -25,7 +26,7 @@ const STATUS_STEPS = [
 
 export default function OrderDetailPage() {
     const { isRTL } = useLanguage();
-    const { socialLinks } = useSettings(); // [[ARABIC_COMMENT]] جلب رقم واتساب الحقيقي
+    const { socialLinks, displayCurrency, currency } = useSettings(); // [[ARABIC_COMMENT]] جلب رقم واتساب الحقيقي
     const params = useParams();
     const orderId = params?.id as string;
 
@@ -255,7 +256,12 @@ export default function OrderDetailPage() {
                                         {isRTL ? 'السعر' : 'Price'}
                                     </span>
                                     <span className="font-black text-white">
-                                        {Number(order.car.price || order.totalAmount).toLocaleString()} SAR
+                                        {formatAmountWithSnapshot(
+                                            Number(order.car?.price || getOrderGrandTotalSar(order)),
+                                            displayCurrency,
+                                            order,
+                                            currency
+                                        )}
                                     </span>
                                 </div>
                                 <div className="h-[1px] bg-white/5" />
@@ -264,7 +270,12 @@ export default function OrderDetailPage() {
                                         {isRTL ? 'الإجمالي' : 'Total'}
                                     </span>
                                     <span className="font-black text-xl text-cinematic-neon-blue italic">
-                                        {Number(order.totalAmount).toLocaleString()} SAR
+                                        {formatAmountWithSnapshot(
+                                            getOrderGrandTotalSar(order),
+                                            displayCurrency,
+                                            order,
+                                            currency
+                                        )}
                                     </span>
                                 </div>
                                 <div className={cn(
@@ -306,7 +317,7 @@ export default function OrderDetailPage() {
                         {/* [[ARABIC_COMMENT]] زر التواصل عبر واتساب - يستخدم الرقم المحفوظ في الإعدادات */}
                         <a
                             href={`https://wa.me/${(socialLinks?.whatsapp || '966500000000').replace(/\D/g, '')}?text=${encodeURIComponent(
-                                `طلب رقم: ${order.orderNumber}\nالسيارة: ${order.car?.title || ''}\nالمبلغ: ${Number(order.totalAmount).toLocaleString()} SAR\n\nأرجو إرسال الفاتورة.`
+                                `طلب رقم: ${order.orderNumber}\nالسيارة: ${order.car?.title || ''}\nالمبلغ: ${formatAmountWithSnapshot(getOrderGrandTotalSar(order), displayCurrency, order, currency)}\n\nأرجو إرسال الفاتورة.`
                             )}`}
                             target="_blank"
                             rel="noopener noreferrer"

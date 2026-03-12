@@ -15,7 +15,7 @@ import { ProductModalData } from '@/components/ProductModal';
 function SharedCartContent() {
     const searchParams = useSearchParams();
     const { isRTL } = useLanguage();
-    const { formatPrice, socialLinks } = useSettings();
+    const { formatPriceFromUsd, socialLinks, currency } = useSettings();
     const [items, setItems] = useState<ProductModalData[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -38,13 +38,13 @@ function SharedCartContent() {
                     return {
                         id: data.id || data._id,
                         title: data.title || data.name,
-                        price: data.price || data.priceSar,
+                        price: data.basePriceUsd || data.priceUsd || data.price || data.priceSar,
                         images: data.images || [],
                         type: data.category ? 'car' : 'part',
                         make: data.make,
                         brand: data.brand,
                         year: data.year,
-                        displayCurrency: 'SAR'
+                        displayCurrency: data.basePriceUsd || data.priceUsd ? 'USD' : (data.priceKrw ? 'KRW' : 'SAR')
                     } as ProductModalData;
                 });
 
@@ -59,7 +59,17 @@ function SharedCartContent() {
         loadItems();
     }, [itemsParam, isRTL]);
 
-    const total = items.reduce((sum, item) => sum + (item.price || 0), 0);
+    const toBaseUsd = (item: ProductModalData) => {
+        const amount = Number(item.price || 0);
+        if (!Number.isFinite(amount) || amount <= 0) return 0;
+
+        const sourceCurrency = (item.displayCurrency || 'SAR') as 'SAR' | 'USD' | 'KRW';
+        if (sourceCurrency === 'USD') return amount;
+        if (sourceCurrency === 'KRW') return amount / Number(currency.usdToKrw || 1);
+        return amount / Number(currency.usdToSar || 1);
+    };
+
+    const totalUsd = items.reduce((sum, item) => sum + toBaseUsd(item), 0);
 
     const contactAdmin = () => {
         const phone = (socialLinks?.whatsapp || '+821080880014').replace(/\D/g, '');
@@ -128,7 +138,7 @@ function SharedCartContent() {
                             </div>
                             <h3 className="font-bold text-sm text-white/90 truncate">{item.title}</h3>
                             <div className="text-[#c9a96e] font-black text-base mt-1">
-                                {formatPrice ? formatPrice(item.price) : `${item.price?.toLocaleString()} SAR`}
+                                {formatPriceFromUsd ? formatPriceFromUsd(toBaseUsd(item)) : `${item.price?.toLocaleString()} SAR`}
                             </div>
                         </div>
                     </div>
@@ -141,7 +151,7 @@ function SharedCartContent() {
                         {isRTL ? 'إجمالي السعر' : 'TOTAL PRICE'}
                     </span>
                     <span className="text-2xl font-black text-[#c9a96e]">
-                        {formatPrice ? formatPrice(total) : `${total.toLocaleString()} SAR`}
+                        {formatPriceFromUsd ? formatPriceFromUsd(totalUsd) : `${totalUsd.toLocaleString()} SAR`}
                     </span>
                 </div>
                 <button

@@ -122,12 +122,40 @@ router.put('/site-info', requireAuthAPI, requireAdmin, invalidateCache('/api/v2/
 });
 
 // تحديث إعدادات العملة
-router.put('/currency-settings', requireAuthAPI, requireAdmin, async (req, res) => {
+router.put('/currency-settings', requireAuthAPI, requireAdmin, invalidateCache('/api/v2/settings*'), async (req, res) => {
     try {
         const { currencySettings } = req.body;
 
+        const usdToSar = Number(currencySettings?.usdToSar);
+        const usdToKrw = Number(currencySettings?.usdToKrw);
+        const partsMultiplier = Number(currencySettings?.partsMultiplier || 1.0);
+        const auctionMultiplier = Number(currencySettings?.auctionMultiplier || 1.0);
+        const activeCurrency = String(currencySettings?.activeCurrency || 'SAR').toUpperCase();
+
+        if (!Number.isFinite(usdToSar) || usdToSar <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'قيمة usdToSar غير صالحة'
+            });
+        }
+
+        if (!Number.isFinite(usdToKrw) || usdToKrw <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'قيمة usdToKrw غير صالحة'
+            });
+        }
+
         const settings = await SiteSettings.updateSettings(
-            { currencySettings },
+            {
+                currencySettings: {
+                    usdToSar,
+                    usdToKrw,
+                    partsMultiplier,
+                    auctionMultiplier,
+                    activeCurrency,
+                }
+            },
             req.user._id
         );
 

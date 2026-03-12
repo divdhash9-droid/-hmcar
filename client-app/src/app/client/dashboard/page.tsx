@@ -19,6 +19,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/LanguageContext";
 import { useAuth } from "@/lib/AuthContext";
+import { useSettings } from "@/lib/SettingsContext";
 import { api } from "@/lib/api";
 import Link from "next/link";
 
@@ -26,6 +27,7 @@ const rawText = (value: string) => value;
 
 export default function ClientDashboard() {
     const { isRTL } = useLanguage();
+    const { formatPrice } = useSettings();
     const { user, isLoading: authLoading } = useAuth();
     const [dashboardData, setDashboardData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -252,7 +254,7 @@ export default function ClientDashboard() {
                                         <div className="text-[13px] font-bold text-white truncate mb-1">{car.title}</div>
                                         <div className="flex items-center justify-between">
                                             <div className="text-[12px] text-cinematic-neon-gold font-semibold">
-                                                {Number(car.price).toLocaleString()} <span className="text-[10px] text-white/30">{rawText('SAR')}</span>
+                                                {formatPrice ? formatPrice(Number(car.price || 0)) : `${Number(car.price || 0).toLocaleString()} SAR`}
                                             </div>
                                             {isRTL
                                                 ? <ArrowLeft className="w-3.5 h-3.5 text-white/20" />

@@ -4,12 +4,51 @@ const express = require('express');
 const router = express.Router();
 const Car = require('../../../models/Car');
 const AuditLog = require('../../../models/AuditLog');
+const SiteSettings = require('../../../models/SiteSettings');
 const { requireAuthAPI, requirePermissionAPI } = require('../../../middleware/auth');
 const SmartAlertService = require('../../../services/SmartAlertService');
 const { cacheResponse, invalidateCache } = require('../../../middleware/cache');
 
+function toFiniteNumber(value) {
+    const n = Number(value);
+    return Number.isFinite(n) ? n : 0;
+}
+
+function normalizeCarPricing(payload, rates) {
+    const usdToSar = Number(rates?.usdToSar || 3.75);
+    const usdToKrw = Number(rates?.usdToKrw || 1350);
+
+    const candidateUsd = toFiniteNumber(payload.basePriceUsd || payload.priceUsd || payload.usdPrice);
+    const candidateSar = toFiniteNumber(payload.priceSar || payload.price);
+    const candidateKrw = toFiniteNumber(payload.priceKrw || payload.krwPrice);
+
+    let basePriceUsd = candidateUsd;
+    if (!basePriceUsd && candidateKrw > 0) basePriceUsd = candidateKrw / usdToKrw;
+    if (!basePriceUsd && candidateSar > 0) basePriceUsd = candidateSar / usdToSar;
+
+    const normalizedUsd = Number(basePriceUsd.toFixed(2));
+    const normalizedSar = Number((normalizedUsd * usdToSar).toFixed(2));
+    const normalizedKrw = Math.round(normalizedUsd * usdToKrw);
+
+    const source = payload?.source === 'korean_import'
+        ? 'korean_import'
+        : (payload?.source === 'hm_local' ? 'hm_local' : (payload?.listingType === 'showroom' ? 'korean_import' : 'hm_local'));
+    const listingType = payload?.listingType || (source === 'korean_import' ? 'showroom' : 'store');
+
+    return {
+        ...payload,
+        source,
+        listingType,
+        basePriceUsd: normalizedUsd,
+        priceUsd: normalizedUsd,
+        priceSar: normalizedSar,
+        priceKrw: normalizedKrw,
+        price: normalizedSar,
+    };
+}
+
 // GET /api/v2/cars - جلب قائمة السيارات
-router.get('/', cacheResponse(300), async (req, res) => {
+router.get('/', cacheResponse(300), async (req, res, next) => {
     try {
         const {
             page = 1,
@@ -20,7 +59,8 @@ router.get('/', cacheResponse(300), async (req, res) => {
             maxPrice,
             search,
             status = 'active',
-            listingType
+            listingType,
+            source
         } = req.query;
 
         // بناء الفلتر
@@ -50,6 +90,31 @@ router.get('/', cacheResponse(300), async (req, res) => {
             } else {
                 conditions.push({ listingType });
             }
+        }
+
+        if (source === 'hm_local') {
+            conditions.push({
+                $or: [
+                    { source: 'hm_local' },
+                    {
+                        source: { $exists: false },
+                        $or: [
+                            { listingType: 'store' },
+                            { listingType: 'auction' },
+                            { listingType: { $exists: false } },
+                            { listingType: null },
+                            { listingType: '' }
+                        ]
+                    }
+                ]
+            });
+        } else if (source === 'korean_import') {
+            conditions.push({
+                $or: [
+                    { source: 'korean_import' },
+                    { source: { $exists: false }, listingType: 'showroom' }
+                ]
+            });
         }
 
         if (minPrice || maxPrice) {
@@ -154,6 +219,7 @@ router.get('/', cacheResponse(300), async (req, res) => {
                     price: car.price || car.priceSar || 0,
                     priceSar: car.priceSar || car.price || 0,
                     priceUsd: car.priceUsd || 0,
+                    basePriceUsd: car.basePriceUsd || car.priceUsd || 0,
                     priceKrw: car.priceKrw || 0,
                     displayCurrency: car.displayCurrency || 'SAR',
                     images: car.images || [],
@@ -166,7 +232,9 @@ router.get('/', cacheResponse(300), async (req, res) => {
                     transmission: car.transmission,
                     mileage: car.mileage,
                     description: car.description,
-                    listingType: car.listingType
+                    listingType: car.listingType,
+                    source: car.source || (car.listingType === 'showroom' ? 'korean_import' : 'hm_local'),
+                    agency: car.agency || null
 
                 })),
                 pagination: {
@@ -178,17 +246,12 @@ router.get('/', cacheResponse(300), async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Get cars error:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Internal Server Error',
-            message: error.message
-        });
+        next(error);
     }
 });
 
 // GET /api/v2/cars/:id - جلب تفاصيل سيارة محددة
-router.get('/:id', cacheResponse(600), async (req, res) => {
+router.get('/:id', cacheResponse(600), async (req, res, next) => {
     try {
         const car = await Car.findById(req.params.id).lean();
 
@@ -204,18 +267,16 @@ router.get('/:id', cacheResponse(600), async (req, res) => {
             data: car
         });
     } catch (error) {
-        console.error('Get car details error:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Internal Server Error'
-        });
+        next(error);
     }
 });
 
 // POST /api/v2/cars - إضافة سيارة جديدة (Admin only)
-router.post('/', requireAuthAPI, requirePermissionAPI('manage_cars'), invalidateCache('/api/v2/cars*'), async (req, res) => {
+router.post('/', requireAuthAPI, requirePermissionAPI('manage_cars'), invalidateCache('/api/v2/cars*'), async (req, res, next) => {
     try {
-        const car = new Car(req.body);
+        const settings = await SiteSettings.getSettings();
+        const payload = normalizeCarPricing(req.body, settings?.currencySettings);
+        const car = new Car(payload);
         await car.save();
 
         // Log car creation
@@ -244,31 +305,37 @@ router.post('/', requireAuthAPI, requirePermissionAPI('manage_cars'), invalidate
             message: 'Car created successfully'
         });
     } catch (error) {
-        console.error('Create car error:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Internal Server Error',
-            message: error.message
-        });
+        next(error);
     }
 });
 
 // PUT /api/v2/cars/:id - تحديث سيارة (Admin only)
-router.put('/:id', requireAuthAPI, requirePermissionAPI('manage_cars'), invalidateCache('/api/v2/cars*'), async (req, res) => {
+router.put('/:id', requireAuthAPI, requirePermissionAPI('manage_cars'), invalidateCache('/api/v2/cars*'), async (req, res, next) => {
     try {
         const oldCar = await Car.findById(req.params.id);
-        const car = await Car.findByIdAndUpdate(
-            req.params.id,
-            req.body,
-            { new: true, runValidators: true }
-        );
-
-        if (!car) {
+        if (!oldCar) {
             return res.status(404).json({
                 success: false,
                 error: 'Car not found'
             });
         }
+
+        const settings = await SiteSettings.getSettings();
+        const mergedPayload = {
+            ...oldCar.toObject(),
+            ...req.body,
+        };
+        const normalizedPayload = normalizeCarPricing(mergedPayload, settings?.currencySettings);
+        delete normalizedPayload._id;
+        delete normalizedPayload.__v;
+        delete normalizedPayload.createdAt;
+        delete normalizedPayload.updatedAt;
+
+        const car = await Car.findByIdAndUpdate(
+            req.params.id,
+            normalizedPayload,
+            { new: true, runValidators: true }
+        );
 
         // Log car update
         await AuditLog.logUserAction(
@@ -292,17 +359,12 @@ router.put('/:id', requireAuthAPI, requirePermissionAPI('manage_cars'), invalida
             message: 'Car updated successfully'
         });
     } catch (error) {
-        console.error('Update car error:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Internal Server Error',
-            message: error.message
-        });
+        next(error);
     }
 });
 
 // DELETE /api/v2/cars/:id - حذف سيارة (Admin only)
-router.delete('/:id', requireAuthAPI, requirePermissionAPI('manage_cars'), invalidateCache('/api/v2/cars*'), async (req, res) => {
+router.delete('/:id', requireAuthAPI, requirePermissionAPI('manage_cars'), invalidateCache('/api/v2/cars*'), async (req, res, next) => {
     try {
         const car = await Car.findByIdAndDelete(req.params.id);
 
@@ -318,17 +380,13 @@ router.delete('/:id', requireAuthAPI, requirePermissionAPI('manage_cars'), inval
             message: 'Car deleted successfully'
         });
     } catch (error) {
-        console.error('Delete car error:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Internal Server Error'
-        });
+        next(error);
     }
 });
 
 // [[ARABIC_COMMENT]] PATCH /api/v2/cars/:id/sold - تعليم السيارة كـ "تم البيع" (أدمن فقط)
 // [[ARABIC_COMMENT]] بعد التنفيذ: isSold=true + isActive=false → تختفي من المعرض فوراً
-router.patch('/:id/sold', requireAuthAPI, requirePermissionAPI('manage_cars'), invalidateCache('/api/v2/cars*'), async (req, res) => {
+router.patch('/:id/sold', requireAuthAPI, requirePermissionAPI('manage_cars'), invalidateCache('/api/v2/cars*'), async (req, res, next) => {
     try {
         const { soldPrice, buyerNote } = req.body;
 
@@ -370,8 +428,7 @@ router.patch('/:id/sold', requireAuthAPI, requirePermissionAPI('manage_cars'), i
             message: 'تم تحديث السيارة كـ "مباعة" بنجاح'
         });
     } catch (error) {
-        console.error('Mark car as sold error:', error);
-        res.status(500).json({ success: false, error: 'Internal Server Error' });
+        next(error);
     }
 });
 

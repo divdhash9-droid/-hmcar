@@ -40,6 +40,8 @@ const siteSettingsSchema = new mongoose.Schema({
         usdToSar: { type: Number, default: 3.75 },       // سعر صرف الدولار مقابل الريال السعودي
         usdToKrw: { type: Number, default: 1350 },       // سعر صرف الدولار مقابل الوون الكوري
         activeCurrency: { type: String, default: 'SAR' }, // العملة الافتراضية للعرض
+        partsMultiplier: { type: Number, default: 1.0 },  // معامل ضرب سعر القطع
+        auctionMultiplier: { type: Number, default: 1.0 }, // معامل ضرب سعر المزاد
     },
 
     // محتوى الصفحة الرئيسية الديناميكي (لماذا تختارنا)

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 /**
  * صفحة إدارة السيارات - لوحة تحكم HM CAR
@@ -16,6 +16,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Search } from 'lucide-react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/lib/LanguageContext';
 import { api } from '@/lib/api';
@@ -44,6 +45,8 @@ type Car = {
     transmission?: string;
     color?: string;
     listingType?: string;
+    source?: 'hm_local' | 'korean_import';
+    agency?: string | { _id: string; name: string };
     usdPrice?: number;
     krwPrice?: number;
 };
@@ -67,6 +70,8 @@ type FormData = {
     isActive: boolean;
     displayCurrency: string;
     listingType: string;
+    source: 'hm_local' | 'korean_import';
+    agency: string;
 };
 
 // ── النموذج الافتراضي الفارغ ──
@@ -76,12 +81,16 @@ const EMPTY_FORM: FormData = {
     price: 0, usdPrice: 0, krwPrice: 0,
     category: 'sedan', images: [''], description: '',
     mileage: 0, fuelType: 'Petrol', transmission: 'Automatic',
-    color: '', isActive: true, displayCurrency: 'SAR', listingType: 'store'
+    color: '', isActive: true, displayCurrency: 'SAR', listingType: 'store', source: 'hm_local',
+    agency: ''
 };
 
 export default function AdminCarsPage() {
     const { isRTL } = useLanguage();
     const { showToast } = useToast();
+    const searchParams = useSearchParams();
+    const requestedSource = searchParams?.get('source');
+    const inventorySource: 'hm_local' | 'korean_import' = requestedSource === 'korean_import' ? 'korean_import' : 'hm_local';
 
     // ── حالات الصفحة ──
     const [cars, setCars] = useState<Car[]>([]);
@@ -104,16 +113,16 @@ export default function AdminCarsPage() {
     useEffect(() => {
         loadData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [filter, searchTerm]);
+    }, [filter, searchTerm, inventorySource]);
 
     // ── جلب السيارات والإعدادات والوكالات من الـ API ──
     const loadData = async () => {
         setLoading(true);
         try {
             const [carsRes, settingsRes, brandsRes] = await Promise.all([
-                api.cars.list({ status: filter, search: searchTerm }),
+                api.cars.list({ status: filter, search: searchTerm, source: inventorySource }),
                 api.settings.getPublic(),
-                api.brands.list('cars')
+                api.brands.list('cars', { targetShowroom: inventorySource })
             ]);
 
             if (carsRes.success) setCars(carsRes.data.cars);
@@ -170,14 +179,21 @@ export default function AdminCarsPage() {
             description: car.description || '', mileage: car.mileage || 0,
             fuelType: car.fuelType || 'Petrol', transmission: car.transmission || 'Automatic',
             color: car.color || '', isActive: car.isActive !== false,
-            displayCurrency: car.displayCurrency || 'SAR', listingType: car.listingType || 'store'
+            displayCurrency: car.displayCurrency || 'SAR',
+            listingType: car.listingType || 'store',
+            source: car.source || (car.listingType === 'showroom' ? 'korean_import' : 'hm_local'),
+            agency: typeof car.agency === 'object' ? (car.agency?._id || '') : (car.agency || '')
         });
         setShowModal(true);
     };
 
     // ── إعادة تعيين النموذج لإضافة سيارة جديدة ──
     const resetForm = () => {
-        setFormData(EMPTY_FORM);
+        setFormData({
+            ...EMPTY_FORM,
+            source: inventorySource,
+            listingType: inventorySource === 'korean_import' ? 'showroom' : 'store'
+        });
         setEditingCar(null);
     };
 
@@ -190,6 +206,8 @@ export default function AdminCarsPage() {
             // Map USD and KRW fields to match the model schema exactly
             const submitData = {
                 ...formData,
+                source: formData.source || inventorySource,
+                listingType: (formData.source || inventorySource) === 'korean_import' ? 'showroom' : 'store',
                 priceUsd: formData.usdPrice,
                 priceKrw: formData.krwPrice
             };
@@ -267,9 +285,13 @@ export default function AdminCarsPage() {
                     <div className="flex items-end justify-between gap-4 flex-wrap">
                         <div>
                             <p className="cockpit-mono text-[10px] text-orange-500/50 tracking-[0.25em] uppercase mb-1">
-                                VEHICLE INVENTORY CONTROL
+                                {inventorySource === 'korean_import' ? 'KOREAN IMPORT INVENTORY' : 'HM LOCAL INVENTORY'}
                             </p>
-                            <h1 className="ck-page-title">{isRTL ? 'إدارة السيارات' : 'CAR CTRL'}</h1>
+                            <h1 className="ck-page-title">
+                                {isRTL
+                                    ? (inventorySource === 'korean_import' ? 'إدارة المعرض الكوري' : 'إدارة مخزون HM')
+                                    : (inventorySource === 'korean_import' ? 'KOREAN CAR CTRL' : 'HM CAR CTRL')}
+                            </h1>
                         </div>
                         {/* زر إضافة سيارة جديدة */}
                         <button

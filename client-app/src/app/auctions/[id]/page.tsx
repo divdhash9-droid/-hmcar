@@ -11,6 +11,7 @@ import {
 import { api } from '@/lib/api';
 import { useLocale } from '@/hooks/useLocale';
 import ClientPageHeader from '@/components/ClientPageHeader';
+import { useSettings } from '@/lib/SettingsContext';
 
 interface AuctionDetails {
     _id: string;
@@ -45,6 +46,7 @@ interface Bid {
 export default function AuctionDetailsPage() {
     const params = useParams();
     const { isRTL, locale } = useLocale();
+    const { formatPrice: formatGlobalPrice } = useSettings();
     const [auction, setAuction] = useState<AuctionDetails | null>(null);
     const [bids, setBids] = useState<Bid[]>([]);
     const [loading, setLoading] = useState(true);
@@ -144,13 +146,7 @@ export default function AuctionDetailsPage() {
         }
     };
 
-    const formatPrice = (price: number) => {
-        return new Intl.NumberFormat(locale === 'AR' ? 'ar-SA' : 'en-US', {
-            style: 'currency',
-            currency: 'SAR',
-            minimumFractionDigits: 0,
-        }).format(price);
-    };
+    const formatPrice = (price: number) => formatGlobalPrice(Number(price || 0));
 
     const formatTime = (dateStr: string) => {
         return new Date(dateStr).toLocaleString(locale === 'AR' ? 'ar-SA' : 'en-US');
@@ -316,7 +312,7 @@ export default function AuctionDetailsPage() {
 
                                 <div>
                                     <label className="text-white/60 text-sm block mb-2">
-                                        {isRTL ? 'المبلغ (ريال)' : 'Amount (SAR)'}
+                                        {isRTL ? 'قيمة المزايدة' : 'Bid Amount'}
                                     </label>
                                     <input
                                         type="number"

@@ -257,13 +257,24 @@ router.get('/cars', async (req, res) => {
         const limit = 20;
         const skip = (page - 1) * limit;
 
+        const showroomFilter = {
+            isActive: true,
+            isSold: false,
+            $or: [
+                { source: 'korean_import' },
+                { source: { $exists: false }, listingType: 'showroom' }
+            ]
+        };
+
         const [cars, total] = await Promise.all([
-            Car.find({ listingType: 'showroom', isActive: true, isSold: false }).sort({ createdAt: -1 }).skip(skip).limit(limit),
-            Car.countDocuments({ listingType: 'showroom', isActive: true, isSold: false })
+            Car.find(showroomFilter).sort({ createdAt: -1 }).skip(skip).limit(limit),
+            Car.countDocuments(showroomFilter)
         ]);
 
         const settings = await SiteSettings.getSettings();
         const showroomUrl = settings?.showroomSettings?.encarUrl || '';
+        const usdToSar = Number(settings?.currencySettings?.usdToSar || 3.75);
+        const usdToKrw = Number(settings?.currencySettings?.usdToKrw || 1350);
 
         const formattedCars = cars.map(car => ({
             id: car._id.toString(),
@@ -275,7 +286,9 @@ router.get('/cars', async (req, res) => {
             titleKr: car.title || '',
             year: car.year || 0,
             mileage: car.mileage || 0,
-            priceKrw: car.priceKrw || 0,
+            priceKrw: car.priceKrw || Math.round((Number(car.priceUsd || 0) * usdToKrw)),
+            priceUsd: Number(car.priceUsd || ((car.priceKrw || 0) / usdToKrw) || ((car.priceSar || car.price || 0) / usdToSar) || 0),
+            priceSar: Number(car.priceSar || car.price || Math.round((Number(car.priceUsd || 0) * usdToSar))),
             fuel: car.fuelType || '',
             fuelAr: car.fuelType || '',
             transmission: car.transmission || '',
@@ -324,6 +337,9 @@ router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
             return res.status(400).json({ success: false, message: 'لا يوجد رابط معرض محفوظ في الإعدادات.' });
         }
 
+        const usdToSar = Number(settings?.currencySettings?.usdToSar || 3.75);
+        const usdToKrw = Number(settings?.currencySettings?.usdToKrw || 1350);
+
         // Only scrape first 3 pages (up to 60 cars) per call to prevent timeout
         let totalCreated = 0;
         let totalUpdated = 0;
@@ -345,6 +361,8 @@ router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
                 if (!item.encarUrl) continue;
                 // Check if car exists
                 const existingCar = await Car.findOne({ externalUrl: item.encarUrl });
+                const computedUsd = Number((item.priceKrw / usdToKrw).toFixed(2));
+                const computedSar = Math.round(computedUsd * usdToSar);
                 if (!existingCar) {
                     await Car.create({
                         title: item.title,
@@ -352,14 +370,16 @@ router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
                         model: item.model,
                         year: item.year,
                         mileage: item.mileage,
-                        price: 0,
-                        priceSar: Math.round(item.priceKrw * 0.0028),
+                        price: computedSar,
+                        priceSar: computedSar,
+                        priceUsd: computedUsd,
                         priceKrw: item.priceKrw,
                         fuelType: item.fuelAr,
                         transmission: item.transmissionAr,
                         color: '',
                         category: 'sedan',
                         listingType: 'showroom',
+                        source: 'korean_import',
                         externalUrl: item.encarUrl,
                         images: Array.isArray(item.images) && item.images.length > 0
                             ? item.images
@@ -370,8 +390,12 @@ router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
                     });
                     totalCreated++;
                 } else {
+                    existingCar.priceUsd = computedUsd;
                     existingCar.priceKrw = item.priceKrw;
-                    existingCar.priceSar = Math.round(item.priceKrw * 0.0028);
+                    existingCar.priceSar = computedSar;
+                    existingCar.price = computedSar;
+                    existingCar.source = 'korean_import';
+                    existingCar.listingType = 'showroom';
                     const incomingImages = Array.isArray(item.images)
                         ? item.images.filter(Boolean)
                         : (item.imageUrl ? [item.imageUrl] : []);

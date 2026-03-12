@@ -17,9 +17,11 @@ const sparePartSchema = new mongoose.Schema({
   carModel: { type: String, trim: true },
   carYear: { type: Number },
   // السعر (قديم/أساسي) + أسعار متعددة عملات 
+  basePriceUsd: { type: Number },
   price: { type: Number, required: true },
   priceSar: { type: Number },
   priceUsd: { type: Number },
+  priceKrw: { type: Number },
   // وصف وصور
   description: { type: String },
   images: [String],

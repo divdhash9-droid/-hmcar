@@ -3,6 +3,7 @@
 const express = require('express');
 const router = express.Router();
 const SparePart = require('../../../models/SparePart');
+const SiteSettings = require('../../../models/SiteSettings');
 const { requireAuthAPI, requireAdmin } = require('../../../middleware/auth');
 
 function normalizeExternalImage(url) {
@@ -89,6 +90,10 @@ router.get('/', async (req, res) => {
             filter.carModel = new RegExp(carModel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
         }
 
+        const settings = await SiteSettings.getSettings().catch(() => null);
+        const usdToSar = Number(settings?.currencySettings?.usdToSar || 3.75);
+        const usdToKrw = Number(settings?.currencySettings?.usdToKrw || 1350);
+
         const parts = await SparePart.find(filter)
             .sort({ createdAt: -1 })
             .limit(Number(limit))
@@ -96,13 +101,22 @@ router.get('/', async (req, res) => {
 
         res.json({
             success: true,
-            parts: parts.map(p => ({
+            parts: parts.map(p => {
+                const sarPrice = Number(p.priceSar || p.price || 0);
+                const usdPrice = Number(p.priceUsd || p.basePriceUsd || (sarPrice > 0 ? (sarPrice / usdToSar) : 0));
+                const krwPrice = Number(p.priceKrw || Math.round(usdPrice * usdToKrw));
+
+                return ({
                 id: p._id,
                 name: p.name,
                 nameAr: p.nameAr || translatePartNameToArabic(p.name) || p.name,
                 brand: p.carMake || p.brand,
                 model: cleanModelName(p.carModel || ''),
-                price: p.priceSar || p.price || 0,
+                price: sarPrice,
+                priceSar: sarPrice,
+                priceUsd: Number(usdPrice.toFixed(2)),
+                priceKrw: krwPrice,
+                basePriceUsd: Number((p.basePriceUsd || usdPrice).toFixed(2)),
                 currency: 'SAR',
                 category: p.partType,
                 categoryAr: p.partTypeAr || toArabicCategory(p.partType),
@@ -116,7 +130,8 @@ router.get('/', async (req, res) => {
                 inStock: typeof p.inStock === 'boolean' ? p.inStock : (p.stockQty || 0) > 0,
                 description: p.description || '',
                 rareLevel: 3
-            }))
+                });
+            })
         });
     } catch (error) {
         console.error('API Parts error:', error);
@@ -248,6 +263,9 @@ router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
         const BRANDS_URL = `${BASE_URL}/brands`;
         const maxBrands = Number(req.body?.maxBrands || 25);
         const maxModelsPerBrand = Number(req.body?.maxModelsPerBrand || 4);
+        const settings = await SiteSettings.getSettings().catch(() => null);
+        const usdToSar = Number(settings?.currencySettings?.usdToSar || 3.75);
+        const usdToKrw = Number(settings?.currencySettings?.usdToKrw || 1350);
 
         // [[ARABIC_COMMENT]] 1. جلب الوكالات (Brands) من الصفحة الرئيسية للعلامات التجارية
         const { data: brandsHtml } = await axios.get(BRANDS_URL, {
@@ -373,6 +391,10 @@ router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
 
                         if (existing) continue;
 
+                        const sarPrice = Math.ceil(card.pPrice * 0.12);
+                        const usdPrice = Number((sarPrice / usdToSar).toFixed(2));
+                        const krwPrice = Math.round(usdPrice * usdToKrw);
+
                         await SparePart.create({
                             name: card.pName,
                             nameAr: translatePartNameToArabic(card.pName) || card.pName,
@@ -383,7 +405,10 @@ router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
                             carMakeLogoUrl: brand.logoUrl || '',
                             carModel: modelName,
                             price: card.pPrice,
-                            priceSar: Math.ceil(card.pPrice * 0.12),
+                            basePriceUsd: usdPrice,
+                            priceSar: sarPrice,
+                            priceUsd: usdPrice,
+                            priceKrw: krwPrice,
                             stockQty: 5,
                             inStock: true,
                             images: card.pImg ? [card.pImg] : [],

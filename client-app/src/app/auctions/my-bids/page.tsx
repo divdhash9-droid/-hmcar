@@ -10,6 +10,7 @@ import {
 import Navbar from "@/components/Navbar";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/LanguageContext";
+import { useSettings } from "@/lib/SettingsContext";
 import { api } from "@/lib/api";
 import Link from "next/link";
 
@@ -33,6 +34,7 @@ interface MyBid {
 
 export default function MyBidsPage() {
     const { isRTL } = useLanguage();
+    const { formatPrice } = useSettings();
     const [bids, setBids] = useState<MyBid[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState<'all' | BidStatus>('all');
@@ -301,8 +303,7 @@ export default function MyBidsPage() {
                                                             "text-2xl font-black italic",
                                                             isLeading ? "text-green-400" : "text-white"
                                                         )}>
-                                                            {Number(bid.myAmount).toLocaleString()}
-                                                            <span className="text-xs font-bold ml-1 opacity-60">SAR</span>
+                                                            {formatPrice ? formatPrice(Number(bid.myAmount)) : `${Number(bid.myAmount).toLocaleString()} SAR`}
                                                         </div>
                                                     </div>
                                                     <div>
@@ -310,8 +311,7 @@ export default function MyBidsPage() {
                                                             {isRTL ? 'أعلى مزايدة' : 'HIGHEST BID'}
                                                         </div>
                                                         <div className="text-2xl font-black italic text-cinematic-neon-blue">
-                                                            {Number(bid.currentHighest).toLocaleString()}
-                                                            <span className="text-xs font-bold ml-1 opacity-60">SAR</span>
+                                                            {formatPrice ? formatPrice(Number(bid.currentHighest)) : `${Number(bid.currentHighest).toLocaleString()} SAR`}
                                                         </div>
                                                     </div>
                                                     <div>
@@ -333,7 +333,7 @@ export default function MyBidsPage() {
                                                         <div className="flex justify-between text-[9px] font-black text-white/30 uppercase tracking-widest">
                                                             <span>{isRTL ? 'أنت متأخر بـ:' : 'You are behind by:'}</span>
                                                             <span className="text-cinematic-neon-yellow">
-                                                                {(bid.currentHighest - bid.myAmount).toLocaleString()} SAR
+                                                                {formatPrice ? formatPrice(Number(bid.currentHighest - bid.myAmount)) : `${(bid.currentHighest - bid.myAmount).toLocaleString()} SAR`}
                                                             </span>
                                                         </div>
                                                         <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">

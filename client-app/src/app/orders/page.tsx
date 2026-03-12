@@ -9,9 +9,12 @@ import { useLanguage } from "@/lib/LanguageContext";
 import { api } from "@/lib/api";
 import Link from "next/link";
 import ClientPageHeader from "@/components/ClientPageHeader";
+import { useSettings } from "@/lib/SettingsContext";
+import { formatAmountWithSnapshot, getOrderGrandTotalSar } from "@/lib/orderCurrency";
 
 export default function OrdersPage() {
     const { t, isRTL } = useLanguage();
+    const { displayCurrency, currency } = useSettings();
     const [orders, setOrders] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all');
@@ -206,7 +209,12 @@ export default function OrdersPage() {
                                                             {isRTL ? 'المبلغ الإجمالي' : 'TOTAL AMOUNT'}
                                                         </div>
                                                         <div className="text-xl font-black text-cinematic-neon-blue italic">
-                                                            {Number(order.totalAmount || 0).toLocaleString()} <span className="text-xs">SAR</span>
+                                                            {formatAmountWithSnapshot(
+                                                                getOrderGrandTotalSar(order),
+                                                                displayCurrency,
+                                                                order,
+                                                                currency
+                                                            )}
                                                         </div>
                                                     </div>
                                                     <div className="h-8 w-[1px] bg-white/10" />

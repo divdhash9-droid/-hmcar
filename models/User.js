@@ -89,6 +89,9 @@ const userSchema = new mongoose.Schema({
   registrationIP: { type: String, default: '' },     // IP عند التسجيل
   lastLoginIP: { type: String, default: '' },        // آخر IP تسجيل دخول
 
+  // مفتاح اسم المشتري (Buyer Name Key) للعقود والتوثيق
+  buyerNameKey: { type: String, unique: true, required: false, sparse: true },
+
   // How the account was created
   createdVia: {
     type: String,

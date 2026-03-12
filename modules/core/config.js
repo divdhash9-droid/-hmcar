@@ -15,9 +15,33 @@
 
 const dotenv = require('dotenv');
 const path = require('path');
+const crypto = require('crypto');
 
 // تحميل متغيرات البيئة
 dotenv.config();
+
+const isProduction = (process.env.NODE_ENV || 'development') === 'production';
+const isTestEnv = (process.env.NODE_ENV || '').toLowerCase() === 'test';
+const isMochaRun = process.argv.some((arg) => String(arg).toLowerCase().includes('mocha'));
+const forceMemoryDb = (isTestEnv || isMochaRun) && process.env.TEST_USE_REMOTE_DB !== 'true';
+const defaultMongoUri = forceMemoryDb
+  ? 'memory://car-auction'
+  : 'mongodb://127.0.0.1:27017/car-auction';
+
+function resolveSecret(envName) {
+  const value = process.env[envName];
+  if (value) return value;
+
+  if (isProduction) {
+    throw new Error(`Missing required environment variable: ${envName}`);
+  }
+
+  // Generate a per-run secret in development to avoid shipping static defaults.
+  return crypto.randomBytes(64).toString('hex');
+}
+
+const sessionSecret = resolveSecret('SESSION_SECRET');
+const jwtSecret = resolveSecret('JWT_SECRET');
 
 /**
  * إعدادات قاعدة البيانات
@@ -27,7 +51,9 @@ const database = {
   type: 'mongodb',
 
   // معلومات الاتصال
-  uri: process.env.MONGO_URI || process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/car-auction',
+  uri: forceMemoryDb
+    ? defaultMongoUri
+    : (process.env.MONGO_URI || process.env.MONGODB_URI || defaultMongoUri),
 
   // خيارات الاتصال
   options: {
@@ -57,7 +83,7 @@ const server = {
 
   // إعدادات الجلسات
   session: {
-    secret: process.env.SESSION_SECRET || 'hm-car-secret-key',
+    secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -80,7 +106,7 @@ const server = {
  */
 const security = {
   // مفتاح JWT
-  jwtSecret: process.env.JWT_SECRET || 'hm-car-jwt-secret',
+  jwtSecret,
 
   // إعدادات CORS
   cors: {

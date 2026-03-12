@@ -11,6 +11,7 @@ import {
 import { api } from '@/lib/api';
 import { useLocale } from '@/hooks/useLocale';
 import ClientPageHeader from '@/components/ClientPageHeader';
+import { useSettings } from '@/lib/SettingsContext';
 
 const rawText = (value: string) => value;
 
@@ -43,7 +44,8 @@ export default function ComparisonsPageWrapper() {
 
 function ComparisonsPage() {
     const searchParams = useSearchParams();
-    const { isRTL, locale } = useLocale();
+    const { isRTL } = useLocale();
+    const { formatPrice: formatGlobalPrice } = useSettings();
     const [cars, setCars] = useState<CarData[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -95,13 +97,7 @@ function ComparisonsPage() {
         }
     };
 
-    const formatPrice = (price: number) => {
-        return new Intl.NumberFormat(locale === 'AR' ? 'ar-SA' : 'en-US', {
-            style: 'currency',
-            currency: 'SAR',
-            minimumFractionDigits: 0,
-        }).format(price);
-    };
+    const formatPrice = (price: number) => formatGlobalPrice(Number(price || 0));
 
     const specs = [
         { key: 'price', label: isRTL ? 'السعر' : 'Price', icon: null, format: (v: any) => formatPrice(v) },

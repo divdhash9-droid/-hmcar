@@ -27,7 +27,7 @@ const rawText = (value: string) => value;
 
 export default function CartPage() {
     const { isRTL } = useLanguage();
-    const { formatPrice, socialLinks } = useSettings();
+    const { formatPriceFromUsd, socialLinks, currency } = useSettings();
     const [cart, setCart] = useState<ProductModalData[]>([]);
     const [copied, setCopied] = useState(false);
     const [sentToWhatsapp, setSentToWhatsapp] = useState(false);
@@ -56,8 +56,18 @@ export default function CartPage() {
         dispatchCartUpdate();
     }, []);
 
-    // [[ARABIC_COMMENT]] إجمالي السعر - عرض مجموع الأسعار
-    const total = cart.reduce((sum, item) => sum + (item.price || 0), 0);
+    const toBaseUsd = useCallback((item: ProductModalData) => {
+        const amount = Number(item.price || 0);
+        if (!Number.isFinite(amount) || amount <= 0) return 0;
+
+        const sourceCurrency = (item.displayCurrency || CURRENCY_SAR) as typeof CURRENCY_SAR | typeof CURRENCY_USD | typeof CURRENCY_KRW;
+        if (sourceCurrency === CURRENCY_USD) return amount;
+        if (sourceCurrency === CURRENCY_KRW) return amount / Number(currency.usdToKrw || 1);
+        return amount / Number(currency.usdToSar || 1);
+    }, [currency.usdToKrw, currency.usdToSar]);
+
+    // [[ARABIC_COMMENT]] إجمالي السعر محسوب على أساس USD ثم يُعرض بالعملة المختارة
+    const totalUsd = cart.reduce((sum, item) => sum + toBaseUsd(item), 0);
 
     // [[ARABIC_COMMENT]] مشاركة رابط السلة - يُنشئ رابطاً يحتوي IDs المنتجات
     const shareCart = useCallback(() => {
@@ -76,13 +86,13 @@ export default function CartPage() {
         const phone = (socialLinks?.whatsapp || DEFAULT_WHATSAPP).replace(/\D/g, '');
 
         const itemsList = cart.map((item, i) => {
-            const price = formatPrice
-                ? formatPrice(item.price, item.displayCurrency as typeof CURRENCY_SAR | typeof CURRENCY_USD | typeof CURRENCY_KRW | undefined)
+            const price = formatPriceFromUsd
+                ? formatPriceFromUsd(toBaseUsd(item))
                 : `${item.price?.toLocaleString()} ${CURRENCY_SAR}`;
             return `${i + 1}. ${item.type === ITEM_TYPE_CAR ? '🚗' : '🔧'} *${item.title}* - ${price}`;
         }).join('\n');
 
-        const totalStr = `${total.toLocaleString()} ${CURRENCY_SAR}`;
+        const totalStr = formatPriceFromUsd ? formatPriceFromUsd(totalUsd) : `${totalUsd.toLocaleString()} ${CURRENCY_SAR}`;
         const shareLink = `${window.location.origin}/cart/share?items=${cart.map(i => i.id).join(',')}`;
 
         const msg = isRTL
@@ -92,7 +102,7 @@ export default function CartPage() {
         window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
         setSentToWhatsapp(true);
         setTimeout(() => setSentToWhatsapp(false), 3000);
-    }, [cart, socialLinks, formatPrice, total, isRTL]);
+    }, [cart, socialLinks, formatPriceFromUsd, totalUsd, isRTL, toBaseUsd]);
 
     return (
         <div className="relative min-h-screen bg-cinematic-darker text-white" dir={isRTL ? 'rtl' : 'ltr'}>
@@ -165,8 +175,8 @@ export default function CartPage() {
                         {/* [[ARABIC_COMMENT]] قائمة المنتجات */}
                         <AnimatePresence mode="popLayout">
                             {cart.map((item, i) => {
-                                const displayPrice = formatPrice
-                                    ? formatPrice(item.price, item.displayCurrency as typeof CURRENCY_SAR | typeof CURRENCY_USD | typeof CURRENCY_KRW | undefined)
+                                const displayPrice = formatPriceFromUsd
+                                    ? formatPriceFromUsd(toBaseUsd(item))
                                     : `${item.price?.toLocaleString()} ${CURRENCY_SAR}`;
                                 const img = item.images?.[0] || EMPTY_STRING;
                                 return (
@@ -231,7 +241,7 @@ export default function CartPage() {
                                     {isRTL ? rawText('الإجمالي التقريبي') : rawText('ESTIMATED TOTAL')}
                                 </span>
                                 <span className="text-xl font-black text-cinematic-neon-gold">
-                                    {formatPrice ? formatPrice(total) : `${total.toLocaleString()} SAR`}
+                                    {formatPriceFromUsd ? formatPriceFromUsd(totalUsd) : `${totalUsd.toLocaleString()} SAR`}
                                 </span>
                             </div>
                             <p className="text-[10px] text-white/25 text-center">

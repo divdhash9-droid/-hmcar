@@ -2,6 +2,7 @@
 
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 const User = require('../models/User');
 
 async function addDefaultPasswords() {
@@ -19,15 +20,15 @@ async function addDefaultPasswords() {
 
     console.log(`📊 Found ${usersWithoutPassword.length} users without passwords`);
 
-    // Default password
-    const defaultPassword = '123456';
+    // Use explicit env password or generate a temporary one for this run.
+    const defaultPassword = process.env.DEFAULT_USER_PASSWORD || crypto.randomBytes(8).toString('hex');
     const hashedPassword = await bcrypt.hash(defaultPassword, 10);
 
     // Update each user
     for (const user of usersWithoutPassword) {
       user.password = hashedPassword;
       await user.save();
-      console.log(`✅ Added password for: ${user.name} (password: ${defaultPassword})`);
+      console.log(`✅ Added password for: ${user.name}`);
     }
 
     console.log('🎉 All password additions completed!');

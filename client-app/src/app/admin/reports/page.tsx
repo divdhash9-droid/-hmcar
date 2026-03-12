@@ -11,6 +11,7 @@ import Link from 'next/link';
 import { useLanguage } from '@/lib/LanguageContext';
 import { cn } from '@/lib/utils';
 import { api } from '@/lib/api';
+import { useSettings } from '@/lib/SettingsContext';
 
 interface ReportStat {
     label: string;
@@ -35,33 +36,66 @@ interface DetailedStatItem {
         month: number;
     };
     revenue: number;
+    revenueUsd?: number;
+    revenueKrw?: number;
     orders: number;
     count?: number;
 }
 
+interface TopCarItem {
+    name: string;
+    sales: number;
+    revenueSar: number;
+    revenueUsd?: number;
+    revenueKrw?: number;
+}
+
 export default function AdminReportsPage() {
     const { isRTL } = useLanguage();
+    const { displayCurrency } = useSettings();
     const [loading, setLoading] = useState(true);
     const [period, setPeriod] = useState<'week' | 'month' | 'year'>('month');
     const [stats, setStats] = useState<ReportStat[]>([]);
     const [chartData, setChartData] = useState<MonthData[]>([]);
-    const [topCars, setTopCars] = useState<{ name: string; sales: number; revenue: number }[]>([]);
+    const [topCars, setTopCars] = useState<TopCarItem[]>([]);
+
+    // [[ARABIC_COMMENT]] اختيار قيمة الإيراد حسب العملة النشطة في الواجهة
+    const pickRevenueByCurrency = (obj: { revenue?: number; revenueUsd?: number; revenueKrw?: number; totalRevenue?: number; totalRevenueUsd?: number; totalRevenueKrw?: number; }) => {
+        if (displayCurrency === 'USD') {
+            return Number(obj.revenueUsd ?? obj.totalRevenueUsd ?? 0);
+        }
+        if (displayCurrency === 'KRW') {
+            return Number(obj.revenueKrw ?? obj.totalRevenueKrw ?? 0);
+        }
+        return Number(obj.revenue ?? obj.totalRevenue ?? 0);
+    };
+
+    // [[ARABIC_COMMENT]] تنسيق رقم خام إلى نص مالي مناسب (SAR/USD/KRW)
+    const formatRawByCurrency = (value: number) => {
+        const locale = displayCurrency === 'USD' ? 'en-US' : displayCurrency === 'KRW' ? 'ko-KR' : 'ar-SA';
+        const symbol = displayCurrency === 'USD' ? '$' : displayCurrency === 'KRW' ? '₩' : 'ر.س';
+        return `${symbol} ${new Intl.NumberFormat(locale, {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: displayCurrency === 'USD' ? 2 : 0,
+        }).format(Number(value || 0))}`;
+    };
 
     const loadReports = async () => {
         setLoading(true);
         try {
+            // [[ARABIC_COMMENT]] جلب الملخص + البيانات التفصيلية للفترة المختارة من نفس API
             const [summaryRes, detailedRes] = await Promise.all([
-                api.analytics.getSummary(),
-                api.analytics.getDetailed()
+                api.analytics.getSummary(period),
+                api.analytics.getDetailed(period)
             ]);
 
             const summary = summaryRes?.stats || {};
-            const detailed = detailedRes?.detailed || { monthlyRevenue: [], monthlyCars: [] };
+            const detailed = detailedRes?.detailed || { monthlyRevenue: [], monthlyCars: [], topCars: [] };
 
             setStats([
                 {
                     label: isRTL ? 'إجمالي الإيرادات' : 'TOTAL REVENUE',
-                    value: `${(summary.totalRevenue || 0).toLocaleString()} SAR`,
+                    value: formatRawByCurrency(pickRevenueByCurrency(summary)),
                     sub: isRTL ? 'تراكمي' : 'Cumulative',
                     trend: 12.5,
                     icon: DollarSign,
@@ -121,7 +155,7 @@ export default function AdminReportsPage() {
                 const carCount = detailed.monthlyCars.find((c: DetailedStatItem) => c._id.month === item._id.month && c._id.year === item._id.year)?.count || 0;
                 return {
                     month: months[item._id.month - 1],
-                    revenue: item.revenue,
+                    revenue: pickRevenueByCurrency(item),
                     orders: item.orders,
                     cars: carCount
                 };
@@ -130,34 +164,55 @@ export default function AdminReportsPage() {
             // Ensure we have at least some data if database is empty for the last 6 months
             if (formattedChartData.length === 0) {
                 setChartData([
-                    { month: 'Sep', revenue: 180000, orders: 8, cars: 5 },
-                    { month: 'Oct', revenue: 320000, orders: 14, cars: 9 },
-                    { month: 'Nov', revenue: 280000, orders: 11, cars: 7 },
-                    { month: 'Dec', revenue: 480000, orders: 19, cars: 13 },
-                    { month: 'Jan', revenue: 390000, orders: 16, cars: 10 },
-                    { month: 'Feb', revenue: 520000, orders: 21, cars: 14 },
+                    { month: 'Sep', revenue: pickRevenueByCurrency({ revenue: 180000, revenueUsd: 48000, revenueKrw: 64800000 }), orders: 8, cars: 5 },
+                    { month: 'Oct', revenue: pickRevenueByCurrency({ revenue: 320000, revenueUsd: 85333, revenueKrw: 115200000 }), orders: 14, cars: 9 },
+                    { month: 'Nov', revenue: pickRevenueByCurrency({ revenue: 280000, revenueUsd: 74666, revenueKrw: 100800000 }), orders: 11, cars: 7 },
+                    { month: 'Dec', revenue: pickRevenueByCurrency({ revenue: 480000, revenueUsd: 128000, revenueKrw: 172800000 }), orders: 19, cars: 13 },
+                    { month: 'Jan', revenue: pickRevenueByCurrency({ revenue: 390000, revenueUsd: 104000, revenueKrw: 140400000 }), orders: 16, cars: 10 },
+                    { month: 'Feb', revenue: pickRevenueByCurrency({ revenue: 520000, revenueUsd: 138666, revenueKrw: 187200000 }), orders: 21, cars: 14 },
                 ]);
             } else {
                 setChartData(formattedChartData);
+            }
+
+            // [[ARABIC_COMMENT]] ربط أفضل المبيعات (Top Cars) مباشرة من الباكند
+            const apiTopCars: TopCarItem[] = Array.isArray(detailed.topCars)
+                ? detailed.topCars.map((car: any) => ({
+                    name: String(car.name || 'Unknown'),
+                    sales: Number(car.sales || 0),
+                    revenueSar: Number(car.revenueSar || 0),
+                    revenueUsd: Number(car.revenueUsd || 0),
+                    revenueKrw: Number(car.revenueKrw || 0),
+                }))
+                : [];
+
+            if (apiTopCars.length > 0) {
+                setTopCars(apiTopCars);
+            } else {
+                setTopCars([
+                    { name: 'Mercedes-Benz S-Class 2024', sales: 8, revenueSar: 3600000, revenueUsd: 960000, revenueKrw: 1296000000 },
+                    { name: 'BMW M5 Competition 2023', sales: 6, revenueSar: 2280000, revenueUsd: 608000, revenueKrw: 820800000 },
+                    { name: 'Porsche 911 Turbo S 2024', sales: 5, revenueSar: 3600000, revenueUsd: 960000, revenueKrw: 1296000000 },
+                    { name: 'Range Rover Autobiography 2024', sales: 7, revenueSar: 2800000, revenueUsd: 746667, revenueKrw: 1008000000 },
+                    { name: 'Ferrari Roma 2023', sales: 3, revenueSar: 2400000, revenueUsd: 640000, revenueKrw: 864000000 },
+                ]);
             }
 
         } catch (err) {
             console.error("Failed to load reports", err);
             // Default placeholder stats on error
             setStats([
-                { label: isRTL ? 'إجمالي الإيرادات' : 'TOTAL REVENUE', value: '2,450,000 SAR', sub: isRTL ? 'هذا الشهر' : 'This period', trend: 12.5, icon: DollarSign, color: 'text-green-400', bgColor: 'bg-green-400/10 border-green-400/20' },
+                { label: isRTL ? 'إجمالي الإيرادات' : 'TOTAL REVENUE', value: formatRawByCurrency(pickRevenueByCurrency({ totalRevenue: 2450000, totalRevenueUsd: 653333, totalRevenueKrw: 882000000 })), sub: isRTL ? 'هذا الشهر' : 'This period', trend: 12.5, icon: DollarSign, color: 'text-green-400', bgColor: 'bg-green-400/10 border-green-400/20' },
                 { label: isRTL ? 'إجمالي الطلبات' : 'TOTAL ORDERS', value: 48, sub: isRTL ? 'طلبات مكتملة' : 'Completed', trend: 8.3, icon: ShoppingCart, color: 'text-orange-400', bgColor: 'bg-orange-400/10 border-orange-400/20' },
                 { label: isRTL ? 'السيارات المباعة' : 'CARS SOLD', value: 32, sub: isRTL ? 'من المخزون' : 'From inventory', trend: -3.1, icon: Car, color: 'text-yellow-400', bgColor: 'bg-yellow-400/10 border-yellow-400/20' },
             ]);
-        }
 
-        setTopCars([
-            { name: 'Mercedes-Benz S-Class 2024', sales: 8, revenue: 3600000 },
-            { name: 'BMW M5 Competition 2023', sales: 6, revenue: 2280000 },
-            { name: 'Porsche 911 Turbo S 2024', sales: 5, revenue: 3600000 },
-            { name: 'Range Rover Autobiography 2024', sales: 7, revenue: 2800000 },
-            { name: 'Ferrari Roma 2023', sales: 3, revenue: 2400000 },
-        ]);
+            setTopCars([
+                { name: 'Mercedes-Benz S-Class 2024', sales: 8, revenueSar: 3600000, revenueUsd: 960000, revenueKrw: 1296000000 },
+                { name: 'BMW M5 Competition 2023', sales: 6, revenueSar: 2280000, revenueUsd: 608000, revenueKrw: 820800000 },
+                { name: 'Porsche 911 Turbo S 2024', sales: 5, revenueSar: 3600000, revenueUsd: 960000, revenueKrw: 1296000000 },
+            ]);
+        }
 
         setLoading(false);
     };
@@ -165,7 +220,7 @@ export default function AdminReportsPage() {
     useEffect(() => {
         loadReports();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [period]);
+    }, [period, displayCurrency]);
 
     const maxRevenue = Math.max(...chartData.map(d => d.revenue));
 
@@ -187,17 +242,17 @@ export default function AdminReportsPage() {
 
         // Chart section
         rows.push('=== MONTHLY REVENUE ===');
-        rows.push('Month,Revenue (SAR),Orders,Cars Sold');
+        rows.push(`Month,Revenue (${displayCurrency}),Orders,Cars Sold`);
         chartData.forEach(d => {
-            rows.push(`${d.month},${d.revenue},${d.orders},${d.cars}`);
+            rows.push(`${d.month},${Number(d.revenue || 0)},${d.orders},${d.cars}`);
         });
         rows.push('');
 
         // Top cars section
         rows.push('=== TOP SELLING CARS ===');
-        rows.push('Rank,Car,Units Sold,Revenue (SAR)');
+        rows.push(`Rank,Car,Units Sold,Revenue (${displayCurrency})`);
         topCars.forEach((car, i) => {
-            rows.push(`${i + 1},"${car.name}",${car.sales},${car.revenue}`);
+            rows.push(`${i + 1},"${car.name}",${car.sales},${pickRevenueByCurrency({ revenue: car.revenueSar, revenueUsd: car.revenueUsd, revenueKrw: car.revenueKrw })}`);
         });
 
         const csvContent = rows.join('\n');
@@ -277,7 +332,7 @@ export default function AdminReportsPage() {
                             <div>
                                 <p className="cockpit-mono text-[9px] text-orange-500/50 uppercase tracking-[0.2em] mb-1">{isRTL ? 'الإيرادات الشهرية' : 'MONTHLY REVENUE'}</p>
                                 <div className="cockpit-num text-2xl font-black text-orange-400">
-                                    {chartData.reduce((sum, d) => sum + d.revenue, 0).toLocaleString()} <span className="text-sm">SAR</span>
+                                    {formatRawByCurrency(chartData.reduce((sum, d) => sum + d.revenue, 0))}
                                 </div>
                             </div>
                         </div>
@@ -340,7 +395,14 @@ export default function AdminReportsPage() {
                         <div className="mt-6 pt-4 border-t border-orange-500/10 space-y-2">
                             <div className="flex justify-between items-center">
                                 <span className="cockpit-mono text-[9px] text-white/30 uppercase">{isRTL ? 'إجمالي الإيرادات' : 'TOTAL REVENUE'}</span>
-                                <span className="cockpit-num text-[11px] text-orange-400">{topCars.reduce((s, c) => s + c.revenue, 0).toLocaleString()} SAR</span>
+                                <span className="cockpit-num text-[11px] text-orange-400">
+                                    {formatRawByCurrency(
+                                        topCars.reduce(
+                                            (s, c) => s + pickRevenueByCurrency({ revenue: c.revenueSar, revenueUsd: c.revenueUsd, revenueKrw: c.revenueKrw }),
+                                            0
+                                        )
+                                    )}
+                                </span>
                             </div>
                             <div className="flex justify-between items-center">
                                 <span className="cockpit-mono text-[9px] text-white/30 uppercase">{isRTL ? 'إجمالي المبيعات' : 'TOTAL UNITS'}</span>
@@ -354,7 +416,7 @@ export default function AdminReportsPage() {
                 <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
                     {[
                         { label: isRTL ? 'معدل التحويل' : 'CONVERSION RATE', value: '68%', icon: TrendingUp, color: 'text-green-400' },
-                        { label: isRTL ? 'متوسط قيمة الطلب' : 'AVG ORDER VALUE', value: '51K SAR', icon: DollarSign, color: 'text-orange-400' },
+                        { label: isRTL ? 'متوسط قيمة الطلب' : 'AVG ORDER VALUE', value: formatRawByCurrency(pickRevenueByCurrency({ revenue: 51000, revenueUsd: 13600, revenueKrw: 18360000 })), icon: DollarSign, color: 'text-orange-400' },
                         { label: isRTL ? 'معدل الاسترداد' : 'RETURN RATE', value: '2.1%', icon: ArrowDownRight, color: 'text-red-400' },
                         { label: isRTL ? 'رضا العملاء' : 'CLIENT SATISFACTION', value: '96%', icon: Users, color: 'text-purple-400' },
                     ].map((item, i) => (

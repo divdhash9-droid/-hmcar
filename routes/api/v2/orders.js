@@ -3,7 +3,13 @@
 const express = require('express');
 const router = express.Router();
 const Order = require('../../../models/Order');
+const SiteSettings = require('../../../models/SiteSettings');
 const { requireAuthAPI } = require('../../../middleware/auth');
+
+function toFiniteNumber(value) {
+    const num = Number(value);
+    return Number.isFinite(num) ? num : 0;
+}
 
 // GET /api/v2/orders - جلب طلبات المستخدم (أو الكل للأدمن)
 router.get('/', requireAuthAPI, async (req, res) => {
@@ -52,6 +58,64 @@ router.get('/', requireAuthAPI, async (req, res) => {
 router.post('/', async (req, res) => {
     try {
         const { buyerId, items, pricing, notes, channel = 'whatsapp' } = req.body;
+        const settings = await SiteSettings.getSettings().catch(() => null);
+
+        const usdToSar = toFiniteNumber(req.body?.currencySnapshot?.usdToSar) || toFiniteNumber(settings?.currencySettings?.usdToSar) || 3.75;
+        const usdToKrw = toFiniteNumber(req.body?.currencySnapshot?.usdToKrw) || toFiniteNumber(settings?.currencySettings?.usdToKrw) || 1350;
+        const activeCurrency = String(req.body?.currencySnapshot?.activeCurrency || settings?.currencySettings?.activeCurrency || 'SAR').toUpperCase();
+
+        const normalizedPricing = {
+            subTotalSar: toFiniteNumber(pricing?.subTotalSar),
+            subTotalUsd: toFiniteNumber(pricing?.subTotalUsd),
+            shippingSar: toFiniteNumber(pricing?.shippingSar),
+            shippingUsd: toFiniteNumber(pricing?.shippingUsd),
+            grandTotalSar: toFiniteNumber(pricing?.grandTotalSar),
+            grandTotalUsd: toFiniteNumber(pricing?.grandTotalUsd),
+        };
+
+        if (!normalizedPricing.subTotalUsd && normalizedPricing.subTotalSar > 0) {
+            normalizedPricing.subTotalUsd = Number((normalizedPricing.subTotalSar / usdToSar).toFixed(2));
+        }
+        if (!normalizedPricing.subTotalSar && normalizedPricing.subTotalUsd > 0) {
+            normalizedPricing.subTotalSar = Number((normalizedPricing.subTotalUsd * usdToSar).toFixed(2));
+        }
+
+        if (!normalizedPricing.shippingUsd && normalizedPricing.shippingSar > 0) {
+            normalizedPricing.shippingUsd = Number((normalizedPricing.shippingSar / usdToSar).toFixed(2));
+        }
+        if (!normalizedPricing.shippingSar && normalizedPricing.shippingUsd > 0) {
+            normalizedPricing.shippingSar = Number((normalizedPricing.shippingUsd * usdToSar).toFixed(2));
+        }
+
+        if (!normalizedPricing.grandTotalUsd && normalizedPricing.grandTotalSar > 0) {
+            normalizedPricing.grandTotalUsd = Number((normalizedPricing.grandTotalSar / usdToSar).toFixed(2));
+        }
+        if (!normalizedPricing.grandTotalSar && normalizedPricing.grandTotalUsd > 0) {
+            normalizedPricing.grandTotalSar = Number((normalizedPricing.grandTotalUsd * usdToSar).toFixed(2));
+        }
+
+        normalizedPricing.exchangeSnapshot = {
+            usdToSar,
+            usdToKrw,
+            activeCurrency: ['SAR', 'USD', 'KRW'].includes(activeCurrency) ? activeCurrency : 'SAR',
+            capturedAt: new Date(),
+        };
+
+        const normalizedItems = Array.isArray(items)
+            ? items.map((item) => {
+                const unitPriceSar = toFiniteNumber(item?.unitPriceSar);
+                const unitPriceUsd = toFiniteNumber(item?.unitPriceUsd);
+
+                const resolvedUnitPriceSar = unitPriceSar || (unitPriceUsd > 0 ? Number((unitPriceUsd * usdToSar).toFixed(2)) : 0);
+                const resolvedUnitPriceUsd = unitPriceUsd || (unitPriceSar > 0 ? Number((unitPriceSar / usdToSar).toFixed(2)) : 0);
+
+                return {
+                    ...item,
+                    unitPriceSar: resolvedUnitPriceSar,
+                    unitPriceUsd: resolvedUnitPriceUsd,
+                };
+            })
+            : [];
 
         // توليد رقم طلب فريد
         const orderNumber = `HM-${new Date().getFullYear()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
@@ -59,8 +123,8 @@ router.post('/', async (req, res) => {
         const newOrder = new Order({
             orderNumber,
             buyer: buyerId || req.user?.userId, // قد يكون ضيفاً أحياناً
-            items,
-            pricing,
+            items: normalizedItems,
+            pricing: normalizedPricing,
             notes,
             channel,
             status: 'pending'

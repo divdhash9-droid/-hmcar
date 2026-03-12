@@ -10,10 +10,38 @@ const { cacheResponse, invalidateCache } = require('../../../middleware/cache');
 // List brands
 router.get('/', cacheResponse(3600), async (req, res) => {
   try {
-    const { category } = req.query;
-    let query = {};
+    const { category, targetShowroom, includeInactive } = req.query;
+    let query = includeInactive === 'true' ? {} : { isActive: true };
     if (category === 'cars') query = { $or: [{ forCars: true }, { forSpareParts: false }] };
     if (category === 'parts') query = { $or: [{ forSpareParts: true }, { forCars: false }] };
+
+    if (includeInactive !== 'true') {
+      query = { ...query, isActive: true };
+    }
+
+    if (targetShowroom === 'hm_local' || targetShowroom === 'korean_import') {
+      query = {
+        ...query,
+        $and: [
+          ...(query.$and || []),
+          {
+            $or: [
+              { targetShowroom },
+              { targetShowroom: 'both' },
+              { targetShowroom: { $exists: false } }
+            ]
+          }
+        ]
+      };
+      delete query.$or;
+      if (category === 'cars') {
+        query.$and.push({ $or: [{ forCars: true }, { forSpareParts: false }] });
+      }
+      if (category === 'parts') {
+        query.$and.push({ $or: [{ forSpareParts: true }, { forCars: false }] });
+      }
+    }
+
     const brands = await Brand.find(query).sort({ name: 1 }).lean();
     res.json({ success: true, brands });
   } catch (e) {
@@ -24,7 +52,7 @@ router.get('/', cacheResponse(3600), async (req, res) => {
 // Create brand (Admin only)
 router.post('/', requireAuthAPI, requirePermissionAPI('manage_brands'), invalidateCache('/api/v2/brands*'), async (req, res) => {
   try {
-    const { name, logoUrl, category, location, phone, whatsapp, description, description_ar, models } = req.body || {};
+    const { name, logoUrl, category, location, phone, whatsapp, description, description_ar, models, targetShowroom, isActive } = req.body || {};
     if (category === 'parts' || category === 'both') {
       return res.status(403).json({
         success: false,
@@ -42,6 +70,8 @@ router.post('/', requireAuthAPI, requirePermissionAPI('manage_brands'), invalida
       whatsapp: whatsapp || '',
       description: description || '',
       description_ar: description_ar || '',
+      targetShowroom: ['hm_local', 'korean_import', 'both'].includes(targetShowroom) ? targetShowroom : 'hm_local',
+      isActive: typeof isActive === 'boolean' ? isActive : true,
     };
     const brand = await Brand.create(payload);
 
@@ -69,7 +99,7 @@ router.post('/', requireAuthAPI, requirePermissionAPI('manage_brands'), invalida
 // Update brand (Admin only)
 router.put('/:id', requireAuthAPI, requirePermissionAPI('manage_brands'), invalidateCache('/api/v2/brands*'), async (req, res) => {
   try {
-    const { name, logoUrl, category, location, phone, whatsapp, description, description_ar, models } = req.body || {};
+    const { name, logoUrl, category, location, phone, whatsapp, description, description_ar, models, targetShowroom, isActive } = req.body || {};
     if (category === 'parts' || category === 'both') {
       return res.status(403).json({
         success: false,
@@ -86,6 +116,10 @@ router.put('/:id', requireAuthAPI, requirePermissionAPI('manage_brands'), invali
       ...(description !== undefined ? { description } : {}),
       ...(description_ar !== undefined ? { description_ar } : {}),
       ...(models !== undefined ? { models: Array.isArray(models) ? models : [] } : {}),
+      ...(targetShowroom !== undefined && ['hm_local', 'korean_import', 'both'].includes(targetShowroom)
+        ? { targetShowroom }
+        : {}),
+      ...(isActive !== undefined ? { isActive: Boolean(isActive) } : {}),
       ...(category
         ? { forCars: category === 'cars' || category === 'both', forSpareParts: category === 'parts' || category === 'both' }
         : {}),

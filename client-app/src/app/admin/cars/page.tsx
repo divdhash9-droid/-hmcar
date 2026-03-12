@@ -14,7 +14,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, Globe, ArrowLeftCircle, Car as CarIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -25,6 +25,7 @@ import { useToast } from '@/lib/ToastContext';
 // ── المكونات المقسمة ──
 import CarCard from './_components/CarCard';
 import CarModal from './_components/CarModal';
+import { motion } from 'framer-motion';
 
 // ── نوع بيانات السيارة ──
 type Car = {
@@ -49,6 +50,8 @@ type Car = {
     agency?: string | { _id: string; name: string };
     usdPrice?: number;
     krwPrice?: number;
+    priceUsd?: number;
+    priceKrw?: number;
 };
 
 // ── نوع بيانات نموذج الإضافة/التعديل ──
@@ -168,8 +171,8 @@ export default function AdminCarsPage() {
         setEditingCar(car);
         const sarPrice = car.price || 0;
         // Use existing priceUsd/priceKrw if available, otherwise calculate
-        const usd = car.usdPrice ?? (((car as any).priceUsd) || parseFloat((sarPrice / usdToSar).toFixed(2)));
-        const krw = car.krwPrice ?? (((car as any).priceKrw) || Math.round((usd * usdToKrw)));
+        const usd = car.usdPrice ?? (car.priceUsd || parseFloat((sarPrice / usdToSar).toFixed(2)));
+        const krw = car.krwPrice ?? (car.priceKrw || Math.round((usd * usdToKrw)));
         // make قد يكون object أو string
         const makeValue = typeof car.make === 'object' ? (car.make?.name || '') : (car.make || '');
         setFormData({
@@ -280,7 +283,15 @@ export default function AdminCarsPage() {
                     <nav className="ck-breadcrumb">
                         <Link href="/admin/dashboard" className="hover:text-orange-400/80 transition-colors">HM-CTRL</Link>
                         <span className="ck-breadcrumb-sep">›</span>
-                        <span className="text-orange-400/70">{isRTL ? 'السيارات' : 'VEHICLES'}</span>
+                        {requestedSource ? (
+                            <>
+                                <Link href="/admin/cars" className="hover:text-orange-400/80 transition-colors">{isRTL ? 'المعرض' : 'SHOWROOM'}</Link>
+                                <span className="ck-breadcrumb-sep">›</span>
+                                <span className="text-orange-400/70">{inventorySource === 'korean_import' ? (isRTL ? 'الكوري' : 'KOREAN') : (isRTL ? 'المحلي' : 'LOCAL')}</span>
+                            </>
+                        ) : (
+                            <span className="text-orange-400/70">{isRTL ? 'المعرض' : 'SHOWROOM'}</span>
+                        )}
                     </nav>
                     <div className="flex items-end justify-between gap-4 flex-wrap">
                         <div>
@@ -331,7 +342,63 @@ export default function AdminCarsPage() {
                 </div>
 
                 {/* ─── شبكة السيارات ─── */}
-                {loading ? (
+                {!requestedSource ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10 py-12">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            transition={{ duration: 0.6 }}
+                        >
+                            <Link href="/admin/cars?source=hm_local" className="group relative block">
+                                <div className="absolute inset-0 bg-orange-500/5 blur-3xl group-hover:bg-orange-500/10 transition-all rounded-full" />
+                                <div className="ck-card p-10 flex flex-col items-center text-center gap-6 h-[400px] justify-center hover:border-orange-500/40 transition-all bg-black/40 backdrop-blur-xl group-hover:translate-y-[-8px]">
+                                    <div className="w-24 h-24 rounded-3xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400 group-hover:scale-110 transition-transform">
+                                        <CarIcon className="w-12 h-12" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-3xl font-black italic uppercase tracking-tighter text-white group-hover:text-orange-400 transition-colors mb-2">
+                                            {isRTL ? 'معرض HM CAR' : 'HM CAR SHOWROOM'}
+                                        </h2>
+                                        <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.3em]">
+                                            {isRTL ? 'إدارة المخزون المحلي والمتوفر حالياً' : 'MANAGE LOCAL & READY INVENTORY'}
+                                        </p>
+                                    </div>
+                                    <div className="mt-4 flex items-center gap-2 text-orange-500/40 group-hover:text-orange-400 transition-colors transition-all">
+                                        <span className="text-[10px] font-black uppercase tracking-widest">{isRTL ? 'دخول النظام' : 'INITIATE ACCESS'}</span>
+                                        <ArrowLeftCircle className={cn("w-5 h-5", isRTL ? "" : "rotate-180")} />
+                                    </div>
+                                </div>
+                            </Link>
+                        </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.2 }}
+                        >
+                            <Link href="/admin/cars?source=korean_import" className="group relative block">
+                                <div className="absolute inset-0 bg-blue-500/5 blur-3xl group-hover:bg-blue-500/10 transition-all rounded-full" />
+                                <div className="ck-card p-10 flex flex-col items-center text-center gap-6 h-[400px] justify-center hover:border-blue-500/40 transition-all bg-black/40 backdrop-blur-xl group-hover:translate-y-[-8px]">
+                                    <div className="w-24 h-24 rounded-3xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">
+                                        <Globe className="w-12 h-12" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-3xl font-black italic uppercase tracking-tighter text-white group-hover:text-blue-400 transition-colors mb-2">
+                                            {isRTL ? 'المعرض الكوري' : 'KOREAN SHOWROOM'}
+                                        </h2>
+                                        <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.3em]">
+                                            {isRTL ? 'إدارة السيارات المستوردة من كوريا' : 'MANAGE KOREAN IMPORTED CARS'}
+                                        </p>
+                                    </div>
+                                    <div className="mt-4 flex items-center gap-2 text-blue-500/40 group-hover:text-blue-400 transition-colors transition-all">
+                                        <span className="text-[10px] font-black uppercase tracking-widest">{isRTL ? 'دخول النظام' : 'INITIATE ACCESS'}</span>
+                                        <ArrowLeftCircle className={cn("w-5 h-5", isRTL ? "" : "rotate-180")} />
+                                    </div>
+                                </div>
+                            </Link>
+                        </motion.div>
+                    </div>
+                ) : loading ? (
                     // هيكل تحميل (skeleton)
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {[...Array(6)].map((_, i) => (

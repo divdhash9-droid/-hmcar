@@ -3,7 +3,7 @@
 // [[ARABIC_COMMENT]] استراتيجية: Network First للصفحات (للتحديثات الفورية) + Cache for Images (للسرعة)
 
 // [[ARABIC_COMMENT]] رقم الإصدار - يتغير مع كل نشر جديد تلقائياً
-const SW_VERSION = 'mmo1fnmh'; // يُستبدل بـ timestamp في وقت البناء
+const SW_VERSION = 'mmo1oaf6'; // يُستبدل بـ timestamp في وقت البناء
 const CACHE_NAME = `hmcar-cache-${SW_VERSION}`;
 const IMAGE_CACHE = `hmcar-images-${SW_VERSION}`;
 

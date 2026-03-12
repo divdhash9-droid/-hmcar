@@ -6,7 +6,7 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Activity, Car, Gavel, Users, ShoppingCart, Settings, Shield,
-    LogOut, Radio, Layers, TrendingUp, Bell, Share2, MessageCircle, Sparkles,
+    LogOut, Radio, Layers, TrendingUp, Bell, Share2, MessageCircle,
     Tag, Briefcase, Mail, Menu, X, Languages, Database, RefreshCcw
 } from 'lucide-react';
 import { useLanguage } from '@/lib/LanguageContext';
@@ -212,8 +212,7 @@ function SidebarInner({
 function buildNavItems(isRTL: boolean): NavItem[] {
     return [
         { id: 'dashboard', icon: Activity, label: isRTL ? 'المركزية' : 'MAINFRAME', href: '/admin/dashboard' },
-        { id: 'cars', icon: Car, label: isRTL ? 'مخزون HM' : 'HM STOCK', href: '/admin/cars?source=hm_local' },
-        { id: 'korean-cars', icon: Sparkles, label: isRTL ? 'المعرض الكوري' : 'KOREAN STOCK', href: '/admin/cars?source=korean_import' },
+        { id: 'cars', icon: Car, label: isRTL ? 'المعرض' : 'SHOWROOM', href: '/admin/cars' },
         { id: 'live-auctions', icon: Radio, label: isRTL ? 'المباشر' : 'LIVE', href: '/admin/live-auctions' },
         { id: 'auctions', icon: Gavel, label: isRTL ? 'المزادات' : 'AUCTIONS', href: '/admin/auctions' },
         { id: 'parts', icon: Layers, label: isRTL ? 'القطع' : 'PARTS', href: '/admin/parts' },
@@ -227,7 +226,6 @@ function buildNavItems(isRTL: boolean): NavItem[] {
         { id: 'social', icon: Share2, label: isRTL ? 'التواصل' : 'SOCIAL', href: '/admin/social' },
         { id: 'security', icon: Shield, label: isRTL ? 'الأمان' : 'SECURITY', href: '/admin/security' },
         { id: 'brands', icon: Tag, label: isRTL ? 'الوكالات' : 'AGENCIES', href: '/admin/brands' },
-        { id: 'showroom', icon: Sparkles, label: isRTL ? 'المعرض' : 'SHOWROOM', href: '/admin/settings?tab=showroom' },
         { id: 'settings', icon: Settings, label: isRTL ? 'الإعدادات' : 'SETTINGS', href: '/admin/settings' },
     ];
 }

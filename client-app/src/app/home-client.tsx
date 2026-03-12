@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useRef, useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -287,7 +287,8 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
 
   return (
     <div ref={containerRef} className="relative min-h-screen overflow-x-hidden" dir={isRTL ? "rtl" : "ltr"}>
-      <Navbar />
+      {/* Navbar hidden on home page per user request */}
+      {/* <Navbar /> */}
 
 
 

@@ -391,7 +391,8 @@ router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
 
                         if (existing) continue;
 
-                        const sarPrice = Math.ceil(card.pPrice * 0.12);
+                        const partsMultiplier = Number(settings?.currencySettings?.partsMultiplier || 1.15);
+                        const sarPrice = Math.ceil(card.pPrice * 0.12 * partsMultiplier);
                         const usdPrice = Number((sarPrice / usdToSar).toFixed(2));
                         const krwPrice = Math.round(usdPrice * usdToKrw);
 

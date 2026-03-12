@@ -31,7 +31,30 @@ export default function LocalCarDetail() {
     const { isRTL } = useLanguage();
     const { formatPrice, formatPriceFromUsd, currency } = useSettings();
 
-    const [car, setCar] = useState<any>(null);
+    const [car, setCar] = useState<{
+        title: string;
+        make: string | { name: string } | null;
+        model: string;
+        year: number;
+        mileage?: number;
+        price?: number;
+        priceSar?: number;
+        priceUsd?: number;
+        basePriceUsd?: number;
+        priceKrw?: number;
+        fuelType?: string;
+        transmission?: string;
+        category?: string;
+        color?: string;
+        description?: string;
+        images?: string[];
+        isActive?: boolean;
+        agency?: {
+            name: string;
+            logoUrl?: string;
+            location?: string;
+        };
+    } | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [activeImage, setActiveImage] = useState(0);
@@ -59,7 +82,7 @@ export default function LocalCarDetail() {
     }, [id, isRTL]);
 
     useEffect(() => {
-        api.settings.getPublic().then((res: any) => {
+        api.settings.getPublic().then((res: { success: boolean; data?: { socialLinks?: { whatsapp?: string } } }) => {
             if (res?.success && res.data?.socialLinks?.whatsapp) {
                 setWhatsapp(res.data.socialLinks.whatsapp);
             } else {
@@ -117,7 +140,7 @@ export default function LocalCarDetail() {
         );
     }
 
-    const getBaseUsd = (payload: any) => {
+    const getBaseUsd = (payload: { basePriceUsd?: number; priceUsd?: number; priceSar?: number; price?: number; priceKrw?: number }) => {
         const baseUsd = toFiniteNumber(payload?.basePriceUsd);
         if (baseUsd && baseUsd > 0) return baseUsd;
 
@@ -219,7 +242,7 @@ export default function LocalCarDetail() {
                         </div>
 
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                            {specs.map((spec, i) => (
+                            {specs.map((spec) => (
                                 <div key={spec.label} className="bg-white/2 border border-white/8 rounded-2xl p-4 space-y-2 hover:border-cinematic-neon-gold/20 transition-all">
                                     <spec.icon className="w-4 h-4 text-cinematic-neon-gold/60" />
                                     <div className="text-[9px] font-black uppercase tracking-[0.3em] text-white/30">{spec.label}</div>
@@ -232,6 +255,32 @@ export default function LocalCarDetail() {
                             <div className="bg-white/2 border border-white/8 rounded-2xl p-6">
                                 <div className="text-[9px] font-black uppercase tracking-[0.3em] text-white/30 mb-3">{isRTL ? rawText('الوصف') : rawText('DESCRIPTION')}</div>
                                 <p className="text-white/60 text-sm leading-relaxed">{car.description}</p>
+                            </div>
+                        )}
+
+                        {car.agency && (
+                            <div className="bg-white/2 border border-cinematic-neon-gold/10 rounded-2xl p-6 flex items-center gap-6 hover:border-cinematic-neon-gold/30 transition-all group">
+                                {car.agency.logoUrl ? (
+                                    <div className="relative w-20 h-20 shrink-0 rounded-2xl overflow-hidden bg-black/40 p-3 border border-white/5 group-hover:border-cinematic-neon-gold/20 transition-colors">
+                                        <Image src={car.agency.logoUrl} alt={car.agency.name} fill className="object-contain p-2" unoptimized />
+                                    </div>
+                                ) : (
+                                    <div className="w-20 h-20 shrink-0 rounded-2xl bg-black/40 border border-white/5 flex items-center justify-center">
+                                        <Car className="w-8 h-8 text-white/10" />
+                                    </div>
+                                )}
+                                <div className="space-y-1">
+                                    <div className="flex items-center gap-2">
+                                        <CheckCircle className="w-3 h-3 text-cinematic-neon-gold" />
+                                        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-cinematic-neon-gold/70 italic">
+                                            {isRTL ? rawText('الوكالة المعتمدة') : rawText('OFFICIAL AGENCY')}
+                                        </span>
+                                    </div>
+                                    <div className="text-xl font-black italic uppercase tracking-tight text-white">{car.agency.name}</div>
+                                    {car.agency.location && (
+                                        <div className="text-[10px] text-white/40 font-medium ">{car.agency.location}</div>
+                                    )}
+                                </div>
                             </div>
                         )}
 

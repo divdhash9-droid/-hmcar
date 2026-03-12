@@ -361,7 +361,8 @@ router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
                 if (!item.encarUrl) continue;
                 // Check if car exists
                 const existingCar = await Car.findOne({ externalUrl: item.encarUrl });
-                const computedUsd = Number((item.priceKrw / usdToKrw).toFixed(2));
+                const auctionMultiplier = Number(settings?.currencySettings?.auctionMultiplier || 1.10);
+                const computedUsd = Number(((item.priceKrw / usdToKrw) * auctionMultiplier).toFixed(2));
                 const computedSar = Math.round(computedUsd * usdToSar);
                 if (!existingCar) {
                     await Car.create({

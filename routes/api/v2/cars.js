@@ -200,6 +200,7 @@ router.get('/', cacheResponse(300), async (req, res, next) => {
 
         const [cars, total] = await Promise.all([
             Car.find(filter)
+                .populate('agency')
                 .sort({ createdAt: -1 })
                 .limit(parseInt(limit))
                 .skip(skip)
@@ -253,7 +254,9 @@ router.get('/', cacheResponse(300), async (req, res, next) => {
 // GET /api/v2/cars/:id - جلب تفاصيل سيارة محددة
 router.get('/:id', cacheResponse(600), async (req, res, next) => {
     try {
-        const car = await Car.findById(req.params.id).lean();
+        const car = await Car.findById(req.params.id)
+            .populate('agency')
+            .lean();
 
         if (!car) {
             return res.status(404).json({

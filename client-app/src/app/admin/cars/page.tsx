@@ -25,7 +25,7 @@ import { useToast } from '@/lib/ToastContext';
 // ── المكونات المقسمة ──
 import CarCard from './_components/CarCard';
 import CarModal from './_components/CarModal';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // ── نوع بيانات السيارة ──
 type Car = {
@@ -105,6 +105,12 @@ export default function AdminCarsPage() {
     const [submitting, setSubmitting] = useState(false); // حالة الإرسال
     const [brands, setBrands] = useState<{ _id: string; name: string }[]>([]);
 
+    // ── Showroom Import States ──
+    const [encarUrl, setEncarUrl] = useState('');
+    const [showImportSettings, setShowImportSettings] = useState(false);
+    const [importLoading, setImportLoading] = useState(false);
+    const [importStatus, setImportStatus] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
+
     // ── أسعار الصرف (تُجلب من الإعدادات) ──
     const [usdToSar, setUsdToSar] = useState(3.75);
     const [usdToKrw, setUsdToKrw] = useState(1350);
@@ -122,10 +128,11 @@ export default function AdminCarsPage() {
     const loadData = async () => {
         setLoading(true);
         try {
-            const [carsRes, settingsRes, brandsRes] = await Promise.all([
+            const [carsRes, settingsRes, brandsRes, showroomRes] = await Promise.all([
                 api.cars.list({ status: filter, search: searchTerm, source: inventorySource }),
                 api.settings.getPublic(),
-                api.brands.list('cars', { targetShowroom: inventorySource })
+                api.brands.list('cars', { targetShowroom: inventorySource }),
+                api.showroom.getSettings()
             ]);
 
             if (carsRes.success) setCars(carsRes.data.cars);
@@ -137,11 +144,54 @@ export default function AdminCarsPage() {
             }
 
             if (brandsRes.success) setBrands(brandsRes.brands || []);
+            if (showroomRes.success) setEncarUrl(showroomRes.data?.encarUrl || '');
         } catch (err) {
             console.error('فشل تحميل البيانات:', err);
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleImportSave = async () => {
+        setImportStatus(null);
+        if (!encarUrl.trim() || !encarUrl.includes('encar.com')) {
+            setImportStatus({ type: 'error', msg: isRTL ? 'يجب أن يكون الرابط من موقع car.encar.com' : 'Must be a car.encar.com URL' });
+            return;
+        }
+        try {
+            setImportLoading(true);
+            const res = await api.showroom.updateSettings({ encarUrl: encarUrl.trim() });
+            if (!res.success) {
+                setImportStatus({ type: 'error', msg: res.message || (isRTL ? 'فشل الحفظ' : 'Save failed') });
+                return;
+            }
+
+            setImportStatus({ type: 'success', msg: isRTL ? '✅ تم حفظ الرابط. جاري الاستيراد...' : '✅ Saved. Importing...' });
+            const scrapeRes = await api.showroom.scrape();
+            if (scrapeRes.success) {
+                setImportStatus({ type: 'success', msg: scrapeRes.message || (isRTL ? '✅ تم الاستيراد بنجاح' : '✅ Import successful') });
+                loadData();
+            } else {
+                setImportStatus({ type: 'error', msg: scrapeRes.message || (isRTL ? 'تم حفظ الرابط لكن فشل الاستيراد' : 'Saved but import failed') });
+            }
+        } catch { setImportStatus({ type: 'error', msg: isRTL ? 'فشل الاتصال بالخادم' : 'Server error' }); }
+        finally { setImportLoading(false); }
+    };
+
+    const handleScrapeNow = async () => {
+        setImportStatus(null);
+        try {
+            setImportLoading(true);
+            setImportStatus({ type: 'success', msg: isRTL ? '⏳ جاري جلب السيارات... قد يستغرق هذا دقيقة.' : '⏳ Fetching cars... might take a minute.' });
+            const res = await api.showroom.scrape();
+            if (res.success) {
+                setImportStatus({ type: 'success', msg: res.message });
+                loadData();
+            } else {
+                setImportStatus({ type: 'error', msg: res.message || (isRTL ? 'فشل جلب السيارات' : 'Fetch failed') });
+            }
+        } catch { setImportStatus({ type: 'error', msg: isRTL ? 'فشل الاتصال بالخادم' : 'Server error' }); }
+        finally { setImportLoading(false); }
     };
 
     // ── دالة تحويل السعر تلقائياً بين العملات الثلاث ──
@@ -304,16 +354,105 @@ export default function AdminCarsPage() {
                                     : (inventorySource === 'korean_import' ? 'KOREAN CAR CTRL' : 'HM CAR CTRL')}
                             </h1>
                         </div>
-                        {/* زر إضافة سيارة جديدة */}
-                        <button
-                            onClick={() => { resetForm(); setShowModal(true); }}
-                            className="ck-btn-primary flex items-center gap-2"
-                        >
-                            <Plus className="w-4 h-4" />
-                            {isRTL ? 'إضافة سيارة' : 'ADD VEHICLE'}
-                        </button>
+                        {inventorySource === 'hm_local' ? (
+                            <button
+                                onClick={() => { resetForm(); setShowModal(true); }}
+                                className="ck-btn-primary flex items-center gap-2"
+                            >
+                                <Plus className="w-4 h-4" />
+                                {isRTL ? 'إضافة سيارة' : 'ADD VEHICLE'}
+                            </button>
+                        ) : (
+                            <button
+                                onClick={() => setShowImportSettings(!showImportSettings)}
+                                className={cn(
+                                    "ck-btn-primary flex items-center gap-2 border-cinematic-neon-blue/40 text-cinematic-neon-blue hover:bg-cinematic-neon-blue/10",
+                                    showImportSettings && "bg-cinematic-neon-blue/20"
+                                )}
+                            >
+                                <Globe className="w-4 h-4" />
+                                {isRTL ? 'إعدادات الاستيراد' : 'IMPORT SETTINGS'}
+                            </button>
+                        )}
                     </div>
                 </div>
+
+                {/* ─── Showroom Import Control Panel ─── */}
+                <AnimatePresence>
+                    {showImportSettings && inventorySource === 'korean_import' && (
+                        <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="overflow-hidden mb-8"
+                        >
+                            <div className="ck-card p-6 border-cinematic-neon-blue/20 bg-cinematic-neon-blue/5">
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                    <div className="space-y-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-lg bg-cinematic-neon-blue/20 flex items-center justify-center text-cinematic-neon-blue font-bold">
+                                                <Globe className="w-4 h-4" />
+                                            </div>
+                                            <h3 className="text-sm font-black uppercase tracking-widest">{isRTL ? 'تكوين استيراد Encar' : 'ENCAR IMPORT CONFIG'}</h3>
+                                        </div>
+                                        <textarea
+                                            value={encarUrl}
+                                            onChange={(e) => setEncarUrl(e.target.value)}
+                                            placeholder="https://car.encar.com/list/car?page=1&search=..."
+                                            className="ck-input w-full h-24 resize-none font-mono text-[10px] bg-black/40"
+                                            dir="ltr"
+                                        />
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={handleImportSave}
+                                                disabled={importLoading}
+                                                className="ck-btn-primary bg-cinematic-neon-blue border-none text-white flex-1 text-[10px]"
+                                            >
+                                                {importLoading ? (isRTL ? 'جاري الحفظ...' : 'SAVING...') : (isRTL ? 'حفظ واستيراد' : 'SAVE & IMPORT')}
+                                            </button>
+                                            <button
+                                                onClick={handleScrapeNow}
+                                                disabled={importLoading}
+                                                className="ck-btn-primary bg-white/5 border-white/10 hover:border-cinematic-neon-blue/40 text-white flex-1 text-[10px]"
+                                            >
+                                                {importLoading ? (isRTL ? 'جاري الجلب...' : 'FETCHING...') : (isRTL ? 'جلب الآن' : 'SCRAPE NOW')}
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div className="bg-black/20 rounded-2xl p-4 border border-white/5">
+                                        <h4 className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-3">{isRTL ? 'إرشادات الاستيراد' : 'IMPORT PROTOCOLS'}</h4>
+                                        <ul className="space-y-2 text-[10px] text-white/50">
+                                            <li className="flex gap-2">
+                                                <span className="text-cinematic-neon-blue">01.</span>
+                                                {isRTL ? 'استخدم رابط البحث من موقع car.encar.com مع الفلاتر المحددة.' : 'Use a search link from car.encar.com with your desired filters.'}
+                                            </li>
+                                            <li className="flex gap-2">
+                                                <span className="text-cinematic-neon-blue">02.</span>
+                                                {isRTL ? 'النظام يستورد أول 60 سيارة ويقوم بتحديثها تلقائياً عند الحفظ.' : 'System imports top 60 vehicles and auto-updates on save.'}
+                                            </li>
+                                            <li className="flex gap-2">
+                                                <span className="text-cinematic-neon-blue">03.</span>
+                                                {isRTL ? 'السيارات المستوردة ستظهر أدناه ويمكنك تعديل تفاصيلها يدوياً.' : 'Imported vehicles appear below; you can manually refine details.'}
+                                            </li>
+                                        </ul>
+                                        {importStatus && (
+                                            <motion.div
+                                                initial={{ scale: 0.9, opacity: 0 }}
+                                                animate={{ scale: 1, opacity: 1 }}
+                                                className={cn(
+                                                    "mt-4 p-3 rounded-xl border text-[10px] font-bold text-center",
+                                                    importStatus.type === 'success' ? "bg-green-500/10 border-green-500/30 text-green-400" : "bg-red-500/10 border-red-500/30 text-red-400"
+                                                )}
+                                            >
+                                                {importStatus.msg}
+                                            </motion.div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
                 {/* ─── شريط البحث والتصفية ─── */}
                 <div className="flex flex-col sm:flex-row gap-4 mb-8">

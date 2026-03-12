@@ -4,9 +4,10 @@ const express = require('express');
 const router = express.Router();
 const SiteSettings = require('../../../models/SiteSettings');
 const { requireAuthAPI, requireAdmin } = require('../../../middleware/auth');
+const { cacheResponse, invalidateCache } = require('../../../middleware/cache');
 
 // الحصول على إعدادات الموقع (عام - للزوار)
-router.get('/public', async (req, res) => {
+router.get('/public', cacheResponse(1800), async (req, res) => {
     try {
         const settings = await SiteSettings.getSettings();
 
@@ -49,7 +50,7 @@ router.get('/', requireAuthAPI, requireAdmin, async (req, res) => {
 });
 
 // تحديث روابط التواصل الاجتماعي
-router.put('/social-links', requireAuthAPI, requireAdmin, async (req, res) => {
+router.put('/social-links', requireAuthAPI, requireAdmin, invalidateCache('/api/v2/settings*'), async (req, res) => {
     try {
         const { socialLinks } = req.body;
 
@@ -73,7 +74,7 @@ router.put('/social-links', requireAuthAPI, requireAdmin, async (req, res) => {
 });
 
 // تحديث معلومات الاتصال
-router.put('/contact-info', requireAuthAPI, requireAdmin, async (req, res) => {
+router.put('/contact-info', requireAuthAPI, requireAdmin, invalidateCache('/api/v2/settings*'), async (req, res) => {
     try {
         const { contactInfo } = req.body;
 
@@ -97,7 +98,7 @@ router.put('/contact-info', requireAuthAPI, requireAdmin, async (req, res) => {
 });
 
 // تحديث معلومات الموقع
-router.put('/site-info', requireAuthAPI, requireAdmin, async (req, res) => {
+router.put('/site-info', requireAuthAPI, requireAdmin, invalidateCache('/api/v2/settings*'), async (req, res) => {
     try {
         const { siteInfo } = req.body;
 

@@ -6,9 +6,10 @@ const Car = require('../../../models/Car');
 const AuditLog = require('../../../models/AuditLog');
 const { requireAuthAPI, requirePermissionAPI } = require('../../../middleware/auth');
 const SmartAlertService = require('../../../services/SmartAlertService');
+const { cacheResponse, invalidateCache } = require('../../../middleware/cache');
 
 // GET /api/v2/cars - جلب قائمة السيارات
-router.get('/', async (req, res) => {
+router.get('/', cacheResponse(300), async (req, res) => {
     try {
         const {
             page = 1,
@@ -187,7 +188,7 @@ router.get('/', async (req, res) => {
 });
 
 // GET /api/v2/cars/:id - جلب تفاصيل سيارة محددة
-router.get('/:id', async (req, res) => {
+router.get('/:id', cacheResponse(600), async (req, res) => {
     try {
         const car = await Car.findById(req.params.id).lean();
 
@@ -212,7 +213,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST /api/v2/cars - إضافة سيارة جديدة (Admin only)
-router.post('/', requireAuthAPI, requirePermissionAPI('manage_cars'), async (req, res) => {
+router.post('/', requireAuthAPI, requirePermissionAPI('manage_cars'), invalidateCache('/api/v2/cars*'), async (req, res) => {
     try {
         const car = new Car(req.body);
         await car.save();
@@ -253,7 +254,7 @@ router.post('/', requireAuthAPI, requirePermissionAPI('manage_cars'), async (req
 });
 
 // PUT /api/v2/cars/:id - تحديث سيارة (Admin only)
-router.put('/:id', requireAuthAPI, requirePermissionAPI('manage_cars'), async (req, res) => {
+router.put('/:id', requireAuthAPI, requirePermissionAPI('manage_cars'), invalidateCache('/api/v2/cars*'), async (req, res) => {
     try {
         const oldCar = await Car.findById(req.params.id);
         const car = await Car.findByIdAndUpdate(
@@ -301,7 +302,7 @@ router.put('/:id', requireAuthAPI, requirePermissionAPI('manage_cars'), async (r
 });
 
 // DELETE /api/v2/cars/:id - حذف سيارة (Admin only)
-router.delete('/:id', requireAuthAPI, requirePermissionAPI('manage_cars'), async (req, res) => {
+router.delete('/:id', requireAuthAPI, requirePermissionAPI('manage_cars'), invalidateCache('/api/v2/cars*'), async (req, res) => {
     try {
         const car = await Car.findByIdAndDelete(req.params.id);
 
@@ -327,7 +328,7 @@ router.delete('/:id', requireAuthAPI, requirePermissionAPI('manage_cars'), async
 
 // [[ARABIC_COMMENT]] PATCH /api/v2/cars/:id/sold - تعليم السيارة كـ "تم البيع" (أدمن فقط)
 // [[ARABIC_COMMENT]] بعد التنفيذ: isSold=true + isActive=false → تختفي من المعرض فوراً
-router.patch('/:id/sold', requireAuthAPI, requirePermissionAPI('manage_cars'), async (req, res) => {
+router.patch('/:id/sold', requireAuthAPI, requirePermissionAPI('manage_cars'), invalidateCache('/api/v2/cars*'), async (req, res) => {
     try {
         const { soldPrice, buyerNote } = req.body;
 

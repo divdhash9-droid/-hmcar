@@ -20,8 +20,13 @@ async function repairAdmin() {
 
         const User = require('../models/User');
 
-        const adminEmail = 'admin@hmcar.com';
-        const newPassword = 'HmCar@2026!'; // Default password
+        const adminEmail = process.env.PROD_ADMIN_EMAIL || 'admin@hmcar.com';
+        const newPassword = process.env.PROD_ADMIN_PASSWORD;
+
+        if (!newPassword) {
+            console.error('❌ PROD_ADMIN_PASSWORD environment variable is missing.');
+            process.exit(1);
+        }
 
         let user = await User.findOne({ email: adminEmail });
 

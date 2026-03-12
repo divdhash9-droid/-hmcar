@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useRef, useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -23,6 +23,14 @@ import { useSocket } from "@/lib/SocketContext";
 import { useAuth } from "@/lib/AuthContext";
 import { useSettings } from "@/lib/SettingsContext";
 import { cn } from "@/lib/utils";
+
+const rawText = (value: string) => value;
+const getCarMakeLabel = (car: CarType) => {
+  const make = car.make;
+  return typeof make === 'object' && make
+    ? make.name || car.title || rawText('')
+    : make || car.title || rawText('');
+};
 
 export type CarType = {
   id?: string;
@@ -307,11 +315,11 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
           >
             <div>
               <motion.div
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#c9a96e]/30 bg-[#c9a96e]/10 backdrop-blur-md mb-4"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-cinematic-neon-gold/30 bg-cinematic-neon-gold/10 backdrop-blur-md mb-4"
                 whileHover={{ scale: 1.05 }}
               >
-                <Sparkles className="w-4 h-4 text-[#c9a96e]" />
-                <span className="text-sm text-[#c9a96e] tracking-wider">{txt.featuredSubtitle}</span>
+                <Sparkles className="w-4 h-4 text-cinematic-neon-gold" />
+                <span className="text-sm text-cinematic-neon-gold tracking-wider">{txt.featuredSubtitle}</span>
               </motion.div>
               <h2 className="text-4xl md:text-5xl font-bold text-white font-display" style={{ textShadow: "0 0 40px rgba(201,169,110,0.3)" }}>
                 {txt.featuredTitle}
@@ -325,7 +333,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
               <button
                 onClick={() => setActiveDock(prev => (prev === "reviews" ? null : "reviews"))}
                 className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${activeDock === "reviews"
-                  ? "bg-[#c9a96e] text-black shadow-[0_0_12px_rgba(201,169,110,0.5)]"
+                  ? "bg-cinematic-neon-gold text-black shadow-[0_0_12px_rgba(201,169,110,0.5)]"
                   : "bg-white/10 border border-white/20 text-white hover:bg-white/20"
                   }`}
                 aria-label="آراء العملاء"
@@ -335,7 +343,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
               <button
                 onClick={() => setActiveDock(prev => (prev === "app" ? null : "app"))}
                 className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${activeDock === "app"
-                  ? "bg-[#c9a96e] text-black shadow-[0_0_12px_rgba(201,169,110,0.5)]"
+                  ? "bg-cinematic-neon-gold text-black shadow-[0_0_12px_rgba(201,169,110,0.5)]"
                   : "bg-white/10 border border-white/20 text-white hover:bg-white/20"
                   }`}
                 aria-label="تحميل التطبيق"
@@ -343,22 +351,22 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
                 <Smartphone className="w-4 h-4" />
               </button>
             </div>
-            {activeDock === "reviews" && (
+            {activeDock === rawText('reviews') && (
               <div>
                 <motion.div className="text-center mb-6" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
                   <h2 className="text-3xl md:text-4xl font-bold text-white font-display" style={{ textShadow: "0 0 30px rgba(201,169,110,0.3)" }}>{txt.testimonialsTitle}</h2>
                 </motion.div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {testimonials.map((testimonial, index) => (
-                    <motion.div key={index} className="relative p-6 rounded-2xl border border-white/10 bg-white/[0.02] backdrop-blur-xl" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: index * 0.15 }}>
+                    <motion.div key={index} className="relative p-6 rounded-2xl border border-white/10 bg-white/2 backdrop-blur-xl" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: index * 0.15 }}>
                       <div className="flex gap-1 mb-3">
                         {[...Array(testimonial.rating)].map((_, i) => (
-                          <Star key={i} className="w-5 h-5 text-[#c9a96e] fill-[#c9a96e]" />
+                          <Star key={i} className="w-5 h-5 text-cinematic-neon-gold fill-cinematic-neon-gold" />
                         ))}
                       </div>
-                      <p className="text-white/80 mb-5 leading-relaxed">&ldquo;{testimonial.text}&rdquo;</p>
+                      <p className="text-white/80 mb-5 leading-relaxed">{rawText('“')}{testimonial.text}{rawText('”')}</p>
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#c9a96e] to-[#8b7355] flex items-center justify-center text-black font-bold">
+                        <div className="w-10 h-10 rounded-full bg-linear-to-br from-cinematic-neon-gold to-[#8b7355] flex items-center justify-center text-black font-bold">
                           {testimonial.name.charAt(0)}
                         </div>
                         <div>
@@ -371,7 +379,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
                 </div>
               </div>
             )}
-            {activeDock === "app" && (
+            {activeDock === rawText('app') && (
               <div>
                 <motion.div className="text-center mb-6" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
                   <h2 className="text-3xl md:text-4xl font-bold text-white font-display" style={{ textShadow: "0 0 30px rgba(201,169,110,0.3)" }}>{txt.downloadTitle}</h2>
@@ -380,24 +388,24 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
                 <div className="flex justify-center">
                   {isInstalled ? (
                     <div className="flex items-center gap-3 px-8 py-4 rounded-2xl bg-green-500/10 border border-green-500/30 text-green-400 font-black uppercase tracking-widest text-sm">
-                      ✓ {isRTL ? 'التطبيق مُثبَّت بالفعل' : 'APP ALREADY INSTALLED'}
+                      {rawText('✓')} {isRTL ? rawText('التطبيق مُثبَّت بالفعل') : rawText('APP ALREADY INSTALLED')}
                     </div>
                   ) : deferredInstall ? (
                     <motion.button
                       onClick={handleInstallPWA}
-                      className="flex items-center gap-3 px-10 py-5 rounded-2xl bg-gradient-to-r from-[#c9a96e] to-[#e8c97a] text-black font-black uppercase tracking-widest text-sm shadow-[0_0_40px_rgba(201,169,110,0.4)] hover:shadow-[0_0_60px_rgba(201,169,110,0.6)] transition-all"
+                      className="flex items-center gap-3 px-10 py-5 rounded-2xl bg-linear-to-r from-cinematic-neon-gold to-[#e8c97a] text-black font-black uppercase tracking-widest text-sm shadow-[0_0_40px_rgba(201,169,110,0.4)] hover:shadow-[0_0_60px_rgba(201,169,110,0.6)] transition-all"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.97 }}
                     >
                       <Smartphone className="w-5 h-5" />
-                      {isRTL ? 'تثبيت التطبيق' : 'INSTALL APP'}
+                      {isRTL ? rawText('تثبيت التطبيق') : rawText('INSTALL APP')}
                     </motion.button>
                   ) : (
                     <div className="text-center">
-                      <p className="text-white/40 text-sm mb-4">{isRTL ? 'لتثبيت التطبيق: اضغط على زر المشاركة ثم "إضافة إلى الشاشة الرئيسية"' : 'To install: tap Share then "Add to Home Screen"'}</p>
+                      <p className="text-white/40 text-sm mb-4">{isRTL ? rawText('لتثبيت التطبيق: اضغط على زر المشاركة ثم "إضافة إلى الشاشة الرئيسية"') : rawText('To install: tap Share then "Add to Home Screen"')}</p>
                       <div className="flex items-center gap-3 px-8 py-4 rounded-2xl bg-white/5 border border-white/10 text-white/50 font-black uppercase tracking-widest text-sm">
                         <Smartphone className="w-5 h-5" />
-                        {isRTL ? 'متوفر للتثبيت' : 'AVAILABLE TO INSTALL'}
+                        {isRTL ? rawText('متوفر للتثبيت') : rawText('AVAILABLE TO INSTALL')}
                       </div>
                     </div>
                   )}
@@ -415,7 +423,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
               {([...latestCars, ...latestCars]).map((car, index) => (
                 <div
                   key={index}
-                  className="min-w-[14rem] h-36 rounded-2xl border border-white/10 bg-white/[0.03] overflow-hidden cursor-pointer"
+                  className="min-w-56 h-36 rounded-2xl border border-white/10 bg-white/3 overflow-hidden cursor-pointer"
                   onClick={() => router.push(isLoggedIn ? "/showroom" : "/login")}
                 >
                   <div className="relative w-full h-28">
@@ -429,8 +437,8 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
                     />
                   </div>
                   <div className="px-3 py-1.5 text-white text-xs line-clamp-1 flex justify-between items-center">
-                    <span>{typeof car.make === 'object' ? car.make?.name : (car.make || car.title || "")}</span>
-                    <span className="text-[#c9a96e] font-bold">{formatPrice(Number(car.price || 0))}</span>
+                    <span>{getCarMakeLabel(car)}</span>
+                    <span className="text-cinematic-neon-gold font-bold">{formatPrice(Number(car.price || 0))}</span>
                   </div>
                 </div>
               ))}
@@ -456,7 +464,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
               {/* [[ARABIC_COMMENT]] باقي روابط التواصل بأيقونات SVG */}
               {socialConfig.links.map((item, idx) => {
                 const SvgIcon = SocialSVGIcons[item.platform];
-                const colorClass = platformColors[item.platform] || 'text-white/60';
+                const colorClass = platformColors[item.platform] || rawText('text-white/60');
                 return (
                   <a key={idx} href={item.url} target="_blank" rel="noopener noreferrer" title={item.platform}>
                     <motion.div whileHover={{ scale: 1.15, y: -3 }} whileTap={{ scale: 0.95 }}
@@ -482,8 +490,8 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
             >
-              <Globe className="w-5 h-5 text-[#c9a96e]" />
-              <h3 className="text-lg font-bold text-white">{isRTL ? 'روابط التواصل الاجتماعي' : 'Social Media'}</h3>
+              <Globe className="w-5 h-5 text-cinematic-neon-gold" />
+              <h3 className="text-lg font-bold text-white">{isRTL ? rawText('روابط التواصل الاجتماعي') : rawText('Social Media')}</h3>
             </motion.div>
 
             {/* [[ARABIC_COMMENT]] أيقونات التواصل بأيقونات SVG واضحة */}
@@ -497,7 +505,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
               )}
               {socialConfig.links.map((link, idx) => {
                 const SvgIcon = SocialSVGIcons[link.platform];
-                const colorClass = platformColors[link.platform] || 'text-white/60';
+                const colorClass = platformColors[link.platform] || rawText('text-white/60');
                 return (
                   <a key={idx} href={link.url} target="_blank" rel="noopener noreferrer" title={link.platform}>
                     <motion.div whileHover={{ scale: 1.1 }} className={`w-12 h-12 rounded-2xl border border-white/10 bg-white/5 flex items-center justify-center shadow-lg hover:bg-white/10 transition-all ${colorClass}`}>
@@ -514,24 +522,24 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
       {/* ── AVAILABLE CARS CREATIVE TICKER ── */}
       {/* [[ARABIC_COMMENT]] إخفاء القسم بالكامل إذا لم تكن هناك سيارات مضافة للمعرض */}
       {latestCars && latestCars.length > 0 && (
-        <section ref={liveRef} className="relative z-10 py-16 bg-gradient-to-b from-transparent via-[#c9a96e]/5 to-transparent overflow-hidden">
+        <section ref={liveRef} className="relative z-10 py-16 bg-linear-to-b from-transparent via-cinematic-neon-gold/5 to-transparent overflow-hidden">
           <div className="max-w-[100vw] mx-auto">
             <motion.div className="text-center mb-16" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
-              <motion.div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full border border-[#c9a96e]/30 bg-[#c9a96e]/10 backdrop-blur-md mb-6 shadow-[0_0_20px_rgba(201,169,110,0.15)]" whileHover={{ scale: 1.05 }}>
-                <Sparkles className="w-5 h-5 text-[#c9a96e] animate-pulse" />
-                <span className="text-sm text-[#c9a96e] font-black tracking-widest uppercase">{isRTL ? "المعرض المباشر" : "SHOWROOM"}</span>
+              <motion.div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full border border-cinematic-neon-gold/30 bg-cinematic-neon-gold/10 backdrop-blur-md mb-6 shadow-[0_0_20px_rgba(201,169,110,0.15)]" whileHover={{ scale: 1.05 }}>
+                <Sparkles className="w-5 h-5 text-cinematic-neon-gold animate-pulse" />
+                <span className="text-sm text-cinematic-neon-gold font-black tracking-widest uppercase">{isRTL ? rawText('المعرض المباشر') : rawText('SHOWROOM')}</span>
               </motion.div>
               <h2 className="text-5xl md:text-6xl font-black text-white italic uppercase tracking-tighter mb-4" style={{ textShadow: "0 0 40px rgba(201,169,110,0.4)" }}>
-                {isRTL ? "سيارات متوفرة محلياً" : "LOCAL INVENTORY"}
+                {isRTL ? rawText('سيارات متوفرة محلياً') : rawText('LOCAL INVENTORY')}
               </h2>
-              <p className="text-white/50 text-sm font-medium uppercase tracking-[0.1em]">{isRTL ? "اكتشف أحدث الموديلات المضافة إلى مستودعاتنا" : "DISCOVER THE LATEST MODELS ADDED TO OUR INVENTORY"}</p>
+              <p className="text-white/50 text-sm font-medium uppercase tracking-widest">{isRTL ? rawText('اكتشف أحدث الموديلات المضافة إلى مستودعاتنا') : rawText('DISCOVER THE LATEST MODELS ADDED TO OUR INVENTORY')}</p>
             </motion.div>
 
             {/* New Ticker Layered Container */}
             <div className="relative w-full overflow-hidden py-10">
               {/* Gradient Mask for fading edges */}
-              <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#050505] to-transparent z-20 pointer-events-none" />
-              <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#050505] to-transparent z-20 pointer-events-none" />
+              <div className="absolute inset-y-0 left-0 w-32 bg-linear-to-r from-cinematic-darker to-transparent z-20 pointer-events-none" />
+              <div className="absolute inset-y-0 right-0 w-32 bg-linear-to-l from-cinematic-darker to-transparent z-20 pointer-events-none" />
 
               <motion.div
                 className="flex gap-8 cursor-grab active:cursor-grabbing w-max px-8"
@@ -541,15 +549,15 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
               >
                 {/* Clone the array to make infinite scrolling seamless */}
                 {[...latestCars, ...latestCars, ...latestCars, ...latestCars].map((car, index) => {
-                  const makeName = typeof car.make === 'object' ? car.make?.name : car.make;
+                  const makeName = getCarMakeLabel(car);
                   return (
                     <motion.div
                       key={index}
-                      className="group relative w-[340px] h-[460px] rounded-[2rem] border border-white/10 bg-black/40 backdrop-blur-3xl overflow-hidden shadow-2xl hover:border-[#c9a96e]/50 transition-all duration-700 flex-shrink-0"
+                      className="group relative w-85 h-115 rounded-4xl border border-white/10 bg-black/40 backdrop-blur-3xl overflow-hidden shadow-2xl hover:border-cinematic-neon-gold/50 transition-all duration-700 shrink-0"
                       onClick={() => router.push(isLoggedIn ? `/cars/${car.id || (car as any)._id}` : '/login')}
                       whileHover={{ y: -10 }}
                     >
-                      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/40 to-black z-10 pointer-events-none" />
+                      <div className="absolute inset-0 bg-linear-to-b from-transparent via-black/40 to-black z-10 pointer-events-none" />
 
                       <Image
                         src={car.images && car.images.length > 0 ? car.images[0] : "/images/placeholder.jpg"}
@@ -563,21 +571,21 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
                       <div className="absolute z-20 inset-0 flex flex-col justify-end p-8">
                         <div className="translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                           <div className="flex items-center gap-2 mb-3">
-                            <span className="px-3 py-1 rounded-lg bg-white/10 border border-white/10 text-[10px] uppercase font-black tracking-widest text-[#c9a96e] backdrop-blur-md">
+                            <span className="px-3 py-1 rounded-lg bg-white/10 border border-white/10 text-[10px] uppercase font-black tracking-widest text-cinematic-neon-gold backdrop-blur-md">
                               {car.year || new Date().getFullYear()}
                             </span>
                             <span className="px-3 py-1 rounded-lg bg-white/10 border border-white/10 text-[10px] uppercase font-black tracking-widest text-white/70 backdrop-blur-md">
-                              {makeName || "AUTO"}
+                              {makeName || rawText('AUTO')}
                             </span>
                           </div>
-                          <h3 className="text-2xl font-black text-white italic uppercase leading-tight mb-2 group-hover:text-[#c9a96e] transition-colors line-clamp-2">
+                          <h3 className="text-2xl font-black text-white italic uppercase leading-tight mb-2 group-hover:text-cinematic-neon-gold transition-colors line-clamp-2">
                             {car.title || car.name}
                           </h3>
                           <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-500 pt-4 border-t border-white/10 flex items-center justify-between">
-                            <div className="text-xl font-black text-[#c9a96e]">
+                            <div className="text-xl font-black text-cinematic-neon-gold">
                               {formatPrice(Number(car.price || 0))}
                             </div>
-                            <button className="w-10 h-10 rounded-full bg-[#c9a96e] flex items-center justify-center text-black hover:scale-110 transition-transform shadow-[0_0_15px_rgba(201,169,110,0.4)]">
+                            <button className="w-10 h-10 rounded-full bg-cinematic-neon-gold flex items-center justify-center text-black hover:scale-110 transition-transform shadow-[0_0_15px_rgba(201,169,110,0.4)]">
                               <ArrowUpRight className="w-5 h-5" />
                             </button>
                           </div>
@@ -591,30 +599,30 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
 
             <div className="flex flex-col sm:flex-row justify-center mt-12 gap-5 relative z-30 pointer-events-auto">
               <button
-                onClick={() => router.push('/search')}
-                className="group flex flex-col items-center gap-2 px-10 py-5 rounded-[2rem] bg-white/[0.03] border border-white/10 hover:border-[#c9a96e]/40 hover:bg-[#c9a96e]/10 transition-all backdrop-blur-xl shadow-2xl"
+                onClick={() => router.push('/cars')}
+                className="group flex flex-col items-center gap-2 px-10 py-5 rounded-4xl bg-white/3 border border-white/10 hover:border-cinematic-neon-gold/40 hover:bg-cinematic-neon-gold/10 transition-all backdrop-blur-xl shadow-2xl"
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-xs font-black uppercase tracking-[0.2em] text-white group-hover:text-[#c9a96e] transition-colors">
-                    {isRTL ? "تصفح السيارات" : "BROWSE CARS"}
+                  <span className="text-xs font-black uppercase tracking-[0.2em] text-white group-hover:text-cinematic-neon-gold transition-colors">
+                    {isRTL ? rawText('معرض HM CAR') : rawText('HM CAR SHOWROOM')}
                   </span>
-                  <ArrowUpRight className="w-4 h-4 text-white/40 group-hover:text-[#c9a96e] transition-colors" />
+                  <ArrowUpRight className="w-4 h-4 text-white/40 group-hover:text-cinematic-neon-gold transition-colors" />
                 </div>
-                <span className="text-[8px] text-white/20 font-bold uppercase tracking-widest">{isRTL ? "سيارات متوفرة وجاهزة" : "AVAILABLE & READY VEHICLES"}</span>
+                <span className="text-[8px] text-white/20 font-bold uppercase tracking-widest">{isRTL ? rawText('سيارات HM CAR المتوفرة') : rawText('HM CAR READY INVENTORY')}</span>
               </button>
 
               <button
                 onClick={() => router.push('/showroom')}
-                className="group flex flex-col items-center gap-2 px-10 py-5 rounded-[2rem] bg-[#c9a96e]/10 border border-[#c9a96e]/20 hover:bg-[#c9a96e]/20 hover:border-[#c9a96e]/40 transition-all backdrop-blur-xl shadow-2xl"
+                className="group flex flex-col items-center gap-2 px-10 py-5 rounded-4xl bg-cinematic-neon-gold/10 border border-cinematic-neon-gold/20 hover:bg-cinematic-neon-gold/20 hover:border-cinematic-neon-gold/40 transition-all backdrop-blur-xl shadow-2xl"
               >
                 <div className="flex items-center gap-3">
-                  <Car className="w-4 h-4 text-[#c9a96e]" />
-                  <span className="text-xs font-black uppercase tracking-[0.2em] text-[#c9a96e]">
-                    {isRTL ? "المعرض المباشر" : "SHOWROOM"}
+                  <Car className="w-4 h-4 text-cinematic-neon-gold" />
+                  <span className="text-xs font-black uppercase tracking-[0.2em] text-cinematic-neon-gold">
+                    {isRTL ? rawText('معرض كوري') : rawText('KOREAN SHOWROOM')}
                   </span>
-                  <ArrowRight className={cn("w-4 h-4 text-[#c9a96e]", isRTL && "rotate-180")} />
+                  <ArrowRight className={cn("w-4 h-4 text-cinematic-neon-gold", isRTL && "rotate-180")} />
                 </div>
-                <span className="text-[8px] text-[#c9a96e]/40 font-bold uppercase tracking-widest">{isRTL ? "اطلب سيارتك مباشرة من كوريا" : "ORDER DIRECTLY FROM KOREA"}</span>
+                <span className="text-[8px] text-cinematic-neon-gold/40 font-bold uppercase tracking-widest">{isRTL ? rawText('اطلب سيارتك مباشرة من كوريا') : rawText('ORDER DIRECTLY FROM KOREA')}</span>
               </button>
             </div>
           </div>
@@ -625,9 +633,9 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
       <section className="relative z-10 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <motion.div className="text-center mb-16" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
-            <motion.div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#c9a96e]/30 bg-[#c9a96e]/10 backdrop-blur-md mb-4" whileHover={{ scale: 1.05 }}>
-              <Award className="w-4 h-4 text-[#c9a96e]" />
-              <span className="text-sm text-[#c9a96e] tracking-wider">{txt.whySubtitle}</span>
+            <motion.div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-cinematic-neon-gold/30 bg-cinematic-neon-gold/10 backdrop-blur-md mb-4" whileHover={{ scale: 1.05 }}>
+              <Award className="w-4 h-4 text-cinematic-neon-gold" />
+              <span className="text-sm text-cinematic-neon-gold tracking-wider">{txt.whySubtitle}</span>
             </motion.div>
             <h2 className="text-4xl md:text-5xl font-bold text-white font-display" style={{ textShadow: "0 0 40px rgba(201,169,110,0.3)" }}>{txt.whyTitle}</h2>
           </motion.div>
@@ -637,10 +645,10 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
               const Icon = lucideIcons[feature.icon] || Shield;
               return (
                 <motion.div key={index} className="group relative" initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: index * 0.1 }}>
-                  <div className="relative p-8 rounded-2xl border border-white/10 bg-white/[0.02] backdrop-blur-xl overflow-hidden transition-all duration-500 hover:border-[#c9a96e]/30 hover:bg-white/[0.05]">
-                    <div className="absolute -top-20 -right-20 w-40 h-40 bg-[#c9a96e]/20 rounded-full blur-3xl group-hover:bg-[#c9a96e]/30 transition-all" />
+                  <div className="relative p-8 rounded-2xl border border-white/10 bg-white/2 backdrop-blur-xl overflow-hidden transition-all duration-500 hover:border-cinematic-neon-gold/30 hover:bg-white/5">
+                    <div className="absolute -top-20 -right-20 w-40 h-40 bg-cinematic-neon-gold/20 rounded-full blur-3xl group-hover:bg-cinematic-neon-gold/30 transition-all" />
                     <div className="relative z-10">
-                      <motion.div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#c9a96e] to-[#8b7355] flex items-center justify-center mb-6" whileHover={{ rotate: 10, scale: 1.1 }}>
+                      <motion.div className="w-14 h-14 rounded-xl bg-linear-to-br from-cinematic-neon-gold to-[#8b7355] flex items-center justify-center mb-6" whileHover={{ rotate: 10, scale: 1.1 }}>
                         <Icon className="w-7 h-7 text-black" />
                       </motion.div>
                       <h3 className="text-xl font-bold text-white mb-2">{isRTL ? feature.title : (feature.titleEn || feature.title)}</h3>
@@ -665,27 +673,27 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.7 }}
-              className="relative overflow-hidden rounded-3xl border border-[#c9a96e]/30 bg-gradient-to-br from-[#c9a96e]/10 via-[#0a0a0a] to-[#c9a96e]/5 p-8 text-center shadow-[0_0_60px_rgba(201,169,110,0.1)]"
+              className="relative overflow-hidden rounded-3xl border border-cinematic-neon-gold/30 bg-linear-to-br from-cinematic-neon-gold/10 via-cinematic-dark to-cinematic-neon-gold/5 p-8 text-center shadow-[0_0_60px_rgba(201,169,110,0.1)]"
             >
               {/* هالة الضوء */}
-              <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-60 h-60 bg-[#c9a96e]/20 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-60 h-60 bg-cinematic-neon-gold/20 rounded-full blur-3xl pointer-events-none" />
 
               {/* أيقونة التطبيق */}
               <motion.div
                 animate={{ y: [0, -8, 0] }}
                 transition={{ duration: 3, repeat: Infinity }}
-                className="w-20 h-20 rounded-3xl bg-gradient-to-br from-[#c9a96e] to-[#7a5c2e] flex items-center justify-center mx-auto mb-5 shadow-[0_0_30px_rgba(201,169,110,0.4)] relative z-10"
+                className="w-20 h-20 rounded-3xl bg-linear-to-br from-cinematic-neon-gold to-[#7a5c2e] flex items-center justify-center mx-auto mb-5 shadow-[0_0_30px_rgba(201,169,110,0.4)] relative z-10"
               >
-                <span className="text-4xl">🚗</span>
+                <span className="text-4xl">{rawText('🚗')}</span>
               </motion.div>
 
               <h2 className="text-2xl font-black text-white mb-2 relative z-10">
-                {isRTL ? '📲 حمّل تطبيق HM CAR' : '📲 Download HM CAR App'}
+                {isRTL ? rawText('📲 حمّل تطبيق HM CAR') : rawText('📲 Download HM CAR App')}
               </h2>
               <p className="text-white/50 text-sm mb-6 relative z-10">
                 {isRTL
-                  ? 'ثبّت التطبيق على هاتفك وتابع المزادات والسيارات في أي وقت'
-                  : 'Install the app and follow auctions & cars anytime'}
+                  ? rawText('ثبّت التطبيق على هاتفك وتابع المزادات والسيارات في أي وقت')
+                  : rawText('Install the app and follow auctions & cars anytime')}
               </p>
 
               {/* زر التثبيت */}
@@ -696,25 +704,25 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
                     onClick={handleInstallPWA}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.97 }}
-                    className="flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-[#c9a96e] to-[#e8c97a] text-black font-black text-base shadow-[0_0_30px_rgba(201,169,110,0.5)] hover:shadow-[0_0_50px_rgba(201,169,110,0.7)] transition-all"
+                    className="flex items-center gap-3 px-8 py-4 rounded-2xl bg-linear-to-r from-cinematic-neon-gold to-[#e8c97a] text-black font-black text-base shadow-[0_0_30px_rgba(201,169,110,0.5)] hover:shadow-[0_0_50px_rgba(201,169,110,0.7)] transition-all"
                   >
                     <Smartphone className="w-5 h-5" />
-                    {isRTL ? 'تثبيت التطبيق الآن' : 'Install App Now'}
+                    {isRTL ? rawText('تثبيت التطبيق الآن') : rawText('Install App Now')}
                   </motion.button>
                 ) : (
                   /* iOS / متصفحات أخرى: تعليمات */
                   <div className="space-y-3 w-full max-w-xs">
-                    <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.04] border border-white/10">
-                      <span className="text-xl">⬆️</span>
-                      <p className="text-white/70 text-sm text-right">{isRTL ? 'اضغط زر المشاركة في المتصفح' : 'Tap the Share button in browser'}</p>
+                    <div className="flex items-center gap-3 p-3 rounded-xl bg-white/4 border border-white/10">
+                      <span className="text-xl">{rawText('⬆️')}</span>
+                      <p className="text-white/70 text-sm text-right">{isRTL ? rawText('اضغط زر المشاركة في المتصفح') : rawText('Tap the Share button in browser')}</p>
                     </div>
-                    <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.04] border border-white/10">
-                      <span className="text-xl">➕</span>
-                      <p className="text-white/70 text-sm text-right">{isRTL ? 'اختر "إضافة إلى الشاشة الرئيسية"' : 'Choose "Add to Home Screen"'}</p>
+                    <div className="flex items-center gap-3 p-3 rounded-xl bg-white/4 border border-white/10">
+                      <span className="text-xl">{rawText('➕')}</span>
+                      <p className="text-white/70 text-sm text-right">{isRTL ? rawText('اختر "إضافة إلى الشاشة الرئيسية"') : rawText('Choose "Add to Home Screen"')}</p>
                     </div>
-                    <div className="flex items-center gap-3 p-3 rounded-xl bg-[#c9a96e]/10 border border-[#c9a96e]/20">
-                      <span className="text-xl">✅</span>
-                      <p className="text-[#c9a96e] text-sm font-bold text-right">{isRTL ? 'استمتع بتجربة التطبيق!' : 'Enjoy the app experience!'}</p>
+                    <div className="flex items-center gap-3 p-3 rounded-xl bg-cinematic-neon-gold/10 border border-cinematic-neon-gold/20">
+                      <span className="text-xl">{rawText('✅')}</span>
+                      <p className="text-cinematic-neon-gold text-sm font-bold text-right">{isRTL ? rawText('استمتع بتجربة التطبيق!') : rawText('Enjoy the app experience!')}</p>
                     </div>
                   </div>
                 )}
@@ -735,15 +743,15 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {testimonials.map((testimonial, index) => (
-                <motion.div key={index} className="relative p-8 rounded-2xl border border-white/10 bg-white/[0.02] backdrop-blur-xl" initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: index * 0.15 }}>
+                <motion.div key={index} className="relative p-8 rounded-2xl border border-white/10 bg-white/2 backdrop-blur-xl" initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: index * 0.15 }}>
                   <div className="flex gap-1 mb-4">
                     {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 text-[#c9a96e] fill-[#c9a96e]" />
+                      <Star key={i} className="w-5 h-5 text-cinematic-neon-gold fill-cinematic-neon-gold" />
                     ))}
                   </div>
-                  <p className="text-white/80 mb-6 leading-relaxed">&ldquo;{testimonial.text}&rdquo;</p>
+                  <p className="text-white/80 mb-6 leading-relaxed">{rawText('“')}{testimonial.text}{rawText('”')}</p>
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#c9a96e] to-[#8b7355] flex items-center justify-center text-black font-bold">
+                    <div className="w-12 h-12 rounded-full bg-linear-to-br from-cinematic-neon-gold to-[#8b7355] flex items-center justify-center text-black font-bold">
                       {testimonial.name.charAt(0)}
                     </div>
                     <div>
@@ -762,21 +770,21 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
         <section className="relative z-10 py-12 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
             <motion.div className="relative overflow-hidden rounded-3xl p-8 md:p-16" initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
-              <div className="absolute inset-0 bg-gradient-to-br from-[#c9a96e]/30 via-[#020202] to-[#8b7355]/20" />
+              <div className="absolute inset-0 bg-linear-to-br from-cinematic-neon-gold/30 via-[#020202] to-[#8b7355]/20" />
               <div className="absolute inset-0 bg-[url('/images/grid.svg')] opacity-20" />
-              <motion.div className="absolute top-0 left-0 w-64 h-64 rounded-full bg-[#c9a96e]/30 blur-3xl" animate={{ x: [0, 50, 0], y: [0, 30, 0] }} transition={{ duration: 8, repeat: Infinity }} />
-              <motion.div className="absolute bottom-0 right-0 w-96 h-96 rounded-full bg-[#c9a96e]/20 blur-3xl" animate={{ x: [0, -50, 0], y: [0, -30, 0] }} transition={{ duration: 10, repeat: Infinity }} />
+              <motion.div className="absolute top-0 left-0 w-64 h-64 rounded-full bg-cinematic-neon-gold/30 blur-3xl" animate={{ x: [0, 50, 0], y: [0, 30, 0] }} transition={{ duration: 8, repeat: Infinity }} />
+              <motion.div className="absolute bottom-0 right-0 w-96 h-96 rounded-full bg-cinematic-neon-gold/20 blur-3xl" animate={{ x: [0, -50, 0], y: [0, -30, 0] }} transition={{ duration: 10, repeat: Infinity }} />
 
               <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-12">
                 <div className="flex-1 text-center md:text-left">
-                  <motion.div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#c9a96e]/30 bg-[#c9a96e]/10 backdrop-blur-md mb-6" whileHover={{ scale: 1.05 }}>
-                    <Smartphone className="w-4 h-4 text-[#c9a96e]" />
-                    <span className="text-sm text-[#c9a96e] tracking-wider">App</span>
+                  <motion.div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-cinematic-neon-gold/30 bg-cinematic-neon-gold/10 backdrop-blur-md mb-6" whileHover={{ scale: 1.05 }}>
+                    <Smartphone className="w-4 h-4 text-cinematic-neon-gold" />
+                    <span className="text-sm text-cinematic-neon-gold tracking-wider">{rawText('App')}</span>
                   </motion.div>
                   <h2 className="text-4xl md:text-5xl font-bold text-white font-display mb-4" style={{ textShadow: "0 0 40px rgba(201,169,110,0.3)" }}>{txt.downloadTitle}</h2>
                   <p className="text-white/60 mb-8">{txt.downloadSubtitle}</p>
                   <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-                    <motion.button className="flex items-center gap-3 px-6 py-3 bg-white text-black rounded-xl font-bold hover:bg-[#c9a96e] transition-all" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
+                    <motion.button className="flex items-center gap-3 px-6 py-3 bg-white text-black rounded-xl font-bold hover:bg-cinematic-neon-gold transition-all" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
                       <Download className="w-5 h-5" />
                       {txt.appStore}
                     </motion.button>
@@ -787,9 +795,9 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
                   </div>
                 </div>
                 <div className="flex-1 flex justify-center">
-                  <motion.div className="relative w-64 h-[500px] rounded-3xl border-4 border-white/20 overflow-hidden bg-gradient-to-b from-[#c9a96e]/20 to-transparent" animate={{ y: [0, -10, 0] }} transition={{ duration: 4, repeat: Infinity }}>
+                  <motion.div className="relative w-64 h-125 rounded-3xl border-4 border-white/20 overflow-hidden bg-linear-to-b from-cinematic-neon-gold/20 to-transparent" animate={{ y: [0, -10, 0] }} transition={{ duration: 4, repeat: Infinity }}>
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <Smartphone className="w-24 h-24 text-[#c9a96e]/30" />
+                      <Smartphone className="w-24 h-24 text-cinematic-neon-gold/30" />
                     </div>
                   </motion.div>
                 </div>
@@ -801,7 +809,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
 
       {/* [[ARABIC_COMMENT]] قسم الوكالات المعتمدة */}
       {brands.length > 0 && (
-        <section className="relative z-10 py-16 px-4 sm:px-6 lg:px-8 border-t border-white/5 bg-gradient-to-b from-black via-[#c9a96e]/5 to-black">
+        <section className="relative z-10 py-16 px-4 sm:px-6 lg:px-8 border-t border-white/5 bg-linear-to-b from-black via-cinematic-neon-gold/5 to-black">
           <div className="max-w-7xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -810,13 +818,13 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
               className="text-center mb-12"
             >
               <div className="flex items-center gap-4 justify-center mb-4">
-                <div className="h-[1px] w-12 bg-[#c9a96e]/30" />
-                <h3 className="text-xl font-black uppercase tracking-[0.3em] text-[#c9a96e] italic">
-                  {isRTL ? "الوكالات المعتمدة" : "OFFICIAL AGENCIES"}
+                <div className="h-px w-12 bg-cinematic-neon-gold/30" />
+                <h3 className="text-xl font-black uppercase tracking-[0.3em] text-cinematic-neon-gold italic">
+                  {isRTL ? rawText('الوكالات المعتمدة') : rawText('OFFICIAL AGENCIES')}
                 </h3>
-                <div className="h-[1px] w-12 bg-[#c9a96e]/30" />
+                <div className="h-px w-12 bg-cinematic-neon-gold/30" />
               </div>
-              <p className="text-white/40 text-xs font-bold uppercase tracking-widest italic">{isRTL ? "نحن وكلاء معتمدون لأكبر الماركات العالمية" : "CERTIFIED AGENTS FOR PREMIER GLOBAL BRANDS"}</p>
+              <p className="text-white/40 text-xs font-bold uppercase tracking-widest italic">{isRTL ? rawText('نحن وكلاء معتمدون لأكبر الماركات العالمية') : rawText('CERTIFIED AGENTS FOR PREMIER GLOBAL BRANDS')}</p>
             </motion.div>
 
             <div className="flex flex-wrap justify-center gap-8 md:gap-16">
@@ -828,12 +836,12 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
                   className="group cursor-pointer flex flex-col items-center gap-4"
                   onClick={() => router.push(`/search?brand=${brand.name}`)}
                 >
-                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-3xl bg-white/[0.02] border border-white/10 p-5 flex items-center justify-center group-hover:bg-[#c9a96e]/10 group-hover:border-[#c9a96e]/40 shadow-2xl transition-all duration-500 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-3xl bg-white/2 border border-white/10 p-5 flex items-center justify-center group-hover:bg-cinematic-neon-gold/10 group-hover:border-cinematic-neon-gold/40 shadow-2xl transition-all duration-500 relative overflow-hidden">
+                    <div className="absolute inset-0 bg-linear-to-br from-white/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                     {brand.logoUrl ? (
                       <img src={brand.logoUrl} alt={brand.name} className="w-full h-full object-contain grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700" />
                     ) : (
-                      <Tag className="w-10 h-10 text-white/10 group-hover:text-[#c9a96e]" />
+                      <Tag className="w-10 h-10 text-white/10 group-hover:text-cinematic-neon-gold" />
                     )}
                   </div>
                   <span className="text-[10px] font-black uppercase tracking-widest text-white/20 group-hover:text-white transition-colors">{brand.name}</span>
@@ -848,12 +856,12 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-8">
             <div className="text-center md:text-left">
-              <h3 className="text-2xl font-bold text-[#c9a96e] font-display mb-2" style={{ textShadow: "0 0 20px rgba(201,169,110,0.3)" }}>{siteInfo?.siteName || 'HM CAR'}</h3>
-              <p className="text-white/60 text-sm">{siteInfo?.siteDescription || (isRTL ? "وجهتك الأولى للسيارات الفاخرة وقطع الغيار الأصلية من كوريا الجنوبية" : "Your first destination for luxury cars and genuine parts from South Korea")}</p>
+              <h3 className="text-2xl font-bold text-cinematic-neon-gold font-display mb-2" style={{ textShadow: "0 0 20px rgba(201,169,110,0.3)" }}>{siteInfo?.siteName || rawText('HM CAR')}</h3>
+              <p className="text-white/60 text-sm">{siteInfo?.siteDescription || (isRTL ? rawText('وجهتك الأولى للسيارات الفاخرة وقطع الغيار الأصلية من كوريا الجنوبية') : rawText('Your first destination for luxury cars and genuine parts from South Korea'))}</p>
             </div>
             <div className="flex items-center gap-3">
               <Link href="/support">
-                <motion.div whileHover={{ scale: 1.08 }} className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:text-[#c9a96e] hover:border-[#c9a96e]/40 transition-all">
+                <motion.div whileHover={{ scale: 1.08 }} className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:text-cinematic-neon-gold hover:border-cinematic-neon-gold/40 transition-all">
                   <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 10a7 7 0 0 1 14 0v4a4 4 0 0 1-4 4h-1v2h-2v-2h-1a4 4 0 0 1-4-4z"></path></svg>
                 </motion.div>
               </Link>
@@ -872,7 +880,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
               {/* [[ARABIC_COMMENT]] أيقونات التواصل الاجتماعي - تظهر بأيقونات SVG واضحة */}
               {socialConfig.links.slice(0, 4).map((item, idx) => {
                 const SvgIcon = SocialSVGIcons[item.platform];
-                const colorClass = platformColors[item.platform] || 'text-white/60';
+                const colorClass = platformColors[item.platform] || rawText('text-white/60');
                 return (
                   <a href={item.url} target="_blank" rel="noopener noreferrer" key={idx}>
                     <motion.div
@@ -888,10 +896,10 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
             </div>
           </div>
           <div className="pt-6 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-white/40 text-xs">© 2026 {siteInfo?.siteName || 'HM CAR'}. {txt.rights}.</p>
+            <p className="text-white/40 text-xs">{rawText('© 2026')} {siteInfo?.siteName || rawText('HM CAR')}{rawText('.')} {txt.rights}{rawText('.')}</p>
             <div className="flex items-center gap-4 text-xs text-white/40">
-              <Link href="#" className="hover:text-[#c9a96e] transition-colors">{txt.privacy}</Link>
-              <Link href="#" className="hover:text-[#c9a96e] transition-colors">{txt.terms}</Link>
+              <Link href="#" className="hover:text-cinematic-neon-gold transition-colors">{txt.privacy}</Link>
+              <Link href="#" className="hover:text-cinematic-neon-gold transition-colors">{txt.terms}</Link>
             </div>
           </div>
         </div>
@@ -902,26 +910,26 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
         <motion.div
           initial={{ y: -80, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="fixed top-0 left-0 right-0 z-[9999] bg-[#c9a96e] text-black px-4 py-3 flex items-center justify-between shadow-[0_4px_20px_rgba(201,169,110,0.5)]"
+          className="fixed top-0 left-0 right-0 z-9999 bg-cinematic-neon-gold text-black px-4 py-3 flex items-center justify-between shadow-[0_4px_20px_rgba(201,169,110,0.5)]"
         >
           <div className="flex items-center gap-3">
             <RefreshCw className="w-4 h-4 animate-spin" />
             <span className="text-sm font-black uppercase tracking-wider">
-              {isRTL ? '🎉 تحديث جديد متوفر!' : '🎉 New update available!'}
+              {isRTL ? rawText('🎉 تحديث جديد متوفر!') : rawText('🎉 New update available!')}
             </span>
           </div>
           <div className="flex items-center gap-3">
             <button
               onClick={() => window.location.reload()}
-              className="px-4 py-1.5 bg-black text-[#c9a96e] text-xs font-black uppercase tracking-widest rounded-lg hover:bg-black/80 transition-all"
+              className="px-4 py-1.5 bg-black text-cinematic-neon-gold text-xs font-black uppercase tracking-widest rounded-lg hover:bg-black/80 transition-all"
             >
-              {isRTL ? 'تحديث الآن' : 'UPDATE NOW'}
+              {isRTL ? rawText('تحديث الآن') : rawText('UPDATE NOW')}
             </button>
             <button
               onClick={() => setShowUpdateBanner(false)}
               className="text-black/60 hover:text-black text-xs font-black"
             >
-              ✕
+              {rawText('✕')}
             </button>
           </div>
         </motion.div>
@@ -929,3 +937,4 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
     </div>
   );
 }
+

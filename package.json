@@ -44,10 +44,12 @@
     "check:health": "node scripts/healthCheck.js",
     "fix:assets": "node scripts/fixAssetPaths.js",
     "setup:railway": "node scripts/setup-railway.js",
-    "health": "node scripts/healthCheck.js"
+    "health": "node scripts/healthCheck.js",
+    "backup": "node scripts/production-backup.js"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.5.2",
+    "@sentry/node": "^10.43.0",
     "axios": "^1.13.6",
     "bcrypt": "^5.1.1",
     "bootstrap-icons": "^1.11.3",
@@ -66,6 +68,7 @@
     "express-mongo-sanitize": "^2.2.0",
     "express-rate-limit": "^7.4.1",
     "express-session": "^1.17.3",
+    "firebase-admin": "^12.1.0",
     "helmet": "^7.1.0",
     "i18n": "^0.15.3",
     "ioredis": "^5.4.1",
@@ -78,7 +81,7 @@
     "nodemailer": "^6.9.8",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
-    "puppeteer": "^24.34.0",
+    "puppeteer": "^24.39.0",
     "qrcode": "^1.5.3",
     "redis": "^4.7.0",
     "sharp": "^0.34.5",

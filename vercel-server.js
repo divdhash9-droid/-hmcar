@@ -10,6 +10,8 @@ const mongoose = require('mongoose');
 const express = require('express');
 const cors = require('cors');
 const compression = require('compression');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 
 let cachedApp = null;
 let dbConnected = false;
@@ -49,27 +51,31 @@ async function seedProductionAdmin() {
     try {
         const User = require('./models/User');
 
-        // ─── الأدمن الرئيسي: أنشئه فقط إذا لم يكن موجوداً ───
+        // ─── الأدمن الرئيسي: أنشئه فقط إذا لم يكن موجوداً ومزود بمتغيرات البيئة ───
+        const adminEmail = process.env.PROD_ADMIN_EMAIL || 'admin@hmcar.com';
         const adminExists = await User.findOne({
-            $or: [{ email: 'admin@hmcar.com' }, { username: 'admin' }]
+            $or: [{ email: adminEmail }, { username: 'admin' }]
         });
 
         if (!adminExists) {
-            // إنشاء أول مرة فقط - لن يُعاد إنشاؤه أبداً
-            const admin = new User({
-                name: 'HM Admin',
-                email: 'admin@hmcar.com',
-                username: 'admin',
-                password: 'HmCar@2026!',
-                role: 'super_admin',
-                status: 'active',
-                permissions: ['super_admin', 'manage_users', 'manage_settings', 'manage_cars', 'manage_parts', 'manage_auctions', 'view_analytics', 'manage_content', 'manage_footer', 'manage_whatsapp', 'manage_concierge']
-            });
-            await admin.save();
-            console.log('✅ [ONCE] Admin created: admin@hmcar.com');
+            // الأمان 1: لا تنشئ حساب أدمن أبداً بكلمة مرور افتراضية
+            if (!process.env.PROD_ADMIN_PASSWORD) {
+                console.warn('⚠️ No PROD_ADMIN_PASSWORD provided in environment. Admin creation skipped for security.');
+            } else {
+                const admin = new User({
+                    name: process.env.PROD_ADMIN_NAME || 'HM Admin',
+                    email: adminEmail,
+                    username: 'admin',
+                    password: process.env.PROD_ADMIN_PASSWORD,
+                    role: 'super_admin',
+                    status: 'active',
+                    permissions: ['super_admin', 'manage_users', 'manage_settings', 'manage_cars', 'manage_parts', 'manage_auctions', 'view_analytics', 'manage_content', 'manage_footer', 'manage_whatsapp', 'manage_concierge']
+                });
+                await admin.save();
+                console.log(`✅ [ONCE] Admin created: ${adminEmail} securely via env vars`);
+            }
         } else {
-            // الأدمن موجود - لا تمسه! فقط تأكد أنه نشط
-            // لا تغيّر كلمة المرور أو الإيميل أو أي بيانات أخرى
+            // الأدمن موجود - لا تمسه!
             if (adminExists.status === 'suspended') {
                 await User.updateOne(
                     { _id: adminExists._id },
@@ -81,25 +87,7 @@ async function seedProductionAdmin() {
             }
         }
 
-        // ─── أدمن احتياطي: أنشئه فقط إذا لم يكن موجوداً ───
-        const masterExists = await User.findOne({ username: 'master_admin' });
-
-        if (!masterExists) {
-            const master = new User({
-                name: 'Master Admin',
-                email: 'master@hmcar.com',
-                username: 'master_admin',
-                password: 'HmCar@2026!',
-                role: 'super_admin',
-                status: 'active',
-                permissions: ['super_admin']
-            });
-            await master.save();
-            console.log('✅ [ONCE] Master Admin created: master_admin');
-        } else {
-            console.log('✅ Master Admin already exists - data preserved as-is');
-        }
-
+        // تم إيقاف إنشاء أدمن إضافي (master_admin) بكلمة مرور افتراضية لزيادة الأمان.
     } catch (e) {
         console.warn('⚠️ Admin seed warning:', e.message);
     }
@@ -110,6 +98,13 @@ async function seedProductionAdmin() {
  */
 async function seedRealData() {
     if (adminSeeded) return;
+    
+    // الأمان 4: منع أي Seeding تلقائي في وقت تشغيل الإنتاج
+    if (process.env.NODE_ENV === 'production' && process.env.ENABLE_DEV_ADMIN !== 'true') {
+        console.log('✅ Production Mode: Skipping real data seeding to protect existing user data.');
+        return;
+    }
+
     adminSeeded = true;
 
     try {
@@ -230,23 +225,45 @@ function buildApp() {
     app.use(cors({
         origin: function (origin, callback) {
             if (!origin) return callback(null, true);
-            if (origin.endsWith('.vercel.app') || origin.startsWith('http://localhost')) {
-                return callback(null, true);
-            }
+            
+            // الأمان 3: تفعيل CORS فقط للنطاقات المسموحة رسمياً حسب المتغير ALLOWED_ORIGINS
             const allowed = (process.env.ALLOWED_ORIGINS || '').split(',').map(o => o.trim());
-            callback(allowed.includes(origin) ? null : new Error('CORS blocked'), allowed.includes(origin));
+            
+            // السماح للنطاقات المتطابقة مع القائمة المسموحة، أو إذا كنا في بيئة التطوير
+            if (allowed.includes(origin) || (process.env.NODE_ENV !== 'production' && (origin.endsWith('.vercel.app') || origin.startsWith('http://localhost')))) {
+                 return callback(null, true);
+            }
+            callback(new Error('CORS blocked by strict policy'), false);
         },
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
     }));
 
+    // الأمان 1: تفعيل Helmet لإخفاء تفاصيل السيرفر وإضافة ترويسات أمنية
+    app.use(helmet());
+
     app.use(compression());
     app.use(express.json({ limit: '10mb' }));
     app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+    // الأمان 1: تفعيل Rate Limiter لحماية الخادم من هجمات الـ DDoS والطلبات العشوائية
+    const apiLimiter = rateLimit({
+        windowMs: 15 * 60 * 1000, // 15 دقيقة
+        max: 500, // حد أقصى 500 طلب لكل مستخدم (كافي جداً للمزادات حيث أن WebSockets لا تتأثر بالـ limit)
+        message: { success: false, message: 'Too many requests from this IP, please try again after 15 minutes', code: 'RATE_LIMIT_EXCEEDED' },
+        standardHeaders: true,
+        legacyHeaders: false,
+    });
+    app.use('/api', apiLimiter);
+
     // ── Diagnostic Check ──
     app.get('/api/diag', async (req, res) => {
+        // الأمان 1: تعطيل المسار التشخيصي في الإنتاج حتى لا يسرب معلومات السيرفر للعامة
+        if (process.env.NODE_ENV === 'production' && process.env.ENABLE_DEV_ADMIN !== 'true') {
+            return res.status(403).json({ success: false, message: 'Diagnostic endpoint disabled in production' });
+        }
+
         let adminStatus = 'Unknown';
         try {
             const User = require('./models/User');

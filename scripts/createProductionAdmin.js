@@ -18,7 +18,7 @@ const ADMIN_DATA = {
     name: process.env.PROD_ADMIN_NAME || 'HM Admin',
     email: process.env.PROD_ADMIN_EMAIL || 'admin@hmcar.com',
     username: 'admin',
-    password: process.env.PROD_ADMIN_PASSWORD || 'HmCar@2026!',
+    password: process.env.PROD_ADMIN_PASSWORD,
     role: 'super_admin',
     status: 'active',
     permissions: [
@@ -34,6 +34,11 @@ async function run() {
     if (!uri || uri.startsWith('memory://')) {
         console.error('❌ يجب تعيين MONGO_URI لقاعدة بيانات Atlas حقيقية!');
         console.error('   مثال: MONGO_URI="mongodb+srv://user:pass@cluster.mongodb.net/car-auction" node scripts/createProductionAdmin.js');
+        process.exit(1);
+    }
+
+    if (!process.env.PROD_ADMIN_PASSWORD) {
+        console.error('❌ يجب تحديد كلمة المرور الخاصة بالأدمن في متغير PROD_ADMIN_PASSWORD');
         process.exit(1);
     }
 

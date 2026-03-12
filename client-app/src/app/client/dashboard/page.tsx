@@ -22,6 +22,8 @@ import { useAuth } from "@/lib/AuthContext";
 import { api } from "@/lib/api";
 import Link from "next/link";
 
+const rawText = (value: string) => value;
+
 export default function ClientDashboard() {
     const { isRTL } = useLanguage();
     const { user, isLoading: authLoading } = useAuth();
@@ -56,7 +58,7 @@ export default function ClientDashboard() {
     };
 
     const statCards = [
-        { label: isRTL ? 'سيارات متاحة' : 'Available Cars', value: stats.availableCars, icon: Car, color: '#3b82f6', href: '/showroom' },
+        { label: isRTL ? 'سيارات متاحة' : 'Available Cars', value: stats.availableCars, icon: Car, color: '#3b82f6', href: '/cars' },
         { label: isRTL ? 'مزادات مباشرة' : 'Live Auctions', value: stats.liveAuctions, icon: Activity, color: '#ef4444', href: '/auctions' },
         { label: isRTL ? 'طلباتي' : 'My Orders', value: stats.myOrders, icon: ShoppingBag, color: '#c9a96e', href: '/orders' },
         { label: isRTL ? 'المفضلة' : 'Favorites', value: stats.myFavorites, icon: Heart, color: '#ec4899', href: '/favorites' },
@@ -65,9 +67,9 @@ export default function ClientDashboard() {
     const quickActions = [
         {
             icon: Car,
-            label: isRTL ? 'تصفح المعرض' : 'Browse Cars',
+            label: isRTL ? 'معرض HM CAR' : 'HM CAR Showroom',
             desc: isRTL ? 'اكتشف أحدث السيارات' : 'Discover latest vehicles',
-            href: '/showroom',
+            href: '/cars',
             color: '#3b82f6',
             bg: 'rgba(59, 130, 246, 0.08)',
         },
@@ -119,7 +121,7 @@ export default function ClientDashboard() {
                 <motion.div
                     animate={{ rotate: 360 }}
                     transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
-                    className="w-10 h-10 border-2 border-[#c9a96e]/30 border-t-[#c9a96e] rounded-full"
+                    className="w-10 h-10 border-2 border-cinematic-neon-gold/30 border-t-cinematic-neon-gold rounded-full"
                 />
             </div>
         );
@@ -130,8 +132,8 @@ export default function ClientDashboard() {
             {/* ── Header ── */}
             <div className="px-5 lg:px-8 pt-6 lg:pt-8 pb-4">
                 <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
-                    <p className="text-[12px] text-white/30 font-medium mb-1">{greeting},</p>
-                    <h1 className="text-2xl lg:text-3xl font-bold text-white">{userName} 👋</h1>
+                    <p className="text-[12px] text-white/30 font-medium mb-1">{greeting}{rawText(',')}</p>
+                    <h1 className="text-2xl lg:text-3xl font-bold text-white">{userName} {rawText('👋')}</h1>
                 </motion.div>
             </div>
 
@@ -148,7 +150,7 @@ export default function ClientDashboard() {
                                 transition={{ delay: i * 0.06 }}
                             >
                                 <Link href={stat.href}>
-                                    <div className="relative p-4 rounded-2xl bg-white/[0.03] border border-white/[0.07] hover:bg-white/[0.05] hover:border-white/10 transition-all group overflow-hidden">
+                                    <div className="relative p-4 rounded-2xl bg-white/3 border border-white/7 hover:bg-white/5 hover:border-white/10 transition-all group overflow-hidden">
                                         {/* خلفية اللون */}
                                         <div
                                             className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
@@ -183,7 +185,7 @@ export default function ClientDashboard() {
             {/* ── Quick Actions ── */}
             <div className="px-5 lg:px-8 mb-6">
                 <h2 className="text-[11px] font-black text-white/25 uppercase tracking-[0.3em] mb-3">
-                    {isRTL ? 'إجراءات سريعة' : 'Quick Actions'}
+                    {isRTL ? rawText('إجراءات سريعة') : rawText('Quick Actions')}
                 </h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {quickActions.map((action, i) => {
@@ -197,7 +199,7 @@ export default function ClientDashboard() {
                             >
                                 <Link href={action.href}>
                                     <div
-                                        className="p-4 rounded-2xl border border-white/[0.06] hover:border-white/12 transition-all group cursor-pointer"
+                                        className="p-4 rounded-2xl border border-white/6 hover:border-white/12 transition-all group cursor-pointer"
                                         style={{ background: action.bg }}
                                     >
                                         <div
@@ -223,10 +225,10 @@ export default function ClientDashboard() {
                 <div className="px-5 lg:px-8 mb-6">
                     <div className={cn("flex items-center justify-between mb-3", isRTL && "flex-row-reverse")}>
                         <h2 className="text-[11px] font-black text-white/25 uppercase tracking-[0.3em]">
-                            {isRTL ? 'سيارات موصى بها' : 'Recommended Cars'}
+                            {isRTL ? rawText('سيارات موصى بها') : rawText('Recommended Cars')}
                         </h2>
-                        <Link href="/showroom" className="text-[11px] text-[#c9a96e]/70 hover:text-[#c9a96e] font-semibold transition-colors flex items-center gap-1">
-                            {isRTL ? <><ArrowLeft className="w-3 h-3" /> عرض الكل</> : <>View All <ArrowRight className="w-3 h-3" /></>}
+                        <Link href="/showroom" className="text-[11px] text-cinematic-neon-gold/70 hover:text-cinematic-neon-gold font-semibold transition-colors flex items-center gap-1">
+                            {isRTL ? <><ArrowLeft className="w-3 h-3" /> {rawText('عرض الكل')}</> : <>{rawText('View All')} <ArrowRight className="w-3 h-3" /></>}
                         </Link>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -236,7 +238,7 @@ export default function ClientDashboard() {
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.3 + i * 0.1 }}
-                                    className="rounded-2xl overflow-hidden border border-white/[0.06] hover:border-white/12 bg-white/[0.02] group transition-all"
+                                    className="rounded-2xl overflow-hidden border border-white/6 hover:border-white/12 bg-white/2 group transition-all"
                                 >
                                     <div className="h-40 overflow-hidden relative">
                                         <img
@@ -244,13 +246,13 @@ export default function ClientDashboard() {
                                             alt={car.title}
                                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                                         />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                                        <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
                                     </div>
                                     <div className="p-3.5">
                                         <div className="text-[13px] font-bold text-white truncate mb-1">{car.title}</div>
                                         <div className="flex items-center justify-between">
-                                            <div className="text-[12px] text-[#c9a96e] font-semibold">
-                                                {Number(car.price).toLocaleString()} <span className="text-[10px] text-white/30">SAR</span>
+                                            <div className="text-[12px] text-cinematic-neon-gold font-semibold">
+                                                {Number(car.price).toLocaleString()} <span className="text-[10px] text-white/30">{rawText('SAR')}</span>
                                             </div>
                                             {isRTL
                                                 ? <ArrowLeft className="w-3.5 h-3.5 text-white/20" />
@@ -272,11 +274,11 @@ export default function ClientDashboard() {
                         <div className={cn("flex items-center gap-2", isRTL && "flex-row-reverse")}>
                             <div className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
                             <h2 className="text-[11px] font-black text-white/25 uppercase tracking-[0.3em]">
-                                {isRTL ? 'مزادات مباشرة' : 'Live Auctions'}
+                                {isRTL ? rawText('مزادات مباشرة') : rawText('Live Auctions')}
                             </h2>
                         </div>
-                        <Link href="/auctions" className="text-[11px] text-[#c9a96e]/70 hover:text-[#c9a96e] font-semibold transition-colors flex items-center gap-1">
-                            {isRTL ? <><ArrowLeft className="w-3 h-3" /> عرض الكل</> : <>View All <ArrowRight className="w-3 h-3" /></>}
+                        <Link href="/auctions" className="text-[11px] text-cinematic-neon-gold/70 hover:text-cinematic-neon-gold font-semibold transition-colors flex items-center gap-1">
+                            {isRTL ? <><ArrowLeft className="w-3 h-3" /> {rawText('عرض الكل')}</> : <>{rawText('View All')} <ArrowRight className="w-3 h-3" /></>}
                         </Link>
                     </div>
                     <div className="overflow-x-auto scrollbar-hide">
@@ -284,7 +286,7 @@ export default function ClientDashboard() {
                             {dashboardData.auctions.map((a: any, i: number) => (
                                 <div
                                     key={a.id || i}
-                                    className="shrink-0 px-4 py-2.5 rounded-xl bg-red-400/[0.06] border border-red-400/15 flex items-center gap-2.5"
+                                    className="shrink-0 px-4 py-2.5 rounded-xl bg-red-400/6 border border-red-400/15 flex items-center gap-2.5"
                                 >
                                     <Clock className="w-3 h-3 text-red-400/70" strokeWidth={2} />
                                     <span className="text-[12px] font-bold text-white/70">{a.label}</span>

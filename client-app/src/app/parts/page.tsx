@@ -22,15 +22,24 @@ interface Part {
     id?: string;
     _id: string;
     name: string;
+    nameAr?: string;
     brand: string;
     model: string;
     price: number;
     images?: string[];
     img?: string;
+    image?: string;
     condition: 'NEW' | 'USED' | 'REFURBISHED';
     category: string;
+    categoryAr?: string;
     stockQty: number;
     compatibility: string[];
+}
+
+function resolvePartImage(part: Part): string {
+    const candidate = part.img || part.image || part.images?.[0] || '';
+    const normalized = typeof candidate === 'string' ? candidate.trim() : '';
+    return normalized || '/images/placeholder.jpg';
 }
 
 interface Agency {
@@ -80,7 +89,13 @@ export default function PartsPage() {
 
     const handleAgencySelect = (agency: Agency) => {
         setSelectedAgency(agency);
-        setViewMode('MODELS');
+        if (!agency.models || agency.models.length === 0) {
+            setSelectedModel('ALL');
+            setViewMode('PARTS');
+            loadParts(agency.name, 'ALL');
+        } else {
+            setViewMode('MODELS');
+        }
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -94,13 +109,13 @@ export default function PartsPage() {
     const loadParts = async (agency: string, model: string) => {
         setLoading(true);
         try {
-            // [[ARABIC_COMMENT]] جلب قطع الغيار الخاصة بالوكالة المختارة
-            const res = await api.parts.list({ q: agency, limit: 200 });
+            // [[ARABIC_COMMENT]] جلب القطع من المصدر المحلي المستورد، مع فلتر اختياري للوكالة
+            const res = await api.parts.list({ q: agency || undefined, limit: 300 });
             // [[ARABIC_COMMENT]] الـ API يعيد البيانات في res.parts أو res.data.parts
             const allParts = res?.parts || res?.data?.parts || [];
             // [[ARABIC_COMMENT]] تصفية حسب اسم الوكالة والموديل المختار
             const fetchedParts = allParts.filter((p: { brand?: string, carModel?: string }) => {
-                const brandMatch = p.brand?.toLowerCase() === agency.toLowerCase();
+                const brandMatch = !agency || p.brand?.toLowerCase() === agency.toLowerCase();
                 const modelMatch = model === 'ALL' || (p.carModel?.toLowerCase() === model.toLowerCase());
                 return brandMatch && modelMatch;
             });
@@ -127,13 +142,20 @@ export default function PartsPage() {
     };
 
     const filteredAgencies = agencies.filter(a => a.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    const filteredParts = parts.filter((part) => {
+        const q = searchQuery.trim().toLowerCase();
+        if (!q) return true;
+        return [part.nameAr, part.name, part.brand, part.model, part.categoryAr, part.category]
+            .filter(Boolean)
+            .some(v => String(v).toLowerCase().includes(q));
+    });
 
     // [[ARABIC_COMMENT]] فتح مودال القطعة مع تحويل بياناتها لصيغة ProductModalData
     const openPartModal = (part: Part) => {
         setModalProduct({
             id: part._id,
             type: 'part',
-            title: part.name,
+            title: part.nameAr || part.name,
             images: (part.images || [part.img]).filter((img): img is string => !!img),
             price: part.price,
             brand: part.brand,
@@ -346,6 +368,27 @@ export default function PartsPage() {
                                                 </div>
                                             </motion.div>
                                         ))}
+                                        <motion.div
+                                            key="ALL"
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: selectedAgency.models.length * 0.05 }}
+                                            onClick={() => handleModelSelect('ALL')}
+                                            className="group relative cursor-pointer"
+                                        >
+                                            <div className="glass-card bg-white/[0.02] border border-white/10 rounded-2xl p-6 flex items-center justify-between group-hover:border-accent-gold/40 transition-all duration-500">
+                                                <div className="flex items-center gap-5">
+                                                    <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:bg-accent-gold/10 transition-all">
+                                                        <CarFront className="w-5 h-5 text-white/20 group-hover:text-accent-gold transition-colors" />
+                                                    </div>
+                                                    <div>
+                                                        <h3 className="text-sm font-black uppercase tracking-widest">{isRTL ? 'جميع الموديلات' : 'ALL MODELS'}</h3>
+                                                        <span className="text-[8px] text-white/20 font-bold uppercase tracking-widest">{selectedAgency.name} SERIES</span>
+                                                    </div>
+                                                </div>
+                                                <ArrowUpRight className="w-4 h-4 text-white/10 group-hover:text-accent-gold group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
+                                            </div>
+                                        </motion.div>
                                     </div>
                                 ) : (
                                     <div className="text-center py-20 text-white/40 italic uppercase tracking-[0.2em] font-black w-full text-xs">
@@ -369,7 +412,7 @@ export default function PartsPage() {
                                             <div key={i} className="aspect-[4/5] rounded-3xl bg-white/[0.02] border border-white/5 animate-pulse" />
                                         ))}
                                     </div>
-                                ) : parts.length === 0 ? (
+                                ) : filteredParts.length === 0 ? (
                                     <motion.div
                                         initial={{ opacity: 0, scale: 0.9 }}
                                         animate={{ opacity: 1, scale: 1 }}
@@ -394,7 +437,7 @@ export default function PartsPage() {
                                     </motion.div>
                                 ) : (
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                                        {parts.map((part, idx) => (
+                                        {filteredParts.map((part, idx) => (
                                             <motion.div
                                                 key={part.id}
                                                 initial={{ opacity: 0, y: 20 }}
@@ -406,7 +449,7 @@ export default function PartsPage() {
                                                 <div className="glass-card bg-black/40 backdrop-blur-3xl border border-white/10 rounded-[32px] p-6 hover:border-accent-gold/40 transition-all duration-700">
                                                     <div className="relative aspect-square mb-6 rounded-2xl overflow-hidden bg-white/5 border border-white/5">
                                                         <Image
-                                                            src={part.img || '/images/placeholder.jpg'}
+                                                            src={resolvePartImage(part)}
                                                             alt={part.name}
                                                             fill
                                                             className="object-cover group-hover:scale-110 transition-transform duration-700"
@@ -422,7 +465,8 @@ export default function PartsPage() {
                                                     </div>
                                                     <div className="space-y-3">
                                                         <span className="text-[8px] font-black text-accent-gold uppercase tracking-[0.3em]">{part.brand}</span>
-                                                        <h3 className="text-lg font-black uppercase tracking-tight leading-tight min-h-[3rem] group-hover:text-accent-gold transition-colors">{part.name}</h3>
+                                                        <h3 className="text-lg font-black uppercase tracking-tight leading-tight min-h-[3rem] group-hover:text-accent-gold transition-colors">{part.nameAr || part.name}</h3>
+                                                        <p className="text-[10px] text-white/35 uppercase tracking-widest">{part.categoryAr || part.category}</p>
                                                         <div className="text-xl font-black gradient-text-gold">{formatPrice(Number(part.price))}</div>
                                                         {part.stockQty !== undefined && (
                                                             <div className={`text-[10px] font-black uppercase tracking-widest ${part.stockQty > 5 ? 'text-green-400' : part.stockQty > 0 ? 'text-yellow-400' : 'text-red-400'

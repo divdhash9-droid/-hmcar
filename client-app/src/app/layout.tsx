@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
+import { Suspense } from "react";
 import { cookies } from "next/headers";
 
 export const viewport: Viewport = {
@@ -46,8 +48,11 @@ export default async function RootLayout({
         <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-96x96.png" />
         <meta name="format-detection" content="telephone=no" />
       </head>
-      <body className="antialiased selection:bg-white/20 selection:text-white" style={{ fontFamily: "system-ui, sans-serif" }}>
+      <body className="antialiased selection:bg-white/20 selection:text-white font-sans">
         <Providers>
+          <Suspense fallback={null}>
+            <GoogleAnalytics />
+          </Suspense>
           {children}
         </Providers>
       </body>

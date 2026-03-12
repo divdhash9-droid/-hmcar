@@ -8,9 +8,13 @@ const User = require('../../../models/User');
 const AuditLog = require('../../../models/AuditLog');
 const DeviceFingerprint = require('../../../models/DeviceFingerprint');
 const { requireAuthAPI } = require('../../../middleware/auth');
+const { authRateLimiter, fullSecurityMiddleware } = require('../../../middleware/securityEnhanced');
+
+// تطبيق ميدلوير الأمان العام على جميع مسارات المصادقة
+router.use(fullSecurityMiddleware);
 
 // Register endpoint
-router.post('/register', async (req, res) => {
+router.post('/register', authRateLimiter, async (req, res) => {
   try {
     const { name, email, phone, password } = req.body;
 
@@ -110,7 +114,7 @@ router.post('/register', async (req, res) => {
 
 // Auto Register/Login endpoint for clients
 // إذا لم يكن المستخدم موجوداً، يتم إنشاؤه تلقائياً
-router.post('/auto-login', async (req, res) => {
+router.post('/auto-login', authRateLimiter, async (req, res) => {
   try {
     const { name, password, deviceId } = req.body;
 
@@ -282,7 +286,7 @@ router.post('/auto-login', async (req, res) => {
 });
 
 // Login endpoint
-router.post('/login', async (req, res) => {
+router.post('/login', authRateLimiter, async (req, res) => {
   try {
     const { email, phone, name, identifier, password, role, deviceInfo, deviceId, rememberMe } = req.body;
 
@@ -582,7 +586,7 @@ router.post('/change-password', requireAuthAPI, async (req, res) => {
 });
 
 // Forgot password endpoint
-router.post('/forgot-password', async (req, res) => {
+router.post('/forgot-password', authRateLimiter, async (req, res) => {
   try {
     const { email, phone } = req.body;
 

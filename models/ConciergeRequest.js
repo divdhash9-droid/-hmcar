@@ -29,6 +29,23 @@ const conciergeRequestSchema = new mongoose.Schema({
     // وصف عام (مشترك)
     description: { type: String, trim: true },
 
+    // مصدر الطلب (عام أو قادم من المعرض الكوري)
+    source: {
+        type: String,
+        enum: ['general', 'korean_showroom'],
+        default: 'general'
+    },
+
+    // رابط خارجي (مثلاً رابط السيارة الأصلي في Encar)
+    externalUrl: { type: String, trim: true },
+
+    // طريقة التواصل المفضلة من العميل
+    contactPreference: {
+        type: String,
+        enum: ['whatsapp', 'chat', 'either'],
+        default: 'whatsapp'
+    },
+
     // حالة الطلب
     status: {
         type: String,

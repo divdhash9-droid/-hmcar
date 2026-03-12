@@ -100,6 +100,9 @@ userNotificationSchema.statics.createNotification = async function (data) {
 
 userNotificationSchema.statics.sendPushNotification = async function (userId, notification) {
   try {
+    // Firebase Push Notifications are currently disabled as requested by the user.
+    // To re-enable, provide the firebase-service-account.json and uncomment this block.
+    /*
     const admin = require('firebase-admin');
     const User = mongoose.model('User');
 
@@ -121,6 +124,8 @@ userNotificationSchema.statics.sendPushNotification = async function (userId, no
 
       await admin.messaging().send(message);
     }
+    */
+    console.log(`[Notification] Would send push to user ${userId}: ${notification.title}`);
   } catch (error) {
     console.error('Error sending push notification:', error);
   }

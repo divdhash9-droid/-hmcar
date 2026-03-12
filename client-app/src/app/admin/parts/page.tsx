@@ -221,17 +221,13 @@ export default function AdminPartsPage() {
                                 disabled={scraping}
                                 className="ck-btn-ghost flex items-center gap-2 border-orange-500/20 text-orange-400">
                                 {scraping ? <div className="ck-radar w-4 h-4" /> : <RefreshCcw className="w-4 h-4" />}
-                                {isRTL ? 'جلب من المصدر' : 'SCRAPE SOURCE'}
-                            </motion.button>
-                            <motion.button
-                                whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
-                                onClick={() => { resetForm(); setShowModal(true); }}
-                                className="ck-btn-primary flex items-center gap-2">
-                                <Plus className="w-4 h-4" />
-                                {isRTL ? 'إضافة قطعة' : 'ADD PART'}
+                                {isRTL ? 'استيراد من الموقع الخارجي' : 'IMPORT FROM EXTERNAL SOURCE'}
                             </motion.button>
                         </div>
                     </div>
+                    <p className="text-[11px] text-white/40 mt-3">
+                        {isRTL ? 'وضع الإدارة الجديد: يتم جلب القطع والوكالات تلقائياً من المصدر الخارجي، وتم إلغاء الإضافة اليدوية.' : 'New workflow: parts and agencies are imported automatically from external source, manual creation is disabled.'}
+                    </p>
                 </div>
 
                 {/* Filters + Search */}
@@ -317,17 +313,9 @@ export default function AdminPartsPage() {
                                                 )}>
                                                 {part.inStock ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
                                             </button>
-                                            <button onClick={() => handleEdit(part)} title={isRTL ? 'تعديل' : 'Edit'}
-                                                className="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-500 hover:text-white transition-all flex items-center justify-center">
-                                                <Edit className="w-3.5 h-3.5" />
-                                            </button>
                                             <button onClick={() => handleMarkSold(part.id, part.name, part.stockQty || 1)} title={isRTL ? 'بيع' : 'Sell'}
                                                 className="w-8 h-8 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 hover:bg-green-500 hover:text-white transition-all flex items-center justify-center">
                                                 <CheckCircle2 className="w-3.5 h-3.5" />
-                                            </button>
-                                            <button onClick={() => handleDelete(part.id)} title={isRTL ? 'حذف' : 'Delete'}
-                                                className="w-8 h-8 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center">
-                                                <Trash2 className="w-3.5 h-3.5" />
                                             </button>
                                         </div>
                                     </div>

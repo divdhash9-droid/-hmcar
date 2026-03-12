@@ -41,7 +41,14 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
         console.log(`[API Response Data]`, data);
 
         if (!response.ok) {
-            const customError: any = new Error(data.message || data.error || `فشل الطلب: ${response.status}`);
+            let message = data.message || data.error || `فشل الطلب: ${response.status}`;
+            
+            // [[ARABIC_COMMENT]] معالجة خاصة لرسالة تخطي عدد الطلبات المسموح به
+            if (response.status === 429) {
+                message = 'لقد قمت بعدد كبير من المحاولات. يرجى الانتظار قليلاً قبل المحاولة مرة أخرى.';
+            }
+
+            const customError: any = new Error(message);
             customError.status = response.status;
             customError.banned = data.banned;
             customError.banCode = data.banCode;

@@ -5,9 +5,10 @@ const router = express.Router();
 const Brand = require('../../../models/Brand');
 const AuditLog = require('../../../models/AuditLog');
 const { requireAuthAPI, requirePermissionAPI } = require('../../../middleware/auth');
+const { cacheResponse, invalidateCache } = require('../../../middleware/cache');
 
 // List brands
-router.get('/', async (req, res) => {
+router.get('/', cacheResponse(3600), async (req, res) => {
   try {
     const { category } = req.query;
     let query = {};
@@ -21,9 +22,15 @@ router.get('/', async (req, res) => {
 });
 
 // Create brand (Admin only)
-router.post('/', requireAuthAPI, requirePermissionAPI('manage_brands'), async (req, res) => {
+router.post('/', requireAuthAPI, requirePermissionAPI('manage_brands'), invalidateCache('/api/v2/brands*'), async (req, res) => {
   try {
     const { name, logoUrl, category, location, phone, whatsapp, description, description_ar, models } = req.body || {};
+    if (category === 'parts' || category === 'both') {
+      return res.status(403).json({
+        success: false,
+        message: 'وكالات قطع الغيار تُدار عبر الاستيراد الخارجي فقط.'
+      });
+    }
     const payload = {
       name,
       logoUrl: logoUrl || '',
@@ -60,9 +67,15 @@ router.post('/', requireAuthAPI, requirePermissionAPI('manage_brands'), async (r
 });
 
 // Update brand (Admin only)
-router.put('/:id', requireAuthAPI, requirePermissionAPI('manage_brands'), async (req, res) => {
+router.put('/:id', requireAuthAPI, requirePermissionAPI('manage_brands'), invalidateCache('/api/v2/brands*'), async (req, res) => {
   try {
     const { name, logoUrl, category, location, phone, whatsapp, description, description_ar, models } = req.body || {};
+    if (category === 'parts' || category === 'both') {
+      return res.status(403).json({
+        success: false,
+        message: 'تعديل وكالات قطع الغيار يدويًا غير متاح. استخدم الاستيراد الخارجي.'
+      });
+    }
     const oldBrand = await Brand.findById(req.params.id);
     const payload = {
       ...(name !== undefined ? { name } : {}),
@@ -104,7 +117,7 @@ router.put('/:id', requireAuthAPI, requirePermissionAPI('manage_brands'), async 
 });
 
 // Delete brand (Admin only)
-router.delete('/:id', requireAuthAPI, requirePermissionAPI('manage_brands'), async (req, res) => {
+router.delete('/:id', requireAuthAPI, requirePermissionAPI('manage_brands'), invalidateCache('/api/v2/brands*'), async (req, res) => {
   try {
     const brand = await Brand.findByIdAndDelete(req.params.id);
 

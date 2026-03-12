@@ -17,6 +17,13 @@ import { getCart, dispatchCartUpdate, CART_KEY, type ProductModalData } from '@/
 import { useToast } from '@/lib/ToastContext';
 
 const DEFAULT_WHATSAPP = '+821080880014';
+const ITEM_TYPE_CAR = 'car';
+const ITEM_TYPE_PART = 'part';
+const CURRENCY_SAR = 'SAR';
+const CURRENCY_USD = 'USD';
+const CURRENCY_KRW = 'KRW';
+const EMPTY_STRING = '';
+const rawText = (value: string) => value;
 
 export default function CartPage() {
     const { isRTL } = useLanguage();
@@ -69,11 +76,13 @@ export default function CartPage() {
         const phone = (socialLinks?.whatsapp || DEFAULT_WHATSAPP).replace(/\D/g, '');
 
         const itemsList = cart.map((item, i) => {
-            const price = formatPrice ? formatPrice(item.price, item.displayCurrency as 'SAR' | 'USD' | 'KRW' | undefined) : `${item.price?.toLocaleString()} SAR`;
-            return `${i + 1}. ${item.type === 'car' ? '🚗' : '🔧'} *${item.title}* - ${price}`;
+            const price = formatPrice
+                ? formatPrice(item.price, item.displayCurrency as typeof CURRENCY_SAR | typeof CURRENCY_USD | typeof CURRENCY_KRW | undefined)
+                : `${item.price?.toLocaleString()} ${CURRENCY_SAR}`;
+            return `${i + 1}. ${item.type === ITEM_TYPE_CAR ? '🚗' : '🔧'} *${item.title}* - ${price}`;
         }).join('\n');
 
-        const totalStr = `${total.toLocaleString()} SAR`;
+        const totalStr = `${total.toLocaleString()} ${CURRENCY_SAR}`;
         const shareLink = `${window.location.origin}/cart/share?items=${cart.map(i => i.id).join(',')}`;
 
         const msg = isRTL
@@ -86,7 +95,7 @@ export default function CartPage() {
     }, [cart, socialLinks, formatPrice, total, isRTL]);
 
     return (
-        <div className="relative min-h-screen bg-[#050505] text-white" dir={isRTL ? 'rtl' : 'ltr'}>
+        <div className="relative min-h-screen bg-cinematic-darker text-white" dir={isRTL ? 'rtl' : 'ltr'}>
             <Navbar />
 
             {/* [[ARABIC_COMMENT]] خلفية زخرفية */}
@@ -101,15 +110,15 @@ export default function CartPage() {
                     <div>
                         <Link href="/showroom" className="flex items-center gap-2 text-white/40 hover:text-white text-[11px] font-black uppercase tracking-widest mb-4 transition-all group">
                             {isRTL ? <ArrowRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />}
-                            {isRTL ? 'المعرض' : 'BACK TO SHOWROOM'}
+                            {isRTL ? rawText('المعرض') : rawText('BACK TO SHOWROOM')}
                         </Link>
                         <h1 className="text-3xl font-black uppercase tracking-tight flex items-center gap-3">
-                            <ShoppingCart className="w-7 h-7 text-[#c9a96e]" />
-                            {isRTL ? 'سلة التسوق' : 'My Cart'}
+                            <ShoppingCart className="w-7 h-7 text-cinematic-neon-gold" />
+                            {isRTL ? rawText('سلة التسوق') : rawText('My Cart')}
                         </h1>
                         {cart.length > 0 && (
                             <p className="text-white/30 text-sm mt-1">
-                                {isRTL ? `${cart.length} منتج في السلة` : `${cart.length} item${cart.length !== 1 ? 's' : ''} in cart`}
+                                {isRTL ? `${cart.length} منتج في السلة` : `${cart.length} item${cart.length !== 1 ? rawText('s') : EMPTY_STRING} in cart`}
                             </p>
                         )}
                     </div>
@@ -119,7 +128,7 @@ export default function CartPage() {
                             className="text-[10px] font-black uppercase tracking-widest text-white/25 hover:text-red-400 transition-all flex items-center gap-1.5"
                         >
                             <Trash2 className="w-3.5 h-3.5" />
-                            {isRTL ? 'تفريغ السلة' : 'Clear All'}
+                            {isRTL ? rawText('تفريغ السلة') : rawText('Clear All')}
                         </button>
                     )}
                 </div>
@@ -131,22 +140,22 @@ export default function CartPage() {
                         animate={{ opacity: 1, y: 0 }}
                         className="text-center py-24 space-y-6"
                     >
-                        <div className="w-24 h-24 rounded-full bg-white/[0.03] border border-white/5 flex items-center justify-center mx-auto">
+                        <div className="w-24 h-24 rounded-full bg-white/3 border border-white/5 flex items-center justify-center mx-auto">
                             <ShoppingCart className="w-10 h-10 text-white/10" />
                         </div>
                         <div>
-                            <h2 className="text-2xl font-black text-white/20 mb-2">{isRTL ? 'السلة فارغة' : 'Your cart is empty'}</h2>
-                            <p className="text-white/20 text-sm">{isRTL ? 'أضف سيارات أو قطع غيار لتظهر هنا' : 'Add cars or parts to see them here'}</p>
+                            <h2 className="text-2xl font-black text-white/20 mb-2">{isRTL ? rawText('السلة فارغة') : rawText('Your cart is empty')}</h2>
+                            <p className="text-white/20 text-sm">{isRTL ? rawText('أضف سيارات أو قطع غيار لتظهر هنا') : rawText('Add cars or parts to see them here')}</p>
                         </div>
                         <div className="flex gap-3 justify-center flex-wrap">
-                            <Link href="/showroom">
-                                <button className="px-6 py-3 bg-[#c9a96e]/10 border border-[#c9a96e]/30 rounded-2xl text-[#c9a96e] text-[11px] font-black uppercase tracking-widest hover:bg-[#c9a96e]/20 transition-all">
-                                    {isRTL ? 'تصفح السيارات' : 'Browse Cars'}
+                            <Link href="/cars">
+                                <button className="px-6 py-3 bg-cinematic-neon-gold/10 border border-cinematic-neon-gold/30 rounded-2xl text-cinematic-neon-gold text-[11px] font-black uppercase tracking-widest hover:bg-cinematic-neon-gold/20 transition-all">
+                                    {isRTL ? rawText('معرض HM CAR') : rawText('HM CAR Showroom')}
                                 </button>
                             </Link>
                             <Link href="/parts">
                                 <button className="px-6 py-3 bg-white/5 border border-white/10 rounded-2xl text-white/60 text-[11px] font-black uppercase tracking-widest hover:bg-white/10 transition-all">
-                                    {isRTL ? 'تصفح القطع' : 'Browse Parts'}
+                                    {isRTL ? rawText('تصفح القطع') : rawText('Browse Parts')}
                                 </button>
                             </Link>
                         </div>
@@ -156,8 +165,10 @@ export default function CartPage() {
                         {/* [[ARABIC_COMMENT]] قائمة المنتجات */}
                         <AnimatePresence mode="popLayout">
                             {cart.map((item, i) => {
-                                const displayPrice = formatPrice ? formatPrice(item.price, item.displayCurrency as 'SAR' | 'USD' | 'KRW' | undefined) : `${item.price?.toLocaleString()} SAR`;
-                                const img = item.images?.[0] || '';
+                                const displayPrice = formatPrice
+                                    ? formatPrice(item.price, item.displayCurrency as typeof CURRENCY_SAR | typeof CURRENCY_USD | typeof CURRENCY_KRW | undefined)
+                                    : `${item.price?.toLocaleString()} ${CURRENCY_SAR}`;
+                                const img = item.images?.[0] || EMPTY_STRING;
                                 return (
                                     <motion.div
                                         key={item.id}
@@ -166,7 +177,7 @@ export default function CartPage() {
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, x: isRTL ? 100 : -100, scale: 0.95 }}
                                         transition={{ delay: i * 0.04 }}
-                                        className="flex gap-4 bg-white/[0.02] border border-white/8 rounded-2xl p-4 hover:border-white/15 transition-all group"
+                                        className="flex gap-4 bg-white/2 border border-white/8 rounded-2xl p-4 hover:border-white/15 transition-all group"
                                     >
                                         {/* [[ARABIC_COMMENT]] صورة المنتج */}
                                         <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden shrink-0 bg-white/5">
@@ -181,17 +192,17 @@ export default function CartPage() {
 
                                         {/* [[ARABIC_COMMENT]] بيانات المنتج */}
                                         <div className="flex-1 min-w-0">
-                                            <div className="text-[9px] font-black uppercase tracking-widest text-[#c9a96e]/60 mb-1">
-                                                {item.type === 'car' ? (isRTL ? 'سيارة' : 'CAR') : (isRTL ? 'قطعة غيار' : 'PART')}
-                                                {item.type === 'car' && item.make ? ` • ${item.make}` : ''}
-                                                {item.type === 'part' && item.brand ? ` • ${item.brand}` : ''}
+                                            <div className="text-[9px] font-black uppercase tracking-widest text-cinematic-neon-gold/60 mb-1">
+                                                {item.type === ITEM_TYPE_CAR ? (isRTL ? rawText('سيارة') : rawText('CAR')) : (isRTL ? rawText('قطعة غيار') : rawText('PART'))}
+                                                {item.type === ITEM_TYPE_CAR && item.make ? ` • ${item.make}` : EMPTY_STRING}
+                                                {item.type === ITEM_TYPE_PART && item.brand ? ` • ${item.brand}` : EMPTY_STRING}
                                             </div>
                                             <h3 className="font-black uppercase text-sm leading-tight line-clamp-2 mb-2">{item.title}</h3>
-                                            <div className="text-[#c9a96e] font-black text-base">{displayPrice}</div>
-                                            {item.type === 'car' && item.year && (
-                                                <div className="text-[10px] text-white/30 mt-1">{item.year} {item.color ? `• ${item.color}` : ''}</div>
+                                            <div className="text-cinematic-neon-gold font-black text-base">{displayPrice}</div>
+                                            {item.type === ITEM_TYPE_CAR && item.year && (
+                                                <div className="text-[10px] text-white/30 mt-1">{item.year} {item.color ? `• ${item.color}` : EMPTY_STRING}</div>
                                             )}
-                                            {item.type === 'part' && item.condition && (
+                                            {item.type === ITEM_TYPE_PART && item.condition && (
                                                 <div className="text-[10px] text-white/30 mt-1">{item.condition}</div>
                                             )}
                                         </div>
@@ -213,20 +224,20 @@ export default function CartPage() {
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="mt-6 bg-white/[0.02] border border-white/8 rounded-2xl p-6 space-y-4"
+                            className="mt-6 bg-white/2 border border-white/8 rounded-2xl p-6 space-y-4"
                         >
                             <div className="flex justify-between items-center border-b border-white/5 pb-4">
                                 <span className="text-[11px] font-black uppercase tracking-widest text-white/40">
-                                    {isRTL ? 'الإجمالي التقريبي' : 'ESTIMATED TOTAL'}
+                                    {isRTL ? rawText('الإجمالي التقريبي') : rawText('ESTIMATED TOTAL')}
                                 </span>
-                                <span className="text-xl font-black text-[#c9a96e]">
+                                <span className="text-xl font-black text-cinematic-neon-gold">
                                     {formatPrice ? formatPrice(total) : `${total.toLocaleString()} SAR`}
                                 </span>
                             </div>
                             <p className="text-[10px] text-white/25 text-center">
                                 {isRTL
-                                    ? '* السعر تقريبي ويتم الاتفاق النهائي مع الأدمن عبر واتساب'
-                                    : '* Price is approximate. Final negotiation via WhatsApp with admin.'}
+                                    ? rawText('* السعر تقريبي ويتم الاتفاق النهائي مع الأدمن عبر واتساب')
+                                    : rawText('* Price is approximate. Final negotiation via WhatsApp with admin.')}
                             </p>
 
                             {/* [[ARABIC_COMMENT]] زر الشراء الرئيسي */}
@@ -235,9 +246,9 @@ export default function CartPage() {
                                 className="w-full py-4 bg-green-500 hover:bg-green-400 rounded-2xl text-black font-black uppercase text-[12px] tracking-[0.25em] shadow-[0_0_30px_rgba(34,197,94,0.3)] hover:shadow-[0_0_50px_rgba(34,197,94,0.5)] transition-all flex items-center justify-center gap-2.5"
                             >
                                 {sentToWhatsapp ? (
-                                    <><Check className="w-5 h-5" />{isRTL ? 'تم الإرسال ✓' : 'Sent ✓'}</>
+                                    <><Check className="w-5 h-5" />{isRTL ? rawText('تم الإرسال ✓') : rawText('Sent ✓')}</>
                                 ) : (
-                                    <><MessageCircle className="w-5 h-5" />{isRTL ? 'إرسال السلة للأدمن عبر واتساب' : 'SEND CART VIA WHATSAPP'}</>
+                                    <><MessageCircle className="w-5 h-5" />{isRTL ? rawText('إرسال السلة للأدمن عبر واتساب') : rawText('SEND CART VIA WHATSAPP')}</>
                                 )}
                             </button>
 
@@ -247,9 +258,9 @@ export default function CartPage() {
                                 className="w-full py-3.5 bg-white/5 border border-white/10 rounded-2xl text-white/60 font-black uppercase text-[11px] tracking-[0.2em] hover:bg-white/10 hover:text-white transition-all flex items-center justify-center gap-2"
                             >
                                 {copied ? (
-                                    <><Check className="w-4 h-4 text-green-400" />{isRTL ? 'تم نسخ الرابط ✓' : 'Link Copied ✓'}</>
+                                    <><Check className="w-4 h-4 text-green-400" />{isRTL ? rawText('تم نسخ الرابط ✓') : rawText('Link Copied ✓')}</>
                                 ) : (
-                                    <><Share2 className="w-4 h-4" />{isRTL ? 'مشاركة رابط السلة' : 'SHARE CART LINK'}</>
+                                    <><Share2 className="w-4 h-4" />{isRTL ? rawText('مشاركة رابط السلة') : rawText('SHARE CART LINK')}</>
                                 )}
                             </button>
                         </motion.div>

@@ -47,7 +47,10 @@ router.post('/', async (req, res) => {
             type, name, phone,
             carName, model, color, colorName, year,
             partName, imageUrl,
-            description
+            description,
+            source,
+            externalUrl,
+            contactPreference
         } = req.body;
 
         if (!name || !phone || !type) {
@@ -63,13 +66,16 @@ router.post('/', async (req, res) => {
             carName, model, color, colorName, year,
             partName, imageUrl,
             description,
+            source: source || 'general',
+            externalUrl,
+            contactPreference: contactPreference || 'whatsapp',
             status: 'new'
         });
 
         // ── إشعار الأدمن ──
         // جلب جميع المستخدمين الأدمن
         try {
-            const admins = await User.find({ role: { $in: ['admin', 'superadmin'] } }).select('_id').lean();
+            const admins = await User.find({ role: { $in: ['admin', 'super_admin', 'superadmin'] } }).select('_id').lean();
             if (admins.length > 0) {
                 const typeLabel = type === 'car' ? 'طلب سيارة' : 'طلب قطعة غيار';
                 const notifTitle = `🔔 ${typeLabel} جديد من ${name}`;
@@ -121,11 +127,12 @@ router.post('/', async (req, res) => {
 // ── GET /api/v2/concierge ── جلب كل الطلبات (الأدمن فقط)
 router.get('/', requireAuthAPI, requireAdmin, async (req, res) => {
     try {
-        const { type, status, page = 1, limit = 20 } = req.query;
+        const { type, status, source, page = 1, limit = 20 } = req.query;
 
         const filter = {};
         if (type) filter.type = type;
         if (status) filter.status = status;
+        if (source) filter.source = source;
 
         const skip = (Number(page) - 1) * Number(limit);
 

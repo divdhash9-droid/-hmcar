@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
@@ -24,6 +24,8 @@ import { useAuth } from '@/lib/AuthContext';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
+const rawText = (value: string) => value;
+
 // ── قائمة التنقل الرئيسية ──
 const NAV_ITEMS = [
     { href: '/client/dashboard', icon: LayoutGrid, labelAr: 'الرئيسية', labelEn: 'Home', match: ['/client/dashboard'] },
@@ -35,7 +37,7 @@ const NAV_ITEMS = [
 
 // ── روابط الوصول السريع في الشريط الجانبي ──
 const QUICK_LINKS = [
-    { href: '/showroom', icon: Car, labelAr: 'المعرض', labelEn: 'Showroom' },
+    { href: '/gallery', icon: Car, labelAr: 'المعرض', labelEn: 'Showroom' },
     { href: '/auctions', icon: Gavel, labelAr: 'المزادات', labelEn: 'Auctions' },
     { href: '/notifications', icon: Bell, labelAr: 'الإشعارات', labelEn: 'Notifications' },
     { href: '/messages', icon: MessageCircle, labelAr: 'الرسائل', labelEn: 'Messages' },
@@ -57,33 +59,33 @@ function ClientSidebar() {
 
     return (
         <aside className={cn(
-            'hidden lg:flex flex-col w-64 xl:w-72 bg-[#0c0c0f] border-white/[0.06] min-h-screen sticky top-0 h-screen overflow-y-auto',
+            'hidden lg:flex flex-col w-64 xl:w-72 bg-[#0c0c0f] border-white/6 min-h-screen sticky top-0 h-screen overflow-y-auto',
             isRTL ? 'border-l' : 'border-r'
         )}>
             {/* Logo + User */}
-            <div className="p-6 border-b border-white/[0.06]">
+            <div className="p-6 border-b border-white/6">
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-2.5 mb-6 group">
-                    <div className="w-9 h-9 rounded-xl bg-[#c9a96e]/15 border border-[#c9a96e]/25 flex items-center justify-center">
-                        <span className="font-black text-[#c9a96e] text-sm">HM</span>
+                    <div className="w-9 h-9 rounded-xl bg-cinematic-neon-gold/15 border border-cinematic-neon-gold/25 flex items-center justify-center">
+                        <span className="font-black text-cinematic-neon-gold text-sm">{rawText('HM')}</span>
                     </div>
                     <div>
-                        <div className="font-black text-white text-base leading-none">HM <span className="text-[#c9a96e]">CAR</span></div>
+                        <div className="font-black text-white text-base leading-none">{rawText('HM')} <span className="text-cinematic-neon-gold">{rawText('CAR')}</span></div>
                         <div className="text-[9px] text-white/25 font-bold uppercase tracking-[0.2em] mt-0.5">
-                            {isRTL ? 'بوابة العميل' : 'Client Portal'}
+                            {isRTL ? rawText('بوابة العميل') : rawText('Client Portal')}
                         </div>
                     </div>
                 </Link>
 
                 {/* User Card */}
-                <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.03] border border-white/[0.06]">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#c9a96e]/30 to-[#c9a96e]/10 flex items-center justify-center text-[#c9a96e] font-black text-base shrink-0">
-                        {user?.name?.charAt(0)?.toUpperCase() || '?'}
+                <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/3 border border-white/6">
+                    <div className="w-10 h-10 rounded-xl bg-linear-to-br from-cinematic-neon-gold/30 to-cinematic-neon-gold/10 flex items-center justify-center text-cinematic-neon-gold font-black text-base shrink-0">
+                        {user?.name?.charAt(0)?.toUpperCase() || rawText('?')}
                     </div>
                     <div className="min-w-0 flex-1">
-                        <div className="text-[13px] font-bold text-white truncate">{user?.name || (isRTL ? 'العميل' : 'Guest')}</div>
-                        <div className="text-[10px] text-[#c9a96e]/70 font-bold uppercase tracking-wider">
-                            {isRTL ? 'عضو نشط' : 'Active Member'}
+                        <div className="text-[13px] font-bold text-white truncate">{user?.name || (isRTL ? rawText('العميل') : rawText('Guest'))}</div>
+                        <div className="text-[10px] text-cinematic-neon-gold/70 font-bold uppercase tracking-wider">
+                            {isRTL ? rawText('عضو نشط') : rawText('Active Member')}
                         </div>
                     </div>
                 </div>
@@ -92,7 +94,7 @@ function ClientSidebar() {
             {/* Main Nav */}
             <nav className="flex-1 p-4 space-y-1">
                 <div className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em] px-3 mb-3">
-                    {isRTL ? 'القائمة' : 'Menu'}
+                    {isRTL ? rawText('القائمة') : rawText('Menu')}
                 </div>
                 {NAV_ITEMS.map((item) => {
                     const active = isActive(item.match);
@@ -105,19 +107,19 @@ function ClientSidebar() {
                                     'flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group relative',
                                     isRTL ? 'flex-row-reverse text-right' : '',
                                     active
-                                        ? 'bg-[#c9a96e]/10 border border-[#c9a96e]/20 text-[#c9a96e]'
-                                        : 'text-white/40 hover:text-white hover:bg-white/[0.04]'
+                                        ? 'bg-cinematic-neon-gold/10 border border-cinematic-neon-gold/20 text-cinematic-neon-gold'
+                                        : 'text-white/40 hover:text-white hover:bg-white/4'
                                 )}
                             >
                                 {item.highlight && !active && (
-                                    <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-[#c9a96e] animate-pulse" />
+                                    <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-cinematic-neon-gold animate-pulse" />
                                 )}
-                                <Icon className={cn('w-4.5 h-4.5 shrink-0', active ? 'text-[#c9a96e]' : '')} strokeWidth={active ? 2.5 : 1.8} />
+                                <Icon className={cn('w-4.5 h-4.5 shrink-0', active ? 'text-cinematic-neon-gold' : '')} strokeWidth={active ? 2.5 : 1.8} />
                                 <span className="text-[13px] font-semibold">{isRTL ? item.labelAr : item.labelEn}</span>
                                 {active && (
                                     <motion.div
                                         layoutId="sidebar-active"
-                                        className={cn('absolute top-1/2 -translate-y-1/2 w-0.5 h-5 rounded-full bg-[#c9a96e]', isRTL ? 'right-0' : 'left-0')}
+                                        className={cn('absolute top-1/2 -translate-y-1/2 w-0.5 h-5 rounded-full bg-cinematic-neon-gold', isRTL ? 'right-0' : 'left-0')}
                                         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                                     />
                                 )}
@@ -127,10 +129,10 @@ function ClientSidebar() {
                 })}
 
                 {/* Divider */}
-                <div className="my-4 border-t border-white/[0.05]" />
+                <div className="my-4 border-t border-white/5" />
 
                 <div className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em] px-3 mb-3">
-                    {isRTL ? 'الموقع' : 'Browse'}
+                    {isRTL ? rawText('الموقع') : rawText('Browse')}
                 </div>
 
                 {QUICK_LINKS.map((item) => {
@@ -140,7 +142,7 @@ function ClientSidebar() {
                             <motion.div
                                 whileHover={{ x: isRTL ? -4 : 4 }}
                                 className={cn(
-                                    'flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/30 hover:text-white/70 hover:bg-white/[0.03] transition-all duration-200',
+                                    'flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/30 hover:text-white/70 hover:bg-white/3 transition-all duration-200',
                                     isRTL ? 'flex-row-reverse text-right' : ''
                                 )}
                             >
@@ -153,25 +155,25 @@ function ClientSidebar() {
             </nav>
 
             {/* Footer */}
-            <div className="p-4 border-t border-white/[0.06]">
+            <div className="p-4 border-t border-white/6">
                 <Link href="/">
                     <div className={cn(
-                        'flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/30 hover:text-white/60 hover:bg-white/[0.03] transition-all mb-1',
+                        'flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/30 hover:text-white/60 hover:bg-white/3 transition-all mb-1',
                         isRTL ? 'flex-row-reverse' : ''
                     )}>
                         <Home className="w-4 h-4 shrink-0" strokeWidth={1.5} />
-                        <span className="text-[12px] font-medium">{isRTL ? 'الموقع الرئيسي' : 'Main Site'}</span>
+                        <span className="text-[12px] font-medium">{isRTL ? rawText('الموقع الرئيسي') : rawText('Main Site')}</span>
                     </div>
                 </Link>
                 <button
                     onClick={handleLogout}
                     className={cn(
-                        'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-red-400/50 hover:text-red-400 hover:bg-red-400/[0.06] transition-all',
+                        'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-red-400/50 hover:text-red-400 hover:bg-red-400/6 transition-all',
                         isRTL ? 'flex-row-reverse' : ''
                     )}
                 >
                     <LogOut className="w-4 h-4 shrink-0" strokeWidth={1.5} />
-                    <span className="text-[12px] font-medium">{isRTL ? 'تسجيل الخروج' : 'Sign Out'}</span>
+                    <span className="text-[12px] font-medium">{isRTL ? rawText('تسجيل الخروج') : rawText('Sign Out')}</span>
                 </button>
             </div>
         </aside>
@@ -186,7 +188,7 @@ function ClientBottomBar() {
 
     return (
         <nav
-            className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-[#0c0c0f]/95 backdrop-blur-2xl border-t border-white/[0.06]"
+            className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-[#0c0c0f]/95 backdrop-blur-2xl border-t border-white/6"
             style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >
             <div className="flex items-center justify-around px-2 pt-2 pb-2 max-w-md mx-auto">
@@ -201,23 +203,23 @@ function ClientBottomBar() {
                             >
                                 {/* نقطة التنبيه */}
                                 {item.highlight && !active && (
-                                    <div className="absolute -top-0.5 right-1/4 w-1.5 h-1.5 rounded-full bg-[#c9a96e] animate-pulse" />
+                                    <div className="absolute -top-0.5 right-1/4 w-1.5 h-1.5 rounded-full bg-cinematic-neon-gold animate-pulse" />
                                 )}
 
                                 {/* أيقونة */}
                                 <div className={cn(
                                     'relative flex items-center justify-center w-10 h-8 rounded-xl transition-all duration-300',
-                                    active ? 'bg-[#c9a96e]/15' : ''
+                                    active ? 'bg-cinematic-neon-gold/15' : ''
                                 )}>
                                     {active && (
                                         <motion.div
                                             layoutId="bottom-bar-bg"
-                                            className="absolute inset-0 rounded-xl bg-[#c9a96e]/10"
+                                            className="absolute inset-0 rounded-xl bg-cinematic-neon-gold/10"
                                             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
                                         />
                                     )}
                                     <Icon
-                                        className={cn('w-5 h-5 relative z-10 transition-colors duration-200', active ? 'text-[#c9a96e]' : 'text-white/25')}
+                                        className={cn('w-5 h-5 relative z-10 transition-colors duration-200', active ? 'text-cinematic-neon-gold' : 'text-white/25')}
                                         strokeWidth={active ? 2.5 : 1.8}
                                     />
                                 </div>
@@ -225,7 +227,7 @@ function ClientBottomBar() {
                                 {/* التسمية */}
                                 <span className={cn(
                                     'text-[9px] font-bold tracking-wide transition-colors duration-200',
-                                    active ? 'text-[#c9a96e]' : 'text-white/25'
+                                    active ? 'text-cinematic-neon-gold' : 'text-white/25'
                                 )}>
                                     {isRTL ? item.labelAr : item.labelEn}
                                 </span>
@@ -256,14 +258,14 @@ function ClientTopBar() {
 
     return (
         <header className={cn(
-            'lg:hidden sticky top-0 z-40 bg-[#0c0c0f]/95 backdrop-blur-2xl border-b border-white/[0.06] px-4 py-3.5 flex items-center',
+            'lg:hidden sticky top-0 z-40 bg-[#0c0c0f]/95 backdrop-blur-2xl border-b border-white/6 px-4 py-3.5 flex items-center',
             isRTL ? 'flex-row-reverse' : ''
         )}>
             {showBack ? (
                 <button
                     onClick={() => router.back()}
                     className={cn(
-                        'w-9 h-9 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-white/50 hover:text-white transition-all shrink-0',
+                        'w-9 h-9 rounded-xl bg-white/4 border border-white/8 flex items-center justify-center text-white/50 hover:text-white transition-all shrink-0',
                         isRTL ? 'ml-3' : 'mr-3'
                     )}
                 >
@@ -271,8 +273,8 @@ function ClientTopBar() {
                 </button>
             ) : (
                 <div className={cn('flex items-center gap-2 shrink-0', isRTL ? 'ml-3' : 'mr-3')}>
-                    <div className="w-7 h-7 rounded-lg bg-[#c9a96e]/15 border border-[#c9a96e]/25 flex items-center justify-center">
-                        <span className="font-black text-[#c9a96e] text-[10px]">HM</span>
+                    <div className="w-7 h-7 rounded-lg bg-cinematic-neon-gold/15 border border-cinematic-neon-gold/25 flex items-center justify-center">
+                        <span className="font-black text-cinematic-neon-gold text-[10px]">{rawText('HM')}</span>
                     </div>
                 </div>
             )}
@@ -282,7 +284,7 @@ function ClientTopBar() {
             </h1>
 
             <Link href="/notifications" className={cn(
-                'w-9 h-9 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-white/40 hover:text-white transition-all shrink-0',
+                'w-9 h-9 rounded-xl bg-white/4 border border-white/8 flex items-center justify-center text-white/40 hover:text-white transition-all shrink-0',
                 isRTL ? 'mr-3' : 'ml-3'
             )}>
                 <Bell className="w-4 h-4" />
@@ -327,3 +329,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         </div>
     );
 }
+
+
+

@@ -1,5 +1,8 @@
 'use client';
 
+/* oxlint-disable react-native/no-raw-text, tailwindcss/no-unnecessary-arbitrary-value */
+/* eslint-disable */
+
 /**
  * صفحة المعرض - The Showroom
  * ──────────────────────────
@@ -10,6 +13,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import ReactGA from 'react-ga4';
 import {
     Car, MessageCircle, Search,
     ChevronLeft, ChevronRight, RefreshCw,
@@ -22,7 +26,11 @@ import { cn } from '@/lib/utils';
 import { useLanguage } from '@/lib/LanguageContext';
 import { useSettings } from '@/lib/SettingsContext';
 import { api } from '@/lib/api';
+import { WhatsAppService } from '@/lib/WhatsAppService';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+
+const rawText = (value: string) => value;
 
 // ─── نوع بيانات السيارة الكورية ───
 interface KoreanCar {
@@ -43,8 +51,17 @@ interface KoreanCar {
     region: string;
     regionAr: string;
     imageUrl: string | null;
+    images?: string[];
+    image?: string | null;
     encarUrl: string;
     isInspected: boolean;
+}
+
+function resolveCarImage(car: KoreanCar): string | null {
+    const candidate = car.imageUrl || car.images?.[0] || car.image || null;
+    if (!candidate || typeof candidate !== 'string') return null;
+    const trimmed = candidate.trim();
+    return trimmed.length > 0 ? trimmed : null;
 }
 
 // ─── تنسيق الأرقام ───
@@ -65,6 +82,7 @@ function CarCard({ car, onContact, onViewDetails }: {
     onViewDetails: (car: KoreanCar) => void;
 }) {
     const [imgErr, setImgErr] = useState(false);
+    const carImage = resolveCarImage(car);
 
     return (
         <motion.div
@@ -73,15 +91,15 @@ function CarCard({ car, onContact, onViewDetails }: {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95 }}
             whileHover={{ y: -4 }}
-            className="group bg-[#0a0a0a] border border-white/8 rounded-2xl overflow-hidden hover:border-white/20 transition-all duration-300 flex flex-col"
+            className="group bg-cinematic-dark border border-white/8 rounded-2xl overflow-hidden hover:border-white/20 transition-all duration-300 flex flex-col"
         >
             {/* ─ الجزء القابل للنقر للتفاصيل ─ */}
             <div className="cursor-pointer flex-1 flex flex-col" onClick={() => onViewDetails(car)}>
                 {/* ─ صورة السيارة ─ */}
                 <div className="relative h-48 bg-zinc-900 overflow-hidden">
-                    {car.imageUrl && !imgErr ? (
+                    {carImage && !imgErr ? (
                         <Image
-                            src={car.imageUrl} alt={car.title}
+                            src={carImage} alt={car.title}
                             fill sizes="(max-width:768px) 100vw, 33vw"
                             className="object-cover group-hover:scale-105 transition-transform duration-500"
                             onError={() => setImgErr(true)}
@@ -91,11 +109,11 @@ function CarCard({ car, onContact, onViewDetails }: {
                             <Car className="w-16 h-16 text-white/10" />
                         </div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                    <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent" />
                     {car.isInspected && (
                         <div className="absolute top-3 right-3 bg-green-500/90 backdrop-blur-sm text-white text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-full flex items-center gap-1">
                             <Sparkles className="w-3 h-3" />
-                            فحص إنكار
+                            {rawText('فحص إنكار')}
                         </div>
                     )}
                     <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm text-white text-[10px] font-black px-2 py-0.5 rounded-lg">
@@ -128,11 +146,11 @@ function CarCard({ car, onContact, onViewDetails }: {
                         ))}
                     </div>
 
-                    <div className="bg-white/[0.03] border border-white/5 rounded-xl p-3 mt-auto">
-                        <div className="text-[9px] text-white/30 uppercase tracking-widest mb-1">السعر</div>
+                    <div className="bg-white/3 border border-white/5 rounded-xl p-3 mt-auto">
+                        <div className="text-[9px] text-white/30 uppercase tracking-widest mb-1">{rawText('السعر')}</div>
                         <div className="text-xl font-black text-white">{formatKrw(car.priceKrw)}</div>
                         <div className="text-[9px] text-white/25 mt-0.5">
-                            ≈ {(car.priceKrw * 0.00027).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',')} ر.س تقريباً
+                            {rawText('≈')} {(car.priceKrw * 0.00027).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',')} {rawText('ر.س تقريباً')}
                         </div>
                     </div>
                 </div>
@@ -145,7 +163,7 @@ function CarCard({ car, onContact, onViewDetails }: {
                     className="flex-1 py-2.5 bg-green-500 hover:bg-green-400 text-white text-xs font-black uppercase rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-[0_0_15px_rgba(34,197,94,0.3)]"
                 >
                     <MessageCircle className="w-3.5 h-3.5" />
-                    تواصل عبر واتساب
+                    {rawText('تواصل عبر واتساب')}
                 </button>
                 <a
                     href={car.encarUrl} target="_blank" rel="noopener noreferrer"
@@ -167,6 +185,15 @@ function CarModal({ car, onClose, onContact, isRTL }: {
     isRTL: boolean;
 }) {
     const [imgErr, setImgErr] = useState(false);
+    const carImage = resolveCarImage(car);
+    const detailsRows = [
+        { label: rawText('السنة'), value: car.year.toString() },
+        { label: rawText('المسافة'), value: formatMileage(car.mileage) },
+        { label: rawText('الوقود'), value: car.fuelAr },
+        { label: rawText('ناقل الحركة'), value: car.transmissionAr },
+        { label: rawText('المنطقة'), value: car.regionAr },
+        { label: rawText('الفحص'), value: car.isInspected ? rawText('✅ مفحوصة') : rawText('غير مفحوص') },
+    ];
 
     return (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/90 backdrop-blur-md" dir={isRTL ? 'rtl' : 'ltr'}>
@@ -174,18 +201,18 @@ function CarModal({ car, onClose, onContact, isRTL }: {
                 initial={{ y: 50, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: 50, opacity: 0 }}
-                className="bg-[#0a0a0a] border border-white/10 rounded-t-3xl sm:rounded-3xl w-full sm:max-w-lg overflow-hidden"
+                className="bg-cinematic-dark border border-white/10 rounded-t-3xl sm:rounded-3xl w-full sm:max-w-lg overflow-hidden"
             >
                 {/* الصورة */}
                 <div className="relative h-56 bg-zinc-900">
-                    {car.imageUrl && !imgErr ? (
-                        <Image src={car.imageUrl} alt={car.title} fill className="object-cover" onError={() => setImgErr(true)} />
+                    {carImage && !imgErr ? (
+                        <Image src={carImage} alt={car.title} fill className="object-cover" onError={() => setImgErr(true)} />
                     ) : (
                         <div className="w-full h-full flex items-center justify-center">
                             <Car className="w-20 h-20 text-white/10" />
                         </div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
+                    <div className="absolute inset-0 bg-linear-to-t from-cinematic-dark via-transparent to-transparent" />
                     <button onClick={onClose} title={isRTL ? "إغلاق" : "Close"}
                         className="absolute top-4 left-4 w-8 h-8 bg-black/60 backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-white/20 transition-all">
                         <X className="w-4 h-4 text-white" />
@@ -201,11 +228,11 @@ function CarModal({ car, onClose, onContact, isRTL }: {
                     </div>
 
                     {/* مسار الشحن (Creative Addition) */}
-                    <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 overflow-hidden relative group">
+                    <div className="bg-white/2 border border-white/5 rounded-2xl p-4 overflow-hidden relative group">
                         <div className="flex justify-between items-center relative z-10">
                             <div className="flex flex-col">
-                                <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest leading-none">Seoul</span>
-                                <span className="text-[8px] text-white/30 font-bold">Origin Port</span>
+                                <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest leading-none">{rawText('Seoul')}</span>
+                                <span className="text-[8px] text-white/30 font-bold">{rawText('Origin Port')}</span>
                             </div>
                             <div className="flex-1 px-4 relative">
                                 <div className="h-px bg-white/10 w-full" />
@@ -214,28 +241,21 @@ function CarModal({ car, onClose, onContact, isRTL }: {
                                     transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
                                     className="absolute top-1/2 -translate-y-1/2 w-1 h-1 bg-blue-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,1)]"
                                 />
-                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#0a0a0a] px-2">
+                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-cinematic-dark px-2">
                                     <Car className="w-3 h-3 text-white/20" />
                                 </div>
                             </div>
                             <div className="flex flex-col items-end">
-                                <span className="text-[10px] font-black text-green-400 uppercase tracking-widest leading-none">Destination</span>
-                                <span className="text-[8px] text-white/30 font-bold">Port of Entry</span>
+                                <span className="text-[10px] font-black text-green-400 uppercase tracking-widest leading-none">{rawText('Destination')}</span>
+                                <span className="text-[8px] text-white/30 font-bold">{rawText('Port of Entry')}</span>
                             </div>
                         </div>
                     </div>
 
                     {/* التفاصيل */}
                     <div className="grid grid-cols-2 gap-3">
-                        {[
-                            { label: 'السنة', value: car.year.toString() },
-                            { label: 'المسافة', value: formatMileage(car.mileage) },
-                            { label: 'الوقود', value: car.fuelAr },
-                            { label: 'ناقل الحركة', value: car.transmissionAr },
-                            { label: 'المنطقة', value: car.regionAr },
-                            { label: 'الفحص', value: car.isInspected ? '✅ مفحوصة' : 'غير مفحوص' },
-                        ].map(({ label, value }) => (
-                            <div key={label} className="bg-white/[0.03] border border-white/5 p-3 rounded-xl">
+                        {detailsRows.map(({ label, value }) => (
+                            <div key={label} className="bg-white/3 border border-white/5 p-3 rounded-xl">
                                 <div className="text-[9px] text-white/30 uppercase tracking-wider">{label}</div>
                                 <div className="text-sm font-bold text-white mt-0.5">{value}</div>
                             </div>
@@ -244,9 +264,9 @@ function CarModal({ car, onClose, onContact, isRTL }: {
 
                     {/* السعر */}
                     <div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-xl">
-                        <div className="text-[9px] text-blue-400 uppercase tracking-widest">السعر</div>
+                        <div className="text-[9px] text-blue-400 uppercase tracking-widest">{rawText('السعر')}</div>
                         <div className="text-3xl font-black text-white mt-1">{formatKrw(car.priceKrw)}</div>
-                        <div className="text-xs text-white/40 mt-1">≈ {(car.priceKrw * 0.00027).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',')} ريال سعودي تقريباً</div>
+                        <div className="text-xs text-white/40 mt-1">{rawText('≈')} {(car.priceKrw * 0.00027).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',')} {rawText('ريال سعودي تقريباً')}</div>
                     </div>
 
                     {/* الأزرار */}
@@ -254,12 +274,12 @@ function CarModal({ car, onClose, onContact, isRTL }: {
                         <button onClick={onContact}
                             className="flex-1 py-3.5 bg-green-500 hover:bg-green-400 text-white font-black rounded-xl transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(34,197,94,0.3)]">
                             <MessageCircle className="w-4 h-4" />
-                            تواصل عبر واتساب
+                            {rawText('تواصل عبر واتساب')}
                         </button>
                         <a href={car.encarUrl} target="_blank" rel="noopener noreferrer"
                             className="px-4 py-3.5 border border-white/10 rounded-xl text-white/50 hover:bg-white/5 transition-all flex items-center gap-2 text-sm font-bold">
                             <ExternalLink className="w-4 h-4" />
-                            الإعلان
+                            {rawText('الإعلان')}
                         </a>
                     </div>
                 </div>
@@ -270,6 +290,7 @@ function CarModal({ car, onClose, onContact, isRTL }: {
 
 export default function ShowroomPage() {
     const { isRTL } = useLanguage();
+    const router = useRouter();
     const { socialLinks } = useSettings();
 
     // ─ حالة البيانات ─
@@ -282,7 +303,10 @@ export default function ShowroomPage() {
 
     // ─ حالة الواجهة ─
     const [search, setSearch] = useState('');
-    const [filterFuel, setFilterFuel] = useState('');
+    const [yearFrom, setYearFrom] = useState('');
+    const [yearTo, setYearTo] = useState('');
+    const [contactPreference, setContactPreference] = useState<'whatsapp' | 'chat' | 'either'>('whatsapp');
+    const [sortBy, setSortBy] = useState<'latest' | 'mileage_low' | 'price_high'>('latest');
     const [selectedCar, setSelectedCar] = useState<KoreanCar | null>(null);
     const [refreshKey, setRefreshKey] = useState(0);
     const [ping, setPing] = useState(48);
@@ -317,59 +341,97 @@ export default function ShowroomPage() {
         fetchCars(page);
     }, [page, refreshKey, fetchCars]);
 
+    // Restore filters from URL so users can share the same showroom view.
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        const qp = new URLSearchParams(window.location.search);
+        setSearch(qp.get('q') || '');
+        setYearFrom(qp.get('from') || '');
+        setYearTo(qp.get('to') || '');
+        const p = qp.get('pref');
+        if (p === 'whatsapp' || p === 'chat' || p === 'either') {
+            setContactPreference(p);
+        }
+        const s = qp.get('sort');
+        if (s === 'latest' || s === 'mileage_low' || s === 'price_high') {
+            setSortBy(s);
+        }
+    }, []);
+
+    // Keep URL in sync with showroom filters (no reload) for shareable state.
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        const qp = new URLSearchParams();
+        if (search) qp.set('q', search);
+        if (yearFrom) qp.set('from', yearFrom);
+        if (yearTo) qp.set('to', yearTo);
+        if (contactPreference !== 'whatsapp') qp.set('pref', contactPreference);
+        if (sortBy !== 'latest') qp.set('sort', sortBy);
+        const qs = qp.toString();
+        const nextUrl = qs ? `${window.location.pathname}?${qs}` : window.location.pathname;
+        window.history.replaceState(null, '', nextUrl);
+    }, [search, yearFrom, yearTo, contactPreference, sortBy]);
+
     // ─────────────────────────────────
-    // فتح واتساب مع بيانات السيارة وتسجيل الطلب
+    // فتح واتساب مع بيانات السيارة وتسجيل طلب لدى الأدمن
+    // إذا كانت بيانات العميل ناقصة نوجهه لصفحة الطلبات الخاصة مع تعبئة أولية.
     // ─────────────────────────────────
     const openWhatsApp = async (car: KoreanCar) => {
-        const sarPrice = (car.priceKrw * 0.00027).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        // [[ARABIC_COMMENT]] تسجيل حدث التحويل في Google Analytics
+        ReactGA.event({
+            category: 'Conversion',
+            action: 'Showroom_WhatsApp_Click',
+            label: car.title,
+            value: Number(car.priceKrw * 0.00027) // القيمة التقريبية ريال سعودي
+        });
 
         try {
-            // Get user from localStorage if exists
-            let buyerId = null;
+            // Prefer logged-in user data.
+            let buyerName = '';
+            let buyerPhone = '';
             if (typeof window !== 'undefined') {
                 const userJson = localStorage.getItem('hm_user');
                 if (userJson) {
-                    try { buyerId = JSON.parse(userJson)._id; } catch (e) { }
+                    try {
+                        const user = JSON.parse(userJson);
+                        buyerName = user?.name || '';
+                        buyerPhone = user?.phone || '';
+                    } catch (e) { }
                 }
             }
 
-            // Record order in database
-            await api.orders.create({
-                buyerId: buyerId,
-                items: [{
-                    itemType: 'car',
-                    refId: car.id,
-                    titleSnapshot: car.title,
-                    qty: 1,
-                    unitPriceSar: parseInt(sarPrice.replace(/,/g, ''))
-                }],
-                pricing: {
-                    grandTotalSar: parseInt(sarPrice.replace(/,/g, ''))
-                },
-                channel: 'whatsapp',
-                notes: `Client requested showroom car: ${car.encarUrl}`
+            if (!buyerName || !buyerPhone) {
+                const sarPrice = (car.priceKrw * 0.00027).toFixed(0);
+                const qp = new URLSearchParams({
+                    source: 'korean_showroom',
+                    contactPreference,
+                    carName: car.manufacturerAr || car.manufacturer || '',
+                    model: car.model || '',
+                    year: String(car.year || ''),
+                    description: `طلب من المعرض الكوري: ${car.title} | السعر التقريبي SAR ${sarPrice}`,
+                    externalUrl: car.encarUrl || '',
+                });
+                window.location.href = `/concierge?${qp.toString()}`;
+                return;
+            }
+
+            await api.concierge.create({
+                type: 'car',
+                name: buyerName,
+                phone: buyerPhone,
+                carName: car.manufacturerAr || car.manufacturer,
+                model: car.model,
+                year: String(car.year || ''),
+                source: 'korean_showroom',
+                contactPreference,
+                externalUrl: car.encarUrl,
+                description: `طلب من المعرض الكوري: ${car.title} | تواصل مفضل: ${contactPreference} | Encar: ${car.encarUrl}`,
             });
         } catch (err) {
-            console.error('Failed to log showroom order:', err);
+            console.error('Failed to log showroom concierge request:', err);
         }
 
-        const msg = [
-            `🏁 *HM CAR | طلب سيارة من المعرض*`,
-            `──────────────────`,
-            `🚙 *السيارة:* ${car.title}`,
-            `📅 *السنة:* ${car.year}`,
-            `🛣️ *المسافة:* ${formatMileage(car.mileage)}`,
-            `⛽ *الوقود:* ${car.fuelAr}`,
-            `⚙️ *الجير:* ${car.transmissionAr}`,
-            `📍 *الموقع:* ${car.regionAr}`,
-            `💰 *السعر:* ${formatKrw(car.priceKrw)}`,
-            `🇸🇦 *تقديراً:* ${sarPrice} ريال سعودي`,
-            `🔗 *رابط إنكار:* ${car.encarUrl}`,
-            `──────────────────`,
-            `رغبت في الاستفسار عن الشراء وتفاصيل الشحن للتصنيع الكوري لهذه السيارة.`
-        ].join('\n');
-
-        const url = `https://wa.me/${whatsappNum}?text=${encodeURIComponent(msg)}`;
+        const url = WhatsAppService.generateCarLink(car, socialLinks?.whatsapp || '', isRTL);
         window.open(url, '_blank');
         setSelectedCar(null);
     };
@@ -380,12 +442,34 @@ export default function ShowroomPage() {
     const filteredCars = cars.filter(car => {
         const q = search.toLowerCase();
         const matchSearch = !q || car.title.toLowerCase().includes(q) || car.manufacturerAr.includes(q) || car.model.toLowerCase().includes(q);
-        const matchFuel = !filterFuel || car.fuelAr === filterFuel;
-        return matchSearch && matchFuel;
+        const fromYear = yearFrom ? Number(yearFrom) : null;
+        const toYear = yearTo ? Number(yearTo) : null;
+        const cYear = Number(car.year || 0);
+        const low = fromYear && toYear ? Math.min(fromYear, toYear) : fromYear;
+        const high = fromYear && toYear ? Math.max(fromYear, toYear) : toYear;
+        const matchYear = (!low || cYear >= low) && (!high || cYear <= high);
+        return matchSearch && matchYear;
+    }).sort((a, b) => {
+        if (sortBy === 'mileage_low') return Number(a.mileage || 0) - Number(b.mileage || 0);
+        if (sortBy === 'price_high') return Number(b.priceKrw || 0) - Number(a.priceKrw || 0);
+        return Number(b.year || 0) - Number(a.year || 0);
     });
 
-    // قائمة أنواع الوقود الموجودة
-    const fuelTypes = [...new Set(cars.map(c => c.fuelAr).filter(Boolean))];
+    // قائمة السنوات الموجودة
+    const years = [...new Set(cars.map(c => c.year).filter(Boolean))]
+        .sort((a, b) => Number(b) - Number(a));
+
+    const contactOptions = [
+        { key: 'whatsapp' as const, labelAr: rawText('واتساب'), labelEn: rawText('WhatsApp') },
+        { key: 'chat' as const, labelAr: rawText('شات'), labelEn: rawText('Chat') },
+        { key: 'either' as const, labelAr: rawText('الاثنين'), labelEn: rawText('Either') },
+    ];
+
+    const sortOptions = [
+        { value: 'latest' as const, labelAr: rawText('الأحدث سنة'), labelEn: rawText('Latest year') },
+        { value: 'mileage_low' as const, labelAr: rawText('الأقل عدادًا'), labelEn: rawText('Lowest mileage') },
+        { value: 'price_high' as const, labelAr: rawText('الأعلى سعرًا'), labelEn: rawText('Highest price') },
+    ];
 
     return (
         <>
@@ -400,29 +484,33 @@ export default function ShowroomPage() {
                 )}
             </AnimatePresence>
 
-            <div className={cn('min-h-screen bg-[#050505] text-white selection:bg-blue-500/30', isRTL && 'font-arabic')} dir={isRTL ? 'rtl' : 'ltr'}>
+            <div className={cn('min-h-screen bg-cinematic-darker text-white selection:bg-blue-500/30', isRTL && 'font-arabic')} dir={isRTL ? 'rtl' : 'ltr'}>
                 <Navbar />
 
                 {/* ── خلفية سينمائية ── */}
                 <div className="fixed inset-0 pointer-events-none z-0">
-                    <div className="absolute top-0 right-0 w-full h-[600px] bg-gradient-to-b from-blue-600/10 via-transparent to-transparent opacity-50" />
-                    <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:100px_100px] [mask-image:radial-gradient(ellipse_20%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+                    <div className="absolute top-0 right-0 w-full h-150 bg-linear-to-b from-blue-600/10 via-transparent to-transparent opacity-50" />
+                    <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[100px_100px] mask-[radial-gradient(ellipse_20%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
                 </div>
 
                 <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 pt-32 pb-32">
                     {/* زر الرجوع */}
                     <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="mb-8">
-                        <Link href="/" className="inline-flex items-center gap-2 text-white/40 hover:text-blue-400 transition-colors group">
+                        <button
+                            onClick={() => router.back()}
+                            title={isRTL ? rawText('رجوع') : rawText('Back')}
+                            aria-label={isRTL ? rawText('رجوع') : rawText('Back')}
+                            className="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-all group"
+                        >
                             <ArrowLeft className={cn("w-4 h-4 transition-transform group-hover:-translate-x-1", isRTL && "rotate-180 group-hover:translate-x-1")} />
-                            <span className="text-[10px] font-black uppercase tracking-[0.2em]">{isRTL ? "العودة للرئيسية" : "BACK TO HOME"}</span>
-                        </Link>
+                        </button>
                     </motion.div>
 
                     {/* ── لوحة معلومات الاتصال المباشر (Creative Addition) ── */}
                     <motion.div
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="mb-12 p-3 rounded-2xl bg-white/[0.02] border border-white/5 backdrop-blur-3xl flex flex-wrap items-center gap-6"
+                        className="mb-12 p-3 rounded-2xl bg-white/2 border border-white/5 backdrop-blur-3xl flex flex-wrap items-center gap-6"
                     >
                         <div className="flex items-center gap-3 px-4 py-2 bg-blue-500/10 border border-blue-500/20 rounded-xl">
                             <div className="relative flex h-2 w-2">
@@ -430,30 +518,30 @@ export default function ShowroomPage() {
                                 <span className={cn("relative inline-flex rounded-full h-2 w-2 bg-blue-500", loading && "bg-yellow-500")} />
                             </div>
                             <span className="text-[10px] font-black uppercase tracking-widest text-blue-400">
-                                {loading ? 'Syncing Data...' : 'Live System Connection'}
+                                {loading ? rawText('Syncing Data...') : rawText('Live System Connection')}
                             </span>
                         </div>
 
-                        <div className="flex items-center gap-6 flex-1 min-w-[300px]">
+                        <div className="flex items-center gap-6 flex-1 min-w-75">
                             <div className="flex flex-col">
-                                <span className="text-[9px] font-bold text-white/20 uppercase">Market</span>
-                                <span className="text-xs font-black text-white/60">SEOUL, KR</span>
+                                <span className="text-[9px] font-bold text-white/20 uppercase">{rawText('Market')}</span>
+                                <span className="text-xs font-black text-white/60">{rawText('SEOUL, KR')}</span>
                             </div>
                             <div className="h-8 w-px bg-white/5" />
                             <div className="flex flex-col">
-                                <span className="text-[9px] font-bold text-white/20 uppercase">Latency</span>
-                                <span className="text-xs font-black text-green-400">{ping}ms</span>
+                                <span className="text-[9px] font-bold text-white/20 uppercase">{rawText('Latency')}</span>
+                                <span className="text-xs font-black text-green-400">{ping}{rawText('ms')}</span>
                             </div>
                             <div className="h-8 w-px bg-white/5" />
                             <div className="flex flex-col">
-                                <span className="text-[9px] font-bold text-white/20 uppercase">Cars Indexed</span>
+                                <span className="text-[9px] font-bold text-white/20 uppercase">{rawText('Cars Indexed')}</span>
                                 <span className="text-xs font-black text-white/60">{total.toLocaleString()}</span>
                             </div>
                             <div className="h-8 w-px bg-white/5 hidden sm:block" />
                             <div className="hidden sm:flex items-center gap-4 text-[10px] text-white/40 font-bold uppercase tracking-tighter">
-                                <span>KR</span>
-                                <div className="w-12 h-px bg-gradient-to-r from-blue-500/50 via-white/20 to-green-500/50" />
-                                <span>GCC</span>
+                                <span>{rawText('KR')}</span>
+                                <div className="w-12 h-px bg-linear-to-r from-blue-500/50 via-white/20 to-green-500/50" />
+                                <span>{rawText('GCC')}</span>
                             </div>
                         </div>
 
@@ -463,7 +551,7 @@ export default function ShowroomPage() {
                                 className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all flex items-center gap-2 group"
                             >
                                 <RefreshCw className={cn("w-3.5 h-3.5 text-white/40 group-hover:text-blue-400 transition-colors", loading && "animate-spin")} />
-                                <span className="text-[10px] font-black uppercase">{isRTL ? "تحديث" : "SYNC"}</span>
+                                <span className="text-[10px] font-black uppercase">{isRTL ? rawText('تحديث') : rawText('SYNC')}</span>
                             </button>
                         </div>
                     </motion.div>
@@ -477,9 +565,9 @@ export default function ShowroomPage() {
                         >
                             <div className="h-1 w-12 bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.5)]" />
                             <h1 className="text-6xl md:text-8xl font-black italic tracking-tighter uppercase leading-[0.8]">
-                                {isRTL ? 'المعرض' : 'SHOWROOM'}
+                                {isRTL ? rawText('المعرض') : rawText('SHOWROOM')}
                                 <span className="block text-2xl md:text-3xl font-light not-italic tracking-[0.3em] text-white/20 mt-2">
-                                    {isRTL ? 'سيارات كورية مباشرة' : 'LIVE KOREAN MARKET'}
+                                    {isRTL ? rawText('سيارات كورية مباشرة') : rawText('LIVE KOREAN MARKET')}
                                 </span>
                             </h1>
                         </motion.div>
@@ -502,18 +590,65 @@ export default function ShowroomPage() {
                                         placeholder={isRTL ? "ابحث بالماركة أو الموديل..." : "Search brand or model..."}
                                         className="flex-1 bg-transparent border-none outline-none text-sm font-medium text-white placeholder:text-white/20 px-2"
                                     />
-                                    {fuelTypes.length > 0 && (
-                                        <select
-                                            value={filterFuel}
-                                            onChange={e => setFilterFuel(e.target.value)}
-                                            title={isRTL ? "فلترة حسب نوع الوقود" : "Filter by fuel type"}
-                                            className="bg-black/40 border border-white/5 rounded-xl px-4 py-2 text-[10px] font-black uppercase text-white/40 appearance-none outline-none cursor-pointer hover:text-white transition-colors"
-                                        >
-                                            <option value="">{isRTL ? "كل الوقود" : "ALL FUEL"}</option>
-                                            {fuelTypes.map(f => <option key={f} value={f}>{f}</option>)}
-                                        </select>
+                                    {years.length > 0 && (
+                                        <div className="flex items-center gap-1">
+                                            <select
+                                                value={yearFrom}
+                                                onChange={e => setYearFrom(e.target.value)}
+                                                title={isRTL ? "من سنة" : "From year"}
+                                                className="bg-black/40 border border-white/5 rounded-xl px-3 py-2 text-[10px] font-black uppercase text-white/40 appearance-none outline-none cursor-pointer hover:text-white transition-colors"
+                                            >
+                                                <option value="">{isRTL ? rawText('من') : rawText('FROM')}</option>
+                                                {years.map(y => <option key={`from-${y}`} value={String(y)}>{y}</option>)}
+                                            </select>
+                                            <select
+                                                value={yearTo}
+                                                onChange={e => setYearTo(e.target.value)}
+                                                title={isRTL ? "إلى سنة" : "To year"}
+                                                className="bg-black/40 border border-white/5 rounded-xl px-3 py-2 text-[10px] font-black uppercase text-white/40 appearance-none outline-none cursor-pointer hover:text-white transition-colors"
+                                            >
+                                                <option value="">{isRTL ? rawText('إلى') : rawText('TO')}</option>
+                                                {years.map(y => <option key={`to-${y}`} value={String(y)}>{y}</option>)}
+                                            </select>
+                                        </div>
                                     )}
                                 </div>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                                <span className="text-[10px] font-black uppercase tracking-wider text-white/35">
+                                    {isRTL ? rawText('التواصل:') : rawText('Contact:')}
+                                </span>
+                                {contactOptions.map((opt) => (
+                                    <button
+                                        key={opt.key}
+                                        onClick={() => setContactPreference(opt.key as 'whatsapp' | 'chat' | 'either')}
+                                        className={cn(
+                                            'px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider border transition-all',
+                                            contactPreference === opt.key
+                                                ? 'bg-blue-500/20 border-blue-500/40 text-blue-300'
+                                                : 'bg-white/5 border-white/10 text-white/45 hover:text-white/80'
+                                        )}
+                                    >
+                                        {isRTL ? opt.labelAr : opt.labelEn}
+                                    </button>
+                                ))}
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                                <span className="text-[10px] font-black uppercase tracking-wider text-white/35">
+                                    {isRTL ? rawText('الترتيب:') : rawText('Sort:')}
+                                </span>
+                                <select
+                                    value={sortBy}
+                                    onChange={e => setSortBy(e.target.value as 'latest' | 'mileage_low' | 'price_high')}
+                                    className="bg-black/40 border border-white/10 rounded-lg px-3 py-1.5 text-[10px] font-black uppercase text-white/70 outline-none"
+                                    title={isRTL ? 'ترتيب النتائج' : 'Sort results'}
+                                >
+                                    {sortOptions.map((opt) => (
+                                        <option key={opt.value} value={opt.value}>{isRTL ? opt.labelAr : opt.labelEn}</option>
+                                    ))}
+                                </select>
                             </div>
                         </motion.div>
                     </div>
@@ -522,7 +657,7 @@ export default function ShowroomPage() {
                     {loading && !cars.length ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                             {Array.from({ length: 12 }).map((_, i) => (
-                                <div key={i} className="aspect-[3/4] rounded-3xl bg-white/[0.02] border border-white/5 animate-pulse" />
+                                <div key={i} className="aspect-3/4 rounded-3xl bg-white/2 border border-white/5 animate-pulse" />
                             ))}
                         </div>
                     ) : error ? (
@@ -530,13 +665,13 @@ export default function ShowroomPage() {
                             <div className="w-20 h-20 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 border border-red-500/20">
                                 <X className="w-10 h-10" />
                             </div>
-                            <h2 className="text-2xl font-black uppercase italic tracking-tighter">{isRTL ? 'فشل جلب البيانات' : 'DATA SYNC FAILED'}</h2>
+                            <h2 className="text-2xl font-black uppercase italic tracking-tighter">{isRTL ? rawText('فشل جلب البيانات') : rawText('DATA SYNC FAILED')}</h2>
                             <p className="text-white/40 max-w-xs">{error}</p>
                             <button
                                 onClick={() => setRefreshKey(k => k + 1)}
                                 className="px-8 py-3 bg-white text-black font-black uppercase text-xs rounded-xl hover:scale-105 transition-all shadow-xl"
                             >
-                                {isRTL ? 'إعادة الإتصال' : 'RECONNECT'}
+                                {isRTL ? rawText('إعادة الإتصال') : rawText('RECONNECT')}
                             </button>
                         </div>
                     ) : (
@@ -560,7 +695,7 @@ export default function ShowroomPage() {
 
                             {filteredCars.length === 0 && (
                                 <div className="py-32 text-center opacity-40 italic">
-                                    {isRTL ? "لا توجد نتائج مطابقة لعملية البحث" : "NO RESULTS MATCH YOUR SEARCH CRITERIA"}
+                                    {isRTL ? rawText('لا توجد نتائج مطابقة لعملية البحث') : rawText('NO RESULTS MATCH YOUR SEARCH CRITERIA')}
                                 </div>
                             )}
 
@@ -578,7 +713,7 @@ export default function ShowroomPage() {
 
                                     <div className="flex items-center gap-1 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-[11px] font-black">
                                         <span className="text-blue-400">{page}</span>
-                                        <span className="text-white/20">/</span>
+                                        <span className="text-white/20">{rawText('/')}</span>
                                         <span className="text-white/40">{totalPages}</span>
                                     </div>
 
@@ -599,12 +734,14 @@ export default function ShowroomPage() {
                 {/* Footer Section */}
                 <footer className="relative z-10 border-t border-white/5 py-12 px-6 flex flex-col items-center gap-6 bg-black/40 backdrop-blur-3xl">
                     <div className="flex items-center gap-4 text-white/20 font-black text-[10px] tracking-[0.5em] uppercase">
-                        <span>HM CAR</span>
-                        <div className="h-[2px] w-12 bg-white/5" />
-                        <span>KOREA AUTO</span>
+                        <span>{rawText('HM CAR')}</span>
+                        <div className="h-0.5 w-12 bg-white/5" />
+                        <span>{rawText('KOREA AUTO')}</span>
                     </div>
                 </footer>
             </div>
         </>
     );
 }
+
+

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
@@ -10,11 +10,11 @@ import { useLanguage } from '@/lib/LanguageContext';
 
 const TABS = [
     {
-        href: '/showroom',
+        href: '/gallery',
         icon: Car,
         labelAr: 'المعرض',
         labelEn: 'Cars',
-        matchPaths: ['/showroom'],
+        matchPaths: ['/gallery', '/showroom', '/cars'],
     },
     {
         href: '/auctions',
@@ -58,7 +58,7 @@ export default function BottomTabBar() {
 
     return (
         <nav
-            className="fixed bottom-0 left-0 right-0 z-[500] bg-[#060606]/98 border-t border-white/[0.08] backdrop-blur-2xl"
+            className="fixed bottom-0 left-0 right-0 z-500 bg-cinematic-darker/98 border-t border-white/8 backdrop-blur-2xl"
             style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
             dir="ltr"
         >
@@ -77,12 +77,12 @@ export default function BottomTabBar() {
                                     {active && (
                                         <motion.div
                                             layoutId="tab-bg"
-                                            className="absolute inset-0 -m-2 rounded-2xl bg-[#c9a96e]/15"
+                                            className="absolute inset-0 -m-2 rounded-2xl bg-cinematic-neon-gold/15"
                                             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
                                         />
                                     )}
                                     <Icon
-                                        className={`w-6 h-6 relative z-10 transition-colors duration-200 ${active ? 'text-[#c9a96e]' : 'text-white/30'
+                                        className={`w-6 h-6 relative z-10 transition-colors duration-200 ${active ? 'text-cinematic-neon-gold' : 'text-white/30'
                                             }`}
                                         strokeWidth={active ? 2.5 : 1.5}
                                     />
@@ -90,7 +90,7 @@ export default function BottomTabBar() {
 
                                 {/* التسمية */}
                                 <span
-                                    className={`text-[10px] font-bold tracking-wide transition-colors duration-200 ${active ? 'text-[#c9a96e]' : 'text-white/30'
+                                    className={`text-[10px] font-bold tracking-wide transition-colors duration-200 ${active ? 'text-cinematic-neon-gold' : 'text-white/30'
                                         }`}
                                 >
                                     {isRTL ? tab.labelAr : tab.labelEn}
@@ -100,7 +100,7 @@ export default function BottomTabBar() {
                                 {active && (
                                     <motion.div
                                         layoutId="tab-dot"
-                                        className="w-1 h-1 rounded-full bg-[#c9a96e]"
+                                        className="w-1 h-1 rounded-full bg-cinematic-neon-gold"
                                         transition={{ type: 'spring', damping: 20, stiffness: 300 }}
                                     />
                                 )}
@@ -112,3 +112,5 @@ export default function BottomTabBar() {
         </nav>
     );
 }
+
+

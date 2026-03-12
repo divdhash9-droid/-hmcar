@@ -15,6 +15,16 @@ export default function BrandDetail({ params }: { params: { key: string } }) {
   const [parts, setParts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const resolveCarImage = (car: any) => {
+    const src = car?.images?.[0] || car?.imageUrl || car?.image || '';
+    return typeof src === 'string' && src.trim() ? src.trim() : '/images/placeholder.jpg';
+  };
+
+  const resolvePartImage = (part: any) => {
+    const src = part?.img || part?.image || part?.images?.[0] || '';
+    return typeof src === 'string' && src.trim() ? src.trim() : '/images/placeholder.jpg';
+  };
+
   useEffect(() => {
     (async () => {
       try {
@@ -71,7 +81,7 @@ export default function BrandDetail({ params }: { params: { key: string } }) {
                       <motion.div key={car.id || car._id || i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ delay: i * 0.05 }}>
                         <div className="group obsidian-card obsidian-card-hover h-full overflow-hidden">
                           <div className="relative h-56">
-                            <img src={car.images?.[0] || '/images/placeholder.jpg'} alt={car.title} className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 transition-all duration-700" />
+                            <img src={resolveCarImage(car)} alt={car.title} className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 transition-all duration-700" />
                             <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
                           </div>
                           <div className="p-6">
@@ -105,7 +115,7 @@ export default function BrandDetail({ params }: { params: { key: string } }) {
                       <motion.div key={part.id || part._id || i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ delay: i * 0.05 }}>
                         <div className="group obsidian-card obsidian-card-hover p-6 h-full">
                           <div className="aspect-square bg-black/40 rounded-xl overflow-hidden mb-6 border border-white/5 relative group-hover:border-accent-gold/20 transition-colors">
-                            <img src={part.img || part.images?.[0] || '/images/placeholder.jpg'} alt={part.name} className="w-full h-full object-contain p-6 grayscale-[40%] opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700" />
+                            <img src={resolvePartImage(part)} alt={part.name} className="w-full h-full object-contain p-6 grayscale-[40%] opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700" />
                           </div>
                           <div>
                             <div className="text-[8px] font-bold uppercase tracking-[0.2em] text-white/50 mb-1">{part.brand}</div>

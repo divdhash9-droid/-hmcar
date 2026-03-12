@@ -212,7 +212,6 @@ function buildNavItems(isRTL: boolean): NavItem[] {
         { id: 'users', icon: Users, label: isRTL ? 'الأعضاء' : 'USERS', href: '/admin/users' },
         { id: 'messages', icon: MessageCircle, label: isRTL ? 'المحادثات' : 'CHATS', href: '/admin/messages' },
         { id: 'contact', icon: Mail, label: isRTL ? 'استفسارات' : 'INQUIRIES', href: '/admin/contact' },
-        { id: 'brands', icon: Tag, label: isRTL ? 'الوكالات' : 'AGENCIES', href: '/admin/brands' },
         { id: 'reports', icon: TrendingUp, label: isRTL ? 'التقارير' : 'REPORTS', href: '/admin/reports' },
         { id: 'notifications', icon: Bell, label: isRTL ? 'الإشعارات' : 'ALERTS', href: '/admin/notifications' },
         { id: 'social', icon: Share2, label: isRTL ? 'التواصل' : 'SOCIAL', href: '/admin/social' },

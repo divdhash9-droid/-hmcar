@@ -3,7 +3,65 @@
 const express = require('express');
 const router = express.Router();
 const SparePart = require('../../../models/SparePart');
-const { requireAuthAPI } = require('../../../middleware/auth');
+const { requireAuthAPI, requireAdmin } = require('../../../middleware/auth');
+
+function normalizeExternalImage(url) {
+    if (!url || typeof url !== 'string') return null;
+    const trimmed = url.trim();
+    if (!trimmed) return null;
+    if (trimmed.startsWith('http')) return trimmed;
+    if (trimmed.startsWith('//')) return `https:${trimmed}`;
+    return `https://autospare.com.eg${trimmed.startsWith('/') ? '' : '/'}${trimmed}`;
+}
+
+function toArabicCategory(value = '') {
+    const normalized = String(value || '').toLowerCase();
+    if (normalized.includes('engine')) return 'محرك';
+    if (normalized.includes('brake')) return 'فرامل';
+    if (normalized.includes('suspension')) return 'تعليق';
+    if (normalized.includes('filter')) return 'فلاتر';
+    if (normalized.includes('electrical')) return 'كهرباء';
+    if (normalized.includes('body')) return 'هيكل';
+    if (normalized.includes('accessories')) return 'إكسسوارات';
+    return value || 'عام';
+}
+
+function translatePartNameToArabic(value = '') {
+    if (!value || typeof value !== 'string') return '';
+    return value
+        .replace(/engine/gi, 'محرك')
+        .replace(/transmission/gi, 'ناقل الحركة')
+        .replace(/gearbox/gi, 'جير')
+        .replace(/brake/gi, 'فرامل')
+        .replace(/pad(s)?/gi, 'فحمات')
+        .replace(/disc/gi, 'دسك')
+        .replace(/filter/gi, 'فلتر')
+        .replace(/air\s*filter/gi, 'فلتر هواء')
+        .replace(/oil\s*filter/gi, 'فلتر زيت')
+        .replace(/fuel\s*filter/gi, 'فلتر وقود')
+        .replace(/spark\s*plug/gi, 'بوجي')
+        .replace(/battery/gi, 'بطارية')
+        .replace(/radiator/gi, 'رديتر')
+        .replace(/pump/gi, 'مضخة')
+        .replace(/suspension/gi, 'نظام التعليق')
+        .replace(/shock/gi, 'مساعد')
+        .replace(/arm/gi, 'ذراع')
+        .replace(/sensor/gi, 'حساس')
+        .replace(/head\s*lamp|headlight/gi, 'شمعة أمامية')
+        .replace(/tail\s*lamp|taillight/gi, 'شمعة خلفية')
+        .replace(/bumper/gi, 'صدام')
+        .replace(/door/gi, 'باب')
+        .replace(/mirror/gi, 'مرآة')
+        .replace(/wheel/gi, 'جنط')
+        .replace(/tire|tyre/gi, 'إطار')
+        .replace(/kit/gi, 'طقم')
+        .trim();
+}
+
+function cleanModelName(value = '') {
+    if (!value || typeof value !== 'string') return '';
+    return value.replace(/\s+/g, ' ').trim();
+}
 
 // GET /api/v2/parts - قائمة قطع الغيار
 router.get('/', async (req, res) => {
@@ -41,16 +99,22 @@ router.get('/', async (req, res) => {
             parts: parts.map(p => ({
                 id: p._id,
                 name: p.name,
+                nameAr: p.nameAr || translatePartNameToArabic(p.name) || p.name,
                 brand: p.carMake || p.brand,
+                model: cleanModelName(p.carModel || ''),
                 price: p.priceSar || p.price || 0,
                 currency: 'SAR',
                 category: p.partType,
-                condition: p.condition || 'NEW',
-                img: p.images?.[0] || 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=1000&auto=format&fit=crop',
-                images: p.images || [],
-                carModel: p.carModel || '',
-                compatibility: [p.carModel || 'ALL Models'],
+                categoryAr: p.partTypeAr || toArabicCategory(p.partType),
+                condition: String(p.condition || 'NEW').toUpperCase(),
+                img: normalizeExternalImage(p.images?.[0]) || 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=1000&auto=format&fit=crop',
+                images: (p.images || []).map(normalizeExternalImage).filter(Boolean),
+                carModel: cleanModelName(p.carModel || ''),
+                compatibility: [cleanModelName(p.carModel || '') || 'ALL Models'],
                 stock: p.stockQty || 1,
+                stockQty: p.stockQty || 1,
+                inStock: typeof p.inStock === 'boolean' ? p.inStock : (p.stockQty || 0) > 0,
+                description: p.description || '',
                 rareLevel: 3
             }))
         });
@@ -62,96 +126,26 @@ router.get('/', async (req, res) => {
 
 // POST /api/v2/parts - Add new part
 router.post('/', requireAuthAPI, async (req, res) => {
-    try {
-        const partData = req.body;
-        // Basic validation/sanitization could happen here
-
-        // Map frontend fields (like brand -> carMake) if needed
-        const newPart = new SparePart({
-            name: partData.name,
-            partType: partData.category || partData.partType,
-            carMake: partData.brand || partData.carMake,
-            carModel: partData.model,
-            carYear: partData.year,
-            price: partData.price,
-            priceSar: partData.price,
-            condition: partData.condition,
-            images: partData.images || [],
-            description: partData.description,
-            stockQty: partData.stockQty !== undefined ? partData.stockQty : 1,
-            inStock: (partData.stockQty !== undefined ? partData.stockQty : 1) > 0
-        });
-
-        await newPart.save();
-
-        res.status(201).json({
-            success: true,
-            data: newPart,
-            message: 'Part created successfully'
-        });
-    } catch (error) {
-        console.error('Create part error:', error);
-        res.status(500).json({ success: false, error: error.message });
-    }
+    return res.status(403).json({
+        success: false,
+        message: 'تم تعطيل الإضافة اليدوية. استخدم زر الاستيراد من المصدر الخارجي.'
+    });
 });
 
 // PUT /api/v2/parts/:id - Update part
 router.put('/:id', requireAuthAPI, async (req, res) => {
-    try {
-        const { id } = req.params;
-        const updateData = req.body;
-
-        // Use mapped data for update
-        const mappedUpdate = {
-            name: updateData.name,
-            partType: updateData.category || updateData.partType,
-            carMake: updateData.brand || updateData.carMake,
-            carModel: updateData.model,
-            carYear: updateData.year,
-            price: updateData.price,
-            priceSar: updateData.price,
-            condition: updateData.condition,
-            images: updateData.images || [], // Ensure images are updated
-            description: updateData.description,
-            stockQty: updateData.stockQty,
-            inStock: updateData.stockQty > 0
-        };
-
-        const part = await SparePart.findByIdAndUpdate(id, mappedUpdate, { new: true });
-
-        if (!part) {
-            return res.status(404).json({ success: false, error: 'Part not found' });
-        }
-
-        res.json({
-            success: true,
-            data: part,
-            message: 'Part updated successfully'
-        });
-    } catch (error) {
-        console.error('Update part error:', error);
-        res.status(500).json({ success: false, error: error.message });
-    }
+    return res.status(403).json({
+        success: false,
+        message: 'تم تعطيل التعديل اليدوي. البيانات تُدار عبر الاستيراد.'
+    });
 });
 
 // DELETE /api/v2/parts/:id - Delete part
 router.delete('/:id', requireAuthAPI, async (req, res) => {
-    try {
-        const { id } = req.params;
-        const part = await SparePart.findByIdAndDelete(id);
-
-        if (!part) {
-            return res.status(404).json({ success: false, error: 'Part not found' });
-        }
-
-        res.json({
-            success: true,
-            message: 'Part deleted successfully'
-        });
-    } catch (error) {
-        console.error('Delete part error:', error);
-        res.status(500).json({ success: false, error: error.message });
-    }
+    return res.status(403).json({
+        success: false,
+        message: 'تم تعطيل الحذف اليدوي. يمكنك إخفاء القطعة أو تحديثها عبر الاستيراد.'
+    });
 });
 
 // [[ARABIC_COMMENT]] PATCH /api/v2/parts/:id/toggle-stock - تبديل حالة الظهور (In Stock / Out of Stock)
@@ -248,14 +242,12 @@ const cheerio = require('cheerio');
 const Brand = require('../../../models/Brand');
 
 // [[ARABIC_COMMENT]] POST /api/v2/parts/scrape - جلب وكالات وقطع غيار من autospare.com.eg (أدمن فقط)
-router.post('/scrape', requireAuthAPI, async (req, res) => {
+router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
     try {
-        if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
-            return res.status(403).json({ success: false, error: 'Forbidden' });
-        }
-
         const BASE_URL = 'https://autospare.com.eg';
         const BRANDS_URL = `${BASE_URL}/brands`;
+        const maxBrands = Number(req.body?.maxBrands || 25);
+        const maxModelsPerBrand = Number(req.body?.maxModelsPerBrand || 4);
 
         // [[ARABIC_COMMENT]] 1. جلب الوكالات (Brands) من الصفحة الرئيسية للعلامات التجارية
         const { data: brandsHtml } = await axios.get(BRANDS_URL, {
@@ -280,7 +272,7 @@ router.post('/scrape', requireAuthAPI, async (req, res) => {
         });
 
         // [[ARABIC_COMMENT]] تقليل العدد لتجنب مشاكل الأداء والوقت في الطلب الواحد
-        const limitBrands = brandsToProcess.slice(0, 15);
+        const limitBrands = brandsToProcess.slice(0, Math.max(1, maxBrands));
 
         for (const bData of limitBrands) {
             let brand = await Brand.findOne({ key: bData.name.toLowerCase() });
@@ -312,12 +304,19 @@ router.post('/scrape', requireAuthAPI, async (req, res) => {
                 const modelsFound = [];
                 const modelUrls = [];
 
-                $models('a.brand-card-link').each((i, el) => {
-                    const mName = $models(el).find('h3').text().trim();
-                    const mHref = $models(el).attr('href');
-                    if (mName && mHref) {
+                $models('a.text-decoration-none[href*="/brands/"]').each((i, el) => {
+                    const mHref = ($models(el).attr('href') || '').trim();
+                    if (!mHref) return;
+                    const absoluteHref = mHref.startsWith('http') ? mHref : `${BASE_URL}${mHref}`;
+                    if (!absoluteHref.startsWith(`${bData.url}/`)) return;
+
+                    const fromText = $models(el).text().trim();
+                    const fromUrl = decodeURIComponent(absoluteHref.split('/').pop() || '').trim();
+                    const mName = fromText || fromUrl;
+
+                    if (mName && absoluteHref) {
                         modelsFound.push(mName);
-                        modelUrls.push(mHref.startsWith('http') ? mHref : `${BASE_URL}${mHref}`);
+                        modelUrls.push(absoluteHref);
                     }
                 });
 
@@ -332,40 +331,67 @@ router.post('/scrape', requireAuthAPI, async (req, res) => {
                 }
 
                 // [[ARABIC_COMMENT]] 3. جلب قطع الغيار لبعض الموديلات (حد أقصى 2 موديل لكل ماركة لتجنب البطء)
-                for (let i = 0; i < Math.min(modelUrls.length, 2); i++) {
+                for (let i = 0; i < Math.min(modelUrls.length, Math.max(1, maxModelsPerBrand)); i++) {
                     const mUrl = modelUrls[i];
-                    const modelName = modelsFound[i];
+                    const modelName = cleanModelName(modelsFound[i]);
 
                     const { data: partsHtml } = await axios.get(mUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } });
                     const $parts = cheerio.load(partsHtml);
 
-                    $parts('div.card').each(async (j, el) => {
-                        const pName = $parts(el).find('a.text-decoration-none h3').text().trim();
-                        const pImg = $parts(el).find('a.card-image-content img').attr('src');
-                        // محاولة استخراج السعر
-                        const pPriceText = $parts(el).text().match(/(\d+)\s*جنيه/);
-                        const pPrice = pPriceText ? parseInt(pPriceText[1]) : 0;
+                    const cards = [];
+                    $parts('a.text-decoration-none[href*="/products/"]').each((j, el) => {
+                        const linkHref = ($parts(el).attr('href') || '').trim();
+                        if (!linkHref) return;
 
-                        if (pName) {
-                            // التحقق مما إذا كانت القطعة موجودة مسبقاً
-                            const existing = await SparePart.findOne({ name: pName, brand: brand._id });
-                            if (!existing) {
-                                await SparePart.create({
-                                    name: pName,
-                                    partType: 'General', // يمكن تحسين هذا بجلب التصنيف من الموقع
-                                    brand: brand._id,
-                                    carMake: brand.name,
-                                    carModel: modelName,
-                                    price: pPrice,
-                                    priceSar: Math.ceil(pPrice * 0.12), // تحويل تقريبي من جنيه لمصري لريال
-                                    stockQty: 5,
-                                    inStock: true,
-                                    images: pImg ? [pImg.startsWith('http') ? pImg : `${BASE_URL}${pImg}`] : []
-                                });
-                                results.partsCreated++;
-                            }
-                        }
+                        const sourceUrl = linkHref.startsWith('http') ? linkHref : `${BASE_URL}${linkHref}`;
+                        const pName = $parts(el).text().trim();
+                        const cardRoot = $parts(el).closest('div.col-lg-4, div.col-md-6, div.col-6, div.product, div.card, article, li');
+
+                        const pImg = cardRoot.find('img').first().attr('src')
+                            || cardRoot.find('img').first().attr('data-src')
+                            || cardRoot.find('img').first().attr('data-lazy-src');
+
+                        const cardText = cardRoot.text().replace(/\s+/g, ' ');
+                        const pPriceText = cardText.replace(/,/g, '').match(/(\d+)\s*جنيه/);
+                        const pPrice = pPriceText ? parseInt(pPriceText[1], 10) : 0;
+
+                        if (!pName) return;
+                        cards.push({
+                            pName,
+                            pImg: normalizeExternalImage(pImg),
+                            pPrice,
+                            sourceUrl,
+                        });
                     });
+
+                    for (const card of cards) {
+                        const existing = await SparePart.findOne({
+                            name: card.pName,
+                            carMake: brand.name,
+                            carModel: modelName
+                        });
+
+                        if (existing) continue;
+
+                        await SparePart.create({
+                            name: card.pName,
+                            nameAr: translatePartNameToArabic(card.pName) || card.pName,
+                            partType: 'General',
+                            partTypeAr: 'عام',
+                            brand: brand._id,
+                            carMake: brand.name,
+                            carMakeLogoUrl: brand.logoUrl || '',
+                            carModel: modelName,
+                            price: card.pPrice,
+                            priceSar: Math.ceil(card.pPrice * 0.12),
+                            stockQty: 5,
+                            inStock: true,
+                            images: card.pImg ? [card.pImg] : [],
+                            externalUrl: card.sourceUrl,
+                            source: 'autospare'
+                        });
+                        results.partsCreated++;
+                    }
                 }
             } catch (err) {
                 console.error(`Error scraping brand ${bData.name}:`, err.message);

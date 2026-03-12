@@ -12,6 +12,8 @@ import { api } from '@/lib/api';
 import { useLocale } from '@/hooks/useLocale';
 import ClientPageHeader from '@/components/ClientPageHeader';
 
+const rawText = (value: string) => value;
+
 interface CarData {
     _id: string;
     title: string;
@@ -31,7 +33,7 @@ export default function ComparisonsPageWrapper() {
     return (
         <Suspense fallback={
             <div className="min-h-screen bg-black flex items-center justify-center">
-                <div className="w-16 h-16 border-4 border-[#c5a059] border-t-transparent rounded-full animate-spin" />
+                <div className="w-16 h-16 border-4 border-cinematic-neon-gold border-t-transparent rounded-full animate-spin" />
             </div>
         }>
             <ComparisonsPage />
@@ -104,7 +106,7 @@ function ComparisonsPage() {
     const specs = [
         { key: 'price', label: isRTL ? 'السعر' : 'Price', icon: null, format: (v: any) => formatPrice(v) },
         { key: 'year', label: isRTL ? 'السنة' : 'Year', icon: Calendar },
-        { key: 'mileage', label: isRTL ? 'المسافة' : 'Mileage', icon: Gauge, format: (v: any) => v ? `${v.toLocaleString()} ${isRTL ? 'كم' : 'km'}` : '-' },
+        { key: 'mileage', label: isRTL ? 'المسافة' : 'Mileage', icon: Gauge, format: (v: any) => v ? `${v.toLocaleString()} ${isRTL ? rawText('كم') : rawText('km')}` : rawText('-') },
         { key: 'fuelType', label: isRTL ? 'الوقود' : 'Fuel', icon: Fuel },
         { key: 'transmission', label: isRTL ? 'ناقل الحركة' : 'Transmission', icon: Settings },
         { key: 'color', label: isRTL ? 'اللون' : 'Color', icon: null },
@@ -113,7 +115,7 @@ function ComparisonsPage() {
     if (loading) {
         return (
             <div className="min-h-screen bg-black flex items-center justify-center">
-                <div className="w-16 h-16 border-4 border-[#c5a059] border-t-transparent rounded-full animate-spin" />
+                <div className="w-16 h-16 border-4 border-cinematic-neon-gold border-t-transparent rounded-full animate-spin" />
             </div>
         );
     }
@@ -131,7 +133,7 @@ function ComparisonsPage() {
                                 className="flex items-center gap-2 text-red-400 hover:text-red-300 transition-colors"
                             >
                                 <Trash2 className="w-5 h-5" />
-                                <span>{isRTL ? 'مسح الكل' : 'Clear All'}</span>
+                                <span>{isRTL ? rawText('مسح الكل') : rawText('Clear All')}</span>
                             </button>
                         )}
                     </div>
@@ -141,16 +143,16 @@ function ComparisonsPage() {
                         animate={{ opacity: 1, y: 0 }}
                         className="text-center"
                     >
-                        <div className="w-20 h-20 bg-[#c5a059]/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <Scale className="w-10 h-10 text-[#c5a059]" />
+                        <div className="w-20 h-20 bg-cinematic-neon-gold/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <Scale className="w-10 h-10 text-cinematic-neon-gold" />
                         </div>
                         <h1 className="text-5xl font-black mb-4">
-                            {isRTL ? 'مقارنة السيارات' : 'Compare Cars'}
+                            {isRTL ? rawText('مقارنة السيارات') : rawText('Compare Cars')}
                         </h1>
                         <p className="text-xl text-white/60">
                             {cars.length > 0
                                 ? (isRTL ? `مقارنة ${cars.length} سيارات` : `Comparing ${cars.length} cars`)
-                                : (isRTL ? 'أضف سيارات للمقارنة' : 'Add cars to compare')}
+                                : (isRTL ? rawText('أضف سيارات للمقارنة') : rawText('Add cars to compare'))}
                         </p>
                     </motion.div>
                 </div>
@@ -165,30 +167,30 @@ function ComparisonsPage() {
                     >
                         <Car className="w-24 h-24 text-white/20 mx-auto mb-6" />
                         <h2 className="text-2xl font-bold mb-4">
-                            {isRTL ? 'لا توجد سيارات للمقارنة' : 'No cars to compare'}
+                            {isRTL ? rawText('لا توجد سيارات للمقارنة') : rawText('No cars to compare')}
                         </h2>
                         <p className="text-white/60 mb-8">
                             {isRTL
-                                ? 'ابحث عن سيارات وأضفها للمقارنة'
-                                : 'Search for cars and add them to compare'}
+                                ? rawText('ابحث عن سيارات وأضفها للمقارنة')
+                                : rawText('Search for cars and add them to compare')}
                         </p>
                         <Link
-                            href="/showroom"
-                            className="inline-flex items-center gap-2 px-8 py-4 bg-[#c5a059] text-black font-bold rounded-xl hover:bg-[#d4af68] transition-all"
+                            href="/cars"
+                            className="inline-flex items-center gap-2 px-8 py-4 bg-cinematic-neon-gold text-black font-bold rounded-xl hover:bg-[#d4af68] transition-all"
                         >
                             <Plus className="w-5 h-5" />
-                            {isRTL ? 'تصفح السيارات' : 'Browse Cars'}
+                            {isRTL ? rawText('معرض HM CAR') : rawText('HM CAR Showroom')}
                         </Link>
                     </motion.div>
                 ) : (
                     <div className="overflow-x-auto">
-                        <table className="w-full min-w-[800px]">
+                        <table className="w-full min-w-200">
                             {/* Car Images & Titles */}
                             <thead>
                                 <tr>
                                     <th className="p-4 text-left w-48"></th>
                                     {cars.map((car, index) => (
-                                        <th key={car._id} className="p-4 min-w-[280px]">
+                                        <th key={car._id} className="p-4 min-w-70">
                                             <motion.div
                                                 initial={{ opacity: 0, y: 20 }}
                                                 animate={{ opacity: 1, y: 0 }}
@@ -216,12 +218,12 @@ function ComparisonsPage() {
 
                                                 {/* Title */}
                                                 <div className="p-4">
-                                                    <div className="text-[#c5a059] text-xs font-bold uppercase mb-1">
-                                                        {car.make} • {car.year}
+                                                    <div className="text-cinematic-neon-gold text-xs font-bold uppercase mb-1">
+                                                        {car.make} {rawText('•')} {car.year}
                                                     </div>
                                                     <Link
                                                         href={`/cars/${car._id}`}
-                                                        className="font-bold hover:text-[#c5a059] transition-colors"
+                                                        className="font-bold hover:text-cinematic-neon-gold transition-colors"
                                                     >
                                                         {car.title || `${car.make} ${car.model}`}
                                                     </Link>
@@ -231,14 +233,14 @@ function ComparisonsPage() {
                                     ))}
                                     {/* Add More Button */}
                                     {cars.length < 4 && (
-                                        <th className="p-4 min-w-[200px]">
+                                        <th className="p-4 min-w-50">
                                             <Link
                                                 href="/showroom"
-                                                className="flex flex-col items-center justify-center h-full min-h-[250px] bg-white/5 rounded-2xl border border-dashed border-white/20 hover:border-[#c5a059] transition-all group"
+                                                className="flex flex-col items-center justify-center h-full min-h-62.5 bg-white/5 rounded-2xl border border-dashed border-white/20 hover:border-cinematic-neon-gold transition-all group"
                                             >
-                                                <Plus className="w-12 h-12 text-white/40 group-hover:text-[#c5a059] transition-colors mb-3" />
-                                                <span className="text-white/40 group-hover:text-[#c5a059] transition-colors">
-                                                    {isRTL ? 'أضف سيارة' : 'Add Car'}
+                                                <Plus className="w-12 h-12 text-white/40 group-hover:text-cinematic-neon-gold transition-colors mb-3" />
+                                                <span className="text-white/40 group-hover:text-cinematic-neon-gold transition-colors">
+                                                    {isRTL ? rawText('أضف سيارة') : rawText('Add Car')}
                                                 </span>
                                             </Link>
                                         </th>
@@ -252,16 +254,16 @@ function ComparisonsPage() {
                                     <tr key={spec.key} className={specIndex % 2 === 0 ? 'bg-white/5' : ''}>
                                         <td className="p-4 font-bold text-white/60">
                                             <div className="flex items-center gap-3">
-                                                {spec.icon && <spec.icon className="w-5 h-5 text-[#c5a059]" />}
+                                                {spec.icon && <spec.icon className="w-5 h-5 text-cinematic-neon-gold" />}
                                                 {spec.label}
                                             </div>
                                         </td>
                                         {cars.map((car) => (
                                             <td key={car._id} className="p-4 text-center">
-                                                <span className={spec.key === 'price' ? 'text-[#c5a059] font-bold text-xl' : ''}>
+                                                <span className={spec.key === 'price' ? 'text-cinematic-neon-gold font-bold text-xl' : ''}>
                                                     {spec.format
                                                         ? spec.format((car as any)[spec.key])
-                                                        : (car as any)[spec.key] || '-'}
+                                                        : (car as any)[spec.key] || rawText('-')}
                                                 </span>
                                             </td>
                                         ))}

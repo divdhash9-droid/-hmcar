@@ -6,8 +6,10 @@ const mongoose = require('mongoose');
 const sparePartSchema = new mongoose.Schema({
   // اسم القطعة
   name: { type: String, required: true, trim: true },
+  nameAr: { type: String, trim: true },
   // نوع القطعة (مثال: مكابح/فلتر...)
   partType: { type: String, trim: true },
+  partTypeAr: { type: String, trim: true },
   brand: { type: mongoose.Schema.Types.ObjectId, ref: 'Brand', default: null }, // Unified Brand
   // بيانات المركبة المستهدفة (اختياري)
   carMake: { type: String, trim: true },
@@ -21,6 +23,8 @@ const sparePartSchema = new mongoose.Schema({
   // وصف وصور
   description: { type: String },
   images: [String],
+  externalUrl: { type: String, trim: true },
+  source: { type: String, trim: true, default: 'manual' },
   // المخزون
   stockQty: { type: Number, default: 0, min: 0 },
   inStock: { type: Boolean, default: true },

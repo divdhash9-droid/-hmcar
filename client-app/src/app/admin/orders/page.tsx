@@ -13,6 +13,24 @@ import { useLanguage } from '@/lib/LanguageContext';
 import { api } from '@/lib/api';
 import { useToast } from '@/lib/ToastContext';
 
+const FILTER_ALL = 'all';
+const STATUS_PENDING = 'pending';
+const STATUS_CONFIRMED = 'confirmed';
+const STATUS_COMPLETED = 'completed';
+const STATUS_CANCELLED = 'cancelled';
+const CHANNEL_WHATSAPP = 'whatsapp';
+const ITEM_TYPE_CAR = 'car';
+const CLASS_TEXT_WHITE = 'text-white';
+const CLASS_TEXT_AMBER_400 = 'text-amber-400';
+const CLASS_TEXT_BLUE_400 = 'text-blue-400';
+const CLASS_TEXT_GREEN_400 = 'text-green-400';
+const CLASS_TEXT_RED_400 = 'text-red-400';
+const CLASS_TEXT_ORANGE_400 = 'text-orange-400';
+const CLASS_TEXT_GREEN_400_20 = 'text-green-400/20';
+const CLASS_TEXT_BLUE_400_20 = 'text-blue-400/20';
+const CLASS_TEXT_ORANGE_400_10 = 'text-orange-400/10';
+const rawText = (value: string) => value;
+
 interface OrderItem {
     itemType: 'car' | 'sparePart';
     refId: string;
@@ -42,7 +60,7 @@ export default function AdminOrdersPage() {
     const { showToast } = useToast();
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
-    const [filter, setFilter] = useState('all');
+    const [filter, setFilter] = useState(FILTER_ALL);
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
     const [updatingId, setUpdatingId] = useState<string | null>(null);
     const [stats, setStats] = useState({ total: 0, pending: 0, confirmed: 0, completed: 0, cancelled: 0, revenue: 0 });
@@ -56,7 +74,7 @@ export default function AdminOrdersPage() {
         setLoading(true);
         try {
             const params: Record<string, string> = {};
-            if (filter !== 'all') params.status = filter;
+            if (filter !== FILTER_ALL) params.status = filter;
             const res = await api.orders.list(params);
             let list: Order[] = [];
             if (res?.success && res?.data?.orders) {
@@ -65,13 +83,13 @@ export default function AdminOrdersPage() {
                     orderNumber: o.orderNumber,
                     buyer: {
                         name: o.buyer?.name || 'Guest User',
-                        email: o.buyer?.email || '—',
+                        email: o.buyer?.email || rawText('—'),
                         phone: o.buyer?.phone
                     },
                     items: o.items || [],
                     pricing: o.pricing || { totalPriceSar: 0, grandTotalSar: 0 },
                     status: o.status,
-                    paymentStatus: o.paymentStatus || 'pending',
+                    paymentStatus: o.paymentStatus || STATUS_PENDING,
                     channel: o.channel || 'web',
                     createdAt: o.createdAt
                 }));
@@ -81,10 +99,10 @@ export default function AdminOrdersPage() {
             // Calculate basic stats for current view
             setStats({
                 total: list.length,
-                pending: list.filter(o => o.status === 'pending').length,
-                confirmed: list.filter(o => o.status === 'confirmed').length,
-                completed: list.filter(o => o.status === 'completed').length,
-                cancelled: list.filter(o => o.status === 'cancelled').length,
+                pending: list.filter(o => o.status === STATUS_PENDING).length,
+                confirmed: list.filter(o => o.status === STATUS_CONFIRMED).length,
+                completed: list.filter(o => o.status === STATUS_COMPLETED).length,
+                cancelled: list.filter(o => o.status === STATUS_CANCELLED).length,
                 revenue: list.filter(o => o.paymentStatus === 'paid').reduce((s, o) => s + (o.pricing?.grandTotalSar || 0), 0),
             });
         } catch (err) {
@@ -124,16 +142,16 @@ export default function AdminOrdersPage() {
 
     const getStatusBadge = (s: string) => {
         switch (s) {
-            case 'pending': return 'ck-badge ck-badge-pending';
-            case 'confirmed': return 'ck-badge ck-badge-info';
-            case 'completed': return 'ck-badge ck-badge-active';
-            case 'cancelled': return 'ck-badge ck-badge-danger';
+            case STATUS_PENDING: return 'ck-badge ck-badge-pending';
+            case STATUS_CONFIRMED: return 'ck-badge ck-badge-info';
+            case STATUS_COMPLETED: return 'ck-badge ck-badge-active';
+            case STATUS_CANCELLED: return 'ck-badge ck-badge-danger';
             default: return 'ck-badge ck-badge-inactive';
         }
     };
 
     const statusLabel = (s: string) => {
-        if (isRTL) return { pending: 'انتظار', confirmed: 'مؤكد', completed: 'مكتمل', cancelled: 'ملغي' }[s] || s;
+        if (isRTL) return { [STATUS_PENDING]: 'انتظار', [STATUS_CONFIRMED]: 'مؤكد', [STATUS_COMPLETED]: 'مكتمل', [STATUS_CANCELLED]: 'ملغي' }[s] || s;
         return s.toUpperCase();
     };
 
@@ -144,7 +162,7 @@ export default function AdminOrdersPage() {
             <AnimatePresence>
                 {selectedOrder && (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[200] flex items-center justify-center p-4 overflow-y-auto"
+                        className="fixed inset-0 z-200 flex items-center justify-center p-4 overflow-y-auto"
                         style={{ background: 'rgba(7,7,17,0.9)', backdropFilter: 'blur(16px)' }}
                         onClick={e => e.target === e.currentTarget && setSelectedOrder(null)}>
                         <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }}
@@ -155,10 +173,10 @@ export default function AdminOrdersPage() {
                             <div className="p-6 border-b border-white/5 flex items-center justify-between">
                                 <div>
                                     <p className="cockpit-mono text-[9px] text-orange-500/50 uppercase tracking-[0.3em] mb-1">
-                                        {isRTL ? 'سجل الطلب' : 'ORDER LOG'}
+                                        {isRTL ? rawText('سجل الطلب') : rawText('ORDER LOG')}
                                     </p>
                                     <h2 className="cockpit-num text-2xl font-black text-orange-400">
-                                        #{selectedOrder.orderNumber}
+                                        {rawText('#')}{selectedOrder.orderNumber}
                                     </h2>
                                 </div>
                                 <button onClick={() => setSelectedOrder(null)}
@@ -172,7 +190,7 @@ export default function AdminOrdersPage() {
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="ck-card p-4 space-y-1">
                                         <p className="cockpit-mono text-[9px] text-orange-500/50 uppercase tracking-[0.2em]">
-                                            {isRTL ? 'المشتري' : 'BUYER'}
+                                            {isRTL ? rawText('المشتري') : rawText('BUYER')}
                                         </p>
                                         <p className="text-sm font-bold">{selectedOrder.buyer.name}</p>
                                         <p className="cockpit-mono text-[10px] text-white/40">{selectedOrder.buyer.email}</p>
@@ -182,10 +200,10 @@ export default function AdminOrdersPage() {
                                     </div>
                                     <div className="ck-card p-4 space-y-1">
                                         <p className="cockpit-mono text-[9px] text-orange-500/50 uppercase tracking-[0.2em]">
-                                            {isRTL ? 'القناة والتاريخ' : 'CHANNEL'}
+                                            {isRTL ? rawText('القناة والتاريخ') : rawText('CHANNEL')}
                                         </p>
                                         <div className="flex items-center gap-2 text-xs font-bold uppercase">
-                                            {selectedOrder.channel === 'whatsapp'
+                                            {selectedOrder.channel === CHANNEL_WHATSAPP
                                                 ? <MessageCircle size={14} className="text-green-400" />
                                                 : <ShoppingCart size={14} className="text-orange-400" />}
                                             {selectedOrder.channel}
@@ -198,25 +216,25 @@ export default function AdminOrdersPage() {
 
                                 {/* Items */}
                                 <div>
-                                    <p className="ck-section-title mb-3">{isRTL ? 'محتويات الطلب' : 'ORDER ITEMS'}</p>
+                                    <p className="ck-section-title mb-3">{isRTL ? rawText('محتويات الطلب') : rawText('ORDER ITEMS')}</p>
                                     <div className="space-y-2 ck-card overflow-hidden">
                                         {selectedOrder.items.map((item, idx) => (
                                             <div key={idx} className="flex items-center justify-between p-4 border-b border-white/5 last:border-0 hover:bg-orange-500/5 transition-all">
                                                 <div className="flex items-center gap-3">
                                                     <div className="p-2 rounded-lg bg-orange-500/10 border border-orange-500/15 text-orange-400">
-                                                        {item.itemType === 'car' ? <CarIcon className="w-3.5 h-3.5" /> : <Package className="w-3.5 h-3.5" />}
+                                                        {item.itemType === ITEM_TYPE_CAR ? <CarIcon className="w-3.5 h-3.5" /> : <Package className="w-3.5 h-3.5" />}
 
                                                     </div>
                                                     <div>
                                                         <p className="text-xs font-bold">{item.titleSnapshot}</p>
                                                         <p className="cockpit-mono text-[9px] text-white/30">
-                                                            {item.itemType === 'car' ? (isRTL ? 'مركبة' : 'Vehicle') : (isRTL ? 'قطعة غيار' : 'Spare Part')}
+                                                            {item.itemType === ITEM_TYPE_CAR ? (isRTL ? rawText('مركبة') : rawText('Vehicle')) : (isRTL ? rawText('قطعة غيار') : rawText('Spare Part'))}
                                                         </p>
                                                     </div>
                                                 </div>
                                                 <div className="text-right">
                                                     <p className="cockpit-num text-sm font-black text-orange-400">{item.unitPriceSar?.toLocaleString()}</p>
-                                                    <p className="cockpit-mono text-[9px] text-white/30">SAR × {item.qty}</p>
+                                                    <p className="cockpit-mono text-[9px] text-white/30">{rawText('SAR x')} {item.qty}</p>
                                                 </div>
                                             </div>
                                         ))}
@@ -227,11 +245,11 @@ export default function AdminOrdersPage() {
                                 <div className="ck-card p-5 flex justify-between items-center">
                                     <div>
                                         <p className="cockpit-mono text-[9px] text-orange-500/50 uppercase tracking-[0.2em] mb-1">
-                                            {isRTL ? 'المجموع النهائي' : 'GRAND TOTAL'}
+                                            {isRTL ? rawText('المجموع النهائي') : rawText('GRAND TOTAL')}
                                         </p>
                                         <p className="cockpit-num text-3xl font-black text-white">
                                             {(selectedOrder.pricing?.grandTotalSar || 0).toLocaleString()}
-                                            <span className="text-sm text-white/30 ms-2">SAR</span>
+                                            <span className="text-sm text-white/30 ms-2">{rawText('SAR')}</span>
                                         </p>
                                     </div>
                                     <span className={cn(getStatusBadge(selectedOrder.status), 'ck-badge-live')}>
@@ -242,14 +260,14 @@ export default function AdminOrdersPage() {
                                 {/* Actions */}
                                 <div>
                                     <p className="cockpit-mono text-[9px] text-white/20 uppercase tracking-[0.3em] mb-3">
-                                        {isRTL ? 'تعديل الحالة' : 'PROTOCOL OVERRIDE'}
+                                        {isRTL ? rawText('تعديل الحالة') : rawText('PROTOCOL OVERRIDE')}
                                     </p>
                                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                                         {([
-                                            { key: 'pending', ar: 'انتظار', en: 'PENDING' },
-                                            { key: 'confirmed', ar: 'مؤكد', en: 'CONFIRM' },
-                                            { key: 'completed', ar: 'مكتمل', en: 'COMPLETE' },
-                                            { key: 'cancelled', ar: 'إلغاء', en: 'CANCEL' },
+                                            { key: STATUS_PENDING, ar: rawText('انتظار'), en: rawText('PENDING') },
+                                            { key: STATUS_CONFIRMED, ar: rawText('مؤكد'), en: rawText('CONFIRM') },
+                                            { key: STATUS_COMPLETED, ar: rawText('مكتمل'), en: rawText('COMPLETE') },
+                                            { key: STATUS_CANCELLED, ar: rawText('إلغاء'), en: rawText('CANCEL') },
                                         ] as const).map(s => (
                                             <button key={s.key}
                                                 disabled={selectedOrder.status === s.key || updatingId === selectedOrder.id}
@@ -260,13 +278,13 @@ export default function AdminOrdersPage() {
                                                         ? getStatusBadge(s.key)
                                                         : 'ck-btn-ghost'
                                                 )}>
-                                                {updatingId === selectedOrder.id ? '...' : (isRTL ? s.ar : s.en)}
+                                                {updatingId === selectedOrder.id ? rawText('...') : (isRTL ? s.ar : s.en)}
                                             </button>
                                         ))}
                                     </div>
                                     <button onClick={() => deleteOrder(selectedOrder.id)}
                                         className="ck-btn-danger w-full py-3 mt-3 rounded-xl text-center">
-                                        {isRTL ? '🗑️ حذف الطلب نهائياً' : '🗑️ PURGE RECORD'}
+                                        {isRTL ? rawText('🗑️ حذف الطلب نهائياً') : rawText('🗑️ PURGE RECORD')}
                                     </button>
                                 </div>
                             </div>
@@ -281,24 +299,24 @@ export default function AdminOrdersPage() {
                 {/* HUD Header */}
                 <div className="ck-page-header">
                     <nav className="ck-breadcrumb">
-                        <Link href="/admin/dashboard" className="hover:text-orange-400/80 transition-colors">HM-CTRL</Link>
-                        <span className="ck-breadcrumb-sep">›</span>
-                        <span className="text-orange-400/70">{isRTL ? 'الطلبات' : 'ORDERS'}</span>
+                        <Link href="/admin/dashboard" className="hover:text-orange-400/80 transition-colors">{rawText('HM-CTRL')}</Link>
+                        <span className="ck-breadcrumb-sep">{rawText('>')}</span>
+                        <span className="text-orange-400/70">{isRTL ? rawText('الطلبات') : rawText('ORDERS')}</span>
                     </nav>
                     <div className="flex items-end justify-between gap-4 flex-wrap">
                         <div>
                             <p className="cockpit-mono text-[10px] text-orange-500/50 tracking-[0.25em] uppercase mb-1">
-                                AIR TRAFFIC CONTROL — ORDER QUEUE
+                                {rawText('AIR TRAFFIC CONTROL - ORDER QUEUE')}
                             </p>
-                            <h1 className="ck-page-title">{isRTL ? 'طلبات العملاء' : 'ORDER CTRL'}</h1>
+                            <h1 className="ck-page-title">{isRTL ? rawText('طلبات العملاء') : rawText('ORDER CTRL')}</h1>
                         </div>
                         {/* Filter tabs */}
                         <div className="ck-tab-group flex-wrap">
                             {([
-                                { key: 'all', ar: 'الكل', en: 'ALL' },
-                                { key: 'pending', ar: 'انتظار', en: 'QUEUE' },
-                                { key: 'confirmed', ar: 'مؤكد', en: 'ACTIVE' },
-                                { key: 'completed', ar: 'مكتمل', en: 'DONE' },
+                                { key: FILTER_ALL, ar: rawText('الكل'), en: rawText('ALL') },
+                                { key: STATUS_PENDING, ar: rawText('انتظار'), en: rawText('QUEUE') },
+                                { key: STATUS_CONFIRMED, ar: rawText('مؤكد'), en: rawText('ACTIVE') },
+                                { key: STATUS_COMPLETED, ar: rawText('مكتمل'), en: rawText('DONE') },
                             ] as const).map(f => (
                                 <button key={f.key} onClick={() => setFilter(f.key)}
                                     className={cn('ck-tab', filter === f.key && 'ck-tab-active')}>
@@ -312,12 +330,12 @@ export default function AdminOrdersPage() {
                 {/* Stats HUD */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 mb-8">
                     {[
-                        { label: isRTL ? 'الكل' : 'TOTAL', val: stats.total, color: 'text-white' },
-                        { label: isRTL ? 'انتظار' : 'QUEUE', val: stats.pending, color: 'text-amber-400' },
-                        { label: isRTL ? 'مؤكد' : 'ACTIVE', val: stats.confirmed, color: 'text-blue-400' },
-                        { label: isRTL ? 'مكتمل' : 'DONE', val: stats.completed, color: 'text-green-400' },
-                        { label: isRTL ? 'ملغي' : 'ABORT', val: stats.cancelled, color: 'text-red-400' },
-                        { label: isRTL ? 'إيرادات' : 'REVENUE', val: `${(stats.revenue / 1000).toFixed(0)}K`, color: 'text-orange-400' },
+                        { label: isRTL ? rawText('الكل') : rawText('TOTAL'), val: stats.total, color: CLASS_TEXT_WHITE },
+                        { label: isRTL ? rawText('انتظار') : rawText('QUEUE'), val: stats.pending, color: CLASS_TEXT_AMBER_400 },
+                        { label: isRTL ? rawText('مؤكد') : rawText('ACTIVE'), val: stats.confirmed, color: CLASS_TEXT_BLUE_400 },
+                        { label: isRTL ? rawText('مكتمل') : rawText('DONE'), val: stats.completed, color: CLASS_TEXT_GREEN_400 },
+                        { label: isRTL ? rawText('ملغي') : rawText('ABORT'), val: stats.cancelled, color: CLASS_TEXT_RED_400 },
+                        { label: isRTL ? rawText('إيرادات') : rawText('REVENUE'), val: `${(stats.revenue / 1000).toFixed(0)}K`, color: CLASS_TEXT_ORANGE_400 },
                     ].map((s, i) => (
                         <div key={i} className={cn('ck-stat text-center ck-fade-up', `ck-delay-${Math.min(i + 1, 4)}`)}>
                             <div className={cn('ck-stat-num text-2xl', s.color)}>{s.val}</div>
@@ -332,12 +350,12 @@ export default function AdminOrdersPage() {
                         <table className="ck-table">
                             <thead>
                                 <tr>
-                                    <th>{isRTL ? 'مرجع' : 'REF'}</th>
-                                    <th>{isRTL ? 'العميل' : 'CLIENT'}</th>
-                                    <th>{isRTL ? 'المنتجات' : 'ITEMS'}</th>
-                                    <th>{isRTL ? 'المبلغ' : 'AMOUNT'}</th>
-                                    <th>{isRTL ? 'الحالة' : 'STATUS'}</th>
-                                    <th>{isRTL ? 'إجراء' : 'OPS'}</th>
+                                    <th>{isRTL ? rawText('مرجع') : rawText('REF')}</th>
+                                    <th>{isRTL ? rawText('العميل') : rawText('CLIENT')}</th>
+                                    <th>{isRTL ? rawText('المنتجات') : rawText('ITEMS')}</th>
+                                    <th>{isRTL ? rawText('المبلغ') : rawText('AMOUNT')}</th>
+                                    <th>{isRTL ? rawText('الحالة') : rawText('STATUS')}</th>
+                                    <th>{isRTL ? rawText('إجراء') : rawText('OPS')}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -349,7 +367,7 @@ export default function AdminOrdersPage() {
                                     <tr><td colSpan={6}>
                                         <div className="ck-empty">
                                             <div className="ck-empty-icon"><ShoppingCart className="w-6 h-6" /></div>
-                                            <p className="cockpit-mono text-sm">{isRTL ? 'لا توجد طلبات' : 'QUEUE EMPTY'}</p>
+                                            <p className="cockpit-mono text-sm">{isRTL ? rawText('لا توجد طلبات') : rawText('QUEUE EMPTY')}</p>
                                         </div>
                                     </td></tr>
                                 ) : orders.map((order, idx) => (
@@ -360,9 +378,9 @@ export default function AdminOrdersPage() {
                                         className="cursor-pointer group"
                                         onClick={() => setSelectedOrder(order)}>
                                         <td>
-                                            <p className="cockpit-num text-sm font-black text-orange-400">#{order.orderNumber}</p>
+                                            <p className="cockpit-num text-sm font-black text-orange-400">{rawText('#')}{order.orderNumber}</p>
                                             <p className="cockpit-mono text-[9px] text-white/30 mt-0.5 flex items-center gap-1">
-                                                {order.channel === 'whatsapp'
+                                                {order.channel === CHANNEL_WHATSAPP
                                                     ? <MessageCircle size={9} className="text-green-400" />
                                                     : <ShoppingCart size={9} className="text-orange-400" />}
                                                 {new Date(order.createdAt).toLocaleDateString()}
@@ -370,7 +388,7 @@ export default function AdminOrdersPage() {
                                         </td>
                                         <td>
                                             <p className="text-sm font-bold">{order.buyer.name}</p>
-                                            <p className="cockpit-mono text-[9px] text-white/30 truncate max-w-[140px]">{order.buyer.email}</p>
+                                            <p className="cockpit-mono text-[9px] text-white/30 truncate max-w-35">{order.buyer.email}</p>
                                         </td>
                                         <td>
                                             <div className="flex flex-wrap gap-1">
@@ -380,7 +398,7 @@ export default function AdminOrdersPage() {
                                                     </span>
                                                 ))}
                                                 {order.items.length > 2 && (
-                                                    <span className="cockpit-mono text-[8px] text-white/20">+{order.items.length - 2}</span>
+                                                    <span className="cockpit-mono text-[8px] text-white/20">{rawText('+')}{order.items.length - 2}</span>
                                                 )}
                                             </div>
                                         </td>
@@ -388,7 +406,7 @@ export default function AdminOrdersPage() {
                                             <p className="cockpit-num text-base font-black text-white">
                                                 {(order.pricing?.grandTotalSar || 0).toLocaleString()}
                                             </p>
-                                            <p className="cockpit-mono text-[9px] text-white/30">SAR</p>
+                                            <p className="cockpit-mono text-[9px] text-white/30">{rawText('SAR')}</p>
                                         </td>
                                         <td>
                                             <span className={cn(getStatusBadge(order.status), 'ck-badge-live')}>
@@ -410,9 +428,9 @@ export default function AdminOrdersPage() {
                 {/* Bottom KPIs */}
                 <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
                     {[
-                        { label: isRTL ? 'إجمالي الإيرادات' : 'VERIFIED REVENUE', val: `${stats.revenue.toLocaleString()} SAR`, icon: TrendingUp, color: 'text-green-400', iconColor: 'text-green-400/20' },
-                        { label: isRTL ? 'قيد المعالجة' : 'LIVE QUEUE', val: String(stats.pending + stats.confirmed), icon: Clock, color: 'text-blue-400', iconColor: 'text-blue-400/20' },
-                        { label: isRTL ? 'كفاءة النظام' : 'SYSTEM HEALTH', val: '99.9%', icon: CheckCircle, color: 'text-orange-400', iconColor: 'text-orange-400/10' },
+                        { label: isRTL ? rawText('إجمالي الإيرادات') : rawText('VERIFIED REVENUE'), val: `${stats.revenue.toLocaleString()} SAR`, icon: TrendingUp, color: CLASS_TEXT_GREEN_400, iconColor: CLASS_TEXT_GREEN_400_20 },
+                        { label: isRTL ? rawText('قيد المعالجة') : rawText('LIVE QUEUE'), val: String(stats.pending + stats.confirmed), icon: Clock, color: CLASS_TEXT_BLUE_400, iconColor: CLASS_TEXT_BLUE_400_20 },
+                        { label: isRTL ? rawText('كفاءة النظام') : rawText('SYSTEM HEALTH'), val: rawText('99.9%'), icon: CheckCircle, color: CLASS_TEXT_ORANGE_400, iconColor: CLASS_TEXT_ORANGE_400_10 },
                     ].map((kpi, i) => (
                         <div key={i} className="ck-card p-5 flex items-center justify-between ck-hover-lift">
                             <div>

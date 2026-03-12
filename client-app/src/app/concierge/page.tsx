@@ -18,6 +18,10 @@ import { cn } from '@/lib/utils';
 import { api } from '@/lib/api';
 import ClientPageHeader from '@/components/ClientPageHeader';
 
+const TAB_CAR = 'car';
+const TAB_PARTS = 'parts';
+const rawText = (value: string) => value;
+
 // ── قائمة الألوان ──
 const CAR_COLORS = [
     { name: 'أبيض', nameEn: 'White', hex: '#FFFFFF' },
@@ -44,7 +48,7 @@ const YEARS = Array.from({ length: currentYear - 1989 }, (_, i) => currentYear -
 
 export default function ConciergePage() {
     const { isRTL } = useLanguage();
-    const [activeTab, setActiveTab] = useState<'car' | 'parts'>('car');
+    const [activeTab, setActiveTab] = useState<'car' | 'parts'>(TAB_CAR);
     const [whatsappNumber, setWhatsappNumber] = useState('+967781007805');
     const [submitted, setSubmitted] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -75,6 +79,57 @@ export default function ConciergePage() {
         year: '',
         description: '',
     });
+
+    // تعبئة تلقائية للحقول عند التحويل من المعرض الكوري عبر query params
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+
+        const params = new URLSearchParams(window.location.search);
+        const source = params.get('source');
+        const carName = params.get('carName') || '';
+        const model = params.get('model') || '';
+        const year = params.get('year') || '';
+        const description = params.get('description') || '';
+        const externalUrl = params.get('externalUrl') || '';
+
+        if (source === 'korean_showroom') {
+            setActiveTab(TAB_CAR);
+            setCarForm(prev => ({
+                ...prev,
+                carName: carName || prev.carName,
+                model: model || prev.model,
+                year: year || prev.year,
+                description: [description, externalUrl ? `الرابط: ${externalUrl}` : '']
+                    .filter(Boolean)
+                    .join('\n'),
+            }));
+        }
+
+        // تعبئة الاسم/الهاتف من حساب المستخدم إن وُجد
+        const userRaw = localStorage.getItem('hm_user');
+        if (userRaw) {
+            try {
+                const user = JSON.parse(userRaw);
+                const name = user?.name || '';
+                const phone = user?.phone || '';
+
+                if (name || phone) {
+                    setCarForm(prev => ({
+                        ...prev,
+                        name: prev.name || name,
+                        phone: prev.phone || phone,
+                    }));
+                    setPartsForm(prev => ({
+                        ...prev,
+                        name: prev.name || name,
+                        phone: prev.phone || phone,
+                    }));
+                }
+            } catch (e) {
+                // تجاهل أي خطأ parsing
+            }
+        }
+    }, []);
 
     // جلب رقم الواتساب من الإعدادات
     useEffect(() => {
@@ -264,18 +319,18 @@ export default function ConciergePage() {
                     <CheckCircle className="w-12 h-12 text-amber-500" />
                 </motion.div>
                 <h2 className="text-3xl font-black uppercase tracking-tighter mb-4">
-                    {isRTL ? 'تم إرسال طلبك!' : 'Request Sent!'}
+                    {isRTL ? rawText('تم إرسال طلبك!') : rawText('Request Sent!')}
                 </h2>
                 <p className="text-white/40 text-sm mb-8">
                     {isRTL
-                        ? 'تم إرسال طلبك للفريق المختص وعبر الواتساب. سنتواصل معك قريباً.'
-                        : 'Your request has been sent to our team and via WhatsApp. We\'ll be in touch soon.'}
+                        ? rawText('تم إرسال طلبك للفريق المختص وعبر الواتساب. سنتواصل معك قريباً.')
+                        : rawText('Your request has been sent to our team and via WhatsApp. We\'ll be in touch soon.')}
                 </p>
                 <button
                     onClick={() => { setSubmitted(false); setPartImagePreview(null); setPartImageFile(null); }}
                     className="px-8 py-4 bg-amber-500 text-black font-black uppercase tracking-wider rounded-xl hover:bg-amber-400 transition-all"
                 >
-                    {isRTL ? 'طلب جديد' : 'NEW REQUEST'}
+                    {isRTL ? rawText('طلب جديد') : rawText('NEW REQUEST')}
                 </button>
             </motion.div>
         </div>
@@ -287,8 +342,8 @@ export default function ConciergePage() {
 
             <div className="pt-24 px-6 max-w-7xl mx-auto">
                 <ClientPageHeader
-                    title={isRTL ? 'طلبات خاصة' : 'SPECIAL REQUESTS'}
-                    subtitle={isRTL ? 'خدمة مخصصة لك' : 'PERSONALIZED SERVICE'}
+                    title={isRTL ? rawText('طلبات خاصة') : rawText('SPECIAL REQUESTS')}
+                    subtitle={isRTL ? rawText('خدمة مخصصة لك') : rawText('PERSONALIZED SERVICE')}
                     icon={Shield}
                 />
             </div>
@@ -300,14 +355,14 @@ export default function ConciergePage() {
                     style={{ filter: 'brightness(0.25) contrast(1.2)' }}>
                     <source src="/videos/hero.mp4" type="video/mp4" />
                 </video>
-                <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black" />
+                <div className="absolute inset-0 bg-linear-to-b from-black/60 via-transparent to-black" />
                 <div className="absolute inset-0 flex items-end z-10">
                     <div className="max-w-7xl mx-auto w-full px-8 pb-10">
                         <span className="text-[9px] font-bold uppercase tracking-[0.5em] text-amber-500/70 block mb-2">
-                            {isRTL ? 'خدمة حصرية' : 'EXCLUSIVE SERVICE'}
+                            {isRTL ? rawText('خدمة حصرية') : rawText('EXCLUSIVE SERVICE')}
                         </span>
                         <h1 className="text-4xl md:text-5xl font-black tracking-[-0.04em] uppercase">
-                            {isRTL ? 'طلبات خاصة' : 'SPECIAL REQUESTS'}
+                            {isRTL ? rawText('طلبات خاصة') : rawText('SPECIAL REQUESTS')}
                         </h1>
                     </div>
                 </div>
@@ -315,7 +370,7 @@ export default function ConciergePage() {
 
             {/* ── AMBIENT ── */}
             <div className="fixed inset-0 pointer-events-none z-0">
-                <div className="orb w-[500px] h-[500px] top-[-200px] right-[-100px] opacity-10 rounded-full"
+                <div className="orb w-125 h-125 -top-50 -right-25 opacity-10 rounded-full"
                     style={{ background: 'radial-gradient(circle, rgba(245,158,11,0.4), transparent)' }} />
             </div>
 
@@ -325,22 +380,22 @@ export default function ConciergePage() {
                     {/* ── INFO PANEL ── */}
                     <div className="lg:col-span-4 space-y-6">
                         <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}>
-                            <div className="p-7 bg-white/[0.02] border border-white/8 rounded-3xl space-y-5">
+                            <div className="p-7 bg-white/2 border border-white/8 rounded-3xl space-y-5">
                                 <h3 className="text-xl font-black tracking-tight">
-                                    {isRTL ? 'اطلب ما تريد' : 'Request Anything'}
+                                    {isRTL ? rawText('اطلب ما تريد') : rawText('Request Anything')}
                                 </h3>
                                 <p className="text-sm text-white/40 leading-relaxed">
                                     {isRTL
-                                        ? 'سواء كنت تبحث عن سيارة بمواصفات محددة أو قطعة غيار نادرة، فريقنا جاهز لمساعدتك.'
-                                        : 'Whether you need a specific car or a rare part, our team is ready to help.'}
+                                        ? rawText('سواء كنت تبحث عن سيارة بمواصفات محددة أو قطعة غيار نادرة، فريقنا جاهز لمساعدتك.')
+                                        : rawText('Whether you need a specific car or a rare part, our team is ready to help.')}
                                 </p>
                                 <div className="space-y-3 pt-2">
                                     {[
-                                        { icon: Car, title: isRTL ? 'توريد السيارات' : 'Vehicle Sourcing', desc: isRTL ? 'بالمواصفات الدقيقة' : 'Exact specifications' },
-                                        { icon: Settings, title: isRTL ? 'قطع الغيار' : 'Parts & Accessories', desc: isRTL ? 'أصلية ومعدّلة' : 'OEM & Aftermarket' },
-                                        { icon: Shield, title: isRTL ? 'فحص معتمد' : 'Certified Inspection', desc: isRTL ? 'فحص شامل بكل التفاصيل' : 'Full detailed checks' },
+                                        { icon: Car, title: isRTL ? rawText('توريد السيارات') : rawText('Vehicle Sourcing'), desc: isRTL ? rawText('بالمواصفات الدقيقة') : rawText('Exact specifications') },
+                                        { icon: Settings, title: isRTL ? rawText('قطع الغيار') : rawText('Parts & Accessories'), desc: isRTL ? rawText('أصلية ومعدّلة') : rawText('OEM & Aftermarket') },
+                                        { icon: Shield, title: isRTL ? rawText('فحص معتمد') : rawText('Certified Inspection'), desc: isRTL ? rawText('فحص شامل بكل التفاصيل') : rawText('Full detailed checks') },
                                     ].map((item) => (
-                                        <div key={item.title} className="flex items-center gap-4 p-4 bg-white/[0.02] rounded-xl border border-white/5 hover:border-amber-500/20 transition-all">
+                                        <div key={item.title} className="flex items-center gap-4 p-4 bg-white/2 rounded-xl border border-white/5 hover:border-amber-500/20 transition-all">
                                             <div className="w-10 h-10 bg-amber-500/10 rounded-lg flex items-center justify-center text-amber-500 shrink-0 border border-amber-500/15">
                                                 <item.icon className="w-4 h-4" />
                                             </div>
@@ -358,13 +413,13 @@ export default function ConciergePage() {
                     {/* ── FORM PANEL ── */}
                     <div className="lg:col-span-8">
                         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-                            <div className="bg-white/[0.02] border border-white/8 rounded-3xl p-8 md:p-10">
+                            <div className="bg-white/2 border border-white/8 rounded-3xl p-8 md:p-10">
 
                                 {/* ── TABS ── */}
                                 <div className="flex mb-8 p-1.5 bg-black/40 rounded-2xl border border-white/8 gap-2">
                                     {[
-                                        { id: 'car', icon: Car, label: isRTL ? 'طلب سيارة' : 'CAR REQUEST' },
-                                        { id: 'parts', icon: Settings, label: isRTL ? 'طلب قطع غيار' : 'PARTS REQUEST' },
+                                        { id: TAB_CAR, icon: Car, label: isRTL ? rawText('طلب سيارة') : rawText('CAR REQUEST') },
+                                        { id: TAB_PARTS, icon: Settings, label: isRTL ? rawText('طلب قطع غيار') : rawText('PARTS REQUEST') },
                                     ].map((tab) => (
                                         <button
                                             key={tab.id}
@@ -385,7 +440,7 @@ export default function ConciergePage() {
 
                                 {/* ── نموذج طلب سيارة ── */}
                                 <AnimatePresence mode="wait">
-                                    {activeTab === 'car' && (
+                                    {activeTab === TAB_CAR && (
                                         <motion.form
                                             key="car"
                                             initial={{ opacity: 0, y: 10 }}
@@ -398,7 +453,7 @@ export default function ConciergePage() {
                                             {/* الاسم والهاتف */}
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div>
-                                                    <label className={labelClass}>{isRTL ? 'الاسم الكامل' : 'FULL NAME'}</label>
+                                                    <label className={labelClass}>{isRTL ? rawText('الاسم الكامل') : rawText('FULL NAME')}</label>
                                                     <div className="relative">
                                                         <User className={cn('absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20', isRTL ? 'right-3.5' : 'left-3.5')} />
                                                         <input
@@ -411,7 +466,7 @@ export default function ConciergePage() {
                                                     </div>
                                                 </div>
                                                 <div>
-                                                    <label className={labelClass}>{isRTL ? 'رقم الهاتف' : 'PHONE NUMBER'}</label>
+                                                    <label className={labelClass}>{isRTL ? rawText('رقم الهاتف') : rawText('PHONE NUMBER')}</label>
                                                     <div className="relative">
                                                         <Phone className={cn('absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20', isRTL ? 'right-3.5' : 'left-3.5')} />
                                                         <input
@@ -428,7 +483,7 @@ export default function ConciergePage() {
                                             {/* اسم السيارة والموديل */}
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div>
-                                                    <label className={labelClass}>{isRTL ? 'اسم السيارة (الماركة)' : 'CAR NAME / MAKE'}</label>
+                                                    <label className={labelClass}>{isRTL ? rawText('اسم السيارة (الماركة)') : rawText('CAR NAME / MAKE')}</label>
                                                     <div className="relative">
                                                         <Car className={cn('absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20', isRTL ? 'right-3.5' : 'left-3.5')} />
                                                         <input
@@ -441,7 +496,7 @@ export default function ConciergePage() {
                                                     </div>
                                                 </div>
                                                 <div>
-                                                    <label className={labelClass}>{isRTL ? 'الموديل' : 'MODEL'}</label>
+                                                    <label className={labelClass}>{isRTL ? rawText('الموديل') : rawText('MODEL')}</label>
                                                     <input
                                                         type="text"
                                                         value={carForm.model}
@@ -456,7 +511,7 @@ export default function ConciergePage() {
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 {/* منتقي اللون */}
                                                 <div>
-                                                    <label className={labelClass}>{isRTL ? 'اللون' : 'COLOR'}</label>
+                                                    <label className={labelClass}>{isRTL ? rawText('اللون') : rawText('COLOR')}</label>
                                                     <div className="relative" ref={colorPickerRef}>
                                                         <button
                                                             type="button"
@@ -470,7 +525,7 @@ export default function ConciergePage() {
                                                             {carForm.color ? (
                                                                 <>
                                                                     <span
-                                                                        className="w-5 h-5 rounded-full border border-white/20 flex-shrink-0"
+                                                                        className="w-5 h-5 rounded-full border border-white/20 shrink-0"
                                                                         style={{ background: carForm.color }}
                                                                     />
                                                                     <span className="text-white text-sm">{carForm.colorName}</span>
@@ -478,7 +533,7 @@ export default function ConciergePage() {
                                                             ) : (
                                                                 <>
                                                                     <Palette className="w-4 h-4 text-white/25" />
-                                                                    <span>{isRTL ? 'اختر اللون' : 'Pick a color'}</span>
+                                                                    <span>{isRTL ? rawText('اختر اللون') : rawText('Pick a color')}</span>
                                                                 </>
                                                             )}
                                                             <ChevronDown className="w-4 h-4 text-white/30 mr-auto ml-auto" />
@@ -508,7 +563,7 @@ export default function ConciergePage() {
                                                                                 )}
                                                                             >
                                                                                 <span
-                                                                                    className="w-6 h-6 rounded-full border border-white/20 flex-shrink-0"
+                                                                                    className="w-6 h-6 rounded-full border border-white/20 shrink-0"
                                                                                     style={{ background: c.hex }}
                                                                                 />
                                                                                 <span className="text-xs text-white/70">
@@ -525,7 +580,7 @@ export default function ConciergePage() {
 
                                                 {/* السنة */}
                                                 <div>
-                                                    <label className={labelClass}>{isRTL ? 'السنة' : 'YEAR'}</label>
+                                                    <label className={labelClass}>{isRTL ? rawText('السنة') : rawText('YEAR')}</label>
                                                     <div className="relative">
                                                         <select
                                                             value={carForm.year}
@@ -533,7 +588,7 @@ export default function ConciergePage() {
                                                             title={isRTL ? 'السنة' : 'Year'}
                                                             className={cn(inputClass, 'appearance-none cursor-pointer')}
                                                         >
-                                                            <option value="" className="bg-black">{isRTL ? '-- اختر السنة --' : '-- Select Year --'}</option>
+                                                            <option value="" className="bg-black">{isRTL ? rawText('-- اختر السنة --') : rawText('-- Select Year --')}</option>
                                                             {YEARS.map(y => (
                                                                 <option key={y} value={y} className="bg-black">{y}</option>
                                                             ))}
@@ -545,7 +600,7 @@ export default function ConciergePage() {
 
                                             {/* الوصف العام */}
                                             <div>
-                                                <label className={labelClass}>{isRTL ? 'وصف عام / المواصفات المطلوبة' : 'GENERAL DESCRIPTION / SPECS'}</label>
+                                                <label className={labelClass}>{isRTL ? rawText('وصف عام / المواصفات المطلوبة') : rawText('GENERAL DESCRIPTION / SPECS')}</label>
                                                 <div className="relative">
                                                     <FileText className={cn('absolute top-4 w-4 h-4 text-white/20', isRTL ? 'right-3.5' : 'left-3.5')} />
                                                     <textarea
@@ -572,7 +627,7 @@ export default function ConciergePage() {
                                                 ) : (
                                                     <>
                                                         <Send className="w-4 h-4" />
-                                                        {isRTL ? 'إرسال طلب السيارة' : 'SEND CAR REQUEST'}
+                                                        {isRTL ? rawText('إرسال طلب السيارة') : rawText('SEND CAR REQUEST')}
                                                     </>
                                                 )}
                                             </motion.button>
@@ -580,7 +635,7 @@ export default function ConciergePage() {
                                     )}
 
                                     {/* ── نموذج طلب قطع الغيار ── */}
-                                    {activeTab === 'parts' && (
+                                    {activeTab === TAB_PARTS && (
                                         <motion.form
                                             key="parts"
                                             initial={{ opacity: 0, y: 10 }}
@@ -593,7 +648,7 @@ export default function ConciergePage() {
                                             {/* الاسم والهاتف */}
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div>
-                                                    <label className={labelClass}>{isRTL ? 'الاسم الكامل' : 'FULL NAME'}</label>
+                                                    <label className={labelClass}>{isRTL ? rawText('الاسم الكامل') : rawText('FULL NAME')}</label>
                                                     <div className="relative">
                                                         <User className={cn('absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20', isRTL ? 'right-3.5' : 'left-3.5')} />
                                                         <input
@@ -606,7 +661,7 @@ export default function ConciergePage() {
                                                     </div>
                                                 </div>
                                                 <div>
-                                                    <label className={labelClass}>{isRTL ? 'رقم الهاتف' : 'PHONE NUMBER'}</label>
+                                                    <label className={labelClass}>{isRTL ? rawText('رقم الهاتف') : rawText('PHONE NUMBER')}</label>
                                                     <div className="relative">
                                                         <Phone className={cn('absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20', isRTL ? 'right-3.5' : 'left-3.5')} />
                                                         <input
@@ -623,7 +678,7 @@ export default function ConciergePage() {
                                             {/* اسم القطعة واسم السيارة */}
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div>
-                                                    <label className={labelClass}>{isRTL ? 'اسم القطعة' : 'PART NAME'}</label>
+                                                    <label className={labelClass}>{isRTL ? rawText('اسم القطعة') : rawText('PART NAME')}</label>
                                                     <div className="relative">
                                                         <Settings className={cn('absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20', isRTL ? 'right-3.5' : 'left-3.5')} />
                                                         <input
@@ -636,7 +691,7 @@ export default function ConciergePage() {
                                                     </div>
                                                 </div>
                                                 <div>
-                                                    <label className={labelClass}>{isRTL ? 'اسم السيارة' : 'CAR NAME'}</label>
+                                                    <label className={labelClass}>{isRTL ? rawText('اسم السيارة') : rawText('CAR NAME')}</label>
                                                     <div className="relative">
                                                         <Car className={cn('absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20', isRTL ? 'right-3.5' : 'left-3.5')} />
                                                         <input
@@ -652,7 +707,7 @@ export default function ConciergePage() {
 
                                             {/* السنة */}
                                             <div>
-                                                <label className={labelClass}>{isRTL ? 'سنة السيارة' : 'CAR YEAR'}</label>
+                                                <label className={labelClass}>{isRTL ? rawText('سنة السيارة') : rawText('CAR YEAR')}</label>
                                                 <div className="relative">
                                                     <select
                                                         value={partsForm.year}
@@ -660,7 +715,7 @@ export default function ConciergePage() {
                                                         title={isRTL ? 'سنة السيارة' : 'Car Year'}
                                                         className={cn(inputClass, 'appearance-none cursor-pointer')}
                                                     >
-                                                        <option value="" className="bg-black">{isRTL ? '-- اختر سنة السيارة --' : '-- Select Car Year --'}</option>
+                                                        <option value="" className="bg-black">{isRTL ? rawText('-- اختر سنة السيارة --') : rawText('-- Select Car Year --')}</option>
                                                         {YEARS.map(y => (
                                                             <option key={y} value={y} className="bg-black">{y}</option>
                                                         ))}
@@ -671,7 +726,7 @@ export default function ConciergePage() {
 
                                             {/* وصف القطعة */}
                                             <div>
-                                                <label className={labelClass}>{isRTL ? 'وصف القطعة / تفاصيل إضافية' : 'PART DESCRIPTION'}</label>
+                                                <label className={labelClass}>{isRTL ? rawText('وصف القطعة / تفاصيل إضافية') : rawText('PART DESCRIPTION')}</label>
                                                 <div className="relative">
                                                     <FileText className={cn('absolute top-4 w-4 h-4 text-white/20', isRTL ? 'right-3.5' : 'left-3.5')} />
                                                     <textarea
@@ -686,13 +741,13 @@ export default function ConciergePage() {
 
                                             {/* رفع صورة القطعة */}
                                             <div>
-                                                <label className={labelClass}>{isRTL ? 'صورة القطعة (اختياري)' : 'PART IMAGE (OPTIONAL)'}</label>
+                                                <label className={labelClass}>{isRTL ? rawText('صورة القطعة (اختياري)') : rawText('PART IMAGE (OPTIONAL)')}</label>
                                                 <div
                                                     className={cn(
                                                         'relative flex flex-col items-center justify-center gap-3 p-6 border-2 border-dashed rounded-2xl cursor-pointer transition-all',
                                                         partImagePreview
                                                             ? 'border-amber-500/40 bg-amber-500/5'
-                                                            : 'border-white/10 bg-white/[0.02] hover:border-white/20 hover:bg-white/[0.04]'
+                                                            : 'border-white/10 bg-white/2 hover:border-white/20 hover:bg-white/4'
                                                     )}
                                                     onClick={() => fileInputRef.current?.click()}
                                                 >
@@ -720,7 +775,7 @@ export default function ConciergePage() {
                                                         <>
                                                             <Upload className="w-8 h-8 text-white/20" />
                                                             <span className="text-xs text-white/30 text-center">
-                                                                {isRTL ? 'اضغط لرفع صورة للقطعة' : 'Click to upload a part image'}
+                                                                {isRTL ? rawText('اضغط لرفع صورة للقطعة') : rawText('Click to upload a part image')}
                                                             </span>
                                                         </>
                                                     )}
@@ -741,7 +796,7 @@ export default function ConciergePage() {
                                                 ) : (
                                                     <>
                                                         <Send className="w-4 h-4" />
-                                                        {isRTL ? 'إرسال طلب القطعة' : 'SEND PARTS REQUEST'}
+                                                        {isRTL ? rawText('إرسال طلب القطعة') : rawText('SEND PARTS REQUEST')}
                                                     </>
                                                 )}
                                             </motion.button>

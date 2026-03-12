@@ -11,6 +11,7 @@ const path = require('path');
 const config = require('./core/config');
 const database = require('./core/database');
 const logger = require('./core/logger');
+const monitoring = require('../services/MonitoringService');
 const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
@@ -54,6 +55,16 @@ class App {
     // تقديم الملفات الثابتة (الصور والوسائط المرفوعة)
     this.app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
     this.app.use('/public', express.static(path.join(__dirname, '..', 'public')));
+
+    // تتبع الطلبات (Monitoring Middleware)
+    this.app.use((req, res, next) => {
+      const start = Date.now();
+      res.on('finish', () => {
+        const duration = Date.now() - start;
+        monitoring.recordRequest(res.statusCode, duration);
+      });
+      next();
+    });
 
     logger.info('✅ تم إعداد الوسطاء وطبقات الأمان بنجاح');
   }

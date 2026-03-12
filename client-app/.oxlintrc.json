@@ -1,0 +1,8 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oxc-project/oxc/main/npm/oxlint/configuration_schema.json",
+  "plugins": ["react", "react-native", "tailwindcss"],
+  "rules": {
+    "react-native/no-raw-text": "off",
+    "tailwindcss/no-unnecessary-arbitrary-value": "off"
+  }
+}

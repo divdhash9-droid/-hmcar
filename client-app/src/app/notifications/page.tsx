@@ -92,13 +92,13 @@ export default function NotificationsPage() {
                         <div>
                             <button
                                 onClick={() => router.back()}
+                                title={isRTL ? 'رجوع' : 'Back'}
+                                aria-label={isRTL ? 'رجوع' : 'Back'}
                                 className={cn(
-                                    "flex items-center gap-2 text-white/40 hover:text-white text-[11px] font-black uppercase tracking-wider mb-5 transition-colors",
-                                    isRTL && "flex-row-reverse"
+                                    "inline-flex items-center justify-center w-11 h-11 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-all mb-5"
                                 )}
                             >
                                 {isRTL ? <ArrowRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />}
-                                {isRTL ? 'عودة' : 'Back'}
                             </button>
 
                             {/* Bell Icon + Count */}

@@ -2,6 +2,7 @@
 // [[ARABIC_COMMENT]] تشمل: ضغط الصور، الكاش الصحيح، حماية النشر، وتحسينات الأداء
 
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 // [[ARABIC_COMMENT]] وضع البناء: 'mobile' لنسخة Capacitor، أو فارغ للموقع العادي
 const isMobileBuild = process.env.BUILD_TARGET === 'mobile';
@@ -26,6 +27,10 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "**.cloudinary.com" },
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "**.unsplash.com" },
+      { protocol: "https", hostname: "ci.encar.com" },
+      { protocol: "https", hostname: "car.encar.com" },
+      { protocol: "https", hostname: "autospare.com.eg" },
+      { protocol: "https", hostname: "www.autospare.com.eg" },
     ],
   },
 
@@ -129,4 +134,31 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// [[ARABIC_COMMENT]] تصدير الإعدادات مغلفة بـ Sentry
+export default withSentryConfig(nextConfig, {
+  // For all available options, see:
+  // https://github.com/getsentry/sentry-webpack-plugin#options
+
+  // Suppresses source map uploading logs during bundling
+  silent: true,
+  org: "hm-car",
+  project: "client-app",
+
+  // For all available options, see:
+  // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+
+  // Upload a larger set of source maps for prettier stack traces (increases build time)
+  widenClientFileUpload: true,
+
+  // Routes browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers (increases server load)
+  tunnelRoute: "/monitoring",
+
+  // Automatically tree-shake Sentry logger statements to reduce bundle size
+  disableLogger: true,
+
+  // Enables automatic instrumentation of Vercel Cron Monitors.
+  // See the following for more information:
+  // https://docs.sentry.io/product/crons/
+  // https://vercel.com/docs/cron-jobs
+  automaticVercelMonitors: true,
+});

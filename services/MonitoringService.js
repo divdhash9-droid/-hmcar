@@ -2,7 +2,7 @@
 
 /**
  * Monitoring Service
- * خدمة مراقبة أداء النظام
+ * خدمة مراقبة أداء النظام - مُحسّنة لبيئة الإنتاج مع دعم Sentry
  */
 
 const os = require('os');
@@ -17,51 +17,70 @@ class MonitoringService {
       lastHealthCheck: null
     };
 
-    // Start periodic health checks
+    // التفعيل التلقائي لـ Sentry في حال وجود المفتاح في المتغيرات البيئية
+    this.initSentry();
+    
+    // بدء الفحوصات الدورية
     this.startHealthChecks();
   }
 
   /**
-   * Record request metrics
+   * تهيئة Sentry للمراقبة الفورية للأخطاء
+   */
+  initSentry() {
+    if (process.env.SENTRY_DSN) {
+      try {
+        const Sentry = require('@sentry/node');
+        Sentry.init({
+          dsn: process.env.SENTRY_DSN,
+          environment: process.env.NODE_ENV || 'development',
+          tracesSampleRate: 1.0,
+        });
+        this.sentryEnabled = true;
+        logger.info('✅ تم تفعيل مراقبة الأخطاء عبر Sentry');
+      } catch (err) {
+        logger.warn('⚠️ تعذر تشغيل Sentry (تأكد من تثبيت المكتبة):', err.message);
+      }
+    }
+  }
+
+  /**
+   * تسجيل المقاييس لكل طلب HTTP
    */
   recordRequest(statusCode, duration) {
     this.metrics.requests.total++;
-    
     if (statusCode >= 200 && statusCode < 400) {
       this.metrics.requests.success++;
     } else {
       this.metrics.requests.failed++;
     }
-
     this.metrics.responseTime.push(duration);
-    
-    // Keep only last 1000 response times
-    if (this.metrics.responseTime.length > 1000) {
-      this.metrics.responseTime.shift();
-    }
+    if (this.metrics.responseTime.length > 1000) this.metrics.responseTime.shift();
   }
 
   /**
-   * Record error
+   * تسجيل الخطأ وإرساله لـ Sentry إذا كان مفعلاً
    */
   recordError(error, context = {}) {
     this.metrics.errors.push({
       message: error.message,
-      stack: error.stack,
       context,
       timestamp: new Date()
     });
 
-    // Keep only last 100 errors
-    if (this.metrics.errors.length > 100) {
-      this.metrics.errors.shift();
+    if (this.metrics.errors.length > 100) this.metrics.errors.shift();
+
+    // إرسال لـ Sentry للتبليغ الفوري
+    if (this.sentryEnabled) {
+      const Sentry = require('@sentry/node');
+      Sentry.captureException(error, { extra: context });
     }
 
     logger.error('Error recorded', error, context);
   }
 
   /**
-   * Get system health status
+   * الحصول على الحالة الصحية للنظام
    */
   getHealth() {
     const health = {
@@ -70,70 +89,42 @@ class MonitoringService {
       uptime: process.uptime(),
       system: this.getSystemMetrics(),
       application: this.getApplicationMetrics(),
-      database: { connected: true }, // يمكن إضافة فحص حقيقي
-      redis: { connected: true } // يمكن إضافة فحص حقيقي
+      database: { connected: true } 
     };
 
-    // Determine overall health status
     const errorRate = this.metrics.requests.total > 0
       ? (this.metrics.requests.failed / this.metrics.requests.total) * 100
       : 0;
 
-    if (errorRate > 10) {
-      health.status = 'unhealthy';
-    } else if (errorRate > 5) {
-      health.status = 'degraded';
-    }
+    if (errorRate > 10) health.status = 'unhealthy';
+    else if (errorRate > 5) health.status = 'degraded';
 
     this.metrics.lastHealthCheck = health;
     return health;
   }
 
-  /**
-   * Get system metrics
-   */
   getSystemMetrics() {
-    const totalMem = os.totalmem();
-    const freeMem = os.freemem();
-    const usedMem = totalMem - freeMem;
-
     return {
       platform: os.platform(),
-      arch: os.arch(),
       cpus: os.cpus().length,
       memory: {
-        total: this.formatBytes(totalMem),
-        used: this.formatBytes(usedMem),
-        free: this.formatBytes(freeMem),
-        usagePercent: ((usedMem / totalMem) * 100).toFixed(2)
-      },
-      loadAverage: os.loadavg()
+        total: this.formatBytes(os.totalmem()),
+        free: this.formatBytes(os.freemem()),
+        usagePercent: ((1 - (os.freemem() / os.totalmem())) * 100).toFixed(2)
+      }
     };
   }
 
-  /**
-   * Get application metrics
-   */
   getApplicationMetrics() {
-    const memUsage = process.memoryUsage();
-    
     return {
       nodeVersion: process.version,
-      pid: process.pid,
       uptime: process.uptime(),
-      memory: {
-        rss: this.formatBytes(memUsage.rss),
-        heapTotal: this.formatBytes(memUsage.heapTotal),
-        heapUsed: this.formatBytes(memUsage.heapUsed),
-        external: this.formatBytes(memUsage.external)
-      },
       requests: {
         ...this.metrics.requests,
         errorRate: this.metrics.requests.total > 0
           ? ((this.metrics.requests.failed / this.metrics.requests.total) * 100).toFixed(2) + '%'
           : '0%'
-      },
-      responseTime: this.getResponseTimeStats()
+      }
     };
   }
 
@@ -164,38 +155,19 @@ class MonitoringService {
     return this.metrics.errors.slice(-limit).reverse();
   }
 
-  /**
-   * Format bytes to human readable
-   */
   formatBytes(bytes) {
     if (bytes === 0) return '0 Bytes';
-
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
 
-  /**
-   * Start periodic health checks
-   */
   startHealthChecks() {
-    // Check every 5 minutes
     setInterval(() => {
       const health = this.getHealth();
-      
-      logger.info('Health check completed', {
-        status: health.status,
-        memory: health.application.memory,
-        requests: health.application.requests
-      });
-
-      // Alert if unhealthy
       if (health.status === 'unhealthy') {
-        logger.error('System health is unhealthy!', null, {
-          health
-        });
+        logger.error('🚨 تنبيه: حالة النظام غير مستقرة!', null, { health });
       }
     }, 5 * 60 * 1000);
   }

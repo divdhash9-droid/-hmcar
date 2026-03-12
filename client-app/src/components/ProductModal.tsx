@@ -136,6 +136,55 @@ export default function ProductModal({ product, onClose, whatsappNumber }: Produ
     const buyViaWhatsapp = useCallback(async () => {
         if (!product) return;
 
+        const phone = (whatsappNumber || '+821080880014').replace(/\D/g, '');
+        const price = formatPrice ? formatPrice(product.price, product.displayCurrency as 'SAR' | 'USD' | 'KRW' | undefined) : `${product.price?.toLocaleString()} SAR`;
+
+        // في قطع الغيار: إذا بيانات العميل ناقصة، نحوله لطلب خاص بنفس فكرة المعرض الكوري.
+        if (product.type === 'part') {
+            let buyerName = '';
+            let buyerPhone = '';
+
+            if (typeof window !== 'undefined') {
+                const userJson = localStorage.getItem('hm_user');
+                if (userJson) {
+                    try {
+                        const u = JSON.parse(userJson);
+                        buyerName = u?.name || '';
+                        buyerPhone = u?.phone || '';
+                    } catch (e) { }
+                }
+            }
+
+            if (!buyerName || !buyerPhone) {
+                const qp = new URLSearchParams({
+                    source: 'parts_catalog',
+                    contactPreference: 'whatsapp',
+                    partName: product.title || '',
+                    carName: product.brand || '',
+                    model: product.compatibility?.[0] || '',
+                    description: `طلب قطعة من قسم قطع الغيار: ${product.title} | السعر التقريبي: ${price}`,
+                });
+                window.location.href = `/concierge?${qp.toString()}`;
+                return;
+            }
+
+            try {
+                await api.concierge.create({
+                    type: 'parts',
+                    name: buyerName,
+                    phone: buyerPhone,
+                    partName: product.title,
+                    carName: product.brand || '',
+                    model: product.compatibility?.[0] || '',
+                    source: 'parts_catalog',
+                    contactPreference: 'whatsapp',
+                    description: `طلب قطعة من قسم قطع الغيار: ${product.title} | الحالة: ${product.condition || '—'} | السعر: ${price}`,
+                });
+            } catch (err) {
+                console.error('Failed to log parts concierge request:', err);
+            }
+        }
+
         // [[ARABIC_COMMENT]] تسجيل الطلب في القاعدة قبل الانتقال للواتساب
         try {
             await api.orders.create({
@@ -156,9 +205,6 @@ export default function ProductModal({ product, onClose, whatsappNumber }: Produ
         } catch (err) {
             console.error('Failed to log order:', err);
         }
-
-        const phone = (whatsappNumber || '+821080880014').replace(/\D/g, '');
-        const price = formatPrice ? formatPrice(product.price, product.displayCurrency as 'SAR' | 'USD' | 'KRW' | undefined) : `${product.price?.toLocaleString()} SAR`;
 
         let msg = '';
         if (product.type === 'car') {

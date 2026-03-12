@@ -24,6 +24,12 @@ import { api } from '@/lib/api';
 import NextLink from 'next/link';
 import { useToast } from '@/lib/ToastContext';
 
+const FILTER_ALL = 'all';
+const ROLE_ADMIN = 'admin';
+const ROLE_SUPER_ADMIN = 'super_admin';
+const ROLE_MANAGER = 'manager';
+const rawText = (value: string) => value;
+
 // ── المكونات المقسمة ──
 import { AddUserModal, UserDetailModal, type User } from './_components/UserModals';
 
@@ -41,7 +47,7 @@ export default function AdminUsersPage() {
 
     // ── حالات الصفحة ──
     const [users, setUsers] = useState<User[]>([]);
-    const [filter, setFilter] = useState('all');         // الفلتر الحالي (الكل / عملاء / مسؤولين...)
+    const [filter, setFilter] = useState(FILTER_ALL);         // الفلتر الحالي (الكل / عملاء / مسؤولين...)
     const [searchTerm, setSearchTerm] = useState('');    // نص البحث
     const [loading, setLoading] = useState(true);
     const [showAddModal, setShowAddModal] = useState(false);   // نافذة إضافة مسؤول
@@ -55,7 +61,7 @@ export default function AdminUsersPage() {
         try {
             setLoading(true);
             const params: Record<string, string | number> = {};
-            if (filter !== 'all') params.role = filter;
+            if (filter !== FILTER_ALL) params.role = filter;
             if (searchTerm) params.search = searchTerm;
             params.limit = 100;
 
@@ -79,7 +85,7 @@ export default function AdminUsersPage() {
                 total: res?.pagination?.total || list.length,
                 buyers: list.filter(u => u.role === 'buyer').length,
                 sellers: list.filter(u => u.role === 'seller').length,
-                admins: list.filter(u => ['admin', 'super_admin', 'manager'].includes(u.role)).length,
+                admins: list.filter(u => [ROLE_ADMIN, ROLE_SUPER_ADMIN, ROLE_MANAGER].includes(u.role)).length,
                 active: list.filter(u => (u.status || 'active') === 'active').length,
             });
         } catch (err) {
@@ -101,7 +107,7 @@ export default function AdminUsersPage() {
     };
 
     const getRoleColor = (role: string) => {
-        if (['admin', 'super_admin', 'manager'].includes(role))
+        if ([ROLE_ADMIN, ROLE_SUPER_ADMIN, ROLE_MANAGER].includes(role))
             return 'bg-red-500/10 border-red-500/30 text-red-400';
         if (role === 'seller')
             return 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400';
@@ -116,27 +122,27 @@ export default function AdminUsersPage() {
                 {/* ─── رأس الصفحة ─── */}
                 <div className="ck-page-header">
                     <nav className="ck-breadcrumb">
-                        <NextLink href="/admin/dashboard" className="hover:text-orange-400/80 transition-colors">HM-CTRL</NextLink>
-                        <span className="ck-breadcrumb-sep">›</span>
-                        <span className="text-orange-400/70">{isRTL ? 'الأعضاء' : 'USERS'}</span>
+                        <NextLink href="/admin/dashboard" className="hover:text-orange-400/80 transition-colors">{rawText('HM-CTRL')}</NextLink>
+                        <span className="ck-breadcrumb-sep">{rawText('>')}</span>
+                        <span className="text-orange-400/70">{isRTL ? rawText('الأعضاء') : rawText('USERS')}</span>
                     </nav>
                     <div className="flex items-end justify-between gap-4 flex-wrap">
                         <div>
                             <p className="cockpit-mono text-[10px] text-orange-500/50 tracking-[0.25em] uppercase mb-1">
-                                USER MANAGEMENT SYSTEM
+                                {rawText('USER MANAGEMENT SYSTEM')}
                             </p>
-                            <h1 className="ck-page-title">{isRTL ? 'إدارة الأعضاء' : 'USER CTRL'}</h1>
+                            <h1 className="ck-page-title">{isRTL ? rawText('إدارة الأعضاء') : rawText('USER CTRL')}</h1>
                         </div>
                         <div className="flex items-center gap-2">
                             {/* زر تحديث القائمة */}
                             <button onClick={loadUsers} className="ck-btn-ghost flex items-center gap-2">
                                 <RefreshCw className={cn('w-3.5 h-3.5', loading && 'animate-spin')} />
-                                <span className="hidden sm:inline">{isRTL ? 'تحديث' : 'REFRESH'}</span>
+                                <span className="hidden sm:inline">{isRTL ? rawText('تحديث') : rawText('REFRESH')}</span>
                             </button>
                             {/* زر إضافة مسؤول جديد */}
                             <button onClick={() => setShowAddModal(true)} className="ck-btn-primary flex items-center gap-2">
                                 <Plus className="w-3.5 h-3.5" />
-                                {isRTL ? 'إضافة مسؤول' : 'ADD ADMIN'}
+                                {isRTL ? rawText('إضافة مسؤول') : rawText('ADD ADMIN')}
                             </button>
                         </div>
                     </div>
@@ -145,11 +151,11 @@ export default function AdminUsersPage() {
                 {/* ─── الإحصائيات السريعة (قابلة للنقر كفلاتر) ─── */}
                 <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-6">
                     {[
-                        { label: isRTL ? 'الكل' : 'ALL', value: stats.total, key: 'all', colorClass: 'text-white' },
-                        { label: isRTL ? 'عملاء' : 'CLIENTS', value: stats.buyers, key: 'buyer', colorClass: 'text-blue-400' },
-                        { label: isRTL ? 'بائعين' : 'SELLERS', value: stats.sellers, key: 'seller', colorClass: 'text-amber-400' },
-                        { label: isRTL ? 'مسؤولين' : 'ADMINS', value: stats.admins, key: 'admin', colorClass: 'text-orange-400' },
-                        { label: isRTL ? 'نشطون' : 'ACTIVE', value: stats.active, key: 'active', colorClass: 'text-green-400' },
+                        { label: isRTL ? rawText('الكل') : rawText('ALL'), value: stats.total, key: FILTER_ALL, colorClass: rawText('text-white') },
+                        { label: isRTL ? rawText('عملاء') : rawText('CLIENTS'), value: stats.buyers, key: rawText('buyer'), colorClass: rawText('text-blue-400') },
+                        { label: isRTL ? rawText('بائعين') : rawText('SELLERS'), value: stats.sellers, key: rawText('seller'), colorClass: rawText('text-amber-400') },
+                        { label: isRTL ? rawText('مسؤولين') : rawText('ADMINS'), value: stats.admins, key: ROLE_ADMIN, colorClass: rawText('text-orange-400') },
+                        { label: isRTL ? rawText('نشطون') : rawText('ACTIVE'), value: stats.active, key: rawText('active'), colorClass: rawText('text-green-400') },
                     ].map((s, i) => (
                         <button key={s.key} onClick={() => setFilter(s.key)}
                             className={cn(
@@ -177,11 +183,11 @@ export default function AdminUsersPage() {
                     <table className="ck-table">
                         <thead>
                             <tr>
-                                <th>{isRTL ? 'العضو' : 'MEMBER'}</th>
-                                <th>{isRTL ? 'الدور' : 'ROLE'}</th>
-                                <th>{isRTL ? 'الصلاحيات' : 'PERMS'}</th>
-                                <th>{isRTL ? 'الحالة' : 'STATUS'}</th>
-                                <th>{isRTL ? 'إجراء' : 'ACTION'}</th>
+                                <th>{isRTL ? rawText('العضو') : rawText('MEMBER')}</th>
+                                <th>{isRTL ? rawText('الدور') : rawText('ROLE')}</th>
+                                <th>{isRTL ? rawText('الصلاحيات') : rawText('PERMS')}</th>
+                                <th>{isRTL ? rawText('الحالة') : rawText('STATUS')}</th>
+                                <th>{isRTL ? rawText('إجراء') : rawText('ACTION')}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -196,7 +202,7 @@ export default function AdminUsersPage() {
                                 <tr><td colSpan={5}>
                                     <div className="ck-empty">
                                         <div className="ck-empty-icon"><Users className="w-6 h-6" /></div>
-                                        <p className="cockpit-mono text-sm">{isRTL ? 'لا توجد بيانات' : 'NO RECORDS'}</p>
+                                        <p className="cockpit-mono text-sm">{isRTL ? rawText('لا توجد بيانات') : rawText('NO RECORDS')}</p>
                                     </div>
                                 </td></tr>
                             ) : users.map(user => (
@@ -210,7 +216,7 @@ export default function AdminUsersPage() {
                                             </div>
                                             <div>
                                                 <div className="text-sm font-bold text-white">{user.name}</div>
-                                                <div className="cockpit-mono text-[10px] text-white/30">{user.email || user.username || user.phone || '—'}</div>
+                                                <div className="cockpit-mono text-[10px] text-white/30">{user.email || user.username || user.phone || rawText('—')}</div>
                                             </div>
                                         </div>
                                     </td>
@@ -221,20 +227,20 @@ export default function AdminUsersPage() {
                                     </td>
                                     <td>
                                         {/* نعرض الصلاحيات فقط للمسؤولين */}
-                                        {['admin', 'super_admin', 'manager'].includes(user.role) ? (
+                                        {[ROLE_ADMIN, ROLE_SUPER_ADMIN, ROLE_MANAGER].includes(user.role) ? (
                                             <div className="flex items-center gap-1.5">
                                                 <span className="ck-badge ck-badge-info cockpit-mono">{user.permissions?.length || 0}</span>
-                                                <span className="text-[9px] text-white/25">{isRTL ? 'صلاحية' : 'perms'}</span>
+                                                <span className="text-[9px] text-white/25">{isRTL ? rawText('صلاحية') : rawText('perms')}</span>
                                             </div>
-                                        ) : <span className="text-white/20">—</span>}
+                                        ) : <span className="text-white/20">{rawText('—')}</span>}
                                     </td>
                                     <td>
                                         <span className={cn('ck-badge ck-badge-live', user.isActive ? 'ck-badge-active' : 'ck-badge-danger')}>
-                                            {user.isActive ? (isRTL ? 'نشط' : 'ACTIVE') : (isRTL ? 'معطل' : 'OFF')}
+                                            {user.isActive ? (isRTL ? rawText('نشط') : rawText('ACTIVE')) : (isRTL ? rawText('معطل') : rawText('OFF'))}
                                         </span>
                                     </td>
                                     <td>
-                                        <button className="ck-btn-ghost text-xs">{isRTL ? 'إدارة' : 'MANAGE'}</button>
+                                        <button className="ck-btn-ghost text-xs">{isRTL ? rawText('إدارة') : rawText('MANAGE')}</button>
                                     </td>
                                 </motion.tr>
                             ))}
@@ -245,7 +251,7 @@ export default function AdminUsersPage() {
                 {/* ─── بطاقات المستخدمين (للهاتف) ─── */}
                 <div className="md:hidden space-y-3">
                     {loading ? (
-                        [...Array(4)].map((_, i) => <div key={i} className="h-24 rounded-2xl bg-white/[0.02] animate-pulse border border-orange-500/10" />)
+                        [...Array(4)].map((_, i) => <div key={i} className="h-24 rounded-2xl bg-white/2 animate-pulse border border-orange-500/10" />)
                     ) : users.map(user => (
                         <motion.div key={user.id} onClick={() => setSelectedUser(user)}
                             initial={{ opacity: 0 }} animate={{ opacity: 1 }}
@@ -257,7 +263,7 @@ export default function AdminUsersPage() {
                                     </div>
                                     <div className="min-w-0">
                                         <div className="text-sm font-bold text-white truncate">{user.name}</div>
-                                        <div className="cockpit-mono text-[10px] text-white/30 truncate">{user.email || user.phone || '—'}</div>
+                                        <div className="cockpit-mono text-[10px] text-white/30 truncate">{user.email || user.phone || rawText('—')}</div>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-1.5 shrink-0">
@@ -270,7 +276,7 @@ export default function AdminUsersPage() {
                     {!loading && users.length === 0 && (
                         <div className="ck-empty">
                             <div className="ck-empty-icon"><Users className="w-6 h-6" /></div>
-                            <p className="cockpit-mono">{isRTL ? 'لا توجد بيانات' : 'NO RECORDS'}</p>
+                            <p className="cockpit-mono">{isRTL ? rawText('لا توجد بيانات') : rawText('NO RECORDS')}</p>
                         </div>
                     )}
                 </div>

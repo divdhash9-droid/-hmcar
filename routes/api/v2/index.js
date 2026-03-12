@@ -8,14 +8,13 @@
 
 const express = require('express');
 const router = express.Router();
-const rateLimit = require('express-rate-limit');
+const { apiRateLimiter } = require('../../middleware/securityEnhanced');
 
 /**
  * إعداد طبقة تقييد الطلبات (Rate Limiter)
  * لحماية الخادم من الهجمات وزيادة عدد الطلبات من نفس العنوان.
  */
-// تمت إزالة الـ Rate Limit مؤقتاً لضمان استقرار الدخول عبر Vercel في بيئة السيرفرليس
-// router.use(limiter);
+router.use(apiRateLimiter);
 
 /**
  * معلومات الإصدار الحالي للـ API

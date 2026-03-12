@@ -11,7 +11,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/lib/LanguageContext';
 import { api } from '@/lib/api';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 // ===================== Types =====================
 interface SmartAlertCriteria {
@@ -541,6 +541,7 @@ const AlertCard = ({
 
 // ===================== Main Page =====================
 export default function SmartAlertsPage() {
+    const router = useRouter();
     const { isRTL } = useLanguage();
     const [alerts, setAlerts] = useState<SmartAlert[]>([]);
     const [stats, setStats] = useState({ total: 0, active: 0, totalTriggers: 0 });
@@ -640,12 +641,14 @@ export default function SmartAlertsPage() {
 
                 {/* Back */}
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="mb-10">
-                    <Link href="/client/dashboard" className="inline-flex items-center gap-3 text-white/30 hover:text-white transition-colors group">
+                    <button
+                        onClick={() => router.back()}
+                        title={isRTL ? 'رجوع' : 'Back'}
+                        aria-label={isRTL ? 'رجوع' : 'Back'}
+                        className="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-all group"
+                    >
                         {isRTL ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />}
-                        <span className="text-[10px] font-black uppercase tracking-[0.3em]">
-                            {isRTL ? 'لوحة التحكم' : 'Dashboard'}
-                        </span>
-                    </Link>
+                    </button>
                 </motion.div>
 
                 {/* Header */}

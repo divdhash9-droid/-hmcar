@@ -51,13 +51,14 @@ const TRANSLATIONS = {
 // دوال مساعدة
 // ─────────────────────────────────────────────────────────
 
-/** تحويل رابط Encar.com إلى رابط API */
 function convertEncarUrlToApi(encarUrl, page = 1) {
     const pageSize = 20;
     const offset = (page - 1) * pageSize;
+    const buildApiUrl = (query) => {
+        return `https://api.encar.com/search/car/list/mobile?count=true&q=${query}&sr=${encodeURIComponent(`|MobileModifiedDate|${offset}|${pageSize}`)}&inav=${encodeURIComponent('|Metadata|Sort')}&cursor=`;
+    };
 
-    // Verified working format from m.encar.com
-    const defaultApiUrl = `https://api.encar.com/search/car/list/mobile?count=true&q=(And.Hidden.N._.(C.CarType.Y.))&sr=|MobileModifiedDate|${offset}|${pageSize}`;
+    const defaultApiUrl = buildApiUrl('(And.Hidden.N._.CarType.A.)');
 
     if (!encarUrl || typeof encarUrl !== 'string' || encarUrl.trim() === '') {
         return defaultApiUrl;
@@ -66,18 +67,14 @@ function convertEncarUrlToApi(encarUrl, page = 1) {
     try {
         const url = new URL(encarUrl);
         const searchParam = url.searchParams.get('search');
-        let query = '(C.CarType.Y)'; // Base car filter
+        let query = 'CarType.A.';
 
         if (searchParam) {
             try {
                 if (searchParam.includes('{')) {
                     const decoded = decodeURIComponent(searchParam);
                     const parsed = JSON.parse(decoded);
-                    if (parsed.action) {
-                        query = parsed.action;
-                        // Remove outer And if it exists to wrap it in our own
-                        query = query.replace(/^\(And\./, '').replace(/\)$/, '');
-                    }
+                    if (parsed.action) query = parsed.action;
                 } else {
                     query = decodeURIComponent(decodeURIComponent(searchParam));
                 }
@@ -86,55 +83,48 @@ function convertEncarUrlToApi(encarUrl, page = 1) {
             }
         }
 
-        // Wrap in the format observed on the mobile site
-        const finalQuery = `(And.Hidden.N._.(${query}))`;
+        query = query.replace(/^\(And\./, '').replace(/\)$/, '');
+        query = query.replace(/^\((.*)\)$/, '$1');
+        query = query.replace(/C\.CarType\.Y\./g, 'CarType.A.');
 
-        return `https://api.encar.com/search/car/list/mobile?count=true&q=${encodeURIComponent(finalQuery)}&sr=|MobileModifiedDate|${offset}|${pageSize}`;
+        if (!query.includes('CarType.A.')) {
+            query = `CarType.A._.${query}`;
+        }
+
+        if (!query.trim()) query = 'CarType.A.';
+
+        const finalQuery = `(And.Hidden.N._.${query})`;
+
+        return buildApiUrl(finalQuery);
     } catch (err) {
         return defaultApiUrl;
     }
 }
 
-function fetchExternal(url, redirectCount = 0) {
-    if (redirectCount > 3) return Promise.reject(new Error('Too many redirects'));
+const axios = require('axios');
 
-    return new Promise((resolve, reject) => {
-        const options = {
+async function fetchExternal(url, redirectCount = 0) {
+    if (redirectCount > 3) throw new Error('Too many redirects');
+
+    try {
+        const res = await axios.get(url, {
             headers: {
-                'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
-                'Accept': 'application/json',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'application/json, text/plain, */*',
+                'Accept-Language': 'ar,en-US;q=0.9,en;q=0.8',
+                'Referer': 'https://car.encar.com/',
+                'sec-ch-ua-platform': '"Windows"',
+                'sec-ch-ua': '"Not-A.Brand";v="24", "Chromium";v="146"',
+                'sec-ch-ua-mobile': '?0',
                 'Cache-Control': 'no-cache',
             },
-            timeout: 10000
-        };
-
-        const req = https.get(url, options, (res) => {
-            const { statusCode } = res;
-
-            if (statusCode >= 300 && statusCode < 400 && res.headers.location) {
-                return fetchExternal(res.headers.location, redirectCount + 1).then(resolve).catch(reject);
-            }
-
-            if (statusCode !== 200) {
-                res.resume();
-                return reject(new Error(`Status ${statusCode}`));
-            }
-
-            let data = '';
-            res.on('data', chunk => data += chunk);
-            res.on('end', () => {
-                try {
-                    const parsed = JSON.parse(data);
-                    resolve(parsed);
-                } catch (e) {
-                    reject(new Error('JSON Parse Error'));
-                }
-            });
+            timeout: 15000,
+            maxRedirects: 3
         });
-
-        req.on('error', (err) => reject(new Error(`Network: ${err.message}`)));
-        req.on('timeout', () => { req.destroy(); reject(new Error('Timeout')); });
-    });
+        return res.data;
+    } catch (err) {
+        throw new Error(`Failed external fetch: ${err.message}`);
+    }
 }
 
 /** ترجمة بيانات السيارة من كوري إلى عربي */
@@ -142,9 +132,24 @@ function translateCar(car) {
     const manufacturer = car.Manufacturer || '';
     const model = car.Model || '';
     const badge = car.Badge || '';
-    const fuel = car.Fuel || '';
+    const fuel = car.FuelType || car.Fuel || '';
     const transmission = car.Transmission || '';
-    const region = car.Region || '';
+    const region = car.Region || car.OfficeCityState || '';
+
+    const translateTokens = (value = '') => {
+        if (!value || typeof value !== 'string') return value;
+        return value
+            .replace(/하이브리드/g, 'هايبرد')
+            .replace(/가솔린/g, 'بنزين')
+            .replace(/디젤/g, 'ديزل')
+            .replace(/전기/g, 'كهربائي')
+            .replace(/오토/g, 'أوتوماتيك')
+            .replace(/수동/g, 'يدوي')
+            .replace(/신형/g, 'موديل جديد')
+            .replace(/풀옵션/g, 'فل كامل')
+            .replace(/무사고/g, 'بدون حوادث')
+            .trim();
+    };
 
     const manuAr = TRANSLATIONS.manufacturers[manufacturer] || manufacturer;
     const fuelAr = TRANSLATIONS.fuelType[fuel] || fuel;
@@ -154,16 +159,64 @@ function translateCar(car) {
     // سعر السيارة بالوون (الوحدة: 만원 = 10,000 وون)
     const priceKrw = (car.Price || 0) * 10000;
 
-    // [[ARABIC_COMMENT]] تصحيح منطق جلب الصور بناءً على هيكل استجابة Encar الجديد
-    let imageUrl = null;
-    if (typeof car.Photo === 'string' && car.Photo.length > 0) {
-        // إذا كان رابطاً مباشراً أو مساراً يبدأ بـ /carpicture
-        imageUrl = car.Photo.startsWith('http') ? car.Photo : `https://ci.encar.com/carpicture${car.Photo}`;
-    } else if (car.Photo?.매물사진?.[0]?.PicFileNo) {
-        // هيكل بديل/قديم
+    const normalizeImage = (value) => {
+        if (!value) return null;
+        const raw = typeof value === 'string'
+            ? value
+            : (value.location || value.Location || value.url || value.Url || value.path || value.Path || '');
+        if (!raw || typeof raw !== 'string') return null;
+        const trimmed = raw.trim();
+        if (!trimmed) return null;
+        if (trimmed.startsWith('http')) {
+            return trimmed.endsWith('_') ? `${trimmed}001.jpg` : trimmed;
+        }
+        if (trimmed.endsWith('_')) {
+            return `https://ci.encar.com${trimmed}001.jpg`;
+        }
+        if (trimmed.startsWith('/carpicture')) return `https://ci.encar.com${trimmed}`;
+        if (trimmed.startsWith('/')) return `https://ci.encar.com/carpicture${trimmed}`;
+        return `https://ci.encar.com/carpicture${trimmed}`;
+    };
+
+    const pickFirstImage = (...candidates) => {
+        for (const candidate of candidates) {
+            const normalized = normalizeImage(candidate);
+            if (normalized) return normalized;
+        }
+        return null;
+    };
+
+    // [[ARABIC_COMMENT]] تغطية عدة أشكال للصور لأن Encar يُرجع حقولاً مختلفة حسب نوع الإعلان
+    let imageUrl = pickFirstImage(
+        car?.Photos?.[0],
+        car?.Images?.[0],
+        car.Photo,
+        car.PhotoUrl,
+        car.MainPhoto,
+        car.MainImg,
+        car.ImageUrl,
+        car.ImgUrl,
+        car.PhotoPath,
+        car.RepresentativePhoto,
+        car.RepresentativeImg,
+        car?.PhotoList?.[0],
+        car?.Photo?.Url,
+        car?.Photo?.Path,
+        car?.Photo?.Small,
+        car?.Photo?.Large,
+        car?.Photo?.매물사진?.[0]?.PicUrl,
+        car?.Photo?.매물사진?.[0]?.Url
+    );
+
+    if (!imageUrl && car?.Photo?.매물사진?.[0]?.PicFileNo) {
         const photoId = car.Photo.매물사진[0].PicFileNo;
         imageUrl = `https://ci.encar.com/carpicture/carpicture${photoId.substring(0, 2)}/pic${photoId.substring(0, 4)}/${photoId}_001.jpg`;
     }
+
+    const extraImages = [
+        ...(Array.isArray(car.Photos) ? car.Photos.map(normalizeImage) : []),
+        ...(Array.isArray(car.Images) ? car.Images.map(normalizeImage) : []),
+    ].filter(Boolean);
 
     return {
         id: car.Id?.toString() || '',
@@ -171,7 +224,7 @@ function translateCar(car) {
         manufacturerAr: manuAr,            // المترجم للعربية
         model: model,
         badge: badge,
-        title: `${manuAr} ${model} ${badge}`.trim(),
+        title: `${manuAr} ${translateTokens(model)} ${translateTokens(badge)}`.trim(),
         titleKr: `${manufacturer} ${model} ${badge}`.trim(),
         year: car.Year || 0,
         mileage: car.Mileage || 0,
@@ -183,6 +236,7 @@ function translateCar(car) {
         region: region,
         regionAr: regionAr,
         imageUrl: imageUrl,
+        images: [imageUrl, ...extraImages].filter(Boolean),
         encarUrl: `https://car.encar.com/detail/car?carid=${car.Id}`,
         isInspected: !!(car.ServiceMark),
     };
@@ -228,14 +282,23 @@ router.get('/cars', async (req, res) => {
             transmissionAr: car.transmission || '',
             region: '',
             regionAr: '',
-            imageUrl: car.images && car.images[0] ? car.images[0] : null,
+            imageUrl: (car.images && car.images[0] && String(car.images[0]).endsWith('_'))
+                ? `https://ci.encar.com${String(car.images[0])}001.jpg`
+                : (car.images && car.images[0]
+                    ? car.images[0]
+                    : 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=1200&auto=format&fit=crop'),
             encarUrl: car.externalUrl || '',
             isInspected: true,
         }));
 
+        const cleanedCars = formattedCars.map((c) => ({
+            ...c,
+            imageUrl: String(c.imageUrl || '').replace('https://ci.encar.comhttps://ci.encar.com', 'https://ci.encar.com'),
+        }));
+
         res.json({
             success: true,
-            data: formattedCars,
+            data: cleanedCars,
             total,
             page,
             totalPages: Math.ceil(total / limit),
@@ -298,7 +361,9 @@ router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
                         category: 'sedan',
                         listingType: 'showroom',
                         externalUrl: item.encarUrl,
-                        images: item.imageUrl ? [item.imageUrl] : [],
+                        images: Array.isArray(item.images) && item.images.length > 0
+                            ? item.images
+                            : (item.imageUrl ? [item.imageUrl] : []),
                         isActive: true,
                         isSold: false,
                         displayCurrency: 'KRW'
@@ -307,8 +372,14 @@ router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
                 } else {
                     existingCar.priceKrw = item.priceKrw;
                     existingCar.priceSar = Math.round(item.priceKrw * 0.0028);
-                    if (item.imageUrl && existingCar.images.length === 0) {
-                        existingCar.images.push(item.imageUrl);
+                    const incomingImages = Array.isArray(item.images)
+                        ? item.images.filter(Boolean)
+                        : (item.imageUrl ? [item.imageUrl] : []);
+                    const needsImageRepair = !Array.isArray(existingCar.images)
+                        || existingCar.images.length === 0
+                        || existingCar.images.some((img) => typeof img === 'string' && img.endsWith('_'));
+                    if (incomingImages.length > 0 && needsImageRepair) {
+                        existingCar.images = incomingImages;
                     }
                     await existingCar.save();
                     totalUpdated++;
@@ -332,7 +403,8 @@ router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
  */
 router.put('/settings', requireAuthAPI, requireAdmin, async (req, res) => {
     try {
-        const { encarUrl } = req.body;
+        const rawUrl = req.body?.encarUrl;
+        const encarUrl = typeof rawUrl === 'string' ? rawUrl.trim() : '';
 
         if (!encarUrl || !encarUrl.includes('encar.com')) {
             return res.status(400).json({

@@ -37,7 +37,7 @@ export default function AdminAgenciesPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [logo, setLogo] = useState("");
-  const [category, setCategory] = useState<'cars' | 'parts' | 'both'>('both');
+  const [category, setCategory] = useState<'cars' | 'parts' | 'both'>('cars');
   const [modelsText, setModelsText] = useState("");
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -85,7 +85,7 @@ export default function AdminAgenciesPage() {
 
   const resetForm = () => {
     setEditingId(null);
-    setName(""); setLogo(""); setCategory('both'); setModelsText("");
+    setName(""); setLogo(""); setCategory('cars'); setModelsText("");
     setImageSrc(null); setShowCropper(false);
   };
 
@@ -104,8 +104,6 @@ export default function AdminAgenciesPage() {
 
   const categories = [
     { id: 'cars', labelAr: 'سيارات', labelEn: 'CARS', icon: Car, color: 'text-blue-400' },
-    { id: 'parts', labelAr: 'قطع غيار', labelEn: 'PARTS', icon: Wrench, color: 'text-orange-400' },
-    { id: 'both', labelAr: 'الكل', labelEn: 'BOTH', icon: Layers, color: 'text-[#c9a96e]' },
   ];
 
   const onCropComplete = (croppedArea: any, croppedAreaPixels: any) => {
@@ -316,6 +314,9 @@ export default function AdminAgenciesPage() {
                   <label className="block text-[9px] font-black uppercase tracking-[0.3em] text-white/40 mb-3">
                     {isRTL ? '④ التصنيف' : '④ CATEGORY'}
                   </label>
+                  <p className="text-[10px] text-orange-400/80 mb-3">
+                    {isRTL ? 'وكالات قطع الغيار تُدار تلقائياً عبر الاستيراد الخارجي من صفحة قطع الغيار.' : 'Spare-part agencies are managed automatically via external import from Admin Parts.'}
+                  </p>
                   <div className="grid grid-cols-3 gap-3">
                     {categories.map((cat) => {
                       const Icon = cat.icon;

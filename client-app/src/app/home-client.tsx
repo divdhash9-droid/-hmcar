@@ -7,7 +7,7 @@ import {
   MessageCircle, Smartphone, Download, Link as LinkIcon, ArrowUpRight,
   ArrowRight, RefreshCw, Car, Play, Check, ChevronLeft, ChevronRight,
   Quote, Phone, Instagram, Facebook, Youtube, Send, Linkedin,
-  Mail, Search, Gavel, Cog, Info, User, LogOut, Menu, X, Tag
+  Mail, Search, Gavel, Cog, Info, User, LogOut, Menu, X, Tag, Languages
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -53,7 +53,7 @@ interface HomeClientProps {
 export const revalidate = 60;
 
 export default function HomeClient({ latestCars }: HomeClientProps) {
-  const { isRTL } = useLanguage();
+  const { isRTL, toggleLanguage } = useLanguage();
   const { user, isLoggedIn } = useAuth();
   const { socket, isConnected } = useSocket();
   const { siteInfo, homeContent, formatPrice, features } = useSettings();
@@ -289,6 +289,17 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
     <div ref={containerRef} className="relative min-h-screen overflow-x-hidden" dir={isRTL ? "rtl" : "ltr"}>
       {/* Navbar hidden on home page per user request */}
       {/* <Navbar /> */}
+
+      {/* Dedicated Translation Button for Home Page */}
+      <div className="fixed top-6 right-6 z-50 flex items-center gap-3">
+        <button
+          onClick={toggleLanguage}
+          className="w-12 h-12 rounded-2xl bg-black/40 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white/70 hover:text-accent-gold hover:border-accent-gold/40 transition-all shadow-2xl"
+          title={isRTL ? "تغيير اللغة" : "Change Language"}
+        >
+          <Languages className="w-6 h-6 text-accent-gold" />
+        </button>
+      </div>
 
 
 

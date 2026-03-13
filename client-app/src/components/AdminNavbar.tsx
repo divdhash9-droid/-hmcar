@@ -232,40 +232,33 @@ function SidebarInner({
 function buildNavCategories(isRTL: boolean): NavCategory[] {
     return [
         {
-            label: isRTL ? 'المركز الرئيسي' : 'MAIN OPS',
+            label: isRTL ? 'القيادة والتحكم' : 'COMMAND',
             items: [
                 { id: 'dashboard', icon: Activity, label: isRTL ? 'المركزية' : 'MAINFRAME', href: '/admin/dashboard' },
-                { id: 'showroom', icon: Car, label: isRTL ? 'المعرض' : 'SHOWROOM', href: '/admin/cars' },
             ]
         },
         {
-            label: isRTL ? 'المزادات والقطع' : 'MARKET',
+            label: isRTL ? 'المخزون والوكالات' : 'INVENTORY',
             items: [
-                { id: 'live-auctions', icon: Radio, label: isRTL ? 'المباشر' : 'LIVE', href: '/admin/live-auctions' },
-                { id: 'auctions', icon: Gavel, label: isRTL ? 'المزادات' : 'AUCTIONS', href: '/admin/auctions' },
-                { id: 'parts', icon: Layers, label: isRTL ? 'القطع' : 'PARTS', href: '/admin/parts' },
-            ]
-        },
-        {
-            label: isRTL ? 'عمليات التنفيذ' : 'FULFILLMENT',
-            items: [
-                { id: 'fulfillment', icon: ShoppingCart, label: isRTL ? 'قسم العمليات' : 'OPERATIONS', href: '/admin/orders' },
-            ]
-        },
-        {
-            label: isRTL ? 'التواصل والجمهور' : 'COMMS',
-            items: [
-                { id: 'messages', icon: MessageCircle, label: isRTL ? 'المحادثات' : 'CHATS', href: '/admin/messages' },
-                { id: 'contact', icon: Mail, label: isRTL ? 'استفسارات' : 'INQUIRIES', href: '/admin/contact' },
-                { id: 'users', icon: Users, label: isRTL ? 'الأعضاء' : 'USERS', href: '/admin/users' },
-            ]
-        },
-        {
-            label: isRTL ? 'أداء النظام' : 'SYSTEM',
-            items: [
-                { id: 'reports', icon: TrendingUp, label: isRTL ? 'التقارير' : 'REPORTS', href: '/admin/reports' },
-                { id: 'security', icon: Shield, label: isRTL ? 'الأمان' : 'SECURITY', href: '/admin/security' },
+                { id: 'showroom', icon: Car, label: isRTL ? 'معرض السيارات' : 'SHOWROOM', href: '/admin/cars' },
+                { id: 'parts', icon: Layers, label: isRTL ? 'قطع الغيار' : 'PARTS', href: '/admin/parts' },
                 { id: 'brands', icon: Tag, label: isRTL ? 'الوكالات' : 'AGENCIES', href: '/admin/brands' },
+            ]
+        },
+        {
+            label: isRTL ? 'مراكز العمليات' : 'TERMINALS',
+            items: [
+                { id: 'market', icon: Gavel, label: isRTL ? 'سوق المزادات' : 'MARKET HUB', href: '/admin/market' }, // Unified Live & Classic
+                { id: 'comms', icon: MessageCircle, label: isRTL ? 'مركز التواصل' : 'COMMS HUB', href: '/admin/comms' }, // Unified Chats & Inquiries
+                { id: 'fulfillment', icon: ShoppingCart, label: isRTL ? 'مركز التنفيذ' : 'FULFILLMENT', href: '/admin/orders' }, // Unified Orders & Special
+            ]
+        },
+        {
+            label: isRTL ? 'النظام والأعضاء' : 'CONTROL',
+            items: [
+                { id: 'users', icon: Users, label: isRTL ? 'الأعضاء' : 'USERS', href: '/admin/users' },
+                { id: 'security', icon: Shield, label: isRTL ? 'الأمان' : 'SECURITY', href: '/admin/security' },
+                { id: 'reports', icon: TrendingUp, label: isRTL ? 'التقارير' : 'REPORTS', href: '/admin/reports' },
                 { id: 'settings', icon: Settings, label: isRTL ? 'الإعدادات' : 'SITE CTRL', href: '/admin/settings' },
             ]
         }

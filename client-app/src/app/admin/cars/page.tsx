@@ -224,7 +224,7 @@ function CarsContent() {
         if (submitting) return;
         setSubmitting(true);
         try {
-            const submitData: any = { // Keeping any for now due to complex nested model structure
+            const submitData = { 
                 ...formData,
                 source: formData.source || inventorySource,
                 listingType: (formData.source || inventorySource) === 'korean_import' ? 'showroom' : 'store',
@@ -241,7 +241,7 @@ function CarsContent() {
             resetForm();
             await loadData();
             showToast(isRTL ? '✅ تم حفظ البيانات بنجاح!' : '✅ Data saved!', 'success');
-        } catch (err: any) {
+        } catch (err) {
             console.error('فشل حفظ البيانات:', err);
             showToast(isRTL ? '❌ فشل في الحفظ' : '❌ Save failed', 'error');
         } finally {
@@ -286,7 +286,7 @@ function CarsContent() {
             await api.cars.markSold(id, soldPrice);
             loadData();
             showToast(isRTL ? '✅ تم تسجيل البيع!' : '✅ Sale recorded!', 'success');
-        } catch (err: any) {
+        } catch (err) {
             console.error('فشل تسجيل البيع:', err);
             showToast(isRTL ? '❌ فشل تسجيل البيع' : '❌ Sale record failed', 'error');
         }

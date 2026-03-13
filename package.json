@@ -26,7 +26,7 @@
     "test:coverage": "nyc --reporter=html --reporter=text mocha --timeout 10000 --recursive test --exit",
     "test:watch": "nodemon --exec \"npm test\"",
     "optimize:db": "node scripts/addDatabaseIndexes.js",
-    "build": "echo 'Build completed successfully'",
+    "build": "cd client-app && npm install && npm run build",
     "deploy": "vercel --prod",
     "publish": "node deploy.js",
     "publish:check": "node deploy.js --check",

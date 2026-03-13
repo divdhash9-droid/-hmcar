@@ -55,6 +55,10 @@ jobs:
         working-directory: client-app
         run: npm ci
       
+      - name: Lint Frontend
+        working-directory: client-app
+        run: npm run lint
+
       - name: Build Frontend
         working-directory: client-app
         run: npm run build

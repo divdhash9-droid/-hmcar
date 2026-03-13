@@ -6,8 +6,8 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Activity, Car, Gavel, Users, ShoppingCart, Settings, Shield,
-    LogOut, Radio, Layers, TrendingUp, MessageCircle,
-    Tag, Mail, Menu, X, Languages, Database, RefreshCw,
+    LogOut, Layers, TrendingUp, MessageCircle,
+    Tag, Menu, X, Languages, Database, RefreshCw,
 } from 'lucide-react';
 import { useLanguage } from '@/lib/LanguageContext';
 import { useAuth } from '@/lib/AuthContext';
@@ -258,6 +258,7 @@ function buildNavCategories(isRTL: boolean): NavCategory[] {
             items: [
                 { id: 'users', icon: Users, label: isRTL ? 'الأعضاء' : 'USERS', href: '/admin/users' },
                 { id: 'security', icon: Shield, label: isRTL ? 'الأمان' : 'SECURITY', href: '/admin/security' },
+                { id: 'health', icon: Activity, label: isRTL ? 'الصحّة' : 'HEALTH', href: '/admin/health' },
                 { id: 'reports', icon: TrendingUp, label: isRTL ? 'التقارير' : 'REPORTS', href: '/admin/reports' },
                 { id: 'settings', icon: Settings, label: isRTL ? 'الإعدادات' : 'SITE CTRL', href: '/admin/settings' },
             ]

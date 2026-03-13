@@ -1,11 +1,10 @@
 'use client';
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-    Activity, PlusCircle, Car, Layers, Gavel, Users, Bell, ShoppingCart,
-    Settings, FileText, MessageCircle, Tag, TrendingUp,
-    Mail, Radio, Database, Briefcase, Zap, ArrowUpRight,
-    Shield, BarChart2
+    Activity, Car, Layers, Gavel, Users, ShoppingCart,
+    Settings, MessageCircle, Tag, TrendingUp,
+    Database, Zap, ArrowUpRight, Shield, BarChart2, Search
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -36,14 +35,16 @@ interface AuditLogEntry {
 }
 
 export default function AdminDashboard() {
-    const { t, isRTL } = useLanguage();
+    const { isRTL } = useLanguage();
     const { showToast } = useToast();
     const [mounted, setMounted] = useState(false);
-    const [backingUp, setBackingUp] = useState(false); // eslint-disable-line @typescript-eslint/no-unused-vars
+    const [backingUp, setBackingUp] = useState(false);
     const router = useRouter();
     const [stats, setStats] = useState<DashboardStats | null>(null);
     const [loading, setLoading] = useState(true);
     const [recentActivities, setRecentActivities] = useState<AuditLogEntry[]>([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [isSearchFocused, setIsSearchFocused] = useState(false);
 
     const handleBackup = async () => {
         setBackingUp(true);
@@ -97,19 +98,17 @@ export default function AdminDashboard() {
     ];
 
     const quickLinks = [
-        { icon: PlusCircle, label: isRTL ? 'إضافة سيارة' : 'ADD CAR', href: '/admin/cars', color: '#f97316' },
-        { icon: Gavel, label: isRTL ? 'المزادات' : 'AUCTIONS', href: '/admin/auctions', color: '#ef4444' },
-        { icon: Radio, label: isRTL ? 'المباشر' : 'LIVE', href: '/admin/live-auctions', color: '#f97316' },
-        { icon: Layers, label: isRTL ? 'القطع' : 'PARTS', href: '/admin/parts', color: '#fbbf24' },
-        { icon: ShoppingCart, label: isRTL ? 'الطلبات' : 'ORDERS', href: '/admin/orders', color: '#34d399' },
-        { icon: Users, label: isRTL ? 'الأعضاء' : 'MEMBERS', href: '/admin/users', color: '#60a5fa' },
-        { icon: Mail, id: 'contact', label: isRTL ? 'الاستفسارات' : 'INQUIRIES', href: '/admin/contact', color: '#f97316' },
-        { icon: Briefcase, label: isRTL ? 'الخاصة' : 'CONCIERGE', href: '/admin/concierge', color: '#fbbf24' },
-        { icon: MessageCircle, label: isRTL ? 'المحادثات' : 'MESSAGES', href: '/admin/messages', color: '#60a5fa' },
-        { icon: BarChart2, label: isRTL ? 'التقارير' : 'REPORTS', href: '/admin/reports', color: '#34d399' },
-        { icon: Shield, label: isRTL ? 'الأمان' : 'SECURITY', href: '/admin/security', color: '#ef4444' },
-        { icon: Tag, label: isRTL ? 'الوكالات' : 'AGENCIES', href: '/admin/brands', color: '#fbbf24' },
-        { icon: Settings, label: isRTL ? 'الإعدادات' : 'SETTINGS', href: '/admin/settings', color: '#9ca3af' },
+        { icon: Car, label: isRTL ? 'معرض السيارات' : 'SHOWROOM', href: '/admin/cars', color: '#f97316' },
+        { icon: Gavel, label: isRTL ? 'سوق المزادات' : 'MARKET HUB', href: '/admin/market', color: '#ef4444' },
+        { icon: ShoppingCart, label: isRTL ? 'مركز التنفيذ' : 'FULFILLMENT', href: '/admin/orders', color: '#34d399' },
+        { icon: MessageCircle, label: isRTL ? 'مركز التواصل' : 'COMMS HUB', href: '/admin/comms', color: '#60a5fa' },
+        { icon: Layers, label: isRTL ? 'قطع الغيار' : 'PARTS', href: '/admin/parts', color: '#fbbf24' },
+        { icon: Users, label: isRTL ? 'الأعضاء' : 'USERS', href: '/admin/users', color: '#8b5cf6' },
+        { icon: Shield, label: isRTL ? 'الأمان' : 'SECURITY', href: '/admin/security', color: '#f43f5e' },
+        { icon: Activity, label: isRTL ? 'الترصد والتشخيص' : 'DIAGNOSTICS', href: '/admin/health', color: '#10b981' },
+        { icon: Tag, label: isRTL ? 'الوكالات' : 'AGENCIES', href: '/admin/brands', color: '#f59e0b' },
+        { icon: BarChart2, label: isRTL ? 'التقارير' : 'REPORTS', href: '/admin/reports', color: '#10b981' },
+        { icon: Settings, label: isRTL ? 'الإعدادات' : 'SITE CTRL', href: '/admin/settings', color: '#64748b' },
         { icon: Database, label: isRTL ? 'نسخ احتياطي' : 'BACKUP', isButton: true, onClick: handleBackup, color: '#f97316' },
     ];
 
@@ -117,10 +116,7 @@ export default function AdminDashboard() {
         const m: Record<string, typeof Car> = { Car, Auction: Gavel, Order: ShoppingCart, User: Users, Brand: Tag, SparePart: Layers };
         return m[target] || Activity;
     };
-    const getActivityColor = (action: string) => {
-        const m: Record<string, string> = { CREATE: '#60a5fa', UPDATE: '#fbbf24', DELETE: '#ef4444', LOGIN: '#34d399' };
-        return m[action] || '#9ca3af';
-    };
+    
     const timeAgo = (date: string) => {
         const diff = Date.now() - new Date(date).getTime();
         const m = Math.floor(diff / 60000);
@@ -134,28 +130,81 @@ export default function AdminDashboard() {
     if (!mounted) return null;
 
     return (
-        <div className="min-h-screen text-white" dir={isRTL ? 'rtl' : 'ltr'}>
+        <div className="min-h-screen text-white bg-black/95" dir={isRTL ? 'rtl' : 'ltr'}>
             <main className="relative z-10 px-4 sm:px-6 lg:px-8 py-6 max-w-7xl mx-auto">
 
                 {/* ── HUD Header ── */}
-                <div className="mb-8">
-                    <p className="cockpit-mono text-[10px] text-orange-500/50 tracking-[0.3em] uppercase mb-1">HM CAR SYSTEMS // ADMIN PROTOCOL</p>
-                    <div className="flex items-end justify-between gap-4 flex-wrap">
+                <div className="mb-10">
+                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-6">
                         <div>
-                            <h1 className="text-3xl md:text-4xl font-black tracking-tight text-white">
-                                {isRTL ? 'لوحة التحكم' : 'CONTROL'}{' '}
-                                <span className="text-orange-400">COCKPIT</span>
+                            <p className="cockpit-mono text-[10px] text-orange-500/50 tracking-[0.3em] uppercase mb-1">HM CAR SYSTEMS // CORE ENGINE</p>
+                            <h1 className="text-4xl md:text-5xl font-black tracking-tight text-white uppercase italic">
+                                COMMAND <span className="text-orange-500">DECK</span>
                             </h1>
                         </div>
-                        <div className="flex items-center gap-3">
-                            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-orange-500/10 border border-orange-500/20">
+
+                        {/* Search / Command Bar */}
+                        <div className={cn(
+                            "relative w-full lg:max-w-md transition-all duration-300",
+                            isSearchFocused ? "lg:max-w-xl scale-[1.02]" : "opacity-80"
+                        )}>
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                            <input 
+                                value={searchQuery}
+                                onChange={e => setSearchQuery(e.target.value)}
+                                onFocus={() => setIsSearchFocused(true)}
+                                onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
+                                placeholder={isRTL ? "أدخل أمر الخدمة أو ابحث..." : "EXECUTE COMMAND OR SEARCH..."}
+                                className="w-full h-14 bg-white/5 border border-white/10 rounded-2xl pl-12 pr-6 cockpit-mono text-xs uppercase tracking-widest focus:outline-none focus:border-orange-500/50 focus:bg-white/[0.08] transition-all"
+                                title={isRTL ? "بحث" : "Search"}
+                            />
+                            
+                            <AnimatePresence>
+                                {isSearchFocused && searchQuery && (
+                                    <motion.div 
+                                        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }}
+                                        className="absolute top-full left-0 right-0 mt-2 z-[100] bg-[#0a0a0a] border border-white/10 rounded-2xl p-2 shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden"
+                                    >
+                                        <div className="p-3 border-b border-white/5 mb-1">
+                                            <span className="cockpit-mono text-[8px] text-white/20 uppercase">Match Results</span>
+                                        </div>
+                                        {quickLinks.filter(l => l.label.toLowerCase().includes(searchQuery.toLowerCase())).map((link, idx) => (
+                                            <Link key={idx} href={link.href || '#'} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-all group">
+                                                <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-white/5 border border-white/5 group-hover:border-white/20">
+                                                    <link.icon className="w-3.5 h-3.5" style={{ color: link.color }} />
+                                                </div>
+                                                <span className="cockpit-mono text-[10px] uppercase font-bold text-white/60">{link.label}</span>
+                                            </Link>
+                                        ))}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+
+                        <div className="flex items-center gap-3 shrink-0">
+                            <div className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-orange-500/10 border border-orange-500/20">
                                 <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse" />
-                                <span className="cockpit-mono text-[9px] text-orange-400 uppercase tracking-widest">SYSTEM ONLINE</span>
+                                <span className="cockpit-mono text-[9px] text-orange-400 uppercase tracking-widest">LIVE DATA FEED</span>
                             </div>
-                            <Link href="/" className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 cockpit-mono text-[9px] text-white/40 hover:text-white hover:bg-white/10 transition-all uppercase tracking-widest flex items-center gap-1">
+                            <Link href="/" className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 cockpit-mono text-[9px] text-white/40 hover:text-white hover:bg-white/10 transition-all uppercase tracking-widest flex items-center gap-1" title={isRTL ? "زيارة الموقع" : "Visit Site"}>
                                 <ArrowUpRight className="w-3 h-3" />
                                 {isRTL ? 'الموقع' : 'SITE'}
                             </Link>
+                        </div>
+                    </div>
+
+                    {/* System Pulse Ticker */}
+                    <div className="bg-white/[0.02] border-y border-white/5 h-8 flex items-center overflow-hidden">
+                        <div className="flex animate-marquee whitespace-nowrap gap-10">
+                            {Array.from({ length: 15 }).map((_, i) => (
+                                <div key={i} className="flex items-center gap-4 text-[8px] cockpit-mono text-white/20 uppercase tracking-[0.2em]">
+                                    <span className="text-orange-500">SYSTEM:00{i}</span>
+                                    <span>CONNECTION SECURE</span>
+                                    <span>LATENCY: 14MS</span>
+                                    <span>STORAGE OK</span>
+                                    <div className="w-1 h-1 rounded-full bg-orange-500/40" />
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>
@@ -166,11 +215,15 @@ export default function AdminDashboard() {
                         <motion.div key={i}
                             initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
                             className="ck-card p-5 relative overflow-hidden group cursor-default">
-                            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                                style={{ background: `radial-gradient(circle at 80% 20%, ${s.glow} 0%, transparent 60%)` }} />
+                            <div 
+                                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                                style={{ background: `radial-gradient(circle at 80% 20%, ${s.glow} 0%, transparent 60%)` }}
+                            />
                             <div className="flex items-start justify-between mb-4">
-                                <div className="w-9 h-9 rounded-xl flex items-center justify-center"
-                                    style={{ background: `${s.color}15`, border: `1px solid ${s.color}25` }}>
+                                <div 
+                                    className="w-9 h-9 rounded-xl flex items-center justify-center bg-white/10"
+                                    style={{ borderColor: s.color, borderStyle: 'solid', borderWidth: '1px' }}
+                                >
                                     <s.icon className="w-4 h-4" style={{ color: s.color }} />
                                 </div>
                                 <Zap className="w-3 h-3 opacity-20 group-hover:opacity-60 transition-opacity" style={{ color: s.color }} />
@@ -182,8 +235,6 @@ export default function AdminDashboard() {
                             )}
                             <p className="cockpit-mono text-[9px] text-white/30 uppercase tracking-widest mt-1">{s.label}</p>
                             <p className="text-[10px] text-white/20 mt-0.5">{s.sub}</p>
-                            <div className="absolute bottom-0 start-0 h-[2px] w-0 group-hover:w-full transition-all duration-500"
-                                style={{ background: s.color }} />
                         </motion.div>
                     ))}
                 </div>
@@ -191,87 +242,78 @@ export default function AdminDashboard() {
                 {/* ── Main Grid ── */}
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
 
-                    {/* Quick Actions */}
-                    <div className="xl:col-span-2 ck-card p-5">
-                        <div className="flex items-center gap-3 mb-5">
-                            <div className="w-1 h-5 rounded-full bg-orange-400" />
-                            <h2 className="cockpit-mono text-[11px] font-bold uppercase tracking-widest text-white/80">
-                                {isRTL ? 'مركز التحكم' : 'CONTROL TERMINAL'}
+                    {/* Quick Access Grid */}
+                    <div className="xl:col-span-2 ck-card p-6">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="w-1.5 h-6 rounded-full bg-orange-500" />
+                            <h2 className="cockpit-mono text-[12px] font-black uppercase tracking-widest text-white/80">
+                                {isRTL ? 'مركز التحكم والعمليات' : 'OPERATIONS TERMINAL'}
                             </h2>
                         </div>
-                        <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-4 2xl:grid-cols-5 gap-2">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-4 2xl:grid-cols-5 gap-3">
                             {quickLinks.map((link, i) => {
                                 const Inner = (
                                     <motion.div
-                                        key={i}
-                                        whileHover={{ scale: 1.04, y: -2 }}
-                                        whileTap={{ scale: 0.97 }}
-                                        className="relative flex flex-col items-center gap-2 p-3 rounded-xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] transition-all cursor-pointer group">
-                                        {link.id === 'contact' && stats?.newContacts && stats.newContacts > 0 && (
-                                            <div className="absolute -top-1 -end-1 w-5 h-5 rounded-full bg-orange-500 flex items-center justify-center text-[9px] font-black shadow-[0_0_12px_rgba(249,115,22,0.8)] animate-pulse">
-                                                {stats.newContacts}
-                                            </div>
-                                        )}
-                                        <div className="w-9 h-9 rounded-xl flex items-center justify-center transition-all group-hover:scale-110"
-                                            style={{ background: `${link.color}12`, border: `1px solid ${link.color}20` }}>
-                                            <link.icon className="w-4 h-4" style={{ color: link.color }} />
+                                        whileHover={{ scale: 1.05, y: -4 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        className="relative flex flex-col items-center gap-3 p-4 rounded-2xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.08] hover:border-white/10 transition-all cursor-pointer group">
+                                        <div 
+                                            className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all group-hover:scale-110 shadow-lg bg-white/5"
+                                            style={{ borderColor: `${link.color}40`, borderStyle: 'solid', borderWidth: '1px' }}
+                                        >
+                                            <link.icon className="w-5 h-5" style={{ color: link.color }} />
                                         </div>
-                                        <span className="cockpit-mono text-[8px] text-white/40 uppercase tracking-wider text-center leading-tight group-hover:text-white/70 transition-colors">
+                                        <span className="cockpit-mono text-[9px] text-white/50 uppercase font-black tracking-widest text-center leading-tight group-hover:text-white transition-colors">
                                             {link.label}
                                         </span>
                                     </motion.div>
                                 );
                                 return link.isButton
-                                    ? <button key={i} onClick={link.onClick} className="w-full">{Inner}</button>
-                                    : <Link key={i} href={link.href!}>{Inner}</Link>;
+                                    ? <button key={i} onClick={link.onClick} className="w-full" disabled={backingUp} title={link.label}>{Inner}</button>
+                                    : <Link key={i} href={link.href!} title={link.label}>{Inner}</Link>;
                             })}
                         </div>
                     </div>
 
-                    {/* Sidebar: Activity + Performance */}
+                    {/* Activity & Performance */}
                     <div className="space-y-4">
-
-                        {/* Recent Activity */}
-                        <div className="ck-card p-5">
-                            <div className="flex items-center justify-between mb-4">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-1 h-5 rounded-full bg-orange-400" />
-                                    <h2 className="cockpit-mono text-[11px] font-bold uppercase tracking-widest text-white/80">
-                                        {isRTL ? 'آخر الأنشطة' : 'ACTIVITY LOG'}
+                        <div className="ck-card p-6">
+                            <div className="flex items-center justify-between mb-6">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-1.5 h-6 rounded-full bg-orange-500" />
+                                    <h2 className="cockpit-mono text-[12px] font-black uppercase tracking-widest text-white/80">
+                                        {isRTL ? 'سجل العمليات' : 'LOG STREAM'}
                                     </h2>
                                 </div>
-                                <div className="flex items-center gap-1">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse" />
-                                    <span className="cockpit-mono text-[8px] text-orange-400/70">LIVE</span>
-                                </div>
+                                <Activity className="w-4 h-4 text-orange-500 animate-pulse" />
                             </div>
-                            <div className="space-y-2">
+                            <div className="space-y-3">
                                 {loading ? (
-                                    Array.from({ length: 4 }).map((_, i) => (
-                                        <div key={i} className="h-12 rounded-xl bg-white/[0.03] animate-pulse" />
+                                    Array.from({ length: 5 }).map((_, i) => (
+                                        <div key={i} className="h-14 rounded-2xl bg-white/[0.03] animate-pulse" />
                                     ))
-                                ) : recentActivities.length === 0 ? (
-                                    <div className="text-center py-8 cockpit-mono text-[10px] text-white/20 uppercase">
-                                        {isRTL ? 'لا يوجد أنشطة' : 'NO ACTIVITY'}
-                                    </div>
                                 ) : (
                                     recentActivities.map((act, i) => {
                                         const Icon = getActivityIcon(act.target);
-                                        const color = getActivityColor(act.action);
+                                        const color = (action: string) => {
+                                            const m: Record<string, string> = { CREATE: '#60a5fa', UPDATE: '#fbbf24', DELETE: '#ef4444', LOGIN: '#34d399' };
+                                            return m[action] || '#9ca3af';
+                                        };
+                                        const actColor = color(act.action);
                                         return (
                                             <motion.div key={i}
-                                                initial={{ opacity: 0, x: isRTL ? 10 : -10 }} animate={{ opacity: 1, x: 0 }}
-                                                transition={{ delay: i * 0.06 }}
-                                                className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all">
-                                                <div className="w-7 h-7 rounded-lg flex-shrink-0 flex items-center justify-center"
-                                                    style={{ background: `${color}15`, border: `1px solid ${color}25` }}>
-                                                    <Icon className="w-3.5 h-3.5" style={{ color }} />
+                                                initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
+                                                className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition-all">
+                                                <div 
+                                                    className="w-9 h-9 rounded-xl shrink-0 flex items-center justify-center bg-white/5"
+                                                    style={{ borderColor: `${actColor}40`, borderStyle: 'solid', borderWidth: '1px' }}
+                                                >
+                                                    <Icon className="w-4 h-4" style={{ color: actColor }} />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <p className="text-[10px] text-white/70 font-medium truncate">{act.description}</p>
-                                                    <p className="cockpit-mono text-[8px] text-white/25 truncate">{act.user?.name || (isRTL ? 'النظام' : 'System')}</p>
+                                                    <p className="text-xs text-white/80 font-bold truncate">{act.description}</p>
+                                                    <p className="cockpit-mono text-[8px] text-white/30 uppercase mt-0.5">{timeAgo(act.createdAt)}</p>
                                                 </div>
-                                                <span className="cockpit-mono text-[8px] text-white/25 shrink-0">{timeAgo(act.createdAt)}</span>
                                             </motion.div>
                                         );
                                     })
@@ -279,46 +321,34 @@ export default function AdminDashboard() {
                             </div>
                         </div>
 
-                        {/* System Performance */}
-                        <div className="ck-card p-5">
-                            <div className="flex items-center gap-2 mb-4">
-                                <div className="w-1 h-5 rounded-full bg-orange-400" />
-                                <h2 className="cockpit-mono text-[11px] font-bold uppercase tracking-widest text-white/80">
-                                    {isRTL ? 'أداء النظام' : 'SYSTEM PERF'}
+                        <div className="ck-card p-6">
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="w-1.5 h-6 rounded-full bg-orange-500" />
+                                <h2 className="cockpit-mono text-[12px] font-black uppercase tracking-widest text-white/80">
+                                    {isRTL ? 'كفاءة النظام' : 'EFFICIENCY'}
                                 </h2>
                             </div>
-                            <div className="space-y-3">
+                            <div className="space-y-4">
                                 {[
-                                    { label: isRTL ? 'الاستجابة' : 'RESPONSE', val: '14ms', pct: 94, color: '#34d399' },
-                                    { label: isRTL ? 'التوفر' : 'UPTIME', val: '99.9%', pct: 99, color: '#60a5fa' },
-                                    { label: isRTL ? 'الأداء' : 'THROUGHPUT', val: 'HIGH', pct: 87, color: '#f97316' },
+                                    { label: 'Latency', pct: 98, color: '#34d399' },
+                                    { label: 'Uptime', pct: 99.9, color: '#60a5fa' },
                                 ].map((m, i) => (
                                     <div key={i}>
-                                        <div className="flex justify-between items-center mb-1">
+                                        <div className="flex justify-between items-center mb-2">
                                             <span className="cockpit-mono text-[9px] text-white/40 uppercase">{m.label}</span>
-                                            <span className="cockpit-mono text-[9px] font-bold" style={{ color: m.color }}>{m.val}</span>
+                                            <span className="cockpit-mono text-[9px] font-black" style={{ color: m.color }}>{m.pct}%</span>
                                         </div>
-                                        <div className="h-1 bg-white/5 rounded-full overflow-hidden">
-                                            <motion.div initial={{ width: 0 }} animate={{ width: `${m.pct}%` }}
-                                                transition={{ delay: 0.5 + i * 0.2, duration: 1.2, ease: 'easeOut' }}
-                                                className="h-full rounded-full" style={{ background: m.color }} />
+                                        <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                                            <motion.div 
+                                                initial={{ width: 0 }} animate={{ width: `${m.pct}%` }} 
+                                                className="h-full rounded-full" 
+                                                style={{ backgroundColor: m.color }} 
+                                            />
                                         </div>
                                     </div>
                                 ))}
                             </div>
-                            <div className="mt-4 pt-4 border-t border-orange-500/10">
-                                <div className="h-12 flex items-end gap-0.5">
-                                    {[4, 7, 3, 9, 5, 8, 10, 6, 4, 9, 12, 8, 5, 7, 11, 9, 6].map((h, i) => (
-                                        <motion.div key={i}
-                                            initial={{ height: 0 }} animate={{ height: `${(h / 12) * 100}%` }}
-                                            transition={{ delay: i * 0.04, duration: 0.8, ease: 'easeOut' }}
-                                            className="flex-1 rounded-t-sm bg-orange-500/20 hover:bg-orange-500/50 transition-colors" />
-                                    ))}
-                                </div>
-                                <p className="cockpit-mono text-[8px] text-white/20 text-center mt-1 uppercase">7-DAY TRAFFIC</p>
-                            </div>
                         </div>
-
                     </div>
                 </div>
 

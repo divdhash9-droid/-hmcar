@@ -1,10 +1,10 @@
-﻿'use client';
+'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
-    TrendingUp, X,
-    ShoppingCart, Clock, CheckCircle, Eye, Package, MessageCircle
+    TrendingUp, X, ArrowLeft,
+    ShoppingCart, Clock, CheckCircle, Eye, Package, MessageCircle, Car as CarIcon, User
 } from 'lucide-react';
 
 import Link from 'next/link';
@@ -14,6 +14,7 @@ import { api } from '@/lib/api';
 import { useToast } from '@/lib/ToastContext';
 import { useSettings } from '@/lib/SettingsContext';
 import { formatAmountWithSnapshot, getOrderGrandTotalSar, getOrderItemUnitSar, resolveOrderSnapshot } from '@/lib/orderCurrency';
+import AdminPageShell from '@/components/AdminPageShell';
 
 const FILTER_ALL = 'all';
 const STATUS_PENDING = 'pending';
@@ -27,10 +28,6 @@ const CLASS_TEXT_AMBER_400 = 'text-amber-400';
 const CLASS_TEXT_BLUE_400 = 'text-blue-400';
 const CLASS_TEXT_GREEN_400 = 'text-green-400';
 const CLASS_TEXT_RED_400 = 'text-red-400';
-const CLASS_TEXT_ORANGE_400 = 'text-orange-400';
-const CLASS_TEXT_GREEN_400_20 = 'text-green-400/20';
-const CLASS_TEXT_BLUE_400_20 = 'text-blue-400/20';
-const CLASS_TEXT_ORANGE_400_10 = 'text-orange-400/10';
 const rawText = (value: string) => value;
 
 interface OrderItem {
@@ -73,22 +70,7 @@ export default function AdminOrdersPage() {
     const [updatingId, setUpdatingId] = useState<string | null>(null);
     const [stats, setStats] = useState({ total: 0, pending: 0, confirmed: 0, completed: 0, cancelled: 0, revenue: 0 });
 
-    useEffect(() => {
-        loadOrders();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [filter]);
-
-    const getOrderAmountInDisplayCurrency = (order: Order) => {
-        const grandTotalSar = getOrderGrandTotalSar(order);
-        const snapshot = resolveOrderSnapshot(order, currency);
-        const usdValue = grandTotalSar / Number(snapshot.usdToSar || 1);
-
-        if (displayCurrency === 'USD') return usdValue;
-        if (displayCurrency === 'KRW') return usdValue * Number(snapshot.usdToKrw || 0);
-        return grandTotalSar;
-    };
-
-    const loadOrders = async () => {
+    const loadOrders = useCallback(async () => {
         setLoading(true);
         try {
             const params: Record<string, string> = {};
@@ -99,40 +81,38 @@ export default function AdminOrdersPage() {
                 list = res.data.orders.map((o: any) => ({
                     id: o.id || o._id,
                     orderNumber: o.orderNumber,
-                    buyer: {
-                        name: o.buyer?.name || 'Guest User',
-                        email: o.buyer?.email || rawText('—'),
-                        phone: o.buyer?.phone
-                    },
+                    buyer: o.buyer || {},
                     items: o.items || [],
-                    pricing: o.pricing || { totalPriceSar: 0, grandTotalSar: 0 },
+                    pricing: o.pricing || {},
                     status: o.status,
-                    paymentStatus: o.paymentStatus || STATUS_PENDING,
-                    channel: o.channel || 'web',
+                    paymentStatus: o.paymentStatus,
+                    channel: o.channel,
                     createdAt: o.createdAt
                 }));
+                setOrders(list);
+                
+                // Calculate stats from full list if needed, or if API provides them
+                const s = { total: list.length, pending: 0, confirmed: 0, completed: 0, cancelled: 0, revenue: 0 };
+                list.forEach(o => {
+                    if (o.status === STATUS_PENDING) s.pending++;
+                    if (o.status === STATUS_CONFIRMED) s.confirmed++;
+                    if (o.status === STATUS_COMPLETED) s.completed++;
+                    if (o.status === STATUS_CANCELLED) s.cancelled++;
+                    if (o.status !== STATUS_CANCELLED) s.revenue += o.pricing.grandTotalSar || 0;
+                });
+                setStats(s);
             }
-            setOrders(list);
-
-            // Calculate basic stats for current view
-            setStats({
-                total: list.length,
-                pending: list.filter(o => o.status === STATUS_PENDING).length,
-                confirmed: list.filter(o => o.status === STATUS_CONFIRMED).length,
-                completed: list.filter(o => o.status === STATUS_COMPLETED).length,
-                cancelled: list.filter(o => o.status === STATUS_CANCELLED).length,
-                revenue: list
-                    .filter(o => o.paymentStatus === 'paid')
-                    .reduce((s, o) => s + getOrderAmountInDisplayCurrency(o), 0),
-            });
         } catch (err) {
             console.error('Failed to load orders', err);
             showToast(isRTL ? 'فشل تحميل الطلبات' : 'Failed to load orders', 'error');
-            setOrders([]);
         } finally {
             setLoading(false);
         }
-    };
+    }, [filter, isRTL, showToast]);
+
+    useEffect(() => {
+        loadOrders();
+    }, [loadOrders]);
 
     const updateStatus = async (orderId: string, newStatus: string) => {
         setUpdatingId(orderId);
@@ -182,7 +162,7 @@ export default function AdminOrdersPage() {
             <AnimatePresence>
                 {selectedOrder && (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-200 flex items-center justify-center p-4 overflow-y-auto"
+                        className="fixed inset-0 z-[200] flex items-center justify-center p-4 overflow-y-auto"
                         style={{ background: 'rgba(7,7,17,0.9)', backdropFilter: 'blur(16px)' }}
                         onClick={e => e.target === e.currentTarget && setSelectedOrder(null)}>
                         <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }}
@@ -206,7 +186,6 @@ export default function AdminOrdersPage() {
                             </div>
 
                             <div className="p-6 space-y-6">
-                                {/* Buyer + Channel */}
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="ck-card p-4 space-y-1">
                                         <p className="cockpit-mono text-[9px] text-orange-500/50 uppercase tracking-[0.2em]">
@@ -234,7 +213,6 @@ export default function AdminOrdersPage() {
                                     </div>
                                 </div>
 
-                                {/* Items */}
                                 <div>
                                     <p className="ck-section-title mb-3">{isRTL ? rawText('محتويات الطلب') : rawText('ORDER ITEMS')}</p>
                                     <div className="space-y-2 ck-card overflow-hidden">
@@ -243,7 +221,6 @@ export default function AdminOrdersPage() {
                                                 <div className="flex items-center gap-3">
                                                     <div className="p-2 rounded-lg bg-orange-500/10 border border-orange-500/15 text-orange-400">
                                                         {item.itemType === ITEM_TYPE_CAR ? <CarIcon className="w-3.5 h-3.5" /> : <Package className="w-3.5 h-3.5" />}
-
                                                     </div>
                                                     <div>
                                                         <p className="text-xs font-bold">{item.titleSnapshot}</p>
@@ -268,7 +245,6 @@ export default function AdminOrdersPage() {
                                     </div>
                                 </div>
 
-                                {/* Total */}
                                 <div className="ck-card p-5 flex justify-between items-center">
                                     <div>
                                         <p className="cockpit-mono text-[9px] text-orange-500/50 uppercase tracking-[0.2em] mb-1">
@@ -288,7 +264,6 @@ export default function AdminOrdersPage() {
                                     </span>
                                 </div>
 
-                                {/* Actions */}
                                 <div>
                                     <p className="cockpit-mono text-[9px] text-white/20 uppercase tracking-[0.3em] mb-3">
                                         {isRTL ? rawText('تعديل الحالة') : rawText('PROTOCOL OVERRIDE')}
@@ -324,37 +299,30 @@ export default function AdminOrdersPage() {
                 )}
             </AnimatePresence>
 
-            {/* ── Main Content ── */}
-            <main className="relative z-10 pt-6 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-
-                {/* HUD Header */}
-                <div className="ck-page-header">
-                    <nav className="ck-breadcrumb">
-                        <Link href="/admin/dashboard" className="hover:text-orange-400/80 transition-colors">{rawText('HM-CTRL')}</Link>
-                        <span className="ck-breadcrumb-sep">{rawText('>')}</span>
-                        <span className="text-orange-400/70">{isRTL ? rawText('الطلبات') : rawText('ORDERS')}</span>
-                    </nav>
-                    <div className="flex items-end justify-between gap-4 flex-wrap">
-                        <div>
-                            <p className="cockpit-mono text-[10px] text-orange-500/50 tracking-[0.25em] uppercase mb-1">
-                                {rawText('AIR TRAFFIC CONTROL - ORDER QUEUE')}
-                            </p>
-                            <h1 className="ck-page-title">{isRTL ? rawText('طلبات العملاء') : rawText('ORDER CTRL')}</h1>
-                        </div>
-                        {/* Filter tabs */}
-                        <div className="ck-tab-group flex-wrap">
-                            {([
-                                { key: FILTER_ALL, ar: rawText('الكل'), en: rawText('ALL') },
-                                { key: STATUS_PENDING, ar: rawText('انتظار'), en: rawText('QUEUE') },
-                                { key: STATUS_CONFIRMED, ar: rawText('مؤكد'), en: rawText('ACTIVE') },
-                                { key: STATUS_COMPLETED, ar: rawText('مكتمل'), en: rawText('DONE') },
-                            ] as const).map(f => (
-                                <button key={f.key} onClick={() => setFilter(f.key)}
-                                    className={cn('ck-tab', filter === f.key && 'ck-tab-active')}>
-                                    {isRTL ? f.ar : f.en}
-                                </button>
-                            ))}
-                        </div>
+            <AdminPageShell
+                title={isRTL ? 'إدارة الطلبات' : 'ORDER MANAGEMENT'}
+                titleEn="FULFILLMENT OPS"
+                backHref="/admin/dashboard"
+                isRTL={isRTL}
+                actions={
+                    <button onClick={loadOrders} className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-emerald-500 shadow-[0_0_15px_rgba(52,211,153,0.2)]">
+                        <Clock className={cn('w-5 h-5', loading && 'animate-spin')} />
+                    </button>
+                }
+            >
+                <div className="flex items-center justify-between gap-4 mb-8 flex-wrap">
+                    <div className="ck-tab-group flex-wrap">
+                        {([
+                            { key: FILTER_ALL, ar: rawText('الكل'), en: rawText('ALL') },
+                            { key: STATUS_PENDING, ar: rawText('انتظار'), en: rawText('QUEUE') },
+                            { key: STATUS_CONFIRMED, ar: rawText('مؤكد'), en: rawText('ACTIVE') },
+                            { key: STATUS_COMPLETED, ar: rawText('مكتمل'), en: rawText('DONE') },
+                        ] as const).map(f => (
+                            <button key={f.key} onClick={() => setFilter(f.key)}
+                                className={cn('ck-tab', filter === f.key && 'ck-tab-active')}>
+                                {isRTL ? f.ar : f.en}
+                            </button>
+                        ))}
                     </div>
                 </div>
 
@@ -366,126 +334,110 @@ export default function AdminOrdersPage() {
                         { label: isRTL ? rawText('مؤكد') : rawText('ACTIVE'), val: stats.confirmed, color: CLASS_TEXT_BLUE_400 },
                         { label: isRTL ? rawText('مكتمل') : rawText('DONE'), val: stats.completed, color: CLASS_TEXT_GREEN_400 },
                         { label: isRTL ? rawText('ملغي') : rawText('ABORT'), val: stats.cancelled, color: CLASS_TEXT_RED_400 },
-                        { label: isRTL ? rawText('إيرادات') : rawText('REVENUE'), val: `${(stats.revenue / 1000).toFixed(0)}K`, color: CLASS_TEXT_ORANGE_400 },
-                    ].map((s, i) => (
-                        <div key={i} className={cn('ck-stat text-center ck-fade-up', `ck-delay-${Math.min(i + 1, 4)}`)}>
-                            <div className={cn('ck-stat-num text-2xl', s.color)}>{s.val}</div>
-                            <div className="cockpit-mono text-[8px] text-white/30 uppercase tracking-widest mt-1">{s.label}</div>
+                    ].map((s, idx) => (
+                        <div key={idx} className="ck-card p-4 flex flex-col items-center">
+                            <span className={cn('text-xl font-black cockpit-num mb-1', s.color)}>{s.val}</span>
+                            <span className="cockpit-mono text-[8px] text-white/20 uppercase tracking-widest">{s.label}</span>
                         </div>
                     ))}
-                </div>
-
-                {/* Orders Table */}
-                <div className="ck-card overflow-hidden">
-                    <div className="overflow-x-auto">
-                        <table className="ck-table">
-                            <thead>
-                                <tr>
-                                    <th>{isRTL ? rawText('مرجع') : rawText('REF')}</th>
-                                    <th>{isRTL ? rawText('العميل') : rawText('CLIENT')}</th>
-                                    <th>{isRTL ? rawText('المنتجات') : rawText('ITEMS')}</th>
-                                    <th>{isRTL ? rawText('المبلغ') : rawText('AMOUNT')}</th>
-                                    <th>{isRTL ? rawText('الحالة') : rawText('STATUS')}</th>
-                                    <th>{isRTL ? rawText('إجراء') : rawText('OPS')}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {loading ? (
-                                    Array.from({ length: 5 }).map((_, i) => (
-                                        <tr key={i}><td colSpan={6}><div className="h-10 bg-white/5 rounded animate-pulse" /></td></tr>
-                                    ))
-                                ) : orders.length === 0 ? (
-                                    <tr><td colSpan={6}>
-                                        <div className="ck-empty">
-                                            <div className="ck-empty-icon"><ShoppingCart className="w-6 h-6" /></div>
-                                            <p className="cockpit-mono text-sm">{isRTL ? rawText('لا توجد طلبات') : rawText('QUEUE EMPTY')}</p>
-                                        </div>
-                                    </td></tr>
-                                ) : orders.map((order, idx) => (
-                                    <motion.tr key={order.id}
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: idx * 0.04 }}
-                                        className="cursor-pointer group"
-                                        onClick={() => setSelectedOrder(order)}>
-                                        <td>
-                                            <p className="cockpit-num text-sm font-black text-orange-400">{rawText('#')}{order.orderNumber}</p>
-                                            <p className="cockpit-mono text-[9px] text-white/30 mt-0.5 flex items-center gap-1">
-                                                {order.channel === CHANNEL_WHATSAPP
-                                                    ? <MessageCircle size={9} className="text-green-400" />
-                                                    : <ShoppingCart size={9} className="text-orange-400" />}
-                                                {new Date(order.createdAt).toLocaleDateString()}
-                                            </p>
-                                        </td>
-                                        <td>
-                                            <p className="text-sm font-bold">{order.buyer.name}</p>
-                                            <p className="cockpit-mono text-[9px] text-white/30 truncate max-w-35">{order.buyer.email}</p>
-                                        </td>
-                                        <td>
-                                            <div className="flex flex-wrap gap-1">
-                                                {order.items.slice(0, 2).map((item, i) => (
-                                                    <span key={i} className="ck-badge ck-badge-inactive text-[8px]">
-                                                        {item.titleSnapshot.slice(0, 12)}
-                                                    </span>
-                                                ))}
-                                                {order.items.length > 2 && (
-                                                    <span className="cockpit-mono text-[8px] text-white/20">{rawText('+')}{order.items.length - 2}</span>
-                                                )}
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <p className="cockpit-num text-base font-black text-white">
-                                                {formatAmountWithSnapshot(
-                                                    getOrderGrandTotalSar(order),
-                                                    displayCurrency,
-                                                    order,
-                                                    currency
-                                                )}
-                                            </p>
-                                        </td>
-                                        <td>
-                                            <span className={cn(getStatusBadge(order.status), 'ck-badge-live')}>
-                                                {statusLabel(order.status)}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <button className="w-8 h-8 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 group-hover:bg-orange-500 group-hover:text-white transition-all flex items-center justify-center">
-                                                <Eye size={14} />
-                                            </button>
-                                        </td>
-                                    </motion.tr>
-                                ))}
-                            </tbody>
-                        </table>
+                    <div className="ck-card p-4 col-span-2 hidden lg:flex items-center justify-between">
+                        <div>
+                            <span className="cockpit-mono text-[8px] text-white/20 uppercase tracking-widest block mb-1">
+                                {isRTL ? rawText('إجمالي المبيعات') : rawText('TOTAL REVENUE')}
+                            </span>
+                            <span className="text-lg font-black text-orange-400 cockpit-num">
+                                {stats.revenue.toLocaleString()} <span className="text-[10px] text-white/30">{isRTL ? 'ر.س' : 'SAR'}</span>
+                            </span>
+                        </div>
+                        <TrendingUp size={24} className="text-orange-500/20" />
                     </div>
                 </div>
 
-                {/* Bottom KPIs */}
-                <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    {[
-                        { label: isRTL ? rawText('إجمالي الإيرادات') : rawText('VERIFIED REVENUE'), val: `${displayCurrency === 'USD' ? '$' : displayCurrency === 'KRW' ? '₩' : 'ر.س'} ${stats.revenue.toLocaleString()}`, icon: TrendingUp, color: CLASS_TEXT_GREEN_400, iconColor: CLASS_TEXT_GREEN_400_20 },
-                        { label: isRTL ? rawText('قيد المعالجة') : rawText('LIVE QUEUE'), val: String(stats.pending + stats.confirmed), icon: Clock, color: CLASS_TEXT_BLUE_400, iconColor: CLASS_TEXT_BLUE_400_20 },
-                        { label: isRTL ? rawText('كفاءة النظام') : rawText('SYSTEM HEALTH'), val: rawText('99.9%'), icon: CheckCircle, color: CLASS_TEXT_ORANGE_400, iconColor: CLASS_TEXT_ORANGE_400_10 },
-                    ].map((kpi, i) => (
-                        <div key={i} className="ck-card p-5 flex items-center justify-between ck-hover-lift">
-                            <div>
-                                <p className="cockpit-mono text-[9px] text-white/30 uppercase tracking-widest mb-1">{kpi.label}</p>
-                                <p className={cn('cockpit-num text-2xl font-black', kpi.color)}>{kpi.val}</p>
-                            </div>
-                            <kpi.icon className={cn('w-10 h-10', kpi.iconColor)} />
-                        </div>
-                    ))}
-                </div>
-            </main>
+                {/* Orders Grid */}
+                {loading ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {[...Array(4)].map((_, i) => (
+                            <div key={i} className="h-48 rounded-3xl bg-white/[0.02] animate-pulse border border-white/5" />
+                        ))}
+                    </div>
+                ) : orders.length === 0 ? (
+                    <div className="ck-empty h-64">
+                        <div className="ck-empty-icon"><Package size={32} /></div>
+                        <p className="cockpit-mono text-[11px]">{isRTL ? 'لا توجد طلبات تطابق هذا التصنيف' : 'NO ORDERS FOUND'}</p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {orders.map((order, idx) => (
+                            <motion.div key={order.id}
+                                initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }}
+                                className="ck-card group hover:border-orange-500/30 transition-all">
+                                <div className="p-5 flex flex-col h-full">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <div>
+                                            <p className="cockpit-mono text-[9px] text-white/25 uppercase tracking-widest mb-0.5">
+                                                {formatDate(order.createdAt)}
+                                            </p>
+                                            <h3 className="cockpit-num text-lg font-black group-hover:text-orange-400 transition-colors">
+                                                {rawText('#')}{order.orderNumber}
+                                            </h3>
+                                        </div>
+                                        <span className={cn(getStatusBadge(order.status), 'ck-badge-live')}>
+                                            {statusLabel(order.status)}
+                                        </span>
+                                    </div>
+
+                                    <div className="flex-1 space-y-3 mb-6">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-white/40">
+                                                <User size={14} />
+                                            </div>
+                                            <div className="min-w-0">
+                                                <p className="text-[11px] font-bold truncate text-white/80">{order.buyer.name}</p>
+                                                <p className="cockpit-mono text-[9px] text-white/25 truncate">{order.buyer.email}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-white/40">
+                                                {order.items[0]?.itemType === ITEM_TYPE_CAR ? <CarIcon size={14} /> : <Package size={14} />}
+                                            </div>
+                                            <div className="min-w-0">
+                                                <p className="text-[11px] font-bold truncate text-white/80">
+                                                    {order.items.length > 1 
+                                                        ? `${order.items[0].titleSnapshot} +${order.items.length - 1}` 
+                                                        : (order.items[0]?.titleSnapshot || 'No Items')}
+                                                </p>
+                                                <p className="cockpit-mono text-[9px] text-orange-400/50">
+                                                    {isRTL ? rawText('إجمالي:') : rawText('TOTAL:')} {formatAmountInDisplayCurrency(order)}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex gap-2 border-t border-white/5 pt-4">
+                                        <button onClick={() => setSelectedOrder(order)}
+                                            className="flex-1 ck-btn-ghost flex items-center justify-center gap-2 py-2">
+                                            <Eye size={14} />
+                                            {isRTL ? 'عرض' : 'VIEW'}
+                                        </button>
+                                        <button onClick={() => window.open(`https://wa.me/${order.buyer.phone?.replace('+', '')}`, '_blank')}
+                                            className="w-10 h-10 rounded-xl bg-green-500/10 border border-green-500/20 text-green-500 flex items-center justify-center hover:bg-green-500 hover:text-white transition-all">
+                                            <MessageCircle size={16} />
+                                        </button>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                )}
+            </AdminPageShell>
         </div>
     );
 }
 
-function CarIcon(props: React.SVGProps<SVGSVGElement>) {
-    return (
-        <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" />
-            <circle cx="7" cy="17" r="2" /><path d="M9 17h6" /><circle cx="17" cy="17" r="2" />
-        </svg>
-    );
+function formatDate(iso: string) {
+    return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: '2-digit' });
+}
+
+function formatAmountInDisplayCurrency(order: any) {
+    return (order.pricing.grandTotalSar || 0).toLocaleString();
 }

@@ -1,15 +1,17 @@
-﻿'use client';
+'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, Suspense } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     MessageCircle, Send, Search,
-    User, CheckCheck, Circle, RefreshCcw, X
+    User, CheckCheck, Circle, RefreshCcw, X, ArrowLeft
 } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '@/lib/LanguageContext';
 import { cn } from '@/lib/utils';
 import { api } from '@/lib/api';
+import AdminPageShell from '@/components/AdminPageShell';
 
 interface Conversation {
     userId: string;
@@ -28,7 +30,7 @@ interface Message {
     read: boolean;
 }
 
-export default function AdminMessagesPage() {
+function AdminMessagesContent() {
     const { isRTL } = useLanguage();
     const [conversations, setConversations] = useState<Conversation[]>([]);
     const [selectedConv, setSelectedConv] = useState<Conversation | null>(null);
@@ -40,6 +42,8 @@ export default function AdminMessagesPage() {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [adminId, setAdminId] = useState<string>('');
 
+    const searchParams = useSearchParams();
+
     useEffect(() => {
         if (typeof window !== 'undefined') {
             try {
@@ -49,6 +53,30 @@ export default function AdminMessagesPage() {
         }
         loadConversations();
     }, []);
+
+    // Handle auto-select from query params
+    useEffect(() => {
+        if (!loading && conversations.length > 0) {
+            const clientPhone = searchParams?.get('clientPhone');
+            const clientName = searchParams?.get('clientName');
+            
+            if (clientPhone || clientName) {
+                // Try to find matching conversation
+                // Some IDs might be like "hm-guest-9665..." so we use includes
+                const found = conversations.find(c => {
+                    const idMatch = clientPhone && c.userId.replace(/[^0-9]/g, '').includes(clientPhone.replace(/[^0-9]/g, ''));
+                    const nameMatch = clientName && c.userName.toLowerCase().includes(clientName.toLowerCase());
+                    return idMatch || nameMatch;
+                });
+                
+                if (found && (!selectedConv || selectedConv.userId !== found.userId)) {
+                    loadMessages(found);
+                } else if (!found && clientName) {
+                    setSearch(clientName);
+                }
+            }
+        }
+    }, [loading, conversations, searchParams, selectedConv]);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -66,20 +94,9 @@ export default function AdminMessagesPage() {
                     lastMessageAt: item.lastMessage?.createdAt || new Date().toISOString(),
                     unreadCount: item.unreadCount || 0
                 })));
-            } else {
-                // Fallback mock if API not ready
-                setConversations([
-                    { userId: 'u1', userName: 'Ahmed Al-Rashid', lastMessage: 'I need info about the BMW M5', lastMessageAt: new Date().toISOString(), unreadCount: 3 },
-                    { userId: 'u2', userName: 'Mohammed Al-Saud', lastMessage: 'Is the Porsche still available?', lastMessageAt: new Date(Date.now() - 3600000).toISOString(), unreadCount: 1 },
-                    { userId: 'u3', userName: 'Khalid Al-Otaibi', lastMessage: 'Thank you for the quick response!', lastMessageAt: new Date(Date.now() - 86400000).toISOString(), unreadCount: 0 },
-                ]);
             }
         } catch {
-            setConversations([
-                { userId: 'u1', userName: 'Ahmed Al-Rashid', lastMessage: 'I need info about the BMW M5', lastMessageAt: new Date().toISOString(), unreadCount: 3 },
-                { userId: 'u2', userName: 'Mohammed Al-Saud', lastMessage: 'Is the Porsche still available?', lastMessageAt: new Date(Date.now() - 3600000).toISOString(), unreadCount: 1 },
-                { userId: 'u3', userName: 'Khalid Al-Otaibi', lastMessage: 'Thank you for the quick response!', lastMessageAt: new Date(Date.now() - 86400000).toISOString(), unreadCount: 0 },
-            ]);
+            console.error('Failed to load conversations');
         } finally {
             setLoading(false);
         }
@@ -152,24 +169,12 @@ export default function AdminMessagesPage() {
     return (
         <div className="min-h-screen text-white overflow-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
 
-            <main className="relative z-10 pt-6 pb-4 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto h-screen flex flex-col">
-
-                {/* HUD Header */}
-                <div className="ck-page-header pb-4 mb-4">
-                    <nav className="ck-breadcrumb">
-                        <Link href="/admin/dashboard" className="hover:text-orange-400/80 transition-colors">HM-CTRL</Link>
-                        <span className="ck-breadcrumb-sep">›</span>
-                        <span className="text-orange-400/70">{isRTL ? 'رسائل العملاء' : 'MESSAGES'}</span>
-                    </nav>
-                    <div className="flex items-center justify-between gap-4">
-                        <h1 className="ck-page-title text-2xl md:text-3xl">{isRTL ? 'رسائل العملاء' : 'CUSTOMER COMMS'}</h1>
-                        {conversations.some(c => c.unreadCount > 0) && (
-                            <span className="ck-badge ck-badge-danger ck-badge-live">
-                                {conversations.reduce((sum, c) => sum + c.unreadCount, 0)} {isRTL ? 'جديد' : 'NEW'}
-                            </span>
-                        )}
-                    </div>
-                </div>
+            <AdminPageShell
+                title={isRTL ? 'رسائل العملاء' : 'MESSAGES'}
+                titleEn="CUSTOMER COMMS"
+                backHref="/admin/dashboard"
+                isRTL={isRTL}
+            >
 
                 {/* Main Chat Layout */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1 min-h-0">
@@ -180,9 +185,9 @@ export default function AdminMessagesPage() {
                         selectedConv ? 'hidden md:flex' : 'flex'
                     )}>
                         {/* Search */}
-                        <div className="p-4 border-b border-orange-500/10">
+                        <div className="p-4 border-b border-red-500/10">
                             <div className="relative">
-                                <Search className={cn('absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-orange-500/30', isRTL ? 'right-3' : 'left-3')} />
+                                <Search className={cn('absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-red-500/30', isRTL ? 'right-3' : 'left-3')} />
                                 <input value={search} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
                                     placeholder={isRTL ? 'بحث في المحادثات...' : 'Search conversations...'}
                                     className={cn('ck-input text-xs py-2', isRTL ? 'pr-8 pl-3' : 'pl-8 pr-3')} />
@@ -208,11 +213,11 @@ export default function AdminMessagesPage() {
                                         className={cn(
                                             'w-full p-3 rounded-xl text-start transition-all border',
                                             selectedConv?.userId === conv.userId
-                                                ? 'bg-orange-500/10 border-orange-500/25'
-                                                : 'bg-white/[0.02] border-white/5 hover:bg-white/5 hover:border-orange-500/10'
+                                                ? 'bg-red-500/10 border-red-500/25'
+                                                : 'bg-white/[0.02] border-white/5 hover:bg-white/5 hover:border-red-500/10'
                                         )}>
                                         <div className="flex items-start gap-3">
-                                            <div className="w-9 h-9 rounded-xl bg-orange-500/10 border border-orange-500/15 flex items-center justify-center shrink-0 relative">
+                                            <div className="w-9 h-9 rounded-xl bg-red-500/10 border border-red-500/15 flex items-center justify-center shrink-0 relative">
                                                 <User className="w-4 h-4 text-orange-400/60" />
                                                 {conv.unreadCount > 0 && (
                                                     <span className="absolute -top-1 -end-1 w-4 h-4 bg-red-500 rounded-full cockpit-mono text-[8px] font-black flex items-center justify-center">
@@ -238,9 +243,9 @@ export default function AdminMessagesPage() {
                         </div>
 
                         {/* Refresh */}
-                        <div className="p-3 border-t border-orange-500/10">
+                        <div className="p-3 border-t border-red-500/10">
                             <button onClick={loadConversations}
-                                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-white/5 hover:bg-orange-500/10 hover:border-orange-500/20 border border-white/5 transition-all cockpit-mono text-[9px] font-bold uppercase text-white/35 hover:text-orange-400">
+                                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-white/5 hover:bg-red-500/10 hover:border-red-500/20 border border-white/5 transition-all cockpit-mono text-[9px] font-bold uppercase text-white/35 hover:text-orange-400">
                                 <RefreshCcw className="w-3 h-3" />
                                 {isRTL ? 'تحديث' : 'REFRESH'}
                             </button>
@@ -264,12 +269,12 @@ export default function AdminMessagesPage() {
                         ) : (
                             <>
                                 {/* Chat Header */}
-                                <div className="p-4 border-b border-orange-500/10 flex items-center gap-3">
+                                <div className="p-4 border-b border-red-500/10 flex items-center gap-3">
                                     <button aria-label="Go back" onClick={() => setSelectedConv(null)}
                                         className="md:hidden w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 transition-all flex items-center justify-center">
                                         <X className="w-4 h-4" />
                                     </button>
-                                    <div className="w-9 h-9 rounded-xl bg-orange-500/10 border border-orange-500/15 flex items-center justify-center">
+                                    <div className="w-9 h-9 rounded-xl bg-red-500/10 border border-red-500/15 flex items-center justify-center">
                                         <User className="w-4 h-4 text-orange-400/60" />
                                     </div>
                                     <div>
@@ -298,7 +303,7 @@ export default function AdminMessagesPage() {
                                                     className={cn('flex gap-3', isMe ? 'flex-row-reverse' : 'flex-row')}>
                                                     <div className={cn(
                                                         'w-7 h-7 rounded-xl flex items-center justify-center shrink-0 cockpit-mono text-[9px] font-black',
-                                                        isMe ? 'bg-orange-500/20 border border-orange-500/30 text-orange-400' : 'bg-white/8 border border-white/10 text-white/40'
+                                                        isMe ? 'bg-red-500/20 border border-red-500/30 text-orange-400' : 'bg-white/8 border border-white/10 text-white/40'
                                                     )}>
                                                         {isMe ? 'A' : (selectedConv?.userName?.[0] || 'U')}
                                                     </div>
@@ -306,7 +311,7 @@ export default function AdminMessagesPage() {
                                                         <div className={cn(
                                                             'px-4 py-2.5 rounded-2xl text-[12px] leading-relaxed',
                                                             isMe
-                                                                ? 'bg-orange-500/15 border border-orange-500/20 text-white rounded-te-none'
+                                                                ? 'bg-red-500/15 border border-red-500/20 text-white rounded-te-none'
                                                                 : 'bg-white/5 border border-white/8 text-white/80 rounded-ts-none'
                                                         )}>{msg.content}</div>
                                                         <div className={cn('flex items-center gap-1 mt-1', isMe ? 'flex-row-reverse' : 'flex-row')}>
@@ -322,7 +327,7 @@ export default function AdminMessagesPage() {
                                 </div>
 
                                 {/* Send Message */}
-                                <div className="p-4 border-t border-orange-500/10">
+                                <div className="p-4 border-t border-red-500/10">
                                     <div className="flex items-center gap-3">
                                         <input type="text" value={newMessage}
                                             onChange={e => setNewMessage(e.target.value)}
@@ -340,7 +345,15 @@ export default function AdminMessagesPage() {
                         )}
                     </div>
                 </div>
-            </main>
+            </AdminPageShell>
         </div>
+    );
+}
+
+export default function AdminMessagesPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center"><div className="w-10 h-10 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" /></div>}>
+            <AdminMessagesContent />
+        </Suspense>
     );
 }

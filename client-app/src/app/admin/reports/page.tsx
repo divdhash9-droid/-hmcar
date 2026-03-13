@@ -1,11 +1,9 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
-    TrendingUp, DollarSign, Car, Gavel, ShoppingCart,
-    Users, BarChart3, ArrowUpRight, ArrowDownRight,
-    Download, type LucideIcon
+    Download, type LucideIcon, ArrowLeft, DollarSign, ShoppingCart, Car, Gavel, Users, BarChart3, TrendingUp, ArrowUpRight, ArrowDownRight
 } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '@/lib/LanguageContext';
@@ -271,29 +269,41 @@ export default function AdminReportsPage() {
         <div className="min-h-screen text-white" dir={isRTL ? 'rtl' : 'ltr'}>
             <main className="relative z-10 pt-6 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
                 {/* HUD Header */}
-                <div className="ck-page-header">
-                    <nav className="ck-breadcrumb">
-                        <Link href="/admin/dashboard" className="hover:text-orange-400/80 transition-colors">HM-CTRL</Link>
-                        <span className="ck-breadcrumb-sep">›</span>
-                        <span className="text-orange-400/70">{isRTL ? 'التقارير' : 'REPORTS'}</span>
-                    </nav>
-                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 flex-wrap">
-                        <div>
-                            <p className="cockpit-mono text-[10px] text-orange-500/50 tracking-[0.25em] uppercase mb-1">ANALYTICS &amp; INTELLIGENCE</p>
-                            <h1 className="ck-page-title">{isRTL ? 'التقارير والإحصائيات' : 'REPORTS & ANALYTICS'}</h1>
+                <div className="ck-page-header pb-6 mb-8">
+                    <div className="flex items-center gap-6">
+                        <Link href="/admin/dashboard">
+                            <motion.button
+                                whileHover={{ scale: 1.1, x: isRTL ? 5 : -5 }}
+                                whileTap={{ scale: 0.9 }}
+                                className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-orange-500/40 hover:bg-orange-500/10 transition-all group shadow-xl"
+                            >
+                                <ArrowLeft className={cn(
+                                    "w-6 h-6 text-white/40 group-hover:text-orange-400 transition-colors",
+                                    isRTL && "rotate-180"
+                                )} />
+                            </motion.button>
+                        </Link>
+                        <div className="flex-1">
+                            <nav className="ck-breadcrumb mb-1">
+                                <Link href="/admin/dashboard" className="hover:text-orange-400 transition-colors">HM-CTRL</Link>
+                                <span className="ck-breadcrumb-sep">›</span>
+                                <span className="text-orange-400/70">{isRTL ? 'التقارير' : 'REPORTS'}</span>
+                            </nav>
+                            <h1 className="ck-page-title text-3xl md:text-4xl">{isRTL ? 'مركز البيانات والتحليل' : 'ANALYTICS HUB'}</h1>
                         </div>
-                        <div className="flex items-center gap-3">
-                            <div className="ck-tab-group">
-                                {(['week', 'month', 'year'] as const).map(p => (
-                                    <button key={p} onClick={() => setPeriod(p)} className={cn('ck-tab', period === p && 'ck-tab-active')}>
-                                        {p === 'week' ? (isRTL ? 'أسبوع' : 'WEEK') : p === 'month' ? (isRTL ? 'شهر' : 'MONTH') : (isRTL ? 'سنة' : 'YEAR')}
-                                    </button>
-                                ))}
-                            </div>
-                            <button onClick={exportToCSV} className="ck-btn-ghost flex items-center gap-2">
-                                <Download className="w-3.5 h-3.5" />{isRTL ? 'تصدير' : 'EXPORT'}
-                            </button>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-4 mt-6 flex-wrap">
+                        <div className="ck-tab-group">
+                            {(['week', 'month', 'year'] as const).map(p => (
+                                <button key={p} onClick={() => setPeriod(p)} className={cn('ck-tab', period === p && 'ck-tab-active')}>
+                                    {p === 'week' ? (isRTL ? 'أسبوع' : 'WEEK') : p === 'month' ? (isRTL ? 'شهر' : 'MONTH') : (isRTL ? 'سنة' : 'YEAR')}
+                                </button>
+                            ))}
                         </div>
+                        <button onClick={exportToCSV} className="ck-btn-ghost flex items-center gap-2 border-white/10">
+                            <Download className="w-3.5 h-3.5" />{isRTL ? 'تصدير البيانات' : 'DATA EXPORT'}
+                        </button>
                     </div>
                 </div>
 

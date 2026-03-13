@@ -26,6 +26,7 @@ import { cn } from '@/lib/utils';
 import { useLanguage } from '@/lib/LanguageContext';
 import { useAuth } from '@/lib/AuthContext';
 import { api } from '@/lib/api';
+import AdminPageShell from '@/components/AdminPageShell';
 
 // ── المكونات المقسمة ──
 import ProfileTab from './_components/ProfileTab';
@@ -227,49 +228,26 @@ function AdminSettingsContent() {
         { id: 'currency', label: isRTL ? 'إعدادات العملة' : 'Currency', icon: DollarSign },
         { id: 'features', label: isRTL ? 'لماذا تختارنا' : 'Features', icon: Shield },
     ];
-
     return (
-        <div className={cn('min-h-screen bg-black text-white', isRTL && 'rtl')}>
-            {/* الخلفية */}
-            <div className="fixed inset-0 pointer-events-none">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-cinematic-neon-red/10 via-black to-black" />
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(255,0,60,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,0,60,0.02)_1px,transparent_1px)] bg-[size:60px_60px]" />
-            </div>
+        <AdminPageShell
+                title={isRTL ? 'الإعدادات' : 'SETTINGS'}
+                titleEn="SYSTEM CONFIG"
+                backHref="/admin/dashboard"
+                isRTL={isRTL}
+            >
+                {/* رسالة النجاح / الخطأ */}
+                {message.text && (
+                    <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+                        className={cn('mb-8 p-4 rounded-xl border text-center',
+                            message.type === 'success'
+                                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                                : 'bg-cinematic-neon-red/10 border-cinematic-neon-red/30 text-cinematic-neon-red')}>
+                        <span className="text-sm font-bold">{message.text}</span>
+                    </motion.div>
+                )}
 
-            <div className="relative z-10 p-8">
-                <div className="max-w-5xl mx-auto">
-
-                    {/* ─── رأس الصفحة ─── */}
-                    <div className="flex items-center gap-6 mb-12">
-                        <Link href="/admin/dashboard"
-                            className="inline-flex items-center gap-2 text-white/40 hover:text-cinematic-neon-red transition-colors group">
-                            <ArrowLeft className={cn('w-5 h-5 transition-transform group-hover:-translate-x-1', isRTL && 'rotate-180 group-hover:translate-x-1')} />
-                            <span className="text-[10px] font-black uppercase tracking-[0.2em]">{isRTL ? 'العودة للرئيسية' : 'BACK TO DASHBOARD'}</span>
-                        </Link>
-                        <div>
-                            <div className="flex items-center gap-3 mb-2">
-                                <div className="h-[2px] w-8 bg-cinematic-neon-red shadow-[0_0_10px_rgba(255,0,60,1)]" />
-                                <span className="text-[9px] font-black uppercase tracking-[0.5em] text-cinematic-neon-red">{isRTL ? 'لوحة التحكم' : 'Admin Panel'}</span>
-                            </div>
-                            <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic">
-                                {isRTL ? 'الإعدادات' : 'SETTINGS'}
-                            </h1>
-                        </div>
-                    </div>
-
-                    {/* رسالة النجاح / الخطأ */}
-                    {message.text && (
-                        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-                            className={cn('mb-8 p-4 rounded-xl border text-center',
-                                message.type === 'success'
-                                    ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
-                                    : 'bg-cinematic-neon-red/10 border-cinematic-neon-red/30 text-cinematic-neon-red')}>
-                            <span className="text-sm font-bold">{message.text}</span>
-                        </motion.div>
-                    )}
-
-                    {/* ─── شريط التبويبات ─── */}
-                    <div className="flex flex-wrap gap-2 mb-8 p-2 bg-white/5 rounded-2xl border border-white/5">
+                {/* ─── شريط التبويبات ─── */}
+                <div className="flex flex-wrap gap-2 mb-8 p-2 bg-white/5 rounded-2xl border border-white/5">
                         {tabs.map(tab => {
                             const Icon = tab.icon;
                             return (
@@ -367,9 +345,6 @@ function AdminSettingsContent() {
                         />
                     )}
 
-                    {/* تذييل الصفحة */}
-                </div>
-            </div>
-        </div>
-    );
-}
+            </AdminPageShell>
+        );
+    }

@@ -1,7 +1,8 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useState } from "react";
-import { MessageCircle, Save, Trash2, CheckCircle2, SquarePen, ChevronLeft } from "lucide-react";
+import { MessageCircle, Save, Trash2, CheckCircle2, SquarePen, ArrowLeft } from "lucide-react";
+import { motion } from "framer-motion";
 import Link from "next/link";
 import { useLanguage } from "@/lib/LanguageContext";
 import { cn } from "@/lib/utils";
@@ -95,15 +96,33 @@ function AdminSocialSettings() {
   return (
     <div className={cn("min-h-screen bg-black text-white px-6 sm:px-12 lg:px-20 py-24")}>
       <div className="max-w-4xl mx-auto space-y-10">
-        <Link href="/admin/dashboard" className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white/70 hover:text-white hover:bg-white/10 transition-all group">
-          <ChevronLeft className={`w-4 h-4 transition-transform group-hover:-translate-x-1 ${isRTL ? 'rotate-180 group-hover:translate-x-1' : ''}`} />
-          <span className="text-[10px] font-black uppercase tracking-[0.2em]">{isRTL ? 'العودة للرئيسية' : 'BACK TO DASHBOARD'}</span>
-        </Link>
-        <div className="flex items-center gap-4">
-          <MessageCircle className="w-7 h-7 text-cinematic-neon-blue" />
-          <h1 className="text-2xl font-black uppercase tracking-[0.4em]">
-            {t('socialSettings')}
-          </h1>
+        
+        {/* Navigation HUD */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-16">
+            <div className="flex items-center gap-8">
+                <Link href="/admin/dashboard">
+                    <motion.button
+                        whileHover={{ scale: 1.1, x: isRTL ? 5 : -5 }}
+                        whileTap={{ scale: 0.9 }}
+                        className="p-5 rounded-2xl bg-white/5 border border-white/10 hover:border-cinematic-neon-blue/40 hover:bg-cinematic-neon-blue/10 transition-all group shadow-2xl"
+                    >
+                        <ArrowLeft className={cn(
+                            "w-7 h-7 text-white/40 group-hover:text-cinematic-neon-blue transition-colors",
+                            isRTL && "rotate-180"
+                        )} />
+                    </motion.button>
+                </Link>
+
+                <div>
+                    <div className="flex items-center gap-4 mb-2">
+                        <div className="h-[2px] w-12 bg-cinematic-neon-blue shadow-[0_0_15px_rgba(0,150,255,1)]" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.5em] text-cinematic-neon-blue italic">HQ Control Settings</span>
+                    </div>
+                    <h1 className="text-3xl md:text-5xl font-black uppercase tracking-[0.4em]">
+                        {t('socialSettings')}
+                    </h1>
+                </div>
+            </div>
         </div>
 
         <div className="glass-card p-8 bg-white/[0.02] border border-white/10 rounded-2xl space-y-6">

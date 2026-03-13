@@ -1,12 +1,13 @@
-﻿'use client';
+'use client';
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Clock, TrendingUp, Users, Eye, Trash2, Edit2, ChevronLeft, X, Trophy } from "lucide-react";
+import { Plus, Clock, TrendingUp, Users, Eye, Trash2, Edit2, ArrowLeft, X, Trophy } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/LanguageContext";
 import Link from "next/link";
 import { api } from "@/lib/api";
+import AdminPageShell from '@/components/AdminPageShell';
 
 export default function AdminAuctionsControl() {
     const { t, isRTL } = useLanguage();
@@ -98,37 +99,21 @@ export default function AdminAuctionsControl() {
 
     return (
         <div className="relative min-h-screen bg-black text-white font-sans overflow-hidden">
-
-            {/* Background HUD */}
-            <div className="fixed inset-0 pointer-events-none opacity-5">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-cinematic-neon-red/20 via-transparent to-transparent opacity-40" />
-            </div>
-
-            <main className="relative z-10 p-6 md:p-12 lg:p-20 max-w-7xl mx-auto">
-
-                {/* Navigation HUD */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-16">
-                    <div className="space-y-4">
-                        <div className="flex items-center gap-3">
-                            <Link href="/admin/dashboard" className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white/70 hover:text-white hover:bg-white/10 transition-all group">
-                                <ChevronLeft className={cn("w-4 h-4 transition-transform group-hover:-translate-x-1", isRTL && "rotate-180 group-hover:translate-x-1")} />
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em]">{isRTL ? 'العودة للرئيسية' : 'BACK TO DASHBOARD'}</span>
-                            </Link>
-                        </div>
-                        <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-none">{isRTL ? "إدارة المزادات" : "ARENA CONTROL"}</h1>
-                    </div>
-
-                    <motion.button
-                        whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(255,0,60,0.3)" }}
-                        whileTap={{ scale: 0.95 }}
+            <AdminPageShell
+                title={isRTL ? 'إدارة المزادات' : 'AUCTION COMMAND'}
+                titleEn="ARENA OPERATIONS"
+                backHref="/admin/dashboard"
+                isRTL={isRTL}
+                actions={
+                    <button
                         onClick={() => setIsCreateModalOpen(true)}
-                        className="px-8 py-4 bg-cinematic-neon-red text-white font-black uppercase text-[10px] tracking-widest rounded-2xl flex items-center gap-3 transition-all"
+                        className="h-12 px-6 flex items-center justify-center gap-2 rounded-2xl bg-red-500 text-white font-black italic uppercase text-xs shadow-[0_0_20px_rgba(239,68,68,0.4)] hover:scale-105 active:scale-95 transition-all"
                     >
                         <Plus className="w-4 h-4" />
-                        {isRTL ? "إطلاق مزاد جديد" : "LAUNCH NEW ARENA"}
-                    </motion.button>
-                </div>
-
+                        <span>{isRTL ? 'إطلاق مزاد' : 'NEW ARENA'}</span>
+                    </button>
+                }
+            >
                 {/* Filter Tabs */}
                 <div className="flex bg-white/5 p-2 rounded-2xl border border-white/5 w-fit mb-10 overflow-x-auto max-w-full">
                     {['LIVE', 'SCHEDULED', 'SETTLED', 'AUDIT'].map((tab) => (
@@ -166,8 +151,8 @@ export default function AdminAuctionsControl() {
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
                                     {auc.status === 'running' && (
-                                        <div className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1 bg-cinematic-neon-red/20 border border-cinematic-neon-red/40 rounded-full">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-cinematic-neon-red animate-pulse" />
+                                        <div className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1 bg-red-500/20 border border-red-500/40 rounded-full">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
                                             <span className="text-[7px] font-black text-white uppercase tracking-widest">LIVE</span>
                                         </div>
                                     )}
@@ -181,7 +166,7 @@ export default function AdminAuctionsControl() {
 
                                     <div className="space-y-1">
                                         <div className="flex items-center gap-2 text-[9px] font-black text-white/20 uppercase tracking-widest"><TrendingUp className="w-3 h-3" /> Current Bid</div>
-                                        <div className="text-lg font-black italic tracking-tight text-cinematic-neon-red">
+                                        <div className="text-lg font-black italic tracking-tight text-red-500">
                                             {Number(auc.currentBid).toLocaleString()} <span className="text-[9px]">{auc.currency}</span>
                                         </div>
                                     </div>
@@ -209,7 +194,7 @@ export default function AdminAuctionsControl() {
                                     <div className="flex gap-3">
                                         <button
                                             onClick={() => handleDelete(auc.id)}
-                                            className="px-4 py-3 bg-white/5 rounded-xl hover:bg-cinematic-neon-red/20 transition-all text-white/40 hover:text-cinematic-neon-red border border-white/5 flex-grow lg:flex-none flex items-center justify-center gap-2 text-[9px] font-black uppercase"
+                                            className="px-4 py-3 bg-white/5 rounded-xl hover:bg-red-500/20 transition-all text-white/40 hover:text-red-500 border border-white/5 flex-grow lg:flex-none flex items-center justify-center gap-2 text-[9px] font-black uppercase"
                                         >
                                             <Trash2 className="w-4 h-4" />
                                             {isRTL ? 'حذف' : 'DELETE'}
@@ -250,7 +235,7 @@ export default function AdminAuctionsControl() {
                                             <select
                                                 value={formData.carId}
                                                 onChange={(e) => setFormData({ ...formData, carId: e.target.value })}
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm font-bold text-white focus:outline-none focus:border-cinematic-neon-red transition-all"
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm font-bold text-white focus:outline-none focus:border-red-500 transition-all"
                                             >
                                                 <option value="" className="bg-black text-white/40">Select a car from inventory...</option>
                                                 {cars.map(car => (
@@ -268,7 +253,7 @@ export default function AdminAuctionsControl() {
                                                     type="number"
                                                     value={formData.startPrice}
                                                     onChange={(e) => setFormData({ ...formData, startPrice: e.target.value })}
-                                                    className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm font-bold text-white focus:outline-none focus:border-cinematic-neon-red transition-all"
+                                                    className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm font-bold text-white focus:outline-none focus:border-red-500 transition-all"
                                                     placeholder="e.g. 500000"
                                                 />
                                             </div>
@@ -284,7 +269,7 @@ export default function AdminAuctionsControl() {
                                                     type="datetime-local"
                                                     value={formData.startsAt}
                                                     onChange={(e) => setFormData({ ...formData, startsAt: e.target.value })}
-                                                    className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm font-bold text-white focus:outline-none focus:border-cinematic-neon-red transition-all [color-scheme:dark]"
+                                                    className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm font-bold text-white focus:outline-none focus:border-red-500 transition-all [color-scheme:dark]"
                                                 />
                                             </div>
                                             <div className="space-y-2">
@@ -293,7 +278,7 @@ export default function AdminAuctionsControl() {
                                                     type="datetime-local"
                                                     value={formData.endsAt}
                                                     onChange={(e) => setFormData({ ...formData, endsAt: e.target.value })}
-                                                    className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm font-bold text-white focus:outline-none focus:border-cinematic-neon-red transition-all [color-scheme:dark]"
+                                                    className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm font-bold text-white focus:outline-none focus:border-red-500 transition-all [color-scheme:dark]"
                                                 />
                                             </div>
                                         </div>
@@ -306,7 +291,7 @@ export default function AdminAuctionsControl() {
                                         disabled={isLoading}
                                         className={cn(
                                             "w-full py-5 text-white font-black uppercase text-xs tracking-[0.5em] rounded-2xl transition-all shadow-xl flex items-center justify-center gap-3",
-                                            isLoading ? "bg-zinc-800 cursor-not-allowed" : "bg-cinematic-neon-red hover:bg-red-600 shadow-[0_0_30px_rgba(255,0,60,0.3)]"
+                                            isLoading ? "bg-zinc-800 cursor-not-allowed" : "bg-red-500 hover:bg-red-600 shadow-[0_0_30px_rgba(239,68,68,0.3)]"
                                         )}
                                     >
                                         {isLoading ? isRTL ? "جاري الإطلاق..." : "INITIALIZING..." : isRTL ? "إطلاق المزاد" : "CONFIRM LAUNCH"}
@@ -317,8 +302,7 @@ export default function AdminAuctionsControl() {
                     )}
                 </AnimatePresence>
 
-            </main>
-
+            </AdminPageShell>
         </div>
     );
 }

@@ -448,8 +448,8 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
         </div>
       </section>
 
-      {/* [[ARABIC_COMMENT]] الشريط السفلي الثابت - أيقونات التواصل الديناميكية */}
-      {(socialConfig.whatsapp || socialConfig.links.length > 0) && (
+      {/* [[ARABIC_COMMENT]] الشريط السفلي الثابت - أيقونات التواصل الديناميكية - إخفاء في الصفحة الرئيسية بطلب المستخدم */}
+      {false && (socialConfig.whatsapp || socialConfig.links.length > 0) && (
         <div className="fixed bottom-0 left-0 right-0 z-40">
           <div className="max-w-7xl mx-auto px-6">
             <div className="flex items-center justify-center gap-3 bg-black/70 border-t border-white/10 backdrop-blur-xl px-4 py-2">

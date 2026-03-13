@@ -10,12 +10,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     Briefcase, Car, Settings, Phone, User, Calendar,
     Palette, FileText, ImageIcon, Clock, CheckCircle, XCircle,
-    Loader, Trash2, ArrowLeft, Filter, RefreshCw, Eye, X
+    Loader, Trash2, ArrowLeft, Filter, RefreshCw, Eye, X, Plus, Search, Globe, ChevronRight
 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useLanguage } from '@/lib/LanguageContext';
 import { cn } from '@/lib/utils';
+import AdminPageShell from '@/components/AdminPageShell';
 import { useToast } from '@/lib/ToastContext';
 
 const FILTER_ALL = 'all';
@@ -70,7 +72,8 @@ function getContactPreferenceLabel(pref: 'whatsapp' | 'chat' | 'either' | undefi
 }
 
 export default function AdminConcierge() {
-    const { isRTL } = useLanguage();
+    const { isRTL, rawText } = useLanguage();
+    const router = useRouter();
     const { showToast } = useToast();
     const [requests, setRequests] = useState<ConciergeRequest[]>([]);
     const [loading, setLoading] = useState(true);
@@ -163,7 +166,10 @@ export default function AdminConcierge() {
     };
 
     const openRequestChat = (req: ConciergeRequest) => {
-        window.open(`/messages?clientName=${encodeURIComponent(req.name)}&clientPhone=${encodeURIComponent(req.phone)}`, '_blank');
+        // We use clientPhone and clientName to match in the messages page
+        // Ensure we pass them correctly as search params
+        const path = `/admin/messages?clientName=${encodeURIComponent(req.name)}&clientPhone=${encodeURIComponent(String(req.phone || ''))}`;
+        window.location.href = path; // Navigate in the same window as per user experience
     };
 
     return (
@@ -174,32 +180,21 @@ export default function AdminConcierge() {
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(245,158,11,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(245,158,11,0.02)_1px,transparent_1px)] bg-size-[80px_80px]" />
             </div>
 
-            <div className="relative z-10 p-6 max-w-7xl mx-auto">
-                {/* Header */}
-                <div className="flex items-center gap-5 mb-8">
-                    <Link href="/admin/dashboard" className="flex items-center gap-2 text-white/40 hover:text-amber-400 transition-colors group">
-                        <ArrowLeft className={cn('w-5 h-5 group-hover:-translate-x-1 transition-transform', isRTL && 'rotate-180')} />
-                    </Link>
-                    <div>
-                        <div className="flex items-center gap-2 mb-1">
-                            <div className="h-0.5 w-8 bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,1)]" />
-                            <span className="text-[9px] font-black uppercase tracking-[0.5em] text-amber-500">
-                                {isRTL ? rawText('لوحة الأدمن') : rawText('Admin Panel')}
-                            </span>
-                        </div>
-                        <h1 className="text-3xl md:text-4xl font-black tracking-tighter uppercase italic">
-                            {isRTL ? rawText('الطلبات الخاصة') : rawText('SPECIAL REQUESTS')}
-                        </h1>
-                    </div>
+            <AdminPageShell
+                title={isRTL ? rawText('الطلبات الخاصة') : rawText('SPECIAL REQUESTS')}
+                titleEn="CONCIERGE OPS"
+                backHref="/admin/dashboard"
+                isRTL={isRTL}
+                actions={
                     <button
                         onClick={loadRequests}
-                        className="mr-auto ml-auto flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-xs font-bold hover:bg-white/10 transition-all"
+                        className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.2)]"
                         title={isRTL ? 'تحديث' : 'Refresh'}
                     >
-                        <RefreshCw className={cn('w-4 h-4', loading && 'animate-spin')} />
-                        {isRTL ? rawText('تحديث') : rawText('Refresh')}
+                        <RefreshCw className={cn('w-5 h-5', loading && 'animate-spin')} />
                     </button>
-                </div>
+                }
+            >
 
                 {/* Stats */}
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-8">
@@ -520,7 +515,6 @@ export default function AdminConcierge() {
                         </AnimatePresence>
                     </div>
                 )}
-            </div>
 
             {/* ── Detail Modal ── */}
             <AnimatePresence>
@@ -609,7 +603,7 @@ export default function AdminConcierge() {
                                     {formatDate(selectedRequest.createdAt)}
                                 </div>
 
-                                {/* تغيير الحالة */}
+                                {/* تحديث الحالة */}
                                 <div>
                                     <div className="text-[9px] font-black uppercase tracking-wider text-white/30 mb-2">
                                         {isRTL ? rawText('تحديث الحالة') : rawText('Update Status')}
@@ -650,6 +644,7 @@ export default function AdminConcierge() {
                     </motion.div>
                 )}
             </AnimatePresence>
+            </AdminPageShell>
         </div>
     );
 }

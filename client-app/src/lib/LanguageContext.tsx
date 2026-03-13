@@ -154,6 +154,7 @@ interface LanguageContextType {
     lang: Language;
     toggleLanguage: () => void;
     t: (key: keyof typeof translations) => string;
+    rawText: (text: string) => string;
     isRTL: boolean;
 }
 
@@ -199,10 +200,11 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         return translations[key]?.[lang] || String(key);
     };
 
+    const rawText = (text: string): string => text;
     const isRTL = lang === 'AR';
 
     return (
-        <LanguageContext.Provider value={{ lang, toggleLanguage, t, isRTL }}>
+        <LanguageContext.Provider value={{ lang, toggleLanguage, t, rawText, isRTL }}>
             <div dir={isRTL ? 'rtl' : 'ltr'} className={isRTL ? 'font-arabic' : 'font-sans'}>
                 {children}
             </div>

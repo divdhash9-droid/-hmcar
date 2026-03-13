@@ -7,7 +7,7 @@ import Image from "next/image";
 import { useLanguage } from "@/lib/LanguageContext";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Upload, Save, Trash2, ChevronLeft, Tag, Car, Wrench, Layers, X, Crop } from "lucide-react";
+import { Upload, Save, Trash2, ArrowLeft, Tag, Car, X, Crop } from "lucide-react";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import Cropper from 'react-easy-crop';
@@ -159,19 +159,30 @@ export default function AdminAgenciesPage() {
       {/* لا نستخدم Navbar هنا لأن AdminLayout يوفر AdminNavbar تلقائياً */}
       <main className="relative z-10 pt-6 pb-24 px-6 max-w-7xl mx-auto">
 
-        {/* Header */}
-        <header className="mb-12">
-          <Link href="/admin/dashboard" className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white/70 hover:text-white hover:bg-white/10 transition-all group w-fit">
-            <ChevronLeft className={`w-4 h-4 transition-transform group-hover:-translate-x-1 ${isRTL ? 'rotate-180 group-hover:translate-x-1' : ''}`} />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em]">{isRTL ? 'العودة للرئيسية' : 'BACK TO DASHBOARD'}</span>
+        {/* Header HUD */}
+        <header className="mb-12 flex items-center gap-8">
+          <Link href="/admin/dashboard">
+            <motion.button
+              whileHover={{ scale: 1.1, x: isRTL ? 5 : -5 }}
+              whileTap={{ scale: 0.9 }}
+              className="p-5 rounded-2xl bg-white/5 border border-white/10 hover:border-cinematic-neon-red/40 hover:bg-cinematic-neon-red/10 transition-all group shadow-2xl"
+            >
+              <ArrowLeft className={cn(
+                "w-7 h-7 text-white/40 group-hover:text-cinematic-neon-red transition-colors",
+                isRTL && "rotate-180"
+              )} />
+            </motion.button>
           </Link>
-          <div className="flex items-center gap-4 mb-3">
-            <div className="h-[2px] w-12 bg-[#c9a96e] shadow-[0_0_10px_rgba(201,169,110,1)]" />
-            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-[#c9a96e] italic">Admin Control</span>
+
+          <div>
+            <div className="flex items-center gap-4 mb-3">
+              <div className="h-[2px] w-12 bg-[#c9a96e] shadow-[0_0_10px_rgba(201,169,110,1)]" />
+              <span className="text-[10px] font-black uppercase tracking-[0.5em] text-[#c9a96e] italic">Admin Control</span>
+            </div>
+            <h1 className="text-5xl md:text-7xl font-black tracking-tighter uppercase italic leading-[0.9]">
+              {isRTL ? 'إدارة' : 'MANAGE'} <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/20">{isRTL ? 'الوكالات' : 'AGENCIES'}</span>
+            </h1>
           </div>
-          <h1 className="text-5xl md:text-7xl font-black tracking-tighter uppercase italic leading-[0.9]">
-            {isRTL ? 'إدارة' : 'MANAGE'} <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/20">{isRTL ? 'الوكالات' : 'AGENCIES'}</span>
-          </h1>
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">

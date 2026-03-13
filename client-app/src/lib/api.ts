@@ -478,4 +478,19 @@ export const api = {
             method: 'POST'
         }),
     },
+    // ── الأمن والحماية (Security) ──
+    security: {
+        getDevices: () => fetchAPI('/api/v2/security/devices'),
+        banDevice: (banCode: string, banned: boolean, reason?: string) =>
+            fetchAPI('/api/v2/security/devices/ban', {
+                method: 'POST',
+                body: JSON.stringify({ banCode, banned, reason }),
+            }),
+        exemptDevice: (banCode: string, exempt: boolean) =>
+            fetchAPI('/api/v2/security/devices/exempt', {
+                method: 'POST',
+                body: JSON.stringify({ banCode, exempt }),
+            }),
+        deleteDevice: (id: string) => fetchAPI(`/api/v2/security/devices/${id}`, { method: 'DELETE' }),
+    },
 };

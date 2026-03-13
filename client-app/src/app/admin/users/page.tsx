@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 /**
  * صفحة إدارة المستخدمين - لوحة تحكم HM CAR
@@ -17,7 +17,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Search, Plus, RefreshCw } from 'lucide-react';
+import { Users, Search, Plus, RefreshCw, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/lib/LanguageContext';
 import { api } from '@/lib/api';
@@ -127,12 +127,27 @@ export default function AdminUsersPage() {
                         <span className="text-orange-400/70">{isRTL ? rawText('الأعضاء') : rawText('USERS')}</span>
                     </nav>
                     <div className="flex items-end justify-between gap-4 flex-wrap">
+                    <div className="flex items-start gap-8">
+                        <NextLink href="/admin/dashboard">
+                            <motion.button
+                                whileHover={{ scale: 1.1, x: isRTL ? 5 : -5 }}
+                                whileTap={{ scale: 0.9 }}
+                                className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-cinematic-neon-red/40 hover:bg-cinematic-neon-red/10 transition-all group shadow-xl"
+                            >
+                                <ArrowLeft className={cn(
+                                    "w-6 h-6 text-white/40 group-hover:text-cinematic-neon-red transition-colors",
+                                    isRTL && "rotate-180"
+                                )} />
+                            </motion.button>
+                        </NextLink>
+
                         <div>
                             <p className="cockpit-mono text-[10px] text-orange-500/50 tracking-[0.25em] uppercase mb-1">
                                 {rawText('USER MANAGEMENT SYSTEM')}
                             </p>
                             <h1 className="ck-page-title">{isRTL ? rawText('إدارة الأعضاء') : rawText('USER CTRL')}</h1>
                         </div>
+                    </div>
                         <div className="flex items-center gap-2">
                             {/* زر تحديث القائمة */}
                             <button onClick={loadUsers} className="ck-btn-ghost flex items-center gap-2">

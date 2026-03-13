@@ -17,12 +17,12 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Search, Plus, RefreshCw, ArrowLeft } from 'lucide-react';
+import { Users, Search, Plus, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/lib/LanguageContext';
 import { api } from '@/lib/api';
-import NextLink from 'next/link';
 import { useToast } from '@/lib/ToastContext';
+import AdminPageShell from '@/components/AdminPageShell';
 
 const FILTER_ALL = 'all';
 const ROLE_ADMIN = 'admin';
@@ -117,51 +117,34 @@ export default function AdminUsersPage() {
     // ── واجهة المستخدم ──
     return (
         <div className="relative min-h-screen text-white overflow-x-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
-            <main className="relative z-10 pt-6 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-
-                {/* ─── رأس الصفحة ─── */}
-                <div className="ck-page-header">
-                    <nav className="ck-breadcrumb">
-                        <NextLink href="/admin/dashboard" className="hover:text-orange-400/80 transition-colors">{rawText('HM-CTRL')}</NextLink>
-                        <span className="ck-breadcrumb-sep">{rawText('>')}</span>
-                        <span className="text-orange-400/70">{isRTL ? rawText('الأعضاء') : rawText('USERS')}</span>
-                    </nav>
-                    <div className="flex items-end justify-between gap-4 flex-wrap">
-                    <div className="flex items-start gap-8">
-                        <NextLink href="/admin/dashboard">
-                            <motion.button
-                                whileHover={{ scale: 1.1, x: isRTL ? 5 : -5 }}
-                                whileTap={{ scale: 0.9 }}
-                                className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-cinematic-neon-red/40 hover:bg-cinematic-neon-red/10 transition-all group shadow-xl"
-                            >
-                                <ArrowLeft className={cn(
-                                    "w-6 h-6 text-white/40 group-hover:text-cinematic-neon-red transition-colors",
-                                    isRTL && "rotate-180"
-                                )} />
-                            </motion.button>
-                        </NextLink>
-
-                        <div>
-                            <p className="cockpit-mono text-[10px] text-orange-500/50 tracking-[0.25em] uppercase mb-1">
-                                {rawText('USER MANAGEMENT SYSTEM')}
-                            </p>
-                            <h1 className="ck-page-title">{isRTL ? rawText('إدارة الأعضاء') : rawText('USER CTRL')}</h1>
-                        </div>
-                    </div>
-                        <div className="flex items-center gap-2">
+            
+            <AdminPageShell
+                title={isRTL ? 'إدارة الأعضاء' : 'USER CTRL'}
+                titleEn="USER MANAGEMENT SYSTEM"
+                backHref="/admin/dashboard"
+                isRTL={isRTL}
+                actions={
+                    <div className="flex items-center gap-2">
                             {/* زر تحديث القائمة */}
-                            <button onClick={loadUsers} className="ck-btn-ghost flex items-center gap-2">
-                                <RefreshCw className={cn('w-3.5 h-3.5', loading && 'animate-spin')} />
-                                <span className="hidden sm:inline">{isRTL ? rawText('تحديث') : rawText('REFRESH')}</span>
+                            <button 
+                                onClick={loadUsers} 
+                                title={isRTL ? 'تحديث القائمة' : 'Refresh List'}
+                                className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.2)]"
+                            >
+                                <RefreshCw className={cn('w-5 h-5', loading && 'animate-spin')} />
                             </button>
                             {/* زر إضافة مسؤول جديد */}
-                            <button onClick={() => setShowAddModal(true)} className="ck-btn-primary flex items-center gap-2">
-                                <Plus className="w-3.5 h-3.5" />
-                                {isRTL ? rawText('إضافة مسؤول') : rawText('ADD ADMIN')}
+                            <button 
+                                onClick={() => setShowAddModal(true)} 
+                                title={isRTL ? 'إضافة مسؤول جديد' : 'Add New Admin'}
+                                className="h-12 px-6 rounded-2xl bg-orange-500 text-black font-black text-xs uppercase tracking-widest hover:bg-orange-400 transition-all shadow-[0_0_20px_rgba(249,115,22,0.3)] flex items-center gap-2"
+                            >
+                                <Plus className="w-4 h-4" />
+                                {isRTL ? 'إضافة مسؤول' : 'ADD ADMIN'}
                             </button>
-                        </div>
                     </div>
-                </div>
+                }
+            >
 
                 {/* ─── الإحصائيات السريعة (قابلة للنقر كفلاتر) ─── */}
                 <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-6">
@@ -296,7 +279,7 @@ export default function AdminUsersPage() {
                     )}
                 </div>
 
-            </main>
+            </AdminPageShell>
 
             {/* ─── النوافذ المنبثقة ─── */}
             <AnimatePresence>

@@ -21,16 +21,18 @@ router.get('/devices', requireAuthAPI, requireAdmin, async (req, res) => {
 
         const allDevices = await DeviceFingerprint.find(query).sort({ updatedAt: -1 });
 
-        // ── إزالة التكرار: نحتفظ بآخر سجل لكل (ip + linkedUsername) ──
+        // ── إزالة التكرار: نحتفظ بآخر سجل لكل (ip + deviceId/banCode) ──
         const seen = new Map();
         for (const device of allDevices) {
-            const key = `${device.ip}___${(device.linkedUsername || '').toLowerCase()}`;
+            // نفضل استخدام deviceId أو ip كمعرف فريد للجهاز
+            const key = device.deviceId || device.ip;
+            
             if (!seen.has(key)) {
                 seen.set(key, device);
             } else {
-                // إذا الجهاز الجديد محظور والقديم غير محظور - نحتفظ بالمحظور
+                // إذا وجدنا سجلاً لنفس الجهاز، نفضل السجل الذي يحتوي على اسم مستخدم مرتبك أو المحظور
                 const existing = seen.get(key);
-                if (device.banned && !existing.banned) {
+                if ((device.linkedUsername && !existing.linkedUsername) || (device.banned && !existing.banned)) {
                     seen.set(key, device);
                 }
             }
@@ -38,7 +40,7 @@ router.get('/devices', requireAuthAPI, requireAdmin, async (req, res) => {
 
         const devices = Array.from(seen.values())
             .sort((a, b) => {
-                // المحظورون أولاً ثم المُستثنون ثم الباقون
+                // المحظورون أولاً ثم المُستثنون ثم الأحدث
                 if (a.banned !== b.banned) return a.banned ? -1 : 1;
                 if (a.exemptFromSecurity !== b.exemptFromSecurity) return a.exemptFromSecurity ? -1 : 1;
                 return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
@@ -46,7 +48,7 @@ router.get('/devices', requireAuthAPI, requireAdmin, async (req, res) => {
 
         res.json({
             success: true,
-            devices,
+            data: devices, // نستخدم data ليتوافق مع الـ Frontend
             total: devices.length
         });
     } catch (error) {

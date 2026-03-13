@@ -1,32 +1,20 @@
 'use client';
 
-/**
- * صفحة إدارة السيارات - لوحة تحكم HM CAR
- * ──────────────────────────────────────────
- * هذه الصفحة مسؤولة عن:
- * - عرض قائمة السيارات مع إمكانية البحث والتصفية
- * - إضافة / تعديل / حذف السيارات
- * - تسجيل عمليات البيع
- *
- * المكونات المستخدمة (في مجلد _components/):
- * - CarCard: بطاقة عرض السيارة الواحدة
- * - CarModal: نموذج الإضافة والتعديل
- */
-
-import { useState, useEffect } from 'react';
-import { Plus, Search, Globe, ArrowLeft, Car as CarIcon, DollarSign, TrendingUp } from 'lucide-react';
-import Link from 'next/link';
+import { useState, useEffect, useCallback, Suspense } from 'react';
+import { 
+    Plus, Globe, DollarSign, TrendingUp, RefreshCw,
+    Car as CarIcon 
+} from 'lucide-react';
+import NextLink from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/lib/LanguageContext';
 import { api } from '@/lib/api';
 import { useToast } from '@/lib/ToastContext';
-
-// ── المكونات المقسمة ──
-import CarCard from './_components/CarCard';
-import CarModal from './_components/CarModal';
 import { motion, AnimatePresence } from 'framer-motion';
 import AdminPageShell from '@/components/AdminPageShell';
+import CarCard from './_components/CarCard';
+import CarModal from './_components/CarModal';
 
 // ── نوع بيانات السيارة ──
 type Car = {
@@ -89,83 +77,66 @@ const EMPTY_FORM: FormData = {
     agency: ''
 };
 
-export default function AdminCarsPage() {
+function CarsContent() {
     const { isRTL } = useLanguage();
     const { showToast } = useToast();
     const searchParams = useSearchParams();
     const requestedSource = searchParams?.get('source');
     const inventorySource: 'hm_local' | 'korean_import' = requestedSource === 'korean_import' ? 'korean_import' : 'hm_local';
 
-    // ── حالات الصفحة ──
     const [cars, setCars] = useState<Car[]>([]);
     const [loading, setLoading] = useState(true);
-    const [currencySettings, setCurrencySettings] = useState({ usdToSar: 3.75, usdToKrw: 1300, partsMultiplier: 1.15, auctionMultiplier: 1.1 });
-    const [savingCurrency, setSavingCurrency] = useState(false);
-    const [filter, setFilter] = useState('active');      // فلتر الحالة
-    const [searchTerm, setSearchTerm] = useState('');    // نص البحث
-    const [showModal, setShowModal] = useState(false);   // إظهار النموذج
-    const [editingCar, setEditingCar] = useState<Car | null>(null); // السيارة المحددة للتعديل
-    const [submitting, setSubmitting] = useState(false); // حالة الإرسال
-    const [brands, setBrands] = useState<{ _id: string; name: string }[]>([]);
-
-    // ── Showroom Import States ──
-    const [encarUrl, setEncarUrl] = useState('');
+    const [showModal, setShowModal] = useState(false);
+    const [editingCar, setEditingCar] = useState<Car | null>(null);
+    const [submitting, setSubmitting] = useState(false);
     const [showImportSettings, setShowImportSettings] = useState(false);
     const [importLoading, setImportLoading] = useState(false);
-    const [importStatus, setImportStatus] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
+    const [importStatus, setImportStatus] = useState<{ type: 'success' | 'error', msg: string } | null>(null);
+    const [encarUrl, setEncarUrl] = useState('');
+    const [brands, setBrands] = useState<Array<{_id: string, name: string}>>([]);
+    
+    const [currencySettings, setCurrencySettings] = useState({ usdToSar: 3.75, usdToKrw: 1350 });
+    const [savingCurrency, setSavingCurrency] = useState(false);
 
-    // ── أسعار الصرف (تُجلب من الإعدادات) ──
-    const [usdToSar, setUsdToSar] = useState(3.75);
-    const [usdToKrw, setUsdToKrw] = useState(1350);
+    const usdToSar = currencySettings.usdToSar || 3.75;
+    const usdToKrw = currencySettings.usdToKrw || 1350;
 
-    // ── بيانات النموذج ──
     const [formData, setFormData] = useState<FormData>(EMPTY_FORM);
 
-    // ── تحميل البيانات عند تغيير الفلتر أو البحث ──
-    useEffect(() => {
-        loadData();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [filter, searchTerm, inventorySource]);
-
-    // ── جلب السيارات والإعدادات والوكالات من الـ API ──
-    const loadData = async () => {
-        setLoading(true);
+    const loadData = useCallback(async () => {
         try {
-            const [carsRes, settingsRes, brandsRes, showroomRes] = await Promise.all([
-                api.cars.list({ status: filter, search: searchTerm, source: inventorySource }),
-                api.settings.getPublic(),
-                api.brands.list('cars', { targetShowroom: inventorySource }),
-                api.showroom.getSettings()
-            ]);
+            setLoading(true);
+            const res = await api.cars.list({ source: inventorySource });
+            if (res.success) setCars(res.data);
 
-            if (carsRes.success) setCars(carsRes.data.cars);
-
-            // تحديث أسعار الصرف من الإعدادات
-            if (settingsRes.success && settingsRes.data.currencySettings) {
-                setUsdToSar(settingsRes.data.currencySettings.usdToSar || 3.75);
-                setUsdToKrw(settingsRes.data.currencySettings.usdToKrw || 1350);
+            const settingsRes = await api.showroom.getSettings();
+            if (settingsRes.success) {
+                setEncarUrl(settingsRes.data?.encarUrl || '');
             }
 
-            if (brandsRes.success) setBrands(brandsRes.brands || []);
-            if (showroomRes.success) setEncarUrl(showroomRes.data?.encarUrl || '');
+            const globalSettings = await api.settings.getPublic();
+            if (globalSettings.success && globalSettings.data?.currencySettings) {
+                setCurrencySettings(globalSettings.data.currencySettings);
+            }
+
+            const brandsRes = await api.brands.list('cars', { targetShowroom: inventorySource });
+            if (brandsRes.success) setBrands(brandsRes.data);
         } catch (err) {
-            console.error('فشل تحميل البيانات:', err);
+            console.error('Failed to load cars:', err);
         } finally {
             setLoading(false);
         }
-    };
+    }, [inventorySource]);
+
+    useEffect(() => { loadData(); }, [loadData]);
 
     const handleImportSave = async () => {
         setImportStatus(null);
-        if (!encarUrl.trim() || !encarUrl.includes('encar.com')) {
-            setImportStatus({ type: 'error', msg: isRTL ? 'يجب أن يكون الرابط من موقع car.encar.com' : 'Must be a car.encar.com URL' });
-            return;
-        }
         try {
             setImportLoading(true);
-            const res = await api.showroom.updateSettings({ encarUrl: encarUrl.trim() });
+            const res = await api.showroom.updateSettings({ encarUrl });
             if (!res.success) {
-                setImportStatus({ type: 'error', msg: res.message || (isRTL ? 'فشل الحفظ' : 'Save failed') });
+                setImportStatus({ type: 'error', msg: res.message || (isRTL ? 'فشل حفظ الإعدادات' : 'Save failed') });
                 return;
             }
 
@@ -197,7 +168,6 @@ export default function AdminCarsPage() {
         finally { setImportLoading(false); }
     };
 
-    // ── دالة تحويل السعر تلقائياً بين العملات الثلاث ──
     const handlePriceChange = (field: 'sar' | 'usd' | 'krw', rawValue: string) => {
         const value = parseFloat(rawValue) || 0;
         let sarPrice = 0, usdPrice = 0, krwPrice = 0;
@@ -219,14 +189,11 @@ export default function AdminCarsPage() {
         setFormData(prev => ({ ...prev, price: sarPrice, usdPrice, krwPrice }));
     };
 
-    // ── بدء تعديل سيارة - تعبئة النموذج ببياناتها ──
     const handleEdit = (car: Car) => {
         setEditingCar(car);
         const sarPrice = car.price || 0;
-        // Use existing priceUsd/priceKrw if available, otherwise calculate
         const usd = car.usdPrice ?? (car.priceUsd || parseFloat((sarPrice / usdToSar).toFixed(2)));
         const krw = car.krwPrice ?? (car.priceKrw || Math.round((usd * usdToKrw)));
-        // make قد يكون object أو string
         const makeValue = typeof car.make === 'object' ? (car.make?.name || '') : (car.make || '');
         setFormData({
             title: car.title, make: makeValue, model: car.model, year: car.year,
@@ -243,7 +210,6 @@ export default function AdminCarsPage() {
         setShowModal(true);
     };
 
-    // ── إعادة تعيين النموذج لإضافة سيارة جديدة ──
     const resetForm = () => {
         setFormData({
             ...EMPTY_FORM,
@@ -253,14 +219,12 @@ export default function AdminCarsPage() {
         setEditingCar(null);
     };
 
-    // ── حفظ بيانات السيارة (إضافة أو تعديل) ──
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (submitting) return;
         setSubmitting(true);
         try {
-            // Map USD and KRW fields to match the model schema exactly
-            const submitData = {
+            const submitData: any = { // Keeping any for now due to complex nested model structure
                 ...formData,
                 source: formData.source || inventorySource,
                 listingType: (formData.source || inventorySource) === 'korean_import' ? 'showroom' : 'store',
@@ -277,7 +241,7 @@ export default function AdminCarsPage() {
             resetForm();
             await loadData();
             showToast(isRTL ? '✅ تم حفظ البيانات بنجاح!' : '✅ Data saved!', 'success');
-        } catch (err) {
+        } catch (err: any) {
             console.error('فشل حفظ البيانات:', err);
             showToast(isRTL ? '❌ فشل في الحفظ' : '❌ Save failed', 'error');
         } finally {
@@ -285,15 +249,13 @@ export default function AdminCarsPage() {
         }
     };
 
-    // ── حذف سيارة ──
     const handleDelete = async (id: string) => {
         if (!confirm(isRTL ? 'هل أنت متأكد من حذف هذه السيارة؟' : 'Delete this car?')) return;
         try {
             await api.cars.delete(id);
             loadData();
             showToast(isRTL ? '🗑️ تم الحذف' : '🗑️ Deleted', 'success');
-        } catch (err) {
-            console.error('فشل الحذف:', err);
+        } catch {
             showToast(isRTL ? '❌ فشل الحذف' : '❌ Delete failed', 'error');
         }
     };
@@ -303,13 +265,13 @@ export default function AdminCarsPage() {
         try {
             await api.settings.updateCurrencySettings({ currencySettings: currencySettings as any });
             showToast(isRTL ? '✅ تم حفظ إعدادات العملة' : '✅ Currency settings saved', 'success');
-        } catch (err) {
-            showToast(isRTL ? '❌ فشل الحفظ' : '❌ Save failed', 'error');
+        } catch {
+            showToast(isRTL ? '❌ فشل حفظ الإعدادات' : '❌ Save failed', 'error');
         } finally {
             setSavingCurrency(false);
         }
     };
-    // ── تعليم السيارة كـ "تم البيع" ──
+
     const handleMarkSold = async (id: string, title: string) => {
         const confirmed = confirm(isRTL
             ? `هل تأكد أنه تم بيع: ${title}؟\nسيتم إخفاؤها من المعرض فوراً.`
@@ -321,26 +283,17 @@ export default function AdminCarsPage() {
         const soldPrice = soldPriceStr ? parseFloat(soldPriceStr) : undefined;
 
         try {
-            await fetch(`/api/v2/cars/${id}/sold`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('hm_token')}`
-                },
-                body: JSON.stringify({ soldPrice }),
-            });
+            await api.cars.markSold(id, soldPrice);
             loadData();
             showToast(isRTL ? '✅ تم تسجيل البيع!' : '✅ Sale recorded!', 'success');
-        } catch (err) {
+        } catch (err: any) {
             console.error('فشل تسجيل البيع:', err);
             showToast(isRTL ? '❌ فشل تسجيل البيع' : '❌ Sale record failed', 'error');
         }
     };
 
-    // ── واجهة المستخدم الرئيسية ──
     return (
         <div className="relative min-h-screen text-white font-sans overflow-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
-
             <AdminPageShell
                 title={!requestedSource
                     ? (isRTL ? 'المعرض' : 'SHOWROOM')
@@ -354,28 +307,28 @@ export default function AdminCarsPage() {
                         {inventorySource === 'hm_local' ? (
                             <button
                                 onClick={() => { resetForm(); setShowModal(true); }}
-                                className="ck-btn-primary flex items-center gap-2"
+                                title={isRTL ? 'إضافة سيارة جديدة' : 'Add New Vehicle'}
+                                className="h-12 px-6 rounded-2xl bg-orange-500 text-black font-black text-xs uppercase tracking-widest hover:bg-orange-400 transition-all shadow-[0_0_20px_rgba(249,115,22,0.3)] flex items-center gap-2"
                             >
                                 <Plus className="w-4 h-4" />
-                                {isRTL ? 'إضافة سيارة جديدة' : 'ADD NEW VEHICLE'}
+                                {isRTL ? 'إضافة سيارة' : 'ADD VEHICLE'}
                             </button>
                         ) : (
                             <button
                                 onClick={() => setShowImportSettings(!showImportSettings)}
+                                title={isRTL ? 'إعدادات الاستيراد' : 'Import Settings'}
                                 className={cn(
-                                    "ck-btn-primary flex items-center gap-2 border-blue-500/40 text-blue-400 hover:bg-blue-500/10",
+                                    "h-12 px-6 rounded-2xl border border-blue-400/30 text-blue-400 font-black text-xs uppercase tracking-widest hover:bg-blue-400/10 transition-all flex items-center gap-2",
                                     showImportSettings && "bg-blue-500/20 shadow-[0_0_20px_rgba(59,130,246,0.3)]"
                                 )}
                             >
                                 <Globe className="w-4 h-4" />
-                                {isRTL ? 'إعدادات الاستيراد' : 'IMPORT SETTINGS'}
+                                {isRTL ? 'استيراد' : 'IMPORT'}
                             </button>
                         )}
                     </div>
                 )}
             >
-
-                {/* ─── Showroom Import Control Panel ─── */}
                 <AnimatePresence>
                     {showImportSettings && inventorySource === 'korean_import' && (
                         <motion.div
@@ -386,7 +339,6 @@ export default function AdminCarsPage() {
                         >
                             <div className="ck-card p-8 border-blue-500/20 bg-blue-500/5">
                                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-10">
-                                    {/* Encar Config */}
                                     <div className="space-y-6">
                                         <div className="flex items-center gap-3">
                                             <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400">
@@ -401,6 +353,7 @@ export default function AdminCarsPage() {
                                             value={encarUrl}
                                             onChange={(e) => setEncarUrl(e.target.value)}
                                             placeholder="https://car.encar.com/list/car?page=1&search=..."
+                                            title={isRTL ? 'رابط Encar للاستيراد' : 'Encar Import URL'}
                                             className="ck-input w-full h-32 resize-none font-mono text-[11px] bg-black/40 border-white/5 focus:border-blue-500/40 p-4"
                                             dir="ltr"
                                         />
@@ -408,6 +361,7 @@ export default function AdminCarsPage() {
                                             <button
                                                 onClick={handleImportSave}
                                                 disabled={importLoading}
+                                                title={isRTL ? 'حفظ وتحديث الرابط' : 'Connect & Save'}
                                                 className="ck-btn-primary bg-blue-500 border-none text-black hover:bg-blue-400 flex-1 text-[11px] h-12"
                                             >
                                                 {importLoading ? (isRTL ? 'جاري الحفظ...' : 'SAVING...') : (isRTL ? 'حفظ وتحديث الرابط' : 'CONNECT & SAVE')}
@@ -415,14 +369,26 @@ export default function AdminCarsPage() {
                                             <button
                                                 onClick={handleScrapeNow}
                                                 disabled={importLoading}
+                                                title={isRTL ? 'جلب البيانات الآن' : 'Force Scrape'}
                                                 className="ck-btn-primary bg-white/5 border-white/10 hover:border-blue-500/40 text-white flex-1 text-[11px] h-12"
                                             >
                                                 {importLoading ? (isRTL ? 'جاري الجلب...' : 'FETCHING...') : (isRTL ? 'جلب البيانات الآن' : 'FORCE SCRAPE')}
                                             </button>
                                         </div>
+                                        {importStatus && (
+                                            <motion.div 
+                                                initial={{ opacity: 0, y: 5 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                className={cn(
+                                                    "p-3 rounded-xl text-[10px] font-bold text-center border animate-pulse",
+                                                    importStatus.type === 'success' ? "bg-green-500/10 border-green-500/20 text-green-400" : "bg-red-500/10 border-red-500/20 text-red-400"
+                                                )}
+                                            >
+                                                {importStatus.msg}
+                                            </motion.div>
+                                        )}
                                     </div>
 
-                                    {/* Currency & Multipliers (Moved from Settings) */}
                                     <div className="space-y-6">
                                         <div className="flex items-center gap-3">
                                             <div className="w-10 h-10 rounded-xl bg-orange-500/20 flex items-center justify-center text-orange-400">
@@ -443,51 +409,33 @@ export default function AdminCarsPage() {
                                                         type="number"
                                                         step="0.01"
                                                         value={currencySettings.usdToSar}
+                                                        title={isRTL ? 'تحويل الدولار للريال' : 'USD to SAR Conversion'}
                                                         onChange={e => setCurrencySettings({ ...currencySettings, usdToSar: parseFloat(e.target.value) })}
                                                         className="ck-input pl-9 text-xs h-11 bg-black/40"
                                                     />
                                                 </div>
                                             </div>
                                             <div className="space-y-1.5">
-                                                <label className="text-[9px] font-black text-white/40 uppercase tracking-widest ml-1">{isRTL ? 'الدولار مقابل الكوري' : 'USD TO KRW'}</label>
+                                                <label className="text-[9px] font-black text-white/40 uppercase tracking-widest ml-1">{isRTL ? 'الدولار مقابل الون' : 'USD TO KRW'}</label>
                                                 <div className="relative">
-                                                    <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-orange-500/40" />
+                                                    <TrendingUp className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-blue-500/40" />
                                                     <input
                                                         type="number"
                                                         value={currencySettings.usdToKrw}
-                                                        onChange={e => setCurrencySettings({ ...currencySettings, usdToKrw: parseFloat(e.target.value) })}
+                                                        title={isRTL ? 'تحويل الدولار للون' : 'USD to KRW Conversion'}
+                                                        onChange={e => setCurrencySettings({ ...currencySettings, usdToKrw: parseInt(e.target.value) })}
                                                         className="ck-input pl-9 text-xs h-11 bg-black/40"
                                                     />
                                                 </div>
                                             </div>
-                                            <div className="space-y-1.5">
-                                                <label className="text-[9px] font-black text-orange-400 uppercase tracking-widest ml-1">{isRTL ? 'مضاعف سعر القطع' : 'PARTS MULTIPLIER'}</label>
-                                                <input
-                                                    type="number"
-                                                    step="0.01"
-                                                    value={currencySettings.partsMultiplier}
-                                                    onChange={e => setCurrencySettings({ ...currencySettings, partsMultiplier: parseFloat(e.target.value) })}
-                                                    className="ck-input text-xs h-11 bg-orange-500/5 border-orange-500/20"
-                                                />
-                                            </div>
-                                            <div className="space-y-1.5">
-                                                <label className="text-[9px] font-black text-orange-400 uppercase tracking-widest ml-1">{isRTL ? 'مضاعف المزادات' : 'AUCTION MULTIPLIER'}</label>
-                                                <input
-                                                    type="number"
-                                                    step="0.01"
-                                                    value={currencySettings.auctionMultiplier}
-                                                    onChange={e => setCurrencySettings({ ...currencySettings, auctionMultiplier: parseFloat(e.target.value) })}
-                                                    className="ck-input text-xs h-11 bg-orange-500/5 border-orange-500/20"
-                                                />
-                                            </div>
                                         </div>
-
-                                        <button
+                                        <button 
                                             onClick={handleSaveCurrency}
                                             disabled={savingCurrency}
-                                            className="w-full h-12 bg-orange-500 rounded-xl text-black font-black text-[11px] uppercase tracking-widest hover:bg-orange-400 transition-all shadow-[0_4px_15px_rgba(249,115,22,0.3)] disabled:opacity-50"
+                                            title={isRTL ? 'حفظ إعدادات العملة' : 'Save Currency Settings'}
+                                            className="w-full h-11 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-400 text-[10px] font-black uppercase tracking-widest hover:bg-orange-500 hover:text-black transition-all"
                                         >
-                                            {savingCurrency ? (isRTL ? 'جاري المزامنة...' : 'SYNCING...') : (isRTL ? 'تحديث المصفوفة المالية' : 'UPDATE FINANCIAL MATRIX')}
+                                            {savingCurrency ? (isRTL ? 'جاري الحفظ...' : 'SAVING...') : (isRTL ? 'تحديث مصفوفة الأسعار' : 'UPDATE FINANCIAL MATRIX')}
                                         </button>
                                     </div>
                                 </div>
@@ -496,110 +444,50 @@ export default function AdminCarsPage() {
                     )}
                 </AnimatePresence>
 
-                {/* ─── شريط البحث والتصفية ─── */}
-                <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                    {/* حقل البحث */}
-                    <div className="flex-1 relative">
-                        <Search className={cn('absolute top-1/2 -translate-y-1/2 w-4 h-4 text-orange-500/30', isRTL ? 'right-4' : 'left-4')} />
-                        <input
-                            type="text"
-                            placeholder={isRTL ? 'بحث في المخزون...' : 'SEARCH INVENTORY...'}
-                            value={searchTerm}
-                            onChange={e => setSearchTerm(e.target.value)}
-                            className={cn('ck-input', isRTL ? 'pr-11' : 'pl-11')}
-                        />
-                    </div>
-                    {/* أزرار التصفية حسب الحالة */}
-                    <div className="ck-tab-group">
-                        {(['active', 'sold', 'inactive', 'all'] as const).map(status => (
-                            <button key={status} onClick={() => setFilter(status)}
-                                className={cn('ck-tab', filter === status && 'ck-tab-active')}>
-                                {isRTL
-                                    ? { active: 'نشط', sold: 'مباع', inactive: 'معطل', all: 'الكل' }[status]
-                                    : status.toUpperCase()}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                {/* ─── شبكة السيارات ─── */}
                 {!requestedSource ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10 py-12">
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            transition={{ duration: 0.6 }}
-                        >
-                            <Link href="/admin/cars?source=hm_local" className="group relative block">
-                                <div className="absolute inset-0 bg-orange-500/5 blur-3xl group-hover:bg-orange-500/10 transition-all rounded-full" />
-                                <div className="ck-card p-10 flex flex-col items-center text-center gap-6 h-[400px] justify-center hover:border-orange-500/40 transition-all bg-black/40 backdrop-blur-xl group-hover:translate-y-[-8px]">
-                                    <div className="w-24 h-24 rounded-3xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400 group-hover:scale-110 transition-transform">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-10">
+                        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}>
+                            <NextLink href="/admin/cars?source=hm_local" className="group block h-full">
+                                <div className="ck-card p-10 h-full border-red-500/10 group-hover:border-red-500/40 transition-all flex flex-col items-center text-center justify-center space-y-6">
+                                    <div className="w-24 h-24 rounded-[30%] bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500 group-hover:scale-110 transition-transform">
                                         <CarIcon className="w-12 h-12" />
                                     </div>
                                     <div>
-                                        <h2 className="text-3xl font-black italic uppercase tracking-tighter text-white group-hover:text-orange-400 transition-colors mb-2">
-                                            {isRTL ? 'معرض HM CAR' : 'HM CAR SHOWROOM'}
-                                        </h2>
-                                        <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.3em]">
-                                            {isRTL ? 'إدارة المخزون المحلي والمتوفر حالياً' : 'MANAGE LOCAL & READY INVENTORY'}
-                                        </p>
+                                        <h3 className="text-2xl font-black italic tracking-tighter mb-2">{isRTL ? 'المخزون المحلي' : 'LOCAL INVENTORY'}</h3>
+                                        <p className="text-white/40 text-xs leading-relaxed max-w-xs">{isRTL ? 'إدارة السيارات المتاحة في المعرض المحلي، إضافة وتعديل وتحكم كامل.' : 'Manage available vehicles in local showroom with full CRUD control.'}</p>
                                     </div>
-                                    <div className="mt-4 flex items-center gap-2 text-orange-500/40 group-hover:text-orange-400 transition-colors transition-all">
-                                        <span className="text-[10px] font-black uppercase tracking-widest">{isRTL ? 'دخول النظام' : 'INITIATE ACCESS'}</span>
-                                        <ArrowLeft className={cn("w-5 h-5", isRTL ? "" : "rotate-180")} />
-                                    </div>
+                                    <div className="cockpit-mono text-[10px] text-red-500 tracking-[0.3em] font-black">{isRTL ? 'فتح المعرض' : 'ENTER GALLERY'}</div>
                                 </div>
-                            </Link>
+                            </NextLink>
                         </motion.div>
-
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: 0.2 }}
-                        >
-                            <Link href="/admin/cars?source=korean_import" className="group relative block">
-                                <div className="absolute inset-0 bg-red-500/5 blur-3xl group-hover:bg-red-500/10 transition-all rounded-full" />
-                                <div className="ck-card p-10 flex flex-col items-center text-center gap-6 h-[400px] justify-center hover:border-red-500/40 transition-all bg-black/40 backdrop-blur-xl group-hover:translate-y-[-8px]">
-                                    <div className="w-24 h-24 rounded-3xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 group-hover:scale-110 transition-transform">
+                        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}>
+                            <NextLink href="/admin/cars?source=korean_import" className="group block h-full">
+                                <div className="ck-card p-10 h-full border-blue-500/10 group-hover:border-blue-500/40 transition-all flex flex-col items-center text-center justify-center space-y-6">
+                                    <div className="w-24 h-24 rounded-[30%] bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">
                                         <Globe className="w-12 h-12" />
                                     </div>
                                     <div>
-                                        <h2 className="text-3xl font-black italic uppercase tracking-tighter text-white group-hover:text-red-400 transition-colors mb-2">
-                                            {isRTL ? 'المعرض الكوري' : 'KOREAN SHOWROOM'}
-                                        </h2>
-                                        <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.3em]">
-                                            {isRTL ? 'إدارة السيارات المستوردة من كوريا' : 'MANAGE KOREAN IMPORTED CARS'}
-                                        </p>
+                                        <h3 className="text-2xl font-black italic tracking-tighter mb-2">{isRTL ? 'المعرض الكوري' : 'KOREAN SHOWROOM'}</h3>
+                                        <p className="text-white/40 text-xs leading-relaxed max-w-xs">{isRTL ? 'استيراد وإدارة السيارات المباشرة من كوريا عبر نظام Encar Scraper.' : 'Direct Korean import management powered by real-time Encar scraper.'}</p>
                                     </div>
-                                    <div className="mt-4 flex items-center gap-2 text-red-500/40 group-hover:text-red-400 transition-colors transition-all">
-                                        <span className="text-[10px] font-black uppercase tracking-widest">{isRTL ? 'دخول النظام' : 'INITIATE ACCESS'}</span>
-                                        <ArrowLeft className={cn("w-5 h-5", isRTL ? "" : "rotate-180")} />
-                                    </div>
+                                    <div className="cockpit-mono text-[10px] text-blue-400 tracking-[0.3em] font-black">{isRTL ? 'فتح المعرض المستورد' : 'ENTER IMPORT HUB'}</div>
                                 </div>
-                            </Link>
+                            </NextLink>
                         </motion.div>
                     </div>
                 ) : loading ? (
-                    // هيكل تحميل (skeleton)
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {[...Array(6)].map((_, i) => (
-                            <div key={i} className="h-72 rounded-3xl bg-white/[0.02] animate-pulse border border-orange-500/10" />
-                        ))}
+                    <div className="py-24 flex flex-col items-center justify-center space-y-6">
+                        <RefreshCw className="w-10 h-10 text-red-500 animate-spin" />
+                        <span className="cockpit-mono text-[10px] text-white/30 uppercase tracking-[0.4em] animate-pulse">Initializing Data Stream...</span>
                     </div>
                 ) : cars.length === 0 ? (
-                    // رسالة "لا توجد سيارات"
-                    <div className="ck-empty">
-                        <div className="ck-empty-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" />
-                                <circle cx="7" cy="17" r="2" /><path d="M9 17h6" /><circle cx="17" cy="17" r="2" />
-                            </svg>
-                        </div>
-                        <p className="cockpit-mono">{isRTL ? 'لا توجد سيارات في هذا القسم' : 'INVENTORY EMPTY'}</p>
+                    <div className="ck-empty py-32">
+                        <div className="ck-empty-icon"><CarIcon className="w-8 h-8" /></div>
+                        <p className="cockpit-mono text-sm">{isRTL ? 'لا توجد سيارات في هذا القسم' : 'NO VEHICLES FOUND IN THIS SECTOR'}</p>
+                        <button onClick={resetForm} className="mt-8 ck-btn-primary h-12 px-8">{isRTL ? 'إضافة أول سيارة' : 'ADD FIRST VEHICLE'}</button>
                     </div>
                 ) : (
-                    // عرض بطاقات السيارات باستخدام CarCard
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-20">
                         {cars.map((car, i) => (
                             <CarCard
                                 key={car.id}
@@ -613,10 +501,8 @@ export default function AdminCarsPage() {
                         ))}
                     </div>
                 )}
-
             </AdminPageShell>
 
-            {/* ─── نموذج الإضافة/التعديل المنبثق ─── */}
             <CarModal
                 isOpen={showModal}
                 isEditing={!!editingCar}
@@ -631,5 +517,13 @@ export default function AdminCarsPage() {
                 onPriceChange={handlePriceChange}
             />
         </div>
+    );
+}
+
+export default function AdminCarsPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <CarsContent />
+        </Suspense>
     );
 }

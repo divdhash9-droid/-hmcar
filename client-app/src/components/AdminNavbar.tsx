@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     Activity, Car, Gavel, Users, ShoppingCart, Settings, Shield,
     LogOut, Radio, Layers, TrendingUp, MessageCircle,
-    Tag, Mail, Menu, X, Languages, Database, RefreshCcw,
+    Tag, Mail, Menu, X, Languages, Database, RefreshCw,
 } from 'lucide-react';
 import { useLanguage } from '@/lib/LanguageContext';
 import { useAuth } from '@/lib/AuthContext';
@@ -211,7 +211,7 @@ function SidebarInner({
                     onClick={onRefresh}
                     className="w-full flex items-center justify-center gap-2 py-1.5 rounded-lg bg-blue-500/[0.08] border border-blue-500/20 text-blue-400/50 hover:text-blue-400 hover:bg-blue-500/15 transition-all"
                 >
-                    <RefreshCcw className="w-3 h-3" />
+                    <RefreshCw className="w-3 h-3" />
                     <span className="font-mono text-[7px] font-bold uppercase tracking-widest">{isRTL ? 'تزامن النظام' : 'SYNC SYSTEM'}</span>
                 </button>
 

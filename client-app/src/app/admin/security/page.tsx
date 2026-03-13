@@ -4,10 +4,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Shield, ShieldAlert, ShieldCheck, Lock, Unlock,
-    Smartphone, Search, RefreshCw, ArrowLeft, History,
-    AlertTriangle, Server, Filter, X
+    Smartphone, Search, RefreshCw, History,
+    AlertTriangle, Server, X
 } from 'lucide-react';
-import Link from 'next/link';
 import { api } from '@/lib/api';
 import { useLanguage } from '@/lib/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -16,6 +15,7 @@ import AdminPageShell from '@/components/AdminPageShell';
 
 interface SecurityDevice {
     _id: string;
+    deviceId?: string;
     banCode?: string;
     ip?: string;
     userAgent?: string;
@@ -23,6 +23,8 @@ interface SecurityDevice {
     exemptFromSecurity: boolean;
     banReason?: string;
     lastSeenAt?: string;
+    updatedAt?: string;
+    createdAt?: string;
     deviceInfo?: string;
 }
 
@@ -40,13 +42,18 @@ export default function AdminSecurity() {
         try {
             setLoading(true);
             const res = await api.security.getDevices();
-            if (res.success && Array.isArray(res.data)) {
-                // De-duplicate devices by banCode (or IP if banCode missing)
+            const deviceList = Array.isArray(res.data) ? res.data : (Array.isArray(res.devices) ? res.devices : []);
+            
+            if (deviceList.length > 0) {
                 const seen = new Set();
-                const unique = res.data
-                    .sort((a: any, b: any) => new Date(b.lastSeenAt || b.createdAt).getTime() - new Date(a.lastSeenAt || a.createdAt).getTime())
-                    .filter((d: any) => {
-                        const key = d.banCode || d.ip;
+                const unique = deviceList
+                    .sort((a: SecurityDevice, b: SecurityDevice) => {
+                        const dateA = new Date(a.lastSeenAt || a.updatedAt || a._id).getTime();
+                        const dateB = new Date(b.lastSeenAt || b.updatedAt || b._id).getTime();
+                        return dateB - dateA;
+                    })
+                    .filter((d: SecurityDevice) => {
+                        const key = d.deviceId || d.banCode || d.ip;
                         if (!key || seen.has(key)) return false;
                         seen.add(key);
                         return true;
@@ -54,9 +61,12 @@ export default function AdminSecurity() {
                 setDevices(unique as SecurityDevice[]);
                 setStats({
                     total: unique.length,
-                    banned: unique.filter((d: any) => d.banned).length,
-                    exempt: unique.filter((d: any) => d.exemptFromSecurity).length
+                    banned: unique.filter((d: SecurityDevice) => d.banned).length,
+                    exempt: unique.filter((d: SecurityDevice) => d.exemptFromSecurity).length
                 });
+            } else {
+                setDevices([]);
+                setStats({ total: 0, banned: 0, exempt: 0 });
             }
         } catch (err) {
             console.error('Failed to load security data:', err);
@@ -70,15 +80,10 @@ export default function AdminSecurity() {
 
     const toggleBan = async (device: SecurityDevice) => {
         try {
-            if (!device.banCode) {
-                showToast(isRTL ? 'لا يوجد معرف حظر للجهاز' : 'No ban code for device', 'error');
-                return;
-            }
-            await api.security.banDevice(device.banCode, !device.banned);
-            showToast(isRTL ? 'تم تحديث حالة الحظر' : 'Ban status updated', 'success');
-            loadData();
-            if (selectedDevice?._id === device._id) {
-                setSelectedDevice({ ...selectedDevice, banned: !device.banned });
+            const res = await api.security.banDevice(device.banCode || '', !device.banned);
+            if (res.success) {
+                showToast(isRTL ? 'تم تحديث حالة الحظر' : 'Ban status updated', 'success');
+                loadData();
             }
         } catch (err) {
             showToast(isRTL ? 'فشل تحديث الحظر' : 'Failed to update ban', 'error');
@@ -87,15 +92,10 @@ export default function AdminSecurity() {
 
     const toggleExempt = async (device: SecurityDevice) => {
         try {
-            if (!device.banCode) {
-                showToast(isRTL ? 'لا يوجد معرف حظر للجهاز' : 'No ban code for device', 'error');
-                return;
-            }
-            await api.security.exemptDevice(device.banCode, !device.exemptFromSecurity);
-            showToast(isRTL ? 'تم تحديث الاستثناء' : 'Exemption updated', 'success');
-            loadData();
-            if (selectedDevice?._id === device._id) {
-                setSelectedDevice({ ...selectedDevice, exemptFromSecurity: !device.exemptFromSecurity });
+            const res = await api.security.exemptDevice(device.banCode || '', !device.exemptFromSecurity);
+            if (res.success) {
+                showToast(isRTL ? 'تم تحديث الاستثناء' : 'Exemption updated', 'success');
+                loadData();
             }
         } catch (err) {
             showToast(isRTL ? 'فشل تحديث الاستثناء' : 'Failed to update exemption', 'error');
@@ -104,11 +104,11 @@ export default function AdminSecurity() {
 
     const filtered = devices.filter(d => {
         const matchesSearch = (d.banCode?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+                            (d.deviceId?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
                             (d.ip?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
                             (d.deviceInfo?.toLowerCase() || '').includes(searchTerm.toLowerCase());
         
         if (!matchesSearch) return false;
-
         if (filterTab === 'banned') return d.banned;
         if (filterTab === 'exempt') return d.exemptFromSecurity && !d.banned;
         if (filterTab === 'clean') return !d.banned && !d.exemptFromSecurity;
@@ -117,26 +117,26 @@ export default function AdminSecurity() {
 
     return (
         <div className="min-h-screen text-white bg-black overflow-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
-            {/* Background Effects */}
             <div className="fixed inset-0 pointer-events-none">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,59,48,0.1),transparent_70%)]" />
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:100px_100px]" />
             </div>
 
-                
             <AdminPageShell
                 title={isRTL ? 'الأمن والحماية' : 'SECURITY OPS'}
                 titleEn="ENDPOINT PROTECTION"
                 backHref="/admin/dashboard"
                 isRTL={isRTL}
                 actions={
-                    <button onClick={loadData} className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-red-500 shadow-[0_0_15px_rgba(255,59,48,0.2)]">
+                    <button 
+                        onClick={loadData} 
+                        title={isRTL ? 'تحديث البيانات' : 'Refresh Data'}
+                        className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-red-500 shadow-[0_0_15px_rgba(255,59,48,0.2)]"
+                    >
                         <RefreshCw className={cn('w-5 h-5', loading && 'animate-spin')} />
                     </button>
                 }
             >
-
-                {/* Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                     <div className="ck-card p-6 border-red-500/10 bg-red-500/5">
                         <div className="flex justify-between items-start mb-4">
@@ -172,7 +172,6 @@ export default function AdminSecurity() {
                     </div>
                 </div>
 
-                {/* Controls & Search */}
                 <div className="flex flex-col md:flex-row gap-4 mb-6">
                     <div className="relative flex-1">
                         <Search className={cn('absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20', isRTL ? 'right-4' : 'left-4')} />
@@ -193,7 +192,8 @@ export default function AdminSecurity() {
                         ].map(t => (
                             <button
                                 key={t.id}
-                                onClick={() => setFilterTab(t.id as any)}
+                                onClick={() => setFilterTab(t.id as 'all' | 'banned' | 'clean' | 'exempt')}
+                                title={t.label}
                                 className={cn(
                                     'px-6 py-2 rounded-xl text-[10px] font-black tracking-widest transition-all',
                                     filterTab === t.id ? 'bg-red-500 text-white shadow-[0_0_15px_rgba(255,59,48,0.5)]' : 'text-white/40 hover:text-white/70'
@@ -205,7 +205,6 @@ export default function AdminSecurity() {
                     </div>
                 </div>
 
-                {/* Device List */}
                 <div className="flex-1 overflow-y-auto ck-scroll space-y-3 pb-8">
                     {loading ? (
                         Array.from({ length: 5 }).map((_, i) => (
@@ -238,7 +237,7 @@ export default function AdminSecurity() {
                                 <div className="flex-1 min-w-0">
                                     <div className="flex flex-wrap items-center gap-3 mb-1.5">
                                         <h3 className="text-sm font-black tracking-tight font-mono">
-                                            {device.banCode || device.ip || (isRTL ? 'غير معرف' : 'UNKNOWN ID')}
+                                            {device.deviceId || device.banCode || device.ip || (isRTL ? 'غير معرف' : 'UNKNOWN ID')}
                                         </h3>
                                         {device.ip && <span className="ck-badge bg-white/5 text-white/40 border-white/10 font-mono text-[9px]">{device.ip}</span>}
                                         {device.banned && <span className="ck-badge ck-badge-danger text-[8px]">{isRTL ? 'محظور نأئياً' : 'HARD BANNED'}</span>}
@@ -262,23 +261,17 @@ export default function AdminSecurity() {
                                 </div>
 
                                 <div className="flex gap-2 w-full md:w-auto">
-                                    {device.banned ? (
-                                        <button 
-                                            onClick={() => toggleBan(device)}
-                                            className="flex-1 md:flex-none h-10 px-4 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 text-[10px] font-black uppercase tracking-wider hover:bg-green-500 hover:text-black transition-all flex items-center justify-center gap-2"
-                                        >
-                                            <Unlock className="w-3.5 h-3.5" />
-                                            {isRTL ? 'فك الحظر' : 'UNBAN'}
-                                        </button>
-                                    ) : (
-                                        <button 
-                                            onClick={() => toggleBan(device)}
-                                            className="flex-1 md:flex-none h-10 px-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-black uppercase tracking-wider hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-2"
-                                        >
-                                            <Lock className="w-3.5 h-3.5" />
-                                            {isRTL ? 'حظر' : 'RESTRICT'}
-                                        </button>
-                                    )}
+                                    <button 
+                                        onClick={() => toggleBan(device)}
+                                        title={device.banned ? (isRTL ? 'إلغاء الحظر' : 'Unban') : (isRTL ? 'حظر' : 'Ban')}
+                                        className={cn(
+                                            "flex-1 md:flex-none h-10 px-4 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2",
+                                            device.banned ? "bg-green-500/10 border border-green-500/20 text-green-400 hover:bg-green-500 hover:text-black" : "bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500 hover:text-white"
+                                        )}
+                                    >
+                                        {device.banned ? <Unlock className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
+                                        {device.banned ? (isRTL ? 'فك الحظر' : 'UNBAN') : (isRTL ? 'حظر' : 'RESTRICT')}
+                                    </button>
                                     
                                     <button 
                                         onClick={() => toggleExempt(device)}
@@ -296,6 +289,7 @@ export default function AdminSecurity() {
 
                                     <button 
                                         onClick={() => setSelectedDevice(device)}
+                                        title={isRTL ? 'عرض التفاصيل' : 'View Details'}
                                         className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white/40 hover:bg-white/10 hover:text-white transition-all"
                                     >
                                         <Server className="w-4 h-4" />
@@ -307,7 +301,6 @@ export default function AdminSecurity() {
                 </div>
             </AdminPageShell>
 
-            {/* Device Detail Modal */}
             <AnimatePresence>
                 {selectedDevice && (
                     <motion.div 
@@ -325,7 +318,6 @@ export default function AdminSecurity() {
                             className="bg-cinematic-dark border border-white/15 rounded-[2.5rem] p-8 max-w-2xl w-full shadow-[0_0_100px_rgba(59,130,246,0.15)] relative overflow-hidden"
                             dir={isRTL ? 'rtl' : 'ltr'}
                         >
-                            {/* Accent Glow */}
                             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-1 bg-red-500 shadow-[0_0_20px_rgba(239,68,68,1)] rounded-full" />
                             
                             <div className="flex items-center justify-between mb-8">
@@ -335,10 +327,14 @@ export default function AdminSecurity() {
                                     </div>
                                     <div>
                                         <div className="cockpit-mono text-[10px] text-red-400 tracking-[0.3em] uppercase mb-1">ENDPOINT ANALYTICS</div>
-                                        <h2 className="text-2xl font-black italic tracking-tighter truncate max-w-[300px]">{selectedDevice.banCode || 'INTERNAL-ID'}</h2>
+                                        <h2 className="text-2xl font-black italic tracking-tighter truncate max-w-[300px]">{selectedDevice.deviceId || selectedDevice.banCode || 'INTERNAL-ID'}</h2>
                                     </div>
                                 </div>
-                                <button onClick={() => setSelectedDevice(null)} className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all">
+                                <button 
+                                    onClick={() => setSelectedDevice(null)} 
+                                    title={isRTL ? 'إغلاق' : 'Close'}
+                                    className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
+                                >
                                     <X className="w-5 h-5" />
                                 </button>
                             </div>
@@ -370,21 +366,15 @@ export default function AdminSecurity() {
                             </div>
 
                             <div className="flex gap-4">
-                                {selectedDevice.banned ? (
-                                    <button 
-                                        onClick={() => { toggleBan(selectedDevice); setSelectedDevice(null); }}
-                                        className="flex-1 h-14 rounded-2xl bg-green-500 text-black text-xs font-black uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(34,197,94,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all"
-                                    >
-                                        {isRTL ? 'إلغاء الحظر الآن' : 'RESTORE ACCESS'}
-                                    </button>
-                                ) : (
-                                    <button 
-                                        onClick={() => { toggleBan(selectedDevice); setSelectedDevice(null); }}
-                                        className="flex-1 h-14 rounded-2xl bg-red-600 text-white text-xs font-black uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(220,38,38,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all"
-                                    >
-                                        {isRTL ? 'حظر الجهاز نهائياً' : 'PERMANENT BAN'}
-                                    </button>
-                                )}
+                                <button 
+                                    onClick={() => { toggleBan(selectedDevice); setSelectedDevice(null); }}
+                                    className={cn(
+                                        "flex-1 h-14 rounded-2xl text-xs font-black uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(34,197,94,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all",
+                                        selectedDevice.banned ? "bg-green-500 text-black shadow-[0_0_20px_rgba(34,197,94,0.3)]" : "bg-red-600 text-white shadow-[0_0_20px_rgba(220,38,38,0.3)]"
+                                    )}
+                                >
+                                    {selectedDevice.banned ? (isRTL ? 'إلغاء الحظر الآن' : 'RESTORE ACCESS') : (isRTL ? 'حظر الجهاز نهائياً' : 'PERMANENT BAN')}
+                                </button>
                             </div>
                         </motion.div>
                     </motion.div>

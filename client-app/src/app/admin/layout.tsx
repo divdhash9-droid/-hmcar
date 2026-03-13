@@ -20,7 +20,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
             {/* Page content offset by AdminNavbar (72px) */}
             {/* lg:ps-[72px] (padding-inline-start) handles both RTL and LTR automatically */}
-            <div className="relative z-10 pt-[52px] lg:pt-0 lg:ps-[72px] transition-all duration-300 overflow-hidden">
+            <div className="relative z-10 pt-[64px] lg:pt-0 lg:ps-[72px] transition-all duration-300 overflow-hidden">
                 {children}
             </div>
         </div>

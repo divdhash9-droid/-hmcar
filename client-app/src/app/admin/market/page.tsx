@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
     Plus, Clock, TrendingUp, Trash2, Edit2, Play, Square, ExternalLink, 
     Link as LinkIcon, Radio, Gavel, RefreshCw, X, 
-    Activity, Info
+    Activity, Info, Car
 } from "lucide-react";
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from 'next/navigation';
@@ -39,6 +39,7 @@ function MarketHubContent() {
     const [activeArena, setActiveArena] = useState('LIVE');
     const [isAuctionModalOpen, setIsAuctionModalOpen] = useState(false);
     const [auctionForm, setAuctionForm] = useState({ carId: '', startPrice: '', startsAt: '', endsAt: '' });
+    const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
     // ── Loaders ──
     const loadLiveSessions = async () => {
@@ -201,7 +202,23 @@ function MarketHubContent() {
                             {auctions.map(auc => (
                                 <motion.div key={auc.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="ck-card p-6 flex flex-col md:flex-row items-center gap-8 group">
                                     <div className="w-full md:w-36 h-24 rounded-xl overflow-hidden border border-white/5 shrink-0 relative">
-                                        <img src={auc.car?.images?.[0] || '/car-placeholder.jpg'} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt="" />
+                                        {(() => {
+                                            const imageKey = String(auc.id || auc._id || auc.car?._id || 'auction');
+                                            const imageSrc = typeof auc.car?.images?.[0] === 'string' ? auc.car.images[0].trim() : '';
+                                            const showFallback = !imageSrc || imageErrors[imageKey];
+                                            return showFallback ? (
+                                                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-white/5 via-black/40 to-black/80">
+                                                    <Car className="w-8 h-8 text-white/20" />
+                                                </div>
+                                            ) : (
+                                                <img
+                                                    src={imageSrc}
+                                                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                                                    alt=""
+                                                    onError={() => setImageErrors(prev => ({ ...prev, [imageKey]: true }))}
+                                                />
+                                            );
+                                        })()}
                                         {auc.status === 'running' && <div className="absolute top-2 left-2 w-2 h-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_rgba(255,0,0,0.8)]" />}
                                     </div>
                                     <div className="flex-1 min-w-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

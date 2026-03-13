@@ -59,6 +59,7 @@ function CarsContent() {
     const [total, setTotal] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
     const [page, setPage] = useState(1);
+    const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
     // Filters state
     const [q, setQ] = useState(searchParams.get('q') || '');
@@ -128,6 +129,11 @@ function CarsContent() {
         { id: rawText('100-500k'), label: isRTL ? rawText('١٠٠ - ٥٠٠ ألف') : rawText('100K - 500K') },
         { id: rawText('500k+'), label: isRTL ? rawText('فوق ٥٠٠ ألف') : rawText('> 500K') },
     ];
+
+    const resolveCarImage = (car: CarModel) => {
+        const src = car.images?.[0] || '';
+        return typeof src === 'string' ? src.trim() : '';
+    };
 
     return (
         <div className={cn("min-h-screen bg-cinematic-darker text-white selection:bg-luxury-gold selection:text-black", isRTL && "font-arabic")} dir={isRTL ? 'rtl' : 'ltr'}>
@@ -261,9 +267,13 @@ function CarsContent() {
                 ) : (
                     <>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 md:gap-12">
-                            {cars.map((car, i) => (
+                            {cars.map((car, i) => {
+                                const cardKey = String(car.id || car._id || `car-${i}`);
+                                const imageSrc = resolveCarImage(car);
+                                const showFallback = !imageSrc || imageErrors[cardKey];
+                                return (
                                 <motion.div
-                                    key={car.id || car._id}
+                                    key={cardKey}
                                     initial={{ opacity: 0, y: 30 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: (i % 4) * 0.1 }}
@@ -272,10 +282,23 @@ function CarsContent() {
                                     <Link href={`/cars/${car.id || car._id}`} className="block obsidian-card obsidian-card-hover overflow-hidden rounded-[2.5rem]">
                                         {/* Image wrapper */}
                                         <div className="relative h-72 w-full bg-zinc-900">
-                                            <Image
-                                                src={car.images?.[0] || 'https://images.unsplash.com/photo-1592194996308-7b43878e84a6?q=80&w=1000'}
-                                                alt={car.title} fill className="object-cover grayscale transition-all duration-1000 group-hover:grayscale-0 group-hover:scale-110 opacity-60 group-hover:opacity-100"
-                                            />
+                                            {showFallback ? (
+                                                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-white/5 via-black/40 to-black/80">
+                                                    <div className="text-center">
+                                                        <Car className="w-10 h-10 text-white/15 mx-auto mb-2" />
+                                                        <div className="text-[9px] font-black uppercase tracking-[0.3em] text-white/30">No Image</div>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <Image
+                                                    src={imageSrc}
+                                                    alt={car.title}
+                                                    fill
+                                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                                                    className="object-cover grayscale transition-all duration-1000 group-hover:grayscale-0 group-hover:scale-110 opacity-60 group-hover:opacity-100"
+                                                    onError={() => setImageErrors(prev => ({ ...prev, [cardKey]: true }))}
+                                                />
+                                            )}
                                             <div className="absolute inset-0 bg-linear-to-t from-cinematic-dark via-transparent to-transparent opacity-90" />
 
                                             {/* Top badges */}
@@ -318,7 +341,8 @@ function CarsContent() {
                                         </div>
                                     </Link>
                                 </motion.div>
-                            ))}
+                                );
+                            })}
                         </div>
 
                         {/* Pagination */}

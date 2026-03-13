@@ -163,7 +163,7 @@ export default function AdminDashboard() {
                                 {isSearchFocused && searchQuery && (
                                     <motion.div 
                                         initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }}
-                                        className="absolute top-full left-0 right-0 mt-2 z-[100] bg-[#0a0a0a] border border-white/10 rounded-2xl p-2 shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden"
+                                        className="absolute top-full left-0 right-0 mt-2 z-[100] bg-[#0a0a0a] border border-white/10 rounded-2xl p-2 shadow-[0_20px_50px_rgba(0,0,0,0.5)] max-h-[60vh] overflow-auto"
                                     >
                                         <div className="p-3 border-b border-white/5 mb-1">
                                             <span className="cockpit-mono text-[8px] text-white/20 uppercase">Match Results</span>

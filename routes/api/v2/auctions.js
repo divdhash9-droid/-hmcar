@@ -4,7 +4,23 @@ const express = require('express');
 const router = express.Router();
 const Auction = require('../../../models/Auction');
 const Car = require('../../../models/Car');
+const SiteSettings = require('../../../models/SiteSettings');
 const { requireAuthAPI } = require('../../../middleware/auth');
+
+function normalizeMultiplier(value) {
+    const num = Number(value);
+    return Number.isFinite(num) && num > 0 ? num : 1;
+}
+
+function applyMultiplier(amount, multiplier) {
+    const safeAmount = Number(amount || 0);
+    return Number((safeAmount * multiplier).toFixed(2));
+}
+
+function toBaseAmount(amount, multiplier) {
+    const safeAmount = Number(amount || 0);
+    return Number((safeAmount / multiplier).toFixed(2));
+}
 
 // GET /api/v2/auctions - قائمة المزادات
 router.get('/', async (req, res) => {
@@ -14,6 +30,9 @@ router.get('/', async (req, res) => {
         if (status && status !== 'all') {
             query.status = status;
         }
+
+        const settings = await SiteSettings.getSettings().catch(() => null);
+        const auctionMultiplier = normalizeMultiplier(settings?.currencySettings?.auctionMultiplier || 1);
 
         const auctions = await Auction.find(query)
             .populate('car')
@@ -27,7 +46,10 @@ router.get('/', async (req, res) => {
             data: auctions.map(a => ({
                 id: a._id,
                 status: a.status,
-                currentBid: a.currentPrice || a.startingPrice,
+                currentBid: applyMultiplier(a.currentPrice || a.startingPrice, auctionMultiplier),
+                currentPrice: applyMultiplier(a.currentPrice || a.startingPrice, auctionMultiplier),
+                startingPrice: applyMultiplier(a.startingPrice, auctionMultiplier),
+                minBidIncrement: applyMultiplier(a.minBidIncrement || 0, auctionMultiplier),
                 currency: a.currency || 'SAR',
                 endsAt: a.endsAt,
                 startsAt: a.startsAt,
@@ -61,12 +83,18 @@ router.get('/:id', async (req, res) => {
             return res.status(404).json({ success: false, error: 'Auction not found' });
         }
 
+        const settings = await SiteSettings.getSettings().catch(() => null);
+        const auctionMultiplier = normalizeMultiplier(settings?.currencySettings?.auctionMultiplier || 1);
+
         res.json({
             success: true,
             data: {
                 id: auction._id,
                 status: auction.status,
-                currentBid: auction.currentPrice || auction.startingPrice,
+            currentBid: applyMultiplier(auction.currentPrice || auction.startingPrice, auctionMultiplier),
+            currentPrice: applyMultiplier(auction.currentPrice || auction.startingPrice, auctionMultiplier),
+            startingPrice: applyMultiplier(auction.startingPrice, auctionMultiplier),
+            minBidIncrement: applyMultiplier(auction.minBidIncrement || 0, auctionMultiplier),
                 currency: auction.currency || 'SAR',
                 endsAt: auction.endsAt,
                 startsAt: auction.startsAt,
@@ -112,10 +140,14 @@ router.post('/', requireAuthAPI, async (req, res) => {
             return res.status(404).json({ success: false, error: 'Car not found' });
         }
 
+        const settings = await SiteSettings.getSettings().catch(() => null);
+        const auctionMultiplier = normalizeMultiplier(settings?.currencySettings?.auctionMultiplier || 1);
+        const baseStartPrice = toBaseAmount(startPrice, auctionMultiplier);
+
         const auction = new Auction({
             car: carId,
-            startingPrice: startPrice,
-            currentPrice: startPrice,
+            startingPrice: baseStartPrice,
+            currentPrice: baseStartPrice,
             startsAt,
             endsAt,
             status: 'scheduled'
@@ -188,17 +220,20 @@ router.post('/:id/bid', requireAuthAPI, async (req, res) => {
             return res.status(400).json({ success: false, error: 'Auction is not active' });
         }
 
+        const settings = await SiteSettings.getSettings().catch(() => null);
+        const auctionMultiplier = normalizeMultiplier(settings?.currencySettings?.auctionMultiplier || 1);
         const currentHighest = auction.currentPrice || auction.startingPrice;
+        const baseAmount = toBaseAmount(amount, auctionMultiplier);
 
-        if (amount <= currentHighest) {
+        if (baseAmount <= currentHighest) {
             return res.status(400).json({
                 success: false,
                 error: 'Bid too low',
-                message: `Bid must be higher than ${currentHighest}`
+                message: `Bid must be higher than ${applyMultiplier(currentHighest, auctionMultiplier)}`
             });
         }
 
-        auction.currentPrice = amount;
+        auction.currentPrice = baseAmount;
         auction.highestBidder = req.user.userId;
 
         // Increase bid count (if schematic supports it, otherwise skip)
@@ -212,7 +247,7 @@ router.post('/:id/bid', requireAuthAPI, async (req, res) => {
             success: true,
             message: 'Bid placed successfully',
             data: {
-                currentPrice: auction.currentPrice,
+                currentPrice: applyMultiplier(auction.currentPrice, auctionMultiplier),
                 highestBidder: req.user.userId
             }
         });

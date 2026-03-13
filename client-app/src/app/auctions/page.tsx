@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
-import { Timer, Gavel, Users, TrendingUp, ChevronRight, AlertCircle, Radio } from "lucide-react";
+import { Gavel, AlertCircle, Radio, Car } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/LanguageContext";
@@ -12,11 +12,14 @@ import Link from "next/link";
 import ClientPageHeader from "@/components/ClientPageHeader";
 
 export default function Auctions() {
-    const { t, isRTL } = useLanguage();
+    const { isRTL } = useLanguage();
     const { formatPrice } = useSettings();
     const [activeTab, setActiveTab] = useState('LIVE');
     const [auctions, setAuctions] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
+
+    const normalizeImage = (src?: string) => (typeof src === 'string' ? src.trim() : '');
 
     useEffect(() => {
         const loadData = async () => {
@@ -136,7 +139,26 @@ export default function Auctions() {
                                 {activeTab === 'SHOWROOM' ? (
                                     <>
                                         <div className="lg:w-[40%] h-64 lg:h-auto overflow-hidden relative">
-                                            <img src={(item.cars && item.cars[0]?.images[0]) || 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d'} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt="" />
+                                            {(() => {
+                                                const imageKey = `${item._id || item.id}-live`;
+                                                const imageSrc = normalizeImage((item.cars && item.cars[0]?.images?.[0]) || '');
+                                                const showFallback = !imageSrc || imageErrors[imageKey];
+                                                return showFallback ? (
+                                                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-white/5 via-black/40 to-black/80">
+                                                        <div className="text-center">
+                                                            <Car className="w-10 h-10 text-white/15 mx-auto mb-2" />
+                                                            <div className="text-[9px] font-black uppercase tracking-[0.3em] text-white/30">No Image</div>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <img
+                                                        src={imageSrc}
+                                                        className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                                                        alt=""
+                                                        onError={() => setImageErrors(prev => ({ ...prev, [imageKey]: true }))}
+                                                    />
+                                                );
+                                            })()}
                                             {item.status === 'live' && (
                                                 <div className="absolute top-6 left-6 px-4 py-2 bg-cinematic-neon-red/20 border border-cinematic-neon-red/40 rounded-lg backdrop-blur-md">
                                                     <span className="text-[10px] font-black text-white uppercase tracking-widest flex items-center gap-2">
@@ -170,7 +192,26 @@ export default function Auctions() {
                                 ) : (
                                     <>
                                         <div className="lg:w-[40%] h-64 lg:h-auto overflow-hidden relative">
-                                            <img src={item.car?.images?.[0]} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt="" />
+                                            {(() => {
+                                                const imageKey = `${item._id || item.id}-classic`;
+                                                const imageSrc = normalizeImage(item.car?.images?.[0]);
+                                                const showFallback = !imageSrc || imageErrors[imageKey];
+                                                return showFallback ? (
+                                                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-white/5 via-black/40 to-black/80">
+                                                        <div className="text-center">
+                                                            <Car className="w-10 h-10 text-white/15 mx-auto mb-2" />
+                                                            <div className="text-[9px] font-black uppercase tracking-[0.3em] text-white/30">No Image</div>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <img
+                                                        src={imageSrc}
+                                                        className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                                                        alt=""
+                                                        onError={() => setImageErrors(prev => ({ ...prev, [imageKey]: true }))}
+                                                    />
+                                                );
+                                            })()}
                                             {item.status === 'running' && (
                                                 <div className="absolute top-6 left-6 flex items-center gap-2.5 px-3.5 py-1.5 bg-black/60 backdrop-blur-xl border border-accent-red/30 rounded-lg">
                                                     <div className="w-2 h-2 rounded-full bg-accent-red animate-pulse" />

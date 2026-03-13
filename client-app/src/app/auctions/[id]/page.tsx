@@ -56,6 +56,7 @@ export default function AuctionDetailsPage() {
     const [bidMessage, setBidMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
     const [timeLeft, setTimeLeft] = useState('');
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
 
     useEffect(() => {
         if (params.id) {
@@ -194,11 +195,22 @@ export default function AuctionDetailsPage() {
                             className="relative aspect-video rounded-3xl overflow-hidden bg-white/5 border border-white/10"
                         >
                             {car.images && car.images.length > 0 ? (
-                                <img
-                                    src={car.images[currentImageIndex]}
-                                    alt={car.title}
-                                    className="w-full h-full object-cover"
-                                />
+                                (() => {
+                                    const imageSrc = car.images[currentImageIndex] || '';
+                                    const showFallback = !imageSrc || imageErrors[currentImageIndex];
+                                    return showFallback ? (
+                                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-white/5 via-black/40 to-black/80">
+                                            <Gavel className="w-24 h-24 text-white/20" />
+                                        </div>
+                                    ) : (
+                                        <img
+                                            src={imageSrc}
+                                            alt={car.title}
+                                            className="w-full h-full object-cover"
+                                            onError={() => setImageErrors(prev => ({ ...prev, [currentImageIndex]: true }))}
+                                        />
+                                    );
+                                })()
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center">
                                     <Gavel className="w-32 h-32 text-white/20" />

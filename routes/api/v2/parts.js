@@ -93,6 +93,8 @@ router.get('/', async (req, res) => {
         const settings = await SiteSettings.getSettings().catch(() => null);
         const usdToSar = Number(settings?.currencySettings?.usdToSar || 3.75);
         const usdToKrw = Number(settings?.currencySettings?.usdToKrw || 1350);
+        const partsMultiplier = Number(settings?.currencySettings?.partsMultiplier || 1.0);
+        const safeMultiplier = Number.isFinite(partsMultiplier) && partsMultiplier > 0 ? partsMultiplier : 1.0;
 
         const parts = await SparePart.find(filter)
             .sort({ createdAt: -1 })
@@ -103,8 +105,12 @@ router.get('/', async (req, res) => {
             success: true,
             parts: parts.map(p => {
                 const sarPrice = Number(p.priceSar || p.price || 0);
-                const usdPrice = Number(p.priceUsd || p.basePriceUsd || (sarPrice > 0 ? (sarPrice / usdToSar) : 0));
-                const krwPrice = Number(p.priceKrw || Math.round(usdPrice * usdToKrw));
+                const baseUsd = Number(p.basePriceUsd || p.priceUsd || (sarPrice > 0 ? (sarPrice / usdToSar) : 0));
+                const adjustedUsd = Number((baseUsd * safeMultiplier).toFixed(2));
+                const adjustedSar = sarPrice > 0 && !p.basePriceUsd && !p.priceUsd
+                    ? sarPrice
+                    : Math.round(adjustedUsd * usdToSar);
+                const adjustedKrw = Number(Math.round(adjustedUsd * usdToKrw));
 
                 return ({
                 id: p._id,
@@ -112,11 +118,11 @@ router.get('/', async (req, res) => {
                 nameAr: p.nameAr || translatePartNameToArabic(p.name) || p.name,
                 brand: p.carMake || p.brand,
                 model: cleanModelName(p.carModel || ''),
-                price: sarPrice,
-                priceSar: sarPrice,
-                priceUsd: Number(usdPrice.toFixed(2)),
-                priceKrw: krwPrice,
-                basePriceUsd: Number((p.basePriceUsd || usdPrice).toFixed(2)),
+                price: adjustedSar,
+                priceSar: adjustedSar,
+                priceUsd: adjustedUsd,
+                priceKrw: adjustedKrw,
+                basePriceUsd: Number((p.basePriceUsd || baseUsd).toFixed(2)),
                 currency: 'SAR',
                 category: p.partType,
                 categoryAr: p.partTypeAr || toArabicCategory(p.partType),

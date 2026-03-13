@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
-import { Package, Clock, CheckCircle, XCircle, Eye, Download, Filter, Search, ArrowLeft } from "lucide-react";
+import { Package, Clock, CheckCircle, XCircle, Eye, Download } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/LanguageContext";
@@ -13,11 +13,33 @@ import { useSettings } from "@/lib/SettingsContext";
 import { formatAmountWithSnapshot, getOrderGrandTotalSar } from "@/lib/orderCurrency";
 
 export default function OrdersPage() {
-    const { t, isRTL } = useLanguage();
+    const { isRTL } = useLanguage();
     const { displayCurrency, currency } = useSettings();
-    const [orders, setOrders] = useState<any[]>([]);
+    type OrderStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled' | string;
+    interface OrderCar {
+        title?: string;
+        image?: string;
+        images?: string[];
+    }
+    interface OrderPricing {
+        grandTotalSar?: number;
+        exchangeSnapshot?: { usdToSar?: number; usdToKrw?: number; activeCurrency?: string };
+    }
+    interface Order {
+        id?: string;
+        _id?: string;
+        orderNumber?: string;
+        status?: OrderStatus;
+        createdAt?: string;
+        car?: OrderCar;
+        pricing?: OrderPricing;
+        totalAmount?: number;
+    }
+
+    const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all');
+    const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
     const [stats, setStats] = useState({
         total: 0,
         pending: 0,
@@ -40,13 +62,13 @@ export default function OrdersPage() {
                 setOrders(response.data.orders);
 
                 // [[ARABIC_COMMENT]] حساب الإحصائيات من الطلبات الحقيقية
-                const allOrders = response.data.orders;
+                const allOrders = response.data.orders as Order[];
                 setStats({
                     total: allOrders.length,
-                    pending: allOrders.filter((o: any) => o.status === 'pending').length,
-                    confirmed: allOrders.filter((o: any) => o.status === 'confirmed').length,
-                    completed: allOrders.filter((o: any) => o.status === 'completed').length,
-                    cancelled: allOrders.filter((o: any) => o.status === 'cancelled').length,
+                    pending: allOrders.filter((o) => o.status === 'pending').length,
+                    confirmed: allOrders.filter((o) => o.status === 'confirmed').length,
+                    completed: allOrders.filter((o) => o.status === 'completed').length,
+                    cancelled: allOrders.filter((o) => o.status === 'cancelled').length,
                 });
             }
         } catch (err) {
@@ -57,6 +79,15 @@ export default function OrdersPage() {
         } finally {
             setLoading(false);
         }
+    };
+
+    const resolveOrderId = (order: Order, index: number) => (
+        order.id || order._id || order.orderNumber || `order-${index}`
+    );
+
+    const resolveOrderImage = (order: Order) => {
+        const src = order.car?.image || order.car?.images?.[0] || '';
+        return typeof src === 'string' ? src.trim() : '';
     };
 
 
@@ -168,9 +199,12 @@ export default function OrdersPage() {
                         <div className="space-y-6">
                             {orders.map((order, i) => {
                                 const StatusIcon = getStatusIcon(order.status);
+                                const orderId = resolveOrderId(order, i);
+                                const imageSrc = resolveOrderImage(order);
+                                const showFallback = !imageSrc || imageErrors[orderId];
                                 return (
                                     <motion.div
-                                        key={order.id}
+                                        key={orderId}
                                         layout
                                         initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
@@ -183,11 +217,21 @@ export default function OrdersPage() {
                                             {/* Car Image */}
                                             <div className="lg:col-span-3">
                                                 <div className="relative h-40 rounded-2xl overflow-hidden">
-                                                    <img
-                                                        src={order.car.image}
-                                                        alt={order.car.title}
-                                                        className="w-full h-full object-cover grayscale-[30%] hover:grayscale-0 transition-all duration-700"
-                                                    />
+                                                    {showFallback ? (
+                                                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-white/5 via-black/40 to-black/70 border border-white/10">
+                                                            <div className="text-center">
+                                                                <Package className="w-10 h-10 text-white/20 mx-auto mb-2" />
+                                                                <div className="text-[9px] font-black uppercase tracking-[0.3em] text-white/30">No Image</div>
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <img
+                                                            src={imageSrc}
+                                                            alt={order.car?.title || 'Order car'}
+                                                            className="w-full h-full object-cover grayscale-[30%] hover:grayscale-0 transition-all duration-700"
+                                                            onError={() => setImageErrors(prev => ({ ...prev, [orderId]: true }))}
+                                                        />
+                                                    )}
                                                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                                                 </div>
                                             </div>
@@ -199,7 +243,7 @@ export default function OrdersPage() {
                                                         {order.orderNumber}
                                                     </div>
                                                     <h3 className="text-2xl font-black uppercase italic tracking-tighter leading-tight">
-                                                        {order.car.title}
+                                                        {order.car?.title || (isRTL ? 'سيارة' : 'Vehicle')}
                                                     </h3>
                                                 </div>
 

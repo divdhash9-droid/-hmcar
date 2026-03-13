@@ -7,7 +7,7 @@ import { useSettings } from '@/lib/SettingsContext';
 import { api } from '@/lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Car, Package } from 'lucide-react';
 
 export default function BrandDetail({ params }: { params: { key: string } }) {
   const { isRTL } = useLanguage();
@@ -16,15 +16,16 @@ export default function BrandDetail({ params }: { params: { key: string } }) {
   const [cars, setCars] = useState<any[]>([]);
   const [parts, setParts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
   const resolveCarImage = (car: any) => {
     const src = car?.images?.[0] || car?.imageUrl || car?.image || '';
-    return typeof src === 'string' && src.trim() ? src.trim() : '/images/placeholder.jpg';
+    return typeof src === 'string' && src.trim() ? src.trim() : '';
   };
 
   const resolvePartImage = (part: any) => {
     const src = part?.img || part?.image || part?.images?.[0] || '';
-    return typeof src === 'string' && src.trim() ? src.trim() : '/images/placeholder.jpg';
+    return typeof src === 'string' && src.trim() ? src.trim() : '';
   };
 
   useEffect(() => {
@@ -83,7 +84,23 @@ export default function BrandDetail({ params }: { params: { key: string } }) {
                       <motion.div key={car.id || car._id || i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ delay: i * 0.05 }}>
                         <div className="group obsidian-card obsidian-card-hover h-full overflow-hidden">
                           <div className="relative h-56">
-                            <img src={resolveCarImage(car)} alt={car.title} className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 transition-all duration-700" />
+                            {(() => {
+                              const imageKey = `car-${car.id || car._id || i}`;
+                              const imageSrc = resolveCarImage(car);
+                              const showFallback = !imageSrc || imageErrors[imageKey];
+                              return showFallback ? (
+                                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-white/5 via-black/40 to-black/80">
+                                  <Car className="w-10 h-10 text-white/20" />
+                                </div>
+                              ) : (
+                                <img
+                                  src={imageSrc}
+                                  alt={car.title}
+                                  className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 transition-all duration-700"
+                                  onError={() => setImageErrors(prev => ({ ...prev, [imageKey]: true }))}
+                                />
+                              );
+                            })()}
                             <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
                           </div>
                           <div className="p-6">
@@ -117,7 +134,23 @@ export default function BrandDetail({ params }: { params: { key: string } }) {
                       <motion.div key={part.id || part._id || i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ delay: i * 0.05 }}>
                         <div className="group obsidian-card obsidian-card-hover p-6 h-full">
                           <div className="aspect-square bg-black/40 rounded-xl overflow-hidden mb-6 border border-white/5 relative group-hover:border-accent-gold/20 transition-colors">
-                            <img src={resolvePartImage(part)} alt={part.name} className="w-full h-full object-contain p-6 grayscale-[40%] opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700" />
+                            {(() => {
+                              const imageKey = `part-${part.id || part._id || i}`;
+                              const imageSrc = resolvePartImage(part);
+                              const showFallback = !imageSrc || imageErrors[imageKey];
+                              return showFallback ? (
+                                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-white/5 via-black/40 to-black/80">
+                                  <Package className="w-10 h-10 text-white/20" />
+                                </div>
+                              ) : (
+                                <img
+                                  src={imageSrc}
+                                  alt={part.name}
+                                  className="w-full h-full object-contain p-6 grayscale-[40%] opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700"
+                                  onError={() => setImageErrors(prev => ({ ...prev, [imageKey]: true }))}
+                                />
+                              );
+                            })()}
                           </div>
                           <div>
                             <div className="text-[8px] font-bold uppercase tracking-[0.2em] text-white/50 mb-1">{part.brand}</div>

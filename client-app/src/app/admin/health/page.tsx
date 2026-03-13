@@ -64,14 +64,31 @@ export default function AdminHealthPage() {
             details: 'Region: Portland (West)'
         });
 
+        // ── Phase 2: Financial Integrity ──
+        try {
+            const settingsRes = await api.settings.getAll();
+            if (settingsRes.success) {
+                const s = settingsRes.data.currencySettings || {};
+                const multipliersOk = s.partsMultiplier > 1 && s.auctionMultiplier > 1;
+                addResult({
+                    id: 'financial_multipliers',
+                    name: 'FINANCIAL LOGIC',
+                    status: multipliersOk ? 'pass' : 'warn',
+                    message: multipliersOk ? 'Price Multipliers Active' : 'Check Pricing Ratios',
+                    category: 'system',
+                    details: `P:x${s.partsMultiplier || 1} A:x${s.auctionMultiplier || 1}`
+                });
+            }
+        } catch { }
+
         setScanProgress(50);
         // ── Phase 2: Asset Integrity ──
         try {
             const carsRes = await api.cars.list({ limit: 100 });
+            const carsData = (carsRes.data as any[]) || [];
             if (carsRes.success) {
-                const cars = carsRes.data || [];
-                const brokenImages = cars.filter((c: any) => !c.images || c.images.length === 0 || c.images[0] === '').length;
-                const missingDesc = cars.filter((c: any) => !c.description || (c.description && c.description.length < 10)).length;
+                const brokenImages = carsData.filter(c => !c.images || c.images.length === 0 || c.images[0] === '').length;
+                const missingDesc = carsData.filter(c => !c.description || (c.description && c.description.length < 10)).length;
 
                 addResult({
                     id: 'car_images',
@@ -114,8 +131,10 @@ export default function AdminHealthPage() {
     };
 
     useEffect(() => {
-        runDiagnostics();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        const timer = setTimeout(() => {
+            runDiagnostics();
+        }, 100);
+        return () => clearTimeout(timer);
     }, []);
 
     const getStatusIcon = (status: string) => {

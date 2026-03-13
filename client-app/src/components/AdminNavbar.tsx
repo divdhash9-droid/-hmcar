@@ -6,9 +6,8 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Activity, Car, Gavel, Users, ShoppingCart, Settings, Shield,
-    LogOut, Radio, Layers, TrendingUp, Bell, Share2, MessageCircle,
-    Tag, Briefcase, Mail, Menu, X, Languages, Database, RefreshCcw,
-    LayoutDashboard, Globe, ShieldAlert, Cpu, Heart
+    LogOut, Radio, Layers, TrendingUp, MessageCircle,
+    Tag, Mail, Menu, X, Languages, Database, RefreshCcw,
 } from 'lucide-react';
 import { useLanguage } from '@/lib/LanguageContext';
 import { useAuth } from '@/lib/AuthContext';
@@ -250,8 +249,7 @@ function buildNavCategories(isRTL: boolean): NavCategory[] {
         {
             label: isRTL ? 'عمليات التنفيذ' : 'FULFILLMENT',
             items: [
-                { id: 'orders', icon: ShoppingCart, label: isRTL ? 'الطلبات' : 'ORDERS', href: '/admin/orders' },
-                { id: 'concierge', icon: Briefcase, label: isRTL ? 'خاصة' : 'SPECIAL', href: '/admin/concierge' },
+                { id: 'fulfillment', icon: ShoppingCart, label: isRTL ? 'قسم العمليات' : 'OPERATIONS', href: '/admin/orders' },
             ]
         },
         {

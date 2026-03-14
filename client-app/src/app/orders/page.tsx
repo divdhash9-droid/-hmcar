@@ -91,7 +91,7 @@ export default function OrdersPage() {
     };
 
 
-    const getStatusColor = (status: string) => {
+    const getStatusColor = (status?: string) => {
         switch (status) {
             case 'pending': return 'text-cinematic-neon-yellow';
             case 'confirmed': return 'text-cinematic-neon-blue';
@@ -101,7 +101,7 @@ export default function OrdersPage() {
         }
     };
 
-    const getStatusBg = (status: string) => {
+    const getStatusBg = (status?: string) => {
         switch (status) {
             case 'pending': return 'bg-cinematic-neon-yellow/10 border-cinematic-neon-yellow/30';
             case 'confirmed': return 'bg-cinematic-neon-blue/10 border-cinematic-neon-blue/30';
@@ -111,7 +111,7 @@ export default function OrdersPage() {
         }
     };
 
-    const getStatusIcon = (status: string) => {
+    const getStatusIcon = (status?: string) => {
         switch (status) {
             case 'pending': return Clock;
             case 'confirmed': return CheckCircle;

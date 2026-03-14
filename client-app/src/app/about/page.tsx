@@ -172,7 +172,7 @@ export default function About() {
             </main>
 
             {/* Footer */}
-            <footer className="max-w-7xl mx-auto px-6 py-16 border-t border-white/5 flex justify-between items-center text-[8px] font-bold uppercase tracking-[0.4em] text-white/10">
+            <footer className="max-w-7xl mx-auto px-6 py-16 border-t border-white/5 flex justify-between items-center text-[8px] font-bold uppercase tracking-[0.4em] text-white/10 hide-in-app">
                 <span>© 2026 HM CAR</span>
                 <span>Riyadh, Saudi Arabia</span>
             </footer>

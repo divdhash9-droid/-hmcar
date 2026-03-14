@@ -734,7 +734,7 @@ export default function ShowroomPage() {
                 </main>
 
                 {/* Footer Section */}
-                <footer className="relative z-10 border-t border-white/5 py-12 px-6 flex flex-col items-center gap-6 bg-black/40 backdrop-blur-3xl">
+                <footer className="relative z-10 border-t border-white/5 py-12 px-6 flex flex-col items-center gap-6 bg-black/40 backdrop-blur-3xl hide-in-app">
                     <div className="flex items-center gap-4 text-white/20 font-black text-[10px] tracking-[0.5em] uppercase">
                         <span>{rawText('HM CAR')}</span>
                         <div className="h-0.5 w-12 bg-white/5" />

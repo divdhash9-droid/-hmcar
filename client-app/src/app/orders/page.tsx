@@ -267,11 +267,11 @@ export default function OrdersPage() {
                                                             {isRTL ? 'تاريخ الطلب' : 'ORDER DATE'}
                                                         </div>
                                                         <div className="text-sm font-bold text-white/60">
-                                                            {new Date(order.createdAt).toLocaleDateString('en-US', {
+                                                            {order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-US', {
                                                                 month: 'short',
                                                                 day: 'numeric',
                                                                 year: 'numeric'
-                                                            })}
+                                                            }) : 'N/A'}
                                                         </div>
                                                     </div>
                                                 </div>

@@ -1,6 +1,7 @@
 /* [[ARABIC_HEADER]] هذا الملف (client-app/src/app/globals.css) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح. */
 
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap');
 
 @theme {
   /* Cinematic Neon Colors */
@@ -959,7 +960,6 @@ select {
 }
 
 /* ── Cockpit Font for Numbers ── */
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap');
 
 .cockpit-num {
   font-family: 'Orbitron', 'JetBrains Mono', monospace;

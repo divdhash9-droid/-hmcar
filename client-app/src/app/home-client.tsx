@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import Navbar from "@/components/Navbar";
+// Navbar import removed because it's managed via AppShell/layout or omitted here
 import CinematicVideoBackground from "@/components/CinematicVideoBackground";
 import { useLanguage } from "@/lib/LanguageContext";
 // [[ARABIC_COMMENT]] أيقونات التواصل الاجتماعي مبنية كـ SVG مضمنة في المكوّن مباشرة
@@ -23,6 +23,7 @@ import { useSocket } from "@/lib/SocketContext";
 import { useAuth } from "@/lib/AuthContext";
 import { useSettings } from "@/lib/SettingsContext";
 import { cn } from "@/lib/utils";
+import { useStandalone } from "@/lib/useStandalone";
 
 const rawText = (value: string) => value;
 const getCarMakeLabel = (car: CarType) => {
@@ -61,13 +62,13 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
   const liveRef = useRef<HTMLDivElement>(null);
   const [videoHeight, setVideoHeight] = useState<string>("55vh");
   const [activeDock, setActiveDock] = useState<"reviews" | "app" | null>(null);
-  const [deferredInstall, setDeferredInstall] = useState<any>(null);
+  const [deferredInstall, setDeferredInstall] = useState<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
   const [isInstalled, setIsInstalled] = useState(() => {
     if (typeof window !== 'undefined') return !!localStorage.getItem('pwa_installed');
     return false;
   });
   const [showUpdateBanner, setShowUpdateBanner] = useState(false);
-  const [brands, setBrands] = useState<any[]>([]);
+  const [brands, setBrands] = useState<any[]>([]); // eslint-disable-line @typescript-eslint/no-explicit-any
 
   // التقاط حدث التثبيت PWA
   useEffect(() => {
@@ -94,6 +95,14 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
     setDeferredInstall(null);
   };
   const router = useRouter();
+  const isStandalone = useStandalone();
+
+  useEffect(() => {
+    // [[ARABIC_COMMENT]] توجيه ذكي: عند فتح التطبيق المثبت (PWA) من قبل مستخدم مسجل الدخول، نوجهه مباشرة إلى لوحة تحكمه
+    if (isStandalone && isLoggedIn) {
+      router.replace('/client/dashboard');
+    }
+  }, [isStandalone, isLoggedIn, router]);
 
   // تتبع دخول العميل وإبلاغ الأدمن في الوقت الحقيقي
   useEffect(() => {
@@ -145,8 +154,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
 
 
 
-  // خريطة لتنسيق الأيقونات من مسمياتها في قاعدة البيانات
-  const lucideIcons: Record<string, any> = {
+  const lucideIcons: Record<string, any> = { // eslint-disable-line @typescript-eslint/no-explicit-any
     Shield, Truck, CreditCard, Award, Zap, Globe, Star, Smartphone, MessageCircle, Heart: Sparkles,
     ArrowUpRight, ArrowRight, Play, Check, ChevronLeft, ChevronRight, Quote, Phone, Instagram,
     Facebook, Youtube, Send, Linkedin, Mail, Search, Gavel, Cog, Info, User, LogOut,
@@ -207,7 +215,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
       }
     };
     fetchSocialLinks();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // [[ARABIC_COMMENT]] جلب الوكالات المتاحة
   useEffect(() => {
@@ -566,7 +574,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
                     <motion.div
                       key={index}
                       className="group relative w-85 h-115 rounded-4xl border border-white/10 bg-black/40 backdrop-blur-3xl overflow-hidden shadow-2xl hover:border-cinematic-neon-gold/50 transition-all duration-700 shrink-0"
-                      onClick={() => router.push(isLoggedIn ? `/cars/${car.id || (car as any)._id}` : '/login')}
+                      onClick={() => router.push(isLoggedIn ? `/cars/${car.id || (car as { _id?: string })._id}` : '/login')}
                       whileHover={{ y: -10 }}
                     >
                       <div className="absolute inset-0 bg-linear-to-b from-transparent via-black/40 to-black z-10 pointer-events-none" />
@@ -642,6 +650,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
       )}
 
       {/* Features Section - Dynamic from Settings */}
+      {!isStandalone && (
       <section className="relative z-10 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <motion.div className="text-center mb-16" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
@@ -673,11 +682,12 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
           </div>
         </div>
       </section>
+      )}
 
       {/* ════════════════════════════════════════
           قسم تثبيت التطبيق — دائماً ظاهر
       ════════════════════════════════════════ */}
-      {!isInstalled && (
+      {!isInstalled && !isStandalone && (
         <section className="relative z-10 py-12 px-4 sm:px-6 lg:px-8" dir={isRTL ? 'rtl' : 'ltr'}>
           <div className="max-w-2xl mx-auto">
             <motion.div
@@ -851,7 +861,13 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
                   <div className="w-20 h-20 md:w-24 md:h-24 rounded-3xl bg-white/2 border border-white/10 p-5 flex items-center justify-center group-hover:bg-cinematic-neon-gold/10 group-hover:border-cinematic-neon-gold/40 shadow-2xl transition-all duration-500 relative overflow-hidden">
                     <div className="absolute inset-0 bg-linear-to-br from-white/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                     {brand.logoUrl ? (
-                      <img src={brand.logoUrl} alt={brand.name} className="w-full h-full object-contain grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700" />
+                      <Image
+                        src={brand.logoUrl}
+                        alt={brand.name}
+                        fill
+                        sizes="96px"
+                        className="object-contain grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700"
+                      />
                     ) : (
                       <Tag className="w-10 h-10 text-white/10 group-hover:text-cinematic-neon-gold" />
                     )}
@@ -864,6 +880,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
         </section>
       )}
 
+      {!isStandalone && (
       <footer className="relative z-10 py-10 px-4 sm:px-6 lg:px-8 border-t border-white/10 bg-black">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-8">
@@ -916,6 +933,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
           </div>
         </div>
       </footer>
+      )}
 
       {/* ── بانر التحديث التلقائي ── */}
       {showUpdateBanner && (

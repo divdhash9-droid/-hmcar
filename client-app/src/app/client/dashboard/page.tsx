@@ -13,7 +13,6 @@ import {
     Sparkles,
     ArrowLeft,
     ArrowRight,
-    TrendingUp,
     Clock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -29,7 +28,16 @@ export default function ClientDashboard() {
     const { isRTL } = useLanguage();
     const { formatPrice } = useSettings();
     const { user, isLoading: authLoading } = useAuth();
-    const [dashboardData, setDashboardData] = useState<any>(null);
+    const [dashboardData, setDashboardData] = useState<{
+        stats?: {
+            availableCars: number;
+            liveAuctions: number;
+            myOrders: number;
+            myFavorites: number;
+        };
+        recentCars?: { id?: string; title: string; image?: string; img?: string; price?: number }[];
+        auctions?: { id?: string; label: string; endsIn: string }[];
+    } | null>(null);
     const [loading, setLoading] = useState(true);
 
     const userName = user?.name || (isRTL ? 'العميل' : 'Guest');
@@ -234,7 +242,7 @@ export default function ClientDashboard() {
                         </Link>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                        {dashboardData.recentCars.slice(0, 3).map((car: any, i: number) => (
+                        {dashboardData.recentCars.slice(0, 3).map((car, i: number) => (
                             <Link key={car.id || i} href={`/showroom/${car.id || ''}`}>
                                 <motion.div
                                     initial={{ opacity: 0, y: 10 }}
@@ -243,6 +251,7 @@ export default function ClientDashboard() {
                                     className="rounded-2xl overflow-hidden border border-white/6 hover:border-white/12 bg-white/2 group transition-all"
                                 >
                                     <div className="h-40 overflow-hidden relative">
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
                                         <img
                                             src={car.image || car.img || '/images/placeholder.jpg'}
                                             alt={car.title}
@@ -285,7 +294,7 @@ export default function ClientDashboard() {
                     </div>
                     <div className="overflow-x-auto scrollbar-hide">
                         <div className="flex gap-2 pb-1">
-                            {dashboardData.auctions.map((a: any, i: number) => (
+                            {dashboardData.auctions.map((a, i: number) => (
                                 <div
                                     key={a.id || i}
                                     className="shrink-0 px-4 py-2.5 rounded-xl bg-red-400/6 border border-red-400/15 flex items-center gap-2.5"

@@ -5,9 +5,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     Bell, Plus, Trash2, Edit3, ChevronLeft, ChevronRight,
     Zap, Target, Check, X, AlertCircle, ToggleLeft, ToggleRight,
-    Car, Filter, SlidersHorizontal, Sparkles, Clock, TrendingUp
+    TrendUp, Target, Check, X, AlertCircle, ToggleLeft, ToggleRight,
+    Car, Filter, Sparkles, Clock, TrendingUp
 } from 'lucide-react';
-// Navbar مُزال - يتم التنقل عبر client/layout.tsx
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/lib/LanguageContext';
 import { api } from '@/lib/api';
@@ -117,15 +117,19 @@ const AlertModal = ({
         }
     }, [open, initial]);
 
-    const set = (key: keyof FormData, value: any) => setForm(p => ({ ...p, [key]: value }));
+    const set = (key: keyof FormData, value: string | boolean | number | null) => setForm(p => ({ ...p, [key]: value }));
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
         try {
             await onSave(form);
-        } catch (err: any) {
-            setError(err.message || 'حدث خطأ');
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setError(err.message || 'حدث خطأ');
+            } else {
+                setError('حدث خطأ');
+            }
         }
     };
 
@@ -336,7 +340,7 @@ const AlertModal = ({
                                     <button
                                         key={opt.value}
                                         type="button"
-                                        onClick={() => set('frequency', opt.value as any)}
+                                        onClick={() => set('frequency', opt.value)}
                                         className={cn(
                                             "p-4 rounded-xl border text-left transition-all",
                                             form.frequency === opt.value
@@ -371,7 +375,7 @@ const AlertModal = ({
                         <motion.button
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
-                            onClick={handleSubmit as any}
+                            onClick={handleSubmit}
                             disabled={loading}
                             className="flex-1 py-4 rounded-xl bg-cyan-400 text-black text-[11px] font-black uppercase tracking-widest shadow-[0_0_30px_rgba(0,240,255,0.3)] hover:shadow-[0_0_40px_rgba(0,240,255,0.5)] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                         >

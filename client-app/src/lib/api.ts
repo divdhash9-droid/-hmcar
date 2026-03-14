@@ -478,6 +478,19 @@ export const api = {
             method: 'POST'
         }),
     },
+    // ── الإشعارات (Notifications) ──
+    notifications: {
+        list: () => fetchAPI('/api/v2/notifications'),
+        markRead: () => fetchAPI('/api/v2/notifications/read', { method: 'POST' }),
+        send: (data: { title: string; message: string; type: string; actionUrl?: string }) => fetchAPI('/api/v2/notifications/send', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        }),
+        broadcast: (title: string, message: string, url?: string) => fetchAPI('/api/v2/notifications/broadcast', {
+            method: 'POST',
+            body: JSON.stringify({ title, message, url }),
+        }),
+    },
     // ── الأمن والحماية (Security) ──
     security: {
         getDevices: () => fetchAPI('/api/v2/security/devices'),

@@ -3,8 +3,10 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
-    Download, type LucideIcon, ArrowLeft, DollarSign, ShoppingCart, Car, Gavel, Users, BarChart3, TrendingUp, ArrowUpRight, ArrowDownRight
+    Download, type LucideIcon, ArrowLeft, DollarSign, ShoppingCart, Car, Gavel, Users, BarChart3, TrendingUp, ArrowUpRight, ArrowDownRight, FileText
 } from 'lucide-react';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 import Link from 'next/link';
 import { useLanguage } from '@/lib/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -265,6 +267,56 @@ export default function AdminReportsPage() {
         URL.revokeObjectURL(url);
     };
 
+    const exportToPDF = () => {
+        const doc = new jsPDF() as any;
+        const timestamp = new Date().toLocaleString();
+        
+        // Title
+        doc.setFontSize(22);
+        doc.text('HM CAR - PERFORMANCE REPORT', 105, 20, { align: 'center' });
+        
+        doc.setFontSize(10);
+        doc.text(`Generated: ${timestamp}`, 105, 30, { align: 'center' });
+        doc.text(`Period: ${period.toUpperCase()}`, 105, 35, { align: 'center' });
+        
+        // Stats Table
+        doc.setFontSize(14);
+        doc.text('Key Metrics', 14, 50);
+        const statsRows = stats.map(s => [s.label, s.value, `${s.trend}%`]);
+        (doc as any).autoTable({
+            startY: 55,
+            head: [['Metric', 'Value', 'Trend']],
+            body: statsRows,
+            theme: 'grid',
+            headStyles: { fillColor: [249, 115, 22] }
+        });
+        
+        // Monthly Table
+        const nextY = (doc as any).lastAutoTable.finalY + 15;
+        doc.text('Detailed Monthly Breakdown', 14, nextY);
+        const monthlyRows = chartData.map(d => [d.month, formatRawByCurrency(d.revenue), d.orders, d.cars]);
+        (doc as any).autoTable({
+            startY: nextY + 5,
+            head: [['Month', 'Revenue', 'Orders', 'Cars']],
+            body: monthlyRows,
+            theme: 'striped'
+        });
+
+        // Top Cars
+        const finalY = (doc as any).lastAutoTable.finalY + 15;
+        doc.text('Top Selling Models', 14, finalY);
+        const topCarsRows = topCars.map((c, i) => [i + 1, c.name, c.sales, formatRawByCurrency(pickRevenueByCurrency({ revenue: c.revenueSar, revenueUsd: c.revenueUsd, revenueKrw: c.revenueKrw }))]);
+        (doc as any).autoTable({
+            startY: finalY + 5,
+            head: [['Rank', 'Car Model', 'Units', 'Revenue']],
+            body: topCarsRows,
+            theme: 'grid',
+            headStyles: { fillColor: [100, 100, 100] }
+        });
+        
+        doc.save(`hm-report-${period}-${new Date().toISOString().split('T')[0]}.pdf`);
+    };
+
     return (
         <div className="min-h-screen text-white" dir={isRTL ? 'rtl' : 'ltr'}>
             <main className="relative z-10 pt-6 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
@@ -293,7 +345,7 @@ export default function AdminReportsPage() {
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-between gap-4 mt-6 flex-wrap">
+                        <div className="flex items-center justify-between gap-4 mt-6 flex-wrap">
                         <div className="ck-tab-group">
                             {(['week', 'month', 'year'] as const).map(p => (
                                 <button key={p} onClick={() => setPeriod(p)} className={cn('ck-tab', period === p && 'ck-tab-active')}>
@@ -301,9 +353,14 @@ export default function AdminReportsPage() {
                                 </button>
                             ))}
                         </div>
-                        <button onClick={exportToCSV} className="ck-btn-ghost flex items-center gap-2 border-white/10">
-                            <Download className="w-3.5 h-3.5" />{isRTL ? 'تصدير البيانات' : 'DATA EXPORT'}
-                        </button>
+                        <div className="flex gap-2">
+                            <button onClick={exportToCSV} className="ck-btn-ghost flex items-center gap-2 border-white/10 hover:bg-white/5">
+                                <Download className="w-3.5 h-3.5" />{isRTL ? 'CSV' : 'CSV'}
+                            </button>
+                            <button onClick={exportToPDF} className="ck-btn-ghost flex items-center gap-2 border-orange-500/20 bg-orange-500/5 text-orange-400 hover:bg-orange-500/10">
+                                <FileText className="w-3.5 h-3.5" />{isRTL ? 'تصدير PDF' : 'PDF REPORT'}
+                            </button>
+                        </div>
                     </div>
                 </div>
 

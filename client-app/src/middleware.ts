@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 /**
- * proxy.ts - نظام حماية المسارات لـ HM CAR
+ * middleware.ts - نظام حماية المسارات لـ HM CAR
  * يعمل كـ Edge Middleware قبل تحميل أي صفحة
  */
 
@@ -20,7 +20,7 @@ const PROTECTED_CLIENT_ROUTES = [
 const PROTECTED_ADMIN_ROUTES = ['/admin'];
 const AUTH_ROUTES = ['/login', '/register'];
 
-export function proxy(request: NextRequest) {
+export function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
     // قراءة التوكن من الـ cookies

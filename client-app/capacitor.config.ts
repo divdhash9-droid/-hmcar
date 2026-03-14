@@ -13,14 +13,16 @@ const config: CapacitorConfig = {
     webDir: 'out',
 
     // ──────────────────────────────────────────
-    // وضع الخادم: يشير لموقعك المنشور على Vercel
-    // هذا يعني أن التطبيق يعرض موقعك المباشر
+    // وضع الخادم: استخدمه فقط إذا أردت عرض الموقع المباشر داخل التطبيق
+    // لتفعيل الفصل بين التطبيق والموقع، اتركه فارغاً أو استخدم CAP_SERVER_URL
     // ──────────────────────────────────────────
-    server: {
-        url: 'https://car-auction-sand.vercel.app',
-        cleartext: false,
-        androidScheme: 'https',
-    },
+    ...(process.env.CAP_SERVER_URL ? {
+        server: {
+            url: process.env.CAP_SERVER_URL,
+            cleartext: false,
+            androidScheme: 'https',
+        }
+    } : {}),
 
     // ──────────────────────────────────────────
     // إعدادات الإضافات

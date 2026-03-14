@@ -93,7 +93,7 @@ export default function LocalCarDetail() {
         });
     }, []);
 
-    const handleWhatsappPurchase = () => {
+    const handleWhatsappPurchase = async () => {
         if (!car) return;
         
         // [[ARABIC_COMMENT]] تسجيل حدث التحويل في Google Analytics
@@ -103,6 +103,38 @@ export default function LocalCarDetail() {
             label: car.title,
             value: Number(car.price || 0)
         });
+
+        // [[ARABIC_COMMENT]] تسجيل الطلب في القاعدة وإنشاء إشعار للأدمن قبل النقل للواتساب
+        try {
+            let buyerId = null;
+            if (typeof window !== 'undefined') {
+                const userJson = localStorage.getItem('hm_user');
+                if (userJson) {
+                    try {
+                        const u = JSON.parse(userJson);
+                        buyerId = u?._id || u?.id;
+                    } catch(e) {}
+                }
+            }
+
+            await api.orders.create({
+                buyerId: buyerId || null,
+                items: [{
+                    itemType: 'car',
+                    refId: (car as any)._id || (car as any).id || id,
+                    titleSnapshot: car.title,
+                    qty: 1,
+                    unitPriceSar: car.priceSar || car.price || 0
+                }],
+                pricing: {
+                    grandTotalSar: car.priceSar || car.price || 0
+                },
+                channel: 'whatsapp',
+                notes: `Clicked buy from Korean car page`
+            });
+        } catch (err) {
+            console.error('Failed to log order:', err);
+        }
 
         const url = WhatsAppService.generateCarLink(car, whatsapp || DEFAULT_WHATSAPP, isRTL, formatPrice);
         window.open(url, '_blank');

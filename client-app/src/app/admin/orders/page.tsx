@@ -8,7 +8,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useCallback, Suspense } from 'react';
 import {
-    X, ShoppingCart, Clock, CheckCircle, Eye, Package, 
+    X, ShoppingCart, Clock, CheckCircle, Package, 
     MessageCircle, Car as CarIcon, User, Briefcase, Settings, Phone, Calendar,
     XCircle, Loader, RefreshCw, Globe
 } from 'lucide-react';
@@ -31,6 +31,10 @@ const FILTER_ALL = 'all';
 // Direct Orders Specific Constants
 const ORDER_STATUS_PENDING = 'pending';
 const ORDER_STATUS_CONFIRMED = 'confirmed';
+const ORDER_STATUS_PROCESSING = 'processing';
+const ORDER_STATUS_SHIPPED_SEA = 'shipped_sea';
+const ORDER_STATUS_CUSTOMS_CLEARANCE = 'customs_clearance';
+const ORDER_STATUS_ARRIVED = 'arrived';
 const ORDER_STATUS_COMPLETED = 'completed';
 const ORDER_STATUS_CANCELLED = 'cancelled';
 const CHANNEL_WHATSAPP = 'whatsapp';
@@ -282,7 +286,11 @@ function AdminFulfillmentContent() {
     const getOrderStatusBadge = (s: string) => {
         switch (s) {
             case ORDER_STATUS_PENDING: return 'ck-badge ck-badge-pending';
-            case ORDER_STATUS_CONFIRMED: return 'ck-badge ck-badge-info';
+            case ORDER_STATUS_CONFIRMED: return 'ck-badge text-blue-400 bg-blue-500/10 border-blue-500/20';
+            case ORDER_STATUS_PROCESSING: return 'ck-badge text-purple-400 bg-purple-500/10 border-purple-500/20';
+            case ORDER_STATUS_SHIPPED_SEA: return 'ck-badge text-blue-500 bg-blue-500/10 border-blue-500/20';
+            case ORDER_STATUS_CUSTOMS_CLEARANCE: return 'ck-badge text-orange-500 bg-orange-500/10 border-orange-500/20';
+            case ORDER_STATUS_ARRIVED: return 'ck-badge text-emerald-300 bg-emerald-500/10 border-emerald-500/20';
             case ORDER_STATUS_COMPLETED: return 'ck-badge ck-badge-active';
             case ORDER_STATUS_CANCELLED: return 'ck-badge ck-badge-danger';
             default: return 'ck-badge ck-badge-inactive';
@@ -291,8 +299,17 @@ function AdminFulfillmentContent() {
 
     const getStatusLabel = (s: string, type: 'order' | 'special') => {
         if (type === 'order') {
-            if (isRTL) return { [ORDER_STATUS_PENDING]: 'انتظار', [ORDER_STATUS_CONFIRMED]: 'مؤكد', [ORDER_STATUS_COMPLETED]: 'مكتمل', [ORDER_STATUS_CANCELLED]: 'ملغي' }[s] || s;
-            return s.toUpperCase();
+            if (isRTL) return { 
+                [ORDER_STATUS_PENDING]: 'انتظار',
+                [ORDER_STATUS_CONFIRMED]: 'مؤكد',
+                [ORDER_STATUS_PROCESSING]: 'تجهيز الشحن',
+                [ORDER_STATUS_SHIPPED_SEA]: 'في البحر',
+                [ORDER_STATUS_CUSTOMS_CLEARANCE]: 'تخليص جمركي',
+                [ORDER_STATUS_ARRIVED]: 'جاهزة للاستلام',
+                [ORDER_STATUS_COMPLETED]: 'مكتمل',
+                [ORDER_STATUS_CANCELLED]: 'ملغي'
+             }[s] || s;
+            return s.toUpperCase().replace('_', ' ');
         } else {
             const cfg = SPECIAL_STATUS_CONFIG[s as keyof typeof SPECIAL_STATUS_CONFIG];
             return isRTL ? cfg?.label : cfg?.labelEn;
@@ -345,11 +362,11 @@ function AdminFulfillmentContent() {
                                     </div>
                                     <span className={cn(getOrderStatusBadge(selectedOrder.status), 'ck-badge-live')}>{getStatusLabel(selectedOrder.status, 'order')}</span>
                                 </div>
-                                <div className="flex gap-2">
-                                     {([ORDER_STATUS_PENDING, ORDER_STATUS_CONFIRMED, ORDER_STATUS_COMPLETED, ORDER_STATUS_CANCELLED] as const).map((s) => (
+                                <div className="flex flex-wrap gap-2">
+                                     {([ORDER_STATUS_PENDING, ORDER_STATUS_CONFIRMED, ORDER_STATUS_PROCESSING, ORDER_STATUS_SHIPPED_SEA, ORDER_STATUS_CUSTOMS_CLEARANCE, ORDER_STATUS_ARRIVED, ORDER_STATUS_COMPLETED, ORDER_STATUS_CANCELLED] as const).map((s) => (
                                          <button key={s} onClick={() => updateOrderStatus(selectedOrder.id, s)} disabled={selectedOrder.status === s || orderUpdatingId === selectedOrder.id}
                                             title={isRTL ? "تعديل الحالة" : "Update Status"}
-                                            className={cn('flex-1 py-2 rounded-xl text-[9px] font-black uppercase tracking-wider border transition-all', selectedOrder.status === s ? getOrderStatusBadge(s) : 'ck-btn-ghost')}>
+                                            className={cn('flex-1 min-w-[30%] py-2 rounded-xl text-[9px] font-black uppercase tracking-wider border transition-all', selectedOrder.status === s ? getOrderStatusBadge(s) : 'ck-btn-ghost')}>
                                             {orderUpdatingId === selectedOrder.id ? '...' : getStatusLabel(s, 'order')}
                                          </button>
                                      ))}

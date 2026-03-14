@@ -13,6 +13,7 @@ import { useLanguage } from "@/lib/LanguageContext";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import { useToast } from "@/lib/ToastContext";
+import LiveNotificationsList from "@/components/LiveNotificationsList";
 
 interface DashboardStats {
     totalCars?: number;
@@ -319,6 +320,16 @@ export default function AdminDashboard() {
                                     })
                                 )}
                             </div>
+                        </div>
+
+                        <div className="ck-card p-6">
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="w-1.5 h-6 rounded-full bg-orange-500" />
+                                <h2 className="cockpit-mono text-[12px] font-black uppercase tracking-widest text-white/80">
+                                    {isRTL ? 'النشاط المباشر' : 'LIVE FEED'}
+                                </h2>
+                            </div>
+                            <LiveNotificationsList isRTL={isRTL} />
                         </div>
 
                         <div className="ck-card p-6">

@@ -75,13 +75,45 @@ export default function ShowroomCarDetail() {
     }, []);
 
     // إرسال رسالة واتساب مع فاتورة السيارة
-    const handleWhatsappPurchase = () => {
+    const handleWhatsappPurchase = async () => {
         if (!car) return;
         const carMake = typeof car.make === 'object' ? car.make?.name : car.make;
         const baseUsd = getBaseUsd(car);
         const price = formatPriceFromUsd
             ? formatPriceFromUsd(baseUsd)
             : (formatPrice ? formatPrice(Number(car.priceSar || car.price || 0)) : `${Number(car.priceSar || car.price || 0).toLocaleString()} SAR`);
+
+        // [[ARABIC_COMMENT]] تسجيل الطلب في القاعدة وإنشاء إشعار للأدمن قبل النقل للواتساب
+        try {
+            let buyerId = null;
+            if (typeof window !== 'undefined') {
+                const userJson = localStorage.getItem('hm_user');
+                if (userJson) {
+                    try {
+                        const u = JSON.parse(userJson);
+                        buyerId = u?._id || u?.id;
+                    } catch(e) {}
+                }
+            }
+
+            await api.orders.create({
+                buyerId: buyerId || null,
+                items: [{
+                    itemType: 'car',
+                    refId: (car as any)._id || (car as any).id || id,
+                    titleSnapshot: car.title,
+                    qty: 1,
+                    unitPriceSar: car.priceSar || car.price || 0
+                }],
+                pricing: {
+                    grandTotalSar: car.priceSar || car.price || 0
+                },
+                channel: 'whatsapp',
+                notes: `Clicked buy from Showroom car page`
+            });
+        } catch (err) {
+            console.error('Failed to log order:', err);
+        }
 
         // [[ARABIC_COMMENT]] بناء رسالة الواتساب مع كل تفاصيل السيارة
         const msg = isRTL

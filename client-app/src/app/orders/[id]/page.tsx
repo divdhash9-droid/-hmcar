@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import {
-    Package, Clock, CheckCircle, Truck,
+    Package, Clock, CheckCircle, Truck, Ship, Anchor, MapPin,
     CreditCard,
     Phone, Mail, AlertCircle, ChevronLeft, ChevronRight
 } from "lucide-react";
@@ -13,14 +13,17 @@ import { useLanguage } from "@/lib/LanguageContext";
 import { useSettings } from "@/lib/SettingsContext";
 import { api } from "@/lib/api";
 import Link from "next/link";
+import Image from "next/image";
 import { useParams } from "next/navigation";
 import { formatAmountWithSnapshot, getOrderGrandTotalSar } from "@/lib/orderCurrency";
 
 const STATUS_STEPS = [
     { key: 'pending', labelAr: 'قيد الانتظار', labelEn: 'Pending', icon: Clock },
-    { key: 'confirmed', labelAr: 'مؤكد', labelEn: 'Confirmed', icon: CheckCircle },
-    { key: 'processing', labelAr: 'قيد المعالجة', labelEn: 'Processing', icon: Package },
-    { key: 'shipped', labelAr: 'تم الشحن', labelEn: 'Shipped', icon: Truck },
+    { key: 'confirmed', labelAr: 'شراء (كوريا)', labelEn: 'Purchased (KR)', icon: CheckCircle },
+    { key: 'processing', labelAr: 'تجهيز الشحن', labelEn: 'Processing', icon: Package },
+    { key: 'shipped_sea', labelAr: 'في البحر', labelEn: 'At Sea', icon: Ship },
+    { key: 'customs_clearance', labelAr: 'تخليص جمركي', labelEn: 'Customs', icon: Anchor },
+    { key: 'arrived', labelAr: 'جاهزة للاستلام', labelEn: 'Arrived', icon: MapPin },
     { key: 'completed', labelAr: 'مكتمل', labelEn: 'Completed', icon: CheckCircle },
 ];
 
@@ -30,7 +33,6 @@ export default function OrderDetailPage() {
     const params = useParams();
     const orderId = params?.id as string;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [order, setOrder] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
@@ -66,7 +68,9 @@ export default function OrderDetailPage() {
             case 'pending': return 'text-cinematic-neon-yellow';
             case 'confirmed': return 'text-cinematic-neon-blue';
             case 'processing': return 'text-purple-400';
-            case 'shipped': return 'text-amber-400';
+            case 'shipped_sea': return 'text-blue-500';
+            case 'customs_clearance': return 'text-orange-500';
+            case 'arrived': return 'text-emerald-300';
             case 'completed': return 'text-green-400';
             case 'cancelled': return 'text-cinematic-neon-red';
             default: return 'text-white/60';
@@ -174,7 +178,6 @@ export default function OrderDetailPage() {
                             {STATUS_STEPS.map((step, i) => {
                                 const StepIcon = step.icon;
                                 const done = i <= currentStep;
-                                const active = i === currentStep;
                                 return (
                                     <div key={step.key} className="relative z-10 flex flex-col items-center gap-3">
                                         <motion.div
@@ -210,10 +213,12 @@ export default function OrderDetailPage() {
                         className="lg:col-span-2 glass-card bg-white/[0.01] border-white/5 overflow-hidden"
                     >
                         <div className="relative h-56 overflow-hidden">
-                            <img
+                            <Image
                                 src={order.car.image}
                                 alt={order.car.title}
-                                className="w-full h-full object-cover"
+                                fill
+                                className="object-cover"
+                                priority
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
                             <div className="absolute bottom-6 left-6 right-6">

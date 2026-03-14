@@ -84,6 +84,7 @@ router.use('/reviews', require('./reviews'));            // التقييمات
 router.use('/comparisons', require('./comparisons'));    // المقارنات
 router.use('/brands', require('./brands'));              // الماركات
 router.use('/contact', require('./contact'));            // الاتصال
+router.use('/leads', require('./leads'));                // العملاء المحتملون (Leads)
 router.use('/favorites', require('./favorites'));        // المفضلة
 router.use('/bids', require('./bids'));                  // المزايدات
 router.use('/live-auctions', require('./live-auctions'));// المزادات المباشرة

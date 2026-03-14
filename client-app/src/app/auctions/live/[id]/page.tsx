@@ -41,14 +41,44 @@ export default function LiveAuctionDetails() {
         loadSession();
     }, [id]);
 
-    const handleBuyRequest = (car: any) => {
+    const handleBuyRequest = async (car: any) => {
+        // [[ARABIC_COMMENT]] تسجيل طلب مزايدة مسبق في النظام قبل التحويل للواتساب
+        try {
+            let buyerName = 'زائر';
+            let buyerPhone = 'غير محدد';
+            
+            if (typeof window !== 'undefined') {
+                const userJson = localStorage.getItem('hm_user');
+                if (userJson) {
+                    try {
+                        const u = JSON.parse(userJson);
+                        if (u.name) buyerName = u.name;
+                        if (u.phone) buyerPhone = u.phone;
+                    } catch(e) {}
+                }
+            }
+
+            await api.concierge.create({
+                type: 'car',
+                name: buyerName,
+                phone: buyerPhone,
+                carName: car.title,
+                model: session.title,
+                source: 'general',
+                contactPreference: 'whatsapp',
+                description: `طلب مزايدة مسبق - المزاد المباشر:\nالسيارة: ${car.title}\nالمزاد: ${session.title}\nرقم اللوت: ${car.lotNumber || 'غير محدد'}\nسعر المزاد المقدر: ${car.priceEstimate || 'غير محدد'}`
+            });
+        } catch (err) {
+            console.error('Failed to log auction request:', err);
+        }
+
         const phone = session.whatsappNumber || globalWhatsapp; // استخدم رقم المزاد أو الرقم العام الافتراضي
         const text = encodeURIComponent(
             isRTL
-                ? `السلام عليكم، أريد الاستفسار عن شراء سيارة من المزاد المباشر:\nالسيارة: ${car.title}\nالمزاد: ${session.title}\nرقم اللوت: ${car.lotNumber || 'N/A'}`
-                : `Hello, I'm interested in buying this car from the Live Auction:\nCar: ${car.title}\nAuction: ${session.title}\nLot #: ${car.lotNumber || 'N/A'}`
+                ? `السلام عليكم، أريد تقديم طلب مزايدة على سيارة من المزاد المباشر:\nالسيارة: ${car.title}\nالمزاد: ${session.title}\nرقم اللوت: ${car.lotNumber || 'N/A'}`
+                : `Hello, I'm interested in bidding on this car from the Live Auction:\nCar: ${car.title}\nAuction: ${session.title}\nLot #: ${car.lotNumber || 'N/A'}`
         );
-        window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
+        window.open(`https://wa.me/${phone.replace(/\D/g, '')}?text=${text}`, '_blank');
     };
 
     if (loading) return <div className="min-h-screen bg-black flex items-center justify-center text-white/20 uppercase tracking-[0.5em] animate-pulse">Initializing HUD Feed...</div>;
@@ -138,7 +168,7 @@ export default function LiveAuctionDetails() {
                                                 onClick={(e) => { e.stopPropagation(); handleBuyRequest(car); }}
                                                 className="px-6 py-3 bg-white/5 border border-white/10 rounded-xl hover:bg-cinematic-neon-blue/20 hover:text-cinematic-neon-blue transition-all text-[9px] font-black uppercase tracking-[0.2em]"
                                             >
-                                                {isRTL ? 'شراء عبر واتساب' : 'BUY VIA WHATSAPP'}
+                                                {isRTL ? 'تقديم طلب مزايدة' : 'REQUEST TO BID'}
                                             </button>
                                         </div>
                                     </div>
@@ -238,7 +268,7 @@ export default function LiveAuctionDetails() {
                                             onClick={() => handleBuyRequest(selectedCar)}
                                             className="flex-1 py-5 bg-cinematic-neon-blue text-black font-black uppercase text-xs tracking-[0.4em] rounded-2xl shadow-[0_0_40px_rgba(0,240,255,0.3)] hover:scale-105 transition-all"
                                         >
-                                            {isRTL ? 'شراء السيارة الآن' : 'SECURE THIS CAR'}
+                                            {isRTL ? 'طلب مزايدة مسبق' : 'REQUEST PRE-BID'}
                                         </button>
                                         <button onClick={() => setSelectedCar(null)} className="px-10 py-5 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all">
                                             {isRTL ? 'العودة' : 'CANCEL'}

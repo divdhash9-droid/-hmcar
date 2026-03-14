@@ -35,7 +35,15 @@ const orderSchema = new mongoose.Schema({
   // المشتري صاحب الطلب
   buyer: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   // حالة الطلب
-  status: { type: String, enum: ['pending', 'confirmed', 'cancelled', 'completed'], default: 'pending' },
+  // - pending: قيد الانتظار
+  // - confirmed: تم التأكيد (الشراء من كوريا)
+  // - processing: قيد التجهيز (للشحن)
+  // - shipped_sea: مشحونة في البحر
+  // - customs_clearance: قيد التخليص الجمركي
+  // - arrived: وصلت (جاهزة للاستلام)
+  // - completed: مكتملة
+  // - cancelled: ملغاة
+  status: { type: String, enum: ['pending', 'confirmed', 'processing', 'shipped_sea', 'customs_clearance', 'arrived', 'completed', 'cancelled'], default: 'pending' },
   // قناة الطلب (حالياً واتساب)
   channel: { type: String, enum: ['whatsapp'], default: 'whatsapp' },
   // عناصر الطلب

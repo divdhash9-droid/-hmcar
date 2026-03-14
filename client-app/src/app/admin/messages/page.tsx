@@ -1,13 +1,12 @@
 'use client';
 
 import React, { useEffect, useState, useRef, Suspense } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     MessageCircle, Send, Search,
-    User, CheckCheck, Circle, RefreshCcw, X, ArrowLeft
+    User, CheckCheck, Circle, RefreshCcw, X
 } from 'lucide-react';
-import Link from 'next/link';
 import { useLanguage } from '@/lib/LanguageContext';
 import { cn } from '@/lib/utils';
 import { api } from '@/lib/api';
@@ -40,19 +39,26 @@ function AdminMessagesContent() {
     const [sending, setSending] = useState(false);
     const [search, setSearch] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const [adminId, setAdminId] = useState<string>('');
+    const pollRef = useRef<NodeJS.Timeout | null>(null);
 
     const searchParams = useSearchParams();
 
     useEffect(() => {
-        if (typeof window !== 'undefined') {
-            try {
-                const user = JSON.parse(localStorage.getItem('hm_user') || '{}');
-                setAdminId(user.id || user._id || '');
-            } catch { }
-        }
+        // No-op for admin ID for now if not used
         loadConversations();
-    }, []);
+        
+        // Auto-refresh every 10 seconds
+        pollRef.current = setInterval(() => {
+            loadConversations();
+            if (selectedConv) {
+                loadMessages(selectedConv, false); // Add flag to avoid loading state flash
+            }
+        }, 10000);
+
+        return () => {
+            if (pollRef.current) clearInterval(pollRef.current);
+        };
+    }, [selectedConv]);
 
     // Handle auto-select from query params
     useEffect(() => {
@@ -102,8 +108,8 @@ function AdminMessagesContent() {
         }
     };
 
-    const loadMessages = async (conv: Conversation) => {
-        setSelectedConv(conv);
+    const loadMessages = async (conv: Conversation, showLoad = true) => {
+        if (showLoad) setSelectedConv(conv);
         try {
             const data = await api.messages.conversation(conv.userId);
             if (data.success && Array.isArray(data.data)) {

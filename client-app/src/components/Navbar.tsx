@@ -165,7 +165,7 @@ export default function Navbar() {
                             <div className="flex items-center gap-2">
                                 <NotificationDropdown />
                                 <Link
-                                    href={user?.role === 'admin' ? '/admin' : '/profile'}
+                                    href={user?.role && ['admin', 'super_admin', 'manager'].includes(user.role) ? '/admin/dashboard' : '/profile'}
                                     className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all"
                                 >
                                     <User className="w-4 h-4" />

@@ -1,9 +1,9 @@
-﻿'use client';
+'use client';
 
 import { motion, AnimatePresence } from "framer-motion";
 import {
     Bell, AlertCircle, CheckCircle2, Clock, Shield,
-    Trash2, RefreshCcw, Terminal,
+    Trash2, RefreshCcw, Terminal, Send, X,
     ShoppingCart, Users, Gavel, type LucideIcon
 } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
@@ -71,6 +71,32 @@ export default function AdminNotifications() {
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
+
+    const [showBroadcastModal, setShowBroadcastModal] = useState(false);
+    const [isBroadcasting, setIsBroadcasting] = useState(false);
+    const [broadcastForm, setBroadcastForm] = useState({ title: '', message: '', url: '' });
+
+    const handleBroadcast = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!broadcastForm.title || !broadcastForm.message) return;
+        setIsBroadcasting(true);
+        try {
+            const res = await api.notifications.broadcast(broadcastForm.title, broadcastForm.message, broadcastForm.url);
+            if (res.success) {
+                setShowBroadcastModal(false);
+                setBroadcastForm({ title: '', message: '', url: '' });
+                alert(isRTL ? 'تم إرسال الإشعار بنجاح!' : 'Broadcast sent successfully!');
+                loadNotifications(true);
+            } else {
+                alert(isRTL ? 'فشل إرسال الإشعار' : 'Failed to send broadcast');
+            }
+        } catch (err: any) {
+            console.error('Broadcast failed:', err);
+            alert(isRTL ? 'حدث خطأ' : 'Error occurred');
+        } finally {
+            setIsBroadcasting(false);
+        }
+    };
 
     const loadNotifications = useCallback(async (showRefreshing = false) => {
         if (showRefreshing) setRefreshing(true);
@@ -155,6 +181,9 @@ export default function AdminNotifications() {
                             </div>
                         </div>
                         <div className="flex gap-2">
+                            <button onClick={() => setShowBroadcastModal(true)} className="flex items-center gap-2 px-4 py-2 bg-cinematic-neon-blue/10 border border-cinematic-neon-blue/20 text-cinematic-neon-blue rounded-xl text-[9px] font-bold uppercase tracking-widest hover:bg-cinematic-neon-blue hover:text-black transition-all">
+                                <Send className="w-3.5 h-3.5" />{isRTL ? 'إرسال للكل' : 'BROADCAST'}
+                            </button>
                             <button onClick={markAllRead} className="ck-btn-ghost flex items-center gap-2 text-[9px]">
                                 <CheckCircle2 className="w-3.5 h-3.5" />{isRTL ? 'تعليم الكل' : 'MARK ALL'}
                             </button>
@@ -267,6 +296,43 @@ export default function AdminNotifications() {
                 </footer>
 
             </main>
+
+            {/* Broadcast Modal */}
+            <AnimatePresence>
+                {showBroadcastModal && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            className="bg-zinc-950 border border-white/10 p-8 rounded-3xl w-full max-w-lg relative"
+                        >
+                            <button onClick={() => setShowBroadcastModal(false)} className="absolute top-6 right-6 text-white/40 hover:text-white transition-all"><X className="w-6 h-6" /></button>
+                            <h2 className="text-2xl font-black uppercase tracking-tighter mb-6 flex items-center gap-3 text-cinematic-neon-blue">
+                                <Send className="w-6 h-6" />
+                                {isRTL ? 'إرسال إشعار للكل' : 'NEW BROADCAST'}
+                            </h2>
+                            <form onSubmit={handleBroadcast} className="space-y-6">
+                                <div>
+                                    <label className="block text-[10px] font-black text-white/40 uppercase tracking-widest mb-2">{isRTL ? 'عنوان الإشعار' : 'TITLE'}</label>
+                                    <input required placeholder={isRTL ? 'مثال: عرض جديد!' : 'e.g., NEW OFFER!'} value={broadcastForm.title} onChange={e => setBroadcastForm(prev => ({ ...prev, title: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-cinematic-neon-blue focus:outline-none transition-all" />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-black text-white/40 uppercase tracking-widest mb-2">{isRTL ? 'نص الإشعار' : 'MESSAGE CONTENT'}</label>
+                                    <textarea required rows={4} placeholder={isRTL ? 'اكتب رسالتك للمستخدمين هنا...' : 'Write your message...'} value={broadcastForm.message} onChange={e => setBroadcastForm(prev => ({ ...prev, message: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-cinematic-neon-blue focus:outline-none transition-all resize-none"></textarea>
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-black text-white/40 uppercase tracking-widest mb-2">{isRTL ? 'رابط اختياري (عند النقر)' : 'OPTIONAL LINK'}</label>
+                                    <input placeholder={isRTL ? 'مثال: /cars/xxx' : 'e.g., /cars/xxx'} value={broadcastForm.url} onChange={e => setBroadcastForm(prev => ({ ...prev, url: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-cinematic-neon-blue focus:outline-none transition-all" />
+                                </div>
+                                <button type="submit" disabled={isBroadcasting} className="w-full py-4 bg-cinematic-neon-blue text-black font-black uppercase text-[11px] tracking-widest rounded-xl hover:shadow-[0_0_30px_rgba(0,240,255,0.3)] transition-all disabled:opacity-50">
+                                    {isBroadcasting ? (isRTL ? 'جاري الإرسال...' : 'SENDING...') : (isRTL ? 'نشر الإشعار' : 'PUBLISH BROADCAST')}
+                                </button>
+                            </form>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

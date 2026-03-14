@@ -251,6 +251,24 @@ router.get('/', cacheResponse(300), async (req, res, next) => {
     }
 });
 
+// GET /api/v2/cars/makes - جلب قائمة الماركات
+router.get('/makes', cacheResponse(1800), async (req, res, next) => {
+    try {
+        const includeInactive = String(req.query.includeInactive || 'false') === 'true';
+        const filter = includeInactive ? {} : { isActive: true, isSold: false };
+
+        const makes = await Car.distinct('make', filter);
+        const cleaned = makes
+            .map(m => (typeof m === 'string' ? m.trim() : m))
+            .filter(Boolean)
+            .sort((a, b) => String(a).localeCompare(String(b)));
+
+        res.json({ success: true, data: cleaned });
+    } catch (error) {
+        next(error);
+    }
+});
+
 // GET /api/v2/cars/:id - جلب تفاصيل سيارة محددة
 router.get('/:id', cacheResponse(600), async (req, res, next) => {
     try {

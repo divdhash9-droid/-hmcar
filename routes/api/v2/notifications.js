@@ -3,6 +3,7 @@
 const express = require('express');
 const router = express.Router();
 const UserNotification = require('../../../models/UserNotification');
+const AdvancedNotification = require('../../../models/AdvancedNotification');
 const { requireAuthAPI } = require('../../../middleware/auth');
 
 // جلب جميع الإشعارات للمستخدم الحالي
@@ -43,6 +44,34 @@ router.post('/send', requireAuthAPI, async (req, res) => {
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// إرسال إشعار لجميع المستخدمين (للمشرفين فقط)
+router.post('/broadcast', requireAuthAPI, async (req, res) => {
+  try {
+    if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
+      return res.status(403).json({ success: false, error: 'Admin access required' });
+    }
+
+    const { title, message, url } = req.body;
+    
+    // إنشاء إشعار عام باستخدام AdvancedNotification
+    await AdvancedNotification.broadcast({
+      title,
+      message,
+      type: 'INFO',
+      priority: 'HIGH',
+      channels: ['IN_APP'], // PUSH if configured
+      actionUrl: url || null,
+      actionText: url ? 'عرض التفاصيل' : null,
+      category: 'GENERAL'
+    });
+
+    res.json({ success: true, message: 'Broadcast successful' });
+  } catch (error) {
+    console.error('Broadcast error:', error);
+    res.status(500).json({ success: false, error: 'Failed to broadcast message' });
   }
 });
 

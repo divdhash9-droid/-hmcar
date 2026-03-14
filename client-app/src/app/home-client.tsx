@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-// Navbar import removed because it's managed via AppShell/layout or omitted here
+import Navbar from "@/components/Navbar";
 import CinematicVideoBackground from "@/components/CinematicVideoBackground";
 import { useLanguage } from "@/lib/LanguageContext";
 // [[ARABIC_COMMENT]] أيقونات التواصل الاجتماعي مبنية كـ SVG مضمنة في المكوّن مباشرة
@@ -295,8 +295,8 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
 
   return (
     <div ref={containerRef} className="relative min-h-screen overflow-x-hidden" dir={isRTL ? "rtl" : "ltr"}>
-      {/* Navbar hidden on home page per user request */}
-      {/* <Navbar /> */}
+      {/* Navbar visible for regular users, hidden for PWA */}
+      {!isStandalone && <Navbar />}
 
       {/* Dedicated Translation Button for Home Page */}
       <div className="fixed top-6 right-6 z-50 flex items-center gap-3">
@@ -467,8 +467,8 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
         </div>
       </section>
 
-      {/* [[ARABIC_COMMENT]] الشريط السفلي الثابت - أيقونات التواصل الديناميكية - إخفاء في الصفحة الرئيسية بطلب المستخدم */}
-      {false && (socialConfig.whatsapp || socialConfig.links.length > 0) && (
+      {/* [[ARABIC_COMMENT]] الشريط السفلي الثابت - أيقونات التواصل الديناميكية */}
+      {!isStandalone && (socialConfig.whatsapp || socialConfig.links.length > 0) && (
         <div className="fixed bottom-0 left-0 right-0 z-40">
           <div className="max-w-7xl mx-auto px-6">
             <div className="flex items-center justify-center gap-3 bg-black/70 border-t border-white/10 backdrop-blur-xl px-4 py-2">
@@ -756,7 +756,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
 
 
 
-      {false && (
+      {!isStandalone && (
         <section className="relative z-10 py-12 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
             <motion.div className="text-center mb-16" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
@@ -788,7 +788,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
         </section>
       )}
 
-      {false && (
+      {!isStandalone && (
         <section className="relative z-10 py-12 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
             <motion.div className="relative overflow-hidden rounded-3xl p-8 md:p-16" initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>

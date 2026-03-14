@@ -14,6 +14,7 @@ import {
     ArrowLeft,
     ArrowRight,
     Clock,
+    Bell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/LanguageContext";
@@ -140,10 +141,20 @@ export default function ClientDashboard() {
     return (
         <div className={cn("min-h-full", isRTL && "rtl")}>
             {/* ── Header ── */}
-            <div className="px-5 lg:px-8 pt-6 lg:pt-8 pb-4">
+            <div className="px-5 lg:px-8 pt-6 lg:pt-8 pb-4 flex items-start justify-between">
                 <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
                     <p className="text-[12px] text-white/30 font-medium mb-1">{greeting}{rawText(',')}</p>
                     <h1 className="text-2xl lg:text-3xl font-bold text-white">{userName} {rawText('👋')}</h1>
+                </motion.div>
+                
+                {/* PWA Notifications Quick Access */}
+                <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="show-in-app">
+                    <Link href="/notifications">
+                        <div className="relative p-2.5 bg-white/5 rounded-full border border-white/10 text-white/70 hover:bg-white/10 transition-colors">
+                            <Bell className="w-5 h-5" />
+                            <div className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-cinematic-neon-red border-2 border-black" />
+                        </div>
+                    </Link>
                 </motion.div>
             </div>
 

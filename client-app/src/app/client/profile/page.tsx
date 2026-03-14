@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from "framer-motion";
-import { User, Mail, Shield, Save, Phone, MapPin } from "lucide-react";
+import { User, Mail, Shield, Save, Phone, MapPin, LogOut } from "lucide-react";
 import { useLanguage } from "@/lib/LanguageContext";
 import { useAuth } from "@/lib/AuthContext";
 import { cn } from "@/lib/utils";
@@ -178,6 +178,24 @@ export default function Profile() {
                             </div>
                         </div>
                     </div>
+
+                    {/* Logout Button */}
+                    <button
+                        type="button"
+                        onClick={() => {
+                            // Clear token and redirect
+                            document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+                            if (typeof window !== 'undefined') {
+                                localStorage.removeItem('user');
+                                window.location.href = '/login';
+                            }
+                        }}
+                        className="w-full mt-6 py-4 rounded-2xl bg-cinematic-neon-red/10 border border-cinematic-neon-red/20 text-cinematic-neon-red font-bold text-[14px] transition-all hover:bg-cinematic-neon-red/20 active:scale-[0.98] flex items-center justify-center gap-2.5"
+                    >
+                        <LogOut className="w-4 h-4" strokeWidth={2} />
+                        {isRTL ? 'تسجيل الخروج' : 'Log Out'}
+                    </button>
+
                 </motion.div>
             </div>
         </div>

@@ -5,8 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     Bell, Plus, Trash2, Edit3, ChevronLeft, ChevronRight,
     Zap, Target, Check, X, AlertCircle, ToggleLeft, ToggleRight,
-    TrendUp, Target, Check, X, AlertCircle, ToggleLeft, ToggleRight,
-    Car, Filter, Sparkles, Clock, TrendingUp
+    Filter, Sparkles, Clock, TrendingUp
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/lib/LanguageContext';
@@ -65,6 +64,70 @@ const EMPTY_FORM: FormData = {
     frequency: 'immediate'
 };
 
+// ===================== Form Field Components =====================
+type FieldSetter = (key: keyof FormData, value: string | boolean | number | null) => void;
+
+const InputField = ({ label, field, type = 'text', placeholder = '', form, set }: {
+    label: string; field: keyof FormData; type?: string; placeholder?: string;
+    form: FormData; set: FieldSetter;
+}) => (
+    <div>
+        <label className="block text-[10px] font-black uppercase tracking-[0.25em] text-white/40 mb-2">{label}</label>
+        <input
+            type={type}
+            value={(form[field] as string) || ''}
+            onChange={e => set(field, type === 'number' ? (e.target.value ? +e.target.value : null) : e.target.value)}
+            placeholder={placeholder}
+            className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm text-white font-medium focus:outline-none focus:border-cyan-400/40 transition-all placeholder:text-white/20"
+        />
+    </div>
+);
+
+const SelectField = ({ label, field, options, form, set, isRTL }: {
+    label: string; field: keyof FormData;
+    options: { value: string; label: string }[];
+    form: FormData; set: FieldSetter;
+    isRTL: boolean;
+}) => (
+    <div>
+        <label className="block text-[10px] font-black uppercase tracking-[0.25em] text-white/40 mb-2">{label}</label>
+        <select
+            value={(form[field] as string) || ''}
+            onChange={e => set(field, e.target.value)}
+            aria-label={label}
+            title={label}
+            className="w-full bg-[#0a0a0f] border border-white/10 rounded-xl px-4 py-3 text-sm text-white font-medium focus:outline-none focus:border-cyan-400/40 transition-all"
+        >
+            <option value="">— {isRTL ? 'الكل' : 'Any'} —</option>
+            {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+        </select>
+    </div>
+);
+
+const ToggleField = ({ field, label, color = 'bg-cyan-400', form, set }: { 
+    field: 'inApp' | 'email'; label: string; color?: string;
+    form: FormData; set: FieldSetter;
+}) => (
+    <div className="flex items-center justify-between p-4 rounded-xl bg-white/[0.02] border border-white/5">
+        <span className="text-[11px] font-bold text-white/60">{label}</span>
+        <button
+            type="button"
+            aria-label={label}
+            title={label}
+            onClick={() => set(field, !form[field])}
+            className={cn(
+                "w-11 h-6 rounded-full transition-all relative",
+                form[field] ? `${color} shadow-[0_0_12px_rgba(0,240,255,0.3)]` : "bg-white/10"
+            )}
+        >
+            <div className={cn(
+                "absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all",
+                form[field] ? "left-6" : "left-1"
+            )} />
+        </button>
+    </div>
+);
+
 // ===================== Badge Component =====================
 const CriteriaBadge = ({ label, value }: { label: string; value?: string | number | null }) => {
     if (!value && value !== 0) return null;
@@ -93,6 +156,7 @@ const AlertModal = ({
     useEffect(() => {
         if (open) {
             if (initial) {
+                // eslint-disable-next-line
                 setForm({
                     name: initial.name,
                     make: initial.criteria.make || '',
@@ -117,7 +181,7 @@ const AlertModal = ({
         }
     }, [open, initial]);
 
-    const set = (key: keyof FormData, value: string | boolean | number | null) => setForm(p => ({ ...p, [key]: value }));
+    const set: FieldSetter = (key, value) => setForm(p => ({ ...p, [key]: value }));
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -132,61 +196,6 @@ const AlertModal = ({
             }
         }
     };
-
-    const InputField = ({ label, field, type = 'text', placeholder = '' }: {
-        label: string; field: keyof FormData; type?: string; placeholder?: string;
-    }) => (
-        <div>
-            <label className="block text-[10px] font-black uppercase tracking-[0.25em] text-white/40 mb-2">{label}</label>
-            <input
-                type={type}
-                value={(form[field] as string) || ''}
-                onChange={e => set(field, type === 'number' ? (e.target.value ? +e.target.value : null) : e.target.value)}
-                placeholder={placeholder}
-                className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm text-white font-medium focus:outline-none focus:border-cyan-400/40 transition-all placeholder:text-white/20"
-            />
-        </div>
-    );
-
-    const SelectField = ({ label, field, options }: {
-        label: string; field: keyof FormData;
-        options: { value: string; label: string }[];
-    }) => (
-        <div>
-            <label className="block text-[10px] font-black uppercase tracking-[0.25em] text-white/40 mb-2">{label}</label>
-            <select
-                value={(form[field] as string) || ''}
-                onChange={e => set(field, e.target.value)}
-                aria-label={label}
-                title={label}
-                className="w-full bg-[#0a0a0f] border border-white/10 rounded-xl px-4 py-3 text-sm text-white font-medium focus:outline-none focus:border-cyan-400/40 transition-all"
-            >
-                <option value="">— {isRTL ? 'الكل' : 'Any'} —</option>
-                {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-            </select>
-        </div>
-    );
-
-    const Toggle = ({ field, label, color = 'bg-cyan-400' }: { field: 'inApp' | 'email'; label: string; color?: string }) => (
-        <div className="flex items-center justify-between p-4 rounded-xl bg-white/[0.02] border border-white/5">
-            <span className="text-[11px] font-bold text-white/60">{label}</span>
-            <button
-                type="button"
-                aria-label={label}
-                title={label}
-                onClick={() => set(field, !form[field])}
-                className={cn(
-                    "w-11 h-6 rounded-full transition-all relative",
-                    form[field] ? `${color} shadow-[0_0_12px_rgba(0,240,255,0.3)]` : "bg-white/10"
-                )}
-            >
-                <div className={cn(
-                    "absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all",
-                    form[field] ? "left-6" : "left-1"
-                )} />
-            </button>
-        </div>
-    );
 
     if (!open) return null;
 
@@ -262,20 +271,20 @@ const AlertModal = ({
 
                         {/* Make & Model */}
                         <div className="grid grid-cols-2 gap-4">
-                            <InputField label={isRTL ? 'الماركة' : 'Make'} field="make" placeholder="Toyota, BMW..." />
-                            <InputField label={isRTL ? 'الموديل' : 'Model'} field="model" placeholder="Corolla, X5..." />
+                            <InputField label={isRTL ? 'الماركة' : 'Make'} field="make" placeholder="Toyota, BMW..." form={form} set={set} />
+                            <InputField label={isRTL ? 'الموديل' : 'Model'} field="model" placeholder="Corolla, X5..." form={form} set={set} />
                         </div>
 
                         {/* Year Range */}
                         <div className="grid grid-cols-2 gap-4">
-                            <InputField label={isRTL ? 'سنة من' : 'Year From'} field="yearMin" type="number" placeholder="2018" />
-                            <InputField label={isRTL ? 'سنة إلى' : 'Year To'} field="yearMax" type="number" placeholder="2024" />
+                            <InputField label={isRTL ? 'سنة من' : 'Year From'} field="yearMin" type="number" placeholder="2018" form={form} set={set} />
+                            <InputField label={isRTL ? 'سنة إلى' : 'Year To'} field="yearMax" type="number" placeholder="2024" form={form} set={set} />
                         </div>
 
                         {/* Price Range */}
                         <div className="grid grid-cols-2 gap-4">
-                            <InputField label={isRTL ? 'السعر من (ر.س)' : 'Price From (SAR)'} field="priceMin" type="number" placeholder="50000" />
-                            <InputField label={isRTL ? 'السعر إلى (ر.س)' : 'Price To (SAR)'} field="priceMax" type="number" placeholder="200000" />
+                            <InputField label={isRTL ? 'السعر من (ر.س)' : 'Price From (SAR)'} field="priceMin" type="number" placeholder="50000" form={form} set={set} />
+                            <InputField label={isRTL ? 'السعر إلى (ر.س)' : 'Price To (SAR)'} field="priceMax" type="number" placeholder="200000" form={form} set={set} />
                         </div>
 
                         {/* Dropdowns */}
@@ -285,11 +294,11 @@ const AlertModal = ({
                                 { value: 'Diesel', label: isRTL ? 'ديزل' : 'Diesel' },
                                 { value: 'Electric', label: isRTL ? 'كهربائي' : 'Electric' },
                                 { value: 'Hybrid', label: isRTL ? 'هجين' : 'Hybrid' },
-                            ]} />
+                            ]} form={form} set={set} isRTL={isRTL} />
                             <SelectField label={isRTL ? 'ناقل الحركة' : 'Transmission'} field="transmission" options={[
                                 { value: 'Automatic', label: isRTL ? 'أوتوماتيك' : 'Automatic' },
                                 { value: 'Manual', label: isRTL ? 'يدوي' : 'Manual' },
-                            ]} />
+                            ]} form={form} set={set} isRTL={isRTL} />
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
@@ -299,18 +308,18 @@ const AlertModal = ({
                                 { value: 'truck', label: isRTL ? 'شاحنة' : 'Truck' },
                                 { value: 'coupe', label: 'Coupe' },
                                 { value: 'van', label: 'Van' },
-                            ]} />
+                            ]} form={form} set={set} isRTL={isRTL} />
                             <SelectField label={isRTL ? 'الحالة' : 'Condition'} field="condition" options={[
                                 { value: 'excellent', label: isRTL ? 'ممتازة' : 'Excellent' },
                                 { value: 'good', label: isRTL ? 'جيدة' : 'Good' },
                                 { value: 'fair', label: isRTL ? 'مقبولة' : 'Fair' },
-                            ]} />
+                            ]} form={form} set={set} isRTL={isRTL} />
                         </div>
 
                         <SelectField label={isRTL ? 'نوع الإعلان' : 'Listing Type'} field="listingType" options={[
                             { value: 'store', label: isRTL ? 'معرض' : 'Store' },
                             { value: 'auction', label: isRTL ? 'مزاد' : 'Auction' },
-                        ]} />
+                        ]} form={form} set={set} isRTL={isRTL} />
 
                         {/* Divider */}
                         <div className="flex items-center gap-3">
@@ -323,8 +332,8 @@ const AlertModal = ({
                         </div>
 
                         <div className="space-y-3">
-                            <Toggle field="inApp" label={isRTL ? '🔔 إشعار داخل التطبيق' : '🔔 In-App Notification'} color="bg-cyan-400" />
-                            <Toggle field="email" label={isRTL ? '📧 إشعار عبر البريد الإلكتروني' : '📧 Email Notification'} color="bg-violet-400" />
+                            <ToggleField field="inApp" label={isRTL ? '🔔 إشعار داخل التطبيق' : '🔔 In-App Notification'} color="bg-cyan-400" form={form} set={set} />
+                            <ToggleField field="email" label={isRTL ? '📧 إشعار عبر البريد الإلكتروني' : '📧 Email Notification'} color="bg-violet-400" form={form} set={set} />
                         </div>
 
                         {/* Frequency */}

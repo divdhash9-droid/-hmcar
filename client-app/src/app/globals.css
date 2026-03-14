@@ -703,6 +703,25 @@ html {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
+
+  /* PWA Exclusive Utilities */
+  .hide-in-app {
+    display: none !important;
+  }
+
+  .show-in-app {
+    display: flex !important; /* Default flex block for mobile UI elements */
+  }
+}
+
+/* Default state for browser users */
+@media screen and (display-mode: browser), screen and (display-mode: minimal-ui) {
+  .show-in-app {
+    display: none !important;
+  }
+}
+.show-in-app {
+    display: none !important;
 }
 
 /* ── Modals تفتح من الأسفل على الموبايل الصغير ── */

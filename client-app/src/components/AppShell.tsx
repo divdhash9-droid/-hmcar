@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useStandalone } from '@/lib/useStandalone';
+import { usePathname } from 'next/navigation';
 import BottomTabBar from './BottomTabBar';
 
 /**
@@ -11,6 +12,7 @@ import BottomTabBar from './BottomTabBar';
  */
 export default function AppShell({ children }: { children: React.ReactNode }) {
     const isStandalone = useStandalone();
+    const pathname = usePathname();
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -40,7 +42,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         return <>{children}</>;
     }
 
-    if (isStandalone) {
+    if (isStandalone && !pathname?.startsWith('/admin')) {
         // ── وضع التطبيق المثبت ──
         return (
             <div

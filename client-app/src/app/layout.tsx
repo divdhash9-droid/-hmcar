@@ -4,6 +4,7 @@ import { Providers } from "@/components/Providers";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import { Suspense } from "react";
 import { cookies } from "next/headers";
+import AppShell from "@/components/AppShell";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -24,6 +25,12 @@ export const metadata: Metadata = {
       { url: "/icons/icon-96x96.png", sizes: "96x96", type: "image/png" },
     ],
     apple: [{ url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" }],
+  },
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "HM CAR",
   },
   openGraph: {
     title: "HM CAR | Premium Korean Auto Export",
@@ -46,14 +53,19 @@ export default async function RootLayout({
     <html lang={lang} dir={dir}>
       <head>
         <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-96x96.png" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="format-detection" content="telephone=no" />
+        <meta name="mobile-web-app-capable" content="yes" />
       </head>
       <body className="antialiased selection:bg-white/20 selection:text-white font-sans">
         <Providers>
-          <Suspense fallback={null}>
-            <GoogleAnalytics />
-          </Suspense>
-          {children}
+          <AppShell>
+            <Suspense fallback={null}>
+              <GoogleAnalytics />
+            </Suspense>
+            {children}
+          </AppShell>
         </Providers>
       </body>
     </html>

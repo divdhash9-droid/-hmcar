@@ -512,7 +512,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
           <section className="relative z-10 py-32 px-4">
             <div className="max-w-7xl mx-auto">
               <div className="text-center mb-24">
-                <h2 className="text-5xl md:text-7xl font-black text-white italic uppercase tracking-tighter">{isRTL ? 'لماذا HM CAR؟' : 'WHY HM CAR?'}</h2>
+                <h2 className="text-5xl md:text-7xl font-black text-white italic uppercase tracking-tighter">{isRTL ? 'لماذا تختارنا؟' : 'WHY CHOOSE US?'}</h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {displayFeatures.slice(0, 6).map((feat, i) => {
@@ -552,40 +552,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
 
 
 
-      {/* ── 8. APP CONVERSION ── */}
-      {(homeContent?.showAppConversion ?? true) && (
-        <section className="relative z-10 py-40 px-4">
-        <div className="max-w-7xl mx-auto rounded-[5rem] overflow-hidden relative p-16 md:p-32 border border-accent-gold/20 bg-linear-to-br from-accent-gold/10 via-black to-blue-900/10 text-center lg:text-left shadow-2xl">
-          <div className="relative z-10 max-w-2xl">
-            <h2 className="text-6xl md:text-9xl font-black text-white italic uppercase tracking-tighter leading-[0.75] mb-12">
-              {isRTL ? 'الجيل القادم من المزادات' : 'NEXT GEN AUCTIONS'}
-            </h2>
-            <div className="flex flex-wrap gap-4 justify-center lg:justify-start mb-10">
-              <div className="flex items-center gap-2 px-4 py-2 rounded-2xl border border-white/10 bg-white/5 text-[10px] font-black uppercase tracking-[0.3em] text-white/70">
-                <Smartphone className="w-4 h-4 text-accent-gold" />
-                {isRTL ? 'تثبيت سريع' : 'QUICK INSTALL'}
-              </div>
-              <div className="flex items-center gap-2 px-4 py-2 rounded-2xl border border-white/10 bg-white/5 text-[10px] font-black uppercase tracking-[0.3em] text-white/70">
-                <Download className="w-4 h-4 text-accent-gold" />
-                {isRTL ? 'تنبيهات فورية' : 'INSTANT ALERTS'}
-              </div>
-              <div className="flex items-center gap-2 px-4 py-2 rounded-2xl border border-white/10 bg-white/5 text-[10px] font-black uppercase tracking-[0.3em] text-white/70">
-                <LinkIcon className="w-4 h-4 text-accent-gold" />
-                {isRTL ? 'تحديثات تلقائية' : 'AUTO UPDATES'}
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-6 justify-center lg:justify-start">
-              <button className="px-14 py-6 bg-white text-black rounded-3xl font-black uppercase tracking-widest text-xs hover:bg-accent-gold transition-all">
-                 {isRTL ? 'آيفون' : 'IOS APP'}
-              </button>
-              <button className="px-14 py-6 bg-white/5 border border-white/20 text-white rounded-3xl font-black uppercase tracking-widest text-xs hover:bg-white/10 transition-all">
-                 {isRTL ? 'أندرويد' : 'ANDROID'}
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-      )}
+
 
 
       {/* ── FOOTER ── */}

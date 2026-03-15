@@ -2,7 +2,7 @@
 
 const isBrowser = typeof window !== 'undefined';
 // الأفضل استخدام الرابط الثابت في الإنتاج إذا كان العميل والارسال منفصلين
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || (isBrowser ? '' : 'https://car-auction-sand.vercel.app');
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://car-auction-sand.vercel.app';
 
 export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
     const url = `${API_BASE_URL}${endpoint}`;

@@ -12,7 +12,6 @@
  * 6. FeaturesTab  - قسم "لماذا تختارنا"
  */
 
-import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
     Save, Globe, MessageCircle, Instagram, Youtube, Facebook, Camera,
@@ -29,7 +28,22 @@ interface SocialLinks { whatsapp: string; instagram: string; twitter: string; fa
 interface ContactInfo { phone: string; email: string; address: string; workingHours: string; }
 interface CurrencySettings { usdToSar: number; usdToKrw: number; activeCurrency: string; partsMultiplier: number; auctionMultiplier: number; }
 interface SiteInfo { siteName: string; siteDescription: string; logoUrl: string; faviconUrl: string; }
-interface HomeContent { heroTitle: string; heroSubtitle: string; heroVideoUrl: string; }
+interface HomeContent {
+    heroTitle: string; 
+    heroSubtitle: string; 
+    heroVideoUrl: string;
+    showSearchSection?: boolean;
+    showLiveMarket?: boolean;
+    showTrustHub?: boolean;
+    showAdvertising?: boolean;
+    showBuyingJourney?: boolean;
+    showPlatformFeatures?: boolean;
+    showBrandCatalog?: boolean;
+    showTrustedBy?: boolean;
+    showTestimonials?: boolean;
+    showAppConversion?: boolean;
+    showFAQ?: boolean;
+}
 interface Feature { icon: string; title: string; desc: string;[key: string]: string; }
 
 // ─────────────────────────────────
@@ -70,7 +84,6 @@ export function SocialTab({ socialLinks, loading, isRTL, onSave, onLinkChange, s
                 </p>
                 <div className="space-y-3">
                     {socialFields.map(field => {
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         const currentVal = ((socialLinks as any)[field.key] as string) || EMPTY_STRING;
                         const hasValue = currentVal.trim() !== EMPTY_STRING;
                         const Icon = field.icon;
@@ -101,7 +114,6 @@ export function SocialTab({ socialLinks, loading, isRTL, onSave, onLinkChange, s
                                         <button type="button" title="حفظ"
                                             onClick={async () => {
                                                 try {
-                                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                     await api.settings.updateSocialLinks({ socialLinks: socialLinks as any });
                                                     setMessage({ type: 'success', text: isRTL ? `✅ تم حفظ ${field.label}` : `✅ ${field.label} saved` });
                                                     setTimeout(() => setMessage({ type: EMPTY_STRING, text: EMPTY_STRING }), 2000);
@@ -116,7 +128,6 @@ export function SocialTab({ socialLinks, loading, isRTL, onSave, onLinkChange, s
                                             const updated = { ...socialLinks, [field.key]: EMPTY_STRING };
                                             onLinkChange(updated as SocialLinks);
                                             try {
-                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                 await api.settings.updateSocialLinks({ socialLinks: updated as any });
                                                 setMessage({ type: 'success', text: isRTL ? `🗑️ تم حذف ${field.label}` : `🗑️ ${field.label} removed` });
                                                 setTimeout(() => setMessage({ type: EMPTY_STRING, text: EMPTY_STRING }), 2000);
@@ -358,6 +369,27 @@ export function HomeTab({ homeContent, loading, isRTL, onSave, onSilentSave, onH
     onSave: () => void; onSilentSave: () => void;
     onHomeChange: (content: HomeContent) => void;
 }) {
+    // Helper for toggles
+    const handleToggle = (key: keyof HomeContent) => {
+        onHomeChange({ ...homeContent, [key]: !(homeContent[key] ?? true) });
+        // Auto-save the toggle
+        setTimeout(() => onSilentSave(), 500);
+    };
+
+    const sections = [
+        { key: 'showSearchSection', labelAr: 'قسم البحث السريع', labelEn: 'Quick Search Section' },
+        { key: 'showLiveMarket', labelAr: 'المعرض المباشر (السيارات المضافة)', labelEn: 'Live Showroom (Added Cars)' },
+        { key: 'showTrustHub', labelAr: 'إحصائيات المنصة', labelEn: 'Platform Statistics' },
+        { key: 'showAdvertising', labelAr: 'المساحة الإعلانية', labelEn: 'Advertising Space' },
+        { key: 'showBuyingJourney', labelAr: 'منظومة الشراء (خطوات)', labelEn: 'Buying Journey Steps' },
+        { key: 'showPlatformFeatures', labelAr: 'مميزات المنصة (لماذا نحن)', labelEn: 'Platform Features' },
+        { key: 'showBrandCatalog', labelAr: 'دليل الماركات', labelEn: 'Brand Catalog' },
+        { key: 'showTrustedBy', labelAr: 'شركاء النخبة', labelEn: 'Trusted Partners' },
+        { key: 'showTestimonials', labelAr: 'آراء العملاء', labelEn: 'Testimonials' },
+        { key: 'showAppConversion', labelAr: 'ترويج التطبيق', labelEn: 'App Promotion' },
+        { key: 'showFAQ', labelAr: 'الأسئلة الشائعة', labelEn: 'FAQ Section' }
+    ];
+
     return (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
             <div className="p-8 bg-white/2 border border-white/5 rounded-3xl">
@@ -369,7 +401,7 @@ export function HomeTab({ homeContent, loading, isRTL, onSave, onSilentSave, onH
                     {/* العنوان الرئيسي */}
                     <div>
                         <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">{isRTL ? rawText('عنوان البطولة (Hero Title)') : rawText('Hero Title')}</label>
-                        <input type="text" title="Hero Title" value={homeContent.heroTitle}
+                        <input type="text" title="Hero Title" value={homeContent?.heroTitle || ''}
                             onChange={e => onHomeChange({ ...homeContent, heroTitle: e.target.value })}
                             onBlur={onSilentSave} placeholder={isRTL ? 'أدخل العنوان الرئيسي...' : 'Enter main title...'}
                             className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40" />
@@ -377,7 +409,7 @@ export function HomeTab({ homeContent, loading, isRTL, onSave, onSilentSave, onH
                     {/* العنوان الفرعي */}
                     <div>
                         <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">{isRTL ? rawText('العنوان الفرعي') : rawText('Hero Subtitle')}</label>
-                        <input type="text" title="Hero Subtitle" value={homeContent.heroSubtitle}
+                        <input type="text" title="Hero Subtitle" value={homeContent?.heroSubtitle || ''}
                             onChange={e => onHomeChange({ ...homeContent, heroSubtitle: e.target.value })}
                             onBlur={onSilentSave} placeholder={isRTL ? 'أدخل العنوان الفرعي...' : 'Enter subtitle...'}
                             className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40" />
@@ -385,10 +417,37 @@ export function HomeTab({ homeContent, loading, isRTL, onSave, onSilentSave, onH
                     {/* رابط الفيديو */}
                     <div>
                         <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2 block">{isRTL ? rawText('رابط الفيديو (Hero Video URL)') : rawText('Hero Video URL')}</label>
-                        <input type="text" title="Hero Video URL" value={homeContent.heroVideoUrl}
+                        <input type="text" title="Hero Video URL" value={homeContent?.heroVideoUrl || ''}
                             onChange={e => onHomeChange({ ...homeContent, heroVideoUrl: e.target.value })}
                             onBlur={onSilentSave} placeholder="/videos/hero.mp4"
                             className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-sm focus:outline-none focus:border-cinematic-neon-red/40" />
+                    </div>
+                </div>
+
+                {/* Toggles */}
+                <div className="mt-10 pt-8 border-t border-white/10">
+                    <h3 className="text-sm font-black uppercase tracking-wider mb-6 flex items-center gap-2">
+                        {isRTL ? rawText('التحكم بظهور الأقسام') : rawText('Section Visibility Controls')}
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {sections.map(section => {
+                            const isVisible = homeContent?.[section.key as keyof HomeContent] ?? true;
+                            return (
+                                <div key={section.key} className="flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors">
+                                    <span className="text-[10px] font-bold uppercase tracking-wide text-white/80">
+                                        {isRTL ? section.labelAr : section.labelEn}
+                                    </span>
+                                    <button 
+                                        type="button"
+                                        title={isRTL ? section.labelAr : section.labelEn}
+                                        onClick={() => handleToggle(section.key as keyof HomeContent)}
+                                        className={`relative inline-flex h-6 w-10 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${isVisible ? "bg-green-500/80" : "bg-white/20"}`}
+                                    >
+                                        <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition duration-200 ease-in-out ${isVisible ? (isRTL ? "-translate-x-4" : "translate-x-4") : "translate-x-0"}`} />
+                                    </button>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             </div>

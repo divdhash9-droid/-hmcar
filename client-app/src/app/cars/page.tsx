@@ -81,6 +81,7 @@ function CarsContent() {
                 limit: 12,
                 search: q,
                 make: brand,
+                source: 'hm_local',
             };
 
             if (minPrice !== undefined) listParams.minPrice = minPrice.toString();

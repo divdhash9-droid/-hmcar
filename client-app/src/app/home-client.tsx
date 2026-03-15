@@ -7,7 +7,7 @@ import {
   MessageCircle, Smartphone, Download, Link as LinkIcon, ArrowUpRight,
   ArrowRight, RefreshCw, Car, Play, Check, ChevronLeft, ChevronRight,
   Quote, Phone, Instagram, Facebook, Youtube, Send, Linkedin,
-  Mail, Search, Gavel, Cog, Info, User, LogOut, Menu, X, Tag, Languages, Users, BarChart3, Plus
+  Mail, Search, Gavel, Cog, Info, User, LogOut, Menu, X, Users, BarChart3, Plus
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -51,10 +51,81 @@ interface HomeClientProps {
   latestCars: CarType[];
 }
 
+// ── مكون زر التطبيق العائم ──
+function PWAFloatingButton({ isRTL, deferredInstall, onInstall }: { isRTL: boolean; deferredInstall: any; onInstall: () => void }) {
+  const [showPopup, setShowPopup] = useState(false);
+
+  return (
+    <>
+      {/* أيقونة الهاتف الثابتة */}
+      <motion.button
+        id="pwa-float-btn"
+        onClick={() => setShowPopup(!showPopup)}
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        whileTap={{ scale: 0.9 }}
+        className="fixed bottom-24 right-4 z-[200] w-14 h-14 rounded-2xl bg-accent-gold text-black flex items-center justify-center shadow-[0_8px_32px_rgba(201,169,110,0.5)] hover:scale-110 transition-transform border-2 border-white/20"
+        title={isRTL ? 'تطبيق HM CAR' : 'HM CAR App'}
+      >
+        <Smartphone className="w-7 h-7" />
+      </motion.button>
+
+      {/* Popup النافذة المنبثقة */}
+      {showPopup && (
+        <>
+          {/* خلفية شفافة لإغلاق النافذة */}
+          <div className="fixed inset-0 z-[199]" onClick={() => setShowPopup(false)} />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.85, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.85, y: 20 }}
+            className="fixed bottom-44 right-4 z-[200] w-72 rounded-3xl bg-black/95 border border-accent-gold/30 backdrop-blur-2xl shadow-[0_20px_60px_rgba(0,0,0,0.8)] overflow-hidden"
+            dir={isRTL ? 'rtl' : 'ltr'}
+          >
+            {/* Header */}
+            <div className="px-6 pt-6 pb-4 border-b border-white/10 flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-accent-gold text-black flex items-center justify-center flex-shrink-0">
+                <Smartphone className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-white font-black text-base uppercase tracking-tight">{isRTL ? 'تطبيق HM CAR' : 'HM CAR App'}</h3>
+                <p className="text-white/40 text-[10px] uppercase tracking-widest">{isRTL ? 'تجربة أسرع وتنبيهات فورية' : 'Faster experience & instant alerts'}</p>
+              </div>
+            </div>
+            {/* Body */}
+            <div className="px-6 py-5">
+              {deferredInstall ? (
+                <button
+                  onClick={() => { onInstall(); setShowPopup(false); }}
+                  className="w-full py-3.5 bg-accent-gold text-black rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-accent-gold/90 transition-all flex items-center justify-center gap-2 shadow-lg"
+                >
+                  <Download className="w-4 h-4" />
+                  {isRTL ? 'تثبيت' : 'INSTALL'}
+                </button>
+              ) : (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10">
+                    <ArrowUpRight className="w-4 h-4 text-accent-gold flex-shrink-0" />
+                    <span className="text-white/70 text-xs font-bold">{isRTL ? 'اضغط زر المشاركة ↗' : 'Tap Share button ↗'}</span>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10">
+                    <Plus className="w-4 h-4 text-accent-gold flex-shrink-0" />
+                    <span className="text-white/70 text-xs font-bold">{isRTL ? 'اختر: إضافة للشاشة الرئيسية' : 'Select: Add To Home Screen'}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </>
+      )}
+    </>
+  );
+}
+
 export const revalidate = 60;
 
 export default function HomeClient({ latestCars }: HomeClientProps) {
-  const { isRTL, toggleLanguage } = useLanguage();
+  const { isRTL } = useLanguage();
   const { user, isLoggedIn } = useAuth();
   const { socket, isConnected } = useSocket();
   const { siteInfo, homeContent, formatPrice, features } = useSettings();
@@ -137,21 +208,6 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
     Menu, X, Car, Sparkles, Plus
   };
 
-  const testimonials = [
-    { name: isRTL ? "أحمد محمد" : "Ahmed Mohammed", role: isRTL ? "تاجر سيارات" : "Car Dealer", text: isRTL ? "تجربة رائعة مع HM CAR، حصلت على أفضل السيارات بأسعار مميزة جداً" : "Amazing experience with HM CAR, got the best cars at great prices" },
-    { name: isRTL ? "خالد العمر" : "Khaled Al-Omar", role: isRTL ? "مستثمر" : "Investor", text: isRTL ? "نظام المزادات سهل وسريع، والشحن وصل في الوقت المحدد" : "Auction system is easy and fast, shipping arrived on time" },
-    { name: isRTL ? "سعد القحطاني" : "Saad Al-Qahtani", role: isRTL ? "مدير شركة" : "Company Manager", text: isRTL ? "خدمة العملاء ممتازة والفريق محترف جداً في التعامل" : "Excellent customer service and very professional team" }
-  ];
-
-  const partnerLogos = [
-    '/images/شعارات/photo_6_2026-02-05_20-57-23.jpg',
-    '/images/شعارات/photo_7_2026-02-05_20-57-23.jpg',
-    '/images/شعارات/photo_8_2026-02-05_20-57-23.jpg',
-    '/images/شعارات/photo_9_2026-02-05_20-57-23.jpg',
-    '/images/شعارات/photo_10_2026-02-05_20-57-23.jpg',
-    '/images/شعارات/TOYOTA.jpg'
-  ];
-
   const faqItems = [
     {
       q: isRTL ? 'كيف أبدأ المزايدة؟' : 'How do I start bidding?',
@@ -171,19 +227,23 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
     }
   ];
 
-  const DEFAULT_WHATSAPP = '+821080880014';
-  const DEFAULT_SOCIAL_LINKS = [
-    { platform: 'instagram', url: 'https://instagram.com' },
-    { platform: 'tiktok', url: 'https://tiktok.com' },
-    { platform: 'snapchat', url: 'https://snapchat.com' },
-  ];
-
   const [socialConfig, setSocialConfig] = useState<{ whatsapp?: string; links: { platform: string; url: string }[] }>({
-    whatsapp: DEFAULT_WHATSAPP,
-    links: DEFAULT_SOCIAL_LINKS
+    whatsapp: '+821080880014',
+    links: [
+      { platform: 'instagram', url: 'https://instagram.com' },
+      { platform: 'tiktok', url: 'https://tiktok.com' },
+      { platform: 'snapchat', url: 'https://snapchat.com' },
+    ]
   });
 
   useEffect(() => {
+    const DEFAULT_WHATSAPP = '+821080880014';
+    const DEFAULT_SOCIAL_LINKS = [
+      { platform: 'instagram', url: 'https://instagram.com' },
+      { platform: 'tiktok', url: 'https://tiktok.com' },
+      { platform: 'snapchat', url: 'https://snapchat.com' },
+    ];
+
     const fetchSocialLinks = async () => {
       try {
         const response = await api.settings.getPublic();
@@ -298,9 +358,11 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
       <LandingShowcase isRTL={isRTL} latestCars={latestCars} />
 
       {/* ── 2. ELITE SEARCH SYSTEM ── */}
-      <div className="relative z-30 -mt-24 mb-32 flex justify-center px-4">
-        <SearchSection />
-      </div>
+      {(homeContent?.showSearchSection ?? true) && (
+        <div className="relative z-30 -mt-24 mb-32 flex justify-center px-4">
+          <SearchSection />
+        </div>
+      )}
 
       {/* ── 2.5 ANNOUNCEMENT RIBBON ── */}
       {latestCars && latestCars.length > 0 && (
@@ -315,7 +377,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
               {[...latestCars, ...latestCars].map((car, index) => (
                 <button
                   key={index}
-                  onClick={() => router.push('/login')}
+                  onClick={() => router.push(`/cars/${car.id || (car as any)._id || index}`)}
                   className="flex items-center gap-3 px-4 py-2 rounded-full border border-white/10 bg-white/[0.03] hover:border-accent-gold/40 transition-colors"
                 >
                   <span className="relative w-10 h-10 rounded-full overflow-hidden border border-white/10">
@@ -340,7 +402,8 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
       )}
 
       {/* ── 3. TRUST HUB (STATISTICS) ── */}
-      <section className="relative z-10 py-12 px-4 mb-20">
+      {(homeContent?.showTrustHub ?? true) && (
+        <section className="relative z-10 py-12 px-4 mb-20">
         <div className="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-6">
           {[
             { label: isRTL ? 'إجمالي المبيعات' : 'TOTAL SALES', value: '12k+', icon: BarChart3, color: 'text-blue-400' },
@@ -359,9 +422,10 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
           ))}
         </div>
       </section>
+      )}
 
       {/* ── 4. LIVE MARKET TICKER ── */}
-      {latestCars && latestCars.length > 0 && (
+      {(homeContent?.showLiveMarket ?? true) && latestCars && latestCars.length > 0 && (
         <section ref={liveRef} className="relative z-10 py-32 overflow-hidden bg-linear-to-b from-transparent via-accent-gold/5 to-transparent">
           <div className="max-w-[100vw] mx-auto text-center mb-20 px-4">
             <h2 className="text-6xl md:text-9xl font-black text-white italic uppercase tracking-tighter drop-shadow-[0_0_60px_rgba(201,169,110,0.6)]">
@@ -382,7 +446,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
                   <motion.div
                     key={index}
                     className="group relative w-96 h-125 rounded-[4rem] border border-white/5 bg-black/90 backdrop-blur-3xl overflow-hidden shadow-3xl shrink-0"
-                    onClick={() => router.push(isLoggedIn ? `/cars/${car.id || (car as any)._id || index}` : '/login')}
+                    onClick={() => router.push(`/cars/${car.id || (car as any)._id || index}`)}
                     whileHover={{ y: -25, scale: 1.05 }}
                   >
                     <Image src={car.images?.[0] || "/images/placeholder.jpg"} alt={car.title || car.name || 'Car'} fill className="object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 transform group-hover:scale-110" />
@@ -407,7 +471,8 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
       )}
 
       {/* ── 4.5 ADVERTISING PARTNER ── */}
-      <section className="relative z-10 py-12 px-4 max-w-7xl mx-auto mt-10">
+      {(homeContent?.showAdvertising ?? true) && (
+        <section className="relative z-10 py-12 px-4 max-w-7xl mx-auto mt-10">
         <div className="w-full h-40 md:h-64 rounded-[3rem] overflow-hidden relative group border border-accent-gold/20 bg-black/60 backdrop-blur-lg flex items-center justify-center shadow-2xl">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(201,169,110,0.15)_0%,transparent_70%)]" />
           <div className="relative z-10 text-center">
@@ -422,9 +487,11 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
           </div>
         </div>
       </section>
+      )}
 
       {/* ── 5. THE BUYING JOURNEY ── */}
-      <section className="relative z-10 py-32 px-4 bg-black/40">
+      {(homeContent?.showBuyingJourney ?? true) && (
+        <section className="relative z-10 py-32 px-4 bg-black/40">
         <div className="max-w-7xl mx-auto">
           <div className="max-w-2xl mb-24">
             <h3 className="text-accent-gold font-black uppercase tracking-[0.4em] text-[11px] mb-6">{isRTL ? 'منظومة الشراء' : 'THE BUYING JOURNEY'}</h3>
@@ -449,9 +516,10 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
           </div>
         </div>
       </section>
+      )}
 
       {/* ── 5.1 PLATFORM FEATURES (DYNAMIC WITH FALLBACK) ── */}
-      {(() => {
+      {(homeContent?.showPlatformFeatures ?? true) && (() => {
         const displayFeatures = features && features.length > 0 ? features : [
           { title: 'موثوقية تامة', titleEn: 'Absolute Trust', desc: 'سيارات مستوردة مفحوصة بالكامل مع ضمان الشفافية للمالك.', descEn: 'Fully inspected imported cars with transparency guaranteed.', icon: 'Shield' },
           { title: 'أسعار تنافسية', titleEn: 'Competitive Pricing', desc: 'مزادات حية تمنحك الأولوية للحصول على أفضل سعر بالسوق.', descEn: 'Live auctions giving you edge for the best market prices.', icon: 'Award' },
@@ -483,41 +551,9 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
         );
       })()}
 
-      {/* ── 5.2 PWA INSTALL HUB ── */}
-      {!isInstalled && !isStandalone && (
-        <section className="relative z-10 py-20 px-4">
-          <div className="max-w-4xl mx-auto p-12 rounded-[4rem] border border-accent-gold/30 bg-linear-to-br from-accent-gold/20 to-black backdrop-blur-3xl text-center relative overflow-hidden shadow-3xl">
-            <div className="absolute -top-24 -right-24 w-64 h-64 bg-accent-gold/20 rounded-full blur-[100px]" />
-            <div className="relative z-10">
-              <div className="w-20 h-20 rounded-3xl bg-accent-gold text-black flex items-center justify-center mx-auto mb-8 shadow-2xl">
-                <Smartphone className="w-10 h-10" />
-              </div>
-              <h2 className="text-4xl font-black text-white mb-4 uppercase italic tracking-tighter">{isRTL ? 'تطبيق HM CAR على هاتفك' : 'HM CAR ON YOUR PHONE'}</h2>
-              <p className="text-white/60 mb-10 max-w-lg mx-auto">{isRTL ? 'ثبت التطبيق الآن للحصول على تجربة أسرع وتنبيهات مباشرة للمزادات.' : 'Install now for a faster experience and real-time auction alerts.'}</p>
-              
-              {deferredInstall ? (
-                <button onClick={handleInstallPWA} className="px-12 py-5 bg-white text-black rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-accent-gold transition-all shadow-xl">
-                  {isRTL ? 'تثبيت التطبيق الآن' : 'INSTALL APP NOW'}
-                </button>
-              ) : (
-                <div className="flex flex-col md:flex-row gap-4 justify-center items-center opacity-60">
-                   <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest">
-                      <ArrowUpRight className="w-3 h-3" />
-                      {isRTL ? 'اضغط زر المشاركة' : 'TAP SHARE'}
-                   </div>
-                   <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest">
-                      <Plus className="w-3 h-3" />
-                      {isRTL ? 'إضافة للشاشة الرئيسية' : 'ADD TO HOME SCREEN'}
-                   </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* ── 6. BRAND CATALOG ── */}
-      {brands.length > 0 && (
+      {(homeContent?.showBrandCatalog ?? true) && brands.length > 0 && (
         <section className="relative z-10 py-20 px-4 bg-white/[0.01] border-y border-white/5">
           <div className="max-w-7xl mx-auto flex flex-wrap justify-center gap-24 opacity-30 hover:opacity-100 transition-opacity">
             {brands.slice(0, 5).map((brand, i) => (
@@ -532,52 +568,11 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
         </section>
       )}
 
-      {/* ── 6.5 TRUSTED BY ── */}
-      <section className="relative z-10 py-24 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-14">
-            <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-white/40">
-              {isRTL ? 'يثق بنا شركاء النخبة' : 'TRUSTED BY ELITE PARTNERS'}
-            </h3>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 items-center opacity-70">
-            {partnerLogos.map((logo, i) => (
-              <div key={i} className="relative h-14 w-full rounded-2xl border border-white/5 bg-white/[0.02]">
-                <Image src={logo} alt="Partner" fill className="object-contain grayscale hover:grayscale-0 transition-all duration-700" />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* ── 7. TESTIMONIALS ── */}
-      <section className="relative z-10 py-32 px-4 shadow-2xl">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
-          <div>
-            <h2 className="text-6xl md:text-8xl font-black text-white italic uppercase tracking-tighter leading-[0.85] mb-12">{isRTL ? 'إرث من الثقة' : 'A LEGACY OF TRUST'}</h2>
-          </div>
-          <div className="space-y-8">
-            {testimonials.map((t, i) => (
-              <div key={i} className="p-10 rounded-[3rem] bg-white/[0.03] border border-white/5 backdrop-blur-md">
-                <div className="flex gap-1 mb-6 text-accent-gold">
-                  {[...Array(5)].map((_, si) => <Star key={si} className="w-4 h-4 fill-current" />)}
-                </div>
-                <p className="text-xl text-white/80 font-light italic mb-8">"{t.text}"</p>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-accent-gold text-black font-black flex items-center justify-center text-lg">{t.name[0]}</div>
-                  <div>
-                    <p className="text-sm font-black text-white uppercase italic">{t.name}</p>
-                    <p className="text-[10px] text-white/30 uppercase tracking-widest">{t.role}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* ── 8. APP CONVERSION ── */}
-      <section className="relative z-10 py-40 px-4">
+      {(homeContent?.showAppConversion ?? true) && (
+        <section className="relative z-10 py-40 px-4">
         <div className="max-w-7xl mx-auto rounded-[5rem] overflow-hidden relative p-16 md:p-32 border border-accent-gold/20 bg-linear-to-br from-accent-gold/10 via-black to-blue-900/10 text-center lg:text-left shadow-2xl">
           <div className="relative z-10 max-w-2xl">
             <h2 className="text-6xl md:text-9xl font-black text-white italic uppercase tracking-tighter leading-[0.75] mb-12">
@@ -608,9 +603,11 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
           </div>
         </div>
       </section>
+      )}
 
       {/* ── 9. FAQ ── */}
-      <section className="relative z-10 py-28 px-4">
+      {(homeContent?.showFAQ ?? true) && (
+        <section className="relative z-10 py-28 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-5xl md:text-7xl font-black text-white italic uppercase tracking-tighter">
@@ -630,6 +627,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
           </div>
         </div>
       </section>
+      )}
 
       {/* ── FOOTER ── */}
       <footer className="relative z-10 py-24 px-4 border-t border-white/10 bg-black hide-in-app">
@@ -697,21 +695,13 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
         </motion.div>
       )}
 
-      {/* ── PWA STICKY INSTALL BUTTON ── */}
-      {!isInstalled && !isStandalone && deferredInstall && (
-        <motion.div 
-          initial={{ y: 100, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] md:bottom-10"
-        >
-          <button 
-            onClick={handleInstallPWA} 
-            className="flex items-center gap-3 px-8 py-4 bg-accent-gold text-black rounded-full shadow-[0_10px_40px_rgba(201,169,110,0.4)] hover:scale-105 transition-transform font-black uppercase tracking-widest text-xs border border-white/20"
-          >
-            <Download className="w-5 h-5" />
-            {isRTL ? 'تثبيت التطبيق بسرعة' : 'QUICK INSTALL APP'}
-          </button>
-        </motion.div>
+      {/* ── FLOATING PWA PHONE ICON ── */}
+      {!isInstalled && !isStandalone && (
+        <PWAFloatingButton
+          isRTL={isRTL}
+          deferredInstall={deferredInstall}
+          onInstall={handleInstallPWA}
+        />
       )}
     </main>
   );

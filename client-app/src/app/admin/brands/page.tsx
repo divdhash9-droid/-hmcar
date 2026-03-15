@@ -354,7 +354,7 @@ export default function AdminAgenciesPage() {
                         )}
                       >
                         {isRTL 
-                          ? (source === 'hm_local' ? 'محلي' : source === 'korean_import' ? 'كوري' : 'الكل')
+                          ? (source === 'hm_local' ? 'HM CAR' : source === 'korean_import' ? 'كوري' : 'الكل')
                           : source.split('_')[0]}
                       </button>
                     ))}

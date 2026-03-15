@@ -463,8 +463,8 @@ function CarsContent() {
                                         <CarIcon className="w-12 h-12" />
                                     </div>
                                     <div>
-                                        <h3 className="text-2xl font-black italic tracking-tighter mb-2">{isRTL ? 'المخزون المحلي' : 'LOCAL INVENTORY'}</h3>
-                                        <p className="text-white/40 text-xs leading-relaxed max-w-xs">{isRTL ? 'إدارة السيارات المتاحة في المعرض المحلي، إضافة وتعديل وتحكم كامل.' : 'Manage available vehicles in local showroom with full CRUD control.'}</p>
+                                        <h3 className="text-2xl font-black italic tracking-tighter mb-2">{isRTL ? 'معرض HM CAR' : 'HM CAR SHOWROOM'}</h3>
+                                        <p className="text-white/40 text-xs leading-relaxed max-w-xs">{isRTL ? 'إدارة السيارات المتاحة في معرض HM CAR، إضافة وتعديل وتحكم كامل.' : 'Manage available vehicles in HM CAR showroom with full CRUD control.'}</p>
                                     </div>
                                     <div className="cockpit-mono text-[10px] text-red-500 tracking-[0.3em] font-black">{isRTL ? 'فتح المعرض' : 'ENTER GALLERY'}</div>
                                 </div>

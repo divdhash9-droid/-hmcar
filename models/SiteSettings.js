@@ -58,6 +58,17 @@ const siteSettingsSchema = new mongoose.Schema({
         heroTitle: String,
         heroSubtitle: String,
         heroVideoUrl: String,
+        showSearchSection: { type: Boolean, default: true },
+        showLiveMarket: { type: Boolean, default: true },
+        showTrustHub: { type: Boolean, default: true },
+        showAdvertising: { type: Boolean, default: true },
+        showBuyingJourney: { type: Boolean, default: true },
+        showPlatformFeatures: { type: Boolean, default: true },
+        showBrandCatalog: { type: Boolean, default: true },
+        showTrustedBy: { type: Boolean, default: true },
+        showTestimonials: { type: Boolean, default: true },
+        showAppConversion: { type: Boolean, default: true },
+        showFAQ: { type: Boolean, default: true },
     },
 
     // إعدادات المعرض الكوري

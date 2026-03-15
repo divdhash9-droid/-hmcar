@@ -29,6 +29,17 @@ interface HomeContent {
     heroTitle?: string;
     heroSubtitle?: string;
     heroVideoUrl?: string;
+    showSearchSection?: boolean;
+    showLiveMarket?: boolean;
+    showTrustHub?: boolean;
+    showAdvertising?: boolean;
+    showBuyingJourney?: boolean;
+    showPlatformFeatures?: boolean;
+    showBrandCatalog?: boolean;
+    showTrustedBy?: boolean;
+    showTestimonials?: boolean;
+    showAppConversion?: boolean;
+    showFAQ?: boolean;
 }
 
 interface SocialLinks {

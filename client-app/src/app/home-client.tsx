@@ -286,18 +286,6 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
         })}
       </div>
 
-      {/* Language Toggle */}
-      <div className="fixed top-6 right-6 z-50">
-        <button 
-          onClick={toggleLanguage} 
-          className="w-12 h-12 rounded-2xl bg-black/40 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white/70 hover:text-accent-gold transition-all"
-          title={isRTL ? "تغيير اللغة" : "Change Language"}
-          aria-label={isRTL ? "تغيير اللغة" : "Change Language"}
-        >
-          <Languages className="w-6 h-6 text-accent-gold" />
-        </button>
-      </div>
-
       <CinematicVideoBackground
         videoSrc={homeContent?.heroVideoUrl || "/videos/hero.mp4"}
         fallbackImage="/images/photo_2026-02-07_22-24-18.jpg"

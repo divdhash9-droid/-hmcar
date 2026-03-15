@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
@@ -161,7 +161,9 @@ export default function Navbar() {
 
                     {/* Right Actions */}
                     <div className="flex items-center gap-2">
-                        {isLoggedIn && (
+                        {pathname !== '/' && (
+                            <>
+                                {isLoggedIn && (
                             <div className="flex items-center gap-2">
                                 <NotificationDropdown />
                                 <Link
@@ -246,14 +248,16 @@ export default function Navbar() {
                         >
                             {displayCurrency === rawText('KRW') ? rawText('₩') : displayCurrency === rawText('USD') ? rawText('$') : rawText('ر.س')}
                         </button>
-                        {/* [[ARABIC_COMMENT]] زر تغيير اللغة */}
-                        <button
-                            onClick={toggleLanguage}
-                            className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all"
-                            title={isRTL ? "تغيير اللغة" : "Change Language"}
-                        >
-                            <Languages className="w-5 h-5 text-accent-gold" />
-                        </button>
+                                {/* [[ARABIC_COMMENT]] زر تغيير اللغة */}
+                                <button
+                                    onClick={toggleLanguage}
+                                    className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all"
+                                    title={isRTL ? "تغيير اللغة" : "Change Language"}
+                                >
+                                    <Languages className="w-5 h-5 text-accent-gold" />
+                                </button>
+                            </>
+                        )}
 
                         {/* Mobile Toggle */}
                         <button

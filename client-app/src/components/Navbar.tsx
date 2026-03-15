@@ -98,7 +98,8 @@ export default function Navbar() {
                 <div className="max-w-400 mx-auto px-6 flex items-center justify-between">
                     {/* Logo + page-specific back */}
                     <div className="group flex flex-col items-start gap-2 shrink-0">
-                        <Link href="/" className="flex items-center gap-3">
+                        <div className="flex items-center gap-3">
+                            <Link href="/" className="flex items-center gap-3">
                             <motion.div
                                 whileHover={{ scale: 1.05 }}
                                 className="relative flex items-center"
@@ -116,6 +117,15 @@ export default function Navbar() {
                                 />
                             </motion.div>
                         </Link>
+                        {/* [[ARABIC_COMMENT]] زر تغيير اللغة بجانب اللوجو (في اليمين) */}
+                        <button
+                            onClick={toggleLanguage}
+                            className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-all rtl:mr-2"
+                            title={isRTL ? "تغيير اللغة" : "Change Language"}
+                        >
+                            <Languages className="w-5 h-5 text-accent-gold" />
+                        </button>
+                        </div>
                         {pathname === rawText('/profile') && (
                             <div className="w-full">
                                 <button
@@ -248,14 +258,6 @@ export default function Navbar() {
                         >
                             {displayCurrency === rawText('KRW') ? rawText('₩') : displayCurrency === rawText('USD') ? rawText('$') : rawText('ر.س')}
                         </button>
-                                {/* [[ARABIC_COMMENT]] زر تغيير اللغة */}
-                                <button
-                                    onClick={toggleLanguage}
-                                    className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all"
-                                    title={isRTL ? "تغيير اللغة" : "Change Language"}
-                                >
-                                    <Languages className="w-5 h-5 text-accent-gold" />
-                                </button>
                             </>
                         )}
 

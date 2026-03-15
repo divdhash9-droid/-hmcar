@@ -1,6 +1,14 @@
 import type { Metadata, Viewport } from "next";
+import { Tajawal } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
+
+const tajawal = Tajawal({
+  subsets: ["arabic", "latin"],
+  weight: ["200", "300", "400", "500", "700", "800", "900"],
+  variable: "--font-tajawal",
+  display: "swap",
+});
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import { Suspense } from "react";
 import { cookies } from "next/headers";
@@ -58,7 +66,7 @@ export default async function RootLayout({
         <meta name="format-detection" content="telephone=no" />
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
-      <body className="antialiased selection:bg-white/20 selection:text-white font-sans">
+      <body className={`antialiased selection:bg-white/20 selection:text-white ${tajawal.variable}`}>
         <Providers>
           <AppShell>
             <Suspense fallback={null}>

@@ -1,20 +1,21 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Menu, X, User, Languages, ArrowLeft, ArrowRight,
-    Headphones, MessageCircle, Search,
+    Headphones, MessageCircle,
     Car, Gavel, ShoppingBag, Settings, ShoppingCart, Heart
 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useLanguage } from '@/lib/LanguageContext';
 import { useSettings } from '@/lib/SettingsContext';
 import { cn } from '@/lib/utils';
-import NotificationDropdown from './NotificationDropdown';
 import { useStandalone } from '@/lib/useStandalone';
+import { useUI } from '@/lib/UIContext';
+import { Bell } from 'lucide-react';
 
 const rawText = (value: string) => value;
 
@@ -23,9 +24,6 @@ export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [cartCount, setCartCount] = useState(0);
-    const [searchOpen, setSearchOpen] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
-    const searchRef = useRef<HTMLInputElement>(null);
     const pathname = usePathname();
 
     // [[ARABIC_COMMENT]] جلب عدد عناصر السلة من localStorage
@@ -46,9 +44,10 @@ export default function Navbar() {
     }, []);
 
     const router = useRouter();
-    const { user, isLoggedIn } = useAuth();
+    const { isLoggedIn } = useAuth();
     const { isRTL, toggleLanguage } = useLanguage();
     const { siteInfo, displayCurrency, setDisplayCurrency } = useSettings();
+    const { setFavoritesOpen, setNotificationsOpen } = useUI();
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -64,7 +63,6 @@ export default function Navbar() {
 
     const navLinks = [
         { href: '/gallery', label: isRTL ? 'المعرض' : 'SHOWROOM', icon: Car },
-        { href: '/cars', label: isRTL ? 'معرض HM CAR' : 'HM CAR SHOWROOM', icon: Search },
         { href: '/auctions', label: isRTL ? 'المزادات' : 'AUCTIONS', icon: Gavel },
         { href: '/parts', label: isRTL ? 'القطع' : 'PARTS', icon: ShoppingBag },
         { href: '/concierge', label: isRTL ? 'طلبات خاصة' : 'REQUESTS', icon: Settings },
@@ -117,14 +115,6 @@ export default function Navbar() {
                                 />
                             </motion.div>
                         </Link>
-                        {/* [[ARABIC_COMMENT]] زر تغيير اللغة بجانب اللوجو (في اليمين) */}
-                        <button
-                            onClick={toggleLanguage}
-                            className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-all rtl:mr-2"
-                            title={isRTL ? "تغيير اللغة" : "Change Language"}
-                        >
-                            <Languages className="w-5 h-5 text-accent-gold" />
-                        </button>
                         </div>
                         {pathname === rawText('/profile') && (
                             <div className="w-full">
@@ -139,125 +129,73 @@ export default function Navbar() {
                         )}
                     </div>
 
-                    {/* ── التنقل الرئيسي ── */}
-                    <div className="hidden lg:flex items-center gap-2 bg-white/3 border border-white/5 rounded-2xl p-1.5 backdrop-blur-xl">
-                        {navLinks.map((link) => (
-                            <Link
-                                key={link.href}
-                                href={link.href}
-                                className={cn(
-                                    "px-6 py-2.5 rounded-xl text-[12px] font-black uppercase tracking-widest transition-all relative group",
-                                    isActive(link.href)
-                                        ? "text-white bg-white/5 border border-white/10 shadow-[0_0_20px_rgba(255,255,255,0.05)]"
-                                        : "text-white/30 hover:text-white/60 hover:bg-white/2"
-                                )}
-                            >
-                                {link.label}
-                                {link.href === rawText('/gallery') && (
-                                    <span className="absolute -top-1 -right-1 flex h-2 w-2">
-                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cinematic-neon-red opacity-75"></span>
-                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-cinematic-neon-red"></span>
-                                    </span>
-                                )}
-                                {isActive(link.href) && (
-                                    <motion.div
-                                        layoutId="nav-active"
-                                        className="absolute -bottom-1 left-6 right-6 h-px bg-white opacity-40"
-                                    />
-                                )}
-                            </Link>
-                        ))}
-                    </div>
 
                     {/* Right Actions */}
                     <div className="flex items-center gap-2">
                         {pathname !== '/' && (
                             <>
                                 {isLoggedIn && (
-                            <div className="flex items-center gap-2">
-                                <NotificationDropdown />
-                                <Link
-                                    href={user?.role && ['admin', 'super_admin', 'manager'].includes(user.role) ? '/admin/dashboard' : '/profile'}
-                                    className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all"
-                                >
-                                    <User className="w-4 h-4" />
-                                </Link>
-                            </div>
-                        )}
-
-                        {!isLoggedIn && (
-                            <Link href="/login" className="hidden sm:block">
-                                <button className="px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-white hover:bg-white/10 transition-all">
-                                    {isRTL ? rawText('دخول') : rawText('SIGN IN')}
-                                </button>
-                            </Link>
-                        )}
-
-                        {/* زر البحث */}
-                        <div className="relative">
-                            <button
-                                onClick={() => { setSearchOpen(o => !o); setTimeout(() => searchRef.current?.focus(), 100); }}
-                                className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all"
-                                title={isRTL ? 'بحث' : 'Search'}
-                            >
-                                <Search className="w-4 h-4" />
-                            </button>
-                            <AnimatePresence>
-                                {searchOpen && (
-                                    <motion.form
-                                        initial={{ opacity: 0, scale: 0.9, y: -10 }}
-                                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                                        exit={{ opacity: 0, scale: 0.9, y: -10 }}
-                                        onSubmit={(e) => { e.preventDefault(); if (searchQuery.trim()) { router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`); setSearchOpen(false); setSearchQuery(''); } }}
-                                        className="absolute top-12 right-0 z-50 bg-cinematic-dark border border-white/10 rounded-2xl p-2 flex gap-2 shadow-[0_20px_60px_rgba(0,0,0,0.8)] min-w-65"
-                                        dir={isRTL ? 'rtl' : 'ltr'}
+                                    <button
+                                        onClick={() => setNotificationsOpen(true)}
+                                        className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all relative"
+                                        title={isRTL ? 'الإشعارات' : 'Notifications'}
                                     >
-                                        <input
-                                            ref={searchRef}
-                                            type="text"
-                                            value={searchQuery}
-                                            onChange={e => setSearchQuery(e.target.value)}
-                                            placeholder={isRTL ? 'ابحث عن سيارة أو قطعة...' : 'Search cars or parts...'}
-                                            className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-white/30 outline-none focus:border-white/30 transition-all"
-                                        />
-                                        <button type="submit" className="px-4 py-2.5 bg-white/10 hover:bg-white/20 border border-white/10 text-white rounded-xl transition-all">
-                                            <Search className="w-4 h-4" />
-                                        </button>
-                                    </motion.form>
+                                        <Bell className="w-4 h-4" />
+                                        <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-cinematic-neon-red animate-pulse" />
+                                    </button>
                                 )}
-                            </AnimatePresence>
-                        </div>
 
-                        {/* [[ARABIC_COMMENT]] زر المفضلة */}
-                        <Link href="/favorites" className="relative w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-red-400 hover:border-red-500/30 hover:bg-red-500/10 transition-all" title={isRTL ? 'المفضلة' : 'Favorites'}>
-                            <Heart className="w-4 h-4" />
-                        </Link>
+                                {!isLoggedIn && (
+                                    <Link href="/login" className="hidden sm:block">
+                                        <button className="px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-white hover:bg-white/10 transition-all">
+                                            {isRTL ? rawText('دخول') : rawText('SIGN IN')}
+                                        </button>
+                                    </Link>
+                                )}
 
-                        {/* [[ARABIC_COMMENT]] زر السلة مع عداد */}
-                        <Link href="/cart" className="relative w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all">
-                            <ShoppingCart className="w-4 h-4" />
-                            {cartCount > 0 && (
-                                <span className="absolute -top-1.5 -right-1.5 min-w-4.5 h-4.5 bg-cinematic-neon-gold text-black text-[9px] font-black rounded-full flex items-center justify-center px-1">
-                                    {cartCount > 9 ? rawText('9+') : cartCount}
-                                </span>
-                            )}
-                        </Link>
+                                {/* [[ARABIC_COMMENT]] زر المفضلة */}
+                                <button 
+                                    onClick={() => setFavoritesOpen(true)}
+                                    className="relative w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-red-400 hover:border-red-500/30 hover:bg-red-500/10 transition-all" 
+                                    title={isRTL ? 'المفضلة' : 'Favorites'}
+                                >
+                                    <Heart className="w-4 h-4" />
+                                </button>
 
-                        {/* [[ARABIC_COMMENT]] زر تدوير العملة بين SAR → USD → KRW → SAR */}
-                        <button
-                            onClick={() => setDisplayCurrency(
-                                displayCurrency === 'SAR' ? 'USD' : displayCurrency === 'USD' ? 'KRW' : 'SAR'
-                            )}
-                            className={`w-10 h-10 rounded-xl bg-white/5 border flex items-center justify-center font-black text-[9px] transition-all ${displayCurrency === 'KRW'
-                                ? 'border-yellow-400/40 text-yellow-400'
-                                : displayCurrency === 'USD'
-                                    ? 'border-cinematic-neon-blue/40 text-cinematic-neon-blue'
-                                    : 'border-white/10 text-white/60 hover:text-white hover:bg-white/10'
-                                }`}
-                            title={isRTL ? "تغيير العملة" : "Change Currency"}
-                        >
-                            {displayCurrency === rawText('KRW') ? rawText('₩') : displayCurrency === rawText('USD') ? rawText('$') : rawText('ر.س')}
-                        </button>
+                                {/* [[ARABIC_COMMENT]] زر السلة مع عداد */}
+                                <Link href="/cart" className="relative w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all">
+                                    <ShoppingCart className="w-4 h-4" />
+                                    {cartCount > 0 && (
+                                        <span className="absolute -top-1.5 -right-1.5 min-w-4.5 h-4.5 bg-cinematic-neon-gold text-black text-[9px] font-black rounded-full flex items-center justify-center px-1">
+                                            {cartCount > 9 ? rawText('9+') : cartCount}
+                                        </span>
+                                    )}
+                                </Link>
+
+                                {/* [[ARABIC_COMMENT]] زر تدوير العملة بين SAR → USD → KRW → SAR */}
+                                <button
+                                    onClick={() => setDisplayCurrency(
+                                        displayCurrency === 'SAR' ? 'USD' : displayCurrency === 'USD' ? 'KRW' : 'SAR'
+                                    )}
+                                    className={`w-10 h-10 rounded-xl bg-white/5 border flex items-center justify-center font-black text-[9px] transition-all ${displayCurrency === 'KRW'
+                                        ? 'border-yellow-400/40 text-yellow-400'
+                                        : displayCurrency === 'USD'
+                                            ? 'border-cinematic-neon-blue/40 text-cinematic-neon-blue'
+                                            : 'border-white/10 text-white/60 hover:text-white hover:bg-white/10'
+                                        }`}
+                                    title={isRTL ? "تغيير العملة" : "Change Currency"}
+                                >
+                                    {displayCurrency === rawText('KRW') ? rawText('₩') : displayCurrency === rawText('USD') ? rawText('$') : rawText('ر.س')}
+                                </button>
+
+                                {/* [[ARABIC_COMMENT]] زر تغيير اللغة (منظم بجانب الأزرار) */}
+                                <button
+                                    onClick={toggleLanguage}
+                                    className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-all"
+                                    title={isRTL ? "English" : "العربية"}
+                                >
+                                    <Languages className="w-4 h-4 text-accent-gold" />
+                                </button>
                             </>
                         )}
 

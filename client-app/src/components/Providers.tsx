@@ -6,6 +6,7 @@ import { AuthProvider } from '@/lib/AuthContext';
 import { SocketProvider } from '@/lib/SocketContext';
 import { SettingsProvider } from '@/lib/SettingsContext';
 import { ToastProvider } from '@/lib/ToastContext';
+import { UIProvider } from '@/lib/UIContext';
 import PWAInstaller from './PWAInstaller';
 
 export function Providers({ children }: { children: ReactNode }) {
@@ -13,12 +14,14 @@ export function Providers({ children }: { children: ReactNode }) {
         <LanguageProvider>
             <SettingsProvider>
                 <ToastProvider>
-                    <AuthProvider>
-                        <SocketProvider>
-                            <PWAInstaller />
-                            {children}
-                        </SocketProvider>
-                    </AuthProvider>
+                    <UIProvider>
+                        <AuthProvider>
+                            <SocketProvider>
+                                <PWAInstaller />
+                                {children}
+                            </SocketProvider>
+                        </AuthProvider>
+                    </UIProvider>
                 </ToastProvider>
             </SettingsProvider>
         </LanguageProvider>

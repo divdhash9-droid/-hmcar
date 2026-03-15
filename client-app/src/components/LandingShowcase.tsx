@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Car, Wrench, Gavel, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useSettings } from "@/lib/SettingsContext";
 
@@ -18,49 +18,8 @@ interface LandingShowcaseProps {
 }
 
 export default function LandingShowcase({ isRTL, latestCars = [] }: LandingShowcaseProps) {
-    const [showSearch, setShowSearch] = useState(false);
-    const [query, setQuery] = useState("");
-    const [results, setResults] = useState<any[]>([]);
-    const [category, setCategory] = useState<"cars" | "parts" | "auctions">("cars");
-    const [lead, setLead] = useState({ name: "", model: "", company: "", phone: "" });
-    const [submitted, setSubmitted] = useState(false);
+    const router = useRouter();
     const { homeContent } = useSettings();
-
-    const runSearch = () => {
-        if (category === "cars") {
-            const q = query.toLowerCase().trim();
-            const filtered = latestCars.filter((c) => {
-                const t = (c.title || "").toLowerCase();
-                const m = typeof c.make === "string" ? (c.make || "").toLowerCase() : (c.make?.name || "").toLowerCase();
-                const mdl = (c.model || "").toLowerCase();
-                return q && (t.includes(q) || m.includes(q) || mdl.includes(q));
-            });
-            setResults(filtered);
-        } else {
-            setResults([]);
-        }
-    };
-
-    const submitLead = async () => {
-        setSubmitted(false);
-        try {
-            await fetch("/api/v2/leads", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ ...lead, category, query }),
-            });
-            setSubmitted(true);
-        } catch {
-            try {
-                const existing = JSON.parse(localStorage.getItem("hmcar_leads") || "[]");
-                existing.push({ ...lead, category, query, ts: Date.now() });
-                localStorage.setItem("hmcar_leads", JSON.stringify(existing));
-                setSubmitted(true);
-            } catch {
-                setSubmitted(true);
-            }
-        }
-    };
 
     const cards = [
         {
@@ -169,7 +128,11 @@ export default function LandingShowcase({ isRTL, latestCars = [] }: LandingShowc
                     cards.map((card, index) => (
                         <motion.button
                             key={index}
-                            onClick={() => { setCategory(card.key as any); setShowSearch(true); }}
+                            onClick={() => {
+                                if (card.key === 'cars') router.push('/cars');
+                                else if (card.key === 'parts') router.push('/parts');
+                                else if (card.key === 'auctions') router.push('/auctions');
+                            }}
                             className="group relative"
                             initial={{ opacity: 0, scale: 0.9, y: 50 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -231,67 +194,6 @@ export default function LandingShowcase({ isRTL, latestCars = [] }: LandingShowc
                     ))
                 }
             </div>
-            {showSearch && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
-                    <div className="absolute inset-0 bg-black/80 backdrop-blur-xl" onClick={() => { setShowSearch(false); setResults([]); setQuery(""); setSubmitted(false); }} />
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        className="relative w-full max-w-3xl rounded-[40px] border border-white/10 bg-black/40 backdrop-blur-3xl shadow-[0_0_100px_rgba(0,0,0,0.8)] p-10"
-                    >
-                        <div className="flex items-center justify-between mb-8">
-                            <h3 className="text-2xl font-black text-white uppercase tracking-widest italic">{isRTL ? "منظومة البحث" : "SEARCH SYSTEM"}</h3>
-                            <button className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-white/10 transition-all" onClick={() => { setShowSearch(false); setResults([]); setQuery(""); setSubmitted(false); }}>✕</button>
-                        </div>
-                        <div className="flex gap-4 mb-8">
-                            <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={isRTL ? "اكتب الاسم أو الموديل..." : "ENTER PROTOCOL / MODEL..."} className="flex-1 px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-white outline-none focus:border-accent-gold/50 transition-all font-bold tracking-widest" />
-                            <button className="px-8 py-4 rounded-2xl bg-accent-gold text-black font-black uppercase tracking-widest shadow-lg shadow-accent-gold/20" onClick={runSearch}>{isRTL ? "بحث" : "QUERY"}</button>
-                        </div>
-
-                        {category === "cars" && results.length > 0 && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[400px] overflow-auto pr-4 scrollbar-thin">
-                                {results.map((c, i) => (
-                                    <div key={i} className="group rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden flex transition-all hover:border-accent-gold/30">
-                                        <div className="relative w-40 h-28 shrink-0">
-                                            <Image
-                                                src={c.images && c.images.length ? c.images[0] : "/images/placeholder.jpg"}
-                                                alt={c.title || "Car"}
-                                                fill
-                                                sizes="160px"
-                                                className="object-cover group-hover:scale-110 transition-transform duration-700"
-                                            />
-                                        </div>
-                                        <div className="p-4 flex flex-col justify-center">
-                                            <p className="text-white font-bold text-sm uppercase italic tracking-tighter truncate w-32">{typeof c.make === "string" ? c.make : c.make?.name || c.title}</p>
-                                            <p className="text-accent-gold text-[10px] font-bold uppercase tracking-widest mt-1">{c.model || ""}</p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-
-                        {(results.length === 0 || category !== "cars") && (
-                            <div className="mt-4">
-                                <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5">
-                                    <p className="text-white/60 mb-6 text-sm font-medium uppercase tracking-[0.2em]">{isRTL ? "غير متوفر حالياً، قدم طلبك:" : "PROTOCOL NOT FOUND. SUBMIT REQUEST:"}</p>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <input className="px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white outline-none focus:border-accent-gold/30 text-xs" placeholder={isRTL ? "الاسم" : "NAME"} value={lead.name} onChange={(e) => setLead({ ...lead, name: e.target.value })} />
-                                        <input className="px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white outline-none focus:border-accent-gold/30 text-xs" placeholder={isRTL ? "الموديل" : "MODEL"} value={lead.model} onChange={(e) => setLead({ ...lead, model: e.target.value })} />
-                                        <input className="px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white outline-none focus:border-accent-gold/30 text-xs" placeholder={isRTL ? "الشركة" : "COMPANY"} value={lead.company} onChange={(e) => setLead({ ...lead, company: e.target.value })} />
-                                        <input className="px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white outline-none focus:border-accent-gold/30 text-xs" placeholder={isRTL ? "رقم الهاتف" : "PHONE"} value={lead.phone} onChange={(e) => setLead({ ...lead, phone: e.target.value })} />
-                                    </div>
-                                    <div className="mt-8 flex justify-end">
-                                        <button className="px-8 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-black uppercase tracking-widest hover:bg-accent-gold hover:text-black transition-all" onClick={submitLead}>{isRTL ? "إرسال البروتوكول" : "SUBMIT PROTOCOL"}</button>
-                                    </div>
-                                    {submitted && (
-                                        <div className="mt-4 text-accent-gold text-xs font-bold animate-pulse text-center">{isRTL ? "✓ تم استلام المعطيات بنجاح" : "✓ DATA PROTOCOL RECEIVED"}</div>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-                    </motion.div>
-                </div>
-            )}
         </div>
     );
 }

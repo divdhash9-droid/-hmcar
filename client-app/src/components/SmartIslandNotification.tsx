@@ -1,0 +1,108 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Bell, Sparkles, X, ChevronRight, Gavel, Car, Info } from 'lucide-react';
+import { useLanguage } from '@/lib/LanguageContext';
+import { cn } from '@/lib/utils';
+
+export interface SmartAlert {
+    id: string;
+    title: string;
+    message: string;
+    type: 'auction' | 'car' | 'promo' | 'info';
+    actionLabel?: string;
+    onAction?: () => void;
+}
+
+export default function SmartIslandNotification() {
+    const { isRTL } = useLanguage();
+    const [alert, setAlert] = useState<SmartAlert | null>(null);
+
+    useEffect(() => {
+        const handleAlert = (e: any) => {
+            const data = e.detail as SmartAlert;
+            setAlert(data);
+            // Auto hide after 6 seconds
+            setTimeout(() => setAlert(null), 6000);
+        };
+
+        window.addEventListener('hm_smart_alert' as any, handleAlert);
+        return () => window.removeEventListener('hm_smart_alert' as any, handleAlert);
+    }, []);
+
+    if (!alert) return null;
+
+    const Icons = {
+        auction: Gavel,
+        car: Car,
+        promo: Sparkles,
+        info: Info
+    };
+
+    const Icon = Icons[alert.type] || Bell;
+
+    return (
+        <div className="fixed top-6 left-0 right-0 z-[200] flex justify-center pointer-events-none px-6">
+            <AnimatePresence>
+                {alert && (
+                    <motion.div
+                        initial={{ y: -100, opacity: 0, scale: 0.8 }}
+                        animate={{ y: 0, opacity: 1, scale: 1 }}
+                        exit={{ y: -50, opacity: 0, scale: 0.9 }}
+                        className="pointer-events-auto"
+                    >
+                        {/* The "Island" Pill */}
+                        <div className="relative group">
+                            {/* Decorative Glow */}
+                            <div className="absolute -inset-0.5 bg-linear-to-r from-cinematic-neon-blue via-purple-500 to-accent-gold rounded-full opacity-30 blur-md group-hover:opacity-100 transition duration-1000"></div>
+                            
+                            <div className="relative flex items-center gap-4 bg-black/80 backdrop-blur-2xl border border-white/20 rounded-full px-2 py-2 pr-6 shadow-[0_20px_50px_rgba(0,0,0,0.5)] min-w-[320px] max-w-[500px]">
+                                {/* Icon Circle */}
+                                <div className={cn(
+                                    "w-10 h-10 rounded-full flex items-center justify-center shadow-lg shrink-0",
+                                    alert.type === 'auction' ? "bg-accent-red" : 
+                                    alert.type === 'promo' ? "bg-accent-gold" : 
+                                    "bg-cinematic-neon-blue"
+                                )}>
+                                    <Icon className="w-5 h-5 text-white" />
+                                </div>
+
+                                {/* Content */}
+                                <div className="flex-1 min-w-0 py-1">
+                                    <h4 className="text-[14px] font-black tracking-tight text-white line-clamp-1 italic uppercase">
+                                        {alert.title}
+                                    </h4>
+                                    <p className="text-[10px] text-white/50 font-bold tracking-wide line-clamp-1 truncate">
+                                        {alert.message}
+                                    </p>
+                                </div>
+
+                                {/* Action button or Close */}
+                                <div className="flex items-center gap-2">
+                                    {alert.actionLabel ? (
+                                        <button 
+                                            onClick={() => { alert.onAction?.(); setAlert(null); }}
+                                            className="px-4 py-1.5 bg-white/10 hover:bg-white text-[10px] font-black text-white hover:text-black rounded-full transition-all uppercase tracking-widest flex items-center gap-1.5"
+                                        >
+                                            {alert.actionLabel}
+                                            <ChevronRight className={cn("w-3 h-3", isRTL && "rotate-180")} />
+                                        </button>
+                                    ) : (
+                                        <button 
+                                            onClick={() => setAlert(null)}
+                                            className="w-8 h-8 rounded-full flex items-center justify-center text-white/20 hover:text-white transition-colors"
+                                            title={isRTL ? 'إغلاق' : 'Close'}
+                                        >
+                                            <X className="w-4 h-4" />
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+}

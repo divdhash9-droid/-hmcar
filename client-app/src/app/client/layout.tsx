@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
@@ -14,15 +14,16 @@ import {
     LogOut,
     Car,
     Gavel,
-    Home,
     ChevronLeft,
     ChevronRight,
     MessageCircle,
+    Languages,
 } from 'lucide-react';
 import { useLanguage } from '@/lib/LanguageContext';
 import { useAuth } from '@/lib/AuthContext';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { useUI } from '@/lib/UIContext';
 
 const rawText = (value: string) => value;
 
@@ -46,9 +47,10 @@ const QUICK_LINKS = [
 
 function ClientSidebar() {
     const pathname = usePathname();
-    const { isRTL } = useLanguage();
+    const { isRTL, toggleLanguage } = useLanguage();
     const { user, logout } = useAuth();
     const router = useRouter();
+    const { setFavoritesOpen, setNotificationsOpen } = useUI();
 
     const isActive = (paths: string[]) => paths.some(p => pathname === p || pathname.startsWith(p + '/'));
 
@@ -99,8 +101,18 @@ function ClientSidebar() {
                 {NAV_ITEMS.map((item) => {
                     const active = isActive(item.match);
                     const Icon = item.icon;
+                    const isDrawerItem = item.href === '/favorites' || item.href === '/notifications';
+
+                    const handleClick = (e: React.MouseEvent) => {
+                        if (isDrawerItem) {
+                            e.preventDefault();
+                            if (item.href === '/favorites') setFavoritesOpen(true);
+                            if (item.href === '/notifications') setNotificationsOpen(true);
+                        }
+                    };
+
                     return (
-                        <Link key={item.href} href={item.href}>
+                        <Link key={item.href} href={item.href} onClick={handleClick}>
                             <motion.div
                                 whileHover={{ x: isRTL ? -4 : 4 }}
                                 className={cn(
@@ -137,8 +149,18 @@ function ClientSidebar() {
 
                 {QUICK_LINKS.map((item) => {
                     const Icon = item.icon;
+                    const isDrawerItem = item.href === '/favorites' || item.href === '/notifications';
+
+                    const handleClick = (e: React.MouseEvent) => {
+                        if (isDrawerItem) {
+                            e.preventDefault();
+                            if (item.href === '/favorites') setFavoritesOpen(true);
+                            if (item.href === '/notifications') setNotificationsOpen(true);
+                        }
+                    };
+
                     return (
-                        <Link key={item.href} href={item.href}>
+                        <Link key={item.href} href={item.href} onClick={handleClick}>
                             <motion.div
                                 whileHover={{ x: isRTL ? -4 : 4 }}
                                 className={cn(
@@ -156,15 +178,17 @@ function ClientSidebar() {
 
             {/* Footer */}
             <div className="p-4 border-t border-white/6">
-                <Link href="/">
-                    <div className={cn(
-                        'flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/30 hover:text-white/60 hover:bg-white/3 transition-all mb-1',
+                <button
+                    onClick={toggleLanguage}
+                    className={cn(
+                        'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/30 hover:text-white/60 hover:bg-white/3 transition-all mb-1',
                         isRTL ? 'flex-row-reverse' : ''
-                    )}>
-                        <Home className="w-4 h-4 shrink-0" strokeWidth={1.5} />
-                        <span className="text-[12px] font-medium">{isRTL ? rawText('الموقع الرئيسي') : rawText('Main Site')}</span>
-                    </div>
-                </Link>
+                    )}
+                    title={isRTL ? 'تغيير اللغة' : 'Toggle Language'}
+                >
+                    <Languages className="w-4 h-4 shrink-0 text-accent-gold" strokeWidth={1.5} />
+                    <span className="text-[12px] font-medium">{isRTL ? rawText('English') : rawText('العربية')}</span>
+                </button>
                 <button
                     onClick={handleLogout}
                     className={cn(
@@ -183,6 +207,7 @@ function ClientSidebar() {
 function ClientBottomBar() {
     const pathname = usePathname();
     const { isRTL } = useLanguage();
+    const { setFavoritesOpen, setNotificationsOpen } = useUI();
 
     const isActive = (paths: string[]) => paths.some(p => pathname === p || pathname.startsWith(p + '/'));
 
@@ -195,8 +220,18 @@ function ClientBottomBar() {
                 {NAV_ITEMS.map((item) => {
                     const active = isActive(item.match);
                     const Icon = item.icon;
+                    const isDrawerItem = item.href === '/favorites' || item.href === '/notifications';
+
+                    const handleClick = (e: React.MouseEvent) => {
+                        if (isDrawerItem) {
+                            e.preventDefault();
+                            if (item.href === '/favorites') setFavoritesOpen(true);
+                            if (item.href === '/notifications') setNotificationsOpen(true);
+                        }
+                    };
+
                     return (
-                        <Link key={item.href} href={item.href} className="flex-1">
+                        <Link key={item.href} href={item.href} className="flex-1" onClick={handleClick}>
                             <motion.div
                                 whileTap={{ scale: 0.85 }}
                                 className="flex flex-col items-center gap-1 relative"
@@ -244,6 +279,7 @@ function ClientTopBar() {
     const pathname = usePathname();
     const { isRTL } = useLanguage();
     const router = useRouter();
+    const { setNotificationsOpen } = useUI();
 
     // تحديد عنوان الصفحة الحالية
     const getPageTitle = () => {
@@ -283,12 +319,16 @@ function ClientTopBar() {
                 {getPageTitle()}
             </h1>
 
-            <Link href="/notifications" className={cn(
-                'w-9 h-9 rounded-xl bg-white/4 border border-white/8 flex items-center justify-center text-white/40 hover:text-white transition-all shrink-0',
-                isRTL ? 'mr-3' : 'ml-3'
-            )}>
+            <button 
+                onClick={() => setNotificationsOpen(true)}
+                className={cn(
+                    'w-9 h-9 rounded-xl bg-white/4 border border-white/8 flex items-center justify-center text-white/40 hover:text-white transition-all shrink-0',
+                    isRTL ? 'mr-3' : 'ml-3'
+                )}
+                title={isRTL ? 'الإشعارات' : 'Notifications'}
+            >
                 <Bell className="w-4 h-4" />
-            </Link>
+            </button>
         </header>
     );
 }

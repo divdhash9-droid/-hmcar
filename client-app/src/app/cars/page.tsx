@@ -15,7 +15,9 @@ import { api } from '@/lib/api';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/lib/LanguageContext';
 import { useSettings } from '@/lib/SettingsContext';
+import { useAuth } from '@/lib/AuthContext';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 const rawText = (value: string) => value;
 const getCarMakeLabel = (make: CarModel['make']) => (typeof make === 'object' && make ? make.name : make);
@@ -49,9 +51,11 @@ export default function CarsBrowserPage() {
 }
 
 function CarsContent() {
+    const router = useRouter();
     const searchParams = useSearchParams();
     const { isRTL } = useLanguage();
     const { formatPrice } = useSettings();
+    const { isLoggedIn } = useAuth();
 
     const [cars, setCars] = useState<CarModel[]>([]);
     const [brands, setBrands] = useState<BrandModel[]>([]);
@@ -280,7 +284,17 @@ function CarsContent() {
                                     transition={{ delay: (i % 4) * 0.1 }}
                                     className="group relative"
                                 >
-                                    <Link href={`/cars/${car.id || car._id}`} className="block obsidian-card obsidian-card-hover overflow-hidden rounded-[2.5rem]">
+                                    <div 
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            if (!isLoggedIn) {
+                                                router.push('/login');
+                                            } else {
+                                                router.push(`/cars/${car.id || car._id}`);
+                                            }
+                                        }}
+                                        className="block obsidian-card obsidian-card-hover overflow-hidden rounded-[2.5rem] cursor-pointer"
+                                    >
                                         {/* Image wrapper */}
                                         <div className="relative h-72 w-full bg-zinc-900">
                                             {showFallback ? (
@@ -340,7 +354,7 @@ function CarsContent() {
                                                 </div>
                                             </div>
                                         </div>
-                                    </Link>
+                                    </div>
                                 </motion.div>
                                 );
                             })}

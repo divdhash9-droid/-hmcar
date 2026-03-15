@@ -9,11 +9,15 @@ import { useLanguage } from "@/lib/LanguageContext";
 import { api } from "@/lib/api";
 import { useSettings } from "@/lib/SettingsContext";
 import Link from "next/link";
+import { useAuth } from "@/lib/AuthContext";
+import { useRouter } from "next/navigation";
 import ClientPageHeader from "@/components/ClientPageHeader";
 
 export default function Auctions() {
+    const router = useRouter();
     const { isRTL } = useLanguage();
     const { formatPrice } = useSettings();
+    const { isLoggedIn } = useAuth();
     const [activeTab, setActiveTab] = useState('LIVE');
     const [auctions, setAuctions] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -182,11 +186,18 @@ export default function Auctions() {
                                                     <div className={cn("text-xs font-black uppercase tracking-widest", item.status === 'live' ? "text-cinematic-neon-blue" : "text-white/40")}>{item.status}</div>
                                                 </div>
                                             </div>
-                                            <Link href={`/auctions/live/${item._id || item.id}`}>
+                                            <div 
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    if (!isLoggedIn) router.push('/login');
+                                                    else router.push(`/auctions/live/${item._id || item.id}`);
+                                                }}
+                                                className="cursor-pointer"
+                                            >
                                                 <button className="w-full lg:w-fit px-12 py-5 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-[0.5em] hover:bg-cinematic-neon-blue hover:text-black hover:shadow-[0_0_30px_rgba(0,240,255,0.4)] transition-all">
                                                     {isRTL ? 'دخول قاعة العرض' : 'ENTER SHOWROOM'}
                                                 </button>
-                                            </Link>
+                                            </div>
                                         </div>
                                     </>
                                 ) : (
@@ -239,11 +250,18 @@ export default function Auctions() {
                                                 </div>
                                             </div>
                                             <div className="flex gap-4">
-                                                <Link href={`/auctions/${item.id}`} className="flex-1">
+                                                <div 
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        if (!isLoggedIn) router.push('/login');
+                                                        else router.push(`/auctions/${item.id}`);
+                                                    }}
+                                                    className="flex-1 cursor-pointer"
+                                                >
                                                     <button className="w-full py-5 bg-accent-red text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.5em] hover:shadow-[0_0_30px_rgba(232,54,78,0.4)] transition-all">
                                                         {isRTL ? 'زايد الآن' : 'PLACE BID'}
                                                     </button>
-                                                </Link>
+                                                </div>
                                                 <button className="px-10 py-5 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10">WATCH</button>
                                             </div>
                                         </div>

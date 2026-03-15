@@ -15,6 +15,8 @@ import { api } from "@/lib/api";
 import { useSettings } from "@/lib/SettingsContext";
 import Link from "next/link";
 import Image from "next/image";
+import { useAuth } from "@/lib/AuthContext";
+import { useRouter } from "next/navigation";
 import ProductModal, { type ProductModalData } from "@/components/ProductModal";
 
 // --- Types ---
@@ -50,8 +52,10 @@ interface Agency {
 }
 
 export default function PartsPage() {
+    const router = useRouter();
     const { isRTL } = useLanguage();
     const { formatPrice, socialLinks } = useSettings();
+    const { isLoggedIn } = useAuth();
     // [[ARABIC_COMMENT]] رقم الواتساب - يستخدم رقم الأدمن أو الرقم الكوري الافتراضي
     const WHATSAPP_NUMBER = (socialLinks?.whatsapp || '+821080880014').replace(/\D/g, '');
     // [[ARABIC_COMMENT]] حالة المودال - null = مغلق, بيانات = مفتوح
@@ -152,6 +156,10 @@ export default function PartsPage() {
 
     // [[ARABIC_COMMENT]] فتح مودال القطعة مع تحويل بياناتها لصيغة ProductModalData
     const openPartModal = (part: Part) => {
+        if (!isLoggedIn) {
+            router.push('/login');
+            return;
+        }
         setModalProduct({
             id: part._id,
             type: 'part',

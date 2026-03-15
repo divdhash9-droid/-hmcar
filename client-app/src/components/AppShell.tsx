@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { useStandalone } from '@/lib/useStandalone';
 import { usePathname } from 'next/navigation';
 import BottomTabBar from './BottomTabBar';
+import GlobalDrawers from './GlobalDrawers';
+import SmartIslandNotification from './SmartIslandNotification';
 
 /**
  * AppShell - غلاف التطبيق
@@ -52,10 +54,18 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             >
                 {children}
                 <BottomTabBar />
+                <GlobalDrawers />
+                <SmartIslandNotification />
             </div>
         );
     }
 
     // ── وضع الموقع العادي ──
-    return <>{children}</>;
+    return (
+        <>
+            {children}
+            <GlobalDrawers />
+            <SmartIslandNotification />
+        </>
+    );
 }

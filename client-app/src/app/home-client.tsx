@@ -265,6 +265,27 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
         <Navbar />
       </div>
 
+      {/* ── STICKY SOCIAL BAR ── */}
+      <div className={cn(
+        "fixed z-[90] flex flex-col gap-3 top-1/3",
+        isRTL ? "right-4" : "left-4"
+      )}>
+        {socialConfig.whatsapp && (
+           <a href={whatsappUrl} target="_blank" rel="noreferrer" className="w-12 h-12 rounded-2xl bg-black/40 backdrop-blur-md border border-green-500/30 flex items-center justify-center text-green-500 hover:scale-110 transition-transform shadow-[0_0_15px_rgba(34,197,94,0.3)]" title="WhatsApp">
+             <SocialSVGIcons.whatsapp className="w-6 h-6" />
+           </a>
+        )}
+        {socialConfig.links.map((link, i) => {
+          const SvgIcon = SocialSVGIcons[link.platform];
+          const colorClass = platformColors[link.platform] || 'text-white/80';
+          return (
+             <a key={i} href={link.url} target="_blank" rel="noreferrer" className={`w-12 h-12 rounded-2xl bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center hover:scale-110 hover:border-white/30 transition-transform ${colorClass}`} title={link.platform}>
+               {SvgIcon ? <SvgIcon className="w-5 h-5" /> : <LinkIcon className="w-5 h-5" />}
+             </a>
+          )
+        })}
+      </div>
+
       {/* Language Toggle */}
       <div className="fixed top-6 right-6 z-50">
         <button 
@@ -397,6 +418,23 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
         </section>
       )}
 
+      {/* ── 4.5 ADVERTISING PARTNER ── */}
+      <section className="relative z-10 py-12 px-4 max-w-7xl mx-auto mt-10">
+        <div className="w-full h-40 md:h-64 rounded-[3rem] overflow-hidden relative group border border-accent-gold/20 bg-black/60 backdrop-blur-lg flex items-center justify-center shadow-2xl">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(201,169,110,0.15)_0%,transparent_70%)]" />
+          <div className="relative z-10 text-center">
+            <div className="flex items-center justify-center gap-2 mb-3">
+               <Star className="w-4 h-4 text-accent-gold opacity-60" />
+               <h3 className="text-accent-gold font-black uppercase tracking-[0.3em] text-[10px]">{isRTL ? 'الشريك الإعلاني' : 'ADVERTISING PARTNER'}</h3>
+               <Star className="w-4 h-4 text-accent-gold opacity-60" />
+            </div>
+            <div className="text-3xl md:text-5xl font-black text-white italic uppercase tracking-widest opacity-40 group-hover:opacity-100 transition-opacity">
+              {isRTL ? 'مساحة إعلانية مميزة' : 'PREMIUM AD SPACE'}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── 5. THE BUYING JOURNEY ── */}
       <section className="relative z-10 py-32 px-4 bg-black/40">
         <div className="max-w-7xl mx-auto">
@@ -424,30 +462,38 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
         </div>
       </section>
 
-      {/* ── 5.1 PLATFORM FEATURES (DYNAMIC) ── */}
-      {features && features.length > 0 && (
-        <section className="relative z-10 py-32 px-4">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-24">
-              <h2 className="text-5xl md:text-7xl font-black text-white italic uppercase tracking-tighter">{isRTL ? 'لماذا HM CAR؟' : 'WHY HM CAR?'}</h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {features.slice(0, 6).map((feat, i) => {
-                const Icon = (lucideIcons as any)[feat.icon] || Shield;
-                return (
-                  <div key={i} className="p-10 rounded-[3rem] border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] transition-all group">
-                    <div className="w-16 h-16 rounded-2xl bg-accent-gold/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
-                      <Icon className="w-8 h-8 text-accent-gold" />
+      {/* ── 5.1 PLATFORM FEATURES (DYNAMIC WITH FALLBACK) ── */}
+      {(() => {
+        const displayFeatures = features && features.length > 0 ? features : [
+          { title: 'موثوقية تامة', titleEn: 'Absolute Trust', desc: 'سيارات مستوردة مفحوصة بالكامل مع ضمان الشفافية للمالك.', descEn: 'Fully inspected imported cars with transparency guaranteed.', icon: 'Shield' },
+          { title: 'أسعار تنافسية', titleEn: 'Competitive Pricing', desc: 'مزادات حية تمنحك الأولوية للحصول على أفضل سعر بالسوق.', descEn: 'Live auctions giving you edge for the best market prices.', icon: 'Award' },
+          { title: 'شحن عالمي', titleEn: 'Global Shipping', desc: 'نظام رقمي يتتبع مسار رحلة سيارتك حتى باب منزلك.', descEn: 'Digital system tracking your car journey to your doorstep.', icon: 'Globe' }
+        ];
+
+        return (
+          <section className="relative z-10 py-32 px-4">
+            <div className="max-w-7xl mx-auto">
+              <div className="text-center mb-24">
+                <h2 className="text-5xl md:text-7xl font-black text-white italic uppercase tracking-tighter">{isRTL ? 'لماذا HM CAR؟' : 'WHY HM CAR?'}</h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {displayFeatures.slice(0, 6).map((feat, i) => {
+                  const Icon = (lucideIcons as any)[feat.icon] || Shield;
+                  return (
+                    <div key={i} className="p-10 rounded-[3rem] border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] transition-all group">
+                      <div className="w-16 h-16 rounded-2xl bg-accent-gold/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
+                        <Icon className="w-8 h-8 text-accent-gold" />
+                      </div>
+                      <h4 className="text-2xl font-black text-white mb-4 uppercase italic tracking-tighter">{isRTL ? feat.title : (feat.titleEn || feat.title)}</h4>
+                      <p className="text-white/40 text-sm leading-relaxed">{isRTL ? feat.desc : (feat.descEn || feat.desc)}</p>
                     </div>
-                    <h4 className="text-2xl font-black text-white mb-4 uppercase italic tracking-tighter">{isRTL ? feat.title : (feat.titleEn || feat.title)}</h4>
-                    <p className="text-white/40 text-sm leading-relaxed">{isRTL ? feat.desc : (feat.descEn || feat.desc)}</p>
-                  </div>
-                )
-              })}
+                  )
+                })}
+              </div>
             </div>
-          </div>
-        </section>
-      )}
+          </section>
+        );
+      })()}
 
       {/* ── 5.2 PWA INSTALL HUB ── */}
       {!isInstalled && !isStandalone && (
@@ -660,6 +706,23 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
             </button>
             <button onClick={() => setShowUpdateBanner(false)} className="text-black/40 hover:text-black transition-colors font-bold text-lg">✕</button>
           </div>
+        </motion.div>
+      )}
+
+      {/* ── PWA STICKY INSTALL BUTTON ── */}
+      {!isInstalled && !isStandalone && deferredInstall && (
+        <motion.div 
+          initial={{ y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] md:bottom-10"
+        >
+          <button 
+            onClick={handleInstallPWA} 
+            className="flex items-center gap-3 px-8 py-4 bg-accent-gold text-black rounded-full shadow-[0_10px_40px_rgba(201,169,110,0.4)] hover:scale-105 transition-transform font-black uppercase tracking-widest text-xs border border-white/20"
+          >
+            <Download className="w-5 h-5" />
+            {isRTL ? 'تثبيت التطبيق بسرعة' : 'QUICK INSTALL APP'}
+          </button>
         </motion.div>
       )}
     </div>

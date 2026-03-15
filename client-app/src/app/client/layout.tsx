@@ -34,6 +34,7 @@ const NAV_ITEMS = [
     { href: '/client/smart-alerts', icon: Sparkles, labelAr: 'تنبيهاتي', labelEn: 'Alerts', match: ['/client/smart-alerts'], highlight: true },
     { href: '/favorites', icon: Heart, labelAr: 'المفضلة', labelEn: 'Favorites', match: ['/favorites'] },
     { href: '/client/settings', icon: Settings, labelAr: 'الإعدادات', labelEn: 'Settings', match: ['/client/settings', '/client/profile'] },
+    { href: '/client/messages', icon: MessageCircle, labelAr: 'الرسائل', labelEn: 'Messages', match: ['/client/messages'] },
 ];
 
 // ── روابط الوصول السريع في الشريط الجانبي ──
@@ -41,7 +42,6 @@ const QUICK_LINKS = [
     { href: '/gallery', icon: Car, labelAr: 'المعرض', labelEn: 'Showroom' },
     { href: '/auctions', icon: Gavel, labelAr: 'المزادات', labelEn: 'Auctions' },
     { href: '/notifications', icon: Bell, labelAr: 'الإشعارات', labelEn: 'Notifications' },
-    { href: '/messages', icon: MessageCircle, labelAr: 'الرسائل', labelEn: 'Messages' },
     { href: '/profile', icon: User, labelAr: 'الملف الشخصي', labelEn: 'Profile' },
 ];
 

@@ -138,9 +138,11 @@ export default function AdminDashboard() {
                 <div className="mb-10">
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-6">
                         <div>
-                            <p className="cockpit-mono text-[10px] text-orange-500/50 tracking-[0.3em] uppercase mb-1">HM CAR SYSTEMS // CORE ENGINE</p>
+                            <p className="cockpit-mono text-[10px] text-orange-500/50 tracking-[0.3em] uppercase mb-1">
+                                {isRTL ? 'أنظمة HM لتجارة السيارات // المحرك الأساسي' : 'HM CAR SYSTEMS // CORE ENGINE'}
+                            </p>
                             <h1 className="text-4xl md:text-5xl font-black tracking-tight text-white uppercase italic">
-                                COMMAND <span className="text-orange-500">DECK</span>
+                                {isRTL ? <><span className="text-orange-500">لوحة</span> القيادة</> : <>COMMAND <span className="text-orange-500">DECK</span></>}
                             </h1>
                         </div>
 
@@ -167,7 +169,7 @@ export default function AdminDashboard() {
                                         className="absolute top-full left-0 right-0 mt-2 z-[100] bg-[#0a0a0a] border border-white/10 rounded-2xl p-2 shadow-[0_20px_50px_rgba(0,0,0,0.5)] max-h-[60vh] overflow-auto"
                                     >
                                         <div className="p-3 border-b border-white/5 mb-1">
-                                            <span className="cockpit-mono text-[8px] text-white/20 uppercase">Match Results</span>
+                                            <span className="cockpit-mono text-[8px] text-white/20 uppercase">{isRTL ? 'تطابق النتائج' : 'Match Results'}</span>
                                         </div>
                                         {quickLinks.filter(l => l.label.toLowerCase().includes(searchQuery.toLowerCase())).map((link, idx) => (
                                             <Link key={idx} href={link.href || '#'} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-all group">
@@ -185,7 +187,7 @@ export default function AdminDashboard() {
                         <div className="flex items-center gap-3 shrink-0">
                             <div className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-orange-500/10 border border-orange-500/20">
                                 <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse" />
-                                <span className="cockpit-mono text-[9px] text-orange-400 uppercase tracking-widest">LIVE DATA FEED</span>
+                                <span className="cockpit-mono text-[9px] text-orange-400 uppercase tracking-widest">{isRTL ? 'بث بيانات مباشر' : 'LIVE DATA FEED'}</span>
                             </div>
                             <Link href="/" className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 cockpit-mono text-[9px] text-white/40 hover:text-white hover:bg-white/10 transition-all uppercase tracking-widest flex items-center gap-1" title={isRTL ? "زيارة الموقع" : "Visit Site"}>
                                 <ArrowUpRight className="w-3 h-3" />
@@ -203,10 +205,10 @@ export default function AdminDashboard() {
                         >
                             {[...Array(10), ...Array(10)].map((_, i) => (
                                 <div key={i} className="flex items-center gap-6 px-6 text-[10px] cockpit-mono text-white/30 uppercase tracking-[0.2em] shrink-0">
-                                    <span className="text-orange-500/80 font-bold">SYSTEM:{String(i % 10).padStart(3, '0')}</span>
-                                    <span>SECURE_LINK</span>
-                                    <span className="text-emerald-500/70">LATENCY:14MS</span>
-                                    <span>DATA_NODE_OK</span>
+                                    <span className="text-orange-500/80 font-bold">{isRTL ? `نظام:${String(i % 10).padStart(3, '0')}` : `SYSTEM:${String(i % 10).padStart(3, '0')}`}</span>
+                                    <span>{isRTL ? 'اتصال آمن' : 'SECURE_LINK'}</span>
+                                    <span className="text-emerald-500/70">{isRTL ? 'استجابة:14MS' : 'LATENCY:14MS'}</span>
+                                    <span>{isRTL ? 'نقطة البيانات تعمل' : 'DATA_NODE_OK'}</span>
                                     <div className="w-1.5 h-1.5 rounded-full bg-orange-500/60 animate-pulse" />
                                 </div>
                             ))}
@@ -345,8 +347,8 @@ export default function AdminDashboard() {
                             </div>
                             <div className="space-y-4">
                                 {[
-                                    { label: 'Latency', pct: 98, color: '#34d399' },
-                                    { label: 'Uptime', pct: 99.9, color: '#60a5fa' },
+                                    { label: isRTL ? 'زمن الاستجابة' : 'Latency', pct: 98, color: '#34d399' },
+                                    { label: isRTL ? 'وقت التشغيل' : 'Uptime', pct: 99.9, color: '#60a5fa' },
                                 ].map((m, i) => (
                                     <div key={i}>
                                         <div className="flex justify-between items-center mb-2">

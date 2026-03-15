@@ -143,6 +143,34 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
     { name: isRTL ? "سعد القحطاني" : "Saad Al-Qahtani", role: isRTL ? "مدير شركة" : "Company Manager", text: isRTL ? "خدمة العملاء ممتازة والفريق محترف جداً في التعامل" : "Excellent customer service and very professional team" }
   ];
 
+  const partnerLogos = [
+    '/images/شعارات/photo_6_2026-02-05_20-57-23.jpg',
+    '/images/شعارات/photo_7_2026-02-05_20-57-23.jpg',
+    '/images/شعارات/photo_8_2026-02-05_20-57-23.jpg',
+    '/images/شعارات/photo_9_2026-02-05_20-57-23.jpg',
+    '/images/شعارات/photo_10_2026-02-05_20-57-23.jpg',
+    '/images/شعارات/TOYOTA.jpg'
+  ];
+
+  const faqItems = [
+    {
+      q: isRTL ? 'كيف أبدأ المزايدة؟' : 'How do I start bidding?',
+      a: isRTL ? 'سجّل حسابك، اشحن الرصيد، ثم اختر المزاد واضغط مزايدة مباشرة.' : 'Create an account, fund your wallet, then join any auction and bid instantly.'
+    },
+    {
+      q: isRTL ? 'هل السيارات مفحوصة؟' : 'Are cars inspected?',
+      a: isRTL ? 'نعم، معظم السيارات تأتي بتقارير فحص مع صور وتفاصيل دقيقة.' : 'Yes, most listings include inspection reports with detailed photos.'
+    },
+    {
+      q: isRTL ? 'كم يستغرق الشحن؟' : 'How long does shipping take?',
+      a: isRTL ? 'يعتمد على بلد الوصول، غالباً بين 2-6 أسابيع مع تتبع كامل.' : 'Depends on destination, usually 2-6 weeks with full tracking.'
+    },
+    {
+      q: isRTL ? 'هل توجد عمولات إضافية؟' : 'Are there extra fees?',
+      a: isRTL ? 'الرسوم تظهر قبل تأكيد العملية بكل شفافية.' : 'All fees are shown transparently before you confirm.'
+    }
+  ];
+
   const DEFAULT_WHATSAPP = '+821080880014';
   const DEFAULT_SOCIAL_LINKS = [
     { platform: 'instagram', url: 'https://instagram.com' },
@@ -264,6 +292,43 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
       <div className="relative z-30 -mt-24 mb-32 flex justify-center px-4">
         <SearchSection />
       </div>
+
+      {/* ── 2.5 ANNOUNCEMENT RIBBON ── */}
+      {latestCars && latestCars.length > 0 && (
+        <section className="relative z-20 mb-24 overflow-hidden">
+          <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/5 to-transparent" />
+          <div className="relative py-4 border-y border-white/10 bg-black/50 backdrop-blur-xl">
+            <motion.div
+              className="flex gap-4 w-max px-6"
+              animate={{ x: isRTL ? ["0%", "50%"] : ["-50%", "0%"] }}
+              transition={{ duration: latestCars.length * 8, repeat: Infinity, ease: "linear" }}
+            >
+              {[...latestCars, ...latestCars].map((car, index) => (
+                <button
+                  key={index}
+                  onClick={() => router.push('/login')}
+                  className="flex items-center gap-3 px-4 py-2 rounded-full border border-white/10 bg-white/[0.03] hover:border-accent-gold/40 transition-colors"
+                >
+                  <span className="relative w-10 h-10 rounded-full overflow-hidden border border-white/10">
+                    <Image
+                      src={car.images?.[0] || "/images/placeholder.jpg"}
+                      alt={car.title || car.name || 'Car'}
+                      fill
+                      className="object-cover"
+                    />
+                  </span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/70">
+                    {car.title || car.name || (isRTL ? 'سيارة' : 'Car')}
+                  </span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-accent-gold">
+                    {formatPrice(Number(car.price || 0))}
+                  </span>
+                </button>
+              ))}
+            </motion.div>
+          </div>
+        </section>
+      )}
 
       {/* ── 3. TRUST HUB (STATISTICS) ── */}
       <section className="relative z-10 py-12 px-4 mb-20">
@@ -433,6 +498,24 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
         </section>
       )}
 
+      {/* ── 6.5 TRUSTED BY ── */}
+      <section className="relative z-10 py-24 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-14">
+            <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-white/40">
+              {isRTL ? 'يثق بنا شركاء النخبة' : 'TRUSTED BY ELITE PARTNERS'}
+            </h3>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 items-center opacity-70">
+            {partnerLogos.map((logo, i) => (
+              <div key={i} className="relative h-14 w-full rounded-2xl border border-white/5 bg-white/[0.02]">
+                <Image src={logo} alt="Partner" fill className="object-contain grayscale hover:grayscale-0 transition-all duration-700" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── 7. TESTIMONIALS ── */}
       <section className="relative z-10 py-32 px-4 shadow-2xl">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
@@ -466,6 +549,20 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
             <h2 className="text-6xl md:text-9xl font-black text-white italic uppercase tracking-tighter leading-[0.75] mb-12">
               {isRTL ? 'الجيل القادم من المزادات' : 'NEXT GEN AUCTIONS'}
             </h2>
+            <div className="flex flex-wrap gap-4 justify-center lg:justify-start mb-10">
+              <div className="flex items-center gap-2 px-4 py-2 rounded-2xl border border-white/10 bg-white/5 text-[10px] font-black uppercase tracking-[0.3em] text-white/70">
+                <Smartphone className="w-4 h-4 text-accent-gold" />
+                {isRTL ? 'تثبيت سريع' : 'QUICK INSTALL'}
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 rounded-2xl border border-white/10 bg-white/5 text-[10px] font-black uppercase tracking-[0.3em] text-white/70">
+                <Download className="w-4 h-4 text-accent-gold" />
+                {isRTL ? 'تنبيهات فورية' : 'INSTANT ALERTS'}
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 rounded-2xl border border-white/10 bg-white/5 text-[10px] font-black uppercase tracking-[0.3em] text-white/70">
+                <LinkIcon className="w-4 h-4 text-accent-gold" />
+                {isRTL ? 'تحديثات تلقائية' : 'AUTO UPDATES'}
+              </div>
+            </div>
             <div className="flex flex-wrap gap-6 justify-center lg:justify-start">
               <button className="px-14 py-6 bg-white text-black rounded-3xl font-black uppercase tracking-widest text-xs hover:bg-accent-gold transition-all">
                  {isRTL ? 'آيفون' : 'IOS APP'}
@@ -474,6 +571,28 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
                  {isRTL ? 'أندرويد' : 'ANDROID'}
               </button>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 9. FAQ ── */}
+      <section className="relative z-10 py-28 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl md:text-7xl font-black text-white italic uppercase tracking-tighter">
+              {isRTL ? 'أسئلة تتكرر كثيراً' : 'FREQUENT QUESTIONS'}
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {faqItems.map((item, i) => (
+              <details key={i} className="group rounded-[2.5rem] border border-white/10 bg-white/[0.02] p-8 open:border-accent-gold/40 transition-all">
+                <summary className="flex items-center justify-between cursor-pointer text-lg font-black text-white uppercase tracking-tight">
+                  <span>{item.q}</span>
+                  <ChevronRight className={cn("w-5 h-5 text-accent-gold transition-transform", isRTL ? "group-open:-rotate-90" : "group-open:rotate-90")} />
+                </summary>
+                <p className="mt-6 text-white/50 text-sm leading-relaxed">{item.a}</p>
+              </details>
+            ))}
           </div>
         </div>
       </section>

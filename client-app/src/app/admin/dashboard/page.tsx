@@ -195,18 +195,22 @@ export default function AdminDashboard() {
                     </div>
 
                     {/* System Pulse Ticker */}
-                    <div className="bg-white/[0.02] border-y border-white/5 h-8 flex items-center overflow-hidden">
-                        <div className="flex animate-marquee whitespace-nowrap gap-10">
-                            {Array.from({ length: 15 }).map((_, i) => (
-                                <div key={i} className="flex items-center gap-4 text-[8px] cockpit-mono text-white/20 uppercase tracking-[0.2em]">
-                                    <span className="text-orange-500">SYSTEM:00{i}</span>
-                                    <span>CONNECTION SECURE</span>
-                                    <span>LATENCY: 14MS</span>
-                                    <span>STORAGE OK</span>
-                                    <div className="w-1 h-1 rounded-full bg-orange-500/40" />
+                    <div className="bg-white/[0.02] border-y border-white/5 h-8 flex items-center overflow-hidden" dir="ltr">
+                        <motion.div 
+                            animate={{ x: [0, "-50%"] }} 
+                            transition={{ repeat: Infinity, duration: 30, ease: "linear" }}
+                            className="flex w-max"
+                        >
+                            {[...Array(10), ...Array(10)].map((_, i) => (
+                                <div key={i} className="flex items-center gap-6 px-6 text-[10px] cockpit-mono text-white/30 uppercase tracking-[0.2em] shrink-0">
+                                    <span className="text-orange-500/80 font-bold">SYSTEM:{String(i % 10).padStart(3, '0')}</span>
+                                    <span>SECURE_LINK</span>
+                                    <span className="text-emerald-500/70">LATENCY:14MS</span>
+                                    <span>DATA_NODE_OK</span>
+                                    <div className="w-1.5 h-1.5 rounded-full bg-orange-500/60 animate-pulse" />
                                 </div>
                             ))}
-                        </div>
+                        </motion.div>
                     </div>
                 </div>
 

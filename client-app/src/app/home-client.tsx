@@ -208,24 +208,6 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
     Menu, X, Car, Sparkles, Plus
   };
 
-  const faqItems = [
-    {
-      q: isRTL ? 'كيف أبدأ المزايدة؟' : 'How do I start bidding?',
-      a: isRTL ? 'سجّل حسابك، اشحن الرصيد، ثم اختر المزاد واضغط مزايدة مباشرة.' : 'Create an account, fund your wallet, then join any auction and bid instantly.'
-    },
-    {
-      q: isRTL ? 'هل السيارات مفحوصة؟' : 'Are cars inspected?',
-      a: isRTL ? 'نعم، معظم السيارات تأتي بتقارير فحص مع صور وتفاصيل دقيقة.' : 'Yes, most listings include inspection reports with detailed photos.'
-    },
-    {
-      q: isRTL ? 'كم يستغرق الشحن؟' : 'How long does shipping take?',
-      a: isRTL ? 'يعتمد على بلد الوصول، غالباً بين 2-6 أسابيع مع تتبع كامل.' : 'Depends on destination, usually 2-6 weeks with full tracking.'
-    },
-    {
-      q: isRTL ? 'هل توجد عمولات إضافية؟' : 'Are there extra fees?',
-      a: isRTL ? 'الرسوم تظهر قبل تأكيد العملية بكل شفافية.' : 'All fees are shown transparently before you confirm.'
-    }
-  ];
 
   const [socialConfig, setSocialConfig] = useState<{ whatsapp?: string; links: { platform: string; url: string }[] }>({
     whatsapp: '+821080880014',
@@ -605,29 +587,6 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
       </section>
       )}
 
-      {/* ── 9. FAQ ── */}
-      {(homeContent?.showFAQ ?? true) && (
-        <section className="relative z-10 py-28 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl md:text-7xl font-black text-white italic uppercase tracking-tighter">
-              {isRTL ? 'أسئلة تتكرر كثيراً' : 'FREQUENT QUESTIONS'}
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {faqItems.map((item, i) => (
-              <details key={i} className="group rounded-[2.5rem] border border-white/10 bg-white/[0.02] p-8 open:border-accent-gold/40 transition-all">
-                <summary className="flex items-center justify-between cursor-pointer text-lg font-black text-white uppercase tracking-tight">
-                  <span>{item.q}</span>
-                  <ChevronRight className={cn("w-5 h-5 text-accent-gold transition-transform", isRTL ? "group-open:-rotate-90" : "group-open:rotate-90")} />
-                </summary>
-                <p className="mt-6 text-white/50 text-sm leading-relaxed">{item.a}</p>
-              </details>
-            ))}
-          </div>
-        </div>
-      </section>
-      )}
 
       {/* ── FOOTER ── */}
       <footer className="relative z-10 py-24 px-4 border-t border-white/10 bg-black hide-in-app">

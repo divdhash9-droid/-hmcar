@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    Menu, X, User, Languages, ArrowLeft, ArrowRight,
+    Menu, X, User, Languages,
     Headphones, MessageCircle,
     Car, Gavel, ShoppingBag, Settings, ShoppingCart, Heart
 } from 'lucide-react';
@@ -43,7 +43,6 @@ export default function Navbar() {
         };
     }, []);
 
-    const router = useRouter();
     const { isLoggedIn } = useAuth();
     const { isRTL, toggleLanguage } = useLanguage();
     const { siteInfo, displayCurrency, setDisplayCurrency } = useSettings();
@@ -116,17 +115,6 @@ export default function Navbar() {
                             </motion.div>
                         </Link>
                         </div>
-                        {pathname === rawText('/profile') && (
-                            <div className="w-full">
-                                <button
-                                    onClick={() => router.back()}
-                                    className="p-2 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all"
-                                    aria-label={isRTL ? 'عودة' : 'Back'}
-                                >
-                                    {isRTL ? <ArrowRight className="w-5 h-5" /> : <ArrowLeft className="w-5 h-5" />}
-                                </button>
-                            </div>
-                        )}
                     </div>
 
 

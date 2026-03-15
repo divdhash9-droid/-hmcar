@@ -1,202 +1,289 @@
 'use client';
 
 import { motion } from "framer-motion";
-import { User, Mail, Shield, Save, Phone, MapPin, LogOut } from "lucide-react";
+import { useState, useEffect } from "react";
+import {
+    User,
+    Mail,
+    Phone,
+    Lock,
+    Save,
+    Edit3,
+    Shield,
+    LogOut
+} from "lucide-react";
 import { useLanguage } from "@/lib/LanguageContext";
-import { useAuth } from "@/lib/AuthContext";
-import { cn } from "@/lib/utils";
+import { api } from "@/lib/api";
+import ClientPageHeader from "@/components/ClientPageHeader";
 
-export default function Profile() {
+const rawText = (value: string) => value;
+
+export default function ClientProfilePage() {
     const { isRTL } = useLanguage();
-    const { user } = useAuth();
+    const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState('');
+    const [userData, setUserData] = useState({
+        name: '',
+        email: '',
+        phone: '',
+        role: 'buyer'
+    });
+    const [passwordData, setPasswordData] = useState({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+    });
 
-    const userName = user?.name || (isRTL ? 'العميل' : 'Guest');
-    const userEmail = user?.email || '';
+    useEffect(() => {
+        // [[ARABIC_COMMENT]] جلب بيانات المستخدم من localStorage
+        if (typeof window !== 'undefined') {
+            const user = localStorage.getItem('hm_user');
+            if (user) {
+                try {
+                    const data = JSON.parse(user);
+                    setUserData({
+                        name: data.name || '',
+                        email: data.email || '',
+                        phone: data.phone || '',
+                        role: data.role || 'buyer'
+                    });
+                } catch (e) {
+                    console.error('Error parsing user data', e);
+                }
+            }
+        }
+    }, []);
+
+    const handleProfileUpdate = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        setMessage('');
+
+        try {
+            await api.users.updateProfile(userData);
+            const currentUser = JSON.parse(localStorage.getItem('hm_user') || '{}');
+            const updatedUser = { ...currentUser, ...userData };
+            localStorage.setItem('hm_user', JSON.stringify(updatedUser));
+            setMessage(isRTL ? 'تم تحديث البيانات بنجاح' : 'Profile updated successfully');
+        } catch (err: any) {
+            setMessage(err.message || (isRTL ? 'حدث خطأ' : 'An error occurred'));
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handlePasswordChange = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (passwordData.newPassword !== passwordData.confirmPassword) {
+            setMessage(isRTL ? 'كلمات المرور غير متطابقة' : 'Passwords do not match');
+            return;
+        }
+
+        setLoading(true);
+        setMessage('');
+
+        try {
+            await api.auth.changePassword({
+                currentPassword: passwordData.currentPassword,
+                newPassword: passwordData.newPassword
+            });
+            setMessage(isRTL ? 'تم تغيير كلمة المرور بنجاح' : 'Password changed successfully');
+            setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+        } catch (err: any) {
+            setMessage(err.message || (isRTL ? 'حدث خطأ في النظام' : 'Protocol error occurred'));
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('hm_token');
+        localStorage.removeItem('hm_user');
+        window.location.href = '/login';
+    };
 
     return (
-        <div className={cn("min-h-full", isRTL && "rtl")}>
-            <div className="px-5 lg:px-8 pt-6 lg:pt-8 pb-8 max-w-2xl mx-auto lg:mx-0">
+        <div className="flex flex-col h-full bg-[#080809]">
+            <ClientPageHeader
+                title={isRTL ? 'الملف الشخصي' : 'Profile Settings'}
+                subtitle={isRTL ? 'إدارة معلوماتك الشخصية وإعدادات الحساب' : 'MANAGE ACCOUNT DETAILS'}
+                icon={User}
+            />
 
-                {/* Header */}
-                <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-7">
-                    <p className="text-[11px] text-white/25 font-bold uppercase tracking-[0.3em] mb-1">
-                        {isRTL ? 'بيانات الحساب' : 'Account Details'}
-                    </p>
-                    <h1 className="text-2xl lg:text-3xl font-bold text-white">
-                        {isRTL ? 'الملف الشخصي' : 'Profile'}
-                    </h1>
-                </motion.div>
-
-                {/* Avatar */}
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.05 }}
-                    className="mb-6"
-                >
-                    <div className={cn("flex items-center gap-4 p-5 rounded-2xl bg-white/[0.03] border border-white/[0.06]", isRTL && "flex-row-reverse")}>
-                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#c9a96e]/30 to-[#c9a96e]/10 flex items-center justify-center text-[#c9a96e] font-black text-2xl shrink-0">
-                            {userName.charAt(0).toUpperCase()}
-                        </div>
-                        <div className={isRTL ? "text-right" : ""}>
-                            <div className="text-[17px] font-bold text-white">{userName}</div>
-                            <div className="text-[12px] text-[#c9a96e]/60 font-semibold mt-0.5">
-                                {isRTL ? 'عضو نشط' : 'Active Member'}
-                            </div>
-                            {userEmail && (
-                                <div className="text-[12px] text-white/35 mt-1">{userEmail}</div>
-                            )}
-                        </div>
-                    </div>
-                </motion.div>
-
-                {/* Form */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                >
-                    <div className="rounded-2xl border border-white/[0.06] overflow-hidden mb-4">
-                        <div className={cn('flex items-center gap-3 px-5 py-4 bg-white/[0.02] border-b border-white/[0.05]', isRTL && 'flex-row-reverse')}>
-                            <User className="w-4 h-4 text-[#c9a96e]/70" strokeWidth={1.8} />
-                            <span className="text-[12px] font-bold text-white/50 uppercase tracking-[0.25em]">
-                                {isRTL ? 'البيانات الشخصية' : 'Personal Info'}
-                            </span>
-                        </div>
-                        <form className="p-5 space-y-4">
-                            {/* الاسم */}
-                            <div>
-                                <label className="block text-[11px] font-semibold text-white/40 mb-2">
-                                    {isRTL ? 'الاسم الكامل' : 'Full Name'}
-                                </label>
-                                <div className="relative">
-                                    <User
-                                        className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-3.5" : "left-3.5")}
-                                        strokeWidth={1.5}
-                                    />
-                                    <input
-                                        type="text"
-                                        defaultValue={userName}
-                                        className={cn(
-                                            "w-full bg-white/[0.03] border border-white/[0.08] rounded-xl py-3.5 text-[14px] text-white focus:outline-none focus:border-[#c9a96e]/40 transition-all placeholder:text-white/20",
-                                            isRTL ? "pr-10 pl-4" : "pl-10 pr-4"
-                                        )}
-                                    />
-                                </div>
-                            </div>
-
-                            {/* البريد */}
-                            <div>
-                                <label className="block text-[11px] font-semibold text-white/40 mb-2">
-                                    {isRTL ? 'البريد الإلكتروني' : 'Email'}
-                                </label>
-                                <div className="relative">
-                                    <Mail
-                                        className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-3.5" : "left-3.5")}
-                                        strokeWidth={1.5}
-                                    />
-                                    <input
-                                        type="email"
-                                        defaultValue={userEmail}
-                                        className={cn(
-                                            "w-full bg-white/[0.03] border border-white/[0.08] rounded-xl py-3.5 text-[14px] text-white/60 focus:outline-none focus:border-[#c9a96e]/40 transition-all placeholder:text-white/20",
-                                            isRTL ? "pr-10 pl-4" : "pl-10 pr-4"
-                                        )}
-                                    />
-                                </div>
-                            </div>
-
-                            {/* الجوال */}
-                            <div>
-                                <label className="block text-[11px] font-semibold text-white/40 mb-2">
-                                    {isRTL ? 'رقم الجوال' : 'Phone Number'}
-                                </label>
-                                <div className="relative">
-                                    <Phone
-                                        className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-3.5" : "left-3.5")}
-                                        strokeWidth={1.5}
-                                    />
-                                    <input
-                                        type="tel"
-                                        placeholder="+966 5X XXX XXXX"
-                                        className={cn(
-                                            "w-full bg-white/[0.03] border border-white/[0.08] rounded-xl py-3.5 text-[14px] text-white focus:outline-none focus:border-[#c9a96e]/40 transition-all placeholder:text-white/20",
-                                            isRTL ? "pr-10 pl-4" : "pl-10 pr-4"
-                                        )}
-                                    />
-                                </div>
-                            </div>
-
-                            {/* المنطقة */}
-                            <div>
-                                <label className="block text-[11px] font-semibold text-white/40 mb-2">
-                                    {isRTL ? 'المنطقة' : 'Region'}
-                                </label>
-                                <div className="relative">
-                                    <MapPin
-                                        className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20", isRTL ? "right-3.5" : "left-3.5")}
-                                        strokeWidth={1.5}
-                                    />
-                                    <select
-                                        aria-label={isRTL ? 'المنطقة' : 'Region'}
-                                        className={cn(
-                                            "w-full bg-[#0c0c0f] border border-white/[0.08] rounded-xl py-3.5 text-[14px] text-white/60 focus:outline-none focus:border-[#c9a96e]/40 transition-all appearance-none",
-                                            isRTL ? "pr-10 pl-4" : "pl-10 pr-4"
-                                        )}
-                                    >
-                                        <option>Riyadh, KSA</option>
-                                        <option>Jeddah, KSA</option>
-                                        <option>Dubai, UAE</option>
-                                        <option>London, UK</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            {/* زر الحفظ */}
-                            <button
-                                type="submit"
-                                className="w-full py-4 rounded-2xl bg-[#c9a96e] text-black font-bold text-[14px] transition-all hover:bg-[#d4b57a] active:scale-[0.98] flex items-center justify-center gap-2.5"
-                            >
-                                <Save className="w-4 h-4" strokeWidth={2} />
-                                {isRTL ? 'حفظ التغييرات' : 'Save Changes'}
-                            </button>
-                        </form>
-                    </div>
-
-                    {/* Security Badge */}
-                    <div className={cn(
-                        "flex items-center gap-3.5 p-4 rounded-2xl bg-[#c9a96e]/[0.05] border border-[#c9a96e]/15",
-                        isRTL && "flex-row-reverse"
-                    )}>
-                        <Shield className="w-5 h-5 text-[#c9a96e]/60 shrink-0" strokeWidth={1.8} />
-                        <div className={isRTL ? "text-right" : ""}>
-                            <div className="text-[12px] font-bold text-white/60">
-                                {isRTL ? 'بياناتك محمية' : 'Your data is protected'}
-                            </div>
-                            <div className="text-[11px] text-white/30 mt-0.5">
-                                {isRTL ? 'تشفير AES-256 - لا مشاركة مع أطراف خارجية' : 'AES-256 encryption · No third-party sharing'}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Logout Button */}
-                    <button
-                        type="button"
-                        onClick={() => {
-                            // Clear token and redirect
-                            document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-                            if (typeof window !== 'undefined') {
-                                localStorage.removeItem('user');
-                                window.location.href = '/login';
-                            }
-                        }}
-                        className="w-full mt-6 py-4 rounded-2xl bg-cinematic-neon-red/10 border border-cinematic-neon-red/20 text-cinematic-neon-red font-bold text-[14px] transition-all hover:bg-cinematic-neon-red/20 active:scale-[0.98] flex items-center justify-center gap-2.5"
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-6 lg:p-8 space-y-8 pb-32 lg:pb-12">
+                {/* Message Banner */}
+                {message && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="p-4 bg-cinematic-neon-gold/10 border border-cinematic-neon-gold/20 rounded-2xl text-center"
                     >
-                        <LogOut className="w-4 h-4" strokeWidth={2} />
-                        {isRTL ? 'تسجيل الخروج' : 'Log Out'}
-                    </button>
+                        <p className="text-xs font-bold text-cinematic-neon-gold">{message}</p>
+                    </motion.div>
+                )}
 
-                </motion.div>
+                <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
+                    {/* User Card */}
+                    <div className="xl:col-span-4 space-y-6">
+                        <div className="bg-white/3 border border-white/5 rounded-[2.5rem] p-8 text-center relative overflow-hidden group">
+                           <div className="absolute inset-0 bg-cinematic-neon-gold/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-3xl" />
+                           <div className="relative">
+                               <div className="w-24 h-24 mx-auto rounded-[2rem] bg-cinematic-neon-gold/10 border border-cinematic-neon-gold/20 flex items-center justify-center mb-6 shadow-2xl">
+                                   <User className="w-10 h-10 text-cinematic-neon-gold" />
+                               </div>
+                               <h3 className="text-xl font-black text-white italic tracking-tight mb-2 uppercase">{userData.name || rawText('GUEST')}</h3>
+                               <div className="text-[10px] text-white/30 font-black uppercase tracking-[0.4em] mb-8">{userData.role}</div>
+                               
+                               <button 
+                                onClick={handleLogout}
+                                className="w-full py-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-500 text-[11px] font-black uppercase tracking-widest hover:bg-red-500/20 transition-all flex items-center justify-center gap-3"
+                               >
+                                   <LogOut className="w-4 h-4" />
+                                   {isRTL ? 'تسجيل الخروج' : 'Sign Out'}
+                               </button>
+                           </div>
+                        </div>
+
+                        {/* Security Info */}
+                        <div className="bg-cinematic-neon-gold/[0.02] border border-cinematic-neon-gold/10 rounded-[2rem] p-6 flex flex-col items-center text-center gap-3">
+                            <Shield className="w-6 h-6 text-cinematic-neon-gold/40" />
+                            <div className="text-[11px] font-black text-cinematic-neon-gold/60 uppercase tracking-widest">{isRTL ? 'اتصال مؤمن' : 'SECURE ENCRYPTION'}</div>
+                            <p className="text-[10px] text-white/20 leading-relaxed">
+                                {isRTL ? 'نظام التشفير لدينا يضمن حماية بياناتك الشخصية بالكامل' : 'END-TO-END AES-256 PROTECTION FOR ALL USER DATA'}
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Forms */}
+                    <div className="xl:col-span-8 space-y-8">
+                        {/* Personal Info */}
+                        <section className="bg-white/3 border border-white/5 rounded-[2.5rem] p-8 lg:p-10">
+                            <div className="flex items-center gap-4 mb-10">
+                                <div className="w-10 h-10 rounded-2xl bg-white/5 flex items-center justify-center">
+                                    <Edit3 className="w-5 h-5 text-cinematic-neon-gold" />
+                                </div>
+                                <div>
+                                    <h2 className="text-[11px] font-black text-white uppercase tracking-[0.5em] mb-1">{isRTL ? 'المعلومات الشخصية' : 'PERSONAL DETAILS'}</h2>
+                                    <div className="h-0.5 w-12 bg-cinematic-neon-gold/30 rounded-full" />
+                                </div>
+                            </div>
+
+                            <form onSubmit={handleProfileUpdate} className="space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] ml-2 rtl:mr-2 rtl:ml-0">{isRTL ? 'اسم المستخدم' : 'NAME'}</label>
+                                        <div className="relative">
+                                            <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-white/10" />
+                                            <input 
+                                                type="text"
+                                                value={userData.name}
+                                                onChange={(e) => setUserData({ ...userData, name: e.target.value })}
+                                                placeholder={isRTL ? 'الاسم' : 'Name'}
+                                                className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 flex pl-12 pr-6 text-sm font-bold text-white focus:outline-none focus:border-cinematic-neon-gold/40 transition-all"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] ml-2 rtl:mr-2 rtl:ml-0">{isRTL ? 'البريد الإلكتروني' : 'EMAIL'}</label>
+                                        <div className="relative">
+                                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-white/10" />
+                                            <input 
+                                                type="email"
+                                                value={userData.email}
+                                                onChange={(e) => setUserData({ ...userData, email: e.target.value })}
+                                                className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-6 text-sm font-bold text-white/60 focus:outline-none focus:border-cinematic-neon-gold/40 transition-all"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] ml-2 rtl:mr-2 rtl:ml-0">{isRTL ? 'رقم الهاتف' : 'PHONE'}</label>
+                                    <div className="relative">
+                                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-white/10" />
+                                        <input 
+                                            type="tel"
+                                            value={userData.phone}
+                                            onChange={(e) => setUserData({ ...userData, phone: e.target.value })}
+                                            placeholder={isRTL ? 'رقم الهاتف' : 'Phone'}
+                                            className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-6 text-sm font-bold text-white focus:outline-none focus:border-cinematic-neon-gold/40 transition-all"
+                                        />
+                                    </div>
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="w-full sm:w-auto px-10 py-4 bg-cinematic-neon-gold text-black rounded-2xl text-[11px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl shadow-cinematic-neon-gold/10 flex items-center justify-center gap-3"
+                                >
+                                    <Save className="w-4.5 h-4.5" />
+                                    {isRTL ? 'حفظ البيانات' : 'UPDATE PROFILE'}
+                                </button>
+                            </form>
+                        </section>
+
+                        {/* Password */}
+                        <section className="bg-white/3 border border-white/5 rounded-[2.5rem] p-8 lg:p-10">
+                            <div className="flex items-center gap-4 mb-10">
+                                <div className="w-10 h-10 rounded-2xl bg-white/5 flex items-center justify-center text-red-500">
+                                    <Lock className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <h2 className="text-[11px] font-black text-white uppercase tracking-[0.5em] mb-1">{isRTL ? 'تعديل كلمة المرور' : 'SECURITY & PASS'}</h2>
+                                    <div className="h-0.5 w-12 bg-red-500/30 rounded-full" />
+                                </div>
+                            </div>
+
+                            <form onSubmit={handlePasswordChange} className="space-y-6">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] ml-2 rtl:mr-2 rtl:ml-0">{isRTL ? 'كلمة المرور الحالية' : 'CURRENT PASSWORD'}</label>
+                                    <div className="relative">
+                                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-white/10" />
+                                        <input 
+                                            type="password"
+                                            value={passwordData.currentPassword}
+                                            onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                                            placeholder="••••••••"
+                                            className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-6 text-sm font-bold text-white focus:outline-none focus:border-red-500/40 transition-all"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] ml-2 rtl:mr-2 rtl:ml-0">{isRTL ? 'جديد' : 'NEW'}</label>
+                                        <input 
+                                            type="password"
+                                            value={passwordData.newPassword}
+                                            onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                                            placeholder="••••••••"
+                                            className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 px-6 text-sm font-bold text-white focus:outline-none focus:border-red-500/40 transition-all"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] ml-2 rtl:mr-2 rtl:ml-0">{isRTL ? 'تأكيد' : 'CONFIRM'}</label>
+                                        <input 
+                                            type="password"
+                                            value={passwordData.confirmPassword}
+                                            onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                                            placeholder="••••••••"
+                                            className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 px-6 text-sm font-bold text-white focus:outline-none focus:border-red-500/40 transition-all"
+                                        />
+                                    </div>
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="w-full sm:w-auto px-10 py-4 bg-white text-black rounded-2xl text-[11px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl flex items-center justify-center gap-3"
+                                >
+                                    <Shield className="w-4.5 h-4.5" />
+                                    {isRTL ? 'تغيير كلمة المرور' : 'CHANGE PASSWORD'}
+                                </button>
+                            </form>
+                        </section>
+                    </div>
+                </div>
             </div>
         </div>
     );

@@ -9,7 +9,6 @@ import {
     X, SlidersHorizontal, ArrowLeft,
     Car
 } from "lucide-react";
-import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import { api } from '@/lib/api';
 import { cn } from '@/lib/utils';
@@ -107,8 +106,13 @@ function CarsContent() {
 
     useEffect(() => {
         const fetchBrands = async () => {
-            const res = await api.brands.list('cars');
-            if (res.success) setBrands(res.brands);
+            try {
+                // [[ARABIC_COMMENT]] جلب الوكالات المخصصة للمعرض المحلي
+                const res = await api.brands.list('cars', { targetShowroom: 'hm_local' });
+                if (res.success) setBrands(res.brands || []);
+            } catch (err) {
+                console.error("Failed to fetch brands", err);
+            }
         };
         fetchBrands();
     }, []);
@@ -153,37 +157,143 @@ function CarsContent() {
             <main className="relative z-10 max-w-400 mx-auto px-6 pt-32 pb-24">
 
                 {/* Header Section */}
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
-                    <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-                        <div className="flex items-center gap-3 text-luxury-gold/60 mb-4">
-                            <SlidersHorizontal className="w-4 h-4" />
-                            <span className="text-[10px] font-black uppercase tracking-[0.4em]">{isRTL ? rawText('مستودع السيارات') : rawText('VEHICLE TERMINAL')}</span>
+                <div className="flex flex-col items-center text-center mb-16 relative">
+                    {/* Back Button */}
+                    <motion.div 
+                        initial={{ opacity: 0, x: -10 }} 
+                        animate={{ opacity: 1, x: 0 }} 
+                        className="absolute left-0 top-0 hidden md:block"
+                    >
+                        <button
+                            onClick={() => router.back()}
+                            className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all group"
+                            title={isRTL ? rawText('رجوع') : rawText('Back')}
+                        >
+                            <ArrowLeft className={cn("w-5 h-5", isRTL && "rotate-180")} />
+                        </button>
+                    </motion.div>
+
+                    <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center">
+                        <div className="flex items-center gap-3 text-luxury-gold mb-6 bg-luxury-gold/10 px-6 py-2 rounded-full border border-luxury-gold/20">
+                            <Car className="w-4 h-4" />
+                            <span className="text-[10px] font-black uppercase tracking-[0.4em]">{isRTL ? rawText('المعرض المحلي') : rawText('LOCAL SHOWROOM')}</span>
                         </div>
-                        <h1 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter leading-none">
-                            {isRTL ? rawText('تصفح') : rawText('BROWSE')} <span className="text-luxury-gold">{isRTL ? rawText('المخزون') : rawText('INVENTORY')}</span>
+                        <h1 className="text-5xl md:text-8xl lg:text-[10rem] font-black uppercase italic tracking-[ -0.05em] leading-[0.85] mb-8 font-display">
+                            {isRTL ? rawText('اختر') : rawText('CHOOSE')} <span className="text-luxury-gold">{isRTL ? rawText('الوكالة') : rawText('AGENCY')}</span>
                         </h1>
                     </motion.div>
 
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                        className="flex items-center gap-4 bg-white/5 border border-white/10 rounded-2xl p-2 md:p-3"
-                    >
-                        <div className="px-4 py-2 border-r border-white/10">
-                            <span className="text-2xl font-black text-white">{total}</span>
-                            <span className="text-[10px] text-white/30 uppercase block font-bold">{isRTL ? rawText('سيارة متاحة') : rawText('ASSETS')}</span>
-                        </div>
-                        <button
-                            onClick={() => setShowFilters(!showFilters)}
-                            className={cn(
-                                "flex items-center gap-3 px-6 py-3 rounded-xl transition-all font-black uppercase tracking-widest text-[10px]",
-                                showFilters ? "bg-luxury-gold text-black" : "hover:bg-white/5 text-white/60"
-                            )}
+                     <div className="md:hidden mb-8 self-start">
+                         <button
+                            onClick={() => router.back()}
+                            title={isRTL ? rawText('رجوع') : rawText('Back')}
+                            className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center"
                         >
-                            <Filter className="w-4 h-4" />
-                            {isRTL ? rawText('الفلاتر') : rawText('FILTERS')}
+                            <ArrowLeft className={cn("w-4 h-4", isRTL && "rotate-180")} />
                         </button>
+                    </div>
+                </div>
+
+                {/* Filter / Stats Bar */}
+                <div className="flex flex-col items-center mb-12">
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-wrap items-center justify-center gap-4">
+                        <div className="bg-white/5 border border-white/10 rounded-2xl px-6 py-3 flex items-center gap-4 backdrop-blur-3xl">
+                            <div className="text-center">
+                                <span className="text-xl font-black text-white block leading-none">{total}</span>
+                                <span className="text-[9px] text-white/30 uppercase font-bold tracking-widest">{isRTL ? rawText('سيارة متاحة') : rawText('ASSETS')}</span>
+                            </div>
+                            <div className="w-px h-8 bg-white/10" />
+                            <button
+                                onClick={() => setShowFilters(!showFilters)}
+                                className={cn(
+                                    "flex items-center gap-2 px-4 py-2 rounded-xl transition-all text-[10px] font-black uppercase tracking-widest",
+                                    showFilters ? "bg-luxury-gold text-black" : "text-white/60 hover:text-white"
+                                )}
+                                title={isRTL ? rawText('الفلاتر') : rawText('Filters')}
+                            >
+                                <Filter className="w-3.5 h-3.5" />
+                                {isRTL ? rawText('تصفية النتائج') : rawText('REFINE')}
+                            </button>
+                        </div>
                     </motion.div>
                 </div>
+
+                {/* Agencies (Brands) Grid */}
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-24"
+                >
+                    <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6">
+                        {/* All Makes Button */}
+                        <button
+                            onClick={() => { setBrand(''); setPage(1); }}
+                            className={cn(
+                                "flex flex-col items-center justify-center min-w-[100px] md:min-w-[120px] p-6 rounded-[2rem] border transition-all gap-4 group relative",
+                                brand === '' 
+                                    ? "bg-luxury-gold/15 border-luxury-gold/40 shadow-[0_0_40px_rgba(197,160,89,0.1)]" 
+                                    : "bg-white/3 border-white/5 hover:bg-white/10 hover:border-white/20"
+                            )}
+                        >
+                            <div className={cn(
+                                "w-12 h-12 rounded-2xl flex items-center justify-center transition-all",
+                                brand === '' ? "bg-luxury-gold text-black scale-110" : "bg-white/5 text-white/30 group-hover:text-white"
+                            )}>
+                                <SlidersHorizontal className="w-6 h-6" />
+                            </div>
+                            <span className={cn(
+                                "text-[10px] font-black uppercase tracking-widest",
+                                brand === '' ? "text-luxury-gold" : "text-white/40 group-hover:text-white"
+                            )}>
+                                {isRTL ? rawText('الكل') : rawText('ALL')}
+                            </span>
+                        </button>
+
+                        {loading && brands.length === 0 ? (
+                            Array.from({ length: 5 }).map((_, i) => (
+                                <div key={i} className="w-[100px] h-[120px] rounded-[2rem] bg-white/3 border border-white/5 animate-pulse" />
+                            ))
+                        ) : (
+                            brands.map((b: any) => (
+                                <button
+                                    key={b._id || b.id || b.name}
+                                    onClick={() => { setBrand(b.name); setPage(1); }}
+                                    className={cn(
+                                        "flex flex-col items-center justify-center min-w-[100px] md:min-w-[120px] p-6 rounded-[2rem] border transition-all duration-500 gap-4 group relative overflow-hidden",
+                                        brand === b.name
+                                            ? "bg-luxury-gold/15 border-luxury-gold/40 shadow-[0_0_50px_rgba(197,160,89,0.15)]"
+                                            : "bg-white/3 border-white/5 hover:bg-white/10 hover:border-white/20 hover:scale-105"
+                                    )}
+                                >
+                                    {brand === b.name && (
+                                        <motion.div layoutId="active-brand" className="absolute inset-0 bg-luxury-gold/5" />
+                                    )}
+                                    <div className={cn(
+                                        "w-12 h-12 rounded-2xl flex items-center justify-center transition-all relative z-10",
+                                        brand === b.name ? "bg-luxury-gold text-black scale-110 shadow-lg" : "bg-white/5 text-white/40 group-hover:scale-110 group-hover:text-white"
+                                    )}>
+                                        {b.logoUrl ? (
+                                            <div className="relative w-8 h-8">
+                                                <Image 
+                                                    src={b.logoUrl} alt={b.name} fill 
+                                                    className={cn("object-contain transition-all", brand === b.name ? "" : "brightness-0 invert opacity-40 group-hover:opacity-80")} 
+                                                />
+                                            </div>
+                                        ) : (
+                                            <Car className="w-6 h-6" />
+                                        )}
+                                    </div>
+                                    <span className={cn(
+                                        "text-[10px] font-black uppercase tracking-widest relative z-10",
+                                        brand === b.name ? "text-luxury-gold" : "text-white/40 group-hover:text-white text-center"
+                                    )}>
+                                        {b.name}
+                                    </span>
+                                </button>
+                            ))
+                        )}
+                    </div>
+                </motion.div>
 
                 {/* Search & Mobile Filter Bar */}
                 <AnimatePresence>
@@ -393,4 +503,3 @@ function CarsContent() {
         </div>
     );
 }
-

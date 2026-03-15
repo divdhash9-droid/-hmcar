@@ -44,8 +44,6 @@
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    /* Native App Feel: Prevent overscroll bounce on body */
-    overscroll-behavior-y: none;
     padding-top: var(--safe-top);
     padding-bottom: var(--safe-bottom);
   }
@@ -354,12 +352,12 @@
 }
 
 /* منع الـ overflow الأفقي في كل الصفحات */
-html,
+html {
+  -webkit-text-size-adjust: 100%;
+}
 body {
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  -webkit-text-size-adjust: 100%;
-  /* منع iOS من تكبير الخط تلقائياً */
 }
 
 /* تحسين الصور والفيديو */

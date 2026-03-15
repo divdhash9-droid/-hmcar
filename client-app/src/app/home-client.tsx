@@ -260,7 +260,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
   const whatsappUrl = socialConfig.whatsapp ? `https://wa.me/${String(socialConfig.whatsapp).replace(/\D/g, '')}` : "#";
 
   return (
-    <div ref={containerRef} className="relative min-h-screen overflow-x-hidden bg-black text-white" dir={isRTL ? "rtl" : "ltr"}>
+    <main ref={containerRef} className="relative min-h-screen overflow-x-hidden bg-black text-white" dir={isRTL ? "rtl" : "ltr"}>
       <div className="hide-in-app">
         <Navbar />
       </div>
@@ -713,6 +713,6 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
           </button>
         </motion.div>
       )}
-    </div>
+    </main>
   );
 }

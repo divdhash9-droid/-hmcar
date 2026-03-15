@@ -107,7 +107,7 @@ function CarsContent() {
         try {
             setLoading(true);
             const res = await api.cars.list({ source: inventorySource });
-            if (res.success) setCars(res.data);
+            if (res.success) setCars(res.data?.cars || []);
 
             const settingsRes = await api.showroom.getSettings();
             if (settingsRes.success) {
@@ -120,7 +120,7 @@ function CarsContent() {
             }
 
             const brandsRes = await api.brands.list('cars', { targetShowroom: inventorySource });
-            if (brandsRes.success) setBrands(brandsRes.data);
+            if (brandsRes.success) setBrands((brandsRes as any).brands || []);
         } catch (err) {
             console.error('Failed to load cars:', err);
         } finally {
@@ -289,6 +289,16 @@ function CarsContent() {
         } catch (err) {
             console.error('فشل تسجيل البيع:', err);
             showToast(isRTL ? '❌ فشل تسجيل البيع' : '❌ Sale record failed', 'error');
+        }
+    };
+
+    const handleToggleActive = async (id: string, currentStatus: boolean) => {
+        try {
+            await api.cars.update(id, { isActive: !currentStatus });
+            loadData();
+            showToast(!currentStatus ? (isRTL ? '👁️ تم إظهار السيارة' : '👁️ Car shown') : (isRTL ? '🙈 تم إخفاء السيارة' : '🙈 Car hidden'), 'success');
+        } catch {
+            showToast(isRTL ? '❌ فشل التحديث' : '❌ Update failed', 'error');
         }
     };
 
@@ -497,6 +507,7 @@ function CarsContent() {
                                 onEdit={handleEdit}
                                 onDelete={handleDelete}
                                 onMarkSold={handleMarkSold}
+                                onToggleActive={handleToggleActive}
                             />
                         ))}
                     </div>

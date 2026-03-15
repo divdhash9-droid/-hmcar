@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
@@ -14,7 +14,10 @@ import {
     CheckCircle2,
     RefreshCcw,
     Eye,
-    EyeOff
+    EyeOff,
+    Settings,
+    TrendingUp,
+    DollarSign
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -46,6 +49,34 @@ export default function AdminPartsPage() {
         condition: 'New',
         stockQty: 1
     });
+
+    const [showSettings, setShowSettings] = useState(false);
+    const [currencySettings, setCurrencySettings] = useState({ usdToSar: 3.75, usdToKrw: 1350, partsMultiplier: 1.15 });
+    const [savingCurrency, setSavingCurrency] = useState(false);
+
+    useEffect(() => {
+        const loadSettings = async () => {
+            try {
+                const settingsRes = await api.settings.getPublic();
+                if (settingsRes.success && settingsRes.data?.currencySettings) {
+                    setCurrencySettings(prev => ({ ...prev, ...settingsRes.data.currencySettings }));
+                }
+            } catch (err) {}
+        };
+        loadSettings();
+    }, []);
+
+    const handleSaveCurrency = async () => {
+        setSavingCurrency(true);
+        try {
+            await api.settings.updateCurrencySettings({ currencySettings: currencySettings as any });
+            showToast(isRTL ? '✅ تم حفظ إعدادات التسعير' : '✅ Pricing settings saved', 'success');
+        } catch {
+            showToast(isRTL ? '❌ فشل حفظ الإعدادات' : '❌ Save failed', 'error');
+        } finally {
+            setSavingCurrency(false);
+        }
+    };
 
     useEffect(() => {
         loadParts();
@@ -217,17 +248,79 @@ export default function AdminPartsPage() {
                         <div className="flex gap-3">
                             <motion.button
                                 whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
+                                onClick={() => setShowSettings(!showSettings)}
+                                className={cn(
+                                    "ck-btn-ghost flex items-center gap-2 transition-all",
+                                    showSettings ? "bg-orange-500/20 text-orange-400 border-orange-500/30" : "text-white/50 border-white/10"
+                                )}>
+                                <Settings className="w-4 h-4" />
+                                {isRTL ? 'إعدادات التسعير' : 'PRICING SETTINGS'}
+                            </motion.button>
+                            <motion.button
+                                whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
                                 onClick={handleScrape}
                                 disabled={scraping}
-                                className="ck-btn-ghost flex items-center gap-2 border-orange-500/20 text-orange-400">
+                                className="ck-btn-primary bg-orange-500 hover:bg-orange-400 text-black flex items-center gap-2 border-none">
                                 {scraping ? <div className="ck-radar w-4 h-4" /> : <RefreshCcw className="w-4 h-4" />}
-                                {isRTL ? 'استيراد من الموقع الخارجي' : 'IMPORT FROM EXTERNAL SOURCE'}
+                                {isRTL ? 'استيراد القطع الكورية' : 'SCRAPE KOREAN AUTOSPARTS'}
                             </motion.button>
                         </div>
                     </div>
                     <p className="text-[11px] text-white/40 mt-3">
                         {isRTL ? 'وضع الإدارة الجديد: يتم جلب القطع والوكالات تلقائياً من المصدر الخارجي، وتم إلغاء الإضافة اليدوية.' : 'New workflow: parts and agencies are imported automatically from external source, manual creation is disabled.'}
                     </p>
+
+                    {/* إعدادات التسعير */}
+                    <AnimatePresence>
+                        {showSettings && (
+                            <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                className="overflow-hidden mt-6"
+                            >
+                                <div className="ck-card p-8 border-orange-500/20 bg-orange-500/5">
+                                    <div className="flex items-center gap-3 mb-6">
+                                        <div className="w-10 h-10 rounded-xl bg-orange-500/20 flex items-center justify-center text-orange-400">
+                                            <TrendingUp className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-sm font-black uppercase tracking-widest">{isRTL ? 'معاملات تسعير قطع الغيار' : 'PARTS PRICING MATRIX'}</h3>
+                                            <p className="text-[10px] text-white/30 uppercase tracking-widest font-mono">FINANCIAL SETTINGS</p>
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                                        <div className="space-y-2">
+                                            <label className="text-[9px] font-black text-white/40 uppercase tracking-widest ml-1">{isRTL ? 'الدولار إلى الريال' : 'USD TO SAR'}</label>
+                                            <div className="relative">
+                                                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                                                <input type="number" step="0.01" value={currencySettings.usdToSar} onChange={(e) => setCurrencySettings({ ...currencySettings, usdToSar: parseFloat(e.target.value) })} className="ck-input pl-10" />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[9px] font-black text-white/40 uppercase tracking-widest ml-1">{isRTL ? 'الدولار إلى الون' : 'USD TO KRW'}</label>
+                                            <div className="relative">
+                                                <TrendingUp className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                                                <input type="number" step="1" value={currencySettings.usdToKrw} onChange={(e) => setCurrencySettings({ ...currencySettings, usdToKrw: parseInt(e.target.value) })} className="ck-input pl-10" />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[9px] font-black text-white/40 uppercase tracking-widest ml-1">{isRTL ? 'مُعامل ربح القطع (x)' : 'PARTS MULTIPLIER (x)'}</label>
+                                            <div className="relative">
+                                                <Settings className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-orange-400/50" />
+                                                <input type="number" step="0.01" value={currencySettings.partsMultiplier} onChange={(e) => setCurrencySettings({ ...currencySettings, partsMultiplier: parseFloat(e.target.value) })} className="ck-input pl-10 border-orange-500/30 focus:border-orange-400 bg-orange-500/10" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-end">
+                                        <button onClick={handleSaveCurrency} disabled={savingCurrency} className="ck-btn-primary min-w-[200px]">
+                                            {savingCurrency ? (isRTL ? 'جاري الحفظ...' : 'SAVING...') : (isRTL ? 'حفظ إعدادات التسعير' : 'SAVE PRICING SETTINGS')}
+                                        </button>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
 
                 {/* Filters + Search */}

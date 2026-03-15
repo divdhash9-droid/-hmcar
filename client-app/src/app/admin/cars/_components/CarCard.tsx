@@ -34,9 +34,10 @@ interface CarCardProps {
     onEdit: (car: Car) => void;
     onDelete: (id: string) => void;
     onMarkSold: (id: string, title: string) => void;
+    onToggleActive?: (id: string, current: boolean) => void;
 }
 
-export default function CarCard({ car, index, usdToSar, onEdit, onDelete, onMarkSold }: CarCardProps) {
+export default function CarCard({ car, index, usdToSar, onEdit, onDelete, onMarkSold, onToggleActive }: CarCardProps) {
     const { isRTL } = useLanguage();
 
     // استخراج اسم الماركة سواء كانت object أو string
@@ -110,12 +111,16 @@ export default function CarCard({ car, index, usdToSar, onEdit, onDelete, onMark
                             <Edit className="w-3.5 h-3.5" />
                         </button>
 
-                        {/* زر العرض في الموقع */}
+                        {/* زر العرض/الإخفاء (Toggle Active) */}
                         <button
-                            title={isRTL ? 'عرض' : 'View'}
-                            className="w-8 h-8 rounded-xl bg-white/5 border border-white/10 text-white/50 hover:bg-white/10 transition-all flex items-center justify-center"
+                            onClick={() => onToggleActive && onToggleActive(car.id, car.isActive)}
+                            title={car.isActive ? (isRTL ? 'إخفاء' : 'Hide') : (isRTL ? 'إظهار' : 'Show')}
+                            className={car.isActive
+                                ? "w-8 h-8 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-400 hover:bg-orange-500 hover:text-white transition-all flex items-center justify-center"
+                                : "w-8 h-8 rounded-xl bg-white/5 border border-white/10 text-white/30 hover:bg-white/20 hover:text-white transition-all flex items-center justify-center"
+                            }
                         >
-                            <Eye className="w-3.5 h-3.5" />
+                            {car.isActive ? <Eye className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5 opacity-50" />}
                         </button>
 
                         {/* زر تسجيل البيع - يظهر فقط إذا لم تُباع بعد */}

@@ -23,8 +23,6 @@ import { useAuth } from "@/lib/AuthContext";
 import { useSettings } from "@/lib/SettingsContext";
 import { cn } from "@/lib/utils";
 import { useStandalone } from "@/lib/useStandalone";
-import SearchSection from "@/components/SearchSection";
-
 const rawText = (value: string) => value;
 const getCarMakeLabel = (car: CarType) => {
   const make = car.make;
@@ -56,7 +54,7 @@ function PWAFloatingButton({ isRTL, deferredInstall, onInstall }: { isRTL: boole
   const [showPopup, setShowPopup] = useState(false);
 
   return (
-    <>
+    <div className="relative">
       {/* أيقونة الهاتف الثابتة */}
       <motion.button
         id="pwa-float-btn"
@@ -64,10 +62,10 @@ function PWAFloatingButton({ isRTL, deferredInstall, onInstall }: { isRTL: boole
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         whileTap={{ scale: 0.9 }}
-        className="fixed bottom-24 right-4 z-[200] w-14 h-14 rounded-2xl bg-accent-gold text-black flex items-center justify-center shadow-[0_8px_32px_rgba(201,169,110,0.5)] hover:scale-110 transition-transform border-2 border-white/20"
+        className="w-12 h-12 rounded-2xl bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center hover:scale-110 hover:border-accent-gold/50 transition-transform text-accent-gold shadow-[0_0_15px_rgba(201,169,110,0.2)]"
         title={isRTL ? 'تطبيق HM CAR' : 'HM CAR App'}
       >
-        <Smartphone className="w-7 h-7" />
+        <Smartphone className="w-5 h-5" />
       </motion.button>
 
       {/* Popup النافذة المنبثقة */}
@@ -76,10 +74,10 @@ function PWAFloatingButton({ isRTL, deferredInstall, onInstall }: { isRTL: boole
           {/* خلفية شفافة لإغلاق النافذة */}
           <div className="fixed inset-0 z-[199]" onClick={() => setShowPopup(false)} />
           <motion.div
-            initial={{ opacity: 0, scale: 0.85, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.85, y: 20 }}
-            className="fixed bottom-44 right-4 z-[200] w-72 rounded-3xl bg-black/95 border border-accent-gold/30 backdrop-blur-2xl shadow-[0_20px_60px_rgba(0,0,0,0.8)] overflow-hidden"
+            initial={{ opacity: 0, scale: 0.85, x: isRTL ? -20 : 20 }}
+            animate={{ opacity: 1, scale: 1, x: 0 }}
+            exit={{ opacity: 0, scale: 0.85, x: isRTL ? -20 : 20 }}
+            className={`absolute top-0 z-[200] w-72 rounded-3xl bg-black/95 border border-accent-gold/30 backdrop-blur-2xl shadow-[0_20px_60px_rgba(0,0,0,0.8)] overflow-hidden ${isRTL ? 'right-16' : 'left-16'}`}
             dir={isRTL ? 'rtl' : 'ltr'}
           >
             {/* Header */}
@@ -118,7 +116,7 @@ function PWAFloatingButton({ isRTL, deferredInstall, onInstall }: { isRTL: boole
           </motion.div>
         </>
       )}
-    </>
+    </div>
   );
 }
 
@@ -326,6 +324,14 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
              </a>
           )
         })}
+        {/* ── FLOATING PWA PHONE ICON ── */}
+        {!isInstalled && !isStandalone && (
+          <PWAFloatingButton
+            isRTL={isRTL}
+            deferredInstall={deferredInstall}
+            onInstall={handleInstallPWA}
+          />
+        )}
       </div>
 
       <CinematicVideoBackground
@@ -339,12 +345,6 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
       {/* ── 1. HERO SHOWCASE ── */}
       <LandingShowcase isRTL={isRTL} latestCars={latestCars} />
 
-      {/* ── 2. ELITE SEARCH SYSTEM ── */}
-      {(homeContent?.showSearchSection ?? true) && (
-        <div className="relative z-30 -mt-24 mb-32 flex justify-center px-4">
-          <SearchSection />
-        </div>
-      )}
 
       {/* ── 2.5 ANNOUNCEMENT RIBBON ── */}
       {latestCars && latestCars.length > 0 && (
@@ -621,14 +621,6 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
         </motion.div>
       )}
 
-      {/* ── FLOATING PWA PHONE ICON ── */}
-      {!isInstalled && !isStandalone && (
-        <PWAFloatingButton
-          isRTL={isRTL}
-          deferredInstall={deferredInstall}
-          onInstall={handleInstallPWA}
-        />
-      )}
     </main>
   );
 }

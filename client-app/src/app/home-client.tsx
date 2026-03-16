@@ -450,34 +450,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
       </section>
       )}
 
-      {/* ── 5. THE BUYING JOURNEY ── */}
-      {(homeContent?.showBuyingJourney ?? true) && (
-        <section className="relative z-10 py-32 px-4 bg-black/40">
-        <div className="max-w-7xl mx-auto">
-          <div className="max-w-2xl mb-24">
-            <h3 className="text-accent-gold font-black uppercase tracking-[0.4em] text-[11px] mb-6">{isRTL ? 'منظومة الشراء' : 'THE BUYING JOURNEY'}</h3>
-            <h2 className="text-6xl md:text-8xl font-black text-white italic uppercase tracking-tighter leading-[0.8]">{isRTL ? 'كيف تمتلك الفخامة؟' : 'HOW TO OWN THE LUXURY?'}</h2>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-            {[
-              { title: isRTL ? 'تصفح' : 'SELECT', desc: isRTL ? 'آلاف السيارات الفاخرة' : 'Thousand luxury cars', icon: Search, color: 'text-blue-400' },
-              { title: isRTL ? 'مزايدة' : 'BID', desc: isRTL ? 'نظام مزايدة آمن ورسمي' : 'Secure official bidding', icon: Gavel, color: 'text-accent-gold' },
-              { title: isRTL ? 'دفع' : 'SECURE', desc: isRTL ? 'بوابة دفع محمية بالكامل' : 'Fully protected vault', icon: CreditCard, color: 'text-green-400' },
-              { title: isRTL ? 'شحن' : 'DELIVER', desc: isRTL ? 'شحن عالمي لباب المنزل' : 'Global ship to door', icon: Truck, color: 'text-purple-400' }
-            ].map((step, i) => (
-              <div key={i} className="group transition-all">
-                <div className="w-20 h-20 rounded-[2.5rem] bg-white/[0.03] border border-white/5 flex items-center justify-center mb-8 group-hover:border-accent-gold transition-all">
-                  <step.icon className={cn("w-8 h-8", step.color)} />
-                </div>
-                <h4 className="text-2xl font-black text-white mb-4 uppercase italic tracking-tighter">{step.title}</h4>
-                <p className="text-white/40 text-[10px] font-black uppercase tracking-[0.3em]">{step.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-      )}
+      {/* ── 5. THE BUYING JOURNEY - REMOVED AS REQUESTED ── */}
 
       {/* ── 5.1 PLATFORM FEATURES (DYNAMIC WITH FALLBACK) ── */}
       {(homeContent?.showPlatformFeatures ?? true) && (() => {

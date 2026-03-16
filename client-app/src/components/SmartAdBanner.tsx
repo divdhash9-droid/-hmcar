@@ -385,8 +385,11 @@ export default function SmartAdBanner() {
                         if (src === 'korean' || src === 'both') {
                             // سيارات المعرض الكوري (Encar)
                             const korRes = await api.showroom.getCars(1);
-                            if (korRes.success && korRes.data?.cars) {
-                                korRes.data.cars.slice(0, 20).forEach((c: any) => {
+                            // [[ARABIC_COMMENT]] المعرض الكوري يرجع البيانات كمصفوفة مباشرة في data
+                            const korCars = Array.isArray(korRes.data) ? korRes.data : (korRes.data?.cars || []);
+                            
+                            if (korRes.success && korCars.length > 0) {
+                                korCars.slice(0, 20).forEach((c: any) => {
                                     allCars.push({
                                         id: c._id || c.id || String(Math.random()),
                                         title: c.title || c.name,

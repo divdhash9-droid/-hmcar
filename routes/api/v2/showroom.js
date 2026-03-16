@@ -300,6 +300,8 @@ router.get('/cars', async (req, res) => {
                     : 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=1200&auto=format&fit=crop'),
             encarUrl: car.externalUrl || '',
             isInspected: true,
+            images: car.images || [],
+            price: car.price || car.priceSar || 0,
         }));
 
         const cleanedCars = formattedCars.map((c) => ({

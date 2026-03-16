@@ -398,6 +398,10 @@ export default function AdminPartsPage() {
                                             <p className="cockpit-num text-lg font-black text-orange-400">{Number(part.price || 0).toLocaleString()}</p>
                                         </div>
                                         <div className="flex gap-1">
+                                            <button onClick={() => handleEdit(part)} title={isRTL ? 'تعديل' : 'Edit'}
+                                                className="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-500 hover:text-white transition-all flex items-center justify-center">
+                                                <Edit className="w-3.5 h-3.5" />
+                                            </button>
                                             <button onClick={() => handleToggleVisibility(part.id)} title={part.inStock ? (isRTL ? 'إخفاء' : 'Hide') : (isRTL ? 'إظهار' : 'Show')}
                                                 className={cn("w-8 h-8 rounded-xl border flex items-center justify-center transition-all",
                                                     part.inStock

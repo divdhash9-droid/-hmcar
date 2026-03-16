@@ -4,6 +4,7 @@ const express = require('express');
 const router = express.Router();
 const DeviceFingerprint = require('../../../models/DeviceFingerprint');
 const { requireAuthAPI, requireAdmin } = require('../../../middleware/auth');
+const { blockedIPs } = require('../../../middleware/securityEnhanced');
 
 // جلب كل الأجهزة والمستخدمين المرتبطين (بدون تكرار)
 router.get('/devices', requireAuthAPI, requireAdmin, async (req, res) => {
@@ -75,6 +76,11 @@ router.post('/toggle-exempt/:id', requireAuthAPI, requireAdmin, async (req, res)
             device.failedAttempts = 0;
             device.unbannedAt = Date.now();
             device.unbannedBy = req.user.userId;
+            
+            // [[ARABIC_COMMENT]] إزالة من الذاكرة أيضاً عند الإعفاء
+            if (device.ip) {
+                blockedIPs.delete(device.ip);
+            }
         }
 
         await device.save();
@@ -105,6 +111,11 @@ router.post('/toggle-ban/:id', requireAuthAPI, requireAdmin, async (req, res) =>
             device.unbannedAt = Date.now();
             device.unbannedBy = req.user.userId;
             device.linkedUsername = ''; // مسح الحساب المرتبط حتى يتسنى له الدخول من جديد
+            
+            // [[ARABIC_COMMENT]] إزالة الـ IP من قائمة المحظورين في الذاكرة لضمان فك الحظر الفوري
+            if (device.ip) {
+                blockedIPs.delete(device.ip);
+            }
         }
 
         await device.save();
@@ -112,7 +123,7 @@ router.post('/toggle-ban/:id', requireAuthAPI, requireAdmin, async (req, res) =>
         res.json({ success: true, message: device.banned ? 'تم حظر الجهاز بنجاح' : 'تم فك الحظر بنجاح', banned: device.banned });
     } catch (error) {
         console.error('Error toggling device ban:', error);
-        res.status(500).json({ success: false, message: 'حدث خطأ أثاء معالجة الحظر' });
+        res.status(500).json({ success: false, message: 'حدث خطأ أثناء معالجة الحظر' });
     }
 });
 

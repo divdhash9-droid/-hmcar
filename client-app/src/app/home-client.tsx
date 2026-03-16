@@ -21,6 +21,7 @@ import SmartAdBanner from "@/components/SmartAdBanner"; // الشريط الإع
 import AppHome from "@/components/AppHome"; // الواجهة المخصصة للتطبيق
 import { useRouter } from "next/navigation";
 import { useSocket } from "@/lib/SocketContext";
+import CurrencySwitcher from "@/components/CurrencySwitcher";
 import { useAuth } from "@/lib/AuthContext";
 import { useSettings } from "@/lib/SettingsContext";
 import { cn } from "@/lib/utils";
@@ -45,6 +46,8 @@ export type CarType = {
   mileage?: number;
   fuelType?: string;
   transmission?: string;
+  priceSar?: number;
+  priceUsd?: number;
 };
 
 interface HomeClientProps {
@@ -324,6 +327,9 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
               onInstall={handleInstallPWA}
             />
           )}
+
+          {/* ── PERSISTENT CURRENCY SWITCHER ── */}
+          <CurrencySwitcher variant="minimal" className="mt-2" />
         </div>
       )}
 
@@ -380,7 +386,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
                         {car.title || car.name || (isRTL ? 'سيارة' : 'Car')}
                       </span>
                       <span className="text-[10px] font-black uppercase tracking-[0.3em] text-accent-gold">
-                        {formatPrice(Number(car.price || 0))}
+                        {formatPrice(Number(car.price || car.priceSar || (Number(car.priceUsd || 0) * 3.75) || 0))}
                       </span>
                     </button>
                   ))}
@@ -423,7 +429,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
                           </div>
                           <h3 className="text-3xl font-black text-white italic uppercase mb-2 group-hover:text-accent-gold transition-colors">{car.title || car.name}</h3>
                           <div className="pt-6 border-t border-white/5 flex items-center justify-between">
-                            <span className="text-2xl font-black text-accent-gold">{formatPrice(Number(car.price || 0))}</span>
+                             <span className="text-2xl font-black text-accent-gold">{formatPrice(Number(car.price || car.priceSar || (Number(car.priceUsd || 0) * 3.75) || 0))}</span>
                             <ArrowUpRight className="w-8 h-8 text-accent-gold" />
                           </div>
                         </div>

@@ -160,9 +160,9 @@ function CarsContent() {
                 <div className="flex flex-col items-center text-center mb-16 relative">
                     {/* Back Button */}
                     <motion.div 
-                        initial={{ opacity: 0, x: -10 }} 
+                        initial={{ opacity: 0, x: 10 }} 
                         animate={{ opacity: 1, x: 0 }} 
-                        className="absolute left-0 top-0 hidden md:block"
+                        className={cn("absolute top-0 hidden md:block", isRTL ? "right-0" : "left-0")}
                     >
                         <button
                             onClick={() => router.back()}
@@ -178,12 +178,12 @@ function CarsContent() {
                             <Car className="w-4 h-4" />
                             <span className="text-[10px] font-black uppercase tracking-[0.4em]">{isRTL ? rawText('المعرض المحلي') : rawText('LOCAL SHOWROOM')}</span>
                         </div>
-                        <h1 className="text-5xl md:text-8xl lg:text-[10rem] font-black uppercase italic tracking-[ -0.05em] leading-[0.85] mb-8 font-display">
+                        <h1 className="text-4xl md:text-6xl lg:text-8xl font-black uppercase italic tracking-tight leading-[0.9] mb-8 font-display">
                             {isRTL ? rawText('اختر') : rawText('CHOOSE')} <span className="text-luxury-gold">{isRTL ? rawText('الوكالة') : rawText('AGENCY')}</span>
                         </h1>
                     </motion.div>
 
-                     <div className="md:hidden mb-8 self-start">
+                     <div className={cn("md:hidden mb-8", isRTL ? "self-end" : "self-start")}>
                          <button
                             onClick={() => router.back()}
                             title={isRTL ? rawText('رجوع') : rawText('Back')}
@@ -212,7 +212,6 @@ function CarsContent() {
                                 title={isRTL ? rawText('الفلاتر') : rawText('Filters')}
                             >
                                 <Filter className="w-3.5 h-3.5" />
-                                {isRTL ? rawText('تصفية النتائج') : rawText('REFINE')}
                             </button>
                         </div>
                     </motion.div>
@@ -224,12 +223,12 @@ function CarsContent() {
                     animate={{ opacity: 1, y: 0 }}
                     className="mb-24"
                 >
-                    <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                         {/* All Makes Button */}
                         <button
                             onClick={() => { setBrand(''); setPage(1); }}
                             className={cn(
-                                "flex flex-col items-center justify-center min-w-[100px] md:min-w-[120px] p-6 rounded-[2rem] border transition-all gap-4 group relative",
+                                "flex flex-col items-center justify-center p-6 rounded-[2rem] border transition-all gap-4 group relative",
                                 brand === '' 
                                     ? "bg-luxury-gold/15 border-luxury-gold/40 shadow-[0_0_40px_rgba(197,160,89,0.1)]" 
                                     : "bg-white/3 border-white/5 hover:bg-white/10 hover:border-white/20"
@@ -259,7 +258,7 @@ function CarsContent() {
                                     key={b._id || b.id || b.name}
                                     onClick={() => { setBrand(b.name); setPage(1); }}
                                     className={cn(
-                                        "flex flex-col items-center justify-center min-w-[100px] md:min-w-[120px] p-6 rounded-[2rem] border transition-all duration-500 gap-4 group relative overflow-hidden",
+                                        "flex flex-col items-center justify-center p-6 rounded-[2rem] border transition-all duration-500 gap-4 group relative overflow-hidden",
                                         brand === b.name
                                             ? "bg-luxury-gold/15 border-luxury-gold/40 shadow-[0_0_50px_rgba(197,160,89,0.15)]"
                                             : "bg-white/3 border-white/5 hover:bg-white/10 hover:border-white/20 hover:scale-105"

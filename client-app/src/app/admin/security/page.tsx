@@ -80,24 +80,24 @@ export default function AdminSecurity() {
 
     const toggleBan = async (device: SecurityDevice) => {
         try {
-            const res = await api.security.banDevice(device.banCode || '', !device.banned);
+            const res = await api.security.toggleBan(device._id);
             if (res.success) {
                 showToast(isRTL ? 'تم تحديث حالة الحظر' : 'Ban status updated', 'success');
                 loadData();
             }
-        } catch (err) {
+        } catch {
             showToast(isRTL ? 'فشل تحديث الحظر' : 'Failed to update ban', 'error');
         }
     };
 
     const toggleExempt = async (device: SecurityDevice) => {
         try {
-            const res = await api.security.exemptDevice(device.banCode || '', !device.exemptFromSecurity);
+            const res = await api.security.toggleExempt(device._id);
             if (res.success) {
                 showToast(isRTL ? 'تم تحديث الاستثناء' : 'Exemption updated', 'success');
                 loadData();
             }
-        } catch (err) {
+        } catch {
             showToast(isRTL ? 'فشل تحديث الاستثناء' : 'Failed to update exemption', 'error');
         }
     };

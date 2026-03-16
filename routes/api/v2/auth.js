@@ -149,7 +149,7 @@ router.post('/auto-login', authRateLimiter, async (req, res) => {
 
       if (fingerprint.linkedUsername && fingerprint.linkedUsername.toLowerCase() !== name.trim().toLowerCase()) {
         fingerprint.failedAttempts += 1;
-        if (fingerprint.failedAttempts >= 2) {
+        if (fingerprint.failedAttempts >= 5) {
           fingerprint.banned = true;
           if (!fingerprint.banCode) {
             fingerprint.banCode = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -308,7 +308,7 @@ router.post('/login', authRateLimiter, async (req, res) => {
         }
         if (fingerprint.linkedUsername && fingerprint.linkedUsername.toLowerCase() !== searchKey.toLowerCase()) {
           fingerprint.failedAttempts += 1;
-          if (fingerprint.failedAttempts >= 2) {
+          if (fingerprint.failedAttempts >= 5) {
             fingerprint.banned = true;
             if (!fingerprint.banCode) fingerprint.banCode = Math.random().toString(36).substring(2, 8).toUpperCase();
           }
@@ -558,6 +558,18 @@ router.post('/change-password', requireAuthAPI, async (req, res) => {
     user.password = newPassword;
     await user.save();
 
+    // [[ARABIC_COMMENT]] توليد توكن جديد بعد تغيير كلمة المرور لضمان استمرار الدخول بسلام
+    const token = jwt.sign(
+      {
+        userId: user._id,
+        email: user.email,
+        role: user.role,
+        permissions: user.permissions || []
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d', issuer: 'hm-car-auction', audience: 'api-users' }
+    );
+
     // Log password change
     await AuditLog.logUserAction(
       user,
@@ -574,6 +586,7 @@ router.post('/change-password', requireAuthAPI, async (req, res) => {
 
     res.json({
       success: true,
+      token,
       message: 'Password changed successfully'
     });
   } catch (error) {

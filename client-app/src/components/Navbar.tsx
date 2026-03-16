@@ -16,6 +16,7 @@ import { cn } from '@/lib/utils';
 import { useStandalone } from '@/lib/useStandalone';
 import { useUI } from '@/lib/UIContext';
 import { Bell } from 'lucide-react';
+import CurrencySwitcher from './CurrencySwitcher';
 
 const rawText = (value: string) => value;
 
@@ -45,7 +46,7 @@ export default function Navbar() {
 
     const { isLoggedIn } = useAuth();
     const { isRTL, toggleLanguage } = useLanguage();
-    const { siteInfo, displayCurrency, setDisplayCurrency } = useSettings();
+    const { siteInfo } = useSettings();
     const { setFavoritesOpen, setNotificationsOpen } = useUI();
 
     useEffect(() => {
@@ -160,21 +161,8 @@ export default function Navbar() {
                                     )}
                                 </Link>
 
-                                {/* [[ARABIC_COMMENT]] زر تدوير العملة بين SAR → USD → KRW → SAR */}
-                                <button
-                                    onClick={() => setDisplayCurrency(
-                                        displayCurrency === 'SAR' ? 'USD' : displayCurrency === 'USD' ? 'KRW' : 'SAR'
-                                    )}
-                                    className={`w-10 h-10 rounded-xl bg-white/5 border flex items-center justify-center font-black text-[9px] transition-all ${displayCurrency === 'KRW'
-                                        ? 'border-yellow-400/40 text-yellow-400'
-                                        : displayCurrency === 'USD'
-                                            ? 'border-cinematic-neon-blue/40 text-cinematic-neon-blue'
-                                            : 'border-white/10 text-white/60 hover:text-white hover:bg-white/10'
-                                        }`}
-                                    title={isRTL ? "تغيير العملة" : "Change Currency"}
-                                >
-                                    {displayCurrency === rawText('KRW') ? rawText('₩') : displayCurrency === rawText('USD') ? rawText('$') : rawText('ر.س')}
-                                </button>
+                                {/* [[ARABIC_COMMENT]] محول العملات الجديد */}
+                                <CurrencySwitcher variant="minimal" />
 
                                 {/* [[ARABIC_COMMENT]] زر تغيير اللغة (منظم بجانب الأزرار) */}
                                 <button

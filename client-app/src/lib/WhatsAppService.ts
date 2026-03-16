@@ -15,10 +15,11 @@ export const WhatsAppService = {
         const carTitle = car.title || car.model || 'سيارة من المعرض';
         const carMake = typeof car.make === 'object' ? car.make?.name : car.make;
         const price = formatPrice ? formatPrice(Number(car.price || 0)) : `${Number(car.price || 0).toLocaleString()} SAR`;
+        const carLink = car.externalUrl || car.encarUrl || '';
 
         const msg = isRTL
-            ? `السلام عليكم HM CAR،\n\nأرغب في الاستفسار عن هذه السيارة:\n🚗 *${carTitle}*\n🛠️ الماركة: ${carMake}\n📅 الموديل: ${car.year || 'غير محدد'}\n💰 السعر: ${price}\n\nأرجو تزويدي بمزيد من التفاصيل.`
-            : `Hello HM CAR,\n\nI'm interested in this vehicle:\n🚗 *${carTitle}*\n🛠️ Make: ${carMake}\n📅 Year: ${car.year || 'N/A'}\n💰 Price: ${price}\n\nPlease provide more details.`;
+            ? `السلام عليكم HM CAR،\n\nأرغب في شراء هذه السيارة:\n🚗 *${carTitle}*\n🛠️ الماركة: ${carMake}\n📅 الموديل: ${car.year || 'غير محدد'}\n🛣️ الممشى: ${car.mileage?.toLocaleString() || '0'} كم\n💰 السعر: ${price}\n🔗 الرابط: ${carLink}\n\nأرجو تزويدي بمزيد من التفاصيل لإتمام عملية الشراء.`
+            : `Hello HM CAR,\n\nI'm interested in buying this vehicle:\n🚗 *${carTitle}*\n🛠️ Make: ${carMake}\n📅 Year: ${car.year || 'N/A'}\n🛣️ Mileage: ${car.mileage?.toLocaleString() || '0'} km\n💰 Price: ${price}\n🔗 Link: ${carLink}\n\nPlease provide more details to complete the purchase.`;
 
         const cleanPhone = phoneNumber.replace(/\D/g, '');
         return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;

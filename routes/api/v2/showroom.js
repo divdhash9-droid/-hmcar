@@ -368,9 +368,8 @@ router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
                 const computedUsd = Number(((item.priceKrw / usdToKrw) * auctionMultiplier).toFixed(2));
                 const computedSar = Math.round(computedUsd * usdToSar);
 
-                // [[ARABIC_COMMENT]] معالجة الصور: تحميل وضغط أول 5 صور لضمان السرعة (البقية تظل روابط خارجية إن لزم)
-                // هذا يحقق توازن بين جودة العرض وسرعة التحميل
-                const imagesToProcess = (item.images || []).slice(0, 5);
+                // [[ARABIC_COMMENT]] معالجة الصور: تحميل وضغط أول 10 صور لضمان السرعة (البقية تظل روابط خارجية)
+                const imagesToProcess = (item.images || []).slice(0, 10);
                 const processedImages = [];
                 
                 for (const imgUrl of imagesToProcess) {
@@ -383,7 +382,7 @@ router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
                 }
                 
                 // دمج الصور المعالجة مع الروابط الأصلية للبقية
-                const finalImagesList = [...processedImages, ...(item.images || []).slice(5)];
+                const finalImagesList = [...processedImages, ...(item.images || []).slice(10)];
 
                 // التحقق من وجود السيارة مسبقاً
                 const existingCar = await Car.findOne({ externalUrl: item.encarUrl });

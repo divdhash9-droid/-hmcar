@@ -65,17 +65,22 @@ const requirePermissionAPI = (permission) => {
       return res.status(401).json({ error: 'يجب تسجيل الدخول' });
     }
 
-    // Super admin and admin have all permissions
-    if (req.user.role === 'super_admin' || req.user.role === 'admin') {
+    // [[ARABIC_COMMENT]] السوبر أدمن له كافة الصلاحيات دائماً
+    if (req.user.role === 'super_admin') {
       return next();
     }
 
-    // Check if user has the specific permission
-    if (req.user.permissions && req.user.permissions.includes(permission)) {
+    // [[ARABIC_COMMENT]] التحقق من الصلاحيات للأدمن والمدير (Manager)
+    // [[ARABIC_COMMENT]] تأكد من أن الأدمن يملك الصلاحية المحددة في مصفوفة permissions
+    const userPermissions = req.user.permissions || [];
+    if (userPermissions.includes(permission)) {
       return next();
     }
 
-    return res.status(403).json({ error: 'ليس لديك صلاحية للوصول' });
+    return res.status(403).json({ 
+      error: 'ليس لديك صلاحية للوصول', 
+      message: `عذراً، لا تملك صلاحية (${permission}) المطلوبة لتنفيذ هذا الإجراء` 
+    });
   };
 };
 

@@ -3,14 +3,14 @@
 // [[ARABIC_COMMENT]] استراتيجية: Network First للصفحات (للتحديثات الفورية) + Cache for Images (للسرعة)
 
 // [[ARABIC_COMMENT]] رقم الإصدار - يتغير مع كل نشر جديد تلقائياً
-const SW_VERSION = 'mmtq11cy'; // يُستبدل بـ timestamp في وقت البناء
+const SW_VERSION = 'v4.1.2'; // ستقوم هذه النسخة بتحديث أجهزة العملاء فوراً
 const CACHE_NAME = `hmcar-cache-${SW_VERSION}`;
 const IMAGE_CACHE = `hmcar-images-${SW_VERSION}`;
 
 // ─────────────────────────────────────────────────────────────
 // [[ARABIC_COMMENT]] حدث التثبيت - خفيف وسريع
 // ─────────────────────────────────────────────────────────────
-self.addEventListener('install', (event) => {
+self.addEventListener('install', () => {
     console.log(`[HM CAR SW v${SW_VERSION}] تثبيت...`);
     // [[ARABIC_COMMENT]] تفعيل فوري بدون انتظار إغلاق التبويبات القديمة
     self.skipWaiting();

@@ -9,6 +9,7 @@ import {
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/lib/AuthContext';
+import CurrencySwitcher from './CurrencySwitcher';
 
 /**
  * AppHome - الواجهة الرئيسية المخصصة للجوال (نمط التطبيق)
@@ -58,6 +59,7 @@ export default function AppHome({ isRTL, latestCars, formatPrice }: { isRTL: boo
                         <Bell className="w-4.5 h-4.5" />
                         <span className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-cinematic-neon-red" />
                     </button>
+                    <CurrencySwitcher variant="minimal" />
                     {!isLoggedIn && (
                         <Link href="/login" className="px-4 py-2 rounded-xl bg-accent-gold text-black text-[10px] font-black uppercase tracking-widest">
                             {isRTL ? 'دخول' : 'LOGIN'}
@@ -88,19 +90,20 @@ export default function AppHome({ isRTL, latestCars, formatPrice }: { isRTL: boo
 
             {/* 3. بطاقة حالة الحساب (Status Card) */}
             {isLoggedIn && (
-                <section className="p-6 rounded-[2.5rem] bg-linear-to-br from-white/[0.05] to-transparent border border-white/10 shadow-xl overflow-hidden relative">
-                     <div className="absolute top-0 right-0 w-32 h-32 bg-accent-gold/5 blur-3xl rounded-full" />
-                     <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-4">
+                <section className="p-6 rounded-[2.5rem] bg-linear-to-br from-white/[0.08] to-transparent border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden relative group">
+                     <div className="absolute top-0 right-0 w-32 h-32 bg-accent-gold/10 blur-3xl rounded-full group-hover:scale-150 transition-transform duration-1000" />
+                     <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 mb-6 flex items-center gap-2">
+                        <div className="w-1 h-1 rounded-full bg-accent-gold" />
                         {isRTL ? 'حالة النشاط' : 'ACTIVITY STATUS'}
                      </h3>
-                     <div className="grid grid-cols-2 gap-6">
-                        <div>
-                            <p className="text-xl font-black text-white">0</p>
-                            <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest">{isRTL ? 'طلبات نشطة' : 'Active Orders'}</p>
+                     <div className="grid grid-cols-2 gap-8">
+                        <div className="relative">
+                            <p className="text-3xl font-black text-white tracking-tighter">0</p>
+                            <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest mt-1">{isRTL ? 'طلبات نشطة' : 'Active Orders'}</p>
                         </div>
-                        <div>
-                            <p className="text-xl font-black text-accent-gold">0</p>
-                            <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest">{isRTL ? 'مزادات متابعة' : 'Watched Auctions'}</p>
+                        <div className="relative">
+                            <p className="text-3xl font-black text-accent-gold tracking-tighter">0</p>
+                            <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest mt-1">{isRTL ? 'مزادات متابعة' : 'Watched Auctions'}</p>
                         </div>
                      </div>
                 </section>
@@ -141,7 +144,7 @@ export default function AppHome({ isRTL, latestCars, formatPrice }: { isRTL: boo
                                     <span className="text-[9px] font-bold text-white/40 truncate">{car.make?.name || car.make}</span>
                                 </div>
                                 <p className="text-xs font-black text-accent-gold">
-                                    {formatPrice(Number(car.price || 0))}
+                                    {formatPrice(Number(car.price || car.priceSar || (Number(car.priceUsd || 0) * 3.75) || 0))}
                                 </p>
                             </div>
                             <ChevronRight className={`w-4 h-4 text-white/10 group-hover:text-accent-gold transition-colors ${isRTL ? 'rotate-180' : ''}`} />

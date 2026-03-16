@@ -18,7 +18,7 @@ import {
     Car, MessageCircle, Search,
     ChevronLeft, ChevronRight, RefreshCw,
     MapPin, Gauge, Fuel, Settings2, Sparkles,
-    ExternalLink, X, ArrowLeft
+    ExternalLink, X, ArrowLeft, Heart, ShoppingBag
 } from 'lucide-react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
@@ -28,6 +28,7 @@ import { useSettings } from '@/lib/SettingsContext';
 import { api } from '@/lib/api';
 import { WhatsAppService } from '@/lib/WhatsAppService';
 import Image from 'next/image';
+import CurrencySwitcher from '@/components/CurrencySwitcher';
 import { useRouter } from 'next/navigation';
 
 const rawText = (value: string) => value;
@@ -80,6 +81,8 @@ function CarCard({ car, onContact, onViewDetails, priceText }: {
     priceText: string;
 }) {
     const [imgErr, setImgErr] = useState(false);
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [isInCart, setIsInCart] = useState(false);
     const carImage = resolveCarImage(car);
 
     return (
@@ -144,9 +147,12 @@ function CarCard({ car, onContact, onViewDetails, priceText }: {
                         ))}
                     </div>
 
-                    <div className="bg-white/3 border border-white/5 rounded-xl p-3 mt-auto">
-                        <div className="text-[9px] text-white/30 uppercase tracking-widest mb-1">{rawText('السعر')}</div>
-                        <div className="text-xl font-black text-white">{priceText}</div>
+                    <div className="bg-white/3 border border-white/8 rounded-2xl p-5 flex items-center justify-between">
+                        <div>
+                            <div className="text-[10px] text-white/30 uppercase tracking-[0.2em] mb-1">{rawText('السعر التقديري')}</div>
+                            <div className="text-3xl font-black text-white">{priceText}</div>
+                        </div>
+                        <CurrencySwitcher variant="minimal" />
                     </div>
                 </div>
             </div>
@@ -158,15 +164,36 @@ function CarCard({ car, onContact, onViewDetails, priceText }: {
                     className="flex-1 py-2.5 bg-green-500 hover:bg-green-400 text-white text-xs font-black uppercase rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-[0_0_15px_rgba(34,197,94,0.3)]"
                 >
                     <MessageCircle className="w-3.5 h-3.5" />
-                    {rawText('تواصل عبر واتساب')}
+                    {rawText('شراء')}
                 </button>
-                <a
-                    href={car.encarUrl} target="_blank" rel="noopener noreferrer"
-                    className="w-10 h-10 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center hover:bg-white/10 transition-all shrink-0"
-                    title="رابط الإعلان الأصلي"
+                
+                {/* زر المفضلة */}
+                <button
+                    onClick={(e) => { e.stopPropagation(); setIsFavorite(!isFavorite); }}
+                    className={cn(
+                        "w-10 h-10 rounded-xl flex items-center justify-center transition-all border shrink-0",
+                        isFavorite 
+                            ? "bg-red-500/20 border-red-500/40 text-red-500" 
+                            : "bg-white/5 border-white/10 text-white/40 hover:bg-white/10"
+                    )}
+                    title={isFavorite ? rawText('حذف من المفضلات') : rawText('إضافة للمفضلات')}
                 >
-                    <ExternalLink className="w-3.5 h-3.5 text-white/40" />
-                </a>
+                    <Heart className={cn("w-4 h-4", isFavorite && "fill-current")} />
+                </button>
+
+                {/* زر السلة */}
+                <button
+                    onClick={(e) => { e.stopPropagation(); setIsInCart(!isInCart); }}
+                    className={cn(
+                        "w-10 h-10 rounded-xl flex items-center justify-center transition-all border shrink-0",
+                        isInCart 
+                            ? "bg-amber-500/20 border-amber-500/40 text-amber-500" 
+                            : "bg-white/5 border-white/10 text-white/40 hover:bg-white/10"
+                    )}
+                    title={isInCart ? rawText('حذف من السلة') : rawText('إضافة للسلة')}
+                >
+                    <ShoppingBag className={cn("w-4 h-4", isInCart && "fill-current")} />
+                </button>
             </div>
         </motion.div>
     );
@@ -181,6 +208,7 @@ function CarModal({ car, onClose, onContact, isRTL, priceText }: {
     priceText: string;
 }) {
     const [imgErr, setImgErr] = useState(false);
+    const [activeImageIndex, setActiveImageIndex] = useState(0);
     const carImage = resolveCarImage(car);
     const detailsRows = [
         { label: rawText('السنة'), value: car.year.toString() },
@@ -199,20 +227,73 @@ function CarModal({ car, onClose, onContact, isRTL, priceText }: {
                 exit={{ y: 50, opacity: 0 }}
                 className="bg-cinematic-dark border border-white/10 rounded-t-3xl sm:rounded-3xl w-full sm:max-w-lg overflow-hidden"
             >
-                {/* الصورة */}
-                <div className="relative h-56 bg-zinc-900">
-                    {carImage && !imgErr ? (
-                        <Image src={carImage} alt={car.title} fill className="object-cover" onError={() => setImgErr(true)} />
-                    ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                            <Car className="w-20 h-20 text-white/10" />
-                        </div>
-                    )}
-                    <div className="absolute inset-0 bg-linear-to-t from-cinematic-dark via-transparent to-transparent" />
-                    <button onClick={onClose} title={isRTL ? "إغلاق" : "Close"}
-                        className="absolute top-4 left-4 w-8 h-8 bg-black/60 backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-white/20 transition-all">
-                        <X className="w-4 h-4 text-white" />
-                    </button>
+                {/* الصورة والجاليري */}
+                <div className="relative group/modal-img">
+                    <div className="relative h-64 sm:h-72 bg-zinc-900">
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={car.images?.[activeImageIndex] || carImage}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="w-full h-full"
+                            >
+                                {(car.images?.[activeImageIndex] || carImage) ? (
+                                    <Image 
+                                        src={car.images?.[activeImageIndex] || carImage!} 
+                                        alt={car.title} 
+                                        fill 
+                                        className="object-cover" 
+                                    />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center">
+                                        <Car className="w-20 h-20 text-white/10" />
+                                    </div>
+                                )}
+                            </motion.div>
+                        </AnimatePresence>
+                        <div className="absolute inset-0 bg-linear-to-t from-cinematic-dark via-transparent to-transparent" />
+                        
+                        {/* أزرار التنقل بين الصور */}
+                        {car.images && car.images.length > 1 && (
+                            <>
+                                <button 
+                                    onClick={() => setActiveImageIndex(prev => (prev === 0 ? car.images!.length - 1 : prev - 1))}
+                                    title={isRTL ? "السابق" : "Previous"}
+                                    className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/40 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/60 transition-all opacity-0 group-hover/modal-img:opacity-100"
+                                >
+                                    <ChevronRight className={cn("w-5 h-5", !isRTL && "rotate-180")} />
+                                </button>
+                                <button 
+                                    onClick={() => setActiveImageIndex(prev => (prev === car.images!.length - 1 ? 0 : prev + 1))}
+                                    title={isRTL ? "التالي" : "Next"}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/40 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/60 transition-all opacity-0 group-hover/modal-img:opacity-100"
+                                >
+                                    <ChevronLeft className={cn("w-5 h-5", !isRTL && "rotate-180")} />
+                                </button>
+                            </>
+                        )}
+
+                        <button onClick={onClose} title={isRTL ? "إغلاق" : "Close"}
+                            className="absolute top-4 left-4 w-9 h-9 bg-black/60 backdrop-blur-md rounded-xl flex items-center justify-center hover:bg-white/20 transition-all z-20">
+                            <X className="w-5 h-5 text-white" />
+                        </button>
+
+                        {/* مؤشر الصور */}
+                        {car.images && car.images.length > 1 && (
+                            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 z-10 px-3 py-1.5 bg-black/40 backdrop-blur-md rounded-full">
+                                {car.images.slice(0, 10).map((_, idx) => (
+                                    <div 
+                                        key={idx} 
+                                        className={cn(
+                                            "w-1.5 h-1.5 rounded-full transition-all",
+                                            idx === activeImageIndex ? "bg-white w-4" : "bg-white/30"
+                                        )} 
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {/* المحتوى */}
@@ -269,7 +350,7 @@ function CarModal({ car, onClose, onContact, isRTL, priceText }: {
                         <button onClick={onContact}
                             className="flex-1 py-3.5 bg-green-500 hover:bg-green-400 text-white font-black rounded-xl transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(34,197,94,0.3)]">
                             <MessageCircle className="w-4 h-4" />
-                            {rawText('تواصل عبر واتساب')}
+                            {rawText('شراء')}
                         </button>
                         <a href={car.encarUrl} target="_blank" rel="noopener noreferrer"
                             className="px-4 py-3.5 border border-white/10 rounded-xl text-white/50 hover:bg-white/5 transition-all flex items-center gap-2 text-sm font-bold">
@@ -300,7 +381,6 @@ export default function ShowroomPage() {
     const [search, setSearch] = useState('');
     const [yearFrom, setYearFrom] = useState('');
     const [yearTo, setYearTo] = useState('');
-    const [contactPreference, setContactPreference] = useState<'whatsapp' | 'chat' | 'either'>('whatsapp');
     const [sortBy, setSortBy] = useState<'latest' | 'mileage_low' | 'price_high'>('latest');
     const [selectedCar, setSelectedCar] = useState<KoreanCar | null>(null);
     const [refreshKey, setRefreshKey] = useState(0);
@@ -340,10 +420,6 @@ export default function ShowroomPage() {
         setSearch(qp.get('q') || '');
         setYearFrom(qp.get('from') || '');
         setYearTo(qp.get('to') || '');
-        const p = qp.get('pref');
-        if (p === 'whatsapp' || p === 'chat' || p === 'either') {
-            setContactPreference(p);
-        }
         const s = qp.get('sort');
         if (s === 'latest' || s === 'mileage_low' || s === 'price_high') {
             setSortBy(s);
@@ -357,12 +433,11 @@ export default function ShowroomPage() {
         if (search) qp.set('q', search);
         if (yearFrom) qp.set('from', yearFrom);
         if (yearTo) qp.set('to', yearTo);
-        if (contactPreference !== 'whatsapp') qp.set('pref', contactPreference);
         if (sortBy !== 'latest') qp.set('sort', sortBy);
         const qs = qp.toString();
         const nextUrl = qs ? `${window.location.pathname}?${qs}` : window.location.pathname;
         window.history.replaceState(null, '', nextUrl);
-    }, [search, yearFrom, yearTo, contactPreference, sortBy]);
+    }, [search, yearFrom, yearTo, sortBy]);
 
     // ─────────────────────────────────
     // فتح واتساب مع بيانات السيارة وتسجيل طلب لدى الأدمن
@@ -400,38 +475,26 @@ export default function ShowroomPage() {
                 }
             }
 
-            if (!buyerName || !buyerPhone) {
-                const displayPrice = formatPriceFromUsd(getBaseUsd(car));
-                const qp = new URLSearchParams({
-                    source: 'korean_showroom',
-                    contactPreference,
-                    carName: car.manufacturerAr || car.manufacturer || '',
-                    model: car.model || '',
-                    year: String(car.year || ''),
-                    description: `طلب من المعرض الكوري: ${car.title} | السعر: ${displayPrice}`,
-                    externalUrl: car.encarUrl || '',
-                });
-                window.location.href = `/concierge?${qp.toString()}`;
-                return;
-            }
-
-            await api.concierge.create({
+            // [[ARABIC_COMMENT]] حتى لو لم يسجل الدخول، نفتحه الواتساب مباشرة بناءً على رغبة المستخدم
+            // ونقوم بتسجيل الطلب في الخلفية للأدمن إذا أمكن
+            api.concierge.create({
                 type: 'car',
-                name: buyerName,
-                phone: buyerPhone,
+                name: buyerName || 'عميل زائر',
+                phone: buyerPhone || '000',
                 carName: car.manufacturerAr || car.manufacturer,
                 model: car.model,
                 year: String(car.year || ''),
                 source: 'korean_showroom',
-                contactPreference,
+                contactPreference: 'whatsapp',
                 externalUrl: car.encarUrl,
-                description: `طلب من المعرض الكوري: ${car.title} | السعر: ${formatPriceFromUsd(getBaseUsd(car))} | تواصل مفضل: ${contactPreference} | Encar: ${car.encarUrl}`,
-            });
+                description: `طلب شراء من المعرض الكوري: ${car.title} | السعر: ${formatPriceFromUsd(getBaseUsd(car))} | Encar: ${car.encarUrl}`,
+            }).catch(e => console.error('Silent record fail:', e));
+
         } catch (err) {
             console.error('Failed to log showroom concierge request:', err);
         }
 
-        const url = WhatsAppService.generateCarLink(car, socialLinks?.whatsapp || '', isRTL);
+        const url = WhatsAppService.generateCarLink(car, socialLinks?.whatsapp || '', isRTL, formatPriceFromUsd);
         window.open(url, '_blank');
         setSelectedCar(null);
     };
@@ -459,11 +522,7 @@ export default function ShowroomPage() {
     const years = [...new Set(cars.map(c => c.year).filter(Boolean))]
         .sort((a, b) => Number(b) - Number(a));
 
-    const contactOptions = [
-        { key: 'whatsapp' as const, labelAr: rawText('واتساب'), labelEn: rawText('WhatsApp') },
-        { key: 'chat' as const, labelAr: rawText('شات'), labelEn: rawText('Chat') },
-        { key: 'either' as const, labelAr: rawText('الاثنين'), labelEn: rawText('Either') },
-    ];
+
 
     const sortOptions = [
         { value: 'latest' as const, labelAr: rawText('الأحدث سنة'), labelEn: rawText('Latest year') },
@@ -551,9 +610,10 @@ export default function ShowroomPage() {
                                 onClick={() => setRefreshKey(k => k + 1)}
                                 className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all flex items-center gap-2 group"
                             >
-                                <RefreshCw className={cn("w-3.5 h-3.5 text-white/40 group-hover:text-blue-400 transition-colors", loading && "animate-spin")} />
-                                <span className="text-[10px] font-black uppercase">{isRTL ? rawText('تحديث') : rawText('SYNC')}</span>
+                                <RefreshCw className={cn("w-4 h-4", loading && "animate-spin")} />
+                                <span className="text-[10px] font-black uppercase tracking-widest">{rawText('تحديث')}</span>
                             </button>
+                            <CurrencySwitcher variant="full" className="hidden md:block" />
                         </div>
                     </motion.div>
 
@@ -616,25 +676,7 @@ export default function ShowroomPage() {
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-2">
-                                <span className="text-[10px] font-black uppercase tracking-wider text-white/35">
-                                    {isRTL ? rawText('التواصل:') : rawText('Contact:')}
-                                </span>
-                                {contactOptions.map((opt) => (
-                                    <button
-                                        key={opt.key}
-                                        onClick={() => setContactPreference(opt.key as 'whatsapp' | 'chat' | 'either')}
-                                        className={cn(
-                                            'px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider border transition-all',
-                                            contactPreference === opt.key
-                                                ? 'bg-blue-500/20 border-blue-500/40 text-blue-300'
-                                                : 'bg-white/5 border-white/10 text-white/45 hover:text-white/80'
-                                        )}
-                                    >
-                                        {isRTL ? opt.labelAr : opt.labelEn}
-                                    </button>
-                                ))}
-                            </div>
+
 
                             <div className="flex items-center gap-2">
                                 <span className="text-[10px] font-black uppercase tracking-wider text-white/35">

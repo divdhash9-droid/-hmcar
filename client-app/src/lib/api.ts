@@ -1,6 +1,5 @@
 // [[ARABIC_HEADER]] هذا الملف (client-app/src/lib/api.ts) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
 
-const isBrowser = typeof window !== 'undefined';
 // الأفضل استخدام الرابط الثابت في الإنتاج إذا كان العميل والارسال منفصلين
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://car-auction-sand.vercel.app';
 
@@ -502,15 +501,13 @@ export const api = {
     // ── الأمن والحماية (Security) ──
     security: {
         getDevices: () => fetchAPI('/api/v2/security/devices'),
-        banDevice: (banCode: string, banned: boolean, reason?: string) =>
-            fetchAPI('/api/v2/security/devices/ban', {
+        toggleBan: (id: string) =>
+            fetchAPI(`/api/v2/security/toggle-ban/${id}`, {
                 method: 'POST',
-                body: JSON.stringify({ banCode, banned, reason }),
             }),
-        exemptDevice: (banCode: string, exempt: boolean) =>
-            fetchAPI('/api/v2/security/devices/exempt', {
+        toggleExempt: (id: string) =>
+            fetchAPI(`/api/v2/security/toggle-exempt/${id}`, {
                 method: 'POST',
-                body: JSON.stringify({ banCode, exempt }),
             }),
         deleteDevice: (id: string) => fetchAPI(`/api/v2/security/devices/${id}`, { method: 'DELETE' }),
     },

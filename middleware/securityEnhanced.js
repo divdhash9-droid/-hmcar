@@ -176,7 +176,7 @@ const detectInjection = (req, res, next) => {
  */
 const authRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 دقيقة
-  max: 5, // 5 محاولات
+  max: 10, // تم الرفع إلى 10 محاولات لتقليل حظر المستخدمين بالخطأ
   message: {
     success: false,
     error: 'Too many login attempts',

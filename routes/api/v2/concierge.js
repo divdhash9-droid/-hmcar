@@ -177,7 +177,7 @@ router.get('/:id', requireAuthAPI, requireAdmin, async (req, res) => {
 // ── PATCH /api/v2/concierge/:id/status ── تحديث حالة الطلب (الأدمن)
 router.patch('/:id/status', requireAuthAPI, requireAdmin, async (req, res) => {
     try {
-        const { status, adminNotes } = req.body;
+        const { status, adminNotes, auctionDate } = req.body;
         const validStatuses = ['new', 'in_progress', 'completed', 'cancelled'];
 
         if (!validStatuses.includes(status)) {
@@ -186,7 +186,11 @@ router.patch('/:id/status', requireAuthAPI, requireAdmin, async (req, res) => {
 
         const request = await ConciergeRequest.findByIdAndUpdate(
             req.params.id,
-            { status, ...(adminNotes && { adminNotes }) },
+            { 
+                status, 
+                ...(adminNotes && { adminNotes }),
+                ...(auctionDate && { auctionDate })
+            },
             { new: true }
         );
 
@@ -198,10 +202,11 @@ router.patch('/:id/status', requireAuthAPI, requireAdmin, async (req, res) => {
         if (status === 'in_progress' && request.user) {
             try {
                 const UserNotification = require('../../../models/UserNotification');
+                const dateStr = auctionDate ? ` في موعد: ${new Date(auctionDate).toLocaleString('ar-YE')}` : '';
                 await UserNotification.createNotification({
                     user: request.user,
                     title: '✅ تمت الموافقة على طلب المزايدة',
-                    message: `تمت الموافقة على طلبك للسيارة: ${request.carName || ''}. سيتم إبلاغك بموعد المزاد عبر واتساب.`,
+                    message: `تمت الموافقة على طلبك للسيارة: ${request.carName || ''}.${dateStr} سيتم المتابعة معك عبر واتساب.`,
                     type: 'success',
                     actionUrl: '/dashboard'
                 });

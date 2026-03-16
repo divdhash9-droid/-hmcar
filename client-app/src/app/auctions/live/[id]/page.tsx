@@ -39,7 +39,12 @@ export default function LiveAuctionDetails() {
                 setLoading(false);
             }
         };
+        
         loadSession();
+        
+        // [[ARABIC_COMMENT]] تحديث تلقائي كل 10 ثوانٍ لمتابعة تغييرات الأسعار
+        const interval = setInterval(loadSession, 10000);
+        return () => clearInterval(interval);
     }, [id]);
 
     const handleBuyRequest = async (car: any) => {

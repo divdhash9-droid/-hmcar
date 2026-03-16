@@ -54,7 +54,8 @@ const conciergeRequestSchema = new mongoose.Schema({
         default: 'new'
     },
 
-    // ملاحظات الأدمن
+    // ملاحظات ومواعيد
+    auctionDate: { type: Date },                 // موعد المزاد المحدد للعميل
     adminNotes: { type: String, trim: true },
 
 }, { timestamps: true });

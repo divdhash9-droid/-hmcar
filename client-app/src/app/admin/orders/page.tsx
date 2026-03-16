@@ -140,6 +140,7 @@ function AdminFulfillmentContent() {
     const [selectedRequest, setSelectedRequest] = useState<ConciergeRequest | null>(null);
     const [specialUpdatingId, setSpecialUpdatingId] = useState<string | null>(null);
     const [specialStats, setSpecialStats] = useState({ total: 0, new: 0, in_progress: 0, completed: 0, cancelled: 0 });
+    const [auctionDateInput, setAuctionDateInput] = useState<string>(''); // [[ARABIC_COMMENT]] حقل إدخال موعد المزاد
 
     // ── Load Orders ──────────────────────────────────────────────
     const loadOrders = useCallback(async () => {
@@ -240,12 +241,13 @@ function AdminFulfillmentContent() {
     const handleSpecialStatusChange = async (id: string, status: string) => {
         setSpecialUpdatingId(id);
         try {
-            await api.concierge.updateStatus(id, status);
+            await api.concierge.updateStatus(id, status, { auctionDate: auctionDateInput || undefined });
             showToast(isRTL ? '✅ تم تحديث الحالة' : '✅ Status updated', 'success');
             await loadRequests();
             if (selectedRequest?._id === id) {
                 setSelectedRequest(prev => prev ? { ...prev, status: status as ConciergeRequest['status'] } : prev);
             }
+            setAuctionDateInput(''); // Reset after use
         } catch {
             showToast(isRTL ? 'فشل التحديث' : 'Update failed', 'error');
         } finally {
@@ -407,6 +409,25 @@ function AdminFulfillmentContent() {
                                         <p className="text-sm text-white/70 leading-relaxed">{selectedRequest.description}</p>
                                     </div>
                                 )}
+
+                                {/* [[ARABIC_COMMENT]] حقل إدخال موعد المزاد للأدمن */}
+                                <div className="ck-card p-4 space-y-2 border-cinematic-neon-blue/20 bg-cinematic-neon-blue/5">
+                                    <label className="text-[10px] font-black uppercase text-cinematic-neon-blue/70 tracking-widest flex items-center gap-2">
+                                        <Calendar size={12} />
+                                        {isRTL ? 'تحديد موعد المزاد (اختياري)' : 'SET AUCTION DATE (OPTIONAL)'}
+                                    </label>
+                                    <input 
+                                        id="auction-date-input"
+                                        placeholder={isRTL ? 'اختر التاريخ والوقت' : 'Select date and time'}
+                                        type="datetime-local"
+                                        value={auctionDateInput}
+                                        onChange={(e) => setAuctionDateInput(e.target.value)}
+                                        className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-xs text-white focus:border-cinematic-neon-blue outline-none transition-all"
+                                    />
+                                    <p className="text-[9px] text-white/30 italic">
+                                        {isRTL ? '* سيصل الموعد للعميل في الإشعار عند الضغط على "موافقة"' : '* Client will receive this in the notification when clicking "Approved"'}
+                                    </p>
+                                </div>
                                 <div className="grid grid-cols-2 gap-2">
                                     {(Object.entries(SPECIAL_STATUS_CONFIG) as [string, any][]).map(([key, cfg]) => (
                                         <button key={key} onClick={() => handleSpecialStatusChange(selectedRequest._id, key)} disabled={specialUpdatingId === selectedRequest._id || selectedRequest.status === key}

@@ -464,9 +464,9 @@ export const api = {
         // إحصائيات الطلبات الخاصة
         stats: () => fetchAPI('/api/v2/concierge/stats'),
         // تحديث حالة طلب
-        updateStatus: (id: string, status: string) => fetchAPI(`/api/v2/concierge/${id}/status`, {
+        updateStatus: (id: string, status: string, data: any = {}) => fetchAPI(`/api/v2/concierge/${id}/status`, {
             method: 'PATCH',
-            body: JSON.stringify({ status }),
+            body: JSON.stringify({ status, ...data }),
         }),
         // حذف طلب
         delete: (id: string) => fetchAPI(`/api/v2/concierge/${id}`, { method: 'DELETE' }),

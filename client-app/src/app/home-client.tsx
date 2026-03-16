@@ -7,7 +7,7 @@ import {
   MessageCircle, Smartphone, Download, Link as LinkIcon, ArrowUpRight,
   ArrowRight, RefreshCw, Car, Play, Check, ChevronLeft, ChevronRight,
   Quote, Phone, Instagram, Facebook, Youtube, Send, Linkedin,
-  Mail, Search, Gavel, Cog, Info, User, LogOut, Menu, X, Users, BarChart3, Plus
+  Mail, Search, Gavel, Cog, Info, User, LogOut, Menu, X, Plus
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -383,28 +383,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
         </section>
       )}
 
-      {/* ── 3. TRUST HUB (STATISTICS) ── */}
-      {(homeContent?.showTrustHub ?? true) && (
-        <section className="relative z-10 py-12 px-4 mb-20">
-        <div className="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-6">
-          {[
-            { label: isRTL ? 'إجمالي المبيعات' : 'TOTAL SALES', value: '12k+', icon: BarChart3, color: 'text-blue-400' },
-            { label: isRTL ? 'عملاء النخبة' : 'ELITE CLIENTS', value: '8.5k+', icon: Users, color: 'text-accent-gold' },
-            { label: isRTL ? 'سيارات جاهزة' : 'READY TO SHIP', value: '500+', icon: Car, color: 'text-green-400' },
-            { label: isRTL ? 'مزادات حية' : 'LIVE FEED', value: '24/7', icon: Sparkles, color: 'text-purple-400' }
-          ].map((stat, i) => (
-            <motion.div key={i} className="p-8 flex flex-col items-center border border-white/5 bg-black/40 backdrop-blur-3xl rounded-[2.5rem] group"
-              initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-              <div className={cn("w-14 h-14 rounded-2xl bg-white/[0.03] flex items-center justify-center mb-6 border border-white/5 group-hover:scale-110 transition-transform", stat.color)}>
-                <stat.icon className="w-7 h-7" />
-              </div>
-              <div className="text-4xl font-black text-white mb-2 tracking-tighter cockpit-num">{stat.value}</div>
-              <div className="text-[10px] font-black tracking-[0.3em] text-white/30 uppercase text-center">{stat.label}</div>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-      )}
+      {/* ── 3. TRUST HUB (STATISTICS) - REMOVED AS REQUESTED ── */}
 
       {/* ── 4. LIVE MARKET TICKER ── */}
       {(homeContent?.showLiveMarket ?? true) && latestCars && latestCars.length > 0 && (

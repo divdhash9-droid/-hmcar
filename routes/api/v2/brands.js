@@ -7,6 +7,34 @@ const AuditLog = require('../../../models/AuditLog');
 const { requireAuthAPI, requirePermissionAPI } = require('../../../middleware/auth');
 const { cacheResponse, invalidateCache } = require('../../../middleware/cache');
 
+// Reset dummy brands and parts (Admin only)
+router.post('/reset-default-hmcar', requireAuthAPI, requirePermissionAPI('manage_brands'), async (req, res) => {
+  try {
+    const SparePart = require('../../../models/SparePart');
+    await SparePart.deleteMany({});
+    await Brand.deleteMany({});
+
+    const koreanBrands = ['هيونداي / Hyundai', 'كيا / Kia', 'جينيسيس / Genesis'];
+    for (const name of koreanBrands) {
+       await Brand.create({
+          name,
+          key: name.split(' ')[0],
+          logoUrl: '',
+          forCars: true,
+          forSpareParts: true,
+          models: [],
+          targetShowroom: 'both',
+          isActive: true
+       });
+    }
+    
+    if (typeof invalidateCache === 'function') invalidateCache('/api/v2/brands*');
+    res.json({ success: true, message: 'All dummy brands/parts wiped and Korean brands restored.' });
+  } catch (e) {
+    res.status(500).json({ success: false, message: e.message });
+  }
+});
+
 // List brands
 router.get('/', cacheResponse(3600), async (req, res) => {
   try {

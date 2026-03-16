@@ -110,12 +110,22 @@ class ServerConfig {
 
   /**
    * إعدادات CORS
+   * [[ARABIC_COMMENT]] يضمن السماح بالاتصال من الواجهة الأمامية فقط مع دعم Vercel تلقائياً
    */
   getCorsConfig() {
+    const allowed = (process.env.ALLOWED_ORIGINS || '').split(',').map(o => o.trim()).filter(Boolean);
+    
+    // إضافة النطاقات المعروفة للنظام تلقائياً
+    if (process.env.CLIENT_URL) allowed.push(process.env.CLIENT_URL.trim());
+    if (process.env.BASE_URL) allowed.push(process.env.BASE_URL.trim());
+    if (process.env.NEXT_PUBLIC_API_URL) allowed.push(process.env.NEXT_PUBLIC_API_URL.split('/api')[0]);
+
     return {
-      origin: this.isDevelopment ? '*' : process.env.ALLOWED_ORIGINS?.split(',') || [],
+      origin: this.isDevelopment ? '*' : (allowed.length > 0 ? allowed : true),
       credentials: true,
-      optionsSuccessStatus: 200
+      optionsSuccessStatus: 200,
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
     };
   }
 
@@ -193,17 +203,23 @@ class ServerConfig {
   validate() {
     const errors = [];
     
-    // التحقق من متطلبات الإنتاج
-    if (this.isProduction && !process.env.MONGO_URI) {
-      errors.push('MONGO_URI مطلوب في بيئة الإنتاج');
+    const requiredProduVars = [
+      'MONGO_URI',
+      'SESSION_SECRET',
+      'JWT_SECRET',
+      'CLOUDINARY_CLOUD_NAME',
+      'CLOUDINARY_API_KEY',
+      'CLOUDINARY_API_SECRET'
+    ];
+
+    if (this.isProduction || this.isVercel) {
+      requiredProduVars.forEach(v => {
+        if (!process.env[v]) errors.push(`المتغير ${v} مفقود ومطلوب للإنتاج`);
+      });
     }
 
     if (this.isProduction && process.env.MONGO_URI && !isValidMongoUri(process.env.MONGO_URI)) {
       errors.push('MONGO_URI غير صالح (يجب أن يبدأ بـ mongodb:// أو mongodb+srv://)');
-    }
-    
-    if (this.isProduction && !process.env.SESSION_SECRET) {
-      errors.push('SESSION_SECRET مطلوب في بيئة الإنتاج');
     }
     
     // التحقق من المنافذ

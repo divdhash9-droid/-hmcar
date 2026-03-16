@@ -19,7 +19,9 @@ router.get('/public', cacheResponse(1800), async (req, res) => {
                 siteInfo: settings.siteInfo,
                 currencySettings: settings.currencySettings,
                 features: settings.features,
-                homeContent: settings.homeContent
+                homeContent: settings.homeContent,
+                // إعدادات الإعلانات متاحة للعامة لعرض الشريط
+                advertisingSettings: settings.advertisingSettings
             }
         });
     } catch (error) {
@@ -221,4 +223,38 @@ router.put('/home-content', requireAuthAPI, requireAdmin, async (req, res) => {
     }
 });
 
+// ── إعدادات الإعلانات: جلب (للأدمن) ──
+router.get('/advertising', requireAuthAPI, requireAdmin, async (req, res) => {
+    try {
+        const settings = await SiteSettings.getSettings();
+        res.json({
+            success: true,
+            data: settings.advertisingSettings || {}
+        });
+    } catch (error) {
+        console.error('خطأ في جلب إعدادات الإعلانات:', error);
+        res.status(500).json({ success: false, message: 'فشل في جلب إعدادات الإعلانات' });
+    }
+});
+
+// ── إعدادات الإعلانات: تحديث (للأدمن) ──
+router.put('/advertising', requireAuthAPI, requireAdmin, invalidateCache('/api/v2/settings*'), async (req, res) => {
+    try {
+        const { advertisingSettings } = req.body;
+        const settings = await SiteSettings.updateSettings(
+            { advertisingSettings },
+            req.user._id
+        );
+        res.json({
+            success: true,
+            message: 'تم تحديث إعدادات الإعلانات بنجاح',
+            data: settings.advertisingSettings
+        });
+    } catch (error) {
+        console.error('خطأ في تحديث إعدادات الإعلانات:', error);
+        res.status(500).json({ success: false, message: 'فشل في تحديث إعدادات الإعلانات' });
+    }
+});
+
 module.exports = router;
+

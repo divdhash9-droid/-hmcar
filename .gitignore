@@ -1,4 +1,4 @@
-﻿# Dependencies
+# Dependencies
 node_modules/
 .pnp/
 .pnp.js
@@ -9,11 +9,19 @@ out/
 build/
 dist/
 
-# Environment files
+# Environment files - منع تسريب ملفات البيئة والمفاتيح السرية
 .env
 .env.local
 .env.production
+.env.production.local
+.env.development.local
+.env.test.local
 .env*.local
+.env.*
+*.env
+*.env.vercel
+.env.vercel*
+.env.production.vercel
 
 # Database
 database-data/

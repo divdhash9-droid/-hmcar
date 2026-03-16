@@ -127,7 +127,7 @@ async function fetchExternal(url, redirectCount = 0) {
     }
 }
 
-/** ترجمة بيانات السيارة من كوري إلى عربي */
+/** ترجمة بيانات السيارة من كوري إلى عربي واستخراج كافة التفاصيل والصور */
 function translateCar(car) {
     const manufacturer = car.Manufacturer || '';
     const model = car.Model || '';
@@ -161,12 +161,19 @@ function translateCar(car) {
 
     const normalizeImage = (value) => {
         if (!value) return null;
-        const raw = typeof value === 'string'
-            ? value
-            : (value.location || value.Location || value.url || value.Url || value.path || value.Path || '');
+        let raw = '';
+        if (typeof value === 'string') {
+            raw = value;
+        } else {
+            // استخراج الرابط من كائنات الصور المختلفة التي ترجعها Encar
+            raw = value.location || value.Location || value.url || value.Url || value.path || value.Path || value.PicUrl || '';
+        }
+        
         if (!raw || typeof raw !== 'string') return null;
         const trimmed = raw.trim();
         if (!trimmed) return null;
+
+        // تنظيف الرابط وإضافة البروتوكول والنطاق إذا لزم الأمر
         if (trimmed.startsWith('http')) {
             return trimmed.endsWith('_') ? `${trimmed}001.jpg` : trimmed;
         }
@@ -178,45 +185,36 @@ function translateCar(car) {
         return `https://ci.encar.com/carpicture${trimmed}`;
     };
 
-    const pickFirstImage = (...candidates) => {
-        for (const candidate of candidates) {
-            const normalized = normalizeImage(candidate);
-            if (normalized) return normalized;
-        }
-        return null;
-    };
+    // [[ARABIC_COMMENT]] استخراج كافة الصور المتاحة (Encar ترجع الصور في حقول متعددة أحياناً)
+    const allEncarPhotos = [];
+    
+    // 1. من مصفوفة Photos أو Images العامة
+    const standardPhotos = Array.isArray(car.Photos) ? car.Photos : (Array.isArray(car.Images) ? car.Images : []);
+    standardPhotos.forEach(p => allEncarPhotos.push(normalizeImage(p)));
 
-    // [[ARABIC_COMMENT]] تغطية عدة أشكال للصور لأن Encar يُرجع حقولاً مختلفة حسب نوع الإعلان
-    let imageUrl = pickFirstImage(
-        car?.Photos?.[0],
-        car?.Images?.[0],
-        car.Photo,
-        car.PhotoUrl,
-        car.MainPhoto,
-        car.MainImg,
-        car.ImageUrl,
-        car.ImgUrl,
-        car.PhotoPath,
-        car.RepresentativePhoto,
-        car.RepresentativeImg,
-        car?.PhotoList?.[0],
-        car?.Photo?.Url,
-        car?.Photo?.Path,
-        car?.Photo?.Small,
-        car?.Photo?.Large,
-        car?.Photo?.매물사진?.[0]?.PicUrl,
-        car?.Photo?.매물사진?.[0]?.Url
-    );
-
-    if (!imageUrl && car?.Photo?.매물사진?.[0]?.PicFileNo) {
-        const photoId = car.Photo.매물사진[0].PicFileNo;
-        imageUrl = `https://ci.encar.com/carpicture/carpicture${photoId.substring(0, 2)}/pic${photoId.substring(0, 4)}/${photoId}_001.jpg`;
+    // 2. من حقل PhotoList (مألوف في نسخ الجوال)
+    if (Array.isArray(car.PhotoList)) {
+        car.PhotoList.forEach(p => allEncarPhotos.push(normalizeImage(p)));
     }
 
-    const extraImages = [
-        ...(Array.isArray(car.Photos) ? car.Photos.map(normalizeImage) : []),
-        ...(Array.isArray(car.Images) ? car.Images.map(normalizeImage) : []),
-    ].filter(Boolean);
+    // 3. من الحقل الكوري 매물사진 (أعلى دقة أحياناً)
+    const koreanPhotos = car?.Photo?.매물사진;
+    if (Array.isArray(koreanPhotos)) {
+        koreanPhotos.forEach(p => allEncarPhotos.push(normalizeImage(p)));
+    }
+
+    // 4. الصور الفردية وحقول الصور الممثلة
+    const singlePhotos = [
+        car.Photo, car.PhotoUrl, car.MainPhoto, car.MainImg, 
+        car.ImageUrl, car.ImgUrl, car.PhotoPath, 
+        car.RepresentativePhoto, car.RepresentativeImg
+    ];
+    singlePhotos.forEach(p => allEncarPhotos.push(normalizeImage(p)));
+
+    // تنقية الصور المتكررة والقيم الفارغة
+    const uniqueImages = [...new Set(allEncarPhotos.filter(Boolean))];
+
+    const imageUrl = uniqueImages[0] || null;
 
     return {
         id: car.Id?.toString() || '',
@@ -236,7 +234,7 @@ function translateCar(car) {
         region: region,
         regionAr: regionAr,
         imageUrl: imageUrl,
-        images: [imageUrl, ...extraImages].filter(Boolean),
+        images: uniqueImages, // الاحتفاظ بكافة الصور للاستفادة منها بالمعرض
         encarUrl: `https://car.encar.com/detail/car?carid=${car.Id}`,
         isInspected: !!(car.ServiceMark),
     };
@@ -327,10 +325,12 @@ router.get('/cars', async (req, res) => {
 /**
  * POST /api/v2/showroom/scrape
  * جلب السيارات من Encar وحفظها في قاعدة البيانات المحلية (للأدمن فقط)
+ * يتم تحميل الصور وضغطها تلقائياً لتحسين سرعة الموقع
  */
 router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
     let apiUrl = '';
     try {
+        const { downloadAndOptimize } = require('../../../services/externalImageService');
         const settings = await SiteSettings.getSettings();
         const showroomUrl = settings?.showroomSettings?.encarUrl || '';
         if (!showroomUrl) {
@@ -340,9 +340,10 @@ router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
         const usdToSar = Number(settings?.currencySettings?.usdToSar || 3.75);
         const usdToKrw = Number(settings?.currencySettings?.usdToKrw || 1350);
 
-        // Only scrape first 3 pages (up to 60 cars) per call to prevent timeout
+        // جلب أول 3 صفحات فقط (حوالي 60 سيارة) لتجنب انتهاء وقت الطلب
         let totalCreated = 0;
         let totalUpdated = 0;
+        
         for (let page = 1; page <= 3; page++) {
             const urlWithPage = showroomUrl.replace(/page=\d+/, `page=${page}`);
             apiUrl = convertEncarUrlToApi(urlWithPage, page);
@@ -359,11 +360,32 @@ router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
 
             for (const item of results) {
                 if (!item.encarUrl) continue;
-                // Check if car exists
-                const existingCar = await Car.findOne({ externalUrl: item.encarUrl });
+                
+                // حساب الأسعار بناءً على المعاملات المحددة في الإعدادات
                 const auctionMultiplier = Number(settings?.currencySettings?.auctionMultiplier || 1.10);
                 const computedUsd = Number(((item.priceKrw / usdToKrw) * auctionMultiplier).toFixed(2));
                 const computedSar = Math.round(computedUsd * usdToSar);
+
+                // [[ARABIC_COMMENT]] معالجة الصور: تحميل وضغط أول 5 صور لضمان السرعة (البقية تظل روابط خارجية إن لزم)
+                // هذا يحقق توازن بين جودة العرض وسرعة التحميل
+                const imagesToProcess = (item.images || []).slice(0, 5);
+                const processedImages = [];
+                
+                for (const imgUrl of imagesToProcess) {
+                    try {
+                        const localPath = await downloadAndOptimize(imgUrl, 'showroom');
+                        processedImages.push(localPath);
+                    } catch (e) {
+                        processedImages.push(imgUrl);
+                    }
+                }
+                
+                // دمج الصور المعالجة مع الروابط الأصلية للبقية
+                const finalImagesList = [...processedImages, ...(item.images || []).slice(5)];
+
+                // التحقق من وجود السيارة مسبقاً
+                const existingCar = await Car.findOne({ externalUrl: item.encarUrl });
+                
                 if (!existingCar) {
                     await Car.create({
                         title: item.title,
@@ -382,40 +404,40 @@ router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
                         listingType: 'showroom',
                         source: 'korean_import',
                         externalUrl: item.encarUrl,
-                        images: Array.isArray(item.images) && item.images.length > 0
-                            ? item.images
-                            : (item.imageUrl ? [item.imageUrl] : []),
+                        images: finalImagesList,
                         isActive: true,
                         isSold: false,
                         displayCurrency: 'KRW'
                     });
                     totalCreated++;
                 } else {
+                    // تحديث الأسعار والمواصفات (مع الحفاظ على البيانات التي قد يكون الأدمن عدلها)
                     existingCar.priceUsd = computedUsd;
                     existingCar.priceKrw = item.priceKrw;
                     existingCar.priceSar = computedSar;
                     existingCar.price = computedSar;
                     existingCar.source = 'korean_import';
                     existingCar.listingType = 'showroom';
-                    const incomingImages = Array.isArray(item.images)
-                        ? item.images.filter(Boolean)
-                        : (item.imageUrl ? [item.imageUrl] : []);
+                    
+                    // تحديث الصور فقط إذا كانت القائمة الحالية ناقصة أو تالفة
                     const needsImageRepair = !Array.isArray(existingCar.images)
-                        || existingCar.images.length === 0
+                        || existingCar.images.length < 3
                         || existingCar.images.some((img) => typeof img === 'string' && img.endsWith('_'));
-                    if (incomingImages.length > 0 && needsImageRepair) {
-                        existingCar.images = incomingImages;
+                    
+                    if (needsImageRepair && finalImagesList.length > 0) {
+                        existingCar.images = finalImagesList;
                     }
+                    
                     await existingCar.save();
                     totalUpdated++;
                 }
             }
 
-            // Stop if there are no more results on this page
+            // التوقف إذا لم تكن هناك نتائج إضافية
             if (results.length < 20) break;
         }
 
-        res.json({ success: true, message: `✅ اكتمل الجلب: أُضيفت ${totalCreated} وحُدّثت ${totalUpdated} سيارة بالمخزون.` });
+        res.json({ success: true, message: `✅ اكتمل الجلب الذكي: أُضيفت ${totalCreated} وحُدّثت ${totalUpdated} سيارة مع تحسين الصور.` });
     } catch (error) {
         console.error('❌ Showroom Scrape Error:', error.message);
         res.status(500).json({ success: false, message: `فشل جلب البيانات وحفظها: ${error.message}` });

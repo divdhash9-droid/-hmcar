@@ -113,12 +113,22 @@ class EnvironmentChecker {
    * فحص متغيرات البيئة
    */
   checkEnvironmentVariables() {
-    console.log('🔍 فحص متغيرات البيئة...');
+    console.log('🔍 فحص متغيرات البيئة الحساسة...');
     
     const requiredVars = [
       'NODE_ENV',
       'MONGO_URI',
-      'SESSION_SECRET'
+      'SESSION_SECRET',
+      'JWT_SECRET',
+      'BASE_URL'
+    ];
+    
+    // متغيرات الإنتاج الإلزامية
+    const prodRequiredVars = [
+      'CLOUDINARY_CLOUD_NAME',
+      'CLOUDINARY_API_KEY',
+      'CLOUDINARY_API_SECRET',
+      'ALLOWED_ORIGINS'
     ];
     
     const missingVars = [];
@@ -131,32 +141,40 @@ class EnvironmentChecker {
     });
     
     // فحص إضافي للإنتاج
-    if (serverConfig.isProduction) {
+    if (serverConfig.isProduction || serverConfig.isVercel) {
+      prodRequiredVars.forEach(v => {
+        if (!process.env[v]) missingVars.push(v);
+      });
+
       if (!process.env.MONGO_URI?.includes('mongodb.net')) {
         warnings.push('يُفضل استخدام MongoDB Atlas في الإنتاج');
       }
       
       if (process.env.SESSION_SECRET === 'hm_car_auction_luxury_secret_2024') {
-        warnings.push('يجب تغيير SESSION_SECRET في الإنتاج');
+        warnings.push('يجب تغيير SESSION_SECRET في الإنتاج (خطر أمني)');
+      }
+
+      if (process.env.JWT_SECRET === 'hm_car_jwt_secret_primary_2024') {
+        warnings.push('يجب تغيير JWT_SECRET في الإنتاج (خطر أمني)');
       }
     }
     
     if (missingVars.length === 0 && warnings.length === 0) {
       this.results.environment = {
         status: 'ok',
-        message: 'جميع متغيرات البيئة صحيحة'
+        message: 'جميع متغيرات البيئة المطلوبة متوفرة وصحيحة'
       };
       console.log('✅ متغيرات البيئة صحيحة');
     } else if (missingVars.length > 0) {
       this.results.environment = {
         status: 'error',
-        message: `متغيرات مفقودة: ${missingVars.join(', ')}`
+        message: `متغيرات إلزامية مفقودة: ${missingVars.join(', ')}`
       };
       console.log(`❌ متغيرات مفقودة: ${missingVars.join(', ')}`);
     } else {
       this.results.environment = {
         status: 'warning',
-        message: `تحذيرات: ${warnings.join(', ')}`
+        message: `تحذيرات أمنية: ${warnings.join(', ')}`
       };
       console.log(`⚠️ تحذيرات: ${warnings.join(', ')}`);
     }

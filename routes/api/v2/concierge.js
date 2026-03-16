@@ -63,6 +63,7 @@ router.post('/', async (req, res) => {
         // حفظ الطلب
         const request = await ConciergeRequest.create({
             type, name, phone,
+            user: req.body.user || null, // [[ARABIC_COMMENT]] ربط المستخدم إذا توفر
             carName, model, color, colorName, year,
             partName, imageUrl,
             description,
@@ -191,6 +192,22 @@ router.patch('/:id/status', requireAuthAPI, requireAdmin, async (req, res) => {
 
         if (!request) {
             return res.status(404).json({ success: false, message: 'الطلب غير موجود' });
+        }
+
+        // [[ARABIC_COMMENT]] إرسال إشعار للعميل إذا تم قبول الطلب (تغيير الحالة لـ in_progress)
+        if (status === 'in_progress' && request.user) {
+            try {
+                const UserNotification = require('../../../models/UserNotification');
+                await UserNotification.createNotification({
+                    user: request.user,
+                    title: '✅ تمت الموافقة على طلب المزايدة',
+                    message: `تمت الموافقة على طلبك للسيارة: ${request.carName || ''}. سيتم إبلاغك بموعد المزاد عبر واتساب.`,
+                    type: 'success',
+                    actionUrl: '/dashboard'
+                });
+            } catch (notifErr) {
+                console.error('Failed to send client notification:', notifErr);
+            }
         }
 
         res.json({ success: true, message: 'تم تحديث الحالة', data: request });

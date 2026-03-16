@@ -20,7 +20,7 @@
 import { motion } from 'framer-motion';
 import { Suspense, useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { ArrowLeft, User, Globe, Phone, DollarSign, Camera, LayoutDashboard, Shield } from 'lucide-react';
+import { ArrowLeft, User, Globe, Phone, DollarSign, Camera, LayoutDashboard, Shield, Megaphone } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/lib/LanguageContext';
@@ -31,9 +31,10 @@ import AdminPageShell from '@/components/AdminPageShell';
 // ── المكونات المقسمة ──
 import ProfileTab from './_components/ProfileTab';
 import { SocialTab, ContactTab, CurrencyTab, SiteTab, HomeTab, FeaturesTab } from './_components/SettingsTabs';
+import AdsTab from './_components/AdsTab';
 
 // ── أنواع التبويبات ──
-type TabID = 'profile' | 'security' | 'social' | 'contact' | 'currency' | 'site' | 'home' | 'features';
+type TabID = 'profile' | 'security' | 'social' | 'contact' | 'currency' | 'site' | 'home' | 'features' | 'ads';
 
 // ── أنواع البيانات ──
 interface SocialLinks { whatsapp: string; instagram: string; twitter: string; facebook: string; youtube: string; tiktok: string; snapchat: string; telegram: string; linkedin: string; }
@@ -59,7 +60,7 @@ function AdminSettingsContent() {
     const [activeTab, setActiveTab] = useState<TabID>('profile');
 
     useEffect(() => {
-        if (tabParam && ['profile', 'security', 'social', 'contact', 'currency', 'site', 'home', 'features'].includes(tabParam)) {
+        if (tabParam && ['profile', 'security', 'social', 'contact', 'currency', 'site', 'home', 'features', 'ads'].includes(tabParam)) {
             setActiveTab(tabParam);
         }
     }, [tabParam]);
@@ -227,6 +228,8 @@ function AdminSettingsContent() {
         { id: 'contact', label: isRTL ? 'معلومات الاتصال' : 'Contact Info', icon: Phone },
         { id: 'currency', label: isRTL ? 'إعدادات العملة' : 'Currency', icon: DollarSign },
         { id: 'features', label: isRTL ? 'لماذا تختارنا' : 'Features', icon: Shield },
+        // ── تبويب الإعلانات الجديد ──
+        { id: 'ads', label: isRTL ? 'الإعلانات' : 'Ads', icon: Megaphone },
     ];
     return (
         <AdminPageShell
@@ -343,6 +346,11 @@ function AdminSettingsContent() {
                             onSave={handleSaveFeatures}
                             onFeaturesChange={setFeatures}
                         />
+                    )}
+
+                    {/* ── تبويب إدارة الإعلانات ── */}
+                    {activeTab === 'ads' && (
+                        <AdsTab isRTL={isRTL} />
                     )}
 
             </AdminPageShell>

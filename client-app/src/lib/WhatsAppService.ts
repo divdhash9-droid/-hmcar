@@ -25,6 +25,23 @@ export const WhatsAppService = {
     },
 
     /**
+     * توليد رابط واتساب لمزاد محدد
+     */
+    generateAuctionLink: (auction: any, phoneNumber: string, isRTL: boolean, formatPrice?: (p: number) => string) => {
+        if (!auction) return '';
+        
+        const title = auction.title || (auction.car ? `${auction.car.make} ${auction.car.model}` : 'مزاد سيارة');
+        const price = formatPrice ? formatPrice(Number(auction.currentPrice || auction.startingPrice || 0)) : `${Number(auction.currentPrice || 0).toLocaleString()} SAR`;
+
+        const msg = isRTL
+            ? `السلام عليكم HM CAR،\n\nبخصوص المزاد القائم على:\n🔨 *${title}*\n💰 السعر الحالي: ${price}\n\nأرغب في الاستفسار عن تفاصيل المزايدة.`
+            : `Hello HM CAR,\n\nRegarding the active auction for:\n🔨 *${title}*\n💰 Current Price: ${price}\n\nI have a question about the bidding process.`;
+
+        const cleanPhone = phoneNumber.replace(/\D/g, '');
+        return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
+    },
+
+    /**
      * رابط عام لخدمة العملاء
      */
     getSupportLink: (phoneNumber: string, isRTL: boolean) => {

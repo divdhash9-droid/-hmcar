@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -8,6 +8,7 @@ import {
     Gavel, Clock, Users, TrendingUp,
     ChevronLeft, ChevronRight, AlertCircle, CheckCircle
 } from 'lucide-react';
+import Image from 'next/image';
 import { api } from '@/lib/api';
 import { useLocale } from '@/hooks/useLocale';
 import ClientPageHeader from '@/components/ClientPageHeader';
@@ -58,23 +59,14 @@ export default function AuctionDetailsPage() {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
 
-    useEffect(() => {
-        if (params.id) {
-            fetchAuctionDetails();
-            fetchBids();
-        }
-    }, [params.id]);
+    const handleQuickBid = (increment: number) => {
+        const currentBase = Number(auction?.currentPrice || auction?.startingPrice || 0);
+        const minIncrement = Number(auction?.minBidIncrement || 100);
+        const newAmount = Math.max(currentBase + minIncrement, currentBase + increment);
+        setBidAmount(String(newAmount));
+    };
 
-    useEffect(() => {
-        if (auction) {
-            const timer = setInterval(() => {
-                setTimeLeft(calculateTimeLeft());
-            }, 1000);
-            return () => clearInterval(timer);
-        }
-    }, [auction]);
-
-    const fetchAuctionDetails = async () => {
+    const fetchAuctionDetails = useCallback(async () => {
         try {
             setLoading(true);
             const response = await api.auctions.getById(params.id as string);
@@ -89,9 +81,9 @@ export default function AuctionDetailsPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [params.id, isRTL]);
 
-    const fetchBids = async () => {
+    const fetchBids = useCallback(async () => {
         try {
             const response = await api.bids.auctionBids(params.id as string, 10);
             if (response.success) {
@@ -100,9 +92,16 @@ export default function AuctionDetailsPage() {
         } catch (err) {
             console.error('Failed to fetch bids:', err);
         }
-    };
+    }, [params.id]);
 
-    const calculateTimeLeft = () => {
+    useEffect(() => {
+        if (params.id) {
+            fetchAuctionDetails();
+            fetchBids();
+        }
+    }, [params.id, fetchAuctionDetails, fetchBids]);
+
+    const calculateTimeLeft = useCallback(() => {
         if (!auction) return '';
         const end = new Date(auction.endTime).getTime();
         const now = Date.now();
@@ -119,7 +118,16 @@ export default function AuctionDetailsPage() {
             return `${days}${isRTL ? 'ي' : 'd'} ${hours}${isRTL ? 'س' : 'h'} ${minutes}${isRTL ? 'د' : 'm'}`;
         }
         return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    };
+    }, [auction, isRTL]);
+
+    useEffect(() => {
+        if (auction) {
+            const timer = setInterval(() => {
+                setTimeLeft(calculateTimeLeft());
+            }, 1000);
+            return () => clearInterval(timer);
+        }
+    }, [auction, calculateTimeLeft]);
 
     const placeBid = async () => {
         const amount = parseInt(bidAmount);
@@ -203,11 +211,13 @@ export default function AuctionDetailsPage() {
                                             <Gavel className="w-24 h-24 text-white/20" />
                                         </div>
                                     ) : (
-                                        <img
+                                        <Image
                                             src={imageSrc}
                                             alt={car.title}
-                                            className="w-full h-full object-cover"
+                                            fill
+                                            className="object-cover"
                                             onError={() => setImageErrors(prev => ({ ...prev, [currentImageIndex]: true }))}
+                                            unoptimized
                                         />
                                     );
                                 })()
@@ -221,12 +231,14 @@ export default function AuctionDetailsPage() {
                                 <>
                                     <button
                                         onClick={() => setCurrentImageIndex((prev) => (prev - 1 + car.images.length) % car.images.length)}
+                                        title={isRTL ? 'الصورة السابقة' : 'Previous Image'}
                                         className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/50 backdrop-blur-xl rounded-full flex items-center justify-center hover:bg-[#c5a059] transition-colors"
                                     >
                                         <ChevronLeft className="w-6 h-6" />
                                     </button>
                                     <button
                                         onClick={() => setCurrentImageIndex((prev) => (prev + 1) % car.images.length)}
+                                        title={isRTL ? 'الصورة التالية' : 'Next Image'}
                                         className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/50 backdrop-blur-xl rounded-full flex items-center justify-center hover:bg-[#c5a059] transition-colors"
                                     >
                                         <ChevronRight className="w-6 h-6" />
@@ -332,11 +344,25 @@ export default function AuctionDetailsPage() {
                                         onChange={(e) => setBidAmount(e.target.value)}
                                         min={(auction.currentPrice || auction.startingPrice) + (auction.minBidIncrement || 100)}
                                         step={auction.minBidIncrement || 100}
+                                        title={isRTL ? 'مبلغ المزايدة' : 'Bid Amount'}
                                         className="w-full bg-black/50 border border-white/20 rounded-xl px-4 py-3 text-lg font-bold focus:outline-none focus:border-[#c5a059]"
                                     />
                                     <div className="text-white/40 text-xs mt-1">
                                         {isRTL ? 'الحد الأدنى للزيادة:' : 'Min Increment:'} {formatPrice(auction.minBidIncrement || 100)}
                                     </div>
+                                </div>
+
+                                {/* Quick Bid Buttons */}
+                                <div className="grid grid-cols-3 gap-2">
+                                    {[500, 1000, 5000].map(amount => (
+                                        <button
+                                            key={amount}
+                                            onClick={() => handleQuickBid(amount)}
+                                            className="py-2 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black hover:bg-white/10 hover:border-[#c5a059]/40 transition-all"
+                                        >
+                                            +{amount}
+                                        </button>
+                                    ))}
                                 </div>
 
                                 {bidMessage && (

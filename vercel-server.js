@@ -224,16 +224,21 @@ function buildApp() {
     // ── Middleware ──
     app.use(cors({
         origin: function (origin, callback) {
+            // السماح للطلبات التي لا تحتوي على origin (مثل الأدوات الداخلية أو السيرفر نفسه)
             if (!origin) return callback(null, true);
             
-            // الأمان 3: تفعيل CORS فقط للنطاقات المسموحة رسمياً حسب المتغير ALLOWED_ORIGINS
-            const allowed = (process.env.ALLOWED_ORIGINS || '').split(',').map(o => o.trim());
-            
-            // السماح للنطاقات المتطابقة مع القائمة المسموحة، أو إذا كنا في بيئة التطوير
-            if (allowed.includes(origin) || (process.env.NODE_ENV !== 'production' && (origin.endsWith('.vercel.app') || origin.startsWith('http://localhost')))) {
+            const allowed = (process.env.ALLOWED_ORIGINS || '').split(',').map(o => o.trim()).filter(Boolean);
+            if (process.env.CLIENT_URL) allowed.push(process.env.CLIENT_URL.trim());
+            if (process.env.BASE_URL) allowed.push(process.env.BASE_URL.trim());
+
+            const isAllowed = allowed.includes(origin) || 
+                              allowed.some(domain => origin.startsWith(domain)) ||
+                              (process.env.NODE_ENV !== 'production' && (origin.endsWith('.vercel.app') || origin.startsWith('http://localhost')));
+
+            if (isAllowed) {
                  return callback(null, true);
             }
-            callback(new Error('CORS blocked by strict policy'), false);
+            callback(new Error(`CORS blocked by strict policy for: ${origin}`), false);
         },
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],

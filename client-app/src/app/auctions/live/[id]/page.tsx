@@ -3,11 +3,12 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { MessageCircle, X, ExternalLink, ChevronLeft, ShieldCheck, Info, Tag, AlertTriangle } from "lucide-react";
+import { MessageCircle, X, ExternalLink, ChevronLeft, ShieldCheck, Tag, AlertTriangle } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/LanguageContext";
 import { api } from "@/lib/api";
+import Image from "next/image";
 
 export default function LiveAuctionDetails() {
     const { isRTL } = useLanguage();
@@ -47,6 +48,7 @@ export default function LiveAuctionDetails() {
             let buyerName = 'زائر';
             let buyerPhone = 'غير محدد';
             
+            let buyerId = null;
             if (typeof window !== 'undefined') {
                 const userJson = localStorage.getItem('hm_user');
                 if (userJson) {
@@ -54,7 +56,8 @@ export default function LiveAuctionDetails() {
                         const u = JSON.parse(userJson);
                         if (u.name) buyerName = u.name;
                         if (u.phone) buyerPhone = u.phone;
-                    } catch(e) {}
+                        buyerId = u._id || u.id;
+                    } catch { }
                 }
             }
 
@@ -62,6 +65,7 @@ export default function LiveAuctionDetails() {
                 type: 'car',
                 name: buyerName,
                 phone: buyerPhone,
+                user: buyerId,
                 carName: car.title,
                 model: session.title,
                 source: 'general',
@@ -151,7 +155,7 @@ export default function LiveAuctionDetails() {
                                     onClick={() => setSelectedCar(car)}
                                 >
                                     <div className="relative aspect-video rounded-2xl overflow-hidden border border-white/5">
-                                        <img src={car.images?.[0] || 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d'} className="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-700" alt={car.title} />
+                                        <Image src={car.images?.[0] || 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d'} fill className="object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-700" alt={car.title} unoptimized />
                                         <div className="absolute top-4 right-4 flex gap-2">
                                             <div className="px-3 py-1 bg-black/60 backdrop-blur-md rounded-lg border border-white/10 text-[8px] font-black uppercase tracking-widest">{car.condition}</div>
                                         </div>
@@ -227,14 +231,14 @@ export default function LiveAuctionDetails() {
                             <button onClick={() => setSelectedCar(null)} className="absolute top-6 right-6 text-white/40 hover:text-white z-20 transition-all hover:rotate-90"><X className="w-8 h-8" /></button>
 
                             <div className="grid grid-cols-1 lg:grid-cols-2">
-                                <div className="p-8 space-y-6">
-                                    <div className="aspect-video rounded-2xl overflow-hidden border border-white/10">
-                                        <img src={selectedCar.images?.[0]} className="w-full h-full object-cover" alt="" />
+                                    <div className="p-8 space-y-6">
+                                    <div className="relative aspect-video rounded-2xl overflow-hidden border border-white/10">
+                                        <Image src={selectedCar.images?.[0]} fill className="object-cover" alt="" unoptimized />
                                     </div>
                                     <div className="grid grid-cols-4 gap-4">
                                         {selectedCar.images?.slice(1, 5).map((img: string, i: number) => (
-                                            <div key={i} className="aspect-square rounded-xl overflow-hidden border border-white/10">
-                                                <img src={img} className="w-full h-full object-cover" alt="" />
+                                            <div key={i} className="relative aspect-square rounded-xl overflow-hidden border border-white/10">
+                                                <Image src={img} fill className="object-cover" alt="" unoptimized />
                                             </div>
                                         ))}
                                     </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactGA from 'react-ga4';
@@ -61,25 +61,26 @@ export default function LocalCarDetail() {
     const [whatsapp, setWhatsapp] = useState('');
     const [showInvoice, setShowInvoice] = useState(false);
 
-    useEffect(() => {
-        const loadCar = async () => {
-            try {
-                setLoading(true);
-                const res = await api.cars.getById(id as string);
-                if (res?.success && res.data) {
-                    setCar(res.data);
-                } else {
-                    setError(isRTL ? 'لم يتم العثور على السيارة' : 'Car not found');
-                }
-            } catch (err) {
-                console.error('Failed to load car:', err);
-                setError(isRTL ? 'حدث خطأ في تحميل البيانات' : 'Failed to load car data');
-            } finally {
-                setLoading(false);
+    const loadCar = useCallback(async () => {
+        try {
+            setLoading(true);
+            const res = await api.cars.getById(id as string);
+            if (res?.success && res.data) {
+                setCar(res.data);
+            } else {
+                setError(isRTL ? 'لم يتم العثور على السيارة' : 'Car not found');
             }
-        };
+        } catch (err) {
+            console.error('Failed to load car:', err);
+            setError(isRTL ? 'حدث خطأ في تحميل البيانات' : 'Failed to load car data');
+        } finally {
+            setLoading(false);
+        }
+    }, [id, isRTL]); // Added id and isRTL as dependencies
+
+    useEffect(() => {
         if (id) loadCar();
-    }, [id, isRTL]);
+    }, [id, loadCar]); // Added loadCar as dependency
 
     useEffect(() => {
         api.settings.getPublic().then((res: { success: boolean; data?: { socialLinks?: { whatsapp?: string } } }) => {
@@ -113,7 +114,7 @@ export default function LocalCarDetail() {
                     try {
                         const u = JSON.parse(userJson);
                         buyerId = u?._id || u?.id;
-                    } catch(e) {}
+                    } catch { }
                 }
             }
 

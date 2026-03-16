@@ -440,6 +440,14 @@ export const api = {
                 method: 'PUT',
                 body: JSON.stringify(data),
             }),
+        // ── جلب إعدادات الإعلانات (للأدمن) ──
+        getAdvertising: () => fetchAPI('/api/v2/settings/advertising'),
+        // ── تحديث إعدادات الإعلانات (للأدمن) ──
+        updateAdvertising: (data: { advertisingSettings: Record<string, unknown> }) =>
+            fetchAPI('/api/v2/settings/advertising', {
+                method: 'PUT',
+                body: JSON.stringify(data),
+            }),
     },
     // ── الطلبات الخاصة (Concierge) ──
     concierge: {

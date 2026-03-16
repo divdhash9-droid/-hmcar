@@ -314,6 +314,7 @@ router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
         const $brands = cheerio.load(brandsHtml);
         const results = { brandsCreated: 0, modelsUpdated: 0, partsCreated: 0 };
 
+        const { downloadAndOptimize } = require('../../../services/externalImageService');
         const brandsToProcess = [];
         $brands('a.brand-card-link').each((i, el) => {
             const name = $brands(el).find('h3').text().trim();
@@ -335,10 +336,12 @@ router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
         for (const bData of limitBrands) {
             let brand = await Brand.findOne({ key: bData.name.toLowerCase() });
             if (!brand) {
+                // [[ARABIC_COMMENT]] تحميل وضغط شعار البراند لضمان سرعة الواجهة
+                const localLogo = await downloadAndOptimize(bData.logo, 'brands');
                 brand = await Brand.create({
                     name: bData.name,
                     key: bData.name.toLowerCase(),
-                    logoUrl: bData.logo,
+                    logoUrl: localLogo,
                     forSpareParts: true,
                     forCars: true,
                     models: []
@@ -350,7 +353,7 @@ router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
                     await brand.save();
                 }
                 if (bData.logo && !brand.logoUrl) {
-                    brand.logoUrl = bData.logo;
+                    brand.logoUrl = await downloadAndOptimize(bData.logo, 'brands');
                     await brand.save();
                 }
             }
@@ -388,7 +391,7 @@ router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
                     }
                 }
 
-                // [[ARABIC_COMMENT]] 3. جلب قطع الغيار لبعض الموديلات (حد أقصى 2 موديل لكل ماركة لتجنب البطء)
+                // [[ARABIC_COMMENT]] 3. جلب قطع الغيار لبعض الموديلات
                 for (let i = 0; i < Math.min(modelUrls.length, Math.max(1, maxModelsPerBrand)); i++) {
                     const mUrl = modelUrls[i];
                     const modelName = cleanModelName(modelsFound[i]);
@@ -436,6 +439,9 @@ router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
                         const usdPrice = Number((sarPrice / usdToSar).toFixed(2));
                         const krwPrice = Math.round(usdPrice * usdToKrw);
 
+                        // [[ARABIC_COMMENT]] تحميل وضغط صورة القطعة لتحسين الأداء
+                        const localPartImg = await downloadAndOptimize(card.pImg, 'parts');
+
                         await SparePart.create({
                             name: card.pName,
                             nameAr: translatePartNameToArabic(card.pName) || card.pName,
@@ -445,14 +451,14 @@ router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
                             carMake: brand.name,
                             carMakeLogoUrl: brand.logoUrl || '',
                             carModel: modelName,
-                            price: card.pPrice,
+                            price: sarPrice,
                             basePriceUsd: usdPrice,
                             priceSar: sarPrice,
                             priceUsd: usdPrice,
                             priceKrw: krwPrice,
                             stockQty: 5,
                             inStock: true,
-                            images: card.pImg ? [card.pImg] : [],
+                            images: localPartImg ? [localPartImg] : [],
                             externalUrl: card.sourceUrl,
                             source: 'autospare'
                         });
@@ -466,7 +472,7 @@ router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
 
         res.json({
             success: true,
-            message: 'Scraping/Import completed successfully from autospare.com.eg',
+            message: '✅ اكتمل جلب قطع الغيار بنجاح مع تحسين الصور والبيانات.',
             stats: results
         });
     } catch (error) {

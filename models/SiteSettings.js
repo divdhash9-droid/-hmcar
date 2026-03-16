@@ -76,6 +76,20 @@ const siteSettingsSchema = new mongoose.Schema({
         encarUrl: { type: String, default: '' }, // رابط البحث من Encar.com
     },
 
+    // ── إعدادات الإعلانات الديناميكية ──
+    // يتحكم الأدمن من هنا بما يظهر في الشريط الإعلاني بالصفحة الرئيسية
+    advertisingSettings: {
+        // المزاد المباشر: هل يظهر في الشريط الإعلاني؟
+        showLiveAuction: { type: Boolean, default: false },
+
+        // نوع مصدر سيارات المعرض: 'none' | 'korean' | 'hmcar' | 'both'
+        showroomSource: { type: String, default: 'none' },
+
+        // نص شعار الشريط الإعلاني (اختياري)
+        bannerLabel: { type: String, default: '' },
+        bannerLabelEn: { type: String, default: '' },
+    },
+
     // آخر تحديث
     updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 

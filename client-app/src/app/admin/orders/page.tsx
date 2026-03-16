@@ -104,9 +104,9 @@ interface ConciergeRequest {
 
 const SPECIAL_STATUS_CONFIG: Record<string, { label: string; labelEn: string; color: string; bg: string; icon: any }> = {
     new: { label: 'جديد', labelEn: 'New', color: CLASS_TEXT_AMBER_400, bg: 'bg-amber-500/10 border-amber-500/30', icon: Clock },
-    in_progress: { label: 'قيد المعالجة', labelEn: 'In Progress', color: CLASS_TEXT_BLUE_400, bg: 'bg-blue-500/10 border-blue-500/30', icon: Loader },
+    in_progress: { label: 'موافقة', labelEn: 'Approved', color: CLASS_TEXT_BLUE_400, bg: 'bg-blue-500/10 border-blue-500/30', icon: Loader },
     completed: { label: 'مكتمل', labelEn: 'Completed', color: CLASS_TEXT_GREEN_400, bg: 'bg-green-500/10 border-green-500/30', icon: CheckCircle },
-    cancelled: { label: 'ملغي', labelEn: 'Cancelled', color: CLASS_TEXT_RED_400, bg: 'bg-red-500/10 border-red-500/30', icon: XCircle },
+    cancelled: { label: 'رفض', labelEn: 'Rejected', color: CLASS_TEXT_RED_400, bg: 'bg-red-500/10 border-red-500/30', icon: XCircle },
 };
 
 function AdminFulfillmentContent() {

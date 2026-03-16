@@ -17,6 +17,7 @@ import { useLanguage } from "@/lib/LanguageContext";
 import { api } from "@/lib/api";
 
 import LandingShowcase from "@/components/LandingShowcase";
+import SmartAdBanner from "@/components/SmartAdBanner"; // الشريط الإعلاني الذكي المتحرك
 import { useRouter } from "next/navigation";
 import { useSocket } from "@/lib/SocketContext";
 import { useAuth } from "@/lib/AuthContext";
@@ -136,7 +137,6 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
     return false;
   });
   const [showUpdateBanner, setShowUpdateBanner] = useState(false);
-  const [brands, setBrands] = useState<any[]>([]);
 
   useEffect(() => {
     const handler = (e: Event) => { e.preventDefault(); setDeferredInstall(e); };
@@ -243,16 +243,6 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
       }
     };
     fetchSocialLinks();
-    
-    const fetchBrands = async () => {
-      try {
-        const res = await api.brands.list();
-        setBrands(res?.brands || []);
-      } catch (err) {
-        console.error("Failed to fetch brands", err);
-      }
-    };
-    fetchBrands();
   }, []);
 
   const SocialSVGIcons: Record<string, React.FC<{ className?: string }>> = {
@@ -431,23 +421,12 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
         </section>
       )}
 
-      {/* ── 4.5 ADVERTISING PARTNER ── */}
+      {/* ── 4.5 الشريط الإعلاني الذكي المتحرك ──
+           يعرض السيارات التي اختارها الأدمن من إعدادات لوحة التحكم
+           (المزاد المباشر / معرض الكوري / معرض HM Car)
+      */}
       {(homeContent?.showAdvertising ?? true) && (
-        <section className="relative z-10 py-12 px-4 max-w-7xl mx-auto mt-10">
-        <div className="w-full h-40 md:h-64 rounded-[3rem] overflow-hidden relative group border border-accent-gold/20 bg-black/60 backdrop-blur-lg flex items-center justify-center shadow-2xl">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(201,169,110,0.15)_0%,transparent_70%)]" />
-          <div className="relative z-10 text-center">
-            <div className="flex items-center justify-center gap-2 mb-3">
-               <Star className="w-4 h-4 text-accent-gold opacity-60" />
-               <h3 className="text-accent-gold font-black uppercase tracking-[0.3em] text-[10px]">{isRTL ? 'الشريك الإعلاني' : 'ADVERTISING PARTNER'}</h3>
-               <Star className="w-4 h-4 text-accent-gold opacity-60" />
-            </div>
-            <div className="text-3xl md:text-5xl font-black text-white italic uppercase tracking-widest opacity-40 group-hover:opacity-100 transition-opacity">
-              {isRTL ? 'مساحة إعلانية مميزة' : 'PREMIUM AD SPACE'}
-            </div>
-          </div>
-        </div>
-      </section>
+        <SmartAdBanner />
       )}
 
       {/* ── 5. THE BUYING JOURNEY - REMOVED AS REQUESTED ── */}
@@ -486,21 +465,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
       })()}
 
 
-      {/* ── 6. BRAND CATALOG ── */}
-      {(homeContent?.showBrandCatalog ?? true) && brands.length > 0 && (
-        <section className="relative z-10 py-20 px-4 bg-white/[0.01] border-y border-white/5">
-          <div className="max-w-7xl mx-auto flex flex-wrap justify-center gap-24 opacity-30 hover:opacity-100 transition-opacity">
-            {brands.slice(0, 5).map((brand, i) => (
-              <div key={i} className="flex flex-col items-center gap-4 cursor-pointer" onClick={() => router.push(`/search?brand=${brand.name}`)}>
-                <div className="w-16 h-16 relative">
-                  {brand.logoUrl ? <Image src={brand.logoUrl} alt={brand.name} fill className="object-contain grayscale hover:grayscale-0 transition-transform" /> : <Car className="w-full h-full text-white/5" />}
-                </div>
-                <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">{brand.name}</span>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+      {/* ── 6. دليل الماركات: تم حذفه حسب الطلب ── */}
 
 
 

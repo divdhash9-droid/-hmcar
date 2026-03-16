@@ -34,7 +34,7 @@ interface Device {
 
 export interface User {
     id: string; name: string; email?: string; username?: string; phone?: string;
-    role: string; isActive: boolean; createdAt: string;
+    role: string; isActive: boolean; createdAt: string; lastLoginAt?: string;
     boundDevices?: Device[]; isDeviceLocked?: boolean; permissions?: string[];
 }
 

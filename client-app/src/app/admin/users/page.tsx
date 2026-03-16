@@ -36,10 +36,17 @@ import { AddUserModal, UserDetailModal, type User } from './_components/UserModa
 // ── أنواع البيانات ──
 interface RawUser {
     _id?: string; id?: string; name: string; email?: string;
-    username?: string; phone?: string; role: string;
+    username?: string; phone?: string; role: string; lastLoginAt?: string;
     status?: string; createdAt: string;
     boundDevices?: User['boundDevices']; isDeviceLocked?: boolean; permissions?: string[];
 }
+
+const isUserOnline = (lastLoginAt?: string) => {
+    if (!lastLoginAt) return false;
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    return new Date(lastLoginAt) >= thirtyDaysAgo;
+};
 
 export default function AdminUsersPage() {
     const { isRTL } = useLanguage();
@@ -54,39 +61,63 @@ export default function AdminUsersPage() {
     const [selectedUser, setSelectedUser] = useState<User | null>(null); // المستخدم المحدد للتعديل
 
     // ── إحصائيات سريعة ──
-    const [stats, setStats] = useState({ total: 0, buyers: 0, sellers: 0, admins: 0, active: 0 });
+    const [stats, setStats] = useState({ total: 0, buyers: 0, sellers: 0, admins: 0, online: 0, inactive: 0 });
 
     // ── جلب المستخدمين من الـ API ──
     const loadUsers = useCallback(async () => {
         try {
             setLoading(true);
             const params: Record<string, string | number> = {};
-            if (filter !== FILTER_ALL) params.role = filter;
+            // نجلب بيانات للفلترة إذا لم يكن الفلتر متعلقاً بالدور مباشرة
+            // لأن الفلاتر online و inactive لا يتعرف عليها الباكإند بشكل صريح
+            if (['buyer', 'seller', ROLE_ADMIN, ROLE_SUPER_ADMIN, ROLE_MANAGER].includes(filter)) {
+                params.role = filter;
+            }
             if (searchTerm) params.search = searchTerm;
-            params.limit = 100;
+            params.limit = 500; // زيادة الحد لتسهيل الفلترة المحلية
 
             const res = await api.users.list(params);
             const list: RawUser[] = Array.isArray(res?.data) ? res.data : [];
 
             // تحويل البيانات الخام إلى الصيغة المطلوبة
-            setUsers(list.map(u => ({
+            let parsedUsers = list.map(u => ({
                 id: u._id || u.id || '',
                 name: u.name, email: u.email, username: u.username, phone: u.phone,
                 role: u.role,
                 isActive: (u.status || 'active') === 'active',
                 createdAt: u.createdAt,
+                lastLoginAt: u.lastLoginAt,
                 boundDevices: u.boundDevices,
                 isDeviceLocked: u.isDeviceLocked,
                 permissions: u.permissions
-            })));
+            }));
+
+            // حساب الإحصائيات قبل الفلترة المحلية
+            const totalCount = res?.pagination?.total || list.length;
+            const onlineCount = list.filter(u => isUserOnline(u.lastLoginAt)).length;
+            const inactiveCount = list.length - onlineCount;
+
+            // تطبيق الفلترة للنشاط (محلية) والأدمن المجمّع
+            if (filter === 'online') {
+                parsedUsers = parsedUsers.filter(u => isUserOnline(u.lastLoginAt));
+            } else if (filter === 'inactive') {
+                parsedUsers = parsedUsers.filter(u => !isUserOnline(u.lastLoginAt));
+            } else if (filter === ROLE_ADMIN) {
+                parsedUsers = parsedUsers.filter(u => [ROLE_ADMIN, ROLE_SUPER_ADMIN, ROLE_MANAGER].includes(u.role));
+            } else if (filter === 'buyer' || filter === 'seller') {
+                parsedUsers = parsedUsers.filter(u => u.role === filter);
+            }
+
+            setUsers(parsedUsers);
 
             // حساب الإحصائيات السريعة
             setStats({
-                total: res?.pagination?.total || list.length,
+                total: totalCount,
                 buyers: list.filter(u => u.role === 'buyer').length,
                 sellers: list.filter(u => u.role === 'seller').length,
                 admins: list.filter(u => [ROLE_ADMIN, ROLE_SUPER_ADMIN, ROLE_MANAGER].includes(u.role)).length,
-                active: list.filter(u => (u.status || 'active') === 'active').length,
+                online: onlineCount,
+                inactive: inactiveCount,
             });
         } catch (err) {
             console.error('فشل تحميل المستخدمين:', err);
@@ -147,13 +178,14 @@ export default function AdminUsersPage() {
             >
 
                 {/* ─── الإحصائيات السريعة (قابلة للنقر كفلاتر) ─── */}
-                <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-6">
+                <div className="grid grid-cols-3 md:grid-cols-6 gap-3 mb-6">
                     {[
                         { label: isRTL ? rawText('الكل') : rawText('ALL'), value: stats.total, key: FILTER_ALL, colorClass: rawText('text-white') },
                         { label: isRTL ? rawText('عملاء') : rawText('CLIENTS'), value: stats.buyers, key: rawText('buyer'), colorClass: rawText('text-blue-400') },
                         { label: isRTL ? rawText('بائعين') : rawText('SELLERS'), value: stats.sellers, key: rawText('seller'), colorClass: rawText('text-amber-400') },
                         { label: isRTL ? rawText('مسؤولين') : rawText('ADMINS'), value: stats.admins, key: ROLE_ADMIN, colorClass: rawText('text-orange-400') },
-                        { label: isRTL ? rawText('نشطون') : rawText('ACTIVE'), value: stats.active, key: rawText('active'), colorClass: rawText('text-green-400') },
+                        { label: isRTL ? rawText('نشطون مؤخراً') : rawText('ACTIVE'), value: stats.online, key: 'online', colorClass: rawText('text-green-400') },
+                        { label: isRTL ? rawText('غير نشطين') : rawText('INACTIVE'), value: stats.inactive, key: 'inactive', colorClass: rawText('text-red-400') },
                     ].map((s, i) => (
                         <button key={s.key} onClick={() => setFilter(s.key)}
                             className={cn(
@@ -183,8 +215,8 @@ export default function AdminUsersPage() {
                             <tr>
                                 <th>{isRTL ? rawText('العضو') : rawText('MEMBER')}</th>
                                 <th>{isRTL ? rawText('الدور') : rawText('ROLE')}</th>
-                                <th>{isRTL ? rawText('الصلاحيات') : rawText('PERMS')}</th>
-                                <th>{isRTL ? rawText('الحالة') : rawText('STATUS')}</th>
+                                <th>{isRTL ? rawText('النشاط') : rawText('ACTIVITY')}</th>
+                                <th>{isRTL ? rawText('الحساب') : rawText('ACCOUNT')}</th>
                                 <th>{isRTL ? rawText('إجراء') : rawText('ACTION')}</th>
                             </tr>
                         </thead>
@@ -224,13 +256,18 @@ export default function AdminUsersPage() {
                                         </span>
                                     </td>
                                     <td>
-                                        {/* نعرض الصلاحيات فقط للمسؤولين */}
-                                        {[ROLE_ADMIN, ROLE_SUPER_ADMIN, ROLE_MANAGER].includes(user.role) ? (
-                                            <div className="flex items-center gap-1.5">
-                                                <span className="ck-badge ck-badge-info cockpit-mono">{user.permissions?.length || 0}</span>
-                                                <span className="text-[9px] text-white/25">{isRTL ? rawText('صلاحية') : rawText('perms')}</span>
+                                        <div className="flex items-center gap-1.5">
+                                            {isUserOnline(user.lastLoginAt) ? (
+                                                <span className="ck-badge ck-badge-info bg-green-500/10 text-green-400 border-green-500/20">{isRTL ? 'نشط مؤخراً' : 'ACTIVE RECENTLY'}</span>
+                                            ) : (
+                                                <span className="ck-badge bg-white/5 text-white/50 border-white/10">{isRTL ? 'غير نشط' : 'INACTIVE'}</span>
+                                            )}
+                                        </div>
+                                        {user.lastLoginAt && (
+                                            <div className="text-[9px] text-white/30 mt-1.5">
+                                                {new Date(user.lastLoginAt).toLocaleDateString(isRTL ? 'ar-SA' : 'en-US')}
                                             </div>
-                                        ) : <span className="text-white/20">{rawText('—')}</span>}
+                                        )}
                                     </td>
                                     <td>
                                         <span className={cn('ck-badge ck-badge-live', user.isActive ? 'ck-badge-active' : 'ck-badge-danger')}>
@@ -264,8 +301,10 @@ export default function AdminUsersPage() {
                                         <div className="cockpit-mono text-[10px] text-white/30 truncate">{user.email || user.phone || rawText('—')}</div>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-1.5 shrink-0">
-                                    <span className={cn('ck-badge text-[8px]', getRoleColor(user.role))}>{getRoleLabel(user.role)}</span>
+                                <div className="flex flex-col items-end gap-1.5 shrink-0">
+                                    <span className={cn('ck-badge text-[8px]', isUserOnline(user.lastLoginAt) ? 'bg-green-500/10 text-green-400 border-green-500/20' : 'bg-white/5 text-white/50 border-white/10')}>
+                                        {isUserOnline(user.lastLoginAt) ? (isRTL ? 'نشط' : 'ONLINE') : (isRTL ? 'خامل' : 'AWAY')}
+                                    </span>
                                     <span className={cn('w-2 h-2 rounded-full', user.isActive ? 'bg-green-400 shadow-[0_0_5px_#22c55e]' : 'bg-red-400')} />
                                 </div>
                             </div>

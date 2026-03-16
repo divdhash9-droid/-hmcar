@@ -18,9 +18,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             {/* Cockpit Admin Sidebar */}
             <AdminNavbar />
 
-            {/* Page content offset by AdminNavbar (72px) */}
-            {/* lg:ps-[72px] (padding-inline-start) handles both RTL and LTR automatically */}
-            <div className="relative z-10 pt-[64px] lg:pt-0 lg:ps-[72px] transition-all duration-300 overflow-hidden">
+            {/* Page content offset by AdminNavbar (260px) */}
+            {/* lg:ps-[260px] (padding-inline-start) handles both RTL and LTR automatically */}
+            <div className="relative z-10 pt-[64px] lg:pt-0 lg:ps-[260px] transition-all duration-300 overflow-hidden">
                 {children}
             </div>
         </div>

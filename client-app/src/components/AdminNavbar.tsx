@@ -102,9 +102,9 @@ function SidebarInner({
             <nav className="flex-1 flex flex-col gap-6 py-6 px-2 overflow-y-auto scrollbar-hide">
                 {categories.map((cat, idx) => (
                     <div key={idx} className="flex flex-col items-center gap-1.5">
-                        <div className="w-full px-2 mb-1">
-                            <div className="h-[1px] w-full bg-white/[0.03] mb-1.5" />
-                            <span className="font-mono text-[5.5px] font-black uppercase tracking-[0.3em] text-white/10 text-center block">
+                        <div className="w-full px-4 mt-2 mb-1">
+                            <div className="h-[1px] w-full bg-white/[0.05] mb-2" />
+                            <span className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-white/30 block mb-1">
                                 {cat.label}
                             </span>
                         </div>
@@ -128,38 +128,38 @@ function SidebarInner({
                                     <Link
                                         href={item.href}
                                         key={item.id}
-                                        className="w-full"
+                                        className="w-full px-2"
                                         onClick={onClose}
                                     >
                                         <motion.div
-                                            whileHover={{ scale: 1.04 }}
-                                            whileTap={{ scale: 0.96 }}
+                                            whileHover={{ x: isRTL ? -5 : 5, backgroundColor: 'rgba(255,255,255,0.05)' }}
+                                            whileTap={{ scale: 0.98 }}
                                             className={cn(
-                                                'relative flex flex-col items-center gap-1 py-2.5 px-1.5 rounded-xl w-full cursor-pointer transition-all duration-150',
+                                                'relative flex items-center gap-4 py-3.5 px-4 rounded-2xl w-full cursor-pointer transition-all duration-200',
                                                 isActive
-                                                    ? (item.color || 'text-orange-400 bg-orange-500/10 shadow-[inset_0_0_20px_rgba(249,115,22,0.05)]')
-                                                    : 'text-white/20 hover:text-white/50 hover:bg-white/[0.03]'
+                                                    ? 'bg-orange-500/10 text-orange-400 shadow-[0_0_20px_rgba(249,115,22,0.05)] border border-orange-500/20'
+                                                    : 'text-white/40 hover:text-white/80'
                                             )}
                                         >
                                             {isActive && (
                                                 <motion.div
                                                     layoutId="cockpitActiveBar"
                                                     className={cn(
-                                                        'absolute top-2 bottom-2 w-[2px] rounded-full bg-current',
-                                                        isRTL ? 'right-1' : 'left-1'
+                                                        'absolute top-3 bottom-3 w-[3px] rounded-full bg-orange-500',
+                                                        isRTL ? '-right-1' : '-left-1'
                                                     )}
-                                                    style={{ boxShadow: '0 0 8px currentColor' }}
+                                                    style={{ boxShadow: '0 0 12px #f97316' }}
                                                 />
                                             )}
                                             <Icon
-                                                className={cn('transition-all duration-150',
-                                                    isActive ? 'w-[18px] h-[18px] drop-shadow-[0_0_6px_currentColor]' : 'w-[16px] h-[16px]'
+                                                className={cn('shrink-0 transition-transform duration-200',
+                                                    isActive ? 'w-5 h-5 drop-shadow-[0_0_8px_rgba(249,115,22,0.6)]' : 'w-5 h-5 opacity-60'
                                                 )}
                                                 strokeWidth={isActive ? 2.5 : 1.5}
                                             />
                                             <span className={cn(
-                                                'font-mono font-bold uppercase text-center leading-tight',
-                                                isActive ? 'text-[6.5px] tracking-[0.06em]' : 'text-[6px] tracking-[0.05em]'
+                                                'font-bold tracking-wide transition-colors whitespace-nowrap',
+                                                isActive ? 'text-[13px]' : 'text-[12px]'
                                             )}>
                                                 {item.label}
                                             </span>
@@ -361,11 +361,11 @@ export default function AdminNavbar() {
             {/* ═══ DESKTOP SIDEBAR ═══ */}
             <aside
                 className={cn(
-                    'fixed top-0 bottom-0 z-[110] w-[72px] hidden lg:flex flex-col',
+                    'fixed top-0 bottom-0 z-[110] w-[260px] hidden lg:flex flex-col',
                     'bg-gradient-to-b from-[#070711] via-[#0D0D18] to-[#070711]',
                     isRTL
-                        ? 'right-0 border-l border-orange-500/12 shadow-[-6px_0_40px_rgba(249,115,22,0.06)]'
-                        : 'left-0 border-r border-orange-500/12 shadow-[6px_0_40px_rgba(249,115,22,0.06)]'
+                        ? 'right-0 border-l border-white/[0.05] shadow-[-10px_0_50px_rgba(0,0,0,0.5)]'
+                        : 'left-0 border-r border-white/[0.05] shadow-[10px_0_50px_rgba(0,0,0,0.5)]'
                 )}
             >
                 <motion.div
@@ -393,11 +393,11 @@ export default function AdminNavbar() {
                             exit={{ x: isRTL ? '100%' : '-100%' }}
                             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
                             className={cn(
-                                'fixed top-0 bottom-0 z-[119] w-[80px] lg:hidden flex flex-col',
+                                'fixed top-0 bottom-0 z-[119] w-[260px] lg:hidden flex flex-col',
                                 'bg-gradient-to-b from-[#070711] via-[#0D0D18] to-[#070711]',
                                 isRTL
-                                    ? 'right-0 border-l border-orange-500/20'
-                                    : 'left-0 border-r border-orange-500/20'
+                                    ? 'right-0 border-l border-white/10'
+                                    : 'left-0 border-r border-white/10'
                             )}
                         >
                             <SidebarInner

@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import BottomTabBar from './BottomTabBar';
 import GlobalDrawers from './GlobalDrawers';
 import SmartIslandNotification from './SmartIslandNotification';
+import AppBackground from './AppBackground';
 
 /**
  * AppShell - غلاف التطبيق
@@ -48,11 +49,17 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         // ── وضع التطبيق المثبت ──
         return (
             <div
-                className="relative min-h-screen bg-[#050505]"
+                className="relative min-h-screen"
                 data-app-mode="standalone"
                 style={{ paddingBottom: '80px' }} // مساحة للـ Bottom Tab Bar
             >
-                {children}
+                {/* خلفية التطبيق الاحترافية */}
+                <AppBackground />
+
+                <main className="relative z-10">
+                    {children}
+                </main>
+                
                 <BottomTabBar />
                 <GlobalDrawers />
                 <SmartIslandNotification />

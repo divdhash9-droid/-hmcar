@@ -18,6 +18,7 @@ import { api } from "@/lib/api";
 
 import LandingShowcase from "@/components/LandingShowcase";
 import SmartAdBanner from "@/components/SmartAdBanner"; // الشريط الإعلاني الذكي المتحرك
+import AppHome from "@/components/AppHome"; // الواجهة المخصصة للتطبيق
 import { useRouter } from "next/navigation";
 import { useSocket } from "@/lib/SocketContext";
 import { useAuth } from "@/lib/AuthContext";
@@ -295,136 +296,148 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
         <Navbar />
       </div>
 
-      {/* ── STICKY SOCIAL BAR ── */}
-      <div className={cn(
-        "fixed z-[90] flex flex-col gap-3 top-1/3",
-        isRTL ? "right-4" : "left-4"
-      )}>
-        {socialConfig.whatsapp && (
-           <a href={whatsappUrl} target="_blank" rel="noreferrer" className="w-12 h-12 rounded-2xl bg-black/40 backdrop-blur-md border border-green-500/30 flex items-center justify-center text-green-500 hover:scale-110 transition-transform shadow-[0_0_15px_rgba(34,197,94,0.3)]" title="WhatsApp">
-             <SocialSVGIcons.whatsapp className="w-6 h-6" />
-           </a>
-        )}
-        {socialConfig.links.map((link, i) => {
-          const SvgIcon = SocialSVGIcons[link.platform];
-          const colorClass = platformColors[link.platform] || 'text-white/80';
-          return (
-             <a key={i} href={link.url} target="_blank" rel="noreferrer" className={`w-12 h-12 rounded-2xl bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center hover:scale-110 hover:border-white/30 transition-transform ${colorClass}`} title={link.platform}>
-               {SvgIcon ? <SvgIcon className="w-5 h-5" /> : <LinkIcon className="w-5 h-5" />}
-             </a>
-          )
-        })}
-        {/* ── FLOATING PWA PHONE ICON ── */}
-        {!isInstalled && !isStandalone && (
-          <PWAFloatingButton
-            isRTL={isRTL}
-            deferredInstall={deferredInstall}
-            onInstall={handleInstallPWA}
-          />
-        )}
-      </div>
+      {/* ── STICKY SOCIAL BAR (Visible only in Web) ── */}
+      {!isStandalone && (
+        <div className={cn(
+          "fixed z-[90] flex flex-col gap-3 top-1/3",
+          isRTL ? "right-4" : "left-4"
+        )}>
+          {socialConfig.whatsapp && (
+            <a href={whatsappUrl} target="_blank" rel="noreferrer" className="w-12 h-12 rounded-2xl bg-black/40 backdrop-blur-md border border-green-500/30 flex items-center justify-center text-green-500 hover:scale-110 transition-transform shadow-[0_0_15px_rgba(34,197,94,0.3)]" title="WhatsApp">
+              <SocialSVGIcons.whatsapp className="w-6 h-6" />
+            </a>
+          )}
+          {socialConfig.links.map((link, i) => {
+            const SvgIcon = SocialSVGIcons[link.platform];
+            const colorClass = platformColors[link.platform] || 'text-white/80';
+            return (
+              <a key={i} href={link.url} target="_blank" rel="noreferrer" className={`w-12 h-12 rounded-2xl bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center hover:scale-110 hover:border-white/30 transition-transform ${colorClass}`} title={link.platform}>
+                {SvgIcon ? <SvgIcon className="w-5 h-5" /> : <LinkIcon className="w-5 h-5" />}
+              </a>
+            )
+          })}
+          {/* ── FLOATING PWA PHONE ICON ── */}
+          {!isInstalled && (
+            <PWAFloatingButton
+              isRTL={isRTL}
+              deferredInstall={deferredInstall}
+              onInstall={handleInstallPWA}
+            />
+          )}
+        </div>
+      )}
 
-      <CinematicVideoBackground
-        videoSrc={homeContent?.heroVideoUrl || "/videos/hero.mp4"}
-        fallbackImage="/images/photo_2026-02-07_22-24-18.jpg"
-        mobileImage="/images/hmcar.jpg"
-        overlayOpacity={0.55}
-        height={videoHeight}
-      />
+      {/* ── BACKGROUND LOGIC ── */}
+      {!isStandalone ? (
+        <CinematicVideoBackground
+          videoSrc={homeContent?.heroVideoUrl || "/videos/hero.mp4"}
+          fallbackImage="/images/photo_2026-02-07_22-24-18.jpg"
+          mobileImage="/images/hmcar.jpg"
+          overlayOpacity={0.55}
+          height={videoHeight}
+        />
+      ) : null}
 
-      {/* ── 1. HERO SHOWCASE ── */}
-      <LandingShowcase isRTL={isRTL} latestCars={latestCars} />
+      {/* ── CONTENT SWITCHER ── */}
+      {isStandalone ? (
+        // ── واجهة التطبيق الاحترافية ──
+        <AppHome 
+          isRTL={isRTL} 
+          latestCars={latestCars} 
+          formatPrice={formatPrice} 
+        />
+      ) : (
+        // ── واجهة الموقع الاستعراضية ──
+        <>
+          {/* 1. HERO SHOWCASE */}
+          <LandingShowcase isRTL={isRTL} latestCars={latestCars} />
 
-
-      {/* ── 2.5 ANNOUNCEMENT RIBBON ── */}
-      {latestCars && latestCars.length > 0 && (
-        <section className="relative z-20 mb-24 overflow-hidden">
-          <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/5 to-transparent" />
-          <div className="relative py-4 border-y border-white/10 bg-black/50 backdrop-blur-xl">
-            <motion.div
-              className="flex gap-4 w-max px-6"
-              animate={{ x: isRTL ? ["0%", "50%"] : ["-50%", "0%"] }}
-              transition={{ duration: latestCars.length * 8, repeat: Infinity, ease: "linear" }}
-            >
-              {[...latestCars, ...latestCars].map((car, index) => (
-                <button
-                  key={index}
-                  onClick={() => router.push(`/cars/${car.id || (car as any)._id || index}`)}
-                  className="flex items-center gap-3 px-4 py-2 rounded-full border border-white/10 bg-white/[0.03] hover:border-accent-gold/40 transition-colors"
+          {/* 2.5 ANNOUNCEMENT RIBBON */}
+          {latestCars && latestCars.length > 0 && (
+            <section className="relative z-20 mb-24 overflow-hidden">
+              <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/5 to-transparent" />
+              <div className="relative py-4 border-y border-white/10 bg-black/50 backdrop-blur-xl">
+                <motion.div
+                  className="flex gap-4 w-max px-6"
+                  animate={{ x: isRTL ? ["0%", "50%"] : ["-50%", "0%"] }}
+                  transition={{ duration: latestCars.length * 8, repeat: Infinity, ease: "linear" }}
                 >
-                  <span className="relative w-10 h-10 rounded-full overflow-hidden border border-white/10">
-                    <Image
-                      src={car.images?.[0] || "/images/placeholder.jpg"}
-                      alt={car.title || car.name || 'Car'}
-                      fill
-                      className="object-cover"
-                    />
-                  </span>
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/70">
-                    {car.title || car.name || (isRTL ? 'سيارة' : 'Car')}
-                  </span>
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-accent-gold">
-                    {formatPrice(Number(car.price || 0))}
-                  </span>
-                </button>
-              ))}
-            </motion.div>
-          </div>
-        </section>
+                  {[...latestCars, ...latestCars].map((car, index) => (
+                    <button
+                      key={index}
+                      onClick={() => router.push(`/cars/${car.id || (car as any)._id || index}`)}
+                      className="flex items-center gap-3 px-4 py-2 rounded-full border border-white/10 bg-white/[0.03] hover:border-accent-gold/40 transition-colors"
+                    >
+                      <span className="relative w-10 h-10 rounded-full overflow-hidden border border-white/10">
+                        <Image
+                          src={car.images?.[0] || "/images/placeholder.jpg"}
+                          alt={car.title || car.name || 'Car'}
+                          fill
+                          className="object-cover"
+                        />
+                      </span>
+                      <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/70">
+                        {car.title || car.name || (isRTL ? 'سيارة' : 'Car')}
+                      </span>
+                      <span className="text-[10px] font-black uppercase tracking-[0.3em] text-accent-gold">
+                        {formatPrice(Number(car.price || 0))}
+                      </span>
+                    </button>
+                  ))}
+                </motion.div>
+              </div>
+            </section>
+          )}
+
+          {/* 4. LIVE MARKET TICKER */}
+          {(homeContent?.showLiveMarket ?? true) && latestCars && latestCars.length > 0 && (
+            <section ref={liveRef} className="relative z-10 py-32 overflow-hidden bg-linear-to-b from-transparent via-accent-gold/5 to-transparent">
+              <div className="max-w-[100vw] mx-auto text-center mb-20 px-4">
+                <h2 className="text-6xl md:text-9xl font-black text-white italic uppercase tracking-tighter drop-shadow-[0_0_60px_rgba(201,169,110,0.6)]">
+                  {isRTL ? 'المعرض المباشر' : 'LIVE SHOWROOM'}
+                </h2>
+              </div>
+
+              <div className="relative w-full overflow-hidden py-10 scale-[0.9] origin-center">
+                <motion.div
+                  className="flex gap-12 cursor-grab active:cursor-grabbing w-max px-12"
+                  animate={{ x: isRTL ? ["0%", "50%"] : ["-50%", "0%"] }}
+                  transition={{ duration: latestCars.length * 10, repeat: Infinity, ease: "linear" }}
+                  whileHover={{ animationPlayState: 'paused' }}
+                >
+                  {[...latestCars, ...latestCars].map((car, index) => {
+                    const makeName = getCarMakeLabel(car);
+                    return (
+                      <motion.div
+                        key={index}
+                        className="group relative w-96 h-125 rounded-[4rem] border border-white/5 bg-black/90 backdrop-blur-3xl overflow-hidden shadow-3xl shrink-0"
+                        onClick={() => router.push(`/cars/${car.id || (car as any)._id || index}`)}
+                        whileHover={{ y: -25, scale: 1.05 }}
+                      >
+                        <Image src={car.images?.[0] || "/images/placeholder.jpg"} alt={car.title || car.name || 'Car'} fill className="object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 transform group-hover:scale-110" />
+                        <div className="absolute inset-0 bg-linear-to-t from-black via-black/30 to-transparent z-10" />
+                        <div className="absolute z-20 inset-0 flex flex-col justify-end p-10">
+                          <div className="flex items-center gap-2 mb-4">
+                            <span className="px-4 py-1.5 rounded-full bg-accent-gold text-black text-[9px] font-black uppercase tracking-widest">{car.year}</span>
+                            <span className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/50 text-[9px] font-black uppercase tracking-widest">{makeName}</span>
+                          </div>
+                          <h3 className="text-3xl font-black text-white italic uppercase mb-2 group-hover:text-accent-gold transition-colors">{car.title || car.name}</h3>
+                          <div className="pt-6 border-t border-white/5 flex items-center justify-between">
+                            <span className="text-2xl font-black text-accent-gold">{formatPrice(Number(car.price || 0))}</span>
+                            <ArrowUpRight className="w-8 h-8 text-accent-gold" />
+                          </div>
+                        </div>
+                      </motion.div>
+                    )
+                  })}
+                </motion.div>
+              </div>
+            </section>
+          )}
+        </>
       )}
 
-      {/* ── 3. TRUST HUB (STATISTICS) - REMOVED AS REQUESTED ── */}
-
-      {/* ── 4. LIVE MARKET TICKER ── */}
-      {(homeContent?.showLiveMarket ?? true) && latestCars && latestCars.length > 0 && (
-        <section ref={liveRef} className="relative z-10 py-32 overflow-hidden bg-linear-to-b from-transparent via-accent-gold/5 to-transparent">
-          <div className="max-w-[100vw] mx-auto text-center mb-20 px-4">
-            <h2 className="text-6xl md:text-9xl font-black text-white italic uppercase tracking-tighter drop-shadow-[0_0_60px_rgba(201,169,110,0.6)]">
-              {isRTL ? 'المعرض المباشر' : 'LIVE SHOWROOM'}
-            </h2>
-          </div>
-
-          <div className="relative w-full overflow-hidden py-10 scale-[0.9] origin-center">
-            <motion.div
-              className="flex gap-12 cursor-grab active:cursor-grabbing w-max px-12"
-              animate={{ x: isRTL ? ["0%", "50%"] : ["-50%", "0%"] }}
-              transition={{ duration: latestCars.length * 10, repeat: Infinity, ease: "linear" }}
-              whileHover={{ animationPlayState: 'paused' }}
-            >
-              {[...latestCars, ...latestCars].map((car, index) => {
-                const makeName = getCarMakeLabel(car);
-                return (
-                  <motion.div
-                    key={index}
-                    className="group relative w-96 h-125 rounded-[4rem] border border-white/5 bg-black/90 backdrop-blur-3xl overflow-hidden shadow-3xl shrink-0"
-                    onClick={() => router.push(`/cars/${car.id || (car as any)._id || index}`)}
-                    whileHover={{ y: -25, scale: 1.05 }}
-                  >
-                    <Image src={car.images?.[0] || "/images/placeholder.jpg"} alt={car.title || car.name || 'Car'} fill className="object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 transform group-hover:scale-110" />
-                    <div className="absolute inset-0 bg-linear-to-t from-black via-black/30 to-transparent z-10" />
-                    <div className="absolute z-20 inset-0 flex flex-col justify-end p-10">
-                      <div className="flex items-center gap-2 mb-4">
-                        <span className="px-4 py-1.5 rounded-full bg-accent-gold text-black text-[9px] font-black uppercase tracking-widest">{car.year}</span>
-                        <span className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/50 text-[9px] font-black uppercase tracking-widest">{makeName}</span>
-                      </div>
-                      <h3 className="text-3xl font-black text-white italic uppercase mb-2 group-hover:text-accent-gold transition-colors">{car.title || car.name}</h3>
-                      <div className="pt-6 border-t border-white/5 flex items-center justify-between">
-                        <span className="text-2xl font-black text-accent-gold">{formatPrice(Number(car.price || 0))}</span>
-                        <ArrowUpRight className="w-8 h-8 text-accent-gold" />
-                      </div>
-                    </div>
-                  </motion.div>
-                )
-              })}
-            </motion.div>
-          </div>
-        </section>
-      )}
-
-      {/* ── 4.5 الشريط الإعلاني الذكي المتحرك ──
-           يعرض السيارات التي اختارها الأدمن من إعدادات لوحة التحكم
-           (المزاد المباشر / معرض الكوري / معرض HM Car)
-      */}
+      {/* 4.5 الشريط الإعلاني الذكي المتحرك */}
       {(homeContent?.showAdvertising ?? true) && (
         <SmartAdBanner />
       )}

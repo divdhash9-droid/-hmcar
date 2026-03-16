@@ -53,12 +53,6 @@ router.get('/', cacheResponse(3600), async (req, res) => {
 router.post('/', requireAuthAPI, requirePermissionAPI('manage_brands'), invalidateCache('/api/v2/brands*'), async (req, res) => {
   try {
     const { name, logoUrl, category, location, phone, whatsapp, description, description_ar, models, targetShowroom, isActive } = req.body || {};
-    if (category === 'parts' || category === 'both') {
-      return res.status(403).json({
-        success: false,
-        message: 'وكالات قطع الغيار تُدار عبر الاستيراد الخارجي فقط.'
-      });
-    }
     const payload = {
       name,
       logoUrl: logoUrl || '',

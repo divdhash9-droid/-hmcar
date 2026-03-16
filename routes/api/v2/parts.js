@@ -147,26 +147,60 @@ router.get('/', async (req, res) => {
 
 // POST /api/v2/parts - Add new part
 router.post('/', requireAuthAPI, async (req, res) => {
-    return res.status(403).json({
-        success: false,
-        message: 'تم تعطيل الإضافة اليدوية. استخدم زر الاستيراد من المصدر الخارجي.'
-    });
+    try {
+        const { name, brand, model, year, price, category, images, description, condition, stockQty } = req.body;
+        const part = await SparePart.create({
+            name,
+            carMake: brand,
+            carModel: model,
+            year: year || new Date().getFullYear(),
+            price: price || 0,
+            priceSar: price || 0,
+            partType: category || 'Engine',
+            images: images || [],
+            description: description || '',
+            condition: condition || 'New',
+            stockQty: stockQty || 1,
+            inStock: (stockQty || 1) > 0
+        });
+        res.json({ success: true, part });
+    } catch (e) {
+        res.status(500).json({ success: false, message: e.message });
+    }
 });
 
 // PUT /api/v2/parts/:id - Update part
 router.put('/:id', requireAuthAPI, async (req, res) => {
-    return res.status(403).json({
-        success: false,
-        message: 'تم تعطيل التعديل اليدوي. البيانات تُدار عبر الاستيراد.'
-    });
+    try {
+        const { name, brand, model, year, price, category, images, description, condition, stockQty } = req.body;
+        const part = await SparePart.findByIdAndUpdate(req.params.id, {
+            name,
+            carMake: brand,
+            carModel: model,
+            year: year || new Date().getFullYear(),
+            price: price || 0,
+            priceSar: price || 0,
+            partType: category || 'Engine',
+            images: images || [],
+            description: description || '',
+            condition: condition || 'New',
+            stockQty: stockQty || 1,
+            inStock: (stockQty || 1) > 0
+        }, { new: true });
+        res.json({ success: true, part });
+    } catch (e) {
+        res.status(500).json({ success: false, message: e.message });
+    }
 });
 
 // DELETE /api/v2/parts/:id - Delete part
 router.delete('/:id', requireAuthAPI, async (req, res) => {
-    return res.status(403).json({
-        success: false,
-        message: 'تم تعطيل الحذف اليدوي. يمكنك إخفاء القطعة أو تحديثها عبر الاستيراد.'
-    });
+    try {
+        await SparePart.findByIdAndDelete(req.params.id);
+        res.json({ success: true });
+    } catch (e) {
+        res.status(500).json({ success: false, message: e.message });
+    }
 });
 
 // [[ARABIC_COMMENT]] PATCH /api/v2/parts/:id/toggle-stock - تبديل حالة الظهور (In Stock / Out of Stock)

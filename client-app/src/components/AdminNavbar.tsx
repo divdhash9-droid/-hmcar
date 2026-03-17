@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     Activity, Car, Gavel, Users, ShoppingCart, Settings, Shield,
     LogOut, Layers, TrendingUp, MessageCircle,
-    Tag, Menu, X, Languages, Database, RefreshCw,
+    Tag, Menu, X, Languages, Database, RefreshCw, Bell, Share2
 } from 'lucide-react';
 import { useLanguage } from '@/lib/LanguageContext';
 import { useAuth } from '@/lib/AuthContext';
@@ -255,6 +255,7 @@ function buildNavCategories(isRTL: boolean, user: any): NavCategory[] {
             items: [
                 ...(hasP('manage_auctions') ? [{ id: 'market', icon: Gavel, label: isRTL ? 'سوق المزادات' : 'MARKET HUB', href: '/admin/market' }] : []),
                 ...(hasP('manage_messages') ? [{ id: 'comms', icon: MessageCircle, label: isRTL ? 'مركز التواصل' : 'COMMS HUB', href: '/admin/comms' }] : []),
+                ...(hasP('manage_notifications') ? [{ id: 'alerts', icon: Bell, label: isRTL ? 'مركز التنبيهات' : 'ALERTS HUB', href: '/admin/notifications' }] : []),
                 ...(hasP('manage_orders') || hasP('manage_concierge') ? [{ id: 'fulfillment', icon: ShoppingCart, label: isRTL ? 'مركز التنفيذ' : 'FULFILLMENT', href: '/admin/orders' }] : []),
             ]
         },
@@ -266,8 +267,9 @@ function buildNavCategories(isRTL: boolean, user: any): NavCategory[] {
                     { id: 'security', icon: Shield, label: isRTL ? 'الأمان' : 'SECURITY', href: '/admin/security' },
                     { id: 'health', icon: Activity, label: isRTL ? 'الصحّة' : 'HEALTH', href: '/admin/health' },
                 ] : []),
+                ...(hasP('manage_footer') || hasP('manage_whatsapp') ? [{ id: 'social', icon: Share2, label: isRTL ? 'القنوات' : 'CHANNELS', href: '/admin/social' }] : []),
                 ...(isSuper || hasP('view_analytics') ? [{ id: 'reports', icon: TrendingUp, label: isRTL ? 'التقارير' : 'REPORTS', href: '/admin/reports' }] : []),
-                ...(hasP('manage_settings') ? [{ id: 'settings', icon: Settings, label: isRTL ? 'الإعدادات' : 'SITE CTRL', href: '/admin/settings' }] : []),
+                ...(hasP('manage_settings') || hasP('manage_content') ? [{ id: 'settings', icon: Settings, label: isRTL ? 'الإعدادات' : 'SITE CTRL', href: '/admin/settings' }] : []),
             ]
         }
     ];

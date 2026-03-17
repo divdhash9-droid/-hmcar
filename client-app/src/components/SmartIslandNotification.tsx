@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, Sparkles, X, ChevronRight, Gavel, Car, Info } from 'lucide-react';
+import { Bell, Sparkles, X, ChevronRight, Gavel, Car, Info, CheckCircle2, AlertTriangle, Terminal, MessageSquare } from 'lucide-react';
 import { useLanguage } from '@/lib/LanguageContext';
 import { cn } from '@/lib/utils';
 
@@ -10,7 +10,7 @@ export interface SmartAlert {
     id: string;
     title: string;
     message: string;
-    type: 'auction' | 'car' | 'promo' | 'info';
+    type: 'auction' | 'car' | 'promo' | 'info' | 'success' | 'warning' | 'system' | 'message';
     actionLabel?: string;
     onAction?: () => void;
 }
@@ -37,7 +37,11 @@ export default function SmartIslandNotification() {
         auction: Gavel,
         car: Car,
         promo: Sparkles,
-        info: Info
+        info: Info,
+        success: CheckCircle2,
+        warning: AlertTriangle,
+        system: Terminal,
+        message: MessageSquare
     };
 
     const Icon = Icons[alert.type] || Bell;
@@ -63,6 +67,10 @@ export default function SmartIslandNotification() {
                                     "w-10 h-10 rounded-full flex items-center justify-center shadow-lg shrink-0",
                                     alert.type === 'auction' ? "bg-accent-red" : 
                                     alert.type === 'promo' ? "bg-accent-gold" : 
+                                    alert.type === 'success' ? "bg-green-500" :
+                                    alert.type === 'warning' ? "bg-red-500" :
+                                    alert.type === 'system' ? "bg-zinc-700" :
+                                    alert.type === 'message' ? "bg-blue-500" :
                                     "bg-cinematic-neon-blue"
                                 )}>
                                     <Icon className="w-5 h-5 text-white" />

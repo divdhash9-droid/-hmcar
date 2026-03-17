@@ -155,7 +155,7 @@ export default function AuctionDetailsPage() {
         }
     };
 
-    const formatPrice = (price: number) => formatGlobalPrice(Number(price || 0));
+    const formatPrice = (price: number) => formatGlobalPrice(Number(price || 0), undefined, 'auction');
 
     const formatTime = (dateStr: string) => {
         return new Date(dateStr).toLocaleString(locale === 'AR' ? 'ar-SA' : 'en-US');

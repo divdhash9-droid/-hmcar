@@ -43,6 +43,22 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
             setIsConnected(false);
         });
 
+        socketInstance.on('new_notification', (data: any) => {
+            console.log('⚡ New Real-time Notification:', data);
+            
+            // [[ARABIC_COMMENT]] إرسال حدث مخصص لتشغيل الـ Smart Island في الواجهة
+            window.dispatchEvent(new CustomEvent('hm_smart_alert', {
+                detail: {
+                    id: data.id || Math.random().toString(),
+                    title: data.title || 'Notification',
+                    message: data.message || '',
+                    type: data.type || 'info',
+                    actionLabel: data.actionLabel,
+                    onAction: data.actionUrl ? () => window.location.href = data.actionUrl : undefined
+                }
+            }));
+        });
+
         setSocket(socketInstance);
 
         return () => {

@@ -7,6 +7,8 @@ interface CurrencySettings {
     usdToSar: number;
     usdToKrw: number;
     activeCurrency: string;
+    partsMultiplier?: number;
+    auctionMultiplier?: number;
 }
 
 interface Feature {
@@ -64,14 +66,20 @@ interface SettingsContextType {
     refreshSettings: () => Promise<void>;
     displayCurrency: 'SAR' | 'USD' | 'KRW';
     setDisplayCurrency: (c: 'SAR' | 'USD' | 'KRW') => void;
-    formatPrice: (priceInSar: number, forcedCurrency?: 'SAR' | 'USD' | 'KRW') => string;
-    formatPriceFromUsd: (priceInUsd: number, forcedCurrency?: 'SAR' | 'USD' | 'KRW') => string;
+    formatPrice: (priceInSar: number, forcedCurrency?: 'SAR' | 'USD' | 'KRW', type?: 'part' | 'auction' | 'car') => string;
+    formatPriceFromUsd: (priceInUsd: number, forcedCurrency?: 'SAR' | 'USD' | 'KRW', type?: 'part' | 'auction' | 'car') => string;
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
 
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
-    const [currency, setCurrency] = useState<CurrencySettings>({ usdToSar: 3.75, usdToKrw: 1350, activeCurrency: 'SAR' });
+    const [currency, setCurrency] = useState<CurrencySettings>({ 
+        usdToSar: 3.75, 
+        usdToKrw: 1350, 
+        activeCurrency: 'SAR',
+        partsMultiplier: 1.0,
+        auctionMultiplier: 1.0
+    });
     const [siteInfo, setSiteInfo] = useState<SiteInfo>({ siteName: 'HM CAR', siteDescription: '', logoUrl: '', faviconUrl: '' });
     const [socialLinks, setSocialLinks] = useState<SocialLinks>({});
     const [homeContent, setHomeContent] = useState<HomeContent>({});
@@ -138,9 +146,17 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
      * تنسيق السعر بناءً على العملة المختارة
      * السعر الأساسي في المتغير هو "ريال سعودي"
      */
-    const formatPrice = (priceInSar: number, forcedCurrency?: 'SAR' | 'USD' | 'KRW') => {
+    const formatPrice = (priceInSar: number, forcedCurrency?: 'SAR' | 'USD' | 'KRW', type?: 'part' | 'auction' | 'car') => {
         const activeCurr = forcedCurrency || displayCurrency;
-        const safeSar = Number(priceInSar || 0);
+        let safeSar = Number(priceInSar || 0);
+
+        // Apply multipliers if applicable
+        if (type === 'part' && currency.partsMultiplier) {
+            safeSar *= currency.partsMultiplier;
+        } else if (type === 'auction' && currency.auctionMultiplier) {
+            safeSar *= currency.auctionMultiplier;
+        }
+
         const priceInUsd = safeSar / Number(currency.usdToSar || 1);
 
         let finalPrice = safeSar;
@@ -156,9 +172,16 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     /**
      * تنسيق السعر عندما يكون السعر الأساسي بالدولار
      */
-    const formatPriceFromUsd = (priceInUsd: number, forcedCurrency?: 'SAR' | 'USD' | 'KRW') => {
+    const formatPriceFromUsd = (priceInUsd: number, forcedCurrency?: 'SAR' | 'USD' | 'KRW', type?: 'part' | 'auction' | 'car') => {
         const activeCurr = forcedCurrency || displayCurrency;
-        const safeUsd = Number(priceInUsd || 0);
+        let safeUsd = Number(priceInUsd || 0);
+
+        // Apply multipliers if applicable
+        if (type === 'part' && currency.partsMultiplier) {
+            safeUsd *= currency.partsMultiplier;
+        } else if (type === 'auction' && currency.auctionMultiplier) {
+            safeUsd *= currency.auctionMultiplier;
+        }
 
         let finalPrice = safeUsd;
         if (activeCurr === 'SAR') {

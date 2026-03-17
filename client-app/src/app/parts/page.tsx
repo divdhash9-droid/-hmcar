@@ -54,7 +54,8 @@ interface Agency {
 export default function PartsPage() {
     const router = useRouter();
     const { isRTL } = useLanguage();
-    const { formatPrice, socialLinks } = useSettings();
+    const { formatPrice: formatGlobalPrice, socialLinks } = useSettings();
+    const formatPrice = (price: number) => formatGlobalPrice(Number(price || 0), undefined, 'part');
     const { isLoggedIn } = useAuth();
     // [[ARABIC_COMMENT]] رقم الواتساب - يستخدم رقم الأدمن أو الرقم الكوري الافتراضي
     const WHATSAPP_NUMBER = (socialLinks?.whatsapp || '+821080880014').replace(/\D/g, '');

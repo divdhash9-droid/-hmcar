@@ -137,7 +137,7 @@ export default function ProductModal({ product, onClose, whatsappNumber }: Produ
         if (!product) return;
 
         const phone = (whatsappNumber || '+821080880014').replace(/\D/g, '');
-        const price = formatPrice ? formatPrice(product.price, product.displayCurrency as 'SAR' | 'USD' | 'KRW' | undefined) : `${product.price?.toLocaleString()} SAR`;
+        const price = formatPrice ? formatPrice(product.price, product.displayCurrency as 'SAR' | 'USD' | 'KRW' | undefined, product.type) : `${product.price?.toLocaleString()} SAR`;
 
         // في قطع الغيار: إذا بيانات العميل ناقصة، نحوله لطلب خاص بنفس فكرة المعرض الكوري.
         if (product.type === 'part') {
@@ -269,7 +269,7 @@ export default function ProductModal({ product, onClose, whatsappNumber }: Produ
     }, [product, isRTL]);
 
     const images = product?.images?.filter(Boolean) || [];
-    const displayPrice = product && formatPrice ? formatPrice(product.price, product.displayCurrency as 'SAR' | 'USD' | 'KRW' | undefined) : `${product?.price?.toLocaleString()} SAR`;
+    const displayPrice = product && formatPrice ? formatPrice(product.price, product.displayCurrency as 'SAR' | 'USD' | 'KRW' | undefined, product.type) : `${product?.price?.toLocaleString()} SAR`;
 
     return (
         <AnimatePresence>
@@ -357,12 +357,14 @@ export default function ProductModal({ product, onClose, whatsappNumber }: Produ
                                         <>
                                             <button
                                                 onClick={() => setActiveImg(p => (p - 1 + images.length) % images.length)}
+                                                title={isRTL ? 'الصورة السابقة' : 'Previous image'}
                                                 className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/60 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white hover:bg-black/80 transition-all"
                                             >
                                                 <ChevronLeft className="w-4 h-4" />
                                             </button>
                                             <button
                                                 onClick={() => setActiveImg(p => (p + 1) % images.length)}
+                                                title={isRTL ? 'الصورة التالية' : 'Next image'}
                                                 className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/60 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white hover:bg-black/80 transition-all"
                                             >
                                                 <ChevronRight className="w-4 h-4" />
@@ -374,6 +376,7 @@ export default function ProductModal({ product, onClose, whatsappNumber }: Produ
                                                     <button
                                                         key={i}
                                                         onClick={() => setActiveImg(i)}
+                                                        title={isRTL ? `عرض الصورة ${i + 1}` : `View image ${i + 1}`}
                                                         className={`w-1.5 h-1.5 rounded-full transition-all ${i === activeImg ? 'bg-[#c9a96e] w-4' : 'bg-white/30'}`}
                                                     />
                                                 ))}
@@ -395,6 +398,7 @@ export default function ProductModal({ product, onClose, whatsappNumber }: Produ
                                             <button
                                                 key={i}
                                                 onClick={() => setActiveImg(i)}
+                                                title={isRTL ? `تصغير الصورة ${i + 1}` : `Thumbnail ${i + 1}`}
                                                 className={`relative w-10 h-10 shrink-0 rounded-lg overflow-hidden border-2 transition-all ${i === activeImg ? 'border-[#c9a96e]' : 'border-transparent opacity-50'}`}
                                             >
                                                 <Image src={img} alt="" fill sizes="40px" quality={50} className="object-cover" />

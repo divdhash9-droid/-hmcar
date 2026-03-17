@@ -47,6 +47,8 @@ export default function Login() {
     const [otpRequested, setOtpRequested] = useState(false); // هل تم طلب رمز التحقق؟
     const [otpCode, setOtpCode] = useState(''); // الرمز المدخل من المستخدم
     const [showRoleSwitcher, setShowRoleSwitcher] = useState(false); // إظهار محول الأدوار (عميل/مدير)
+    const [isPWA, setIsPWA] = useState(false);
+    const [webLanding, setWebLanding] = useState(false);
 
     const { socket, isConnected } = useSocket();
     const { user } = useAuth();
@@ -55,12 +57,26 @@ export default function Login() {
     // عند تحميل الصفحة للمرة الأولى
     useEffect(() => {
         try {
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true;
+            setIsPWA(isStandalone);
+
             const path = typeof window !== 'undefined' ? window.location.pathname : '';
             const sp = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-            // إذا كان المسار يحتوي على admin/login أو كان هناك باراميتر role=admin، نقوم بتحويل الدور إلى مدير
-            if (path.includes('/admin/login') || sp?.get('role') === 'admin') {
-                setRole('admin');
-                setShowRoleSwitcher(true);
+            
+            // التمييز بين الويب والتطبيق
+            if (!isStandalone) {
+                // إذا كان ويب، نظهر الخيارات أولاً ما لم يكن هناك دور محدد في الرابط
+                if (path.includes('/admin/login') || sp?.get('role') === 'admin') {
+                    setRole('admin');
+                    setShowRoleSwitcher(true);
+                    setWebLanding(false);
+                } else {
+                    setWebLanding(true);
+                }
+            } else {
+                // إذا كان تطبيق، نبدأ كعميل فوراً
+                setRole('buyer');
+                setWebLanding(false);
             }
         } catch { }
     }, []);
@@ -273,7 +289,41 @@ export default function Login() {
                 transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
                 className="relative z-10 w-full max-w-md px-2"
             >
-                {banInfo ? (
+                {webLanding ? (
+                    <div className="relative glass-card p-10 rounded-3xl border border-white/10 backdrop-blur-3xl shadow-2xl overflow-hidden text-center space-y-8">
+                        <div className="space-y-4">
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                className="w-20 h-20 mx-auto rounded-full bg-accent-gold/10 border border-accent-gold/20 flex items-center justify-center mb-6"
+                            >
+                                <Lock className="w-8 h-8 text-accent-gold" />
+                            </motion.div>
+                            <h2 className="text-4xl font-black text-white tracking-widest uppercase">{isRTL ? "تسجيل الدخول" : "GATEWAY"}</h2>
+                            <p className="text-white/40 text-[10px] tracking-[0.3em] uppercase">{isRTL ? "حدد نوع الوصول" : "SELECT ACCESS TYPE"}</p>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-4">
+                            <button
+                                onClick={() => { setRole('buyer'); setWebLanding(false); }}
+                                className="group relative overflow-hidden flex flex-col items-center justify-center p-8 rounded-2xl bg-white/5 border border-white/10 hover:border-accent-gold/50 hover:bg-accent-gold/5 transition-all duration-500"
+                            >
+                                <User className="w-10 h-10 text-white/40 group-hover:text-accent-gold transition-colors mb-3" />
+                                <span className="text-sm font-black tracking-widest uppercase">{isRTL ? "دخول العميل" : "CLIENT ACCESS"}</span>
+                                <span className="text-[10px] text-white/20 mt-1 uppercase group-hover:text-accent-gold/40 transition-colors">Personal Account</span>
+                            </button>
+
+                            <button
+                                onClick={() => { setRole('admin'); setWebLanding(false); setShowRoleSwitcher(true); }}
+                                className="group relative overflow-hidden flex flex-col items-center justify-center p-8 rounded-2xl bg-white/5 border border-white/10 hover:border-red-500/50 hover:bg-red-500/5 transition-all duration-500"
+                            >
+                                <ShieldCheck className="w-10 h-10 text-white/40 group-hover:text-red-500 transition-colors mb-3" />
+                                <span className="text-sm font-black tracking-widest uppercase">{isRTL ? "بوابة الإدارة" : "ADMIN GATEWAY"}</span>
+                                <span className="text-[10px] text-white/20 mt-1 uppercase group-hover:text-red-500/40 transition-colors">Management Terminal</span>
+                            </button>
+                        </div>
+                    </div>
+                ) : banInfo ? (
                     <div className="relative glass-card p-6 sm:p-10 md:p-12 rounded-3xl border border-red-500/20 bg-red-950/20 backdrop-blur-3xl shadow-2xl overflow-hidden">
                         <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_20px_rgba(239,68,68,0.5)]"></div>
                         <div className="text-center space-y-6">
@@ -333,8 +383,17 @@ export default function Login() {
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: 0.4 }}
-                            className={`absolute top-4 ${isRTL ? 'left-4' : 'right-4'} z-20`}
+                            className={`absolute top-4 ${isRTL ? 'left-4' : 'right-4'} z-20 flex gap-2`}
                         >
+                            {!isPWA && (
+                                <button
+                                    onClick={() => setWebLanding(true)}
+                                    className="w-10 h-10 rounded-xl border border-white/10 bg-white/5 backdrop-blur-md flex items-center justify-center text-white/40 hover:text-white hover:border-white/30 transition-all duration-300 shadow-lg"
+                                    title={isRTL ? 'تغيير الدور' : 'Change Role'}
+                                >
+                                    <UserCheck className="w-4 h-4" />
+                                </button>
+                            )}
                             <Link href="/">
                                 <motion.div
                                     whileHover={{ scale: 1.1 }}

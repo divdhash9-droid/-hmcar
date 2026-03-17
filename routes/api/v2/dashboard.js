@@ -40,7 +40,7 @@ router.get('/client', requireAuthAPI, async (req, res) => {
             Car.find({ isActive: true, isSold: false })
                 .sort({ createdAt: -1 })
                 .limit(6)
-                .select('title make model year price images category')
+                .select('title make model year price priceSar priceUsd priceKrw images category')
                 .lean(),
 
             // المفضلة (إذا كان هناك نموذج للمفضلة)
@@ -64,7 +64,7 @@ router.get('/client', requireAuthAPI, async (req, res) => {
                     make: car.make,
                     model: car.model,
                     year: car.year,
-                    price: car.price || car.priceSar || 0,
+                    price: car.price || car.priceSar || (car.priceUsd ? car.priceUsd * 3.75 : 0) || 0,
                     image: car.images?.[0] || '',
                     category: car.category
                 }))

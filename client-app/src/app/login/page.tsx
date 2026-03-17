@@ -1,5 +1,11 @@
 'use client';
 
+/**
+ * صفحة تسجيل الدخول (Login Page)
+ * تتيح للمستخدمين (سواء عملاء أو مدراء) الدخول إلى النظام.
+ * تدعم تسجيل الدخول بالاسم أو برقم الهاتف مع التحقق عبر رمز OTP.
+ */
+
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { User, ShieldCheck, Lock, ArrowRight, ChevronLeft, ChevronRight, Key, UserCheck, Sparkles, Power, Eye, EyeOff, Phone, AlertOctagon, Copy, MessageCircle } from "lucide-react";
@@ -14,26 +20,50 @@ import CinematicVideoBackground from "@/components/CinematicVideoBackground";
 
 export default function Login() {
     const { isRTL } = useLanguage();
-    const [role, setRole] = useState<'buyer' | 'admin'>('buyer');
-    const [formData, setFormData] = useState({ email: '', password: '' });
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
-    const [rememberMe, setRememberMe] = useState(false);
-    const [successMessage, setSuccessMessage] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
-    const [method, setMethod] = useState<'name' | 'phone'>('name');
-    const [banInfo, setBanInfo] = useState<{ banned: boolean, banCode: string, message: string } | null>(null);
-    const countryList = countryDialCodes.map(c => ({ code: c.code, dial: c.dial, name: isRTL ? (c.nameAr || c.nameEn) : c.nameEn }));
-    const [countrySearch, setCountrySearch] = useState('');
-    const [selectedCountry, setSelectedCountry] = useState(countryList[0]);
-    const [phoneNumber, setPhoneNumber] = useState('');
-    const [showCountry, setShowCountry] = useState(false);
-    const [otpRequested, setOtpRequested] = useState(false);
-    const [otpCode, setOtpCode] = useState('');
+    
+    // --- حالات الواجهة (States) ---
+    const [role, setRole] = useState<'buyer' | 'admin'>('buyer'); // دور المستخدم الحالي
+    const [formData, setFormData] = useState({ email: '', password: '' }); // بيانات النموذج الأساسية
+    const [loading, setLoading] = useState(false); // حالة التحميل أثناء الإرسال
+    const [error, setError] = useState(''); // رسائل الخطأ
+    const [rememberMe, setRememberMe] = useState(false); // خيار "تذكرني"
+    const [successMessage, setSuccessMessage] = useState(''); // رسائل النجاح
+    const [showPassword, setShowPassword] = useState(false); // إظهار أو إخفاء كلمة المرور
+    const [method, setMethod] = useState<'name' | 'phone'>('name'); // طريقة الدخول: بالاسم أو الهاتف
+    const [banInfo, setBanInfo] = useState<{ banned: boolean, banCode: string, message: string } | null>(null); // معلومات الحظر في حال تم حظر الجهاز
+    
+    // --- معالجة الدول والأرقام ---
+    const countryList = countryDialCodes.map(c => ({ 
+        code: c.code, 
+        dial: c.dial, 
+        name: isRTL ? (c.nameAr || c.nameEn) : c.nameEn 
+    }));
+    const [countrySearch, setCountrySearch] = useState(''); // البحث عن دولة
+    const [selectedCountry, setSelectedCountry] = useState(countryList[0]); // الدولة المختارة للرمز الدولي
+    const [phoneNumber, setPhoneNumber] = useState(''); // رقم الهاتف المدخل
+    const [showCountry, setShowCountry] = useState(false); // إظهار قائمة الدول
+    
+    // --- التحقق عبر OTP ---
+    const [otpRequested, setOtpRequested] = useState(false); // هل تم طلب رمز التحقق؟
+    const [otpCode, setOtpCode] = useState(''); // الرمز المدخل من المستخدم
+    const [showRoleSwitcher, setShowRoleSwitcher] = useState(false); // إظهار محول الأدوار (عميل/مدير)
 
     const { socket, isConnected } = useSocket();
     const { user } = useAuth();
     const DEV_FAKE = process.env.NEXT_PUBLIC_ENABLE_DEV_ADMIN === '1';
+
+    // عند تحميل الصفحة للمرة الأولى
+    useEffect(() => {
+        try {
+            const path = typeof window !== 'undefined' ? window.location.pathname : '';
+            const sp = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+            // إذا كان المسار يحتوي على admin/login أو كان هناك باراميتر role=admin، نقوم بتحويل الدور إلى مدير
+            if (path.includes('/admin/login') || sp?.get('role') === 'admin') {
+                setRole('admin');
+                setShowRoleSwitcher(true);
+            }
+        } catch { }
+    }, []);
 
     // تتبع دخول العميل لصفحة تسجيل الدخول وإبلاغ الأدمن
     useEffect(() => {
@@ -46,6 +76,9 @@ export default function Login() {
         }
     }, [socket, isConnected, isRTL, user]);
 
+    /**
+     * معالجة عملية تسجيل الدخول عند الضغط على الزر
+     */
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -57,6 +90,8 @@ export default function Login() {
             const deviceId = typeof window !== 'undefined' ? localStorage.getItem('hm_device_id') || '' : '';
 
             const identifier = formData.email.trim();
+            
+            // --- أولاً: معالجة دخول المدير ---
             if (role === 'admin') {
                 response = await api.auth.login({
                     identifier: identifier,
@@ -66,21 +101,30 @@ export default function Login() {
                     deviceId
                 });
             } else {
+                // --- ثانياً: معالجة دخول العميل ---
+
+                // التحقق من صحة الاسم إذا كانت الطريقة بالاسم
                 if (method === 'name') {
                     const parts = identifier.split(/\s+/).filter(Boolean);
                     if (parts.length < 2) {
                         throw new Error('الاسم يجب أن يكون على الأقل اسمين');
                     }
                 } else {
+                    // التحقق من صحة رقم الهاتف
                     const digits = phoneNumber.replace(/\D/g, '');
                     if (digits.length < 8 || digits.length > 15) {
                         throw new Error('رقم الهاتف غير صالح');
                     }
                 }
+                
+                // التحقق من طول كلمة المرور
                 if (formData.password.length < 6) {
                     throw new Error('كلمة المرور يجب أن تكون 6 خانات على الأقل');
                 }
+
                 const phoneE164 = `${selectedCountry.dial}${phoneNumber.replace(/\D/g, '')}`;
+
+                // معالجة طلب رمز OTP إذا لم يطلب بعد (في حال الدخول بالهاتف)
                 if (method === 'phone' && !otpRequested) {
                     try {
                         await api.auth.sendOtp({ phone: phoneE164 });
@@ -89,12 +133,15 @@ export default function Login() {
                         setLoading(false);
                         return;
                     } catch {
+                        // في حال فشل الإرسال (Fallback للتجربة)
                         setSuccessMessage(isRTL ? 'تم إرسال رمز التحقق إلى هاتفك' : 'Verification code sent to your phone');
                         setOtpRequested(true);
                         setLoading(false);
                         return;
                     }
                 }
+
+                // التحقق من رمز OTP إذا كان مطلوباً
                 if (method === 'phone' && otpRequested) {
                     if (!otpCode || otpCode.replace(/\D/g, '').length < 4) {
                         throw new Error(isRTL ? 'أدخل رمز التحقق الصحيح' : 'Enter valid verification code');
@@ -108,6 +155,8 @@ export default function Login() {
                         }
                     }
                 }
+
+                // تنفيذ تسجيل الدخول التلقائي أو العادي للعميل
                 response = await api.auth.autoLogin({
                     name: method === 'name' ? identifier : phoneE164,
                     password: formData.password,
@@ -116,14 +165,14 @@ export default function Login() {
             }
 
             if (response.success) {
-                // حفظ التوكن وبيانات المستخدم
+                // حفظ التوكن وبيانات المستخدم في التخزين المحلي (LocalStorage)
                 localStorage.setItem('hm_token', response.token);
                 localStorage.setItem('hm_user', JSON.stringify(response.user));
                 const savedRole = response.user?.role || 'buyer';
                 localStorage.setItem('hm_user_role', savedRole);
 
-                // حفظ في Cookie للـ middleware - مهم جداً للتوجيه الصحيح
-                const maxAge = rememberMe ? 604800 : 86400; // أسبوع أو يوم
+                // حفظ في Cookie للـ middleware - لضمان حماية المسارات من جهة الخادم (Server-side)
+                const maxAge = rememberMe ? 604800 : 86400; // أسبوع في حال تذكرني، أو يوم واحد
                 document.cookie = `hm_token=${response.token}; path=/; max-age=${maxAge}; SameSite=Lax`;
                 document.cookie = `hm_user_role=${savedRole}; path=/; max-age=${maxAge}; SameSite=Lax`;
 
@@ -133,9 +182,9 @@ export default function Login() {
                     setSuccessMessage(isRTL ? 'تم تسجيل الدخول بنجاح ✓' : 'Login successful ✓');
                 }
 
+                // التوجيه التلقائي بناءً على دور المستخدم أو المعلمة 'redirect'
                 setTimeout(() => {
                     const userRole = response.user.role || 'buyer';
-                    // التحقق من وجود redirect param
                     const params = new URLSearchParams(window.location.search);
                     const redirectTo = params.get('redirect');
                     if (redirectTo && redirectTo.startsWith('/')) {
@@ -180,16 +229,6 @@ export default function Login() {
 
     useEffect(() => {
         try {
-            const path = typeof window !== 'undefined' ? window.location.pathname : '';
-            const sp = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-            if (path.includes('/admin/login') || sp?.get('role') === 'admin') {
-                setRole('admin');
-            }
-        } catch { }
-    }, []);
-
-    useEffect(() => {
-        try {
             const saved = localStorage.getItem('hm_remember');
             if (saved) {
                 const data = JSON.parse(saved);
@@ -211,7 +250,7 @@ export default function Login() {
 
     return (
         <div className={`relative min-h-screen bg-black text-white flex items-center justify-center p-6 overflow-hidden ${isRTL ? 'font-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
-            {/* Cinematic Background */}
+            {/* الخلفية السينمائية - Cinematic Background */}
             <CinematicVideoBackground
                 videoSrc="/videos/video.mp4"
                 fallbackImage="/images/photo_2026-02-07_22-24-18.jpg"
@@ -219,7 +258,7 @@ export default function Login() {
                 overlayOpacity={0.55}
             />
 
-            {/* ── AMBIENT ORBS ── */}
+            {/* الكرات الضوئية الخلفية - AMBIENT ORBS */}
             <div className="fixed inset-0 pointer-events-none z-[1]">
                 <div className="orb orb-gold w-[600px] h-[600px] top-[-200px] right-[-200px] animate-breathe blur-[100px] opacity-30" />
                 <div className="orb orb-blue w-[400px] h-[400px] bottom-[-100px] left-[-100px] animate-breathe delay-1000 blur-[100px] opacity-20" />
@@ -227,7 +266,7 @@ export default function Login() {
 
 
 
-            {/* ── LOGIN CARD OR BAN CARD ── */}
+            {/* بطاقة تسجيل الدخول أو بطاقة الحظر - LOGIN CARD OR BAN CARD */}
             <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -289,7 +328,7 @@ export default function Login() {
                     </div>
                 ) : (
                     <div className="relative glass-card p-6 sm:p-10 md:p-12 rounded-3xl border border-white/10 backdrop-blur-3xl shadow-2xl">
-                        {/* ── BACK BUTTON (داخل البطاقة، أعلى اليمين) ── */}
+                        {/* زر العودة - BACK BUTTON */}
                         <motion.div
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
@@ -308,7 +347,7 @@ export default function Login() {
                             </Link>
                         </motion.div>
 
-                        {/* ── Header ── */}
+                        {/* الهيدر والعنوان - Header */}
                         <div className="text-center space-y-6 mb-10">
                             {/* Animated badge */}
                             <motion.div
@@ -335,41 +374,42 @@ export default function Login() {
                             </div>
                         </div>
 
-                        {/* ── Role Switcher ── */}
-                        <div className="flex bg-black/20 p-1 rounded-xl border border-white/5 mb-8 backdrop-blur-md">
-                            <button
-                                onClick={() => setRole('buyer')}
-                                className={cn(
-                                    "relative overflow-hidden flex-1 py-3 rounded-lg flex items-center justify-center gap-2 transition-all duration-500 text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.1em] sm:tracking-[0.15em]",
-                                    role === 'buyer'
-                                        ? "bg-white text-black shadow-lg shadow-white/10"
-                                        : "text-white/30 hover:text-white/50"
-                                )}
-                            >
-                                <UserCheck className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
-                                {isRTL ? "عميل" : "CLIENT"}
-                            </button>
-                            <button
-                                onClick={() => {
-                                    setRole('admin');
-                                    // مسح البريد إذا كان يحتوي على كلمة admin عند التبديل لزيادة الخصوصية
-                                    if (formData.email.toLowerCase().includes('admin')) {
-                                        setFormData(prev => ({ ...prev, email: '' }));
-                                    }
-                                }}
-                                className={cn(
-                                    "relative overflow-hidden flex-1 py-3 rounded-lg flex items-center justify-center gap-2 transition-all duration-500 text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.1em] sm:tracking-[0.15em]",
-                                    role === 'admin'
-                                        ? "bg-accent-red text-white shadow-lg shadow-red-500/20"
-                                        : "text-white/30 hover:text-white/50"
-                                )}
-                            >
-                                <ShieldCheck className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
-                                {isRTL ? "مدير" : "ADMIN"}
-                            </button>
-                        </div>
+                        {/* محول الأدوار - Role Switcher */}
+                        {showRoleSwitcher && (
+                            <div className="flex bg-black/20 p-1 rounded-xl border border-white/5 mb-8 backdrop-blur-md">
+                                <button
+                                    onClick={() => setRole('buyer')}
+                                    className={cn(
+                                        "relative overflow-hidden flex-1 py-3 rounded-lg flex items-center justify-center gap-2 transition-all duration-500 text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.1em] sm:tracking-[0.15em]",
+                                        role === 'buyer'
+                                            ? "bg-white text-black shadow-lg shadow-white/10"
+                                            : "text-white/30 hover:text-white/50"
+                                    )}
+                                >
+                                    <UserCheck className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
+                                    {isRTL ? "عميل" : "CLIENT"}
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setRole('admin');
+                                        if (formData.email.toLowerCase().includes('admin')) {
+                                            setFormData(prev => ({ ...prev, email: '' }));
+                                        }
+                                    }}
+                                    className={cn(
+                                        "relative overflow-hidden flex-1 py-3 rounded-lg flex items-center justify-center gap-2 transition-all duration-500 text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.1em] sm:tracking-[0.15em]",
+                                        role === 'admin'
+                                            ? "bg-accent-red text-white shadow-lg shadow-red-500/20"
+                                            : "text-white/30 hover:text-white/50"
+                                    )}
+                                >
+                                    <ShieldCheck className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
+                                    {isRTL ? "مدير" : "ADMIN"}
+                                </button>
+                            </div>
+                        )}
 
-                        {/* ── Form ── */}
+                        {/* نموذج البيانات - Form */}
                         <form onSubmit={handleLogin} className="space-y-6">
                             {/* Alert Messages */}
                             <AnimatePresence mode="wait">
@@ -637,7 +677,7 @@ export default function Login() {
             {/* ── Bottom Branding ── */}
             <div className="fixed bottom-8 text-center opacity-20 hover:opacity-40 transition-opacity duration-500">
                 <span className="text-[8px] font-bold uppercase tracking-[0.6em] text-white">
-                    HM CAR SYSTEMS // v4.0 CINEMATIC
+                    HM CAR // PREMIER EXPERIENCE
                 </span>
             </div>
         </div >

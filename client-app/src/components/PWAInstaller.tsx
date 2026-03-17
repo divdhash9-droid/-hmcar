@@ -1,5 +1,11 @@
 'use client';
 
+/**
+ * مكون تثبيت التطبيق (PWA Installer)
+ * يظهر زر عائم للمستخدم لتثبيت الموقع كتطبيق على شاشة الجوال الرئيسية.
+ * يتعامل مع متصفح كروم (Android/Desktop) ومتصفح سفاري (iOS).
+ */
+
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Smartphone, X } from 'lucide-react';
@@ -9,11 +15,11 @@ const DISMISSED_KEY = 'pwa_dismissed_until';
 const DISMISS_DAYS = 7;
 
 export default function PWAInstaller() {
-    const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-    const [visible, setVisible] = useState(false);   // الزر العائم
-    const [isIOS, setIsIOS] = useState(false);
-    const [showIOSGuide, setShowIOSGuide] = useState(false);
-    const [installing, setInstalling] = useState(false);
+    const [deferredPrompt, setDeferredPrompt] = useState<any>(null); // حفظ حدث التثبيت لكروم
+    const [visible, setVisible] = useState(false);   // إظهار/إخفاء الزر العائم
+    const [isIOS, setIsIOS] = useState(false); // هل الجهاز هو آيفون؟
+    const [showIOSGuide, setShowIOSGuide] = useState(false); // إظهار دليل تثبيت آيفون
+    const [installing, setInstalling] = useState(false); // حالة معالجة التثبيت حالياً
 
     useEffect(() => {
         // ── تسجيل Service Worker ──
@@ -55,9 +61,10 @@ export default function PWAInstaller() {
         };
         window.addEventListener('beforeinstallprompt', onBeforeInstall);
 
+        // الاستماع لحدث اكتمال التثبيت بنجاح
         window.addEventListener('appinstalled', () => {
             localStorage.setItem(INSTALLED_KEY, '1');
-            setVisible(false);
+            setVisible(false); // إخفاء الزر فور اكتمال التثبيت
         });
 
         // ── إظهار الزر بعد ثانيتين ──
@@ -128,7 +135,7 @@ export default function PWAInstaller() {
                                 <span className="text-[10px] text-white/50">ثبّت التطبيق مجاناً</span>
                             </div>
 
-                            {/* زر التثبيت */}
+                            {/* زر التثبيت - Install Button */}
                             <button
                                 onClick={handleInstall}
                                 disabled={installing}
@@ -152,9 +159,7 @@ export default function PWAInstaller() {
                 )}
             </AnimatePresence>
 
-            {/* ════════════════════════════════
-                دليل التثبيت لـ iOS
-            ════════════════════════════════ */}
+            {/* دليل التثبيت لنظام iOS (دليل سفاري) */}
             <AnimatePresence>
                 {showIOSGuide && (
                     <motion.div

@@ -1,6 +1,9 @@
 'use client';
 
-// [[ARABIC_COMMENT]] صفحة الخطأ 404 - تظهر تلقائياً عند أي رابط غير موجود في النظام
+/**
+ * صفحة الخطأ 404 (Not Found Page)
+ * تظهر تلقائياً عندما يحاول المستخدم الدخول إلى رابط غير موجود في نظام التوجيه الخاص بـ Next.js.
+ */
 
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -13,7 +16,7 @@ export default function NotFound() {
         <div className="relative min-h-screen bg-black text-white overflow-hidden flex flex-col">
             <Navbar />
 
-            {/* [[ARABIC_COMMENT]] خلفية الصفحة - شبكة نيون حمراء */}
+            {/* خلفية الصفحة - شبكة نيون حمراء بنمط السايبربانك */}
             <div className="fixed inset-0 pointer-events-none z-0">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,59,48,0.08),transparent_70%)]" />
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(255,59,48,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,59,48,0.03)_1px,transparent_1px)] bg-size-[80px_80px]" />
@@ -22,7 +25,7 @@ export default function NotFound() {
             {/* [[ARABIC_COMMENT]] المحتوى الرئيسي */}
             <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 py-24">
 
-                {/* [[ARABIC_COMMENT]] رقم 404 الكبير */}
+                {/* تصميم رقم 404 الضخم مع تأثيرات الشفافية */}
                 <motion.div
                     initial={{ opacity: 0, scale: 0.5 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -74,7 +77,7 @@ export default function NotFound() {
                         <span className="text-white/20">{rawText('The page you requested does not exist.')}</span>
                     </p>
 
-                    {/* [[ARABIC_COMMENT]] أزرار التنقل */}
+                    {/* أزرار التنقل السريع للرجوع للأمان أو استكشاف المعرض */}
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                         <Link href="/">
                             <motion.button

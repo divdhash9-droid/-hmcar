@@ -3,9 +3,10 @@ import { Tajawal } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 
+// إعداد خط "Tajawal" لتحسين مظهر اللغة العربية واللاتينية في التطبيق
 const tajawal = Tajawal({
   subsets: ["arabic", "latin"],
-  weight: ["200", "300", "400", "500", "700", "800", "900"],
+  weight: ["300", "400", "700", "900"], // [[ARABIC_COMMENT]] تقليل عدد الأوزان لضغط حجم الخط وتسريع التحميل
   variable: "--font-tajawal",
   display: "swap",
 });
@@ -13,16 +14,19 @@ import GoogleAnalytics from "@/components/GoogleAnalytics";
 import { Suspense } from "react";
 import { cookies } from "next/headers";
 import AppShell from "@/components/AppShell";
+import SmartPrefetchProvider from "@/components/SmartPrefetchProvider";
 
+// إعدادات نافذة العرض (Viewport) للجوال والحاسوب
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
-  userScalable: true,
+  userScalable: true, // السماح للمستخدم بتكبير الصفحة لسهولة القراءة
   themeColor: "#000000",
   colorScheme: "dark",
 };
 
+// البيانات الوصفية (SEO Metadata) لتحسين ظهور الموقع في محركات البحث ومشاركات التواصل الاجتماعي
 export const metadata: Metadata = {
   metadataBase: new URL('https://car-auction-sand.vercel.app'),
   title: {
@@ -90,6 +94,7 @@ export const metadata: Metadata = {
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  // قراءة اللغة المفضلة من الكوكيز (Cookies) لتحديد اتجاه الصفحة (RTL/LTR) في السيرفر قبل التحميل
   const cookieStore = await cookies();
   const cookieLang = cookieStore.get("appLang")?.value?.toUpperCase();
   const lang = cookieLang === "EN" ? "en" : "ar";
@@ -99,19 +104,41 @@ export default async function RootLayout({
     <html lang={lang} dir={dir}>
       <head>
         <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-96x96.png" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://res.cloudinary.com" />
+        <link rel="dns-prefetch" href="https://res.cloudinary.com" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="theme-color" content="#000000" />
       </head>
       <body className={`antialiased selection:bg-white/20 selection:text-white ${tajawal.variable}`}>
+        {/* [[ARABIC_COMMENT]] فاحص أداء الواجهة - يظهر فقط في بيئة التطوير للمساعدة في تحسين السرعة */}
+        {process.env.NODE_ENV === 'development' && (
+          <script dangerouslySetInnerHTML={{
+            __html: `
+              if (typeof window !== 'undefined') {
+                const observer = new PerformanceObserver((list) => {
+                  list.getEntries().forEach((entry) => {
+                    console.log(\`%c[Performance] \${entry.name}: \${entry.startTime.toFixed(2)}ms\`, 'color: #c9a96e; font-weight: bold;');
+                  });
+                });
+                observer.observe({ entryTypes: ['paint', 'largest-contentful-paint'] });
+              }
+            `
+          }} />
+        )}
         <Providers>
-          <AppShell>
-            <Suspense fallback={null}>
-              <GoogleAnalytics />
-            </Suspense>
-            {children}
-          </AppShell>
+          <SmartPrefetchProvider>
+            <AppShell>
+              <Suspense fallback={null}>
+                <GoogleAnalytics />
+              </Suspense>
+              {children}
+            </AppShell>
+          </SmartPrefetchProvider>
         </Providers>
       </body>
     </html>

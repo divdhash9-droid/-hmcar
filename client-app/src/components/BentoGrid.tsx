@@ -1,5 +1,11 @@
 "use client";
 
+/**
+ * شبكة التصنيف الجذابة (Bento Grid)
+ * تعرض فئات الموقع (قطع غيار، سيارات، عروض، مزادات) بتنسيق هندسي عصري.
+ * يتميز بصور خلفية عالية الجودة وتأثيرات حركية عند التمرير (Scroll Reveal).
+ */
+
 import { motion } from "framer-motion";
 import { Wrench, Car, Tag, ArrowUpRight, ArrowRight } from "lucide-react";
 import Link from "next/link";
@@ -29,6 +35,7 @@ export default function BentoGrid() {
                     </p>
                 </motion.div>
 
+                {/* ── شبكة بينتو (Bento Grid) ── */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6 h-auto md:h-[600px]">
                     {/* Item 1: Spare Parts (Large - 2x2) */}
                     <motion.div
@@ -130,7 +137,7 @@ export default function BentoGrid() {
                         </div>
                     </motion.div>
 
-                    {/* Item 4: Auction (Wide - 1x1) */}
+                    {/* العنصر 4: المزادات الحية (Live Auctions) */}
                     <motion.div
                         className="md:col-span-1 relative group overflow-hidden rounded-[2.5rem] bg-black/40 backdrop-blur-xl border border-white/5"
                         initial={{ opacity: 0, x: 30 }}

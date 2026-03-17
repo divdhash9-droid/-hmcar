@@ -48,6 +48,23 @@ const carSchema = new mongoose.Schema({
   pendingSaleAt: { type: Date, default: null }
 }, { timestamps: true });
 
+// [[ARABIC_COMMENT]] إضافة فهارس (Indexes) لتحسين سرعة الاستعلامات
+carSchema.index({ isActive: 1, listingType: 1, createdAt: -1 });
+carSchema.index({ make: 1, model: 1, year: -1 });
+carSchema.index({ price: 1, priceUsd: 1 });
+carSchema.index({ source: 1, isActive: 1 });
+carSchema.index({ seller: 1 });
+carSchema.index(
+  { title: 'text', description: 'text' },
+  { 
+    weights: {
+      title: 10,       // [[ARABIC_COMMENT]] إعطاء الأولوية القصوى للعنوان في نتائج البحث
+      description: 2   // الوصف له أهمية أقل
+    },
+    name: "CarTextSearch"
+  }
+);
+
 // ======== Hook: تفعيل التنبيهات الذكية عند إضافة سيارة جديدة ========
 carSchema.post('save', function (doc) {
   // فقط عند إنشاء وثيقة جديدة (isNew=true عند أول save)

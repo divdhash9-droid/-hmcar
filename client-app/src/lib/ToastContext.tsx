@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * سياق رسائل التنبيه (ToastContext)
+ * المسؤول عن إظهار رسائل منبثقة سريعة للمستخدم (نجاح، خطأ، معلومات) في زاوية الشاشة.
+ */
+
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, AlertCircle, X, Info } from 'lucide-react';
@@ -13,7 +18,7 @@ interface Toast {
 }
 
 interface ToastContextType {
-    showToast: (message: string, type?: ToastType) => void;
+    showToast: (message: string, type?: ToastType) => void; // دالة لإظهار تنبيه جديد
 }
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
@@ -22,12 +27,14 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     const [toasts, setToasts] = useState<Toast[]>([]);
 
     const removeToast = useCallback((id: string) => {
+        // حذف التنبيه من القائمة بناءً على معرفه
         setToasts(prev => prev.filter(toast => toast.id !== id));
     }, []);
 
     const showToast = useCallback((message: string, type: ToastType = 'success') => {
         const id = Math.random().toString(36).substring(2, 9);
         setToasts(prev => [...prev, { id, message, type }]);
+        // إخفاء التنبيه تلقائياً بعد 4 ثوانٍ
         setTimeout(() => removeToast(id), 4000);
     }, [removeToast]);
 
@@ -73,6 +80,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     );
 }
 
+/**
+ * خطاف مخصص لاستخدام نظام التنبيهات في أي مكان بالتطبيق
+ */
 export function useToast() {
     const context = useContext(ToastContext);
     if (!context) throw new Error('useToast must be used within ToastProvider');

@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * صفحة قطع الغيار (Spare Parts Page)
+ * تتيح للمستخدمين البحث عن قطع الغيار المتاحة عبر خطوات منظمة:
+ * 1. اختيار الوكالة (Agency): مثل تويوتا، كيا، كاديلاك، إلخ.
+ * 2. اختيار الموديل (Model): مثل كامري، كورولا، إلخ.
+ * 3. عرض القطع (Parts): قائمة بجميع المكونات المتاحة المتوافقة مع الخيارات المختارة.
+ */
+
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import {
@@ -57,9 +65,9 @@ export default function PartsPage() {
     const { formatPrice: formatGlobalPrice, socialLinks } = useSettings();
     const formatPrice = (price: number) => formatGlobalPrice(Number(price || 0), undefined, 'part');
     const { isLoggedIn } = useAuth();
-    // [[ARABIC_COMMENT]] رقم الواتساب - يستخدم رقم الأدمن أو الرقم الكوري الافتراضي
+    // رقم الواتساب - يستخدم رقم الأدمن من الإعدادات أو الرقم الافتراضي
     const WHATSAPP_NUMBER = (socialLinks?.whatsapp || '+821080880014').replace(/\D/g, '');
-    // [[ARABIC_COMMENT]] حالة المودال - null = مغلق, بيانات = مفتوح
+    // حالة المودال (المنبثق) - null تعني مغلق، وبيانات الكائن تعني مفتوح
     const [modalProduct, setModalProduct] = useState<ProductModalData | null>(null);
 
     const [viewMode, setViewMode] = useState<'AGENCIES' | 'MODELS' | 'PARTS'>('AGENCIES');
@@ -114,11 +122,11 @@ export default function PartsPage() {
     const loadParts = async (agency: string, model: string) => {
         setLoading(true);
         try {
-            // [[ARABIC_COMMENT]] جلب القطع من المصدر المحلي المستورد، مع فلتر اختياري للوكالة
+            // جلب القطع من المصدر المحلي المستورد، مع فلتر اختياري للوكالة
             const res = await api.parts.list({ q: agency || undefined, limit: 300 });
-            // [[ARABIC_COMMENT]] الـ API يعيد البيانات في res.parts أو res.data.parts
+            // الـ API يعيد البيانات في res.parts أو res.data.parts بناءً على الاستجابة
             const allParts = res?.parts || res?.data?.parts || [];
-            // [[ARABIC_COMMENT]] تصفية حسب اسم الوكالة والموديل المختار
+            // تصفية النتائج يدوياً حسب اسم الوكالة والموديل المختار لضمان الدقة
             const fetchedParts = allParts.filter((p: { brand?: string, carModel?: string }) => {
                 const brandMatch = !agency || p.brand?.toLowerCase() === agency.toLowerCase();
                 const modelMatch = model === 'ALL' || (p.carModel?.toLowerCase() === model.toLowerCase());

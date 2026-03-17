@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * مزودي الخدمات العامين (Global Providers)
+ * يقوم هذا المكون بتغليف التطبيق بجميع الـ React Contexts اللازمة مثل:
+ * اللغة، الإعدادات، التنبيهات، واجهة المستخدم، المصادقة، والاتصال المباشر (Socket).
+ * كما يقوم بتشغيل خدمات الـ PWA والتنبيهات المنبثقة.
+ */
+
 import { ReactNode } from 'react';
 import { LanguageProvider } from '@/lib/LanguageContext';
 import { AuthProvider } from '@/lib/AuthContext';

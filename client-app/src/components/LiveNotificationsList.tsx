@@ -1,5 +1,11 @@
 'use client';
 
+/**
+ * قائمة الإشعارات الحية (Live Notifications List)
+ * تعرض آخر الأنشطة في النظام (مثل تسجيل دخول المستخدمين) بشكل مباشر باستخدام Socket.IO.
+ * تدعم الرسوم المتحركة لدخول المكونات الجديدة.
+ */
+
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSocket } from '@/lib/SocketContext';
@@ -13,7 +19,9 @@ export default function LiveNotificationsList({ isRTL }: { isRTL: boolean }) {
     useEffect(() => {
         if (!socket) return;
 
+        // معالج استقبال الإشعارات الإدارية من السيرفر
         const handleNotification = (notification: any) => {
+            // الاحتفاظ بآخر 10 إشعارات فقط لضمان أداء المتصفح
             setNotifications(prev => [notification, ...prev].slice(0, 10));
         };
 

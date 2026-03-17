@@ -9,6 +9,7 @@
 const express = require('express');
 const router = express.Router();
 const { apiRateLimiter } = require('../../../middleware/securityEnhanced');
+const { autoCacheMiddleware } = require('../../../middleware/autoCache');
 
 /**
  * إعداد طبقة تقييد الطلبات (Rate Limiter)
@@ -70,15 +71,15 @@ router.get('/health', async (req, res) => {
 
 router.use('/auth', require('./auth'));                  // المصادقة
 router.use('/users', require('./users'));                // المستخدمين
-router.use('/cars', require('./cars'));                  // السيارات
+router.use('/cars', autoCacheMiddleware({ ttl: 300 }), require('./cars'));    // [[ARABIC_COMMENT]] كاش للسيارات لمدة 5 دقائق
 router.use('/auctions', require('./auctions'));          // المزادات
-router.use('/parts', require('./parts'));                // قطع الغيار
+router.use('/parts', autoCacheMiddleware({ ttl: 300 }), require('./parts'));  // [[ARABIC_COMMENT]] كاش لقطع الغيار لمدة 5 دقائق
 router.use('/dashboard', require('./dashboard'));        // لوحة التحكم
 router.use('/orders', require('./orders'));              // الطلبات
 router.use('/notifications', require('./notifications')); // التنبيهات
 router.use('/analytics', require('./analytics'));        // التحليلات
 router.use('/upload', require('./upload.js'));           // رفع الملفات
-router.use('/settings', require('./settings'));          // الإعدادات
+router.use('/settings', autoCacheMiddleware({ ttl: 600 }), require('./settings')); // [[ARABIC_COMMENT]] كاش للإعدادات لمدة 10 دقائق
 router.use('/messages', require('./messages'));          // الرسائل
 router.use('/reviews', require('./reviews'));            // التقييمات
 router.use('/comparisons', require('./comparisons'));    // المقارنات
@@ -93,6 +94,7 @@ router.use('/security', require('./security'));         // قسم الأمان �
 router.use('/backup', require('./backup'));             // [[ARABIC_COMMENT]] النسخ الاحتياطي التلقائي
 router.use('/concierge', require('./concierge'));       // الطلبات الخاصة (طلب سيارة / قطع غيار)
 router.use('/showroom', require('./showroom'));          // المعرض الكوري (Encar)
+router.use('/invoices', require('./invoices'));          // نظام الفواتير المخصص (Invoices)
 
 /**
  * معالج الأخطاء المركزي لمسارات API

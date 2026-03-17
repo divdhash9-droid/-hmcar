@@ -257,6 +257,7 @@ function buildNavCategories(isRTL: boolean, user: any): NavCategory[] {
                 ...(hasP('manage_messages') ? [{ id: 'comms', icon: MessageCircle, label: isRTL ? 'مركز التواصل' : 'COMMS HUB', href: '/admin/comms' }] : []),
                 ...(hasP('manage_notifications') ? [{ id: 'alerts', icon: Bell, label: isRTL ? 'مركز التنبيهات' : 'ALERTS HUB', href: '/admin/notifications' }] : []),
                 ...(hasP('manage_orders') || hasP('manage_concierge') ? [{ id: 'fulfillment', icon: ShoppingCart, label: isRTL ? 'مركز التنفيذ' : 'FULFILLMENT', href: '/admin/orders' }] : []),
+                ...(hasP('manage_orders') ? [{ id: 'invoices', icon: Tag, label: isRTL ? 'الفواتير المطوّرة' : 'SMART INVOICES', href: '/admin/invoices' }] : []),
             ]
         },
         {

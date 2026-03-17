@@ -1,5 +1,11 @@
 'use client';
 
+/**
+ * روابط التواصل الاجتماعي (Social Links)
+ * يعرض أيقونات تفاعلية لجميع حسابات التواصل الاجتماعي المضافة من قبل المشرف.
+ * يدعم فتح الروابط في علامات تبويب جديدة واستخدام صور مخصصة للأيقونات.
+ */
+
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import {
@@ -61,19 +67,17 @@ export default function SocialLinks({
 
     const loadSocialLinks = async () => {
         try {
+            // جلب روابط التواصل الاجتماعي من الإعدادات العامة للموقع
             const response = await api.settings.getPublic();
             if (response.success && response.data.socialLinks) {
-                // استخدام فقط الروابط الواردة من قاعدة البيانات - بدون قيم افتراضية
+                // دمج الروابط المجلوبة مع القائمة الفارغة لضمان وجود جميع الحقول
                 setSocialLinks({ ...emptySocialLinks, ...response.data.socialLinks });
             } else {
-                // لا توجد إعدادات - ابقَ بروابط فارغة (لن تظهر أيقونات)
                 setSocialLinks(emptySocialLinks);
             }
         } catch {
             console.error('Failed to load social links');
             setSocialLinks(emptySocialLinks);
-        } finally {
-            // تم التحميل
         }
     };
 
@@ -209,7 +213,10 @@ export default function SocialLinks({
     );
 }
 
-// مكون العائم (FAB) للواتساب
+/**
+ * الزر العائم للواتساب (WhatsApp Floating Action Button)
+ * يظهر في زاوية الشاشة ليتيح للمستخدم التواصل المباشر والسريع مع الدعم الفني.
+ */
 export function WhatsAppFAB() {
     const [whatsappNumber, setWhatsappNumber] = useState('+967781007805');
 

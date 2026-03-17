@@ -1,4 +1,10 @@
 'use client';
+
+/**
+ * مكتبة أيقونات التواصل الاجتماعي (Social Icons Library)
+ * توفر مجموعة من الأيقونات المخصصة لمنصات التواصل الاجتماعي المختلفة.
+ * تدعم Instagram, X (Twitter), TikTok, WhatsApp, Facebook, YouTube, Snapchat, Telegram, LinkedIn.
+ */
 import React from "react";
 
 type IconProps = { className?: string };
@@ -9,6 +15,7 @@ const Badge = ({ children, className }: { children: React.ReactNode; className?:
   </div>
 );
 
+// خريطة الأيقونات - تربط اسم المنصة بالمكون البرمجي الخاص بالأيقونة
 export const SOCIAL_ICON_MAP: Record<string, React.FC<IconProps>> = {
   instagram: ({ className }) => (
     <svg className={className || "w-6 h-6"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -59,6 +66,9 @@ export const SOCIAL_ICON_MAP: Record<string, React.FC<IconProps>> = {
   ),
 };
 
+/**
+ * دالة مساعدة للحصول على الأيقونة بناءً على اسم المنصة
+ */
 export const getSocialIcon = (platform?: string): React.FC<IconProps> | null => {
   if (!platform) return null;
   const key = platform.trim().toLowerCase();

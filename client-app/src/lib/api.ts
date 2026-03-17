@@ -1,19 +1,35 @@
-// [[ARABIC_HEADER]] هذا الملف (client-app/src/lib/api.ts) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+// [[ARABIC_HEADER]] هذا الملف (client-app/src/lib/api.ts) المسؤول عن جميع طلبات التواصل مع الخادم (API).
+/**
+ * نظام التواصل مع API
+ * يحتوي على الدوال الأساسية لإرسال واستقبال البيانات من الخادم (Backend).
+ */
 
 // الأفضل استخدام الرابط الثابت في الإنتاج إذا كان العميل والارسال منفصلين
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://car-auction-sand.vercel.app';
 
-export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
+import { apiCache } from './api-cache';
+
+/**
+ * الدالة الأساسية لإرسال طلبات الـ API مع دعم المهلة الزمنية وإعادة المحاولة
+ */
+export async function fetchAPI(endpoint: string, options: RequestInit & { useCache?: boolean } = {}, retries = 2) {
+    // [[ARABIC_COMMENT]] التحقق من الكاش المحلي أولاً للسرعة القصوى
+    if (options.useCache && options.method === 'GET' || !options.method) {
+        const cached = apiCache.get(endpoint);
+        if (cached) return cached;
+    }
+
     const url = `${API_BASE_URL}${endpoint}`;
 
-    // Don't set Content-Type for FormData — let the browser set it with the boundary
+    // التحقق مما إذا كان الطلب يحتوي على ملفات (FormData)
     const isFormData = options.body instanceof FormData;
 
+    // تعيين الترويسات الافتراضية (Headers)
     const defaultHeaders: Record<string, string> = isFormData
         ? { 'Accept': 'application/json' }
         : { 'Content-Type': 'application/json', 'Accept': 'application/json' };
 
-    // If using JWT from local storage
+    // إذا كان المستخدم مسجلاً، نقوم بإضافة التوكن للطلب (Bearer Token)
     if (typeof window !== 'undefined') {
         const token = localStorage.getItem('hm_token');
         if (token) {
@@ -21,41 +37,53 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
         }
     }
 
+    // [[ARABIC_COMMENT]] إعداد مهلة زمنية للطلب (Timeout) لضمان عدم تعليق المتصفح
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 12000); // 12 seconds timeout
+
     const defaultOptions: RequestInit = {
         ...options,
-        cache: 'no-store', // Disable aggressive Next.js built-in fetch caching
+        cache: 'no-store',
+        signal: controller.signal,
         headers: {
             ...defaultHeaders,
             ...(options.headers as Record<string, string> || {}),
         },
     };
 
-    console.log(`[API Request] ${options.method || 'GET'} ${url}`, options.body && !isFormData ? JSON.parse(options.body as string) : options.body);
-
     try {
         const response = await fetch(url, defaultOptions);
-        console.log(`[API Response Status] ${response.status} for ${url}`);
+        clearTimeout(timeoutId);
 
         const data = await response.json().catch(() => ({}));
-        console.log(`[API Response Data]`, data);
 
         if (!response.ok) {
             let message = data.message || data.error || `فشل الطلب: ${response.status}`;
             
-            // [[ARABIC_COMMENT]] معالجة خاصة لرسالة تخطي عدد الطلبات المسموح به
             if (response.status === 429) {
                 message = 'لقد قمت بعدد كبير من المحاولات. يرجى الانتظار قليلاً قبل المحاولة مرة أخرى.';
             }
 
             const customError: any = new Error(message);
             customError.status = response.status;
-            customError.banned = data.banned;
-            customError.banCode = data.banCode;
             throw customError;
+        }
+
+        // [[ARABIC_COMMENT]] حفظ في الكاش إذا تم طلب ذلك
+        if (options.useCache) {
+            apiCache.set(endpoint, data);
         }
 
         return data;
     } catch (error: any) {
+        clearTimeout(timeoutId);
+        
+        // [[ARABIC_COMMENT]] إعادة المحاولة تلقائياً في حالة فشل الشبكة أو المهلة
+        if (retries > 0 && (error.name === 'AbortError' || error.message.includes('fetch'))) {
+            console.warn(`[API Retry] Retrying ${url}... Attempts left: ${retries}`);
+            return fetchAPI(endpoint, options, retries - 1);
+        }
+
         console.error(`[API Error] ${url}:`, error);
         throw error;
     }
@@ -103,15 +131,14 @@ export const api = {
             body: JSON.stringify(data),
         }),
     },
+    // --- خدمات التحليلات والإحصائيات (Analytics) ---
     analytics: {
-        // ملخص إحصائي للداشبورد
-        // [[ARABIC_COMMENT]] period اختياري لدعم الفلاتر الزمنية من الواجهة
+        // الحصول على الملخص العام
         getSummary: (period?: 'all' | 'week' | 'month' | 'year') =>
             fetchAPI(`/api/v2/analytics${period ? `?period=${period}` : ''}`),
-        // أحدث الأنشطة
+        // عرض أحدث العمليات والأنشطة
         getActivities: (limit = 10) => fetchAPI(`/api/v2/analytics/activities?limit=${limit}`),
-        // إحصائيات تفصيلية
-        // [[ARABIC_COMMENT]] يرجع الرسم الشهري + أفضل المبيعات وفق period
+        // الإحصائيات التفصيلية بالرسوم البيانية
         getDetailed: (period?: 'all' | 'week' | 'month' | 'year') =>
             fetchAPI(`/api/v2/analytics/detailed${period ? `?period=${period}` : ''}`),
     },
@@ -143,7 +170,9 @@ export const api = {
         }),
         delete: (id: string) => fetchAPI(`/api/v2/users/${id}`, { method: 'DELETE' }),
     },
+    // --- خدمات إدارة السيارات والمعرض (Cars) ---
     cars: {
+        // جلب قائمة السيارات المتوفرة
         list: (params: Record<string, string | number | boolean> = {}) => {
             const query = new URLSearchParams(params as Record<string, string>).toString();
             return fetchAPI(`/api/v2/cars?${query}`);
@@ -161,7 +190,7 @@ export const api = {
             method: 'DELETE'
         }),
         getStyles: () => fetchAPI('/api/v2/cars/makes'),
-        // [[ARABIC_COMMENT]] تعليم السيارة كـ "مباعة" - تختفي من المعرض فوراً
+        // تحديد السيارة كمباعة وبأي سعر
         markSold: (id: string, soldPrice?: number) => fetchAPI(`/api/v2/cars/${id}/sold`, {
             method: 'PATCH',
             body: JSON.stringify({ soldPrice }),
@@ -231,6 +260,24 @@ export const api = {
             body: JSON.stringify({ status }),
         }),
         delete: (id: string) => fetchAPI(`/api/v2/orders/${id}`, { method: 'DELETE' }),
+    },
+    // --- خدمات الفواتير (Invoices) ---
+    invoices: {
+        list: (params: any = {}) => {
+            const query = new URLSearchParams(params).toString();
+            return fetchAPI(`/api/v2/invoices?${query}`);
+        },
+        getNextNumber: () => fetchAPI('/api/v2/invoices/next-number'),
+        getById: (id: string) => fetchAPI(`/api/v2/invoices/${id}`),
+        create: (data: any) => fetchAPI('/api/v2/invoices', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        }),
+        updateStatus: (id: string, status: string) => fetchAPI(`/api/v2/invoices/${id}/status`, {
+            method: 'PATCH',
+            body: JSON.stringify({ status }),
+        }),
+        delete: (id: string) => fetchAPI(`/api/v2/invoices/${id}`, { method: 'DELETE' }),
     },
     upload: {
         image: (formData: FormData) => fetchAPI('/api/v2/upload', {

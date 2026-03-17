@@ -59,11 +59,11 @@ const database = {
   options: {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    maxPoolSize: 10, // الحد الأقصى للاتصالات
-    serverSelectionTimeoutMS: 5000, // مهلة اختيار الخادم
-    socketTimeoutMS: 45000, // مهلة الاتصال
-    bufferMaxEntries: 0, // تعطيل التخزين المؤقت
-    bufferCommands: false // تعطيل الأوامر المؤقتة
+    maxPoolSize: 50, // [[ARABIC_COMMENT]] رفع الحد الأقصى للاتصالات لدعم المزيد من المستخدمين المتزامنين
+    serverSelectionTimeoutMS: 5000,
+    socketTimeoutMS: 45000,
+    bufferMaxEntries: 0,
+    bufferCommands: false
   }
 };
 

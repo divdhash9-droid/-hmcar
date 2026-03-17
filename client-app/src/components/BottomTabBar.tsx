@@ -1,4 +1,10 @@
-﻿'use client';
+'use client';
+
+/**
+ * شريط التنقل السفلي (Bottom Tab Bar)
+ * مخصص لواجهة الجوال (PWA) ليوفر تجربة مشابهة للتطبيقات الأصلية.
+ * يتيح الانتقال السريع بين المعرض، المزادات، الصفحة الرئيسية، القطع، والحساب الشخصي.
+ */
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
@@ -8,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '@/lib/LanguageContext';
 
+// قائمة التبويبات (Tabs) والروابط المرتبطة بها
 const TABS = [
     {
         href: '/gallery',
@@ -52,6 +59,7 @@ export default function BottomTabBar() {
     const { isRTL } = useLanguage();
 
     const isActive = (tab: typeof TABS[0]) => {
+        // التحقق مما إذا كان المسار الحالي يطابق التبويب (سواء مطابقة تامة أو بداية المسار)
         if (tab.exact) return pathname === tab.href;
         return tab.matchPaths.some(p => pathname.startsWith(p));
     };
@@ -59,7 +67,7 @@ export default function BottomTabBar() {
     return (
         <nav
             className="fixed bottom-0 left-0 right-0 z-500 bg-cinematic-darker/98 border-t border-white/8 backdrop-blur-2xl"
-            style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+            style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }} // مراعاة المساحة الآمنة في هواتف آيفون الحديثة
             dir="ltr"
         >
             <div className="flex items-center justify-around px-1 pt-2 pb-2 max-w-lg mx-auto">

@@ -48,6 +48,10 @@ export interface ProductModalData {
     stock?: number;
 }
 
+/**
+ * البيانات المطلوبة لعرض المودال
+ */
+
 interface ProductModalProps {
     product: ProductModalData | null;
     onClose: () => void;
@@ -139,7 +143,7 @@ export default function ProductModal({ product, onClose, whatsappNumber }: Produ
         const phone = (whatsappNumber || '+821080880014').replace(/\D/g, '');
         const price = formatPrice ? formatPrice(product.price, product.displayCurrency as 'SAR' | 'USD' | 'KRW' | undefined, product.type) : `${product.price?.toLocaleString()} SAR`;
 
-        // في قطع الغيار: إذا بيانات العميل ناقصة، نحوله لطلب خاص بنفس فكرة المعرض الكوري.
+        // [[ARABIC_COMMENT]] منطق شراء قطع الغيار: إذا العميل لم يسجل دخوله، يتم تحويله لملء نموذج الطلب الخاص
         if (product.type === 'part') {
             let buyerName = '';
             let buyerPhone = '';
@@ -185,7 +189,7 @@ export default function ProductModal({ product, onClose, whatsappNumber }: Produ
             }
         }
 
-        // [[ARABIC_COMMENT]] تسجيل الطلب في القاعدة قبل الانتقال للواتساب
+        // [[ARABIC_COMMENT]] تسجيل الطلب في قاعدة البيانات لغرض الإحصائيات والمتابعة قبل فتح الواتساب
         try {
             await api.orders.create({
                 buyerId: user?._id || null,

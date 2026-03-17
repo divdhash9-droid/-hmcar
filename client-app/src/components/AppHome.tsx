@@ -1,10 +1,15 @@
 'use client';
 
+/**
+ * الواجهة الرئيسية لنمط التطبيق (AppHome)
+ * مصممة خصيصاً لتجربة الجوال (PWA) لتوفر سهولة الوصول للخدمات الأساسية.
+ */
+
 import React from 'react';
 import { motion } from 'framer-motion';
 import { 
-    Gavel, Car, ShoppingBag, Settings, 
-    Bell, User, ChevronRight, MessageCircle, Star 
+    Gavel, Car, ShoppingBag, 
+    Bell, User, ChevronRight, MessageCircle, Star, Send 
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -24,7 +29,7 @@ export default function AppHome({ isRTL, latestCars, formatPrice }: { isRTL: boo
         { href: '/auctions/live', labelAr: 'المزاد المباشر', labelEn: 'Live Auction', icon: Gavel, color: 'bg-[#00f0ff]/10 text-[#00f0ff] border-[#00f0ff]/20' },
         { href: '/gallery', labelAr: 'المعرض', labelEn: 'Showroom', icon: Car, color: 'bg-accent-gold/10 text-accent-gold border-accent-gold/20' },
         { href: '/parts', labelAr: 'قطع الغيار', labelEn: 'Parts Store', icon: ShoppingBag, color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
-        { href: '/concierge', labelAr: 'طلب خاص', labelEn: 'Requests', icon: Settings, color: 'bg-purple-500/10 text-purple-400 border-purple-500/20' },
+        { href: '/concierge', labelAr: 'طلب خاص', labelEn: 'Requests', icon: Send, color: 'bg-purple-500/10 text-purple-400 border-purple-500/20' },
     ];
 
     const userProfileImage = (user as any)?.image || null;
@@ -124,31 +129,35 @@ export default function AppHome({ isRTL, latestCars, formatPrice }: { isRTL: boo
 
                 <div className="flex flex-col gap-4">
                     {latestCars.slice(0, 3).map((car, i) => (
-                        <motion.button 
-                            key={car.id || i}
-                            whileTap={{ scale: 0.98 }}
-                            onClick={() => window.location.href = `/cars/${car.id}`}
-                            className="group relative flex items-center gap-4 p-3 rounded-[1.5rem] bg-white/[0.03] border border-white/5 hover:border-white/10 transition-all text-right"
+                        <Link 
+                            key={car.id || car._id || i}
+                            href={`/cars/${car.id || car._id || ''}`}
+                            className="group relative flex items-center gap-4 p-3 rounded-[1.5rem] bg-white/[0.03] border border-white/5 hover:border-white/10 transition-all text-right w-full"
                             dir={isRTL ? 'rtl' : 'ltr'}
                         >
-                            <div className="relative w-24 h-20 rounded-xl overflow-hidden border border-white/10 shrink-0">
-                                <Image src={car.images?.[0] || '/images/placeholder.jpg'} alt={car.title} fill className="object-cover" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                                <h4 className="text-xs font-black text-white uppercase truncate mb-1">
-                                    {car.title || car.name}
-                                </h4>
-                                <div className="flex items-center gap-2 mb-2">
-                                    <span className="text-[9px] font-bold text-white/40">{car.year}</span>
-                                    <span className="w-1 h-1 rounded-full bg-white/10" />
-                                    <span className="text-[9px] font-bold text-white/40 truncate">{car.make?.name || car.make}</span>
+                            <motion.div 
+                                whileTap={{ scale: 0.98 }}
+                                className="flex items-center gap-4 w-full"
+                            >
+                                <div className="relative w-24 h-20 rounded-xl overflow-hidden border border-white/10 shrink-0">
+                                    <Image src={car.images?.[0] || '/images/placeholder.jpg'} alt={car.title || 'Car'} fill className="object-cover" />
                                 </div>
-                                <p className="text-xs font-black text-accent-gold">
-                                    {formatPrice(Number(car.price || car.priceSar || (Number(car.priceUsd || 0) * 3.75) || 0))}
-                                </p>
-                            </div>
-                            <ChevronRight className={`w-4 h-4 text-white/10 group-hover:text-accent-gold transition-colors ${isRTL ? 'rotate-180' : ''}`} />
-                        </motion.button>
+                                <div className="flex-1 min-w-0">
+                                    <h4 className="text-xs font-black text-white uppercase truncate mb-1">
+                                        {car.title || car.name}
+                                    </h4>
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <span className="text-[9px] font-bold text-white/40">{car.year}</span>
+                                        <span className="w-1 h-1 rounded-full bg-white/10" />
+                                        <span className="text-[9px] font-bold text-white/40 truncate">{car.make?.name || car.make}</span>
+                                    </div>
+                                    <p className="text-xs font-black text-accent-gold">
+                                        {formatPrice(Number(car.price || car.priceSar || (Number(car.priceUsd || 0) * 3.75) || 0) || 0)}
+                                    </p>
+                                </div>
+                                <ChevronRight className={`w-4 h-4 text-white/10 group-hover:text-accent-gold transition-colors ${isRTL ? 'rotate-180' : ''}`} />
+                            </motion.div>
+                        </Link>
                     ))}
                 </div>
             </section>

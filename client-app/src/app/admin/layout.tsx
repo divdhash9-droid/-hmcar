@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import AdminNavbar from '@/components/AdminNavbar';
 import { useLanguage } from '@/lib/LanguageContext';
 
@@ -16,12 +17,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className="fixed inset-0 pointer-events-none z-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(7,7,17,0.85)_100%)]" />
 
             {/* Cockpit Admin Sidebar */}
-            <AdminNavbar />
+            <Suspense fallback={null}>
+                <AdminNavbar />
+            </Suspense>
 
             {/* Page content offset by AdminNavbar (260px) */}
             {/* lg:ps-[260px] (padding-inline-start) handles both RTL and LTR automatically */}
             <div className="relative z-10 pt-[64px] lg:pt-0 lg:ps-[260px] transition-all duration-300 overflow-hidden">
-                {children}
+                <Suspense fallback={null}>
+                    {children}
+                </Suspense>
             </div>
         </div>
     );

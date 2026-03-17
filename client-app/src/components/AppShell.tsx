@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * غلاف التطبيق (AppShell)
+ * يتحكم في مظهر التطبيق بناءً على ما إذا كان يعمل كموقع ويب عادي أو كتطبيق مثبت (PWA).
+ */
+
 import { useEffect, useState } from 'react';
 import { useStandalone } from '@/lib/useStandalone';
 import { usePathname } from 'next/navigation';
@@ -14,9 +19,9 @@ import AppBackground from './AppBackground';
  * ويظهر Bottom Tab Bar بدلاً من الـ Navbar العادية
  */
 export default function AppShell({ children }: { children: React.ReactNode }) {
-    const isStandalone = useStandalone();
-    const pathname = usePathname();
-    const [mounted, setMounted] = useState(false);
+    const isStandalone = useStandalone(); // التحقق من وضع التشغيل (مستقل PWA أو متصفح)
+    const pathname = usePathname(); // المسار الحالي
+    const [mounted, setMounted] = useState(false); // حالة التحميل الأولية (لحل مشاكل Hydration)
 
     useEffect(() => {
         setMounted(true);
@@ -60,19 +65,19 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                     {children}
                 </main>
                 
-                <BottomTabBar />
-                <GlobalDrawers />
-                <SmartIslandNotification />
+                <BottomTabBar /> {/* شريط التنقل السفلي كما في تطبيقات الجوال */}
+                <GlobalDrawers /> {/* الحاويات الجانبية العالمية (المفضلة، الإشعارات) */}
+                <SmartIslandNotification /> {/* الإشعارات العلوية الذكية */}
             </div>
         );
     }
 
-    // ── وضع الموقع العادي ──
+    // ── وضع الموقع العادي (Browser Mode) ──
     return (
         <>
             {children}
-            <GlobalDrawers />
-            <SmartIslandNotification />
+            <GlobalDrawers /> {/* الحاويات الجانبية تعمل في الموقع أيضاً */}
+            <SmartIslandNotification /> {/* تحذيرات النظام */}
         </>
     );
 }

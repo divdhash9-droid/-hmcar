@@ -1,5 +1,11 @@
 "use client";
 
+/**
+ * المعرض العائم (Floating Gallery)
+ * يعرض سيارات مميزة في شريط أفقي متحرك بشكل لانهائي.
+ * يتم تكرار العناصر لضمان استمرارية الحركة دون انقطاع.
+ */
+
 import Image from "next/image";
 import { useLanguage } from "@/lib/LanguageContext";
 import { cn } from "@/lib/utils";
@@ -15,8 +21,7 @@ const cars = [
 export default function FloatingGallery() {
     const { isRTL } = useLanguage();
 
-    // Create a seamless loop by duplicating content
-    // We need enough copies to cover the screen and scroll
+    // إنشاء حلقة سلسة عن طريق تكرار المحتوى (ثلاث نسخ لضمان التغطية الكاملة للشاشة أثناء الحركة)
     const displayCars = [...cars, ...cars, ...cars];
 
     return (
@@ -34,13 +39,10 @@ export default function FloatingGallery() {
             <div className="w-full overflow-hidden">
                 <div className={cn(
                     "flex gap-8 w-max hover:play-state-paused",
-                    // If RTL, we want to scroll from Left to Right (negative to positive or start at negative and move to 0?)
-                    // Actually, for RTL carousel, usually it still moves one way or the other.
-                    // Let's just make it move continually.
-                    // Standard marquee: translate from 0 to -50% (if doubled content).
                     "animate-scroll-gallery"
                 )}
                     style={{
+                        // عكس اتجاه الحركة في حالة اللغة العربية (RTL)
                         animationDirection: isRTL ? 'reverse' : 'normal'
                     }}
                 >

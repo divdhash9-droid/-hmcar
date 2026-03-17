@@ -1,5 +1,14 @@
 'use client';
 
+/**
+ * صفحة المزادات (Auctions Page)
+ * تعرض جميع جلسات المزايدة المتاحة للمستخدم.
+ * تنقسم الجلسات إلى:
+ * 1. مباشر (LIVE): مزادات تجري في الوقت الحالي.
+ * 2. المعرض (SHOWROOM): سيارات معروضة للمزايدة يدوياً.
+ * 3. قادمة (UPCOMING): مزادات ستبدأ قريباً.
+ */
+
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { Gavel, AlertCircle, Radio, Car } from "lucide-react";
@@ -26,15 +35,16 @@ export default function Auctions() {
     const normalizeImage = (src?: string) => (typeof src === 'string' ? src.trim() : '');
 
     useEffect(() => {
+        // تحميل البيانات بناءً على التبويب المختار (LIVE, SHOWROOM, UPCOMING)
         const loadData = async () => {
             setLoading(true);
             try {
                 if (activeTab === 'SHOWROOM') {
-                    // [[ARABIC_COMMENT]] جلب المزادات المباشرة اليدوية من قاعدة البيانات
+                    // جلب المزادات المباشرة اليدوية من قاعدة البيانات
                     const data = await api.liveAuctions.list();
                     if (data.success) setAuctions(data.data || []);
                 } else {
-                    // [[ARABIC_COMMENT]] الحالات الصحيحة: 'live' للمباشر و 'upcoming' للقادم
+                    // الحالات الصحيحة للـ API: 'live' للمباشر و 'upcoming' للقادم
                     const status = activeTab === 'LIVE' ? 'live' : 'upcoming';
                     const data = await api.auctions.list({ status });
                     if (data.success) setAuctions(data.data || []);

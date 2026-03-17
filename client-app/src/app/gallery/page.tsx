@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * صفحة مركز المعارض (Gallery Hub Page)
+ * تعتبر نقطة الدخول الرئيسية لاختيار نوع المعرض المفضل للمستخدم.
+ * تتيح للمستخدم الاختيار بين:
+ * 1. المعرض الكوري (Showroom): سيارات استيراد مباشر من كوريا بمواصفات خاصة.
+ * 2. معرض HM CAR (Cars): سيارات متوفرة محلياً في المخزون وجاهزة للتسليم.
+ */
+
 /* oxlint-disable react-native/no-raw-text, tailwindcss/no-unnecessary-arbitrary-value */
 
 import Link from 'next/link';
@@ -13,6 +21,8 @@ import { useRouter } from 'next/navigation';
 export default function GalleryHubPage() {
   const { isRTL } = useLanguage();
   const router = useRouter();
+  
+  // نصوص الصفحة المترجمة بناءً على اللغة المختارة
   const TXT = {
     choose: isRTL ? 'اختر المعرض المناسب' : 'Choose Your Showroom',
     title: isRTL ? 'المعرض' : 'SHOWROOM',
@@ -34,8 +44,10 @@ export default function GalleryHubPage() {
     <div className={cn('min-h-screen bg-cinematic-darker text-white', isRTL && 'font-arabic')} dir={isRTL ? 'rtl' : 'ltr'}>
       <Navbar />
 
+      {/* المحتوى الرئيسي للملف */}
       <main className="pt-32 pb-20 px-6">
         <div className="max-w-5xl mx-auto">
+          {/* قسم العنوان والوصف العلوي */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -48,6 +60,7 @@ export default function GalleryHubPage() {
                     <h1 className="text-4xl md:text-5xl font-black leading-tight">
                         {TXT.title}
                     </h1>
+                    {/* زر الرجوع للخلف */}
                     <button
                         onClick={() => router.back()}
                         title={isRTL ? 'رجوع' : 'Back'}
@@ -60,7 +73,9 @@ export default function GalleryHubPage() {
             <p className="text-white/50 mt-4 max-w-2xl mx-auto">{TXT.subtitle}</p>
           </motion.div>
 
+          {/* شبكة الخيارات (المعرض الكوري ومعرض HM CAR المحلي) */}
           <div className="grid md:grid-cols-2 gap-6">
+            {/* خيار المعرض الكوري */}
             <Link href="/showroom" className="group">
               <motion.div
                 whileHover={{ y: -6 }}
@@ -78,6 +93,7 @@ export default function GalleryHubPage() {
               </motion.div>
             </Link>
 
+            {/* خيار معرض HM CAR المحلي */}
             <Link href="/cars" className="group">
               <motion.div
                 whileHover={{ y: -6 }}

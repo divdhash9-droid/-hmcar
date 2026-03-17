@@ -12,7 +12,7 @@ const VAPID_PUBLIC_KEY = 'BNghi5tZPhPvYdmdEEPQPn6M5xuonh0cUsBRpdKjPsy1a9MusGgJuV
 function urlBase64ToUint8Array(base64String: string) {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
   const base64 = (base64String + padding)
-    .replace(/\-/g, '+')
+    .replace(/\-/g, '+') // تحويل تنسيق Base64 الخاص بالعناوين إلى تنسيق قياسي
     .replace(/_/g, '/');
 
   const rawData = window.atob(base64);
@@ -59,7 +59,7 @@ export default function PushNotificationManager() {
       }
     }
 
-    // [[ARABIC_COMMENT]] التحقق من دعم المتصفح واستمرارية الاشتراك
+    // التحقق من دعم المتصفح لنظام الإشعارات واستمرارية الاشتراك الفعال
     async function initPush() {
       if (typeof window === 'undefined' || !('serviceWorker' in navigator) || !('PushManager' in window)) {
         console.warn('[Push] Browser does not support push notifications');
@@ -77,7 +77,7 @@ export default function PushNotificationManager() {
         const subscription = await registration.pushManager.getSubscription();
         
         if (subscription) {
-          // [[ARABIC_COMMENT]] تحديث الاشتراك في كل مرة لضمان بقائه حياً في السيرفر
+          // تحديث بيانات الاشتراك في كل مرة لضمان مزامنة التوكين مع الخادم
           await sendSubscriptionToBackend(subscription);
         } else {
           // إذا لم يكن هناك اشتراك، نطلب الصلاحية ونشترك

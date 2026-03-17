@@ -1,14 +1,22 @@
 'use client';
 
+/**
+ * سياق الهوية والتوثيق (AuthContext)
+ * المسؤول عن إدارة بيانات المستخدم المسجل، الصلاحيات، وعمليات تسجيل الخروج.
+ */
+
 import { useEffect, useState, createContext, useContext, ReactNode, useCallback } from 'react';
 
+/**
+ * واجهة بيانات المستخدم
+ */
 interface User {
-    _id: string;
-    name: string;
-    username?: string;
-    email?: string;
-    role: string;
-    phone?: string;
+    _id: string; // معرف المستخدم الفريد
+    name: string; // اسم المستخدم
+    username?: string; // اسم الدخول (اختياري)
+    email?: string; // البريد الإلكتروني (اختياري)
+    role: string; // دور المستخدم (مدير، عميل، إلخ)
+    phone?: string; // رقم الهاتف (اختياري)
 }
 
 interface AuthContextType {
@@ -22,6 +30,9 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+/**
+ * خطاف مخصص لاستخدام سياق التوثيق في أي مكون
+ */
 export function useAuth() {
     const context = useContext(AuthContext);
     if (!context) {
@@ -31,12 +42,15 @@ export function useAuth() {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-    const [user, setUser] = useState<User | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const [user, setUser] = useState<User | null>(null); // حاله المستخدم الحالي
+    const [isLoading, setIsLoading] = useState(true); // حالة التحميل أثناء التحقق من الجلسة
 
-    const isLoggedIn = !!user;
-    const isAdmin = user?.role === 'admin' || user?.role === 'super_admin' || user?.role === 'manager';
+    const isLoggedIn = !!user; // تحويل حالة المستخدم إلى قيمة منطقية (هل هو مسجل دخول؟)
+    const isAdmin = user?.role === 'admin' || user?.role === 'super_admin' || user?.role === 'manager'; // هل المستخدم لديه صلاحيات إدارية؟
 
+    /**
+     * مسح ملفات تعريف الارتباط (Cookies) الخاصة بالتوثيق
+     */
     const clearCookies = useCallback(() => {
         if (typeof document !== 'undefined') {
             document.cookie = 'hm_token=; path=/; max-age=0; SameSite=Lax';
@@ -44,6 +58,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     }, []);
 
+    /**
+     * مسح جميع بيانات التوثيق من التخزين المحلي والمتصفح
+     */
     const clearAuth = useCallback(() => {
         localStorage.removeItem('hm_token');
         localStorage.removeItem('hm_user');
@@ -52,6 +69,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(null);
     }, [clearCookies]);
 
+    /**
+     * التحقق من وجود جلسة دخول سابقة عند تحميل الموقع
+     */
     const checkExistingLogin = useCallback(() => {
         setIsLoading(true);
         try {
@@ -96,6 +116,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         checkExistingLogin();
     }
 
+    /**
+     * تسجيل الخروج
+     */
     function logout() {
         clearAuth();
         // إعادة توجيه للصفحة الرئيسية بعد الخروج

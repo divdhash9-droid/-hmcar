@@ -42,6 +42,7 @@
     color: var(--foreground);
     font-family: var(--font-tajawal), sans-serif;
     overflow-x: hidden;
+    scrollbar-gutter: stable; /* [[ARABIC_COMMENT]] يمنع اهتزاز الصفحة عند ظهور أو اختفاء شريط التمرير */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     padding-top: var(--safe-top);
@@ -156,11 +157,12 @@
   /* Cinematic Glass Card */
   .glass-card {
     background: linear-gradient(145deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
-    backdrop-filter: blur(10px) saturate(130%);
-    -webkit-backdrop-filter: blur(10px) saturate(130%);
+    backdrop-filter: blur(6px) saturate(130%);
+    -webkit-backdrop-filter: blur(6px) saturate(130%);
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    transition: all 0.5s var(--ease-cinematic);
+    transition: transform 0.4s var(--ease-cinematic), border-color 0.4s ease, box-shadow 0.4s ease;
+    will-change: transform;
   }
 
   .glass-card:hover {
@@ -317,6 +319,30 @@
 
 .animate-pulse-glow {
   animation: pulse-glow 3s ease-in-out infinite;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes marquee-rtl {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(50%); }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee-rtl {
+  animation: marquee-rtl 30s linear infinite;
+  will-change: transform;
+}
+
+.pause-marquee:hover {
+  animation-play-state: paused;
 }
 
 /* Scrollbar */

@@ -1,12 +1,17 @@
 'use client';
 
+/**
+ * سياق الاتصال الفوري (SocketContext)
+ * المسؤول عن إنشاء وإدارة اتصال WebSockets مع الخادم لتلقي الإشعارات والتحديثات الحية.
+ */
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from './AuthContext';
 
 interface SocketContextType {
-    socket: Socket | null;
-    isConnected: boolean;
+    socket: Socket | null; // كائن الاتصال (Socket Instance)
+    isConnected: boolean; // هل الاتصال نشط حالياً؟
 }
 
 const SocketContext = createContext<SocketContextType>({
@@ -17,9 +22,9 @@ const SocketContext = createContext<SocketContextType>({
 export const useSocket = () => useContext(SocketContext);
 
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
-    const [socket, setSocket] = useState<Socket | null>(null);
-    const [isConnected, setIsConnected] = useState(false);
-    const { user, isLoggedIn } = useAuth();
+    const [socket, setSocket] = useState<Socket | null>(null); // حالة كائن السوكت
+    const [isConnected, setIsConnected] = useState(false); // حالة الاتصال
+    const { user, isLoggedIn } = useAuth(); // جلب بيانات المستخدم لربط الاتصال به
 
     useEffect(() => {
         // الاتصال بالخادم (استبدل بالرابط الفعلي في الإنتاج)
@@ -32,7 +37,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
             console.log('✅ Connected to Real-time Server');
             setIsConnected(true);
 
-            // إذا كان المستخدم أدمن، ينضم لغرفة الأدمن لتلقي التنبيهات
+            // إذا كان المستخدم مديراً (Admin)، ينضم لغرفة الإدارة لتلقي تنبيهات النظام والتحكم
             if (user?.role === 'admin') {
                 socketInstance.emit('join_room', 'admin_room');
             }
@@ -43,14 +48,15 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
             setIsConnected(false);
         });
 
+        // الاستماع للإشعارات الجديدة القادمة من الخادم
         socketInstance.on('new_notification', (data: any) => {
             console.log('⚡ New Real-time Notification:', data);
             
-            // [[ARABIC_COMMENT]] إرسال حدث مخصص لتشغيل الـ Smart Island في الواجهة
+            // [[ARABIC_COMMENT]] إرسال حدث مخصص لتشغيل مكون الـ Smart Island في الواجهة لعرض الإشعار للمستخدم
             window.dispatchEvent(new CustomEvent('hm_smart_alert', {
                 detail: {
                     id: data.id || Math.random().toString(),
-                    title: data.title || 'Notification',
+                    title: data.title || 'تنبيه جديد',
                     message: data.message || '',
                     type: data.type || 'info',
                     actionLabel: data.actionLabel,
@@ -66,7 +72,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
         };
     }, [user?.role]);
 
-    // إرسال حدث تسجيل الدخول عند الدخول الأول للمنصة
+    // إرسال حدث (User Login) عند استقرار الاتصال لتوثيق المستخدم في السوكت
     useEffect(() => {
         if (isLoggedIn && user && socket && isConnected) {
             socket.emit('user_login', {

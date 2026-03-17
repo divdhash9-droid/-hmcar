@@ -132,6 +132,9 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: false,
   },
+  experimental: {
+    optimizePackageImports: ["lucide-react", "framer-motion"],
+  },
 };
 
 // [[ARABIC_COMMENT]] تصدير الإعدادات مغلفة بـ Sentry

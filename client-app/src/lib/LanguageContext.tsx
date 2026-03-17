@@ -1,5 +1,11 @@
 'use client';
 
+/**
+ * سياق اللغة والترجمة (LanguageContext)
+ * المسؤول عن إدارة لغات التطبيق (العربية، الإنجليزية، الكورية).
+ * يحتوي على قاموس الترجمات ووظائف التبديل بين اللغات.
+ */
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 type Language = 'AR' | 'EN' | 'KR';
@@ -161,25 +167,30 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 // [[ARABIC_HEADER]] هذا الملف مسؤول عن إدارة اللغات في التطبيق (العربية، الإنجليزية، والكورية).
-// يتم تخزين خيار المستخدم في LocalStorage و Cookies لضمان استمرارية الخيار.
-
+/**
+ * مزود سياق اللغة (LanguageProvider)
+ */
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-    // تهيئة اللغة مباشرة من المتصفح أو التخزين المحلي لتجنب التحديث المتأخر
+    // تهيئة اللغة مباشرة من المتصفح أو التخزين المحلي لتجنب التحديث المتأخر عند التحميل
     const [lang, setLang] = useState<Language>(() => {
         if (typeof window === 'undefined') return 'AR';
         const cookieMatch = document.cookie.match(/(?:^|; )appLang=([^;]+)/);
         const cookieLang = cookieMatch ? decodeURIComponent(cookieMatch[1]) : null;
         const storedLang = localStorage.getItem('appLang') as Language | null;
 
+        // التحقق من صحة اللغة المخزنة
         if (cookieLang === 'EN' || cookieLang === 'AR' || cookieLang === 'KR') return cookieLang as Language;
         if (storedLang === 'EN' || storedLang === 'AR' || storedLang === 'KR') return storedLang as Language;
-        return 'AR';
+        return 'AR'; // اللغة الافتراضية
     });
 
+    /**
+     * حفظ اللغة المختارة في التخزين المحلي وملفات البريد (Cookies)
+     */
     const persistLang = (value: Language) => {
         if (typeof window === 'undefined') return;
         localStorage.setItem('appLang', value);
-        document.cookie = `appLang=${value}; path=/; max-age=${60 * 60 * 24 * 365};`; // سنة واحدة
+        document.cookie = `appLang=${value}; path=/; max-age=${60 * 60 * 24 * 365};`; // صلاحية لمدة سنة
     };
 
     useEffect(() => {
@@ -187,7 +198,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     }, [lang]);
 
     const toggleLanguage = () => {
-        // التنقل بين اللغات (AR -> EN -> KR -> AR)
+        // التنقل التتابعي بين اللغات (عربي -> إنجليزي -> كوري -> عربي)
         const nextLang: Record<Language, Language> = {
             'AR': 'EN',
             'EN': 'KR',
@@ -201,7 +212,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     };
 
     const rawText = (text: string): string => text;
-    const isRTL = lang === 'AR';
+    const isRTL = lang === 'AR'; // هل اللغة الحالية تدعم الكتابة من اليمين لليسار؟
 
     return (
         <LanguageContext.Provider value={{ lang, toggleLanguage, t, rawText, isRTL }}>

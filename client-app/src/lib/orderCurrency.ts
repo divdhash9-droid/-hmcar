@@ -1,3 +1,8 @@
+/**
+ * مساعد تحويل العملات للطلبات (Order Currency Helper)
+ * يوفر وظائف لحساب أسعار المنتجات في الطلبات بناءً على "لقطة" (Snapshot) لسعر الصرف
+ * وقت إنشاء الطلب، لضمان استقرار الأسعار حتى لو تغيرت أسعار الصرف العالمية لاحقاً.
+ */
 export type CurrencyCode = 'SAR' | 'USD' | 'KRW';
 
 interface ExchangeSnapshot {
@@ -28,6 +33,10 @@ const getSymbol = (currency: CurrencyCode) => {
     return 'ر.س';
 };
 
+/**
+ * تحليل لقطة أسعار الصرف من بيانات الطلب
+ * تستخرج أسعار الدولار مقابل الريال والوون التي كانت معتمدة وقت الطلب.
+ */
 export const resolveOrderSnapshot = (order: any, fallbackRates?: CurrencyRates): Required<ExchangeSnapshot> => {
     const snapshot = order?.pricing?.exchangeSnapshot || {};
 

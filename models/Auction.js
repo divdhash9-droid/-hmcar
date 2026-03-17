@@ -21,6 +21,11 @@ const auctionSchema = new mongoose.Schema({
   status: { type: String, enum: ['scheduled', 'running', 'ended'], default: 'scheduled' }
 }, { timestamps: true });
 
+// [[ARABIC_COMMENT]] إضافة فهارس (Indexes) لتحسين سرعة الاستعلامات
+auctionSchema.index({ status: 1, startsAt: 1, endsAt: 1 });
+auctionSchema.index({ car: 1 });
+auctionSchema.index({ endsAt: 1 });
+
 auctionSchema.methods.isActive = function() {
   // يتحقق إن كان المزاد ضمن الفترة الزمنية ولم يتم إغلاقه
   const now = new Date();

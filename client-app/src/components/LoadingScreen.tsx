@@ -1,5 +1,11 @@
 'use client';
 
+/**
+ * شاشة التحميل السينمائية (Loading Screen)
+ * تظهر عند فتح التطبيق لأول مرة أو أثناء تحميل الموارد الأساسية.
+ * تحتوي على شريط تقدم (Progress Bar) وشعار متحرك مع تأثيرات إضاءة "Orb".
+ */
+
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/lib/LanguageContext";
@@ -11,10 +17,12 @@ export default function LoadingScreen() {
     const [isVisible, setIsVisible] = useState(true);
 
     useEffect(() => {
+        // محاكاة عملية التحميل لزيادة شريط التقدم بشكل عشوائي ومنتظم
         const timer = setInterval(() => {
             setProgress(prev => {
                 if (prev >= 100) {
                     clearInterval(timer);
+                    // إخفاء الشاشة بعد اكتمال التحميل بمدة قصيرة
                     setTimeout(() => setIsVisible(false), 600);
                     return 100;
                 }

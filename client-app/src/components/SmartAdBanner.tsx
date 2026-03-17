@@ -1,6 +1,12 @@
 'use client';
 
 /**
+ * الشريط الإعلاني الذكي (Smart Ad Banner)
+ * مكون ديناميكي يعرض مجموعة من السيارات (مزادات مباشرة أو سيارات المعرض) بشكل شريط متحرك (Marquee).
+ * يعتمد بشكل كلي على الإعدادات التي يحددها المسؤول (Admin) في لوحة التحكم.
+ */
+
+/**
  * الشريط الإعلاني الذكي - SmartAdBanner
  * ─────────────────────────────────────────
  * يُعرض في الصفحة الرئيسية ويعمل وفق إعدادات الأدمن:
@@ -24,6 +30,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { useSettings } from '@/lib/SettingsContext';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
+import { cn } from '@/lib/utils';
 
 // ── نوع السيارة المستخدمة في الشريط ──
 interface BannerCar {
@@ -38,8 +45,8 @@ interface BannerCar {
     mileage?: number;
     fuelType?: string;
     transmission?: string;
-    source: 'live' | 'korean' | 'hmcar'; // مصدر السيارة
-    auctionUrl?: string;   // رابط المزاد إن وُجد
+    source: 'live' | 'korean' | 'hmcar'; // مصدر السيارة (مزاد مباشر، كوري، أو محلي)
+    auctionUrl?: string;   // رابط صفحة المزاد إن وُجد
 }
 
 // ── نوع إعدادات الإعلانات ──
@@ -114,7 +121,7 @@ function CarModal({
                 className="relative w-full md:max-w-2xl bg-black border border-white/10 rounded-t-[2.5rem] md:rounded-[2.5rem] overflow-hidden shadow-2xl max-h-[90vh] overflow-y-auto"
                 dir={isRTL ? 'rtl' : 'ltr'}
             >
-                {/* زر الإغلاق */}
+                {/* زر الإغلاق (Close Button) */}
                 <button
                     onClick={onClose}
                     title={isRTL ? 'إغلاق' : 'Close'}
@@ -293,12 +300,12 @@ export default function SmartAdBanner() {
     const router = useRouter();
 
     // ── الحالة ──
-    const [adSettings, setAdSettings] = useState<AdvertisingSettings>({});
-    const [cars, setCars] = useState<BannerCar[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [selectedCar, setSelectedCar] = useState<BannerCar | null>(null);
-    const [isPaused, setIsPaused] = useState(false);
-    const [showroomType, setShowroomType] = useState<'live' | 'showroom'>('showroom');
+    const [adSettings, setAdSettings] = useState<AdvertisingSettings>({}); // إعدادات الإعلانات المجلوبة من السيرفر
+    const [cars, setCars] = useState<BannerCar[]>([]); // قائمة السيارات التي ستظهر في الشريط
+    const [loading, setLoading] = useState(true); // حالة التحميل
+    const [selectedCar, setSelectedCar] = useState<BannerCar | null>(null); // السيارة المختارة لعرض تفاصيلها
+    const [isPaused, setIsPaused] = useState(false); // هل الحركة متوقفة (عند مرور الماوس)؟
+    const [showroomType, setShowroomType] = useState<'live' | 'showroom'>('showroom'); // نوع العرض الحالي
 
     // ── تحميل إعدادات الإعلانات وسيارات الشريط ──
     useEffect(() => {
@@ -493,16 +500,16 @@ export default function SmartAdBanner() {
                             ))}
                         </div>
                     ) : (
-                        <motion.div
-                            className="flex gap-4 w-max px-6"
-                            animate={{ x: isPaused ? undefined : (isRTL ? [0, cars.length * 210] : [0, -(cars.length * 210)]) }}
-                            transition={{
-                                duration: Math.max(15, cars.length * 6),
-                                repeat: Infinity,
-                                ease: 'linear',
-                                repeatType: 'loop',
+                        <div
+                            className={cn(
+                                "flex gap-4 w-max px-6",
+                                isRTL ? "animate-marquee-rtl" : "animate-marquee",
+                                "pause-marquee"
+                            )}
+                            style={{ 
+                                animationDuration: `${Math.max(15, cars.length * 6)}s`,
+                                animationPlayState: isPaused ? 'paused' : 'running'
                             }}
-                            style={{ willChange: 'transform' }}
                         >
                             {displayCars.map((car, idx) => (
                                 <motion.button
@@ -546,7 +553,7 @@ export default function SmartAdBanner() {
                                     )}
                                 </motion.button>
                             ))}
-                        </motion.div>
+                        </div>
                     )}
                 </div>
             </section>

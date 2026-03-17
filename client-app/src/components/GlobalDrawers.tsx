@@ -1,5 +1,11 @@
 'use client';
 
+/**
+ * اللوحات الجانبية العالمية (Global Drawers)
+ * مكون واحد يتحكم في عرض لوحة "المفضلة" أو "الإشعارات" بناءً على حالة الـ UI.
+ * يستخدم التصميم السينمائي الغامق مع تأثيرات ضبابية (Blur) وحركات سلسة.
+ */
+
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, Bell, X, ArrowRight, Clock, Gavel, ShoppingBag, Car, Gift, Settings, AlertTriangle } from 'lucide-react';
@@ -11,7 +17,7 @@ import Image from 'next/image';
 
 const rawText = (value: string) => value;
 
-// --- Favorites Types ---
+// --- أنواع البيانات للمفضلة (Favorites) ---
 interface FavoriteItem {
     id: string;
     type: 'car' | 'part';
@@ -21,14 +27,14 @@ interface FavoriteItem {
     brand?: string;
 }
 
-// --- Notification Types ---
+// --- أنواع الإشعارات وأيقوناتها وألوانها ---
 const NOTIFICATION_TYPES = {
-    bid: { icon: Gavel, color: 'from-amber-500 to-orange-600' },
-    order: { icon: ShoppingBag, color: 'from-emerald-500 to-green-600' },
-    car: { icon: Car, color: 'from-blue-500 to-cyan-600' },
-    promo: { icon: Gift, color: 'from-pink-500 to-rose-600' },
-    system: { icon: Settings, color: 'from-slate-500 to-gray-600' },
-    alert: { icon: AlertTriangle, color: 'from-red-500 to-rose-600' },
+    bid: { icon: Gavel, color: 'from-amber-500 to-orange-600' }, // مزايدة
+    order: { icon: ShoppingBag, color: 'from-emerald-500 to-green-600' }, // طلب شراء
+    car: { icon: Car, color: 'from-blue-500 to-cyan-600' }, // سيارة جديدة
+    promo: { icon: Gift, color: 'from-pink-500 to-rose-600' }, // عرض ترويجي
+    system: { icon: Settings, color: 'from-slate-500 to-gray-600' }, // نظام
+    alert: { icon: AlertTriangle, color: 'from-red-500 to-rose-600' }, // تنبيه هام
 };
 
 const SAMPLE_NOTIFICATIONS = [

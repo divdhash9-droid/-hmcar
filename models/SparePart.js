@@ -34,4 +34,21 @@ const sparePartSchema = new mongoose.Schema({
   updatedByFirebaseUid: { type: String, required: false, default: '' }
 }, { timestamps: true });
 
+// [[ARABIC_COMMENT]] إضافة فهارس (Indexes) لتحسين سرعة الاستعلامات
+sparePartSchema.index(
+  { name: 'text', nameAr: 'text', carMake: 'text', carModel: 'text' },
+  {
+    weights: {
+      name: 10,
+      nameAr: 10,
+      carMake: 3,
+      carModel: 3
+    },
+    name: "SparePartTextSearch"
+  }
+);
+sparePartSchema.index({ carMake: 1, carModel: 1, carYear: -1 });
+sparePartSchema.index({ inStock: 1, price: 1 });
+sparePartSchema.index({ brand: 1 });
+
 module.exports = mongoose.model('SparePart', sparePartSchema);

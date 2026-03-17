@@ -1,5 +1,11 @@
 'use client';
 
+/**
+ * مكون تبديل العملة (Currency Switcher)
+ * يتيح للمستخدم تغيير العملة المعروضة في الموقع (ريال سعودي، دولار أمريكي، وون كوري).
+ * يتفاعل مع SettingsContext لتحديث الأسعار في كافة أرجاء الموقع فوراً.
+ */
+
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
@@ -17,6 +23,7 @@ export default function CurrencySwitcher({ className, variant = 'full' }: Curren
     const { isRTL } = useLanguage();
     const [isOpen, setIsOpen] = React.useState(false);
 
+    // قائمة العملات المدعومة مع تسمياتها وألوانها الرمزية
     const currencies: { code: 'SAR' | 'USD' | 'KRW'; label: string; symbol: string; color: string }[] = [
         { code: 'SAR', label: isRTL ? 'ريال سعودي' : 'Saudi Riyal', symbol: 'ر.س', color: 'bg-emerald-500' },
         { code: 'USD', label: isRTL ? 'دولار أمريكي' : 'US Dollar', symbol: '$', color: 'bg-blue-500' },

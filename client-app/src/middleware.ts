@@ -6,7 +6,7 @@ import type { NextRequest } from 'next/server';
  * يعمل كـ Edge Middleware قبل تحميل أي صفحة
  */
 
-// المسارات المحمية التي تتطلب تسجيل دخول
+// المسارات المحمية التي تتطلب تسجيل دخول (للعملاء)
 const PROTECTED_CLIENT_ROUTES = [
     '/client',
     '/profile',
@@ -17,19 +17,22 @@ const PROTECTED_CLIENT_ROUTES = [
     '/comparisons',
 ];
 
+// المسارات المحمية للمدراء
 const PROTECTED_ADMIN_ROUTES = ['/admin'];
+// مسارات التوثيق (تسجيل الدخول / إنشاء حساب)
 const AUTH_ROUTES = ['/login', '/register'];
 
 export function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
-    // قراءة التوكن من الـ cookies
+    // قراءة التوكن (Token) من ملفات تعريف الارتباط للتحقق من الجلسة
     const token = request.cookies.get('hm_token')?.value;
-    const isAuthenticated = !!token;
+    const isAuthenticated = !!token; // هل المستخدم موثق؟
 
-    // ── 1. حماية مسارات الأدمن ──
+    // ── 1. حماية مسارات الإدارة (Admin Protection) ──
     if (PROTECTED_ADMIN_ROUTES.some(r => pathname.startsWith(r))) {
         if (!isAuthenticated) {
+            // إذا لم يكن مسجلاً، يتم تحويله لصفحة الدخول مع حفظ المسار المطلوب
             const loginUrl = new URL('/login', request.url);
             loginUrl.searchParams.set('redirect', pathname);
             loginUrl.searchParams.set('role', 'admin');
@@ -46,8 +49,8 @@ export function middleware(request: NextRequest) {
         }
     }
 
-    // ── 3. إذا كان مسجلاً ويحاول فتح /login أو /register ──
-    //    نحوله لصفحته بدلاً من إظهار صفحة الدخول
+    // ── 3. منع الدخول لصفحات التوثيق إذا كان المستخدم مسجلاً بالفعل ──
+    //    يتم تحويله لصفحة التحكم الخاصة به (Admin Dashboard أو Client Dashboard)
     const isAuthRoute = AUTH_ROUTES.some(r => pathname === r);
     if (isAuthRoute && isAuthenticated) {
         const userRole = request.cookies.get('hm_user_role')?.value;

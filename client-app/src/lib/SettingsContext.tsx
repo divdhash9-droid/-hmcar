@@ -1,14 +1,20 @@
 'use client';
 
+/**
+ * سياق الإعدادات (SettingsContext)
+ * المسؤول عن جلب وإدارة إعدادات الموقع العامة من الخادم، بما في ذلك أسعار العملات،
+ * معلومات التواصل، ومحتوى الصفحة الرئيسية.
+ */
+
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { api } from '@/lib/api';
 
 interface CurrencySettings {
-    usdToSar: number;
-    usdToKrw: number;
-    activeCurrency: string;
-    partsMultiplier?: number;
-    auctionMultiplier?: number;
+    usdToSar: number; // سعر تحويل الدولار إلى ريال
+    usdToKrw: number; // سعر تحويل الدولار إلى وون كوري
+    activeCurrency: string; // العملة الافتراضية للموقع
+    partsMultiplier?: number; // معامل ربح قطع الغيار
+    auctionMultiplier?: number; // معامل ربح المزادات
 }
 
 interface Feature {
@@ -87,6 +93,9 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     const [loading, setLoading] = useState(true);
     const [displayCurrency, setDisplayCurrency] = useState<'SAR' | 'USD' | 'KRW'>('SAR');
 
+    /**
+     * تحديث الإعدادات من الخادم
+     */
     const refreshSettings = useCallback(async () => {
         try {
             const res = await api.settings.getPublic();
@@ -97,7 +106,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
                 if (res.data.homeContent) setHomeContent(res.data.homeContent);
                 if (res.data.features) setFeatures(res.data.features);
 
-                // Set initial display currency from settings if not manually changed
+                // تحديد العملة المفضلة للمستخدم من التخزين المحلي أو الإعدادات الافتراضية
                 const stored = localStorage.getItem('displayCurrency');
                 if (stored === 'USD' || stored === 'SAR' || stored === 'KRW') {
                     setDisplayCurrency(stored as 'SAR' | 'USD' | 'KRW');
@@ -121,14 +130,18 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem('displayCurrency', c);
     };
 
+    /**
+     * دالة داخلية لتنسيق الرقم حسب العملة واللغة (Intl.NumberFormat)
+     */
     const formatByCurrency = (amount: number, activeCurr: 'SAR' | 'USD' | 'KRW') => {
         let locale = 'ar-SA';
         if (activeCurr === 'USD') locale = 'en-US';
         if (activeCurr === 'KRW') locale = 'ko-KR';
 
+        // استخدام واجهة برمجة تطبيقات التنسيق الدولية (Intl) لتنسيق الرقم حسب الدولة
         const formatter = new Intl.NumberFormat(locale, {
             minimumFractionDigits: 0,
-            maximumFractionDigits: activeCurr === 'USD' ? 2 : 0,
+            maximumFractionDigits: activeCurr === 'USD' ? 2 : 0, // الدولار يحتاج لمنزلتين عشريتين
         });
 
         const formattedNumber = formatter.format(amount);
@@ -150,7 +163,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
         const activeCurr = forcedCurrency || displayCurrency;
         let safeSar = Number(priceInSar || 0);
 
-        // Apply multipliers if applicable
+        // تطبيق معاملات الربح بناءً على نوع المنتج (قطع غيار أو مزاد)
         if (type === 'part' && currency.partsMultiplier) {
             safeSar *= currency.partsMultiplier;
         } else if (type === 'auction' && currency.auctionMultiplier) {

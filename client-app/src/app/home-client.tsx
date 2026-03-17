@@ -1,11 +1,17 @@
 "use client";
 
+/**
+ * المكون الرئيسي للصفحة الرئيسية (HomeClient)
+ * يتحكم في عرض الموقع بناءً على المنصة (متصفح أو PWA مثبت).
+ * يتضمن الخلفية السينمائية، شريط الإعلانات، وعرض السيارات الأحدث.
+ */
+
 import React, { useRef, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   Sparkles, Shield, Truck, CreditCard, Award, Star, Zap, Globe,
   MessageCircle, Smartphone, Download, Link as LinkIcon, ArrowUpRight,
-  ArrowRight, RefreshCw, Car, Play, Check, ChevronLeft, ChevronRight,
+  ArrowRight, Car, Play, Check, ChevronLeft, ChevronRight,
   Quote, Phone, Instagram, Facebook, Youtube, Send, Linkedin,
   Mail, Search, Gavel, Cog, Info, User, LogOut, Menu, X, Plus
 } from "lucide-react";
@@ -16,9 +22,11 @@ import CinematicVideoBackground from "@/components/CinematicVideoBackground";
 import { useLanguage } from "@/lib/LanguageContext";
 import { api } from "@/lib/api";
 
-import LandingShowcase from "@/components/LandingShowcase";
-import SmartAdBanner from "@/components/SmartAdBanner"; // الشريط الإعلاني الذكي المتحرك
-import AppHome from "@/components/AppHome"; // الواجهة المخصصة للتطبيق
+import dynamic from "next/dynamic";
+const LandingShowcase = dynamic(() => import("@/components/LandingShowcase"), { ssr: false });
+const AppHome = dynamic(() => import("@/components/AppHome"), { ssr: false });
+const SmartAdBanner = dynamic(() => import("@/components/SmartAdBanner"), { ssr: false });
+
 import { useRouter } from "next/navigation";
 import { useSocket } from "@/lib/SocketContext";
 import CurrencySwitcher from "@/components/CurrencySwitcher";
@@ -137,10 +145,10 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
   const [videoHeight, setVideoHeight] = useState<string>("55vh");
   const [deferredInstall, setDeferredInstall] = useState<any>(null);
   const [isInstalled, setIsInstalled] = useState(() => {
+    // التحقق مما إذا كان التطبيق مسجلاً كمثبت في التخزين المحلي
     if (typeof window !== 'undefined') return !!localStorage.getItem('pwa_installed');
     return false;
   });
-  const [showUpdateBanner, setShowUpdateBanner] = useState(false);
 
   useEffect(() => {
     const handler = (e: Event) => { e.preventDefault(); setDeferredInstall(e); };
@@ -149,13 +157,6 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
     return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
 
-  useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.addEventListener('message', (e) => {
-        if (e.data?.type === 'SW_UPDATED') setShowUpdateBanner(true);
-      });
-    }
-  }, []);
 
   const handleInstallPWA = async () => {
     if (!deferredInstall) return;
@@ -169,6 +170,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
   const isStandalone = useStandalone();
 
   useEffect(() => {
+    // إذا كان التطبيق يعمل كـ PWA مثبت والمستخدم مسجل دخول، يتم تحويله مباشرة للوحة التحكم
     if (isStandalone && isLoggedIn) {
       router.replace('/client/dashboard');
     }
@@ -344,16 +346,27 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
         />
       ) : null}
 
+      {/* ── BACK TO TOP BUTTON ── */}
+      <motion.button
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        className="fixed bottom-8 right-8 z-50 w-12 h-12 rounded-2xl bg-accent-gold text-black flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
+        title={isRTL ? 'الرجوع للأعلى' : 'Back to Top'}
+      >
+        <ArrowRight className="-rotate-90 w-5 h-5" />
+      </motion.button>
+
       {/* ── CONTENT SWITCHER ── */}
       {isStandalone ? (
-        // ── واجهة التطبيق الاحترافية ──
+        // ── واجهة التطبيق الاحترافية (App Interface) ──
         <AppHome 
           isRTL={isRTL} 
           latestCars={latestCars} 
           formatPrice={formatPrice} 
         />
       ) : (
-        // ── واجهة الموقع الاستعراضية ──
+        // ── واجهة الموقع الاستعراضية (Web Showcase) ──
         <>
           {/* 1. HERO SHOWCASE */}
           <LandingShowcase isRTL={isRTL} latestCars={latestCars} />
@@ -363,10 +376,13 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
             <section className="relative z-20 mb-24 overflow-hidden">
               <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/5 to-transparent" />
               <div className="relative py-4 border-y border-white/10 bg-black/50 backdrop-blur-xl">
-                <motion.div
-                  className="flex gap-4 w-max px-6"
-                  animate={{ x: isRTL ? ["0%", "50%"] : ["-50%", "0%"] }}
-                  transition={{ duration: latestCars.length * 8, repeat: Infinity, ease: "linear" }}
+                <div
+                  className={cn(
+                    "flex gap-4 w-max px-6",
+                    isRTL ? "animate-marquee-rtl" : "animate-marquee",
+                    "pause-marquee"
+                  )}
+                  style={{ animationDuration: `${latestCars.length * 8}s` }}
                 >
                   {[...latestCars, ...latestCars].map((car, index) => (
                     <button
@@ -390,7 +406,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
                       </span>
                     </button>
                   ))}
-                </motion.div>
+                </div>
               </div>
             </section>
           )}
@@ -405,11 +421,13 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
               </div>
 
               <div className="relative w-full overflow-hidden py-10 scale-[0.9] origin-center">
-                <motion.div
-                  className="flex gap-12 cursor-grab active:cursor-grabbing w-max px-12"
-                  animate={{ x: isRTL ? ["0%", "50%"] : ["-50%", "0%"] }}
-                  transition={{ duration: latestCars.length * 10, repeat: Infinity, ease: "linear" }}
-                  whileHover={{ animationPlayState: 'paused' }}
+                <div
+                  className={cn(
+                    "flex gap-12 w-max px-12",
+                    isRTL ? "animate-marquee-rtl" : "animate-marquee",
+                    "pause-marquee"
+                  )}
+                  style={{ animationDuration: `${latestCars.length * 10}s` }}
                 >
                   {[...latestCars, ...latestCars].map((car, index) => {
                     const makeName = getCarMakeLabel(car);
@@ -436,7 +454,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
                       </motion.div>
                     )
                   })}
-                </motion.div>
+                </div>
               </div>
             </section>
           )}
@@ -541,21 +559,7 @@ export default function HomeClient({ latestCars }: HomeClientProps) {
         </div>
       </footer>
 
-      {/* ── UPDATE SYSTEM OVERLAY ── */}
-      {showUpdateBanner && (
-        <motion.div initial={{ y: -100 }} animate={{ y: 0 }} className="fixed top-0 left-0 right-0 z-9999 bg-accent-gold text-black px-6 py-4 flex items-center justify-between shadow-3xl">
-          <div className="flex items-center gap-4">
-            <RefreshCw className="w-5 h-5 animate-spin" />
-            <span className="text-sm font-black uppercase tracking-widest">{isRTL ? 'تحديث جديد متاح!' : 'NEW UPDATE READY!'}</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <button onClick={() => window.location.reload()} className="px-6 py-2 bg-black text-accent-gold text-xs font-black uppercase tracking-widest rounded-xl hover:bg-black/80 transition-all">
-               {isRTL ? 'تحديث' : 'SYNC'}
-            </button>
-            <button onClick={() => setShowUpdateBanner(false)} className="text-black/40 hover:text-black transition-colors font-bold text-lg">✕</button>
-          </div>
-        </motion.div>
-      )}
+
 
     </main>
   );

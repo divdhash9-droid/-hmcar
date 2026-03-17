@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * ترويسة صفحات العملاء (Client Page Header)
+ * مكون موحد يظهر في أعلى صفحات لوحة تحكم العميل، يحتوي على:
+ * 1. زر العودة للخلف (Back Button).
+ * 2. أيقونة الصفحة.
+ * 3. العنوان الرئيسي والعنوان الفرعي.
+ */
+
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, LucideIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -23,7 +31,7 @@ export default function ClientPageHeader({ title, subtitle, icon: Icon }: Client
             transition={{ duration: 0.6 }}
             className="flex items-center gap-5 py-8"
         >
-            {/* Back Button */}
+            {/* زر العودة للخلف - يستخدم router.back() للرجوع للصفحة السابقة */}
             <button
                 onClick={() => router.back()}
                 className="group w-12 h-12 rounded-xl border border-white/8 bg-white/[0.02] backdrop-blur-md flex items-center justify-center hover:border-white/15 hover:bg-white/[0.05] transition-all duration-300 shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-luxury-gold/40"

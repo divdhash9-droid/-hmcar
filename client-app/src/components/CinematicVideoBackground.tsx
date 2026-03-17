@@ -1,5 +1,11 @@
 "use client";
 
+/**
+ * مكون الخلفية السينمائية (Cinematic Video Background)
+ * يعرض فيديو بدقة عالية كخلفية على أجهزة الكمبيوتر، وصورة ثابتة على الجوال لتوفير البيانات والبطارية.
+ * يحتوي على طبقات مظلمة وتأثيرات سينمائية (Vignette) لإبراز المحتوى العلوي.
+ */
+
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
@@ -24,10 +30,10 @@ export default function CinematicVideoBackground({
   children,
   height,
 }: CinematicVideoBackgroundProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [isDesktop, setIsDesktop] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [videoReady, setVideoReady] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null); // مرجع لعنصر الفيديو للتحكم البرمجي
+  const [isDesktop, setIsDesktop] = useState(false); // حالة لتحديد ما إذا كان الجهاز كمبيوتر
+  const [isLoaded, setIsLoaded] = useState(false); // هل تم تحميل المكون في المتصفح؟
+  const [videoReady, setVideoReady] = useState(false); // هل الفيديو جاهز للتشغيل؟
 
   // التحقق من نوع الجهاز (كمبيوتر أم جوال) عند التحميل وتغير الحجم
   useEffect(() => {
@@ -97,7 +103,7 @@ export default function CinematicVideoBackground({
               src={fallbackImage}
               alt="Background"
               fill
-              loading="lazy"
+              priority
               quality={75}
               className="object-cover opacity-50"
             />
@@ -138,7 +144,7 @@ export default function CinematicVideoBackground({
         </div>
       )}
 
-      {/* ── الطبقة السينمائية المظلمة ── */}
+      {/* ── الطبقة السينمائية المظلمة (Overlay) ── */}
       <motion.div
         className="absolute inset-0 z-20 bg-gradient-to-b from-black/50 via-black/20 to-black/80"
         initial={{ opacity: 0 }}
@@ -159,7 +165,7 @@ export default function CinematicVideoBackground({
         </div>
       )}
 
-      {/* ── محتوى الصفحة الممرر فوق الخلفية ── */}
+      {/* ── محتوى الصفحة (Children) ── */}
       <div className="relative z-30">{children}</div>
     </div>
   );

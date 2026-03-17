@@ -76,4 +76,9 @@ const orderSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
+// [[ARABIC_COMMENT]] إضافة فهارس (Indexes) لتحسين سرعة الاستعلامات
+orderSchema.index({ buyer: 1, status: 1 });
+orderSchema.index({ createdAt: -1 });
+orderSchema.index({ 'meta.pendingSaleToken': 1 });
+
 module.exports = mongoose.model('Order', orderSchema);

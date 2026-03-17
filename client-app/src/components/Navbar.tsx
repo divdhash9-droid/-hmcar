@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * مكون مسطرة التنقل العلوي (Navbar)
+ * يحتوي على الشعار، روابط التنقل، المفضلة، سلة المشتريات، وتغيير اللغة والعملة.
+ */
+
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -21,13 +26,14 @@ import CurrencySwitcher from './CurrencySwitcher';
 const rawText = (value: string) => value;
 
 export default function Navbar() {
-    const isStandalone = useStandalone();
-    const [isOpen, setIsOpen] = useState(false);
-    const [scrolled, setScrolled] = useState(false);
-    const [cartCount, setCartCount] = useState(0);
-    const pathname = usePathname();
+    const isStandalone = useStandalone(); // التحقق مما إذا كان التطبيق يعمل كـ PWA مثبت
+    const [isOpen, setIsOpen] = useState(false); // حالة القائمة الجانبية للجوال
+    const [scrolled, setScrolled] = useState(false); // حالة التمرير لتغيير شفافية المسطرة
+    const [cartCount, setCartCount] = useState(0); // عدد العناصر في السلة
+    const pathname = usePathname(); // مسار الصفحة الحالي
 
     // [[ARABIC_COMMENT]] جلب عدد عناصر السلة من localStorage
+    // تحديث عدد عناصر السلة عند التغيير في التخزين المحلي
     useEffect(() => {
         const updateCart = () => {
             try {
@@ -61,6 +67,7 @@ export default function Navbar() {
         return () => clearTimeout(timer);
     }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
+    // روابط التنقل الرئيسية
     const navLinks = [
         { href: '/gallery', label: isRTL ? 'المعرض' : 'SHOWROOM', icon: Car },
         { href: '/auctions', label: isRTL ? 'المزادات' : 'AUCTIONS', icon: Gavel },
@@ -94,7 +101,7 @@ export default function Navbar() {
                 dir={isRTL ? 'rtl' : 'ltr'}
             >
                 <div className="max-w-400 mx-auto px-6 flex items-center justify-between">
-                    {/* Logo + page-specific back */}
+                    {/* الشعار - Logo */}
                     <div className="group flex flex-col items-start gap-2 shrink-0">
                         <div className="flex items-center gap-3">
                             <Link href="/" className="flex items-center gap-3">
@@ -119,7 +126,7 @@ export default function Navbar() {
                     </div>
 
 
-                    {/* Right Actions */}
+                    {/* أزرار الإجراءات على اليمين (أو اليسار في RTL) - Right Actions */}
                     <div className="flex items-center gap-2">
                         {pathname !== '/' && (
                             <>
@@ -164,7 +171,7 @@ export default function Navbar() {
                                 {/* [[ARABIC_COMMENT]] محول العملات الجديد */}
                                 <CurrencySwitcher variant="minimal" />
 
-                                {/* [[ARABIC_COMMENT]] زر تغيير اللغة (منظم بجانب الأزرار) */}
+                                {/* زر تغيير اللغة - لتبديل الواجهة بين العربية والإنجليزية */}
                                 <button
                                     onClick={toggleLanguage}
                                     className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-all"
@@ -215,7 +222,7 @@ export default function Navbar() {
                             )}
                             dir={isRTL ? 'rtl' : 'ltr'}
                         >
-                            {/* Header */}
+                            {/* هيدر القائمة الجانبية - Header */}
                             <div className="flex items-center justify-between p-6 border-b border-white/5">
                                 <span className="text-lg font-black">
                                     {rawText('HM')} <span className="font-display italic text-white/30">{rawText('CAR')}</span>
@@ -225,7 +232,7 @@ export default function Navbar() {
                                 </button>
                             </div>
 
-                            {/* Links */}
+                            {/* الروابط داخل قائمة الجوال - Links */}
                             <div className="flex-1 p-6 space-y-2 overflow-y-auto">
                                 {navLinks.map((link, i) => (
                                     <motion.div
@@ -250,7 +257,7 @@ export default function Navbar() {
                                 ))}
                             </div>
 
-                            {/* Footer */}
+                            {/* تذييل القائمة الجانبية - Footer */}
                             <div className="p-6 border-t border-white/5 space-y-3">
                                 {!isLoggedIn && (
                                     <Link href="/login" className="block">

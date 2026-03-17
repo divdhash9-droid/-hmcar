@@ -1,3 +1,9 @@
+/**
+ * واجهة العرض الرئيسية (Landing Showcase)
+ * أول ما يراه المستخدم في الموقع (البوابة الرئيسية).
+ * تعرض الأقسام الثلاثة الكبرى: السيارات، قطع الغيار، وخدمات المزادات.
+ * تتميز بتأثيرات بصرية سينمائية (أشعة نيون، حركات انسابية، وتصاميم زجاجية).
+ */
 import { motion } from "framer-motion";
 import { Car, Wrench, Gavel, ArrowRight } from "lucide-react";
 import Link from "next/link";
@@ -21,6 +27,7 @@ export default function LandingShowcase({ isRTL, latestCars = [] }: LandingShowc
     const router = useRouter();
     const { homeContent } = useSettings();
 
+    // إعداد البطاقات الثلاث الرئيسية (السيارات، قطع الغيار، المزادات)
     const cards = [
         {
             title: isRTL ? "سيارات للبيع" : "Cars for Sale",
@@ -129,6 +136,7 @@ export default function LandingShowcase({ isRTL, latestCars = [] }: LandingShowc
                         <motion.button
                             key={index}
                             onClick={() => {
+                                // التوجيه للصفحة المحددة عند النقر
                                 if (card.key === 'cars') router.push('/cars');
                                 else if (card.key === 'parts') router.push('/parts');
                                 else if (card.key === 'auctions') router.push('/auctions');

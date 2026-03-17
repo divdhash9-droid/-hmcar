@@ -58,7 +58,7 @@ export default function SearchSection() {
                         </select>
                     </div>
 
-                    {/* Price Range (hidden) */}
+                    {/* نطاق السعر (Price Range) - مخفي حالياً */}
                     <div className="flex-1 relative group hidden">
                         <Banknote className={cn(
                             "absolute top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-luxury-gold transition-all duration-500",

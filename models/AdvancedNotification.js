@@ -333,11 +333,24 @@ advancedNotificationSchema.methods.sendWhatsApp = async function() {
 };
 
 advancedNotificationSchema.methods.sendPush = async function() {
-  // هنا يتم إرسال الإشعار via Push Notification
-  // يمكن استخدام خدمات مثل Firebase Cloud Messaging
-  console.log(`Sending push notification to user ${this.user}: ${this.title}`);
-  return Promise.resolve();
+  // هنا يتم إرسال إشعار Web Push حقيقي للمستخدم
+  try {
+    const NotificationService = require('../services/NotificationService');
+    console.log(`Sending push notification to user ${this.user}: ${this.title}`);
+    
+    await NotificationService.sendPushToUser(this.user, {
+      title: this.title,
+      body: this.message,
+      url: this.actionUrl || '/'
+    });
+    
+    return Promise.resolve();
+  } catch (error) {
+    console.error('Error in sendPush instance method:', error);
+    return Promise.reject(error);
+  }
 };
+
 
 advancedNotificationSchema.methods.sendWebhook = async function() {
   // هنا يتم إرسال الإشعار via Webhook

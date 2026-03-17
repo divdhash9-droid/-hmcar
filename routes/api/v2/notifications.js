@@ -63,7 +63,7 @@ router.post('/broadcast', requireAuthAPI, async (req, res) => {
       message,
       type: 'INFO',
       priority: 'HIGH',
-      channels: ['IN_APP'], // PUSH if configured
+      channels: ['IN_APP', 'PUSH'], // [[ARABIC_COMMENT]] الإرسال داخل التطبيق وكإشعار PWA
       actionUrl: url || null,
       actionText: url ? 'عرض التفاصيل' : null,
       category: 'GENERAL'

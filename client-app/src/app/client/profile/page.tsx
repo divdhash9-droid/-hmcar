@@ -83,13 +83,23 @@ export default function ClientProfilePage() {
         setMessage('');
 
         try {
-            await api.auth.changePassword({
+            const res = await api.auth.changePassword({
                 currentPassword: passwordData.currentPassword,
                 newPassword: passwordData.newPassword
             });
-            setMessage(isRTL ? 'تم تغيير كلمة المرور بنجاح' : 'Password changed successfully');
-            setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+            
+            if (res.success && res.token) {
+                localStorage.setItem('hm_token', res.token);
+                // Also set cookie for middleware
+                document.cookie = `hm_token=${res.token}; path=/; max-age=${30 * 24 * 60 * 60}; SameSite=Lax`;
+                
+                setMessage(isRTL ? '✅ تم تغيير كلمة المرور بنجاح' : '✅ Password changed successfully');
+                setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+            } else {
+                setMessage(res.message || (isRTL ? 'فشل تغيير كلمة المرور' : 'Failed to change password'));
+            }
         } catch (err: any) {
+            console.error('Password change error:', err);
             setMessage(err.message || (isRTL ? 'حدث خطأ في النظام' : 'Protocol error occurred'));
         } finally {
             setLoading(false);

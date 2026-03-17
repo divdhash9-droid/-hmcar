@@ -10,6 +10,7 @@ import {
     Car
 } from "lucide-react";
 import Navbar from '@/components/Navbar';
+import CurrencySwitcher from '@/components/CurrencySwitcher';
 import { api } from '@/lib/api';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/lib/LanguageContext';
@@ -160,7 +161,7 @@ function CarsContent() {
                 <div className="flex flex-col items-center text-center mb-16 relative">
                     {/* Back Button */}
                     <motion.div 
-                        initial={{ opacity: 0, x: 10 }} 
+                        initial={{ opacity: 0, x: isRTL ? -10 : 10 }} 
                         animate={{ opacity: 1, x: 0 }} 
                         className={cn("absolute top-0 hidden md:block", isRTL ? "right-0" : "left-0")}
                     >
@@ -174,24 +175,24 @@ function CarsContent() {
                     </motion.div>
 
                     <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center">
-                        <div className="flex items-center gap-3 text-luxury-gold mb-6 bg-luxury-gold/10 px-6 py-2 rounded-full border border-luxury-gold/20">
+                        <div className="flex items-center gap-3 text-luxury-gold mb-4 bg-luxury-gold/10 px-6 py-2 rounded-full border border-luxury-gold/20">
                             <Car className="w-4 h-4" />
                             <span className="text-[10px] font-black uppercase tracking-[0.4em]">{isRTL ? rawText('المعرض المحلي') : rawText('LOCAL SHOWROOM')}</span>
                         </div>
-                        <h1 className="text-4xl md:text-6xl lg:text-8xl font-black uppercase italic tracking-tight leading-[0.9] mb-8 font-display">
+                        <h1 className="text-2xl md:text-3xl font-black uppercase tracking-widest leading-tight mb-4 font-display">
                             {isRTL ? rawText('اختر') : rawText('CHOOSE')} <span className="text-luxury-gold">{isRTL ? rawText('الوكالة') : rawText('AGENCY')}</span>
                         </h1>
                     </motion.div>
 
-                     <div className={cn("md:hidden mb-8", isRTL ? "self-end" : "self-start")}>
-                         <button
-                            onClick={() => router.back()}
-                            title={isRTL ? rawText('رجوع') : rawText('Back')}
-                            className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center"
-                        >
-                            <ArrowLeft className={cn("w-4 h-4", isRTL && "rotate-180")} />
-                        </button>
-                    </div>
+                     <div className={cn("md:hidden mb-4 w-full flex", isRTL ? "justify-end" : "justify-start")}>
+                          <button
+                             onClick={() => router.back()}
+                             title={isRTL ? rawText('رجوع') : rawText('Back')}
+                             className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center"
+                         >
+                             <ArrowLeft className={cn("w-4 h-4", isRTL && "rotate-180")} />
+                         </button>
+                     </div>
                 </div>
 
                 {/* Filter / Stats Bar */}
@@ -202,6 +203,11 @@ function CarsContent() {
                                 <span className="text-xl font-black text-white block leading-none">{total}</span>
                                 <span className="text-[9px] text-white/30 uppercase font-bold tracking-widest">{isRTL ? rawText('سيارة متاحة') : rawText('ASSETS')}</span>
                             </div>
+                            <div className="w-px h-8 bg-white/10" />
+                            
+                            {/* [[ARABIC_COMMENT]] زر تغيير العملة بجانب الفلاتر لسهولة الوصول */}
+                            <CurrencySwitcher variant="minimal" className="scale-90" />
+                            
                             <div className="w-px h-8 bg-white/10" />
                             <button
                                 onClick={() => setShowFilters(!showFilters)}

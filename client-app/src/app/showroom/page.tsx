@@ -163,17 +163,36 @@ function CarCard({ car, onContact, onViewDetails, priceText }: {
                     onClick={() => onContact(car)}
                     className="flex-1 py-2.5 bg-green-500 hover:bg-green-400 text-white text-xs font-black uppercase rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-[0_0_15px_rgba(34,197,94,0.3)]"
                 >
-                    <MessageCircle className="w-3.5 h-3.5" />
+                    <ShoppingBag className="w-3.5 h-3.5" />
                     {rawText('شراء')}
                 </button>
                 
                 {/* زر المفضلة */}
                 <button
-                    onClick={(e) => { e.stopPropagation(); setIsFavorite(!isFavorite); }}
+                    onClick={(e) => { 
+                        e.stopPropagation(); 
+                        const favs = JSON.parse(localStorage.getItem('hm_favorites') || '[]');
+                        if (isFavorite) {
+                            const filtered = favs.filter((f: any) => f.id !== car.id);
+                            localStorage.setItem('hm_favorites', JSON.stringify(filtered));
+                            setIsFavorite(false);
+                        } else {
+                            favs.push({ 
+                                id: car.id, 
+                                type: 'car', 
+                                title: car.title, 
+                                price: car.priceSar || (car.priceUsd ? car.priceUsd * 3.75 : 0),
+                                image: car.imageUrl || car.image || car.images?.[0] || '',
+                                brand: car.manufacturerAr
+                            });
+                            localStorage.setItem('hm_favorites', JSON.stringify(favs));
+                            setIsFavorite(true);
+                        }
+                    }}
                     className={cn(
                         "w-10 h-10 rounded-xl flex items-center justify-center transition-all border shrink-0",
                         isFavorite 
-                            ? "bg-red-500/20 border-red-500/40 text-red-500" 
+                            ? "bg-red-500/20 border-red-500/40 text-red-500 shadow-[0_0_15px_rgba(239,68,68,0.2)]" 
                             : "bg-white/5 border-white/10 text-white/40 hover:bg-white/10"
                     )}
                     title={isFavorite ? rawText('حذف من المفضلات') : rawText('إضافة للمفضلات')}
@@ -183,11 +202,31 @@ function CarCard({ car, onContact, onViewDetails, priceText }: {
 
                 {/* زر السلة */}
                 <button
-                    onClick={(e) => { e.stopPropagation(); setIsInCart(!isInCart); }}
+                    onClick={(e) => { 
+                        e.stopPropagation(); 
+                        const cart = JSON.parse(localStorage.getItem('hm_cart') || '[]');
+                        if (isInCart) {
+                            const filtered = cart.filter((c: any) => c.id !== car.id);
+                            localStorage.setItem('hm_cart', JSON.stringify(filtered));
+                            setIsInCart(false);
+                        } else {
+                            cart.push({ 
+                                id: car.id, 
+                                type: 'car', 
+                                title: car.title, 
+                                price: car.priceSar || (car.priceUsd ? car.priceUsd * 3.75 : 0),
+                                image: car.imageUrl || car.image || car.images?.[0] || '',
+                            });
+                            localStorage.setItem('hm_cart', JSON.stringify(cart));
+                            setIsInCart(true);
+                            // Trigger event for navbar
+                            window.dispatchEvent(new CustomEvent('hm_cart_updated'));
+                        }
+                    }}
                     className={cn(
                         "w-10 h-10 rounded-xl flex items-center justify-center transition-all border shrink-0",
                         isInCart 
-                            ? "bg-amber-500/20 border-amber-500/40 text-amber-500" 
+                            ? "bg-blue-500/20 border-blue-500/40 text-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.2)]" 
                             : "bg-white/5 border-white/10 text-white/40 hover:bg-white/10"
                     )}
                     title={isInCart ? rawText('حذف من السلة') : rawText('إضافة للسلة')}

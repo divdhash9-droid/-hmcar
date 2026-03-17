@@ -229,8 +229,13 @@ function SidebarInner({
 }
 
 // ── Main Category Configuration ──
-function buildNavCategories(isRTL: boolean): NavCategory[] {
-    return [
+function buildNavCategories(isRTL: boolean, user: any): NavCategory[] {
+    const permissions = user?.permissions || [];
+    const isSuper = user?.role === 'super_admin';
+
+    const hasP = (p: string) => isSuper || permissions.includes(p);
+
+    const categories: NavCategory[] = [
         {
             label: isRTL ? 'القيادة والتحكم' : 'COMMAND',
             items: [
@@ -240,36 +245,41 @@ function buildNavCategories(isRTL: boolean): NavCategory[] {
         {
             label: isRTL ? 'المخزون والوكالات' : 'INVENTORY',
             items: [
-                { id: 'showroom', icon: Car, label: isRTL ? 'معرض السيارات' : 'SHOWROOM', href: '/admin/cars' },
-                { id: 'parts', icon: Layers, label: isRTL ? 'قطع الغيار' : 'PARTS', href: '/admin/parts' },
-                { id: 'brands', icon: Tag, label: isRTL ? 'الوكالات' : 'AGENCIES', href: '/admin/brands' },
+                ...(hasP('manage_cars') ? [{ id: 'showroom', icon: Car, label: isRTL ? 'معرض السيارات' : 'SHOWROOM', href: '/admin/cars' }] : []),
+                ...(hasP('manage_parts') ? [{ id: 'parts', icon: Layers, label: isRTL ? 'قطع الغيار' : 'PARTS', href: '/admin/parts' }] : []),
+                ...(hasP('manage_brands') ? [{ id: 'brands', icon: Tag, label: isRTL ? 'الوكالات' : 'AGENCIES', href: '/admin/brands' }] : []),
             ]
         },
         {
             label: isRTL ? 'مراكز العمليات' : 'TERMINALS',
             items: [
-                { id: 'market', icon: Gavel, label: isRTL ? 'سوق المزادات' : 'MARKET HUB', href: '/admin/market' }, // Unified Live & Classic
-                { id: 'comms', icon: MessageCircle, label: isRTL ? 'مركز التواصل' : 'COMMS HUB', href: '/admin/comms' }, // Unified Chats & Inquiries
-                { id: 'fulfillment', icon: ShoppingCart, label: isRTL ? 'مركز التنفيذ' : 'FULFILLMENT', href: '/admin/orders' }, // Unified Orders & Special
+                ...(hasP('manage_auctions') ? [{ id: 'market', icon: Gavel, label: isRTL ? 'سوق المزادات' : 'MARKET HUB', href: '/admin/market' }] : []),
+                ...(hasP('manage_messages') ? [{ id: 'comms', icon: MessageCircle, label: isRTL ? 'مركز التواصل' : 'COMMS HUB', href: '/admin/comms' }] : []),
+                ...(hasP('manage_orders') || hasP('manage_concierge') ? [{ id: 'fulfillment', icon: ShoppingCart, label: isRTL ? 'مركز التنفيذ' : 'FULFILLMENT', href: '/admin/orders' }] : []),
             ]
         },
         {
             label: isRTL ? 'النظام والأعضاء' : 'CONTROL',
             items: [
-                { id: 'users', icon: Users, label: isRTL ? 'الأعضاء' : 'USERS', href: '/admin/users' },
-                { id: 'security', icon: Shield, label: isRTL ? 'الأمان' : 'SECURITY', href: '/admin/security' },
-                { id: 'health', icon: Activity, label: isRTL ? 'الصحّة' : 'HEALTH', href: '/admin/health' },
-                { id: 'reports', icon: TrendingUp, label: isRTL ? 'التقارير' : 'REPORTS', href: '/admin/reports' },
-                { id: 'settings', icon: Settings, label: isRTL ? 'الإعدادات' : 'SITE CTRL', href: '/admin/settings' },
+                ...(hasP('manage_users') ? [
+                    { id: 'users', icon: Users, label: isRTL ? 'الأعضاء' : 'USERS', href: '/admin/users' },
+                    { id: 'security', icon: Shield, label: isRTL ? 'الأمان' : 'SECURITY', href: '/admin/security' },
+                    { id: 'health', icon: Activity, label: isRTL ? 'الصحّة' : 'HEALTH', href: '/admin/health' },
+                ] : []),
+                ...(isSuper || hasP('view_analytics') ? [{ id: 'reports', icon: TrendingUp, label: isRTL ? 'التقارير' : 'REPORTS', href: '/admin/reports' }] : []),
+                ...(hasP('manage_settings') ? [{ id: 'settings', icon: Settings, label: isRTL ? 'الإعدادات' : 'SITE CTRL', href: '/admin/settings' }] : []),
             ]
         }
     ];
+
+    // Filter categories that have no items
+    return categories.filter(cat => cat.items.length > 0);
 }
 
 // ── Main Export ────────────────────────────────────────────────
 export default function AdminNavbar() {
     const { isRTL, lang, toggleLanguage } = useLanguage();
-    const { logout } = useAuth();
+    const { logout, user } = useAuth();
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const [mobileOpen, setMobileOpen] = useState(false);
@@ -314,7 +324,7 @@ export default function AdminNavbar() {
         } catch { /* ignore */ }
     };
 
-    const categories = buildNavCategories(isRTL);
+    const categories = buildNavCategories(isRTL, user);
     const handleForceRefresh = () => {
         if (confirm(isRTL ? 'سيتم مسح الذاكرة المؤقتة للتطبيق وتحديث الصفحة لإصلاح التنسيق. هل أنت متأكد؟' : 'Clear cache and fix UI layout? This will perform a hard refresh.')) {
             if ('serviceWorker' in navigator) {

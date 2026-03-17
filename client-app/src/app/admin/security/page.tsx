@@ -78,15 +78,21 @@ export default function AdminSecurity() {
 
     useEffect(() => { loadData(); }, [loadData]);
 
-    const toggleBan = async (device: SecurityDevice) => {
+    const toggleBan = async (device: any) => {
         try {
             const res = await api.security.toggleBan(device._id);
             if (res.success) {
-                showToast(isRTL ? 'تم تحديث حالة الحظر' : 'Ban status updated', 'success');
-                loadData();
+                setDevices(prev => prev.map(d =>
+                    d._id === device._id ? { ...d, banned: !d.banned } : d
+                ));
+                showToast(device.banned ? '✅ تم فك الحظر' : '🚫 تم الحظر', 'success');
+            } else {
+                showToast(res.message || 'فشل تحديث الحظر', 'error');
             }
-        } catch {
-            showToast(isRTL ? 'فشل تحديث الحظر' : 'Failed to update ban', 'error');
+        } catch (err: any) {
+            console.error('Toggle ban error:', err);
+            const msg = err.response?.data?.message || err.message || 'فشل تحديث الحظر';
+            showToast(msg, 'error');
         }
     };
 

@@ -100,32 +100,15 @@ userNotificationSchema.statics.createNotification = async function (data) {
 
 userNotificationSchema.statics.sendPushNotification = async function (userId, notification) {
   try {
-    // Firebase Push Notifications are currently disabled as requested by the user.
-    // To re-enable, provide the firebase-service-account.json and uncomment this block.
-    /*
-    const admin = require('firebase-admin');
-    const User = mongoose.model('User');
-
-    const user = await User.findById(userId);
-    if (user && user.fcmToken) {
-      const message = {
-        notification: {
-          title: notification.title,
-          body: notification.message,
-          sound: 'default'
-        },
-        data: {
-          notificationId: notification._id.toString(),
-          type: notification.type,
-          actionUrl: notification.actionUrl || ''
-        },
-        token: user.fcmToken
-      };
-
-      await admin.messaging().send(message);
-    }
-    */
-    console.log(`[Notification] Would send push to user ${userId}: ${notification.title}`);
+    // [[ARABIC_COMMENT]] إرسال إشعار Web Push حقيقي للمشتركين عبر المتصفح/PWA
+    const NotificationService = require('../services/NotificationService');
+    await NotificationService.sendPushToUser(userId, {
+      title: notification.title,
+      body: notification.message,
+      url: notification.actionUrl || '/'
+    });
+    
+    console.log(`[Notification] Sent push to user ${userId} via WebPush: ${notification.title}`);
   } catch (error) {
     console.error('Error sending push notification:', error);
   }

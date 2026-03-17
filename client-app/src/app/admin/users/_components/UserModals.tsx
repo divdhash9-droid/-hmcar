@@ -38,6 +38,27 @@ export interface User {
     boundDevices?: Device[]; isDeviceLocked?: boolean; permissions?: string[];
 }
 
+// ── قوالب الصلاحيات التلقائية حسب الرتبة ──
+export const ROLE_DEFAULT_PERMISSIONS: Record<string, string[]> = {
+    super_admin: [
+        'manage_cars', 'manage_parts', 'manage_auctions', 'manage_orders', 
+        'manage_users', 'manage_concierge', 'manage_settings', 'manage_content', 
+        'manage_footer', 'manage_whatsapp', 'view_analytics', 'manage_messages', 
+        'manage_brands', 'manage_notifications'
+    ],
+    admin: [
+        'manage_cars', 'manage_parts', 'manage_orders', 'manage_concierge', 
+        'manage_content', 'manage_footer', 'manage_whatsapp', 'view_analytics', 
+        'manage_messages', 'manage_brands', 'manage_notifications'
+    ],
+    manager: [
+        'manage_cars', 'manage_parts', 'manage_orders', 'manage_concierge', 
+        'manage_messages', 'manage_brands', 'manage_notifications'
+    ],
+    seller: ['manage_cars', 'manage_brands'],
+    buyer: []
+};
+
 // ─────────────────────────────────
 // مكوّن مساعد: حقل إدخال مع أيقونة
 // ─────────────────────────────────
@@ -86,8 +107,15 @@ export function AddUserModal({ onClose, onAdd, isRTL }: {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
-    const update = (field: string, value: string) =>
-        setFormData(prev => ({ ...prev, [field]: value }));
+    const update = (field: string, value: string) => {
+        if (field === 'role') {
+            // تحديث تلقائي للصلاحيات عند تغيير الرتبة
+            const defaults = ROLE_DEFAULT_PERMISSIONS[value] || [];
+            setFormData(prev => ({ ...prev, [field]: value, permissions: defaults }));
+        } else {
+            setFormData(prev => ({ ...prev, [field]: value }));
+        }
+    };
 
     const isAdminRole = ['admin', 'manager', 'super_admin'].includes(formData.role);
 
@@ -284,9 +312,11 @@ export function AddUserModal({ onClose, onAdd, isRTL }: {
                                 <select value={formData.role} title="نوع الحساب"
                                     onChange={e => update('role', e.target.value)}
                                     className="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white focus:border-blue-500/50 outline-none transition-all appearance-none cursor-pointer">
-                                    <option value="admin" className="bg-zinc-900">🛡️ مسؤول - Admin (صلاحيات كاملة)</option>
+                                    <option value="super_admin" className="bg-zinc-900">👑 مسؤول عام - Super Admin (كامل النظام)</option>
+                                    <option value="admin" className="bg-zinc-900">🛡️ مسؤول - Admin (إدارة العمليات)</option>
                                     <option value="manager" className="bg-zinc-900">👔 مدير - Manager (صلاحيات محددة)</option>
-                                    <option value="buyer" className="bg-zinc-900">👤 عميل - Buyer</option>
+                                    <option value="seller" className="bg-zinc-900">💼 بائع - Seller (مزادات وسيارات)</option>
+                                    <option value="buyer" className="bg-zinc-900">👤 عميل - Buyer (تصفح وشراء)</option>
                                 </select>
                                 <ChevronDown className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none" />
                             </div>
@@ -297,21 +327,22 @@ export function AddUserModal({ onClose, onAdd, isRTL }: {
                             )}
                         </div>
 
-                        {/* ── الصلاحيات (للمسؤولين والمدراء فقط) ── */}
-                        {isAdminRole && (
-                            <div className="space-y-3 border-t border-white/8 pt-4">
-                                <div className="flex items-center gap-2">
-                                    <Shield className="w-4 h-4 text-blue-400" />
-                                    <h3 className="text-[9px] font-black uppercase tracking-widest text-blue-400">
-                                        صلاحيات النظام {formData.permissions.length > 0 && `(${formData.permissions.length} محددة)`}
-                                    </h3>
-                                </div>
-                                <PermissionsGrid
-                                    permissions={formData.permissions}
-                                    onChange={p => setFormData(prev => ({ ...prev, permissions: p }))}
-                                />
+                        {/* ── الصلاحيات (تظهر دائماً للإدارة والتحكم) ── */}
+                        <div className="space-y-3 border-t border-white/8 pt-4">
+                            <div className="flex items-center gap-2">
+                                <Shield className="w-4 h-4 text-blue-400" />
+                                <h3 className="text-[9px] font-black uppercase tracking-widest text-blue-400">
+                                    تخصيص الصلاحيات {formData.permissions.length > 0 && `(${formData.permissions.length} محددة)`}
+                                </h3>
                             </div>
-                        )}
+                            <p className="text-[8px] text-white/30 px-1 -mt-2">
+                                * اختيار الرتبة يحدد صلاحيات افتراضية، يمكنك التعديل عليها يدوياً الآن
+                            </p>
+                            <PermissionsGrid
+                                permissions={formData.permissions}
+                                onChange={p => setFormData(prev => ({ ...prev, permissions: p }))}
+                            />
+                        </div>
 
                         {/* ── أزرار الإجراءات ── */}
                         <div className="flex gap-3 pt-2">
@@ -364,6 +395,13 @@ export function UserDetailModal({ user, onClose, onUpdate, onDelete, isRTL }: {
     const [activeTab, setActiveTab] = useState<'info' | 'perms' | 'devices'>('info');
 
     const isAdminRole = ['admin', 'manager', 'super_admin'].includes(editData.role);
+
+    // دالة تحديث الرتبة مع الصلاحيات التلقائية
+    const handleRoleChange = (newRole: string) => {
+        const defaults = ROLE_DEFAULT_PERMISSIONS[newRole] || [];
+        setEditData(prev => ({ ...prev, role: newRole }));
+        setPermissions(defaults);
+    };
 
     // ── حفظ التغييرات ──
     const handleSave = async () => {
@@ -450,10 +488,10 @@ export function UserDetailModal({ user, onClose, onUpdate, onDelete, isRTL }: {
         }
     };
 
-    // قائمة التبويبات حسب دور المستخدم
+    // قائمة التبويبات (الصلاحيات تظهر للجميع للتحكم الكامل)
     const tabs = [
         { id: 'info', label: 'المعلومات' },
-        ...(isAdminRole ? [{ id: 'perms', label: `الصلاحيات (${permissions.length})` }] : []),
+        { id: 'perms', label: `الصلاحيات (${permissions.length})` },
         ...(editData.role === 'buyer' ? [{ id: 'devices', label: `الأجهزة (${devices.length})` }] : []),
     ];
 
@@ -538,7 +576,7 @@ export function UserDetailModal({ user, onClose, onUpdate, onDelete, isRTL }: {
                                 <label className="text-[9px] font-black text-white/40 uppercase tracking-widest block mb-1.5">الدور</label>
                                 <div className="relative">
                                     <select value={editData.role} title="الدور"
-                                        onChange={e => setEditData(p => ({ ...p, role: e.target.value }))}
+                                        onChange={e => handleRoleChange(e.target.value)}
                                         className="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white focus:border-blue-500/40 outline-none transition-all appearance-none cursor-pointer">
                                         <option value="super_admin" className="bg-zinc-900">👑 مسؤول عام - Super Admin</option>
                                         <option value="admin" className="bg-zinc-900">🛡️ مسؤول - Admin</option>
@@ -608,7 +646,7 @@ export function UserDetailModal({ user, onClose, onUpdate, onDelete, isRTL }: {
                     {activeTab === 'perms' && (
                         <div>
                             <p className="text-[9px] text-white/30 mb-4">
-                                صلاحيات هذا المستخدم في النظام. تنطبق فقط على المسؤولين والمدراء.
+                                صلاحيات هذا المستخدم في النظام. تنبيه: اختيار رتبة جديدة سيعيد تعيين هذه الصلاحيات للقيم الافتراضية للرتبة، ولكن يمكنك تعديلها بعد ذلك.
                             </p>
                             <PermissionsGrid permissions={permissions} onChange={setPermissions} />
                         </div>

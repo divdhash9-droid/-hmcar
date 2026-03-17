@@ -6,6 +6,14 @@
  *
  * الوصف:
  * - إرسال إشعارات للمستخدمين عند أحداث معينة
+// [[ARABIC_HEADER]] هذا الملف (services/NotificationService.js) جزء من مشروع HM CAR ويحتوي تعليقات عربية لضمان الوضوح.
+
+/**
+ * services/NotificationService.js
+ * خدمة الإشعارات المتقدمة
+ *
+ * الوصف:
+ * - إرسال إشعارات للمستخدمين عند أحداث معينة
  * - دعم أنواع مختلفة: مزادات، طلبات، رسائل، نظامية
  * - تخزين الإشعارات في قاعدة البيانات
  * - إشعارات مجدولة ومخصصة
@@ -14,9 +22,23 @@
  */
 const UserNotification = require('../models/UserNotification');
 const UserNotificationPreference = require('../models/UserNotificationPreference');
+const PushSubscription = require('../models/PushSubscription');
 const WebSocketService = require('./WebSocketService');
 const EmailService = require('./EmailService'); // Assuming you have an EmailService
 const mongoose = require('mongoose');
+const webpush = require('web-push');
+
+/**
+ * إعداد مفاتيح VAPID لإرسال إشعارات PWA
+ */
+const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY || 'BNghi5tZPhPvYdmdEEPQPn6M5xuonh0cUsBRpdKjPsy1a9MusGgJuVFZcaE_-t38LfJmeHdIznWWQKfjuUviRVc';
+const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY || '_D1JtL9AQ1gBn_Daa6NMh12gXLsQ9e0fD683tUmDvUM';
+
+webpush.setVapidDetails(
+  'mailto:info@hmcar.com',
+  VAPID_PUBLIC_KEY,
+  VAPID_PRIVATE_KEY
+);
 
 class NotificationService {
 
@@ -63,6 +85,13 @@ class NotificationService {
                     data: template.metadata,
                     actionUrl: template.actionUrl
                 });
+
+                // [[ARABIC_COMMENT]] إرسال إشعار PWA (Web Push) ليظهر خارج التطبيق
+                this.sendPushToUser(userId, {
+                    title: template.title,
+                    body: template.message,
+                    url: template.actionUrl || '/'
+                }).catch(err => console.error('WebPush Error:', err.message));
             }
 
             // Send via Email
@@ -200,6 +229,41 @@ class NotificationService {
         // for (const userId of usersToNotifyByEmail) {
         //     await EmailService.sendNotificationEmail(userId, template);
         // }
+    }
+    /**
+     * إرسال إشعار Web Push حقيقي لجميع أجهزة المستخدم المسجلة
+     * @param {String} userId 
+     * @param {Object} payload 
+     */
+    static async sendPushToUser(userId, payload) {
+        try {
+            const subscriptions = await PushSubscription.find({ user: userId });
+            
+            if (!subscriptions || subscriptions.length === 0) return;
+
+            const notificationPayload = JSON.stringify({
+                title: payload.title || 'HM CAR',
+                body: payload.body || '',
+                url: payload.url || '/',
+                icon: '/icons/icon-192x192.png',
+                badge: '/icons/icon-96x96.png'
+            });
+
+            const pushPromises = subscriptions.map(sub => {
+                return webpush.sendNotification(sub.subscription, notificationPayload)
+                    .catch(async (err) => {
+                        // إذا انتهت صلاحية الاشتراك أو أصبح غير صالح، نحذفه من القاعدة
+                        if (err.statusCode === 404 || err.statusCode === 410) {
+                            console.log(`[WebPush] Removing expired subscription for user ${userId}`);
+                            await PushSubscription.findByIdAndDelete(sub._id);
+                        }
+                    });
+            });
+
+            await Promise.all(pushPromises);
+        } catch (error) {
+            console.error('sendPushToUser error:', error);
+        }
     }
 }
 

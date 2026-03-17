@@ -497,6 +497,16 @@ export const api = {
             method: 'POST',
             body: JSON.stringify({ title, message, url }),
         }),
+        // [[ARABIC_COMMENT]] تسجيل اشتراك جديد لإشعارات PWA
+        subscribePush: (subscription: any, deviceInfo?: any) => fetchAPI('/api/v2/notifications/push/subscribe', {
+            method: 'POST',
+            body: JSON.stringify({ subscription, deviceInfo }),
+        }),
+        // [[ARABIC_COMMENT]] إلغاء اشتراك إشعارات PWA
+        unsubscribePush: (endpoint: string) => fetchAPI('/api/v2/notifications/push/unsubscribe', {
+            method: 'POST',
+            body: JSON.stringify({ endpoint }),
+        }),
     },
     // ── الأمن والحماية (Security) ──
     security: {

@@ -9,6 +9,7 @@ import { ToastProvider } from '@/lib/ToastContext';
 import { UIProvider } from '@/lib/UIContext';
 import PWAInstaller from './PWAInstaller';
 import PWAUpdater from './PWAUpdater';
+import PushNotificationManager from './PushNotificationManager';
 
 export function Providers({ children }: { children: ReactNode }) {
     return (
@@ -20,6 +21,7 @@ export function Providers({ children }: { children: ReactNode }) {
                             <SocketProvider>
                                 <PWAInstaller />
                                 <PWAUpdater />
+                                <PushNotificationManager />
                                 {children}
                             </SocketProvider>
                         </AuthProvider>

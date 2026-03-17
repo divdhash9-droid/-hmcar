@@ -4,6 +4,7 @@ const express = require('express');
 const router = express.Router();
 const UserNotification = require('../../../models/UserNotification');
 const AdvancedNotification = require('../../../models/AdvancedNotification');
+const PushSubscription = require('../../../models/PushSubscription');
 const { requireAuthAPI } = require('../../../middleware/auth');
 
 // جلب جميع الإشعارات للمستخدم الحالي
@@ -72,6 +73,47 @@ router.post('/broadcast', requireAuthAPI, async (req, res) => {
   } catch (error) {
     console.error('Broadcast error:', error);
     res.status(500).json({ success: false, error: 'Failed to broadcast message' });
+  }
+});
+
+/**
+ * تسجيل اشتراك Push جديد لجهاز العميل
+ */
+router.post('/push/subscribe', requireAuthAPI, async (req, res) => {
+  try {
+    const { subscription, deviceInfo } = req.body;
+
+    if (!subscription || !subscription.endpoint) {
+      return res.status(400).json({ success: false, error: 'Subscription data required' });
+    }
+
+    // [[ARABIC_COMMENT]] تحديث أو إنشاء اشتراك جديد لهذا الجهاز
+    await PushSubscription.findOneAndUpdate(
+      { user: req.user.userId, 'subscription.endpoint': subscription.endpoint },
+      { 
+        subscription, 
+        deviceInfo: { ...deviceInfo, lastUsedAt: new Date() } 
+      },
+      { upsert: true, new: true }
+    );
+
+    res.json({ success: true, message: 'Push subscription registered' });
+  } catch (error) {
+    console.error('Push Subscribe error:', error);
+    res.status(500).json({ success: false, error: 'Internal Server Error' });
+  }
+});
+
+/**
+ * إلغاء اشتراك Push
+ */
+router.post('/push/unsubscribe', requireAuthAPI, async (req, res) => {
+  try {
+    const { endpoint } = req.body;
+    await PushSubscription.deleteOne({ user: req.user.userId, 'subscription.endpoint': endpoint });
+    res.json({ success: true, message: 'Push subscription removed' });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 

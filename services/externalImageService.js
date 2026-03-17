@@ -16,8 +16,22 @@ const { optimizeImage } = require('../utils/imageOptimizer');
 async function downloadAndOptimize(url, folder = 'imported') {
     if (!url || typeof url !== 'string' || !url.startsWith('http')) return url;
 
+    // 1. إنشاء اسم فريد بناءً على الرابط
+    const hash = crypto.createHash('md5').update(url).digest('hex');
+    const filename = `${hash}_opt.webp`;
+    const uploadsDir = path.join(__dirname, '..', 'uploads', folder);
+    const filepath = path.join(uploadsDir, filename);
+
     try {
-        // 1. تحميل الصورة
+        // 2. التحقق من وجود الملف مسبقاً (لتوفير الموارد)
+        try {
+            await fs.access(filepath);
+            return `/uploads/${folder}/${filename}`;
+        } catch {
+            // الملف غير موجود، ننتقل للتحميل
+        }
+
+        // 3. تحميل الصورة
         const response = await axios.get(url, {
             responseType: 'arraybuffer',
             timeout: 10000,
@@ -28,7 +42,7 @@ async function downloadAndOptimize(url, folder = 'imported') {
 
         if (!response.data) return url;
 
-        // 2. ضغط وتحسين الصورة باستخدام Sharp (عبر optimizeImage)
+        // 4. ضغط وتحسين الصورة باستخدام Sharp
         const optimizedBuffer = await optimizeImage(Buffer.from(response.data), {
             width: 1000,
             height: 700,
@@ -36,23 +50,14 @@ async function downloadAndOptimize(url, folder = 'imported') {
             format: 'webp'
         });
 
-        // 3. إنشاء اسم فريد وحفظ الملف محلياً
-        const hash = crypto.createHash('md5').update(url).digest('hex');
-        const filename = `${hash}_opt.webp`;
-        const uploadsDir = path.join(__dirname, '..', 'uploads', folder);
-        
-        // التأكد من وجود المجلد
+        // 5. التأكد من وجود المجلد وحفظ الملف
         await fs.mkdir(uploadsDir, { recursive: true });
-        
-        const filepath = path.join(uploadsDir, filename);
         await fs.writeFile(filepath, optimizedBuffer);
 
-        // 4. إرجاع المسار النسبي (الذي يفهمه المتصفح عبر /uploads)
         return `/uploads/${folder}/${filename}`;
 
     } catch (error) {
         console.warn(`[ExternalImage] Failed for ${url}:`, error.message);
-        // في حالة الفشل نكتفي بالرابط الأصلي لضمان بقاء الصورة متاحة للعميل
         return url;
     }
 }

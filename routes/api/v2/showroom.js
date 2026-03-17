@@ -342,11 +342,11 @@ router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
         const usdToSar = Number(settings?.currencySettings?.usdToSar || 3.75);
         const usdToKrw = Number(settings?.currencySettings?.usdToKrw || 1350);
 
-        // جلب أول 3 صفحات فقط (حوالي 60 سيارة) لتجنب انتهاء وقت الطلب
+        // جلب أول صفحتين فقط (حوالي 40 سيارة) لتجنب انتهاء وقت الطلب (Timeout)
         let totalCreated = 0;
         let totalUpdated = 0;
         
-        for (let page = 1; page <= 3; page++) {
+        for (let page = 1; page <= 2; page++) {
             const urlWithPage = showroomUrl.replace(/page=\d+/, `page=${page}`);
             apiUrl = convertEncarUrlToApi(urlWithPage, page);
 
@@ -355,7 +355,8 @@ router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
                 data = await fetchExternal(apiUrl);
             } catch (err) {
                 console.warn(`[Showroom Scrape] Failed on page ${page}: ${err.message}`);
-                break;
+                // إذا فشلت صفحة، نحاول المتابعة مع الصفحات الأخرى بدلاً من إيقاف العملية بالكامل
+                continue;
             }
 
             const results = (data.SearchResults || []).map(translateCar);

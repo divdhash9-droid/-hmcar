@@ -27,8 +27,9 @@ const sparePartSchema = new mongoose.Schema({
   images: [String],
   externalUrl: { type: String, trim: true },
   source: { type: String, trim: true, default: 'manual' },
-  // المخزون
-  stockQty: { type: Number, default: 0, min: 0 },
+  // المبيعات والمخزون
+  stockQty: { type: Number, default: 999 }, // قيمة عالية افتراضية لتجنب انتهاء المخزون التلقائي
+  soldCount: { type: Number, default: 0 },  // إجمالي كمية القطع المباعة
   inStock: { type: Boolean, default: true },
   createdByFirebaseUid: { type: String, required: false, default: '' },
   updatedByFirebaseUid: { type: String, required: false, default: '' }

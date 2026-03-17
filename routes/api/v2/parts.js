@@ -133,7 +133,8 @@ router.get('/', async (req, res) => {
                 compatibility: [cleanModelName(p.carModel || '') || 'ALL Models'],
                 stock: p.stockQty || 1,
                 stockQty: p.stockQty || 1,
-                inStock: typeof p.inStock === 'boolean' ? p.inStock : (p.stockQty || 0) > 0,
+                soldCount: p.soldCount || 0,
+                inStock: typeof p.inStock === 'boolean' ? p.inStock : true,
                 description: p.description || '',
                 rareLevel: 3
                 });
@@ -234,7 +235,7 @@ router.patch('/:id/toggle-stock', requireAuthAPI, async (req, res) => {
 });
 
 // [[ARABIC_COMMENT]] PATCH /api/v2/parts/:id/sold - تسجيل بيع قطعة غيار
-// [[ARABIC_COMMENT]] المنطق: إذا stockQty > 1 → ينقص واحد، إذا = 1 → يُخفي القطعة (inStock=false)
+// [[ARABIC_COMMENT]] المنطق الجديد: زيادة عداد "المباع" (soldCount) دون إنقاص الكمية أو الإخفاء التلقائي
 router.patch('/:id/sold', requireAuthAPI, async (req, res) => {
     try {
         const { soldQty = 1 } = req.body;
@@ -244,19 +245,17 @@ router.patch('/:id/sold', requireAuthAPI, async (req, res) => {
             return res.status(404).json({ success: false, error: 'Part not found' });
         }
 
-        const currentStock = part.stockQty || 1;
-        const newStock = Math.max(0, currentStock - soldQty);
-
-        const updates = {
-            stockQty: newStock,
-            inStock: newStock > 0,
-            // [[ARABIC_COMMENT]] إذا نفد المخزون تماماً، نُسجّل وقت البيع
-            ...(newStock === 0 ? { soldAt: new Date() } : {})
-        };
+        const currentSoldCount = part.soldCount || 0;
+        const newSoldCount = currentSoldCount + Number(soldQty);
 
         const updatedPart = await SparePart.findByIdAndUpdate(
             req.params.id,
-            updates,
+            { 
+                $set: { 
+                    soldCount: newSoldCount,
+                    inStock: true // التأكد من بقاء القطعة ظاهرة دائماً
+                } 
+            },
             { new: true }
         );
 
@@ -266,9 +265,9 @@ router.patch('/:id/sold', requireAuthAPI, async (req, res) => {
             await AuditLog.create({
                 action: 'SOLD',
                 targetModel: 'SparePart',
-                description: `تم بيع ${soldQty} قطعة من: ${part.name} — المتبقي: ${newStock}`,
+                description: `تم تسجيل بيع ${soldQty} قطعة من: ${part.name} — إجمالي المبيعات الآن: ${newSoldCount}`,
                 targetId: part._id,
-                after: { soldQty, newStock, soldAt: new Date() },
+                after: { soldQty, newSoldCount, soldAt: new Date() },
                 ipAddress: req.ip,
                 userAgent: req.get('User-Agent'),
                 sessionId: req.sessionID || 'api'
@@ -281,10 +280,8 @@ router.patch('/:id/sold', requireAuthAPI, async (req, res) => {
             success: true,
             data: updatedPart,
             soldQty,
-            newStock,
-            message: newStock === 0
-                ? `تم بيع القطعة وتم إخفاؤها (نفد المخزون)`
-                : `تم بيع ${soldQty} قطعة. المتبقي في المخزون: ${newStock}`
+            totalSold: newSoldCount,
+            message: `تم تسجيل بيع ${soldQty} قطعة بنجاح. إجمالي المبيعات: ${newSoldCount}`
         });
     } catch (error) {
         console.error('Mark part as sold error:', error);

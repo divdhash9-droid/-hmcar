@@ -135,16 +135,16 @@ export default function AdminPartsPage() {
         }
     };
 
-    // [[ARABIC_COMMENT]] تسجيل بيع قطعة - ينقص المخزون ويخفيها إذا نفد
-    const handleMarkSold = async (id: string, name: string, currentStock: number) => {
+    // [[ARABIC_COMMENT]] تسجيل بيع قطعة - زيادة عداد المبيعات
+    const handleMarkSold = async (id: string, name: string, currentTotalSold: number) => {
         const confirmed = confirm(isRTL
-            ? `تأكيد بيع: ${name}؟\nالمخزون الحالي: ${currentStock} قطعة`
-            : `Confirm sale: ${name}?\nCurrent stock: ${currentStock}`
+            ? `تأكيد تسجيل بيع لـ: ${name}؟\nإجمالي المبيعات الحالي: ${currentTotalSold}`
+            : `Confirm sale for: ${name}?\nCurrent total sold: ${currentTotalSold}`
         );
         if (!confirmed) return;
 
         const soldQtyStr = prompt(
-            isRTL ? `كم قطعة تم بيعها؟ (1-${currentStock})` : `How many units sold? (1-${currentStock})`,
+            isRTL ? `كم قطعة تم بيعها؟` : `How many units sold?`,
             '1'
         );
         const soldQty = soldQtyStr ? parseInt(soldQtyStr) : 1;
@@ -375,14 +375,12 @@ export default function AdminPartsPage() {
                                             {isRTL ? { New: 'جديد', Used: 'مستعمل', Refurbished: 'مجدد' }[part.condition as string] || part.condition : part.condition}
                                         </span>
                                     </div>
-                                    {/* Stock indicator */}
-                                    {typeof part.stockQty === 'number' && (
-                                        <div className="absolute bottom-2 start-2">
-                                            <span className="cockpit-mono text-[9px] bg-black/60 px-2 py-0.5 rounded-full text-orange-400/80">
-                                                {isRTL ? `مخزون: ${part.stockQty}` : `QTY: ${part.stockQty}`}
-                                            </span>
-                                        </div>
-                                    )}
+                                    {/* Sold Count indicator */}
+                                    <div className="absolute bottom-2 start-2">
+                                        <span className="cockpit-mono text-[9px] bg-black/60 px-2 py-0.5 rounded-full text-green-400/80">
+                                            {isRTL ? `المباع: ${part.soldCount || 0}` : `SOLD: ${part.soldCount || 0}`}
+                                        </span>
+                                    </div>
                                 </div>
 
                                 <div className="p-4 space-y-3">
@@ -410,7 +408,7 @@ export default function AdminPartsPage() {
                                                 )}>
                                                 {part.inStock ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
                                             </button>
-                                            <button onClick={() => handleMarkSold(part.id, part.name, part.stockQty || 1)} title={isRTL ? 'بيع' : 'Sell'}
+                                            <button onClick={() => handleMarkSold(part.id, part.name, part.soldCount || 0)} title={isRTL ? 'تسجيل بيع' : 'Mark Sold'}
                                                 className="w-8 h-8 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 hover:bg-green-500 hover:text-white transition-all flex items-center justify-center">
                                                 <CheckCircle2 className="w-3.5 h-3.5" />
                                             </button>

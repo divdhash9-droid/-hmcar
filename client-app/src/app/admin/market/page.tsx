@@ -136,7 +136,7 @@ function MarketHubContent() {
                         className={cn('flex-1 py-3 rounded-xl text-[11px] font-black uppercase tracking-[0.1em] transition-all flex items-center justify-center gap-3', 
                         activeMode === MODE_LIVE ? 'bg-[#00f0ff] text-black shadow-[0_0_20px_rgba(0,240,255,0.3)]' : 'text-white/40 hover:text-white/60')}>
                         <Radio size={16} />
-                        {isRTL ? 'العروض المباشرة' : 'LIVE ARENA'}
+                        {isRTL ? 'ساحة العرض الحي' : 'LIVE ARENA'}
                     </button>
                     <button onClick={() => setActiveMode(MODE_AUCTIONS)}
                         className={cn('flex-1 py-3 rounded-xl text-[11px] font-black uppercase tracking-[0.1em] transition-all flex items-center justify-center gap-3', 
@@ -150,11 +150,11 @@ function MarketHubContent() {
                     <div className="space-y-6">
                         <div className="flex justify-between items-center bg-white/[0.02] p-6 rounded-3xl border border-white/5">
                             <div>
-                                <h3 className="text-xl font-black uppercase italic">{isRTL ? 'جلسات العرض الحي' : 'LIVE SHOWROOM SESSIONS'}</h3>
-                                <p className="text-[10px] text-white/30 uppercase tracking-[0.2em]">{isRTL ? 'إدارة البث والمزادات الخارجية' : 'Manage external feeds & manual streams'}</p>
+                                <h3 className="text-xl font-black uppercase italic">{isRTL ? 'جلسات العرض الحي المباشر' : 'LIVE SHOWROOM SESSIONS'}</h3>
+                                <p className="text-[10px] text-white/30 uppercase tracking-[0.2em]">{isRTL ? 'إدارة البث المباشر والمزادات الخارجية واليدوية' : 'Manage external feeds & manual streams'}</p>
                             </div>
                             <button onClick={() => { setLiveForm({ title: '', externalUrl: '', whatsappNumber: '', auctionUsername: '', auctionPassword: '', cars: [] }); setEditingLiveId(null); setIsLiveModalOpen(true); }} className="px-6 py-3 bg-[#00f0ff] text-black font-black uppercase text-[10px] tracking-widest rounded-xl hover:scale-105 transition-all shadow-[0_0_20px_rgba(0,240,255,0.2)]">
-                                <Plus size={14} className="inline mr-2" /> {isRTL ? 'جلسة جديدة' : 'INITIATE'}
+                                <Plus size={14} className="inline mr-2" /> {isRTL ? 'إنشاء جلسة' : 'INITIATE'}
                             </button>
                         </div>
 
@@ -163,27 +163,29 @@ function MarketHubContent() {
                                 <motion.div key={s._id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="ck-card p-6 flex flex-col md:flex-row items-center gap-6 group">
                                     <div className="flex-1 space-y-2">
                                         <div className="flex items-center gap-3">
-                                            <span className={cn('px-2.5 py-1 rounded-lg text-[8px] font-black uppercase tracking-wider', s.status === 'live' ? 'bg-red-500/20 text-red-500 border border-red-500/40' : 'bg-white/5 text-white/30 border border-white/10')}>{s.status}</span>
+                                            <span className={cn('px-2.5 py-1 rounded-lg text-[8px] font-black uppercase tracking-wider', s.status === 'live' ? 'bg-red-500/20 text-red-500 border border-red-500/40' : 'bg-white/5 text-white/30 border border-white/10')}>
+                                                {s.status === 'live' ? (isRTL ? 'مباشر الآن' : 'LIVE') : (isRTL ? 'متوقف' : 'ENDED')}
+                                            </span>
                                             <h4 className="text-lg font-black uppercase italic tracking-tighter">{s.title}</h4>
                                         </div>
-                                        <div className="flex items-center gap-4 text-[9px] text-white/40 font-bold uppercase tracking-widest"><LinkIcon size={12} /> {s.externalUrl || 'No External Feed'}</div>
+                                        <div className="flex items-center gap-4 text-[9px] text-white/40 font-bold uppercase tracking-widest"><LinkIcon size={12} /> {s.externalUrl || (isRTL ? 'لا يوجد بث خارجي' : 'No External Feed')}</div>
                                     </div>
                                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 w-full md:w-auto shrink-0">
-                                        <button onClick={() => handleStatusUpdate(s._id, s.status === 'live' ? 'end' : 'start')} title={s.status === 'live' ? 'Stop' : 'Start'} className={cn('p-3 rounded-xl border flex flex-col items-center gap-1 transition-all', s.status === 'live' ? 'border-red-500/40 text-red-500 hover:bg-red-500/10' : 'border-[#00f0ff]/40 text-[#00f0ff] hover:bg-[#00f0ff]/10')}>
+                                        <button onClick={() => handleStatusUpdate(s._id, s.status === 'live' ? 'end' : 'start')} title={s.status === 'live' ? (isRTL ? 'إيقاف' : 'Stop') : (isRTL ? 'بدء' : 'Start')} className={cn('p-3 rounded-xl border flex flex-col items-center gap-1 transition-all', s.status === 'live' ? 'border-red-500/40 text-red-500 hover:bg-red-500/10' : 'border-[#00f0ff]/40 text-[#00f0ff] hover:bg-[#00f0ff]/10')}>
                                             {s.status === 'live' ? <Square size={16} /> : <Play size={16} />}
-                                            <span className="text-[7px] font-black">{s.status === 'live' ? 'STOP' : 'LIVE'}</span>
+                                            <span className="text-[7px] font-black">{s.status === 'live' ? (isRTL ? 'إيقاف' : 'STOP') : (isRTL ? 'تشغيل' : 'LIVE')}</span>
                                         </button>
-                                        <button onClick={() => { setLiveForm(s); setEditingLiveId(s._id); setIsLiveModalOpen(true); }} title="Edit" className="p-3 rounded-xl border border-white/5 text-white/40 hover:text-white hover:bg-white/5 flex flex-col items-center gap-1">
+                                        <button onClick={() => { setLiveForm(s); setEditingLiveId(s._id); setIsLiveModalOpen(true); }} title={isRTL ? 'تعديل' : 'Edit'} className="p-3 rounded-xl border border-white/5 text-white/40 hover:text-white hover:bg-white/5 flex flex-col items-center gap-1">
                                             <Edit2 size={16} />
-                                            <span className="text-[7px] font-black uppercase">Edit</span>
+                                            <span className="text-[7px] font-black uppercase">{isRTL ? 'تعديل' : 'Edit'}</span>
                                         </button>
-                                        <button onClick={() => handleDeleteLive(s._id)} title="Delete" className="p-3 rounded-xl border border-white/5 text-white/20 hover:text-red-500 hover:bg-red-500/10 flex flex-col items-center gap-1">
+                                        <button onClick={() => handleDeleteLive(s._id)} title={isRTL ? 'حذف' : 'Delete'} className="p-3 rounded-xl border border-white/5 text-white/20 hover:text-red-500 hover:bg-red-500/10 flex flex-col items-center gap-1">
                                             <Trash2 size={16} />
-                                            <span className="text-[7px] font-black uppercase">Del</span>
+                                            <span className="text-[7px] font-black uppercase">{isRTL ? 'حذف' : 'Del'}</span>
                                         </button>
-                                        <Link href={`/auctions/live/${s._id}`} target="_blank" title="View" className="p-3 rounded-xl border border-white/5 text-white/40 hover:text-[#00f0ff] hover:bg-[#00f0ff]/10 flex flex-col items-center gap-1">
+                                        <Link href={`/auctions/live/${s._id}`} target="_blank" title={isRTL ? 'عرض' : 'View'} className="p-3 rounded-xl border border-white/5 text-white/40 hover:text-[#00f0ff] hover:bg-[#00f0ff]/10 flex flex-col items-center gap-1">
                                             <ExternalLink size={16} />
-                                            <span className="text-[7px] font-black uppercase">View</span>
+                                            <span className="text-[7px] font-black uppercase">{isRTL ? 'عرض' : 'View'}</span>
                                         </Link>
                                     </div>
                                 </motion.div>
@@ -193,8 +195,13 @@ function MarketHubContent() {
                 ) : (
                     <div className="space-y-8">
                         <div className="flex bg-white/5 p-1 rounded-2xl border border-white/5 w-fit">
-                            {['LIVE', 'SCHEDULED', 'SETTLED', 'AUDIT'].map(tab => (
-                                <button key={tab} onClick={() => setActiveArena(tab)} className={cn('px-6 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all', activeArena === tab ? 'bg-red-500 text-white shadow-lg' : 'text-white/40 hover:text-white')}>{tab}</button>
+                            {[
+                                { id: 'LIVE', label: isRTL ? 'مباشرة الآن' : 'LIVE' },
+                                { id: 'SCHEDULED', label: isRTL ? 'المجدولة' : 'SCHEDULED' },
+                                { id: 'SETTLED', label: isRTL ? 'المنتهية' : 'SETTLED' },
+                                { id: 'AUDIT', label: isRTL ? 'السجل الكامل' : 'AUDIT' }
+                            ].map(tab => (
+                                <button key={tab.id} onClick={() => setActiveArena(tab.id)} className={cn('px-6 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all', activeArena === tab.id ? 'bg-red-500 text-white shadow-lg' : 'text-white/40 hover:text-white')}>{tab.label}</button>
                             ))}
                         </div>
 
@@ -223,29 +230,33 @@ function MarketHubContent() {
                                     </div>
                                     <div className="flex-1 min-w-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                                         <div>
-                                            <p className="text-[10px] font-black text-red-500/50 uppercase tracking-[0.2em] italic mb-0.5">{auc.car?.make || 'Vehicle'}</p>
-                                            <h4 className="text-md font-black italic uppercase truncate">{auc.car?.title || 'Unknown Car'}</h4>
+                                            <p className="text-[10px] font-black text-red-500/50 uppercase tracking-[0.2em] italic mb-0.5">{auc.car?.make || (isRTL ? 'مركبة' : 'Vehicle')}</p>
+                                            <h4 className="text-md font-black italic uppercase truncate">{auc.car?.title || (isRTL ? 'سيارة غير معروفة' : 'Unknown Car')}</h4>
                                         </div>
                                         <div>
-                                            <p className="flex items-center gap-2 text-[9px] font-black text-white/20 uppercase tracking-widest mb-1"><TrendingUp size={12} /> Live Bid</p>
+                                            <p className="flex items-center gap-2 text-[9px] font-black text-white/20 uppercase tracking-widest mb-1"><TrendingUp size={12} /> {isRTL ? 'أعلى مزايدة' : 'Live Bid'}</p>
                                             <p className="text-xl font-black italic text-red-500">{Number(auc.currentBid).toLocaleString()} <span className="text-[9px]">{auc.currency}</span></p>
                                         </div>
                                         <div className="hidden lg:block">
-                                            <p className="flex items-center gap-2 text-[9px] font-black text-white/20 uppercase tracking-widest mb-1"><Clock size={12} /> Deadline</p>
+                                            <p className="flex items-center gap-2 text-[9px] font-black text-white/20 uppercase tracking-widest mb-1"><Clock size={12} /> {isRTL ? 'الموعد النهائي' : 'Deadline'}</p>
                                             <p className="text-sm font-black italic">{new Date(auc.endsAt).toLocaleDateString()}</p>
                                         </div>
                                     </div>
                                     <div className="flex gap-2 shrink-0">
-                                        <button onClick={() => handleDeleteAuction(auc.id)} title="Delete" className="w-10 h-10 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-white/20 hover:text-red-500 transition-all"><Trash2 size={16} /></button>
-                                        <Link href={`/auctions/${auc.id}`} target="_blank" title="View" className="h-10 px-4 rounded-xl bg-white/5 border border-white/5 flex items-center gap-2 text-[9px] font-black uppercase text-white/40 hover:text-white transition-all"><ExternalLink size={14} /> Link</Link>
+                                        <button onClick={() => handleDeleteAuction(auc.id)} title={isRTL ? 'حذف' : 'Delete'} className="w-10 h-10 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-white/20 hover:text-red-500 transition-all"><Trash2 size={16} /></button>
+                                        <Link href={`/auctions/${auc.id}`} target="_blank" title={isRTL ? 'فتح الرابط' : 'View'} className="h-10 px-4 rounded-xl bg-white/5 border border-white/5 flex items-center gap-2 text-[9px] font-black uppercase text-white/40 hover:text-white transition-all">
+                                            <ExternalLink size={14} /> {isRTL ? 'رابط' : 'Link'}
+                                        </Link>
                                     </div>
                                 </motion.div>
                             ))}
                         </div>
                         
-                        <button onClick={() => setIsAuctionModalOpen(true)} title="Init mission" className="w-full py-8 border-2 border-dashed border-red-500/10 rounded-3xl hover:border-red-500/30 hover:bg-red-500/5 transition-all flex flex-col items-center gap-2 group">
+                        <button onClick={() => setIsAuctionModalOpen(true)} title={isRTL ? "بدء مهمة جديدة" : "Init mission"} className="w-full py-8 border-2 border-dashed border-red-500/10 rounded-3xl hover:border-red-500/30 hover:bg-red-500/5 transition-all flex flex-col items-center gap-2 group">
                             <Plus size={32} className="text-red-500 group-hover:scale-110 transition-transform" />
-                            <span className="text-xs font-black uppercase tracking-[0.3em] text-red-500/60">Initialize New Arena Mission</span>
+                            <span className="text-xs font-black uppercase tracking-[0.3em] text-red-500/60">
+                                {isRTL ? 'بدء مهمة إطلاق مزاد جديد' : 'Initialize New Arena Mission'}
+                            </span>
                         </button>
                     </div>
                 )}
@@ -256,10 +267,10 @@ function MarketHubContent() {
                 {isAuctionModalOpen && (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[210] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl" onClick={() => setIsAuctionModalOpen(false)}>
                         <motion.div initial={{ scale: 0.9, y: 30 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 30 }} onClick={e => e.stopPropagation()} className="ck-modal max-w-2xl w-full p-10 relative">
-                            <button onClick={() => setIsAuctionModalOpen(false)} title="Close" className="absolute top-6 right-6 w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-white/10"><X size={20} /></button>
+                            <button onClick={() => setIsAuctionModalOpen(false)} title={isRTL ? 'إغلاق' : 'Close'} className="absolute top-6 right-6 w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-white/10"><X size={20} /></button>
                             <div className="mb-10">
-                                <h2 className="text-2xl font-black uppercase italic tracking-tighter">Initiate Arena</h2>
-                                <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest mt-1">Configure Auction Parameters</p>
+                                <h2 className="text-2xl font-black uppercase italic tracking-tighter">{isRTL ? 'بدء المزاد (الساحة)' : 'Initiate Arena'}</h2>
+                                <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest mt-1">{isRTL ? 'تكوين معايير المزاد المباشر' : 'Configure Auction Parameters'}</p>
                             </div>
                             <div className="space-y-6">
                                 <div className="space-y-2">
@@ -292,7 +303,9 @@ function MarketHubContent() {
                                         <input type="datetime-local" value={auctionForm.endsAt} title="Deactivation Time" onChange={e => setAuctionForm({ ...auctionForm, endsAt: e.target.value })} className="ck-input h-14 bg-white/5 [color-scheme:dark]" />
                                     </div>
                                 </div>
-                                <button onClick={handleLaunchAuction} title="Launch" className="w-full h-16 bg-red-500 text-white font-black uppercase text-xs tracking-[0.5em] rounded-2xl shadow-[0_0_40px_rgba(239,68,68,0.3)] hover:scale-[1.02] transition-all">Launch Market Event</button>
+                                <button onClick={handleLaunchAuction} title={isRTL ? 'إطلاق' : 'Launch'} className="w-full h-16 bg-red-500 text-white font-black uppercase text-xs tracking-[0.5em] rounded-2xl shadow-[0_0_40px_rgba(239,68,68,0.3)] hover:scale-[1.02] transition-all">
+                                    {isRTL ? 'إطلاق حدث المزاد' : 'Launch Market Event'}
+                                </button>
                             </div>
                         </motion.div>
                     </motion.div>
@@ -305,41 +318,47 @@ function MarketHubContent() {
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[210] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl" onClick={() => setIsLiveModalOpen(false)}>
                         <motion.div initial={{ scale: 0.9, y: 30 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 30 }} onClick={e => e.stopPropagation()} className="ck-modal max-w-4xl w-full p-0 relative overflow-hidden flex flex-col h-[85vh]">
                             <div className="p-8 border-b border-white/5 bg-white/[0.02]">
-                                <h2 className="text-2xl font-black uppercase italic tracking-tighter">{editingLiveId ? 'Edit Session' : 'New Live Session'}</h2>
-                                <button onClick={() => setIsLiveModalOpen(false)} title="Close" className="absolute top-8 right-8 text-white/40 hover:text-white"><X size={24} /></button>
+                                <h2 className="text-2xl font-black uppercase italic tracking-tighter">
+                                    {editingLiveId ? (isRTL ? 'تعديل الجلسة' : 'Edit Session') : (isRTL ? 'جلسة بث جديدة' : 'New Live Session')}
+                                </h2>
+                                <button onClick={() => setIsLiveModalOpen(false)} title={isRTL ? 'إغلاق' : 'Close'} className="absolute top-8 right-8 text-white/40 hover:text-white"><X size={24} /></button>
                             </div>
                             <div className="flex-1 overflow-y-auto p-10 space-y-8 ck-scroll">
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase text-white/30 tracking-widest">Session Title</label>
-                                        <input value={liveForm.title} title="Title" onChange={e => setLiveForm({ ...liveForm, title: e.target.value })} className="ck-input bg-white/5" />
+                                        <label className="text-[10px] font-black uppercase text-white/30 tracking-widest">{isRTL ? 'عنوان الجلسة' : 'Session Title'}</label>
+                                        <input value={liveForm.title} title={isRTL ? 'العنوان' : 'Title'} onChange={e => setLiveForm({ ...liveForm, title: e.target.value })} className="ck-input bg-white/5" />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase text-white/30 tracking-widest">External URL / Stream</label>
-                                        <input value={liveForm.externalUrl} title="URL" onChange={e => setLiveForm({ ...liveForm, externalUrl: e.target.value })} className="ck-input bg-white/5" />
+                                        <label className="text-[10px] font-black uppercase text-white/30 tracking-widest">{isRTL ? 'رابط البث الخارجي' : 'External URL / Stream'}</label>
+                                        <input value={liveForm.externalUrl} title={isRTL ? 'الرابط' : 'URL'} onChange={e => setLiveForm({ ...liveForm, externalUrl: e.target.value })} className="ck-input bg-white/5" />
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-3 gap-4">
                                      <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase text-white/30 tracking-widest">WA Number</label>
-                                        <input value={liveForm.whatsappNumber} title="WA" onChange={e => setLiveForm({ ...liveForm, whatsappNumber: e.target.value })} className="ck-input bg-white/5" />
+                                        <label className="text-[10px] font-black uppercase text-white/30 tracking-widest">{isRTL ? 'رقم الواتساب' : 'WA Number'}</label>
+                                        <input value={liveForm.whatsappNumber} title={isRTL ? 'واتساب' : 'WA'} onChange={e => setLiveForm({ ...liveForm, whatsappNumber: e.target.value })} className="ck-input bg-white/5" />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase text-white/30 tracking-widest">Vendor User</label>
-                                        <input value={liveForm.auctionUsername} title="User" onChange={e => setLiveForm({ ...liveForm, auctionUsername: e.target.value })} className="ck-input bg-white/5" />
+                                        <label className="text-[10px] font-black uppercase text-white/30 tracking-widest">{isRTL ? 'اسم مستخدم البائع' : 'Vendor User'}</label>
+                                        <input value={liveForm.auctionUsername} title={isRTL ? 'مستخدم' : 'User'} onChange={e => setLiveForm({ ...liveForm, auctionUsername: e.target.value })} className="ck-input bg-white/5" />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase text-white/30 tracking-widest">Vendor Password</label>
-                                        <input type="password" value={liveForm.auctionPassword} title="Pass" onChange={e => setLiveForm({ ...liveForm, auctionPassword: e.target.value })} className="ck-input bg-white/5" />
+                                        <label className="text-[10px] font-black uppercase text-white/30 tracking-widest">{isRTL ? 'كلمة مرور البائع' : 'Vendor Password'}</label>
+                                        <input type="password" value={liveForm.auctionPassword} title={isRTL ? 'مرور' : 'Pass'} onChange={e => setLiveForm({ ...liveForm, auctionPassword: e.target.value })} className="ck-input bg-white/5" />
                                     </div>
                                 </div>
                                 
                                 <div className="bg-red-500/5 border border-red-500/10 p-6 rounded-3xl">
                                     <div className="flex items-center gap-3 mb-4">
                                         <Info size={16} className="text-red-500" />
-                                         <p className="text-[10px] font-black uppercase text-red-500/70 tracking-widest">{isRTL ? 'تنبيه' : 'OPERATIONAL NOTE'}</p>
+                                         <p className="text-[10px] font-black uppercase text-red-500/70 tracking-widest">{isRTL ? 'تنبيه تشغيلي' : 'OPERATIONAL NOTE'}</p>
                                     </div>
-                                    <p className="text-xs text-white/40 leading-relaxed italic">Live sessions allow manual car inventory display alongside external feeds. High resource usage expected during broadcast.</p>
+                                    <p className="text-xs text-white/40 leading-relaxed italic">
+                                        {isRTL 
+                                            ? 'تسمح جلسات البث الحي بعرض مخزون السيارات يدوياً مع البث الخارجي. يتوقع استهلاك عالٍ للموارد أثناء البث.' 
+                                            : 'Live sessions allow manual car inventory display alongside external feeds. High resource usage expected during broadcast.'}
+                                    </p>
                                 </div>
                             </div>
                             <div className="p-8 bg-black/80 border-t border-white/5">
@@ -352,7 +371,9 @@ function MarketHubContent() {
                                         loadLiveSessions();
                                         showToast(isRTL ? 'تم الحفظ' : 'Saved', 'success');
                                     } catch { } finally { setLoading(false); }
-                                }} title="Execute" className="w-full h-16 bg-[#00f0ff] text-black font-black uppercase tracking-[0.5em] text-xs rounded-2xl shadow-[0_0_30px_rgba(0,240,255,0.2)]">Execute Session Config</button>
+                                }} title={isRTL ? 'تنفيذ التكوين' : 'Execute'} className="w-full h-16 bg-[#00f0ff] text-black font-black uppercase tracking-[0.5em] text-xs rounded-2xl shadow-[0_0_30px_rgba(0,240,255,0.2)]">
+                                     {isRTL ? 'تنفيذ إعدادات الجلسة' : 'Execute Session Config'}
+                                 </button>
                             </div>
                         </motion.div>
                     </motion.div>

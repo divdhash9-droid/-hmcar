@@ -27,6 +27,23 @@ export default function AdminHealthPage() {
     const [results, setResults] = useState<DiagnosticResult[]>([]);
     const [scanProgress, setScanProgress] = useState(0);
 
+    const t = {
+        coreStatus: isRTL ? 'حالة سلامة النظام والمكونات' : 'CORE INTEGRITY STATUS',
+        systemNominal: isRTL ? 'النظام مستقر وآمن' : 'SYSTEM NOMINAL',
+        scanning: isRTL ? 'جاري الفحص المتقدم...' : 'SCANNING...',
+        read: isRTL ? 'قراءة' : 'Read',
+        write: isRTL ? 'كتابة' : 'Write',
+        liveHeatmap: isRTL ? 'خريطة النشاط المباشر للشبكة' : 'LIVE HEATMAP',
+        realTimePacket: isRTL ? 'تحليل تدفق البيانات والعمليات' : 'REAL-TIME PACKET FLOW ANALYSIS',
+        cpuCluster: isRTL ? 'مجمع المعالجة (CPU)' : 'CPU CLUSTER',
+        energyFed: isRTL ? 'الطاقة الموفرة للنظام' : 'ENERGY FED',
+        load: isRTL ? 'الحمل' : 'LOAD',
+        throughput: isRTL ? 'الإنتاجية' : 'THROUGHPUT',
+        high: isRTL ? 'عالية جداً' : 'HIGH',
+        protocol: isRTL ? 'بروتوكول' : 'protocol',
+        info: isRTL ? 'معلومات:' : 'INFO:'
+    };
+
     const runDiagnostics = async () => {
         setIsScanning(true);
         setScanProgress(0);
@@ -44,24 +61,32 @@ export default function AdminHealthPage() {
             const latency = Date.now() - start;
             addResult({
                 id: 'api_connectivity',
-                name: 'API GATEWAY',
+                name: isRTL ? 'بوابة الربط المستقرة (API)' : 'API GATEWAY',
                 status: res.success ? 'pass' : 'fail',
-                message: res.success ? `Connection Stable (${latency}ms)` : 'Gateway Unreachable',
+                message: res.success 
+                    ? (isRTL ? `اتصال مستقر (${latency}ملي ثانية)` : `Connection Stable (${latency}ms)`) 
+                    : (isRTL ? 'البوابة غير متاحة حالياً' : 'Gateway Unreachable'),
                 category: 'system'
             });
         } catch {
-            addResult({ id: 'api_connectivity', name: 'API GATEWAY', status: 'fail', message: 'CRITICAL: Offline', category: 'system' });
+            addResult({ 
+                id: 'api_connectivity', 
+                name: isRTL ? 'بوابة الربط (API)' : 'API GATEWAY', 
+                status: 'fail', 
+                message: isRTL ? 'خطأ حرج: غير متصل' : 'CRITICAL: Offline', 
+                category: 'system' 
+            });
         }
 
         setScanProgress(30);
         // Database Check
         addResult({
             id: 'db_auth',
-            name: 'DB CLUSTER',
+            name: isRTL ? 'مجمع قواعد البيانات' : 'DB CLUSTER',
             status: 'pass',
-            message: 'MongoDB Atlas - Connected',
+            message: isRTL ? 'MongoDB Atlas - متصل بنجاح' : 'MongoDB Atlas - Connected',
             category: 'database',
-            details: 'Region: Portland (West)'
+            details: isRTL ? 'المنطقة: بورتلاند (الغرب)' : 'Region: Portland (West)'
         });
 
         // ── Phase 2: Financial Integrity ──
@@ -72,9 +97,11 @@ export default function AdminHealthPage() {
                 const multipliersOk = s.partsMultiplier > 1 && s.auctionMultiplier > 1;
                 addResult({
                     id: 'financial_multipliers',
-                    name: 'FINANCIAL LOGIC',
+                    name: isRTL ? 'المنطق المالي والنظام' : 'FINANCIAL LOGIC',
                     status: multipliersOk ? 'pass' : 'warn',
-                    message: multipliersOk ? 'Price Multipliers Active' : 'Check Pricing Ratios',
+                    message: multipliersOk 
+                        ? (isRTL ? 'مضاعفات السعر نشطة' : 'Price Multipliers Active') 
+                        : (isRTL ? 'تحقق من نسب التسعير' : 'Check Pricing Ratios'),
                     category: 'system',
                     details: `P:x${s.partsMultiplier || 1} A:x${s.auctionMultiplier || 1}`
                 });
@@ -92,17 +119,21 @@ export default function AdminHealthPage() {
 
                 addResult({
                     id: 'car_images',
-                    name: 'MEDIA ASSETS',
+                    name: isRTL ? 'الوسائط والصور' : 'MEDIA ASSETS',
                     status: brokenImages > 0 ? 'warn' : 'pass',
-                    message: brokenImages > 0 ? `${brokenImages} Cars missing media` : 'All assets verified',
+                    message: brokenImages > 0 
+                        ? (isRTL ? `${brokenImages} سيارات بدون وسائط` : `${brokenImages} Cars missing media`) 
+                        : (isRTL ? 'تم التحقق من جميع الوسائط' : 'All assets verified'),
                     category: 'assets'
                 });
 
                 addResult({
                     id: 'car_desc',
-                    name: 'INVENTORY CONTENT',
+                    name: isRTL ? 'محتوى المخزون والبيانات' : 'INVENTORY CONTENT',
                     status: missingDesc > 3 ? 'warn' : 'pass',
-                    message: missingDesc > 0 ? `${missingDesc} Low detail listings` : 'Metadata Quality High',
+                    message: missingDesc > 0 
+                        ? (isRTL ? `${missingDesc} قوائم بتفاصيل محدودة` : `${missingDesc} Low detail listings`) 
+                        : (isRTL ? 'جودة البيانات الوصفية عالية' : 'Metadata Quality High'),
                     category: 'assets'
                 });
             }
@@ -112,17 +143,17 @@ export default function AdminHealthPage() {
         // ── Phase 3: Security ──
         addResult({
             id: 'ssl_status',
-            name: 'ENCRYPTION (SSL/TLS)',
+            name: isRTL ? 'تشفير الحماية (SSL/TLS)' : 'ENCRYPTION (SSL/TLS)',
             status: 'pass',
-            message: 'Standard AES-256 Active',
+            message: isRTL ? 'معيار AES-256 نشط ومفعل' : 'Standard AES-256 Active',
             category: 'security'
         });
 
         addResult({
             id: 'auth_audit',
-            name: 'AUTH PROTOCOL',
+            name: isRTL ? 'بروتوكول التحقق والتحكيم' : 'AUTH PROTOCOL',
             status: 'pass',
-            message: 'JWT Bearer Rotation Active',
+            message: isRTL ? 'تدوير رموز JWT نشط وآمن' : 'JWT Bearer Rotation Active',
             category: 'security'
         });
 
@@ -168,9 +199,9 @@ export default function AdminHealthPage() {
                 <div className="mb-12 relative">
                     <div className="flex items-end justify-between mb-4">
                         <div>
-                            <p className="cockpit-mono text-[9px] text-orange-500/50 uppercase tracking-[0.4em] mb-1">CORE INTEGRITY STATUS</p>
+                            <p className="cockpit-mono text-[9px] text-orange-500/50 uppercase tracking-[0.4em] mb-1">{t.coreStatus}</p>
                             <h2 className="text-3xl font-black italic tracking-tighter uppercase">
-                                {isScanning ? (isRTL ? 'جاري الفحص...' : 'SCANNING...') : (isRTL ? 'النظام مستقر' : 'SYSTEM NOMINAL')}
+                                {isScanning ? t.scanning : t.systemNominal}
                             </h2>
                         </div>
                         <div className="text-right">
@@ -216,7 +247,7 @@ export default function AdminHealthPage() {
                                             {res.category === 'security' && <Shield size={20} />}
                                         </div>
                                         <div>
-                                            <p className="cockpit-mono text-[9px] text-white/30 uppercase tracking-widest mb-1">{res.category} protocol</p>
+                                            <p className="cockpit-mono text-[9px] text-white/30 uppercase tracking-widest mb-1">{res.category} {t.protocol}</p>
                                             <h3 className="text-sm font-black uppercase text-white/80">{res.name}</h3>
                                         </div>
                                     </div>
@@ -224,7 +255,7 @@ export default function AdminHealthPage() {
                                 </div>
                                 <div className="mt-4 flex items-center justify-between">
                                     <p className="text-[11px] font-bold text-white/60 italic">{res.message}</p>
-                                    {res.details && <span className="cockpit-mono text-[8px] text-white/20 uppercase">INFO: {res.details}</span>}
+                                    {res.details && <span className="cockpit-mono text-[8px] text-white/20 uppercase">{t.info} {res.details}</span>}
                                 </div>
                             </motion.div>
                         ))}
@@ -235,10 +266,10 @@ export default function AdminHealthPage() {
                 <div className="mt-12 grid grid-cols-1 xl:grid-cols-3 gap-6">
                     <div className="ck-card p-8 xl:col-span-2">
                         <div className="flex items-center justify-between mb-8">
-                            <h3 className="cockpit-mono text-[11px] font-black uppercase tracking-widest text-orange-500">LIVE HEATMAP</h3>
+                            <h3 className="cockpit-mono text-[11px] font-black uppercase tracking-widest text-orange-500">{t.liveHeatmap}</h3>
                             <div className="flex gap-4">
-                                <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-blue-500" /><span className="text-[8px] text-white/40 uppercase">Read</span></div>
-                                <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-orange-500" /><span className="text-[8px] text-white/40 uppercase">Write</span></div>
+                                <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-blue-500" /><span className="text-[8px] text-white/40 uppercase">{t.read}</span></div>
+                                <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-orange-500" /><span className="text-[8px] text-white/40 uppercase">{t.write}</span></div>
                             </div>
                         </div>
                         <div className="h-48 flex items-end gap-1 px-2">
@@ -255,27 +286,27 @@ export default function AdminHealthPage() {
                                 />
                             ))}
                         </div>
-                        <p className="text-center cockpit-mono text-[8px] text-white/20 mt-4 tracking-widest uppercase">REAL-TIME PACKET FLOW ANALYSIS</p>
+                        <p className="text-center cockpit-mono text-[8px] text-white/20 mt-4 tracking-widest uppercase">{t.realTimePacket}</p>
                     </div>
 
                     <div className="space-y-4">
-                        <div className="ck-card p-6">
+                         <div className="ck-card p-6">
                             <div className="flex items-center gap-3 mb-4">
                                 <Cpu size={16} className="text-orange-500" />
-                                <span className="cockpit-mono text-[10px] uppercase font-black tracking-widest">CPU CLUSTER</span>
+                                <span className="cockpit-mono text-[10px] uppercase font-black tracking-widest">{t.cpuCluster}</span>
                             </div>
                             <div className="space-y-2">
-                                <div className="flex justify-between text-[10px] font-bold text-white/40"><span>LOAD</span><span>32.4%</span></div>
+                                <div className="flex justify-between text-[10px] font-bold text-white/40"><span>{t.load}</span><span>32.4%</span></div>
                                 <div className="h-1 bg-white/5 rounded-full overflow-hidden"><div className="h-full bg-orange-500 w-[32%]" /></div>
                             </div>
                         </div>
-                        <div className="ck-card p-6">
+                         <div className="ck-card p-6">
                             <div className="flex items-center gap-3 mb-4">
                                 <Zap size={16} className="text-blue-400" />
-                                <span className="cockpit-mono text-[10px] uppercase font-black tracking-widest">ENERGY FED</span>
+                                <span className="cockpit-mono text-[10px] uppercase font-black tracking-widest">{t.energyFed}</span>
                             </div>
                             <div className="space-y-2">
-                                <div className="flex justify-between text-[10px] font-bold text-white/40"><span>THROUGHPUT</span><span>HIGH</span></div>
+                                <div className="flex justify-between text-[10px] font-bold text-white/40"><span>{t.throughput}</span><span>{t.high}</span></div>
                                 <div className="h-1 bg-white/5 rounded-full overflow-hidden"><div className="h-full bg-blue-400 w-[88%]" /></div>
                             </div>
                         </div>

@@ -32,16 +32,7 @@ const TYPE_CONFIG: Record<string, { icon: LucideIcon; color: string; bg: string 
     AUCTION: { icon: Gavel, color: 'text-orange-400', bg: 'bg-orange-500/10 border-orange-500/20' },
 };
 
-const MOCK_NOTIFICATIONS: Notification[] = [
-    { id: '1', type: 'CRITICAL', title: 'FIREWALL BREACH ATTEMPT', content: 'Suspicious IP 104.28.14.2 detected – SQL injection on /api/auctions/bid.', time: '2m ago', status: 'BLOCKED', isRead: false },
-    { id: '2', type: 'TRANSACTION', title: 'PAYMENT VERIFIED: 1.2M SAR', content: 'Fahad Al-Qahtani cleared payment for Porsche 911 GT3 RS.', time: '15m ago', status: 'CLEARED', isRead: false },
-    { id: '3', type: 'ORDER', title: 'NEW ORDER PLACED', content: 'Order #ORD-A1B2C3D4 placed — Mercedes-Benz S-Class 2024 — 450,000 SAR.', time: '1h ago', status: 'PENDING', isRead: false },
-    { id: '4', type: 'AUCTION', title: 'AUCTION ENDING SOON', content: 'BMW M5 Competition auction closes in 30 minutes. Current bid: 320,000 SAR.', time: '2h ago', status: 'ACTIVE', isRead: true },
-    { id: '5', type: 'USER', title: 'NEW USER REGISTERED', content: 'khalid.otaibi@gmail.com just signed up and verified their account.', time: '3h ago', status: 'VERIFIED', isRead: true },
-    { id: '6', type: 'SYSTEM', title: 'DATABASE BACKUP COMPLETE', content: 'Nightly incremental backup of RIYADH-DB-01 finished in 4m 12s.', time: '4h ago', status: 'SUCCESS', isRead: true },
-    { id: '7', type: 'WARNING', title: 'LATENCY SPIKE DETECTED', content: 'API response time surged 40% in EMEA regions. Auto-scaling triggered.', time: '6h ago', status: 'MONITORING', isRead: true },
-    { id: '8', type: 'TRANSACTION', title: 'REFUND PROCESSED: 85,000 SAR', content: 'Refund issued to Mohammed Al-Saud for cancelled order #ORD-Z9Y8X7.', time: '8h ago', status: 'REFUNDED', isRead: true },
-];
+const MOCK_NOTIFICATIONS: Notification[] = [];
 
 const FILTER_LABELS: Record<string, { en: string; ar: string }> = {
     ALL: { en: 'ALL', ar: 'الكل' },
@@ -117,12 +108,12 @@ export default function AdminNotifications() {
                 live.push({ id: 'live-3', type: 'USER', title: isRTL ? 'تقرير المستخدمين' : 'USER SUMMARY', content: isRTL ? `${stats.totalUsers} مستخدم مسجل في المنصة` : `${stats.totalUsers} total registered users on platform`, time: new Date(Date.now() - 3600000).toISOString(), status: 'INFO', isRead: true });
             }
 
-            const merged = [...live, ...MOCK_NOTIFICATIONS];
+            const merged = [...live];
             setNotifications(merged);
             setUnreadCount(merged.filter(n => !n.isRead).length);
         } catch {
-            setNotifications(MOCK_NOTIFICATIONS);
-            setUnreadCount(MOCK_NOTIFICATIONS.filter(n => !n.isRead).length);
+            setNotifications([]);
+            setUnreadCount(0);
         } finally {
             setLoading(false);
             setRefreshing(false);

@@ -5,6 +5,7 @@ const router = express.Router();
 const https = require('https');
 const SiteSettings = require('../../../models/SiteSettings');
 const Car = require('../../../models/Car');
+const Brand = require('../../../models/Brand');
 const { requireAuthAPI, requireAdmin } = require('../../../middleware/auth');
 
 // ─────────────────────────────────────────────────────────
@@ -389,9 +390,13 @@ router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
                 const existingCar = await Car.findOne({ externalUrl: item.encarUrl });
                 
                 if (!existingCar) {
+                    // [[ARABIC_COMMENT]] محاولة جلب شعار الماركة من قاعدة البيانات إذا توفرت
+                    const brand = await Brand.findOne({ name: item.manufacturerAr });
+
                     await Car.create({
                         title: item.title,
                         make: item.manufacturerAr,
+                        makeLogoUrl: brand ? brand.logoUrl : '',
                         model: item.model,
                         year: item.year,
                         mileage: item.mileage,
@@ -409,7 +414,8 @@ router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
                         images: finalImagesList,
                         isActive: true,
                         isSold: false,
-                        displayCurrency: 'KRW'
+                        displayCurrency: settings?.currencySettings?.defaultCurrency || 'SAR',
+                        agency: brand ? brand._id : null
                     });
                     totalCreated++;
                 } else {

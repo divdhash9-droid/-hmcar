@@ -263,8 +263,9 @@ router.patch('/:id/sold', requireAuthAPI, async (req, res) => {
         try {
             const AuditLog = require('../../../models/AuditLog');
             await AuditLog.create({
+                user: req.user?.userId || null,
                 action: 'SOLD',
-                targetModel: 'SparePart',
+                target: 'SparePart',
                 description: `تم تسجيل بيع ${soldQty} قطعة من: ${part.name} — إجمالي المبيعات الآن: ${newSoldCount}`,
                 targetId: part._id,
                 after: { soldQty, newSoldCount, soldAt: new Date() },

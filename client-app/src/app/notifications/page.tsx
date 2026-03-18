@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Bell, Check, CheckCheck, Trash2, Clock,
@@ -12,6 +12,7 @@ import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/lib/LanguageContext';
+import { api } from '@/lib/api';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 const NOTIFICATION_TYPES = {
@@ -23,22 +24,22 @@ const NOTIFICATION_TYPES = {
     alert: { icon: AlertTriangle, color: 'from-red-500 to-rose-600', bg: 'bg-red-500/10', border: 'border-red-500/20', label: 'تنبيهات', labelEn: 'Alerts' },
 };
 
-const MOCK_NOTIFICATIONS = [
-    { id: 1, type: 'bid', title: 'مزايدة جديدة!', titleEn: 'New Bid!', message: 'تم تقديم مزايدة بقيمة 450,000 ر.س على Mercedes AMG GT', messageEn: 'A bid of 450,000 SAR was placed on Mercedes AMG GT', time: '2 دقيقة', timeEn: '2 min ago', read: false, priority: 'high' },
-    { id: 2, type: 'order', title: 'طلبك قيد المعالجة', titleEn: 'Order Processing', message: 'طلب #HM-2024-0892 قيد المعالجة وسيتم الشحن قريباً', messageEn: 'Order #HM-2024-0892 is being processed and will ship soon', time: '15 دقيقة', timeEn: '15 min ago', read: false, priority: 'medium' },
-    { id: 3, type: 'car', title: 'سيارة أحلامك متوفرة!', titleEn: 'Your Dream Car!', message: 'Lamborghini Urus 2024 الآن في معرضنا بسعر مميز', messageEn: 'Lamborghini Urus 2024 now in our showroom at special price', time: 'ساعة', timeEn: '1 hour ago', read: false, priority: 'high' },
-    { id: 4, type: 'promo', title: 'عرض حصري 🎉', titleEn: 'Exclusive Offer 🎉', message: 'خصم 15% على جميع قطع الغيار لفترة محدودة حتى نهاية الشهر', messageEn: '15% off on all spare parts for limited time until end of month', time: '3 ساعات', timeEn: '3 hours ago', read: true, priority: 'low' },
-    { id: 5, type: 'alert', title: 'تنبيه أمني', titleEn: 'Security Alert', message: 'تم تسجيل دخول جديد من جهاز غير معروف في الرياض', messageEn: 'New login detected from unknown device in Riyadh', time: '5 ساعات', timeEn: '5 hours ago', read: true, priority: 'high' },
-    { id: 6, type: 'system', title: 'تحديث النظام', titleEn: 'System Update', message: 'تم تحديث سياسة الخصوصية. اطلع على التفاصيل الكاملة.', messageEn: 'Privacy policy updated. Check the full details.', time: 'أمس', timeEn: 'Yesterday', read: true, priority: 'low' },
-    { id: 7, type: 'bid', title: 'تم قبول مزايدتك!', titleEn: 'Bid Accepted!', message: 'تهانينا! فزت بالمزاد على BMW M5 Competition 2024', messageEn: 'Congratulations! You won BMW M5 Competition 2024 auction', time: 'أمس', timeEn: 'Yesterday', read: true, priority: 'high' },
-];
+const MOCK_NOTIFICATIONS: any[] = [];
 
 // ─── Main Page ──────────────────────────────────────────────────────────────────
 export default function NotificationsPage() {
     const { isRTL } = useLanguage();
     const router = useRouter();
 
-    const [notifications, setNotifications] = useState(MOCK_NOTIFICATIONS);
+    const [notifications, setNotifications] = useState<any[]>([]);
+
+    useEffect(() => {
+        api.notifications?.list?.().then(res => {
+            if (res?.success && Array.isArray(res.data)) {
+                setNotifications(res.data);
+            }
+        }).catch(err => console.error("Failed to load notifications", err));
+    }, []);
     const [filter, setFilter] = useState<string>('all');
     const [soundEnabled, setSoundEnabled] = useState(true);
     const [selected, setSelected] = useState<any>(null);

@@ -49,70 +49,9 @@ export default function MyBidsPage() {
             if (res?.success) {
                 setBids(res.data);
             } else throw new Error();
-        } catch {
-            // Mock data
-            setBids([
-                {
-                    id: '1',
-                    auction: {
-                        id: 'a1',
-                        title: 'FERRARI F8 TRIBUTO 2023',
-                        image: 'https://images.unsplash.com/photo-1586464831261-c3b7f68ea2b1?q=80&w=1200',
-                        endDate: new Date(Date.now() - 3600000).toISOString(),
-                        basePrice: 850000,
-                    },
-                    myAmount: 920000,
-                    currentHighest: 920000,
-                    status: 'won',
-                    bidTime: new Date(Date.now() - 7200000).toISOString(),
-                    totalBids: 34,
-                },
-                {
-                    id: '2',
-                    auction: {
-                        id: 'a2',
-                        title: 'LAMBORGHINI URUS 2024',
-                        image: 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b?q=80&w=1200',
-                        endDate: new Date(Date.now() + 86400000 * 2).toISOString(),
-                        basePrice: 1200000,
-                    },
-                    myAmount: 1250000,
-                    currentHighest: 1350000,
-                    status: 'outbid',
-                    bidTime: new Date(Date.now() - 1800000).toISOString(),
-                    totalBids: 61,
-                },
-                {
-                    id: '3',
-                    auction: {
-                        id: 'a3',
-                        title: 'PORSCHE 911 TURBO S 2024',
-                        image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1200',
-                        endDate: new Date(Date.now() + 3600000 * 5).toISOString(),
-                        basePrice: 700000,
-                    },
-                    myAmount: 750000,
-                    currentHighest: 750000,
-                    status: 'active',
-                    bidTime: new Date(Date.now() - 600000).toISOString(),
-                    totalBids: 22,
-                },
-                {
-                    id: '4',
-                    auction: {
-                        id: 'a4',
-                        title: 'BMW M8 COMPETITION 2023',
-                        image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?q=80&w=1200',
-                        endDate: new Date(Date.now() - 86400000 * 5).toISOString(),
-                        basePrice: 480000,
-                    },
-                    myAmount: 500000,
-                    currentHighest: 520000,
-                    status: 'lost',
-                    bidTime: new Date(Date.now() - 86400000 * 5).toISOString(),
-                    totalBids: 45,
-                },
-            ]);
+        } catch (error) {
+            console.error("Failed to load bids", error);
+            setBids([]);
         } finally {
             setLoading(false);
         }

@@ -4,7 +4,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4002";
 
 async function getLatestCars(): Promise<CarType[]> {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/v2/cars?limit=10&status=active&listingType=store&source=hm_local`, {
+    const res = await fetch(`${API_BASE_URL}/api/v2/cars?limit=12&status=active`, {
       headers: { Accept: "application/json" },
       next: { revalidate: 15 },
     });

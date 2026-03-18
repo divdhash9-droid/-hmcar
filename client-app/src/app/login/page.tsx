@@ -138,14 +138,12 @@ export default function Login() {
                 if (method === 'phone' && !otpRequested) {
                     try {
                         await api.auth.sendOtp({ phone: phoneE164 });
-                        setSuccessMessage(isRTL ? 'تم إرسال رمز التحقق إلى هاتفك' : 'Verification code sent to your phone');
+                        setSuccessMessage(isRTL ? 'تهانينا، تم إرسال رمز التحقق إلى هاتفك' : 'Verification code sent to your phone');
                         setOtpRequested(true);
                         setLoading(false);
                         return;
-                    } catch {
-                        // في حال فشل الإرسال (Fallback للتجربة)
-                        setSuccessMessage(isRTL ? 'تم إرسال رمز التحقق إلى هاتفك' : 'Verification code sent to your phone');
-                        setOtpRequested(true);
+                    } catch (err: any) {
+                        setError(err.message || (isRTL ? 'فشل إرسال رمز التحقق' : 'Failed to send OTP'));
                         setLoading(false);
                         return;
                     }
@@ -158,11 +156,8 @@ export default function Login() {
                     }
                     try {
                         await api.auth.verifyOtp({ phone: phoneE164, code: otpCode });
-                    } catch {
-                        const saved = typeof window !== 'undefined' ? localStorage.getItem(`hm_mock_otp_${phoneE164}`) : null;
-                        if (!saved || saved !== otpCode) {
-                            throw new Error(isRTL ? 'رمز التحقق غير صحيح' : 'Invalid verification code');
-                        }
+                    } catch (err: any) {
+                        throw new Error(err.message || (isRTL ? 'رمز التحقق غير صحيح، أو انتهت صلاحيته' : 'Invalid or expired verification code'));
                     }
                 }
 
@@ -219,21 +214,9 @@ export default function Login() {
 
             const errMsg = err.message || '';
             const identifier = formData.email.trim();
-            // DEV_FAKE: Only allow admin fallback with specific dev credentials
-            if (role === 'admin' && DEV_FAKE && identifier === 'id_7788' && formData.password.length >= 6) {
-                console.log('[Login] Falling back to DEV_FAKE admin...');
-                localStorage.setItem('hm_token', 'dev_admin_token');
-                localStorage.setItem('hm_user', JSON.stringify({ role: 'admin', name: 'Admin', username: identifier }));
-                document.cookie = `hm_token=dev_admin_token; path=/; max-age=86400; SameSite=Lax`;
-                setSuccessMessage(isRTL ? 'تم الدخول كمدير' : 'Logged in as admin');
-                setTimeout(() => {
-                    window.location.href = "/admin/dashboard";
-                }, 800);
-            } else {
-                // All other login failures show the error - no local bypass allowed
-                setError(errMsg || (isRTL ? 'فشل تسجيل الدخول. تحقق من البيانات أو تواصل مع الدعم.' : 'Login failed. Check your credentials or contact support.'));
-                setLoading(false);
-            }
+            // All other login failures show the error - no local bypass allowed
+            setError(errMsg || (isRTL ? 'فشل تسجيل الدخول. تحقق من البيانات أو تواصل مع الدعم.' : 'Login failed. Check your credentials or contact support.'));
+            setLoading(false);
         }
     };
 
@@ -620,12 +603,8 @@ export default function Login() {
                                                 try {
                                                     await api.auth.sendOtp({ phone: phoneE164 });
                                                     setSuccessMessage(isRTL ? 'تم إرسال الرمز مرة أخرى' : 'Code resent');
-                                                } catch {
-                                                    const mock = String(Math.floor(100000 + Math.random() * 900000));
-                                                    try {
-                                                        localStorage.setItem(`hm_mock_otp_${phoneE164}`, mock);
-                                                    } catch { }
-                                                    setSuccessMessage(isRTL ? `رمز تجريبي جديد: ${mock}` : `New mock code: ${mock}`);
+                                                } catch (err: any) {
+                                                    setSuccessMessage(isRTL ? 'فشل إرسال الرمز مرة أخرى' : 'Failed to resend code');
                                                 }
                                             }}
                                             className="px-4 py-2 rounded-lg border border-white/10 text-white/80 hover:text-white hover:bg-white/10"

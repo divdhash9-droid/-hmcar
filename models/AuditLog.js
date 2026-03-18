@@ -7,7 +7,7 @@ const auditLogSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: false // [[ARABIC_COMMENT]] جعل الحقل غير مطلوب للسماح بتسجيل أحداث النظام التلقائية
   },
   // نوع العملية
   action: {
@@ -15,7 +15,7 @@ const auditLogSchema = new mongoose.Schema({
     enum: [
       'CREATE', 'UPDATE', 'DELETE', 'LOGIN', 'LOGOUT', 'VIEW', 'EXPORT',
       'APPROVE', 'REJECT', 'SUSPEND', 'ACTIVATE', 'RESET_PASSWORD',
-      'UPLOAD', 'DOWNLOAD', 'BACKUP', 'RESTORE', 'SYSTEM_CHANGE'
+      'UPLOAD', 'DOWNLOAD', 'BACKUP', 'RESTORE', 'SYSTEM_CHANGE', 'SOLD', 'SCRAPE'
     ],
     required: true
   },
@@ -139,7 +139,7 @@ auditLogSchema.statics.log = async function(logData) {
 
 auditLogSchema.statics.logUserAction = async function(user, action, target, description, additionalData = {}) {
   return this.log({
-    user: user._id,
+    user: (user && user._id) ? user._id : user,
     action,
     target,
     description,

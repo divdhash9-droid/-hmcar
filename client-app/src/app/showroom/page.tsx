@@ -56,6 +56,7 @@ interface KoreanCar {
     imageUrl: string | null;
     images?: string[];
     image?: string | null;
+    makeLogoUrl?: string;
     encarUrl: string;
     isInspected: boolean;
 }
@@ -125,8 +126,15 @@ function CarCard({ car, onContact, onViewDetails, priceText }: {
                 {/* ─ بيانات السيارة ─ */}
                 <div className="p-4 flex flex-col flex-1 gap-3">
                     <div>
-                        <div className="text-[9px] text-white/30 font-bold uppercase tracking-widest mb-1">
-                            {car.manufacturerAr}
+                        <div className="flex items-center gap-2 mb-1">
+                            {car.makeLogoUrl && (
+                                <div className="relative w-4 h-4 rounded overflow-hidden opacity-60">
+                                    <Image src={car.makeLogoUrl} alt={car.manufacturerAr} fill className="object-contain" />
+                                </div>
+                            )}
+                            <div className="text-[9px] text-white/30 font-bold uppercase tracking-widest">
+                                {car.manufacturerAr}
+                            </div>
                         </div>
                         <h3 className="text-base font-black text-white leading-tight line-clamp-1 group-hover:text-blue-400 transition-colors">
                             {car.title}

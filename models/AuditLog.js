@@ -7,7 +7,7 @@ const auditLogSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: false // [[ARABIC_COMMENT]] جعل الحقل غير مطلوب للسماح بتسجيل أحداث النظام التلقائية
+    required: true
   },
   // نوع العملية
   action: {
@@ -15,7 +15,7 @@ const auditLogSchema = new mongoose.Schema({
     enum: [
       'CREATE', 'UPDATE', 'DELETE', 'LOGIN', 'LOGOUT', 'VIEW', 'EXPORT',
       'APPROVE', 'REJECT', 'SUSPEND', 'ACTIVATE', 'RESET_PASSWORD',
-      'UPLOAD', 'DOWNLOAD', 'BACKUP', 'RESTORE', 'SYSTEM_CHANGE', 'SOLD', 'SCRAPE'
+      'UPLOAD', 'DOWNLOAD', 'BACKUP', 'RESTORE', 'SYSTEM_CHANGE'
     ],
     required: true
   },

@@ -70,14 +70,19 @@ router.get('/', async (req, res) => {
         const { category, q, brand, carModel, limit = 20 } = req.query;
         const filter = {};
 
-        if (category && category !== 'ALL') {
-            filter.partType = new RegExp(category, 'i');
+        // [[ARABIC_COMMENT]] فلتر الفئة: يدعم الأسماء الإنجليزية والعربية معاً
+        if (category && category !== 'ALL' && category !== 'all') {
+            // الفئات التي ترد من واجهة المستخدم قد تكون Engine أو Brakes إلخ
+            // كما قد تكون البيانات المستوردة General أو قيمة أخرى
+            // نبحث في partType بشكل مرن
+            const categoryRegex = new RegExp(category.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+            filter.partType = categoryRegex;
         }
 
         // [[ARABIC_COMMENT]] دعم البحث بالاسم أو الوكالة أو صانع السيارة
         if (q) {
             const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
-            filter.$or = [{ name: re }, { partType: re }, { carMake: re }];
+            filter.$or = [{ name: re }, { nameAr: re }, { partType: re }, { carMake: re }, { carModel: re }];
         }
 
         // [[ARABIC_COMMENT]] فلتر مباشر حسب وكالة السيارة (brand=toyota مثلاً)
@@ -263,9 +268,8 @@ router.patch('/:id/sold', requireAuthAPI, async (req, res) => {
         try {
             const AuditLog = require('../../../models/AuditLog');
             await AuditLog.create({
-                user: req.user?.userId || null,
                 action: 'SOLD',
-                target: 'SparePart',
+                targetModel: 'SparePart',
                 description: `تم تسجيل بيع ${soldQty} قطعة من: ${part.name} — إجمالي المبيعات الآن: ${newSoldCount}`,
                 targetId: part._id,
                 after: { soldQty, newSoldCount, soldAt: new Date() },
@@ -332,6 +336,8 @@ router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
         const limitBrands = brandsToProcess.slice(0, Math.max(1, maxBrands));
 
         for (const bData of limitBrands) {
+            // [[ARABIC_COMMENT]] نبحث بـ key فقط، وإذا كان البراند موجوداً للسيارات نضيف forSpareParts=true له
+            // لكن لا نجعل وكالة قطع الغيار تظهر كوكالة سيارات (forCars=false للجديدة)
             let brand = await Brand.findOne({ key: bData.name.toLowerCase() });
             if (!brand) {
                 // [[ARABIC_COMMENT]] تحميل وضغط شعار البراند لضمان سرعة الواجهة
@@ -341,7 +347,8 @@ router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
                     key: bData.name.toLowerCase(),
                     logoUrl: localLogo,
                     forSpareParts: true,
-                    forCars: true,
+                    forCars: false, // [[ARABIC_COMMENT]] وكالات قطع الغيار لا تظهر في معرض السيارات
+                    targetShowroom: 'both',
                     models: []
                 });
                 results.brandsCreated++;

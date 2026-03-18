@@ -716,15 +716,15 @@ html {
 /* ── Prevent elastic scrolling on PWA ── */
 @media all and (display-mode: standalone) {
   html, body {
-    height: 100%;
-    overflow: hidden;
-    position: fixed;
-    width: 100%;
+    /* تم إصلاح التمرير (Scrolling) ليكون سلساً ولا يعلق */
+    overscroll-behavior-y: none; /* يمنع السحب للتحديث Pull-to-refresh الذي يزعج المستخدم */
+    -webkit-overflow-scrolling: touch;
+    height: auto;
+    min-height: 100vh;
+    overflow-x: hidden;
   }
   
   main, [role="main"] {
-    height: 100%;
-    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
 

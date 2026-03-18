@@ -1,34 +1,33 @@
 'use client';
 
 /**
- * شريط التنقل السفلي (Bottom Tab Bar)
- * مخصص لواجهة الجوال (PWA) ليوفر تجربة مشابهة للتطبيقات الأصلية.
- * يتيح الانتقال السريع بين المعرض، المزادات، الصفحة الرئيسية، القطع، والحساب الشخصي.
+ * شريط التنقل السفلي (Bottom Tab Bar) الواسع
+ * مخصص لواجهة الجوال (PWA) ليوفر تجربة أسهل في القراءة والتمرير
  */
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
-    Home, Car, Gavel, Wrench, User
+    Home, Car, Bell, Wrench, User
 } from 'lucide-react';
 import { useLanguage } from '@/lib/LanguageContext';
 
-// قائمة التبويبات (Tabs) والروابط المرتبطة بها
+// قائمة التبويبات (Tabs) والروابط المرتبطة بها - معدلة حسب طلب المستخدم
 const TABS = [
     {
         href: '/gallery',
         icon: Car,
-        labelAr: 'المعرض',
+        labelAr: 'السيارات',
         labelEn: 'Cars',
         matchPaths: ['/gallery', '/showroom', '/cars'],
     },
     {
-        href: '/auctions',
-        icon: Gavel,
-        labelAr: 'المزادات',
-        labelEn: 'Auctions',
-        matchPaths: ['/auctions'],
+        href: '/parts',
+        icon: Wrench,
+        labelAr: 'قطع الغيار',
+        labelEn: 'Parts',
+        matchPaths: ['/parts'],
     },
     {
         href: '/',
@@ -39,11 +38,11 @@ const TABS = [
         exact: true,
     },
     {
-        href: '/parts',
-        icon: Wrench,
-        labelAr: 'قطع الغيار',
-        labelEn: 'Parts',
-        matchPaths: ['/parts'],
+        href: '/notifications',
+        icon: Bell,
+        labelAr: 'الإشعارات',
+        labelEn: 'Notifications',
+        matchPaths: ['/notifications'],
     },
     {
         href: '/client/dashboard',
@@ -66,54 +65,52 @@ export default function BottomTabBar() {
 
     return (
         <nav
-            className="fixed bottom-0 left-0 right-0 z-500 bg-black/95 border-t border-white/10 backdrop-blur-3xl shadow-[0_-10px_30px_rgba(0,0,0,0.5)]"
-            style={{ 
-                paddingBottom: 'env(safe-area-inset-bottom, 12px)',
-                height: 'calc(75px + env(safe-area-inset-bottom, 0px))'
-            }}
+            // جعلنا حجم الشريط وأزراره أكبر قليلاً، وأضفنا تأثيرات تجعل التمرير والضغط سلساً
+            className="fixed bottom-0 left-0 right-0 z-[100] bg-[#0A0A0A] border-t border-white/10 backdrop-blur-3xl shadow-2xl"
+            style={{ paddingBottom: 'env(safe-area-inset-bottom, 12px)' }} 
             dir="ltr"
         >
-            <div className="flex items-center justify-around h-full px-2 max-w-lg mx-auto">
+            <div className="flex items-center justify-around px-2 pt-4 pb-3 max-w-lg mx-auto overflow-hidden touch-pan-x">
                 {TABS.map((tab) => {
                     const active = isActive(tab);
                     const Icon = tab.icon;
                     return (
-                        <Link key={tab.href} href={tab.href} className="flex-1 h-full flex flex-col items-center justify-center">
+                        <Link key={tab.href} href={tab.href} className="flex-1 group" prefetch={true}>
                             <motion.div
-                                whileTap={{ scale: 0.9 }}
-                                className="flex flex-col items-center gap-1.5 relative py-1"
+                                whileTap={{ scale: 0.9 }} // تصغير خفيف جدا لزيادة السلاسة
+                                className="flex flex-col items-center gap-1.5 cursor-pointer relative"
                             >
                                 {/* أيقونة مع مؤشر النشاط */}
                                 <div className="relative">
                                     {active && (
                                         <motion.div
                                             layoutId="tab-bg"
-                                            className="absolute inset-0 -m-3 rounded-2xl bg-gradient-to-br from-cinematic-neon-gold/20 to-cinematic-neon-gold/5 blur-sm"
+                                            className="absolute -inset-3 rounded-xl bg-cinematic-neon-gold/10"
                                             transition={{ type: 'spring', damping: 25, stiffness: 400 }}
                                         />
                                     )}
                                     <Icon
-                                        className={`w-7 h-7 relative z-10 transition-all duration-300 ${
-                                            active ? 'text-cinematic-neon-gold drop-shadow-[0_0_8px_rgba(201,169,110,0.5)]' : 'text-white/40'
+                                        className={`w-7 h-7 relative z-10 transition-all duration-300 ease-in-out ${
+                                            active ? 'text-cinematic-neon-gold scale-110 drop-shadow-[0_0_8px_rgba(255,184,0,0.4)]' : 'text-white/40 group-hover:text-white/70'
                                         }`}
                                         strokeWidth={active ? 2.5 : 2}
                                     />
                                 </div>
 
-                                {/* التسمية */}
+                                {/* التسمية - حجم خط أكبر */}
                                 <span
-                                    className={`text-[11px] font-black uppercase tracking-wider transition-all duration-300 ${
-                                        active ? 'text-cinematic-neon-gold scale-105' : 'text-white/30'
+                                    className={`text-[12px] md:text-[13px] font-bold tracking-wide transition-all duration-300 ${
+                                        active ? 'text-cinematic-neon-gold' : 'text-white/40 group-hover:text-white/70'
                                     }`}
                                 >
                                     {isRTL ? tab.labelAr : tab.labelEn}
                                 </span>
 
-                                {/* خط المؤشر النشط تحت الأيقونة */}
+                                {/* نقطة المؤشر */}
                                 {active && (
                                     <motion.div
-                                        layoutId="tab-line"
-                                        className="absolute -bottom-1 w-6 h-0.5 rounded-full bg-cinematic-neon-gold shadow-[0_0_10px_#c9a96e]"
+                                        layoutId="tab-dot"
+                                        className="absolute -bottom-2 w-1.5 h-1.5 rounded-full bg-cinematic-neon-gold"
                                         transition={{ type: 'spring', damping: 25, stiffness: 400 }}
                                     />
                                 )}

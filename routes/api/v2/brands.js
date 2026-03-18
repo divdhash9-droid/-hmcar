@@ -35,13 +35,52 @@ router.post('/reset-default-hmcar', requireAuthAPI, requirePermissionAPI('manage
   }
 });
 
+// [[ARABIC_COMMENT]] POST /api/v2/brands/fix-spare-brands - إصلاح وكالات قطع الغيار الموجودة
+// يضبط forCars=false لأي وكالة تحتوي على قطع غيار مستوردة لكي لا تختلط بوكالات السيارات
+router.post('/fix-spare-brands', requireAuthAPI, requirePermissionAPI('manage_brands'), async (req, res) => {
+  try {
+    const SparePart = require('../../../models/SparePart');
+    // جلب أسماء الوكالات التي لها قطع غيار مستوردة
+    const spareMakes = await SparePart.distinct('carMake');
+    let fixedCount = 0;
+    
+    for (const make of spareMakes) {
+      if (!make) continue;
+      const result = await Brand.updateMany(
+        { key: make.toLowerCase(), forSpareParts: true, forCars: true },
+        { $set: { forCars: false } }
+      );
+      fixedCount += result.modifiedCount;
+    }
+    
+    if (typeof invalidateCache === 'function') invalidateCache('/api/v2/brands*');
+    res.json({ 
+      success: true, 
+      message: `تم إصلاح ${fixedCount} وكالة قطع غيار - لن تظهر مع وكالات السيارات بعد الآن`,
+      fixedCount
+    });
+  } catch (e) {
+    res.status(500).json({ success: false, message: e.message });
+  }
+});
+
 // List brands
 router.get('/', cacheResponse(3600), async (req, res) => {
   try {
     const { category, targetShowroom, includeInactive } = req.query;
     let query = includeInactive === 'true' ? {} : { isActive: true };
-    if (category === 'cars') query = { $or: [{ forCars: true }, { forSpareParts: false }] };
-    if (category === 'parts') query = { $or: [{ forSpareParts: true }, { forCars: false }] };
+    
+    // [[ARABIC_COMMENT]] الفلتر الدقيق: وكالات السيارات تُرجع forCars=true فقط
+    // وكالات قطع الغيار تُرجع forSpareParts=true فقط، ولا تختلط ببعضها
+    if (category === 'cars') {
+      // وكالات السيارات: يجب أن تكون forCars=true
+      // نستثني الوكالات التي هي لقطع الغيار فقط (forSpareParts=true AND forCars=false)
+      query = { forCars: true };
+    }
+    if (category === 'parts') {
+      // وكالات قطع الغيار: يجب أن تكون forSpareParts=true
+      query = { forSpareParts: true };
+    }
 
     if (includeInactive !== 'true') {
       query = { ...query, isActive: true };
@@ -61,12 +100,13 @@ router.get('/', cacheResponse(3600), async (req, res) => {
           }
         ]
       };
-      delete query.$or;
       if (category === 'cars') {
-        query.$and.push({ $or: [{ forCars: true }, { forSpareParts: false }] });
+        if (!query.$and) query.$and = [];
+        query.$and.push({ forCars: true });
       }
       if (category === 'parts') {
-        query.$and.push({ $or: [{ forSpareParts: true }, { forCars: false }] });
+        if (!query.$and) query.$and = [];
+        query.$and.push({ forSpareParts: true });
       }
     }
 

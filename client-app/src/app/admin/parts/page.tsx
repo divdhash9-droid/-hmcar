@@ -1,10 +1,9 @@
 'use client';
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
     Package,
-    Plus,
     Edit,
     Trash2,
     Search,
@@ -17,7 +16,11 @@ import {
     EyeOff,
     Settings,
     TrendingUp,
-    DollarSign
+    DollarSign,
+    ChevronDown,
+    ChevronRight,
+    Building2,
+    Layers
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -26,21 +29,31 @@ import { useLanguage } from "@/lib/LanguageContext";
 import { api } from "@/lib/api";
 import { useToast } from "@/lib/ToastContext";
 
+const CATEGORIES = ['all', 'Engine', 'Brakes', 'Filters', 'Suspension', 'Electrical'] as const;
+type CategoryFilter = typeof CATEGORIES[number];
+
+const CAT_LABELS_AR: Record<CategoryFilter, string> = {
+    all: 'الكل', Engine: 'محرك', Brakes: 'فرامل', Filters: 'مرشحات', Suspension: 'تعليق', Electrical: 'كهرباء'
+};
+
 export default function AdminPartsPage() {
-    const { t, isRTL } = useLanguage();
+    const { isRTL } = useLanguage();
     const { showToast } = useToast();
     const [parts, setParts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const [filter, setFilter] = useState('all');
+    const [filter, setFilter] = useState<CategoryFilter>('all');
     const [searchTerm, setSearchTerm] = useState('');
+    const [viewMode, setViewMode] = useState<'grouped' | 'flat'>('grouped'); // [[ARABIC_COMMENT]] وضع العرض: مجموع بالوكالات أو عرض مسطح
+    const [expandedBrands, setExpandedBrands] = useState<Record<string, boolean>>({});
     const [showModal, setShowModal] = useState(false);
     const [editingPart, setEditingPart] = useState<any>(null);
     const [submitting, setSubmitting] = useState(false);
     const [scraping, setScraping] = useState(false);
+    const [totalPartsCount, setTotalPartsCount] = useState(0); // [[ARABIC_COMMENT]] عداد إجمالي القطع المستوردة
     const [formData, setFormData] = useState({
         name: '',
-        brand: 'TOYOTA', // Representing the Agency
-        model: '', // Representing the Car Model (e.g. Camry)
+        brand: 'TOYOTA',
+        model: '',
         year: new Date().getFullYear(),
         price: 0,
         category: 'Engine',
@@ -61,7 +74,7 @@ export default function AdminPartsPage() {
                 if (settingsRes.success && settingsRes.data?.currencySettings) {
                     setCurrencySettings(prev => ({ ...prev, ...settingsRes.data.currencySettings }));
                 }
-            } catch (err) {}
+            } catch {}
         };
         loadSettings();
     }, []);
@@ -78,26 +91,49 @@ export default function AdminPartsPage() {
         }
     };
 
-    useEffect(() => {
-        loadParts();
-    }, [filter, searchTerm]);
-
-    const loadParts = async () => {
+    const loadParts = useCallback(async () => {
         try {
             setLoading(true);
-            const params: any = {};
-            if (filter !== 'all') params.category = filter;
+            // [[ARABIC_COMMENT]] نجلب دائماً الكل بدون فلتر category لنتحكم بالفلتر في الـ frontend
+            // لأن البيانات المستوردة قد تكون partType='General' وليس Engine/Brakes
+            const params: any = { limit: 1000 };
             if (searchTerm) params.q = searchTerm;
 
             const response = await api.parts.list(params);
             if (response.success) {
-                setParts(response.parts);
+                let allParts = response.parts || [];
+                setTotalPartsCount(allParts.length);
+
+                // [[ARABIC_COMMENT]] الفلتر بالفئة يتم في الـ frontend بعد جلب البيانات
+                if (filter !== 'all') {
+                    allParts = allParts.filter((p: any) => {
+                        const pt = String(p.category || p.partType || '').toLowerCase();
+                        return pt.includes(filter.toLowerCase());
+                    });
+                }
+                setParts(allParts);
             }
         } catch (err) {
             console.error('Failed to load parts', err);
         } finally {
             setLoading(false);
         }
+    }, [filter, searchTerm]);
+
+    useEffect(() => {
+        loadParts();
+    }, [loadParts]);
+
+    // [[ARABIC_COMMENT]] تجميع القطع حسب الوكالة
+    const partsByBrand = parts.reduce((acc: Record<string, any[]>, part) => {
+        const brandKey = String(part.brand || 'غير محدد').trim();
+        if (!acc[brandKey]) acc[brandKey] = [];
+        acc[brandKey].push(part);
+        return acc;
+    }, {});
+
+    const toggleBrand = (brand: string) => {
+        setExpandedBrands(prev => ({ ...prev, [brand]: !prev[brand] }));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -135,7 +171,6 @@ export default function AdminPartsPage() {
         }
     };
 
-    // [[ARABIC_COMMENT]] تسجيل بيع قطعة - زيادة عداد المبيعات
     const handleMarkSold = async (id: string, name: string, currentTotalSold: number) => {
         const confirmed = confirm(isRTL
             ? `تأكيد تسجيل بيع لـ: ${name}؟\nإجمالي المبيعات الحالي: ${currentTotalSold}`
@@ -143,10 +178,7 @@ export default function AdminPartsPage() {
         );
         if (!confirmed) return;
 
-        const soldQtyStr = prompt(
-            isRTL ? `كم قطعة تم بيعها؟` : `How many units sold?`,
-            '1'
-        );
+        const soldQtyStr = prompt(isRTL ? `كم قطعة تم بيعها؟` : `How many units sold?`, '1');
         const soldQty = soldQtyStr ? parseInt(soldQtyStr) : 1;
 
         try {
@@ -195,7 +227,7 @@ export default function AdminPartsPage() {
     };
 
     const handleScrape = async () => {
-        if (!confirm(isRTL ? 'هل تريد جاري جلب البيانات من المصدر الخارجي؟ قد يستغرق هذا وقتاً.' : 'Do you want to scrape data from external source? This may take some time.')) return;
+        if (!confirm(isRTL ? 'هل تريد جلب البيانات من المصدر الخارجي؟ قد يستغرق هذا وقتاً.' : 'Do you want to scrape data from external source? This may take some time.')) return;
         setScraping(true);
         try {
             const res = await api.parts.scrape();
@@ -224,14 +256,13 @@ export default function AdminPartsPage() {
             condition: 'New',
             stockQty: 1
         });
-        setEditingPart(null); // [[ARABIC_COMMENT]] تصفير حالة التعديل لضمان عدم الكتابة على قطعة قديمة عند إضافة جديدة
+        setEditingPart(null);
     };
 
     return (
         <div className="relative min-h-screen text-white font-sans overflow-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
 
             <main className="relative z-10 pt-6 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-
 
                 {/* HUD Header */}
                 <div className="ck-page-header">
@@ -245,7 +276,7 @@ export default function AdminPartsPage() {
                             <p className="cockpit-mono text-[10px] text-orange-500/50 tracking-[0.25em] uppercase mb-1">PARTS INVENTORY CONTROL</p>
                             <h1 className="ck-page-title">{isRTL ? 'قطع الغيار' : 'PARTS CTRL'}</h1>
                         </div>
-                        <div className="flex gap-3">
+                        <div className="flex gap-3 flex-wrap">
                             <motion.button
                                 whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
                                 onClick={() => setShowSettings(!showSettings)}
@@ -262,13 +293,28 @@ export default function AdminPartsPage() {
                                 disabled={scraping}
                                 className="ck-btn-primary bg-orange-500 hover:bg-orange-400 text-black flex items-center gap-2 border-none">
                                 {scraping ? <div className="ck-radar w-4 h-4" /> : <RefreshCcw className="w-4 h-4" />}
-                                {isRTL ? 'استيراد القطع الكورية' : 'SCRAPE KOREAN AUTOSPARTS'}
+                                {isRTL ? 'استيراد القطع الكورية' : 'SCRAPE KOREAN AUTOPARTS'}
                             </motion.button>
                         </div>
                     </div>
-                    <p className="text-[11px] text-white/40 mt-3">
-                        {isRTL ? 'وضع الإدارة الجديد: يتم جلب القطع والوكالات تلقائياً من المصدر الخارجي، وتم إلغاء الإضافة اليدوية.' : 'New workflow: parts and agencies are imported automatically from external source, manual creation is disabled.'}
-                    </p>
+
+                    {/* [[ARABIC_COMMENT]] عداد إجمالي القطع المستوردة */}
+                    <div className="flex items-center gap-6 mt-4 flex-wrap">
+                        <div className="flex items-center gap-3 bg-orange-500/10 border border-orange-500/20 rounded-2xl px-5 py-3">
+                            <Package className="w-5 h-5 text-orange-400" />
+                            <div>
+                                <p className="cockpit-mono text-[9px] text-orange-500/60 uppercase tracking-widest">{isRTL ? 'إجمالي القطع المستوردة' : 'TOTAL IMPORTED PARTS'}</p>
+                                <p className="cockpit-num text-2xl font-black text-orange-400">{loading ? '...' : totalPartsCount.toLocaleString()}</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-3 bg-blue-500/10 border border-blue-500/20 rounded-2xl px-5 py-3">
+                            <Building2 className="w-5 h-5 text-blue-400" />
+                            <div>
+                                <p className="cockpit-mono text-[9px] text-blue-500/60 uppercase tracking-widest">{isRTL ? 'عدد الوكالات' : 'AGENCIES'}</p>
+                                <p className="cockpit-num text-2xl font-black text-blue-400">{loading ? '...' : Object.keys(partsByBrand).length}</p>
+                            </div>
+                        </div>
+                    </div>
 
                     {/* إعدادات التسعير */}
                     <AnimatePresence>
@@ -323,7 +369,7 @@ export default function AdminPartsPage() {
                     </AnimatePresence>
                 </div>
 
-                {/* Filters + Search */}
+                {/* Filters + Search + View Toggle */}
                 <div className="flex flex-col sm:flex-row gap-4 mb-8">
                     <div className="flex-1 relative">
                         <Search className={cn('absolute top-1/2 -translate-y-1/2 w-4 h-4 text-orange-500/30', isRTL ? 'right-4' : 'left-4')} />
@@ -332,18 +378,29 @@ export default function AdminPartsPage() {
                             className={cn('ck-input', isRTL ? 'pr-11' : 'pl-11')} />
                     </div>
                     <div className="ck-tab-group">
-                        {(['all', 'Engine', 'Brakes', 'Filters', 'Suspension', 'Electrical'] as const).map(cat => (
+                        {CATEGORIES.map(cat => (
                             <button key={cat} onClick={() => setFilter(cat)}
                                 className={cn('ck-tab', filter === cat && 'ck-tab-active')}>
-                                {isRTL
-                                    ? { all: 'الكل', Engine: 'محرك', Brakes: 'فرامل', Filters: 'مرشحات', Suspension: 'تعليق', Electrical: 'كهرباء' }[cat]
-                                    : cat.toUpperCase()}
+                                {isRTL ? CAT_LABELS_AR[cat] : cat.toUpperCase()}
                             </button>
                         ))}
                     </div>
+                    {/* [[ARABIC_COMMENT]] زر تبديل وضع العرض: مجموع بالوكالات أو قائمة مسطحة */}
+                    <div className="flex gap-2">
+                        <button onClick={() => setViewMode('grouped')}
+                            className={cn('ck-tab flex items-center gap-1.5', viewMode === 'grouped' && 'ck-tab-active')}>
+                            <Building2 className="w-3.5 h-3.5" />
+                            {isRTL ? 'الوكالات' : 'BY AGENCY'}
+                        </button>
+                        <button onClick={() => setViewMode('flat')}
+                            className={cn('ck-tab flex items-center gap-1.5', viewMode === 'flat' && 'ck-tab-active')}>
+                            <Layers className="w-3.5 h-3.5" />
+                            {isRTL ? 'الكل' : 'ALL PARTS'}
+                        </button>
+                    </div>
                 </div>
 
-                {/* Parts Grid */}
+                {/* Parts Display */}
                 {loading ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                         {[...Array(8)].map((_, i) => <div key={i} className="h-64 rounded-3xl bg-white/[0.02] animate-pulse border border-orange-500/10" />)}
@@ -352,70 +409,93 @@ export default function AdminPartsPage() {
                     <div className="ck-empty">
                         <div className="ck-empty-icon"><Package className="w-8 h-8" /></div>
                         <p className="cockpit-mono">{isRTL ? 'لا توجد قطع في المخزون' : 'PARTS INVENTORY EMPTY'}</p>
+                        {filter !== 'all' && (
+                            <p className="text-white/30 text-sm mt-2">
+                                {isRTL 
+                                    ? `لا توجد قطع بفئة "${CAT_LABELS_AR[filter]}" - جرب "الكل" لعرض جميع القطع`
+                                    : `No parts with category "${filter}" - try "ALL" to see all parts`
+                                }
+                            </p>
+                        )}
+                        <button onClick={() => setFilter('all')} className="ck-btn-ghost mt-4 text-orange-400">
+                            {isRTL ? 'عرض الكل' : 'SHOW ALL'}
+                        </button>
+                    </div>
+                ) : viewMode === 'grouped' ? (
+                    // [[ARABIC_COMMENT]] وضع العرض المجموع بالوكالات
+                    <div className="space-y-6">
+                        {Object.entries(partsByBrand).sort(([a], [b]) => a.localeCompare(b)).map(([brand, brandParts]) => (
+                            <motion.div
+                                key={brand}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="ck-card overflow-hidden"
+                            >
+                                {/* Agency Header */}
+                                <button
+                                    onClick={() => toggleBrand(brand)}
+                                    className="w-full flex items-center justify-between p-5 hover:bg-orange-500/5 transition-all"
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
+                                            <Building2 className="w-5 h-5 text-orange-400" />
+                                        </div>
+                                        <div className="text-start">
+                                            <h3 className="font-black uppercase tracking-widest text-white">{brand}</h3>
+                                            <p className="cockpit-mono text-[9px] text-orange-500/60 uppercase">
+                                                {brandParts.length} {isRTL ? 'قطعة' : 'PARTS'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    {expandedBrands[brand]
+                                        ? <ChevronDown className="w-5 h-5 text-orange-400" />
+                                        : <ChevronRight className="w-5 h-5 text-white/30" />
+                                    }
+                                </button>
+
+                                {/* Parts Grid for this agency */}
+                                <AnimatePresence>
+                                    {expandedBrands[brand] && (
+                                        <motion.div
+                                            initial={{ height: 0, opacity: 0 }}
+                                            animate={{ height: 'auto', opacity: 1 }}
+                                            exit={{ height: 0, opacity: 0 }}
+                                            className="overflow-hidden"
+                                        >
+                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-5 pt-0 border-t border-white/5">
+                                                {brandParts.map((part, i) => (
+                                                    <PartCard
+                                                        key={part.id}
+                                                        part={part}
+                                                        i={i}
+                                                        isRTL={isRTL}
+                                                        onEdit={handleEdit}
+                                                        onDelete={handleDelete}
+                                                        onToggle={handleToggleVisibility}
+                                                        onMarkSold={handleMarkSold}
+                                                    />
+                                                ))}
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </motion.div>
+                        ))}
                     </div>
                 ) : (
+                    // [[ARABIC_COMMENT]] وضع العرض المسطح - كل القطع دفعة واحدة
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                         {parts.map((part, i) => (
-                            <motion.div key={part.id}
-                                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: i * 0.06 }}
-                                className="ck-card overflow-hidden group ck-hover-lift">
-
-                                <div className="relative h-44 overflow-hidden">
-                                    <Image
-                                        src={part.img || part.images?.[0] || 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=1000&auto=format&fit=crop'}
-                                        alt={part.name} fill
-                                        sizes="(max-width: 768px) 100vw, 25vw"
-                                        quality={70} priority={i < 4}
-                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-[#070711] via-transparent to-transparent" />
-                                    <div className="absolute top-2 end-2">
-                                        <span className={cn('ck-badge', part.condition === 'New' ? 'ck-badge-active' : part.condition === 'Used' ? 'ck-badge-pending' : 'ck-badge-info')}>
-                                            {isRTL ? { New: 'جديد', Used: 'مستعمل', Refurbished: 'مجدد' }[part.condition as string] || part.condition : part.condition}
-                                        </span>
-                                    </div>
-                                    {/* Sold Count indicator */}
-                                    <div className="absolute bottom-2 start-2">
-                                        <span className="cockpit-mono text-[9px] bg-black/60 px-2 py-0.5 rounded-full text-green-400/80">
-                                            {isRTL ? `المباع: ${part.soldCount || 0}` : `SOLD: ${part.soldCount || 0}`}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div className="p-4 space-y-3">
-                                    <div>
-                                        <p className="cockpit-mono text-[9px] text-orange-400/60 uppercase tracking-[0.2em] mb-0.5">{part.brand} · {part.model}</p>
-                                        <h3 className="text-sm font-bold text-white truncate">{part.name}</h3>
-                                        <p className="cockpit-mono text-[9px] text-white/30 uppercase mt-0.5">{part.category}</p>
-                                    </div>
-
-                                    <div className="flex items-center justify-between pt-2 border-t border-white/5">
-                                        <div>
-                                            <p className="cockpit-mono text-[8px] text-white/25 uppercase">SAR</p>
-                                            <p className="cockpit-num text-lg font-black text-orange-400">{Number(part.price || 0).toLocaleString()}</p>
-                                        </div>
-                                        <div className="flex gap-1">
-                                            <button onClick={() => handleEdit(part)} title={isRTL ? 'تعديل' : 'Edit'}
-                                                className="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-500 hover:text-white transition-all flex items-center justify-center">
-                                                <Edit className="w-3.5 h-3.5" />
-                                            </button>
-                                            <button onClick={() => handleToggleVisibility(part.id)} title={part.inStock ? (isRTL ? 'إخفاء' : 'Hide') : (isRTL ? 'إظهار' : 'Show')}
-                                                className={cn("w-8 h-8 rounded-xl border flex items-center justify-center transition-all",
-                                                    part.inStock
-                                                        ? "bg-orange-500/10 border-orange-500/20 text-orange-400 hover:bg-orange-500 hover:text-white"
-                                                        : "bg-white/5 border-white/10 text-white/30 hover:bg-white/20 hover:text-white"
-                                                )}>
-                                                {part.inStock ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
-                                            </button>
-                                            <button onClick={() => handleMarkSold(part.id, part.name, part.soldCount || 0)} title={isRTL ? 'تسجيل بيع' : 'Mark Sold'}
-                                                className="w-8 h-8 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 hover:bg-green-500 hover:text-white transition-all flex items-center justify-center">
-                                                <CheckCircle2 className="w-3.5 h-3.5" />
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </motion.div>
+                            <PartCard
+                                key={part.id}
+                                part={part}
+                                i={i}
+                                isRTL={isRTL}
+                                onEdit={handleEdit}
+                                onDelete={handleDelete}
+                                onToggle={handleToggleVisibility}
+                                onMarkSold={handleMarkSold}
+                            />
                         ))}
                     </div>
                 )}
@@ -433,7 +513,6 @@ export default function AdminPartsPage() {
                             onClick={(e) => e.stopPropagation()}
                             className="ck-modal ck-scroll p-7 max-w-2xl w-full"
                         >
-                            {/* Modal Header */}
                             <div className="flex items-center justify-between mb-6 pb-4 border-b border-orange-500/10">
                                 <div>
                                     <p className="cockpit-mono text-[9px] text-orange-500/50 uppercase tracking-[0.2em] mb-1">PARTS CONTROL</p>
@@ -448,7 +527,6 @@ export default function AdminPartsPage() {
 
                             <form onSubmit={handleSubmit} className="space-y-5">
                                 <div className="grid grid-cols-2 gap-4">
-                                    {/* Image Upload */}
                                     <div className="col-span-2">
                                         <label className="block cockpit-mono text-[9px] text-orange-400/60 uppercase tracking-[0.15em] mb-2">{isRTL ? 'صورة القطعة' : 'PART IMAGE'}</label>
                                         <div className="flex items-center gap-4">
@@ -525,5 +603,83 @@ export default function AdminPartsPage() {
                 )}
             </AnimatePresence>
         </div>
+    );
+}
+
+// [[ARABIC_COMMENT]] مكون بطاقة القطعة المنفصل لإعادة الاستخدام
+function PartCard({ part, i, isRTL, onEdit, onDelete, onToggle, onMarkSold }: {
+    part: any;
+    i: number;
+    isRTL: boolean;
+    onEdit: (p: any) => void;
+    onDelete: (id: string) => void;
+    onToggle: (id: string) => void;
+    onMarkSold: (id: string, name: string, count: number) => void;
+}) {
+    return (
+        <motion.div key={part.id}
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.04 }}
+            className="ck-card overflow-hidden group ck-hover-lift">
+
+            <div className="relative h-44 overflow-hidden">
+                <Image
+                    src={part.img || part.images?.[0] || 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=1000&auto=format&fit=crop'}
+                    alt={part.name} fill
+                    sizes="(max-width: 768px) 100vw, 25vw"
+                    quality={70} priority={i < 4}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    unoptimized
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#070711] via-transparent to-transparent" />
+                <div className="absolute top-2 end-2">
+                    <span className={cn('ck-badge', part.condition === 'New' || part.condition === 'NEW' ? 'ck-badge-active' : part.condition === 'Used' || part.condition === 'USED' ? 'ck-badge-pending' : 'ck-badge-info')}>
+                        {isRTL ? { New: 'جديد', NEW: 'جديد', Used: 'مستعمل', USED: 'مستعمل', Refurbished: 'مجدد', REFURBISHED: 'مجدد' }[part.condition as string] || part.condition : part.condition}
+                    </span>
+                </div>
+                <div className="absolute bottom-2 start-2">
+                    <span className="cockpit-mono text-[9px] bg-black/60 px-2 py-0.5 rounded-full text-green-400/80">
+                        {isRTL ? `المباع: ${part.soldCount || 0}` : `SOLD: ${part.soldCount || 0}`}
+                    </span>
+                </div>
+            </div>
+
+            <div className="p-4 space-y-3">
+                <div>
+                    <p className="cockpit-mono text-[9px] text-orange-400/60 uppercase tracking-[0.2em] mb-0.5">{part.brand} · {part.model}</p>
+                    <h3 className="text-sm font-bold text-white truncate">{part.name}</h3>
+                    <p className="cockpit-mono text-[9px] text-white/30 uppercase mt-0.5">{part.category || part.partType || '—'}</p>
+                </div>
+
+                <div className="flex items-center justify-between pt-2 border-t border-white/5">
+                    <div>
+                        <p className="cockpit-mono text-[8px] text-white/25 uppercase">SAR</p>
+                        <p className="cockpit-num text-lg font-black text-orange-400">{Number(part.price || 0).toLocaleString()}</p>
+                    </div>
+                    <div className="flex gap-1">
+                        <button onClick={() => onEdit(part)} title={isRTL ? 'تعديل' : 'Edit'}
+                            className="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-500 hover:text-white transition-all flex items-center justify-center">
+                            <Edit className="w-3.5 h-3.5" />
+                        </button>
+                        <button onClick={() => onToggle(part.id)} title={part.inStock ? (isRTL ? 'إخفاء' : 'Hide') : (isRTL ? 'إظهار' : 'Show')}
+                            className={cn("w-8 h-8 rounded-xl border flex items-center justify-center transition-all",
+                                part.inStock
+                                    ? "bg-orange-500/10 border-orange-500/20 text-orange-400 hover:bg-orange-500 hover:text-white"
+                                    : "bg-white/5 border-white/10 text-white/30 hover:bg-white/20 hover:text-white"
+                            )}>
+                            {part.inStock ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                        </button>
+                        <button onClick={() => onMarkSold(part.id, part.name, part.soldCount || 0)} title={isRTL ? 'تسجيل بيع' : 'Mark Sold'}
+                            className="w-8 h-8 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 hover:bg-green-500 hover:text-white transition-all flex items-center justify-center">
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                        </button>
+                        <button onClick={() => onDelete(part.id)} title={isRTL ? 'حذف' : 'Delete'}
+                            className="w-8 h-8 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center">
+                            <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </motion.div>
     );
 }

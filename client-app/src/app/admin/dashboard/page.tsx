@@ -92,7 +92,8 @@ export default function AdminDashboard() {
     }, []);
 
     const statCards = [
-        { label: isRTL ? 'المركبات' : 'VEHICLES', val: stats?.totalCars ?? '—', sub: isRTL ? 'السيارات والقطع' : 'Cars & Parts', icon: Car, color: '#f97316', glow: 'rgba(249,115,22,0.25)' },
+        { label: isRTL ? 'السيارات' : 'VEHICLES', val: stats?.totalCars ?? '—', sub: isRTL ? 'سيارات في المعرض' : 'Cars in Showroom', icon: Car, color: '#f97316', glow: 'rgba(249,115,22,0.25)' },
+        { label: isRTL ? 'قطع مستوردة' : 'PARTS', val: stats?.totalParts ?? '—', sub: isRTL ? 'قطع غيار مستوردة' : 'Imported Spare Parts', icon: Layers, color: '#fbbf24', glow: 'rgba(251,191,36,0.25)' },
         { label: isRTL ? 'الأعضاء' : 'MEMBERS', val: stats?.totalUsers ?? '—', sub: isRTL ? 'عملاء مسجلون' : 'Registered Clients', icon: Users, color: '#60a5fa', glow: 'rgba(96,165,250,0.25)' },
         { label: isRTL ? 'الطلبات' : 'ORDERS', val: stats?.totalOrders ?? '—', sub: isRTL ? 'طلبات الشراء' : 'Purchase Orders', icon: ShoppingCart, color: '#34d399', glow: 'rgba(52,211,153,0.25)' },
         { label: isRTL ? 'الإيرادات' : 'REVENUE', val: stats?.totalRevenue ? `${(stats.totalRevenue / 1000).toFixed(0)}K` : '0', sub: isRTL ? 'إجمالي المبيعات' : 'Total Sales', icon: TrendingUp, color: '#a78bfa', glow: 'rgba(167,139,250,0.25)' },
@@ -217,7 +218,7 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* ── Stats Row ── */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+                <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
                     {statCards.map((s, i) => (
                         <motion.div key={i}
                             initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}

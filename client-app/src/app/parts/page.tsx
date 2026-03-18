@@ -74,7 +74,8 @@ export default function PartsPage() {
     const [selectedAgency, setSelectedAgency] = useState<Agency | null>(null);
     const [selectedModel, setSelectedModel] = useState<string | null>(null);
 
-    const [searchQuery, setSearchQuery] = useState('');
+    const [agencySearchQuery, setAgencySearchQuery] = useState(''); // [[ARABIC_COMMENT]] بحث الوكالات منفصل
+    const [partSearchQuery, setPartSearchQuery] = useState('');    // [[ARABIC_COMMENT]] بحث القطع منفصل
     const [parts, setParts] = useState<Part[]>([]);
     const [loading, setLoading] = useState(false);
 
@@ -121,18 +122,17 @@ export default function PartsPage() {
 
     const loadParts = async (agency: string, model: string) => {
         setLoading(true);
+        setPartSearchQuery(''); // [[ARABIC_COMMENT]] تصفير بحث القطع عند تغيير الوكالة/الموديل
         try {
-            // جلب القطع من المصدر المحلي المستورد، مع فلتر اختياري للوكالة
-            const res = await api.parts.list({ q: agency || undefined, limit: 300 });
+            // [[ARABIC_COMMENT]] نرسل brand=agency لجلب قطع هذه الوكالة تحديداً
+            const params: Record<string, string | number> = { limit: 300 };
+            if (agency) params.brand = agency;
+            if (model && model !== 'ALL') params.carModel = model;
+
+            const res = await api.parts.list(params);
             // الـ API يعيد البيانات في res.parts أو res.data.parts بناءً على الاستجابة
             const allParts = res?.parts || res?.data?.parts || [];
-            // تصفية النتائج يدوياً حسب اسم الوكالة والموديل المختار لضمان الدقة
-            const fetchedParts = allParts.filter((p: { brand?: string, carModel?: string }) => {
-                const brandMatch = !agency || p.brand?.toLowerCase() === agency.toLowerCase();
-                const modelMatch = model === 'ALL' || (p.carModel?.toLowerCase() === model.toLowerCase());
-                return brandMatch && modelMatch;
-            });
-            setParts(fetchedParts);
+            setParts(allParts);
         } catch (error) {
             console.error("Failed to load parts", error);
             setParts([]);
@@ -145,18 +145,19 @@ export default function PartsPage() {
         setViewMode('AGENCIES');
         setSelectedAgency(null);
         setSelectedModel(null);
-        setSearchQuery('');
+        setAgencySearchQuery('');
+        setPartSearchQuery('');
     };
 
     const resetToModels = () => {
         setViewMode('MODELS');
         setSelectedModel(null);
-        setSearchQuery('');
+        setPartSearchQuery('');
     };
 
-    const filteredAgencies = agencies.filter(a => a.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    const filteredAgencies = agencies.filter(a => a.name.toLowerCase().includes(agencySearchQuery.toLowerCase()));
     const filteredParts = parts.filter((part) => {
-        const q = searchQuery.trim().toLowerCase();
+        const q = partSearchQuery.trim().toLowerCase();
         if (!q) return true;
         return [part.nameAr, part.name, part.brand, part.model, part.categoryAr, part.category]
             .filter(Boolean)
@@ -259,9 +260,9 @@ export default function PartsPage() {
                             transition={{ delay: 0.2 }}
                             className="text-4xl md:text-6xl font-black uppercase tracking-tighter"
                         >
-                            {viewMode === 'AGENCIES' && (isRTL ? "اختر وكالة السيارة" : "SELECT AUTO AGENCY")}
+                        {viewMode === 'AGENCIES' && (isRTL ? "اختر الوكالة" : "SELECT AGENCY")}
                             {viewMode === 'MODELS' && (isRTL ? `موديلات ${selectedAgency?.name}` : `${selectedAgency?.name} MODELS`)}
-                            {viewMode === 'PARTS' && (isRTL ? `قطع غيار ${selectedModel}` : `${selectedModel} SPARE PARTS`)}
+                            {viewMode === 'PARTS' && (isRTL ? `قطع غيار ${selectedModel === 'ALL' ? selectedAgency?.name : selectedModel}` : `${selectedModel === 'ALL' ? selectedAgency?.name : selectedModel} SPARE PARTS`)}
                         </motion.h1>
                         <motion.p
                             initial={{ opacity: 0 }}
@@ -287,13 +288,23 @@ export default function PartsPage() {
                             <div className="relative flex items-center bg-white/[0.03] backdrop-blur-2xl border border-white/10 rounded-2xl p-2 shadow-2xl overflow-hidden group">
                                 <div className="flex-1 flex items-center px-4 gap-4">
                                     <Search className="w-5 h-5 text-accent-gold group-hover:scale-110 transition-transform" />
-                                    <input
-                                        type="text"
-                                        placeholder={viewMode === 'AGENCIES' ? (isRTL ? "ابحث عن شركة (تويوتا، كيا...)" : "Search Agency (Toyota, Kia...)") : (isRTL ? "اسم القطعة..." : "Part Name...")}
-                                        className="w-full bg-transparent border-none outline-none py-4 text-sm font-bold placeholder:text-white/20"
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                    />
+                                    {viewMode === 'AGENCIES' ? (
+                                        <input
+                                            type="text"
+                                            placeholder={isRTL ? "ابحث عن وكالة (تويوتا، كيا...)" : "Search Agency (Toyota, Kia...)"}
+                                            className="w-full bg-transparent border-none outline-none py-4 text-sm font-bold placeholder:text-white/20"
+                                            value={agencySearchQuery}
+                                            onChange={(e) => setAgencySearchQuery(e.target.value)}
+                                        />
+                                    ) : (
+                                        <input
+                                            type="text"
+                                            placeholder={isRTL ? "ابحث عن قطعة..." : "Search Part..."}
+                                            className="w-full bg-transparent border-none outline-none py-4 text-sm font-bold placeholder:text-white/20"
+                                            value={partSearchQuery}
+                                            onChange={(e) => setPartSearchQuery(e.target.value)}
+                                        />
+                                    )}
                                 </div>
                             </div>
                         </motion.div>

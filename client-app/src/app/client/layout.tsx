@@ -18,6 +18,7 @@ import {
     ChevronRight,
     MessageCircle,
     Languages,
+    Wrench,
 } from 'lucide-react';
 import { useLanguage } from '@/lib/LanguageContext';
 import { useAuth } from '@/lib/AuthContext';
@@ -41,6 +42,7 @@ const NAV_ITEMS = [
 const QUICK_LINKS = [
     { href: '/gallery', icon: Car, labelAr: 'المعرض', labelEn: 'Showroom' },
     { href: '/auctions', icon: Gavel, labelAr: 'المزادات', labelEn: 'Auctions' },
+    { href: '/parts', icon: Wrench, labelAr: 'قطع الغيار', labelEn: 'Parts' },
     { href: '/notifications', icon: Bell, labelAr: 'الإشعارات', labelEn: 'Notifications' },
     { href: '/client/profile', icon: User, labelAr: 'الملف الشخصي', labelEn: 'Profile' },
 ];

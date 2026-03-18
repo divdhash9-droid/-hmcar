@@ -85,6 +85,7 @@ function CarsContent() {
     const inventorySource: 'hm_local' | 'korean_import' = requestedSource === 'korean_import' ? 'korean_import' : 'hm_local';
 
     const [cars, setCars] = useState<Car[]>([]);
+    const [totalCarsCount, setTotalCarsCount] = useState(0);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [editingCar, setEditingCar] = useState<Car | null>(null);
@@ -107,7 +108,10 @@ function CarsContent() {
         try {
             setLoading(true);
             const res = await api.cars.list({ source: inventorySource });
-            if (res.success) setCars(res.data?.cars || []);
+            if (res.success) {
+                setCars(res.data?.cars || []);
+                setTotalCarsCount(res.data?.pagination?.total || 0);
+            }
 
             const settingsRes = await api.showroom.getSettings();
             if (settingsRes.success) {
@@ -457,6 +461,14 @@ function CarsContent() {
                         </motion.div>
                     )}
                 </AnimatePresence>
+
+                {requestedSource && (
+                    <div className="flex justify-between items-center mb-6 bg-black/40 p-4 rounded-xl border border-white/5">
+                        <div className="flex items-center gap-3">
+                            <h2 className="text-sm font-bold uppercase tracking-widest">{isRTL ? 'إجمالي السيارات في هذا القسم:' : 'Total Cars:'} <span className={inventorySource === 'korean_import' ? 'text-blue-400' : 'text-orange-500'}>{totalCarsCount}</span></h2>
+                        </div>
+                    </div>
+                )}
 
                 {!requestedSource ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-10">

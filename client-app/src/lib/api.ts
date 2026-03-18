@@ -12,7 +12,7 @@ import { apiCache } from './api-cache';
 /**
  * الدالة الأساسية لإرسال طلبات الـ API مع دعم المهلة الزمنية وإعادة المحاولة
  */
-export async function fetchAPI(endpoint: string, options: RequestInit & { useCache?: boolean } = {}, retries = 2) {
+export async function fetchAPI(endpoint: string, options: RequestInit & { useCache?: boolean; timeout?: number } = {}, retries = 2) {
     // [[ARABIC_COMMENT]] التحقق من الكاش المحلي أولاً للسرعة القصوى
     if (options.useCache && options.method === 'GET' || !options.method) {
         const cached = apiCache.get(endpoint);
@@ -37,9 +37,10 @@ export async function fetchAPI(endpoint: string, options: RequestInit & { useCac
         }
     }
 
-    // [[ARABIC_COMMENT]] إعداد مهلة زمنية للطلب (Timeout) لضمان عدم تعليق المتصفح
+    // [[ARABIC_COMMENT]] إعداد مهلة زمنية للطلب (Timeout) لضمان عدم تعليق المتصفح (مرفوع لـ 60 ثانية للعمليات الثقيلة)
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 12000); // 12 seconds timeout
+    const customTimeout = options.timeout || 60000;
+    const timeoutId = setTimeout(() => controller.abort(), customTimeout); // 60 seconds timeout
 
     const defaultOptions: RequestInit = {
         ...options,

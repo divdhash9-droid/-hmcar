@@ -347,20 +347,21 @@ router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
         let totalCreated = 0;
         let totalUpdated = 0;
         
-        for (let page = 1; page <= 2; page++) {
-            const urlWithPage = showroomUrl.replace(/page=\d+/, `page=${page}`);
-            apiUrl = convertEncarUrlToApi(urlWithPage, page);
+        // استخدام الصفحة المحفوظة لجلب بيانات جديدة كل مرة، والبدء بـ 1 إذا لم تكن موجودة
+        let targetPage = Number(settings?.showroomSettings?.lastScrapedPage || 1);
 
-            let data;
-            try {
-                data = await fetchExternal(apiUrl);
-            } catch (err) {
-                console.warn(`[Showroom Scrape] Failed on page ${page}: ${err.message}`);
-                // إذا فشلت صفحة، نحاول المتابعة مع الصفحات الأخرى بدلاً من إيقاف العملية بالكامل
-                continue;
-            }
+        const urlWithPage = showroomUrl.replace(/page=\d+/, `page=${targetPage}`);
+        apiUrl = convertEncarUrlToApi(urlWithPage, targetPage);
 
-            const results = (data.SearchResults || []).map(translateCar);
+        let data;
+        try {
+            data = await fetchExternal(apiUrl);
+        } catch (err) {
+            console.warn(`[Showroom Scrape] Failed on page ${targetPage}: ${err.message}`);
+            return res.status(500).json({ success: false, message: `فشل جلب البيانات من Encar: ${err.message}` });
+        }
+
+        const results = (data.SearchResults || []).map(translateCar);
 
             for (const item of results) {
                 if (!item.encarUrl) continue;
@@ -428,11 +429,15 @@ router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
                 }
             }
 
-            // التوقف إذا لم تكن هناك نتائج إضافية
-            if (results.length < 20) break;
-        }
+            // تحديث رقم الصفحة للعملية القادمة (أو تصفيره إذا وصلنا للنهاية)
+            const nextPage = results.length < 20 ? 1 : targetPage + 1;
+            await SiteSettings.findOneAndUpdate(
+                { key: 'main' },
+                { $set: { 'showroomSettings.lastScrapedPage': nextPage } },
+                { upsert: true }
+            );
 
-        res.json({ success: true, message: `✅ اكتمل الجلب الذكي: أُضيفت ${totalCreated} وحُدّثت ${totalUpdated} سيارة مع تحسين الصور.` });
+        res.json({ success: true, message: `✅ اكتمل الجلب الذكي (الصفحة ${targetPage}): أُضيفت ${totalCreated} وحُدّثت ${totalUpdated} سيارة.` });
     } catch (error) {
         console.error('❌ Showroom Scrape Error:', error.message);
         res.status(500).json({ success: false, message: `فشل جلب البيانات وحفظها: ${error.message}` });

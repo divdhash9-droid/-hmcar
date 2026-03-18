@@ -86,6 +86,8 @@ function CarsContent() {
 
     const [cars, setCars] = useState<Car[]>([]);
     const [totalCarsCount, setTotalCarsCount] = useState(0);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [editingCar, setEditingCar] = useState<Car | null>(null);
@@ -107,10 +109,11 @@ function CarsContent() {
     const loadData = useCallback(async () => {
         try {
             setLoading(true);
-            const res = await api.cars.list({ source: inventorySource });
+            const res = await api.cars.list({ source: inventorySource, page, limit: 30 });
             if (res.success) {
                 setCars(res.data?.cars || []);
                 setTotalCarsCount(res.data?.pagination?.total || 0);
+                setTotalPages(res.data?.pagination?.pages || 1);
             }
 
             const settingsRes = await api.showroom.getSettings();
@@ -130,7 +133,7 @@ function CarsContent() {
         } finally {
             setLoading(false);
         }
-    }, [inventorySource]);
+    }, [inventorySource, page]);
 
     useEffect(() => { loadData(); }, [loadData]);
 
@@ -513,20 +516,41 @@ function CarsContent() {
                         <button onClick={resetForm} className="mt-8 ck-btn-primary h-12 px-8">{isRTL ? 'إضافة أول سيارة' : 'ADD FIRST VEHICLE'}</button>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-20">
-                        {cars.map((car, i) => (
-                            <CarCard
-                                key={car.id}
-                                car={car}
-                                index={i}
-                                usdToSar={usdToSar}
-                                onEdit={handleEdit}
-                                onDelete={handleDelete}
-                                onMarkSold={handleMarkSold}
-                                onToggleActive={handleToggleActive}
-                            />
-                        ))}
-                    </div>
+                    <>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-8">
+                            {cars.map((car, i) => (
+                                <CarCard
+                                    key={car.id}
+                                    car={car}
+                                    index={i}
+                                    usdToSar={usdToSar}
+                                    onEdit={handleEdit}
+                                    onDelete={handleDelete}
+                                    onMarkSold={handleMarkSold}
+                                    onToggleActive={handleToggleActive}
+                                />
+                            ))}
+                        </div>
+                        {totalPages > 1 && (
+                            <div className="flex justify-center items-center gap-4 py-8 mb-12 bg-black/40 rounded-xl border border-white/5">
+                                <button 
+                                    disabled={page === 1} 
+                                    onClick={() => setPage(page - 1)} 
+                                    className="ck-btn-primary bg-white/5 hover:bg-white/10 text-white px-6 h-10 disabled:opacity-20 disabled:cursor-not-allowed border-none shadow-none text-xs"
+                                >
+                                    {isRTL ? 'السابق' : 'Prev'}
+                                </button>
+                                <span className="text-white/50 text-xs font-mono font-bold px-4 tracking-widest">{page} / {totalPages}</span>
+                                <button 
+                                    disabled={page >= totalPages} 
+                                    onClick={() => setPage(page + 1)} 
+                                    className="ck-btn-primary bg-orange-500 hover:bg-orange-400 text-black px-6 h-10 disabled:opacity-20 disabled:cursor-not-allowed border-none shadow-none text-xs"
+                                >
+                                    {isRTL ? 'التالي' : 'Next'}
+                                </button>
+                            </div>
+                        )}
+                    </>
                 )}
             </AdminPageShell>
 

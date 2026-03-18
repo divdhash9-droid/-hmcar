@@ -370,21 +370,8 @@ router.post('/scrape', requireAuthAPI, requireAdmin, async (req, res) => {
                 const computedUsd = Number(((item.priceKrw / usdToKrw) * auctionMultiplier).toFixed(2));
                 const computedSar = Math.round(computedUsd * usdToSar);
 
-                // [[ARABIC_COMMENT]] معالجة الصور: تحميل وضغط أول 10 صور لضمان السرعة (البقية تظل روابط خارجية)
-                const imagesToProcess = (item.images || []).slice(0, 10);
-                const processedImages = [];
-                
-                for (const imgUrl of imagesToProcess) {
-                    try {
-                        const localPath = await downloadAndOptimize(imgUrl, 'showroom');
-                        processedImages.push(localPath);
-                    } catch (e) {
-                        processedImages.push(imgUrl);
-                    }
-                }
-                
-                // دمج الصور المعالجة مع الروابط الأصلية للبقية
-                const finalImagesList = [...processedImages, ...(item.images || []).slice(10)];
+                // [[ARABIC_COMMENT]] تخطي تحميل وتخزين الصور محلياً لتجنب انتهاء وقت دالة Serverless (Vercel Timeout)
+                const finalImagesList = item.images || [];
 
                 // التحقق من وجود السيارة مسبقاً
                 const existingCar = await Car.findOne({ externalUrl: item.encarUrl });

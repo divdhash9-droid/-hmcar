@@ -148,7 +148,9 @@ function CarsContent() {
             } else {
                 setImportStatus({ type: 'error', msg: scrapeRes.message || (isRTL ? 'تم حفظ الرابط لكن فشل الاستيراد' : 'Saved but import failed') });
             }
-        } catch { setImportStatus({ type: 'error', msg: isRTL ? 'فشل الاتصال بالخادم' : 'Server error' }); }
+        } catch (err: any) { 
+            setImportStatus({ type: 'error', msg: err?.message || (isRTL ? 'فشل الاتصال بالخادم' : 'Server error') }); 
+        }
         finally { setImportLoading(false); }
     };
 
@@ -164,7 +166,9 @@ function CarsContent() {
             } else {
                 setImportStatus({ type: 'error', msg: res.message || (isRTL ? 'فشل جلب السيارات' : 'Fetch failed') });
             }
-        } catch { setImportStatus({ type: 'error', msg: isRTL ? 'فشل الاتصال بالخادم' : 'Server error' }); }
+        } catch (err: any) { 
+            setImportStatus({ type: 'error', msg: err?.message || (isRTL ? 'فشل الاتصال بالخادم' : 'Server error') }); 
+        }
         finally { setImportLoading(false); }
     };
 

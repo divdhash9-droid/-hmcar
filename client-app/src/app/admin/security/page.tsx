@@ -5,13 +5,21 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     Shield, ShieldAlert, ShieldCheck, Lock, Unlock,
     Smartphone, Search, RefreshCw, History,
-    AlertTriangle, Server, X
+    AlertTriangle, Server, X, Laptop
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useLanguage } from '@/lib/LanguageContext';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/lib/ToastContext';
 import AdminPageShell from '@/components/AdminPageShell';
+
+function getDeviceType(ua?: string) {
+    if (!ua) return 'unknown';
+    const lower = ua.toLowerCase();
+    if (lower.includes('mobile') || lower.includes('android') || lower.includes('iphone')) return 'mobile';
+    if (lower.includes('tablet') || lower.includes('ipad')) return 'tablet';
+    return 'desktop';
+}
 
 interface SecurityDevice {
     _id: string;
@@ -53,7 +61,8 @@ export default function AdminSecurity() {
                         return dateB - dateA;
                     })
                     .filter((d: SecurityDevice) => {
-                        const key = d.deviceId || d.banCode || d.ip;
+                        const devType = getDeviceType(d.userAgent);
+                        const key = d.ip ? `${d.ip}-${devType}` : (d.deviceId || d.banCode);
                         if (!key || seen.has(key)) return false;
                         seen.add(key);
                         return true;
@@ -237,7 +246,7 @@ export default function AdminSecurity() {
                                     'w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border transition-all',
                                     device.banned ? 'bg-red-500/10 border-red-500/20 text-red-500 shadow-[0_0_15px_rgba(255,59,48,0.1)]' : 'bg-red-500/5 border-white/10 text-white/40'
                                 )}>
-                                    {device.banned ? <ShieldAlert className="w-6 h-6" /> : <Smartphone className="w-6 h-6" />}
+                                    {device.banned ? <ShieldAlert className="w-6 h-6" /> : (getDeviceType(device.userAgent) === 'mobile' ? <Smartphone className="w-6 h-6" /> : <Laptop className="w-6 h-6" />)}
                                 </div>
 
                                 <div className="flex-1 min-w-0">
@@ -248,6 +257,11 @@ export default function AdminSecurity() {
                                         {device.ip && <span className="ck-badge bg-white/5 text-white/40 border-white/10 font-mono text-[9px]">{device.ip}</span>}
                                         {device.banned && <span className="ck-badge ck-badge-danger text-[8px]">{isRTL ? 'محظور نأئياً' : 'HARD BANNED'}</span>}
                                         {device.exemptFromSecurity && <span className="ck-badge bg-green-500/10 text-green-400 border-green-500/20 text-[8px]">{isRTL ? 'مستثنى من الحماية' : 'SECURITY EXEMPT'}</span>}
+                                    </div>
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <span className="text-[10px] font-bold text-red-400">
+                                            {getDeviceType(device.userAgent) === 'mobile' ? 'هاتف محمول' : getDeviceType(device.userAgent) === 'desktop' ? 'لابتوب / كمبيوتر' : 'جهاز غير معروف'}
+                                        </span>
                                     </div>
                                     <p className="text-[10px] text-white/30 truncate max-w-2xl font-mono">
                                         {device.deviceInfo || device.userAgent || 'No hardware details available'}

@@ -57,16 +57,19 @@ router.post('/broadcast', requireAuthAPI, async (req, res) => {
 
     const { title, message, url } = req.body;
     
-    // إنشاء إشعار عام باستخدام AdvancedNotification
-    await AdvancedNotification.broadcast({
-      title,
-      message,
-      type: 'INFO',
-      priority: 'HIGH',
-      channels: ['IN_APP', 'PUSH'], // [[ARABIC_COMMENT]] الإرسال داخل التطبيق وكإشعار PWA
-      actionUrl: url || null,
-      actionText: url ? 'عرض التفاصيل' : null,
-      category: 'GENERAL'
+    const User = require('../../../models/User');
+    const users = await User.find({}).select('_id');
+
+    // إرسال الإشعار لجميع المستخدمين بشكل غير متزامن
+    users.forEach(u => {
+      UserNotification.createNotification({
+        user: u._id,
+        title,
+        message,
+        type: 'system',
+        actionUrl: url || null,
+        actionText: url ? 'عرض التفاصيل' : null
+      }).catch(e => console.error('Broadcast individual err:', e));
     });
 
     res.json({ success: true, message: 'Broadcast successful' });

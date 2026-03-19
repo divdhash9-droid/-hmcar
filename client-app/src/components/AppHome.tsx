@@ -9,7 +9,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { 
     Gavel, Car, ShoppingBag, 
-    Bell, User, ChevronRight, MessageCircle, Star, Send 
+    Bell, User, ChevronRight, MessageCircle, Star, Send, Wrench 
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -30,6 +30,7 @@ export default function AppHome({ isRTL, latestCars, formatPrice }: { isRTL: boo
         { href: '/gallery', labelAr: 'المعرض', labelEn: 'Showroom', icon: Car, color: 'bg-accent-gold/10 text-accent-gold border-accent-gold/20' },
         { href: '/parts', labelAr: 'قطع الغيار', labelEn: 'Parts Store', icon: ShoppingBag, color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
         { href: '/concierge', labelAr: 'طلب خاص', labelEn: 'Requests', icon: Send, color: 'bg-purple-500/10 text-purple-400 border-purple-500/20' },
+        { href: 'https://simulator.electude.com/simulator', labelAr: 'صيانة (محاكي)', labelEn: 'Maintenance', icon: Wrench, color: 'bg-red-500/10 text-red-400 border-red-500/20 col-span-2', external: true },
     ];
 
     const userProfileImage = (user as any)?.image || null;
@@ -77,17 +78,29 @@ export default function AppHome({ isRTL, latestCars, formatPrice }: { isRTL: boo
             <section className="grid grid-cols-2 gap-4">
                 {quickActions.map((action, i) => {
                     const Icon = action.icon;
+                    const content = (
+                        <motion.div 
+                            whileTap={{ scale: 0.95 }}
+                            className={`flex flex-col items-start gap-4 p-5 rounded-[2rem] border transition-all h-full ${action.color}`}
+                        >
+                            <Icon className="w-6 h-6" />
+                            <span className="text-xs font-black uppercase tracking-wider">
+                                {isRTL ? action.labelAr : action.labelEn}
+                            </span>
+                        </motion.div>
+                    );
+                    
+                    if (action.external) {
+                        return (
+                            <a key={i} href={action.href} target="_blank" rel="noopener noreferrer" className={action.color?.includes('col-span-2') ? 'col-span-2' : ''}>
+                                {content}
+                            </a>
+                        );
+                    }
+                    
                     return (
-                        <Link key={i} href={action.href}>
-                            <motion.div 
-                                whileTap={{ scale: 0.95 }}
-                                className={`flex flex-col items-start gap-4 p-5 rounded-[2rem] border transition-all ${action.color}`}
-                            >
-                                <Icon className="w-6 h-6" />
-                                <span className="text-xs font-black uppercase tracking-wider">
-                                    {isRTL ? action.labelAr : action.labelEn}
-                                </span>
-                            </motion.div>
+                        <Link key={i} href={action.href} className={action.color?.includes('col-span-2') ? 'col-span-2' : ''}>
+                            {content}
                         </Link>
                     );
                 })}

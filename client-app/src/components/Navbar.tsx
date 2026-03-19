@@ -12,7 +12,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     Menu, X, User, Languages,
     Headphones, MessageCircle,
-    Car, Gavel, ShoppingBag, Settings, ShoppingCart, Heart
+    Car, Gavel, ShoppingBag, Settings, ShoppingCart, Heart, Wrench
 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useLanguage } from '@/lib/LanguageContext';
@@ -75,6 +75,7 @@ export default function Navbar() {
         { href: '/concierge', label: isRTL ? 'طلبات خاصة' : 'REQUESTS', icon: Settings },
         { href: '/support', label: isRTL ? 'الدعم' : 'SUPPORT', icon: Headphones },
         { href: '/contact', label: isRTL ? 'تواصل' : 'CONTACT', icon: MessageCircle },
+        { href: 'https://simulator.electude.com/simulator', label: isRTL ? 'صيانة (محاكي)' : 'MAINTENANCE', icon: Wrench, external: true },
     ];
 
     const isActive = (href: string) => pathname === href;
@@ -241,18 +242,37 @@ export default function Navbar() {
                                         animate={{ opacity: 1, x: 0 }}
                                         transition={{ delay: i * 0.05 }}
                                     >
-                                        <Link
-                                            href={link.href}
-                                            className={cn(
-                                                "flex items-center gap-4 px-5 py-4 rounded-xl text-sm font-bold uppercase tracking-widest transition-all",
-                                                isActive(link.href)
-                                                    ? "bg-white/5 text-white border border-white/8"
-                                                    : "text-white/30 hover:text-white/60 hover:bg-white/2"
-                                            )}
-                                        >
-                                            <link.icon className="w-4.5 h-4.5" />
-                                            {link.label}
-                                        </Link>
+                                        {link.external ? (
+                                            <a
+                                                href={link.href}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className={cn(
+                                                    "flex items-center gap-4 px-5 py-4 rounded-xl text-sm font-bold uppercase tracking-widest transition-all",
+                                                    isActive(link.href)
+                                                        ? "bg-white/5 text-white border border-white/8"
+                                                        : "text-white/30 hover:text-white/60 hover:bg-white/2"
+                                                )}
+                                                onClick={() => setIsOpen(false)}
+                                            >
+                                                <link.icon className="w-4.5 h-4.5" />
+                                                {link.label}
+                                            </a>
+                                        ) : (
+                                            <Link
+                                                href={link.href}
+                                                className={cn(
+                                                    "flex items-center gap-4 px-5 py-4 rounded-xl text-sm font-bold uppercase tracking-widest transition-all",
+                                                    isActive(link.href)
+                                                        ? "bg-white/5 text-white border border-white/8"
+                                                        : "text-white/30 hover:text-white/60 hover:bg-white/2"
+                                                )}
+                                                onClick={() => setIsOpen(false)}
+                                            >
+                                                <link.icon className="w-4.5 h-4.5" />
+                                                {link.label}
+                                            </Link>
+                                        )}
                                     </motion.div>
                                 ))}
                             </div>

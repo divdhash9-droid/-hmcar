@@ -382,7 +382,6 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 body {
-  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -716,12 +715,9 @@ html {
 /* ── Prevent elastic scrolling on PWA ── */
 @media all and (display-mode: standalone) {
   html, body {
-    /* تم إصلاح التمرير (Scrolling) ليكون سلساً ولا يعلق */
-    overscroll-behavior-y: none; /* يمنع السحب للتحديث Pull-to-refresh الذي يزعج المستخدم */
+    /* تم إزالة القيود الصارمة للسماح بالتمرير الطبيعي (Scrolling) للأسفل والأعلى */
+    overscroll-behavior-y: auto; 
     -webkit-overflow-scrolling: touch;
-    height: auto;
-    min-height: 100vh;
-    overflow-x: hidden;
   }
   
   main, [role="main"] {
